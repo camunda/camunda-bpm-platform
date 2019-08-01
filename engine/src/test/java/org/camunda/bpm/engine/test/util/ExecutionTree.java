@@ -47,14 +47,15 @@ public class ExecutionTree implements Execution {
   }
 
   public static ExecutionTree forExecution(final String executionId, ProcessEngine processEngine) {
-    ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl)
-        processEngine.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) processEngine
+        .getProcessEngineConfiguration();
 
     CommandExecutor commandExecutor = configuration.getCommandExecutorTxRequired();
 
     ExecutionTree executionTree = commandExecutor.execute(new Command<ExecutionTree>() {
       public ExecutionTree execute(CommandContext commandContext) {
-        ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(executionId);
+        ExecutionEntity execution = commandContext.getExecutionManager()
+            .findExecutionById(executionId);
         return ExecutionTree.forExecution(execution);
       }
     });
@@ -86,8 +87,7 @@ public class ExecutionTree implements Execution {
           if (activityId.equals(child.getActivityId())) {
             executions.add(child);
           }
-        }
-        else {
+        } else {
           executions.addAll(child.getLeafExecutions(activityId));
         }
       }

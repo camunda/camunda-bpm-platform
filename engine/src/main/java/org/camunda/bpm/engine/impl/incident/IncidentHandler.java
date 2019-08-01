@@ -19,9 +19,8 @@ package org.camunda.bpm.engine.impl.incident;
 import org.camunda.bpm.engine.runtime.Incident;
 
 /**
- * The {@link IncidentHandler} interface may be implemented by components
- * that handle and resolve incidents of a specific type that occur during the
- * execution of a process instance.
+ * The {@link IncidentHandler} interface may be implemented by components that handle and resolve
+ * incidents of a specific type that occur during the execution of a process instance.
  *
  * <p>
  *
@@ -46,18 +45,17 @@ public interface IncidentHandler {
   public Incident handleIncident(IncidentContext context, String message);
 
   /**
-   * Called in situations in which an incidenthandler may wich to resolve existing incidents
-   * The implementation receives this callback to enable it to resolve any open incidents that
-   * may exist.
+   * Called in situations in which an incidenthandler may wich to resolve existing incidents The
+   * implementation receives this callback to enable it to resolve any open incidents that may
+   * exist.
    */
   public void resolveIncident(IncidentContext context);
 
   /**
-   * Called in situations in which an incidenthandler may wich to delete existing incidents
-   * Example: when a scope is ended or a job is deleted. The implementation receives
-   * this callback to enable it to delete any open incidents that may exist.
+   * Called in situations in which an incidenthandler may wich to delete existing incidents Example:
+   * when a scope is ended or a job is deleted. The implementation receives this callback to enable
+   * it to delete any open incidents that may exist.
    */
   public void deleteIncident(IncidentContext context);
 
 }
- 

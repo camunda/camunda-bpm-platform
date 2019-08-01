@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.task.Attachment;
 
-
 /**
  * @author kristin.polenz@camunda.com
  */
@@ -39,9 +38,8 @@ public class GetTaskAttachmentCmd implements Command<Attachment>, Serializable {
   }
 
   public Attachment execute(CommandContext commandContext) {
-    return commandContext
-      .getAttachmentManager()
-      .findAttachmentByTaskIdAndAttachmentId(taskId, attachmentId);
+    return commandContext.getAttachmentManager().findAttachmentByTaskIdAndAttachmentId(taskId,
+        attachmentId);
   }
 
 }

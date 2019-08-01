@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -32,7 +31,8 @@ public class AbstractHistoricManager extends AbstractManager {
   protected HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
 
   protected boolean isHistoryEnabled = !historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE);
-  protected boolean isHistoryLevelFullEnabled = historyLevel.equals(HistoryLevel.HISTORY_LEVEL_FULL);
+  protected boolean isHistoryLevelFullEnabled = historyLevel
+      .equals(HistoryLevel.HISTORY_LEVEL_FULL);
 
   protected void checkHistoryEnabled() {
     if (!isHistoryEnabled) {

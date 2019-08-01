@@ -48,9 +48,12 @@ public abstract class AbstractExecutionListenerSpec {
     this.fieldSpecs = new ArrayList<FieldSpec>();
   }
 
-  public void addListenerToElement(CmmnModelInstance modelInstance, CmmnModelElementInstance modelElement) {
-    ExtensionElements extensionElements = SpecUtil.createElement(modelInstance, modelElement, null, ExtensionElements.class);
-    CamundaCaseExecutionListener caseExecutionListener = SpecUtil.createElement(modelInstance, extensionElements, null, CamundaCaseExecutionListener.class);
+  public void addListenerToElement(CmmnModelInstance modelInstance,
+      CmmnModelElementInstance modelElement) {
+    ExtensionElements extensionElements = SpecUtil.createElement(modelInstance, modelElement, null,
+        ExtensionElements.class);
+    CamundaCaseExecutionListener caseExecutionListener = SpecUtil.createElement(modelInstance,
+        extensionElements, null, CamundaCaseExecutionListener.class);
 
     if (!ANY_EVENT.equals(eventNameToRegisterOn)) {
       caseExecutionListener.setCamundaEvent(eventNameToRegisterOn);
@@ -63,20 +66,23 @@ public abstract class AbstractExecutionListenerSpec {
     }
   }
 
-  protected abstract void configureCaseExecutionListener(CmmnModelInstance modelInstance, CamundaCaseExecutionListener listener);
+  protected abstract void configureCaseExecutionListener(CmmnModelInstance modelInstance,
+      CamundaCaseExecutionListener listener);
 
   public void verify(CmmnActivity activity) {
 
     assertEquals(expectedRegisteredEvents.size(), activity.getListeners().size());
 
     for (String expectedRegisteredEvent : expectedRegisteredEvents) {
-      List<DelegateListener<? extends BaseDelegateExecution>> listeners = activity.getListeners(expectedRegisteredEvent);
+      List<DelegateListener<? extends BaseDelegateExecution>> listeners = activity
+          .getListeners(expectedRegisteredEvent);
       assertEquals(1, listeners.size());
       verifyListener(listeners.get(0));
     }
   }
 
-  protected abstract void verifyListener(DelegateListener<? extends BaseDelegateExecution> listener);
+  protected abstract void verifyListener(
+      DelegateListener<? extends BaseDelegateExecution> listener);
 
   public AbstractExecutionListenerSpec expectRegistrationFor(List<String> events) {
     expectedRegisteredEvents = new HashSet<String>(events);
@@ -88,7 +94,8 @@ public abstract class AbstractExecutionListenerSpec {
     return this;
   }
 
-  public AbstractExecutionListenerSpec withFieldChildExpression(String fieldName, String expression) {
+  public AbstractExecutionListenerSpec withFieldChildExpression(String fieldName,
+      String expression) {
     fieldSpecs.add(new FieldSpec(fieldName, null, expression, null, null));
     return this;
   }

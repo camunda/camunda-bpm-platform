@@ -92,15 +92,11 @@ public class FilterQueryImpl extends AbstractQuery<FilterQuery, Filter> implemen
   }
 
   public List<Filter> executeList(CommandContext commandContext, Page page) {
-    return commandContext
-      .getFilterManager()
-      .findFiltersByQueryCriteria(this);
+    return commandContext.getFilterManager().findFiltersByQueryCriteria(this);
   }
 
   public long executeCount(CommandContext commandContext) {
-    return commandContext
-      .getFilterManager()
-      .findFilterCountByQueryCriteria(this);
+    return commandContext.getFilterManager().findFilterCountByQueryCriteria(this);
   }
 
 }

@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.history;
 
-
 public interface ExternalTaskState {
 
   ExternalTaskState CREATED = new ExternalTaskStateImpl(0, "created");

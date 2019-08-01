@@ -50,7 +50,8 @@ public class DatabaseHistoryPropertyAutoTest {
     return config("false", historyLevel);
   }
 
-  private static ProcessEngineConfigurationImpl config(final String schemaUpdate, final String historyLevel) {
+  private static ProcessEngineConfigurationImpl config(final String schemaUpdate,
+      final String historyLevel) {
     StandaloneInMemProcessEngineConfiguration engineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     engineConfiguration.setProcessEngineName(UUID.randomUUID().toString());
     engineConfiguration.setDatabaseSchemaUpdate(schemaUpdate);
@@ -61,13 +62,13 @@ public class DatabaseHistoryPropertyAutoTest {
     return engineConfiguration;
   }
 
-
   @Test
   public void failWhenSecondEngineDoesNotHaveTheSameHistoryLevel() {
     buildEngine(config("true", ProcessEngineConfiguration.HISTORY_FULL));
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyLevel mismatch: configuration says HistoryLevelAudit(name=audit, id=2) and database says HistoryLevelFull(name=full, id=3)");
+    thrown.expectMessage(
+        "historyLevel mismatch: configuration says HistoryLevelAudit(name=audit, id=2) and database says HistoryLevelFull(name=full, id=3)");
 
     buildEngine(config(ProcessEngineConfiguration.HISTORY_AUDIT));
   }
@@ -78,29 +79,35 @@ public class DatabaseHistoryPropertyAutoTest {
     buildEngine(config("true", ProcessEngineConfiguration.HISTORY_FULL));
 
     // when
-    ProcessEngineImpl processEngineTwo = buildEngine(config("true", ProcessEngineConfiguration.HISTORY_AUTO));
+    ProcessEngineImpl processEngineTwo = buildEngine(
+        config("true", ProcessEngineConfiguration.HISTORY_AUTO));
 
     // then
-    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistory(), is(ProcessEngineConfiguration.HISTORY_AUTO));
-    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistoryLevel(), is(HistoryLevel.HISTORY_LEVEL_FULL));
+    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistory(),
+        is(ProcessEngineConfiguration.HISTORY_AUTO));
+    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistoryLevel(),
+        is(HistoryLevel.HISTORY_LEVEL_FULL));
 
   }
 
   @Test
   public void usesDefaultValueAuditWhenNoValueIsConfigured() {
-    final ProcessEngineConfigurationImpl config = config("true", ProcessEngineConfiguration.HISTORY_AUTO);
+    final ProcessEngineConfigurationImpl config = config("true",
+        ProcessEngineConfiguration.HISTORY_AUTO);
     ProcessEngineImpl processEngine = buildEngine(config);
 
-    final Integer level = config.getCommandExecutorSchemaOperations().execute(new Command<Integer>() {
-      @Override
-      public Integer execute(CommandContext commandContext) {
-        return HistoryLevelSetupCommand.databaseHistoryLevel(commandContext);
-      }
-    });
+    final Integer level = config.getCommandExecutorSchemaOperations()
+        .execute(new Command<Integer>() {
+          @Override
+          public Integer execute(CommandContext commandContext) {
+            return HistoryLevelSetupCommand.databaseHistoryLevel(commandContext);
+          }
+        });
 
     assertThat(level, equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT.getId()));
 
-    assertThat(processEngine.getProcessEngineConfiguration().getHistoryLevel(), equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
+    assertThat(processEngine.getProcessEngineConfiguration().getHistoryLevel(),
+        equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
   }
 
   @After

@@ -34,7 +34,7 @@ public class MultiTenancyFilterServiceTest extends PluggableProcessEngineTestCas
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
-  protected static final String[] TENANT_IDS = new String[] {TENANT_ONE, TENANT_TWO};
+  protected static final String[] TENANT_IDS = new String[] { TENANT_ONE, TENANT_TWO };
 
   protected String filterId = null;
   protected final List<String> taskIds = new ArrayList<String>();
@@ -193,7 +193,7 @@ public class MultiTenancyFilterServiceTest extends PluggableProcessEngineTestCas
     Task newTask = taskService.newTask();
     newTask.setName("testTask");
 
-    if(tenantId != null) {
+    if (tenantId != null) {
       newTask.setTenantId(tenantId);
     }
 
@@ -213,7 +213,7 @@ public class MultiTenancyFilterServiceTest extends PluggableProcessEngineTestCas
   protected void tearDown() throws Exception {
     filterService.deleteFilter(filterId);
     identityService.clearAuthentication();
-    for(String taskId : taskIds) {
+    for (String taskId : taskIds) {
       taskService.deleteTask(taskId, true);
     }
   }

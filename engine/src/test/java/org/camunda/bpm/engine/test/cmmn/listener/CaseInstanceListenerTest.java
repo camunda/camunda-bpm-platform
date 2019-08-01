@@ -27,19 +27,16 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByClass.cmmn" })
   public void testCreateListenerByClass() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -47,24 +44,22 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("create").singleResult().getValue());
     assertEquals(1, query.variableName("createEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("createOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("createOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByDelegateExpression.cmmn" })
   public void testCreateListenerByDelegateExpression() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myListener", new MySpecialCaseExecutionListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MySpecialCaseExecutionListener()).create().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -72,24 +67,22 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("create").singleResult().getValue());
     assertEquals(1, query.variableName("createEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("createOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("createOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByExpression.cmmn" })
   public void testCreateListenerByExpression() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myListener", new MyCaseExecutionListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MyCaseExecutionListener()).create().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -97,23 +90,21 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("create").singleResult().getValue());
     assertEquals(1, query.variableName("createEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("createOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("createOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCreateListenerByScript.cmmn" })
   public void testCreateListenerByScript() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -121,26 +112,22 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("create").singleResult().getValue());
     assertEquals(1, query.variableName("createEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("createOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("createOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByClass.cmmn" })
   public void testCompleteListenerByClass() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // when
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -148,27 +135,23 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("complete").singleResult().getValue());
     assertEquals(1, query.variableName("completeEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("completeOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("completeOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByDelegateExpression.cmmn" })
   public void testCompleteListenerByDelegateExpression() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new MySpecialCaseExecutionListener())
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MySpecialCaseExecutionListener()).create().getId();
 
     // when
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -176,27 +159,23 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("complete").singleResult().getValue());
     assertEquals(1, query.variableName("completeEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("completeOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("completeOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByExpression.cmmn" })
   public void testCompleteListenerByExpression() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new MyCaseExecutionListener())
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MyCaseExecutionListener()).create().getId();
 
     // when
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -204,26 +183,22 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("complete").singleResult().getValue());
     assertEquals(1, query.variableName("completeEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("completeOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("completeOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCompleteListenerByScript.cmmn" })
   public void testCompleteListenerByScript() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // when
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -231,24 +206,22 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("complete").singleResult().getValue());
     assertEquals(1, query.variableName("completeEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("completeOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("completeOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByClass.cmmn" })
   public void testTerminateListenerByClass() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // when
     terminate(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -256,25 +229,23 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("terminate").singleResult().getValue());
     assertEquals(1, query.variableName("terminateEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByDelegateExpression.cmmn" })
   public void testTerminateListenerByDelegateExpression() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new MySpecialCaseExecutionListener())
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MySpecialCaseExecutionListener()).create().getId();
 
     // when
     terminate(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -282,25 +253,23 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("terminate").singleResult().getValue());
     assertEquals(1, query.variableName("terminateEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByExpression.cmmn" })
   public void testTerminateListenerByExpression() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new MyCaseExecutionListener())
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MyCaseExecutionListener()).create().getId();
 
     // when
     terminate(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -308,24 +277,22 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("terminate").singleResult().getValue());
     assertEquals(1, query.variableName("terminateEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testTerminateListenerByScript.cmmn" })
   public void testTerminateListenerByScript() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // when
     terminate(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -333,24 +300,22 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("terminate").singleResult().getValue());
     assertEquals(1, query.variableName("terminateEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByClass.cmmn" })
   public void testSuspendListenerByClass() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // when
     suspend(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -358,25 +323,23 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("suspend").singleResult().getValue());
     assertEquals(1, query.variableName("suspendEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByDelegateExpression.cmmn" })
   public void testSuspendListenerByDelegateExpression() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new MySpecialCaseExecutionListener())
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MySpecialCaseExecutionListener()).create().getId();
 
     // when
     suspend(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -384,25 +347,23 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("suspend").singleResult().getValue());
     assertEquals(1, query.variableName("suspendEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByExpression.cmmn" })
   public void testSuspendListenerByExpression() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new MyCaseExecutionListener())
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MyCaseExecutionListener()).create().getId();
 
     // when
     suspend(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -410,24 +371,22 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("suspend").singleResult().getValue());
     assertEquals(1, query.variableName("suspendEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testSuspendListenerByScript.cmmn" })
   public void testSuspendListenerByScript() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // when
     suspend(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -435,28 +394,24 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("suspend").singleResult().getValue());
     assertEquals(1, query.variableName("suspendEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByClass.cmmn" })
   public void testReActivateListenerByClass() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     // when
     reactivate(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -464,18 +419,17 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("reactivate").singleResult().getValue());
     assertEquals(1, query.variableName("reactivateEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByDelegateExpression.cmmn" })
   public void testReActivateListenerByDelegateExpression() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new MySpecialCaseExecutionListener())
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MySpecialCaseExecutionListener()).create().getId();
 
     terminate(caseInstanceId);
 
@@ -483,8 +437,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     reactivate(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -492,18 +445,17 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("reactivate").singleResult().getValue());
     assertEquals(1, query.variableName("reactivateEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByExpression.cmmn" })
   public void testReActivateListenerByExpression() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new MyCaseExecutionListener())
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MyCaseExecutionListener()).create().getId();
 
     suspend(caseInstanceId);
 
@@ -511,8 +463,7 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     reactivate(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -520,28 +471,24 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("reactivate").singleResult().getValue());
     assertEquals(1, query.variableName("reactivateEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testReActivateListenerByScript.cmmn" })
   public void testReActivateListenerByScript() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     // when
     reactivate(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -549,11 +496,13 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertTrue((Boolean) query.variableName("reactivate").singleResult().getValue());
     assertEquals(1, query.variableName("reactivateEventCounter").singleResult().getValue());
     assertEquals(1, query.variableName("eventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByClass.cmmn" })
   public void testCloseListenerByClass() {
     CloseCaseExecutionListener.clear();
 
@@ -562,19 +511,12 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertNull(CloseCaseExecutionListener.ON_CASE_EXECUTION_ID);
 
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     // when
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .close();
+    caseService.withCaseExecution(caseInstanceId).close();
 
     // then
     assertEquals("close", CloseCaseExecutionListener.EVENT);
@@ -583,7 +525,8 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByDelegateExpression.cmmn" })
   public void testCloseListenerByDelegateExpression() {
     CloseCaseExecutionListener.clear();
 
@@ -592,18 +535,13 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertNull(CloseCaseExecutionListener.ON_CASE_EXECUTION_ID);
 
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new CloseCaseExecutionListener())
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new CloseCaseExecutionListener()).create().getId();
 
     terminate(caseInstanceId);
 
     // when
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .close();
+    caseService.withCaseExecution(caseInstanceId).close();
 
     // then
     assertEquals("close", CloseCaseExecutionListener.EVENT);
@@ -612,7 +550,8 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByExpression.cmmn" })
   public void testCloseListenerByExpression() {
     CloseCaseExecutionListener.clear();
 
@@ -621,18 +560,13 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     assertNull(CloseCaseExecutionListener.ON_CASE_EXECUTION_ID);
 
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new CloseCaseExecutionListener())
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new CloseCaseExecutionListener()).create().getId();
 
     suspend(caseInstanceId);
 
     // when
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .close();
+    caseService.withCaseExecution(caseInstanceId).close();
 
     // then
     assertEquals("close", CloseCaseExecutionListener.EVENT);
@@ -641,41 +575,31 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testCloseListenerByScript.cmmn" })
   public void testCloseListenerByScript() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     // when
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .close();
+    caseService.withCaseExecution(caseInstanceId).close();
 
     // then
     // TODO: if history is provided, the historic variables have to be checked!
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByClass.cmmn" })
   public void testAllListenerByClass() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     reactivate(caseInstanceId);
 
@@ -686,50 +610,50 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     suspend(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(16, query.count());
 
     assertTrue((Boolean) query.variableName("create").singleResult().getValue());
     assertEquals(1, query.variableName("createEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("createOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("createOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("complete").singleResult().getValue());
     assertEquals(1, query.variableName("completeEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("completeOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("completeOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("terminate").singleResult().getValue());
     assertEquals(1, query.variableName("terminateEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("suspend").singleResult().getValue());
     assertEquals(1, query.variableName("suspendEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("reactivate").singleResult().getValue());
     assertEquals(2, query.variableName("reactivateEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
 
     assertEquals(6, query.variableName("eventCounter").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByDelegateExpression.cmmn" })
   public void testAllListenerByDelegateExpression() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myListener", new MySpecialCaseExecutionListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MySpecialCaseExecutionListener()).create().getId();
 
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     reactivate(caseInstanceId);
 
@@ -740,50 +664,50 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     suspend(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(17, query.count());
 
     assertTrue((Boolean) query.variableName("create").singleResult().getValue());
     assertEquals(1, query.variableName("createEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("createOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("createOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("complete").singleResult().getValue());
     assertEquals(1, query.variableName("completeEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("completeOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("completeOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("terminate").singleResult().getValue());
     assertEquals(1, query.variableName("terminateEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("suspend").singleResult().getValue());
     assertEquals(1, query.variableName("suspendEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("reactivate").singleResult().getValue());
     assertEquals(2, query.variableName("reactivateEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
 
     assertEquals(6, query.variableName("eventCounter").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByExpression.cmmn" })
   public void testAllListenerByExpression() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myListener", new MyCaseExecutionListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new MyCaseExecutionListener()).create().getId();
 
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     reactivate(caseInstanceId);
 
@@ -794,49 +718,49 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     suspend(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(17, query.count());
 
     assertTrue((Boolean) query.variableName("create").singleResult().getValue());
     assertEquals(1, query.variableName("createEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("createOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("createOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("complete").singleResult().getValue());
     assertEquals(1, query.variableName("completeEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("completeOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("completeOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("terminate").singleResult().getValue());
     assertEquals(1, query.variableName("terminateEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("suspend").singleResult().getValue());
     assertEquals(1, query.variableName("suspendEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("reactivate").singleResult().getValue());
     assertEquals(2, query.variableName("reactivateEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
 
     assertEquals(6, query.variableName("eventCounter").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testAllListenerByScript.cmmn" })
   public void testAllListenerByScript() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     reactivate(caseInstanceId);
 
@@ -847,49 +771,50 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
     suspend(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(16, query.count());
 
     assertTrue((Boolean) query.variableName("create").singleResult().getValue());
     assertEquals(1, query.variableName("createEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("createOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("createOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("complete").singleResult().getValue());
     assertEquals(1, query.variableName("completeEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("completeOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("completeOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("terminate").singleResult().getValue());
     assertEquals(1, query.variableName("terminateEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("suspend").singleResult().getValue());
     assertEquals(1, query.variableName("suspendEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("suspendOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("reactivate").singleResult().getValue());
     assertEquals(2, query.variableName("reactivateEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("reactivateOnCaseExecutionId").singleResult().getValue());
 
     assertEquals(6, query.variableName("eventCounter").singleResult().getValue());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testFieldInjectionByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testFieldInjectionByClass.cmmn" })
   public void testFieldInjectionByClass() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -901,20 +826,17 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testFieldInjectionByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testFieldInjectionByDelegateExpression.cmmn" })
   public void testFieldInjectionByDelegateExpression() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myListener", new FieldInjectionCaseExecutionListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myListener", new FieldInjectionCaseExecutionListener()).create().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -928,93 +850,90 @@ public class CaseInstanceListenerTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testListenerByScriptResource.cmmn",
-      "org/camunda/bpm/engine/test/cmmn/listener/caseExecutionListener.groovy"
-      })
+      "org/camunda/bpm/engine/test/cmmn/listener/caseExecutionListener.groovy" })
   public void testListenerByScriptResource() {
     // given
 
     // when
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    caseService
-      .withCaseExecution(caseInstanceId)
-      .complete();
+    caseService.withCaseExecution(caseInstanceId).complete();
 
     reactivate(caseInstanceId);
 
     terminate(caseInstanceId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(10, query.count());
 
     assertTrue((Boolean) query.variableName("create").singleResult().getValue());
     assertEquals(1, query.variableName("createEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("createOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("createOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("complete").singleResult().getValue());
     assertEquals(1, query.variableName("completeEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("completeOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("completeOnCaseExecutionId").singleResult().getValue());
 
     assertTrue((Boolean) query.variableName("terminate").singleResult().getValue());
     assertEquals(1, query.variableName("terminateEventCounter").singleResult().getValue());
-    assertEquals(caseInstanceId, query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
+    assertEquals(caseInstanceId,
+        query.variableName("terminateOnCaseExecutionId").singleResult().getValue());
 
     assertEquals(3, query.variableName("eventCounter").singleResult().getValue());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testDoesNotImplementCaseExecutionListenerInterfaceByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testDoesNotImplementCaseExecutionListenerInterfaceByClass.cmmn" })
   public void testDoesNotImplementCaseExecutionListenerInterfaceByClass() {
     // given
 
-
     try {
       // when
-      caseService
-        .withCaseDefinitionByKey("case")
-        .create();
+      caseService.withCaseDefinitionByKey("case").create();
     } catch (Exception e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("ENGINE-05016 Class 'org.camunda.bpm.engine.test.cmmn.listener.NotCaseExecutionListener' doesn't implement '"+CaseExecutionListener.class.getName() + "'", message);
+      assertTextPresent(
+          "ENGINE-05016 Class 'org.camunda.bpm.engine.test.cmmn.listener.NotCaseExecutionListener' doesn't implement '"
+              + CaseExecutionListener.class.getName() + "'",
+          message);
     }
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testDoesNotImplementCaseExecutionListenerInterfaceByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testDoesNotImplementCaseExecutionListenerInterfaceByDelegateExpression.cmmn" })
   public void testDoesNotImplementCaseExecutionListenerInterfaceByDelegateExpression() {
     // given
 
     try {
       // when
-      caseService
-        .withCaseDefinitionByKey("case")
-        .setVariable("myListener", new NotCaseExecutionListener())
-        .create();
+      caseService.withCaseDefinitionByKey("case")
+          .setVariable("myListener", new NotCaseExecutionListener()).create();
     } catch (Exception e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("Delegate expression ${myListener} did not resolve to an implementation of interface "+CaseExecutionListener.class.getName(), message);
+      assertTextPresent(
+          "Delegate expression ${myListener} did not resolve to an implementation of interface "
+              + CaseExecutionListener.class.getName(),
+          message);
     }
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testListenerDoesNotExist.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/listener/CaseInstanceListenerTest.testListenerDoesNotExist.cmmn" })
   public void testListenerDoesNotExist() {
     // given
 
     try {
       // when
-      caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+      caseService.withCaseDefinitionByKey("case").create().getId();
     } catch (Exception e) {
       // then
       String message = e.getMessage();

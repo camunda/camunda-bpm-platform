@@ -30,12 +30,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
 import java.util.List;
 
-
 /**
  * @author Askar Akhmerov
  */
 public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesBatchConfiguration> {
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_SET_JOB_RETRIES);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(
+      Batch.TYPE_SET_JOB_RETRIES);
 
   @Override
   public String getType() {
@@ -52,24 +52,26 @@ public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesB
   }
 
   @Override
-  protected SetRetriesBatchConfiguration createJobConfiguration(SetRetriesBatchConfiguration configuration, List<String> jobIds) {
+  protected SetRetriesBatchConfiguration createJobConfiguration(
+      SetRetriesBatchConfiguration configuration, List<String> jobIds) {
     return new SetRetriesBatchConfiguration(jobIds, configuration.getRetries());
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
+  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
+    ByteArrayEntity configurationEntity = commandContext.getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    SetRetriesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    SetRetriesBatchConfiguration batchConfiguration = readConfiguration(
+        configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
+    boolean initialLegacyRestrictions = commandContext
+        .isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();
     commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
     try {
-      commandContext.getProcessEngineConfiguration()
-          .getManagementService()
+      commandContext.getProcessEngineConfiguration().getManagementService()
           .setJobRetries(batchConfiguration.getIds(), batchConfiguration.getRetries());
     } finally {
       commandContext.enableUserOperationLog();

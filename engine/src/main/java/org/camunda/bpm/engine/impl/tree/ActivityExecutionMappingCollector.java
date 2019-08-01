@@ -26,7 +26,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * Collect the mappings of scopes and executions. It can be used to collect the mappings over process instances.
+ * Collect the mappings of scopes and executions. It can be used to collect the mappings over
+ * process instances.
  *
  * @see ActivityExecution#createActivityExecutionMapping()
  *
@@ -56,7 +57,8 @@ public class ActivityExecutionMappingCollector implements TreeVisitor<ActivityEx
   }
 
   private void appendActivityExecutionMapping(ActivityExecution execution) {
-    if (execution.getActivity() != null && !LegacyBehavior.hasInvalidIntermediaryActivityId((PvmExecutionImpl) execution)) {
+    if (execution.getActivity() != null
+        && !LegacyBehavior.hasInvalidIntermediaryActivityId((PvmExecutionImpl) execution)) {
       activityExecutionMapping.putAll(execution.createActivityExecutionMapping());
     }
   }

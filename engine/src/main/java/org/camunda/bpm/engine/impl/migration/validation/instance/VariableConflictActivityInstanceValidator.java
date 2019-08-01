@@ -28,15 +28,18 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 /**
- * Validates that when an activity instance has a variable with the same name twice (as a scope execution variable and a
- * a concurrent variable parent execution variable), no situation occurs in which either one is overwritten.
+ * Validates that when an activity instance has a variable with the same name twice (as a scope
+ * execution variable and a a concurrent variable parent execution variable), no situation occurs in
+ * which either one is overwritten.
  *
  * @author Thorben Lindhauer
  */
-public class VariableConflictActivityInstanceValidator implements MigratingActivityInstanceValidator {
+public class VariableConflictActivityInstanceValidator
+    implements MigratingActivityInstanceValidator {
 
   @Override
-  public void validate(MigratingActivityInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+  public void validate(MigratingActivityInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
       MigratingActivityInstanceValidationReportImpl instanceReport) {
 
     ScopeImpl sourceScope = migratingInstance.getSourceScope();
@@ -45,11 +48,12 @@ public class VariableConflictActivityInstanceValidator implements MigratingActiv
     if (migratingInstance.migrates()) {
       boolean becomesNonScope = sourceScope.isScope() && !targetScope.isScope();
       if (becomesNonScope) {
-        Map<String, List<MigratingVariableInstance>> dependentVariablesByName = getMigratingVariableInstancesByName(migratingInstance);
+        Map<String, List<MigratingVariableInstance>> dependentVariablesByName = getMigratingVariableInstancesByName(
+            migratingInstance);
         for (String variableName : dependentVariablesByName.keySet()) {
           if (dependentVariablesByName.get(variableName).size() > 1) {
-            instanceReport.addFailure("The variable '" + variableName + "' exists in both, this scope and "
-                + "concurrent local in the parent scope. "
+            instanceReport.addFailure("The variable '" + variableName
+                + "' exists in both, this scope and " + "concurrent local in the parent scope. "
                 + "Migrating to a non-scope activity would overwrite one of them.");
           }
         }
@@ -57,13 +61,15 @@ public class VariableConflictActivityInstanceValidator implements MigratingActiv
     }
   }
 
-  protected Map<String, List<MigratingVariableInstance>> getMigratingVariableInstancesByName(MigratingActivityInstance activityInstance) {
+  protected Map<String, List<MigratingVariableInstance>> getMigratingVariableInstancesByName(
+      MigratingActivityInstance activityInstance) {
     Map<String, List<MigratingVariableInstance>> result = new HashMap<String, List<MigratingVariableInstance>>();
 
     for (MigratingInstance migratingInstance : activityInstance.getMigratingDependentInstances()) {
       if (migratingInstance instanceof MigratingVariableInstance) {
         MigratingVariableInstance migratingVariableInstance = (MigratingVariableInstance) migratingInstance;
-        CollectionUtil.addToMapOfLists(result, migratingVariableInstance.getVariableName(), migratingVariableInstance);
+        CollectionUtil.addToMapOfLists(result, migratingVariableInstance.getVariableName(),
+            migratingVariableInstance);
       }
     }
 

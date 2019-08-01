@@ -94,7 +94,8 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return new DeploymentBuilderImpl(this);
   }
 
-  public ProcessApplicationDeploymentBuilder createDeployment(ProcessApplicationReference processApplication) {
+  public ProcessApplicationDeploymentBuilder createDeployment(
+      ProcessApplicationReference processApplication) {
     return new ProcessApplicationDeploymentBuilderImpl(this, processApplication);
   }
 
@@ -115,12 +116,15 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners) {
-    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, skipCustomListeners, false));
+    commandExecutor
+        .execute(new DeleteDeploymentCmd(deploymentId, cascade, skipCustomListeners, false));
   }
 
   @Override
-  public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
-    commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade, skipCustomListeners, skipIoMappings));
+  public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners,
+      boolean skipIoMappings) {
+    commandExecutor.execute(
+        new DeleteDeploymentCmd(deploymentId, cascade, skipCustomListeners, skipIoMappings));
   }
 
   @Override
@@ -134,12 +138,14 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   @Override
-  public void deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners) {
+  public void deleteProcessDefinition(String processDefinitionId, boolean cascade,
+      boolean skipCustomListeners) {
     deleteProcessDefinition(processDefinitionId, cascade, skipCustomListeners, false);
   }
 
   @Override
-  public void deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
+  public void deleteProcessDefinition(String processDefinitionId, boolean cascade,
+      boolean skipCustomListeners, boolean skipIoMappings) {
     DeleteProcessDefinitionsBuilder builder = deleteProcessDefinitions().byIds(processDefinitionId);
 
     if (cascade) {
@@ -209,75 +215,66 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public void suspendProcessDefinitionById(String processDefinitionId) {
-    updateProcessDefinitionSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .suspend();
+    updateProcessDefinitionSuspensionState().byProcessDefinitionId(processDefinitionId).suspend();
   }
 
-  public void suspendProcessDefinitionById(String processDefinitionId, boolean suspendProcessInstances, Date suspensionDate) {
-    updateProcessDefinitionSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .includeProcessInstances(suspendProcessInstances)
-      .executionDate(suspensionDate)
-      .suspend();
+  public void suspendProcessDefinitionById(String processDefinitionId,
+      boolean suspendProcessInstances, Date suspensionDate) {
+    updateProcessDefinitionSuspensionState().byProcessDefinitionId(processDefinitionId)
+        .includeProcessInstances(suspendProcessInstances).executionDate(suspensionDate).suspend();
   }
 
   public void suspendProcessDefinitionByKey(String processDefinitionKey) {
-    updateProcessDefinitionSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .suspend();
+    updateProcessDefinitionSuspensionState().byProcessDefinitionKey(processDefinitionKey).suspend();
   }
 
-  public void suspendProcessDefinitionByKey(String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate) {
-    updateProcessDefinitionSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .includeProcessInstances(suspendProcessInstances)
-      .executionDate(suspensionDate)
-      .suspend();
+  public void suspendProcessDefinitionByKey(String processDefinitionKey,
+      boolean suspendProcessInstances, Date suspensionDate) {
+    updateProcessDefinitionSuspensionState().byProcessDefinitionKey(processDefinitionKey)
+        .includeProcessInstances(suspendProcessInstances).executionDate(suspensionDate).suspend();
   }
 
   public void activateProcessDefinitionById(String processDefinitionId) {
-    updateProcessDefinitionSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .activate();
+    updateProcessDefinitionSuspensionState().byProcessDefinitionId(processDefinitionId).activate();
   }
 
-  public void activateProcessDefinitionById(String processDefinitionId, boolean activateProcessInstances, Date activationDate) {
-    updateProcessDefinitionSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .includeProcessInstances(activateProcessInstances)
-      .executionDate(activationDate)
-      .activate();
+  public void activateProcessDefinitionById(String processDefinitionId,
+      boolean activateProcessInstances, Date activationDate) {
+    updateProcessDefinitionSuspensionState().byProcessDefinitionId(processDefinitionId)
+        .includeProcessInstances(activateProcessInstances).executionDate(activationDate).activate();
   }
 
   public void activateProcessDefinitionByKey(String processDefinitionKey) {
-    updateProcessDefinitionSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .activate();
+    updateProcessDefinitionSuspensionState().byProcessDefinitionKey(processDefinitionKey)
+        .activate();
   }
 
-  public void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances, Date activationDate) {
-    updateProcessDefinitionSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .includeProcessInstances(activateProcessInstances)
-      .executionDate(activationDate)
-      .activate();
+  public void activateProcessDefinitionByKey(String processDefinitionKey,
+      boolean activateProcessInstances, Date activationDate) {
+    updateProcessDefinitionSuspensionState().byProcessDefinitionKey(processDefinitionKey)
+        .includeProcessInstances(activateProcessInstances).executionDate(activationDate).activate();
   }
 
   public UpdateProcessDefinitionSuspensionStateSelectBuilder updateProcessDefinitionSuspensionState() {
     return new UpdateProcessDefinitionSuspensionStateBuilderImpl(commandExecutor);
   }
 
-  public void updateProcessDefinitionHistoryTimeToLive(String processDefinitionId, Integer historyTimeToLive){
-    commandExecutor.execute(new UpdateProcessDefinitionHistoryTimeToLiveCmd(processDefinitionId, historyTimeToLive));
+  public void updateProcessDefinitionHistoryTimeToLive(String processDefinitionId,
+      Integer historyTimeToLive) {
+    commandExecutor.execute(
+        new UpdateProcessDefinitionHistoryTimeToLiveCmd(processDefinitionId, historyTimeToLive));
   }
 
-  public void updateDecisionDefinitionHistoryTimeToLive(String decisionDefinitionId, Integer historyTimeToLive){
-    commandExecutor.execute(new UpdateDecisionDefinitionHistoryTimeToLiveCmd(decisionDefinitionId, historyTimeToLive));
+  public void updateDecisionDefinitionHistoryTimeToLive(String decisionDefinitionId,
+      Integer historyTimeToLive) {
+    commandExecutor.execute(
+        new UpdateDecisionDefinitionHistoryTimeToLiveCmd(decisionDefinitionId, historyTimeToLive));
   }
 
-  public void updateCaseDefinitionHistoryTimeToLive(String caseDefinitionId, Integer historyTimeToLive){
-    commandExecutor.execute(new UpdateCaseDefinitionHistoryTimeToLiveCmd(caseDefinitionId, historyTimeToLive));
+  public void updateCaseDefinitionHistoryTimeToLive(String caseDefinitionId,
+      Integer historyTimeToLive) {
+    commandExecutor
+        .execute(new UpdateCaseDefinitionHistoryTimeToLiveCmd(caseDefinitionId, historyTimeToLive));
   }
 
   public InputStream getProcessModel(String processDefinitionId) {
@@ -333,23 +330,28 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public void addCandidateStarterUser(String processDefinitionId, String userId) {
-    commandExecutor.execute(new AddIdentityLinkForProcessDefinitionCmd(processDefinitionId, userId, null));
+    commandExecutor
+        .execute(new AddIdentityLinkForProcessDefinitionCmd(processDefinitionId, userId, null));
   }
 
   public void addCandidateStarterGroup(String processDefinitionId, String groupId) {
-    commandExecutor.execute(new AddIdentityLinkForProcessDefinitionCmd(processDefinitionId, null, groupId));
+    commandExecutor
+        .execute(new AddIdentityLinkForProcessDefinitionCmd(processDefinitionId, null, groupId));
   }
 
   public void deleteCandidateStarterGroup(String processDefinitionId, String groupId) {
-    commandExecutor.execute(new DeleteIdentityLinkForProcessDefinitionCmd(processDefinitionId, null, groupId));
+    commandExecutor
+        .execute(new DeleteIdentityLinkForProcessDefinitionCmd(processDefinitionId, null, groupId));
   }
 
   public void deleteCandidateStarterUser(String processDefinitionId, String userId) {
-    commandExecutor.execute(new DeleteIdentityLinkForProcessDefinitionCmd(processDefinitionId, userId, null));
+    commandExecutor
+        .execute(new DeleteIdentityLinkForProcessDefinitionCmd(processDefinitionId, userId, null));
   }
 
   public List<IdentityLink> getIdentityLinksForProcessDefinition(String processDefinitionId) {
-    return commandExecutor.execute(new GetIdentityLinksForProcessDefinitionCmd(processDefinitionId));
+    return commandExecutor
+        .execute(new GetIdentityLinksForProcessDefinitionCmd(processDefinitionId));
   }
 
   public CaseDefinition getCaseDefinition(String caseDefinitionId) {
@@ -392,9 +394,11 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     }
   }
 
-  public DecisionRequirementsDefinition getDecisionRequirementsDefinition(String decisionRequirementsDefinitionId) {
+  public DecisionRequirementsDefinition getDecisionRequirementsDefinition(
+      String decisionRequirementsDefinitionId) {
     try {
-      return commandExecutor.execute(new GetDeploymentDecisionRequirementsDefinitionCmd(decisionRequirementsDefinitionId));
+      return commandExecutor.execute(
+          new GetDeploymentDecisionRequirementsDefinitionCmd(decisionRequirementsDefinitionId));
     } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
     } catch (DecisionDefinitionNotFoundException e) {
@@ -416,7 +420,8 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public InputStream getDecisionRequirementsModel(String decisionRequirementsDefinitionId) {
     try {
-      return commandExecutor.execute(new GetDeploymentDecisionRequirementsModelCmd(decisionRequirementsDefinitionId));
+      return commandExecutor
+          .execute(new GetDeploymentDecisionRequirementsModelCmd(decisionRequirementsDefinitionId));
     } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
     } catch (DecisionDefinitionNotFoundException e) {
@@ -431,6 +436,7 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   public InputStream getDecisionRequirementsDiagram(String decisionRequirementsDefinitionId) {
-    return commandExecutor.execute(new GetDeploymentDecisionRequirementsDiagramCmd(decisionRequirementsDefinitionId));
+    return commandExecutor
+        .execute(new GetDeploymentDecisionRequirementsDiagramCmd(decisionRequirementsDefinitionId));
   }
 }

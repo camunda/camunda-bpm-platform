@@ -58,158 +58,144 @@ public class SelfCancellationTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(processEngineRule).around(testHelper);
 
-  //========================================================================================================================
-  //=======================================================MODELS===========================================================
-  //========================================================================================================================
+  // ========================================================================================================================
+  // =======================================================MODELS===========================================================
+  // ========================================================================================================================
 
-  public static final BpmnModelInstance PROCESS_WITH_CANCELING_RECEIVE_TASK = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .parallelGateway("fork")
-      .userTask()
-      .sendTask("sendTask")
-        .camundaClass(SendMessageDelegate.class.getName())
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
+  public static final BpmnModelInstance PROCESS_WITH_CANCELING_RECEIVE_TASK = Bpmn
+      .createExecutableProcess("process").startEvent().parallelGateway("fork").userTask()
+      .sendTask("sendTask").camundaClass(SendMessageDelegate.class.getName())
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+          RecorderExecutionListener.class.getName())
       .endEvent("endEvent")
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
-      .moveToLastGateway()
-      .receiveTask("receiveTask")
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
-        .message(MESSAGE)
-      .endEvent("terminateEnd")
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START,
+          RecorderExecutionListener.class.getName())
+      .moveToLastGateway().receiveTask("receiveTask")
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+          RecorderExecutionListener.class.getName())
+      .message(MESSAGE).endEvent("terminateEnd")
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+          RecorderExecutionListener.class.getName())
       .done();
 
-  public static final BpmnModelInstance PROCESS_WITH_CANCELING_RECEIVE_TASK_AND_USER_TASK_AFTER_SEND =
-    modify(PROCESS_WITH_CANCELING_RECEIVE_TASK)
-      .removeFlowNode("endEvent")
-      .activityBuilder("sendTask")
-      .userTask("userTask")
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
-      .endEvent()
-      .done();
+  public static final BpmnModelInstance PROCESS_WITH_CANCELING_RECEIVE_TASK_AND_USER_TASK_AFTER_SEND = modify(
+      PROCESS_WITH_CANCELING_RECEIVE_TASK).removeFlowNode("endEvent").activityBuilder("sendTask")
+          .userTask("userTask")
+          .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START,
+              RecorderExecutionListener.class.getName())
+          .endEvent().done();
 
-  public static final BpmnModelInstance PROCESS_WITH_CANCELING_RECEIVE_TASK_WITHOUT_END_AFTER_SEND =
-      modify(PROCESS_WITH_CANCELING_RECEIVE_TASK)
-        .removeFlowNode("endEvent");
+  public static final BpmnModelInstance PROCESS_WITH_CANCELING_RECEIVE_TASK_WITHOUT_END_AFTER_SEND = modify(
+      PROCESS_WITH_CANCELING_RECEIVE_TASK).removeFlowNode("endEvent");
 
-  public static final BpmnModelInstance PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE =
-      modify(PROCESS_WITH_CANCELING_RECEIVE_TASK)
-        .activityBuilder("sendTask")
-        .boundaryEvent("boundary")
-          .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
-          .timerWithDuration("PT5S")
-        .endEvent("endEventBoundary")
-          .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
-        .done();
+  public static final BpmnModelInstance PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE = modify(
+      PROCESS_WITH_CANCELING_RECEIVE_TASK)
+          .activityBuilder("sendTask").boundaryEvent("boundary")
+          .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START,
+              RecorderExecutionListener.class.getName())
+          .timerWithDuration("PT5S").endEvent("endEventBoundary")
+          .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START,
+              RecorderExecutionListener.class.getName())
+          .done();
 
+  public static final BpmnModelInstance PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE_WITHOUT_END = modify(
+      PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE).removeFlowNode("endEvent");
 
-  public static final BpmnModelInstance PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE_WITHOUT_END =
-      modify(PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE)
-        .removeFlowNode("endEvent");
+  public static final BpmnModelInstance PROCESS_WITH_SUBPROCESS_AND_DELEGATE_MSG_SEND = modify(
+      Bpmn.createExecutableProcess("process").startEvent().subProcess().embeddedSubProcess()
+          .startEvent().userTask().serviceTask("sendTask")
+          .camundaClass(SendMessageDelegate.class.getName())
+          .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+              RecorderExecutionListener.class.getName())
+          .endEvent("endEventSubProc")
+          .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START,
+              RecorderExecutionListener.class.getName())
+          .subProcessDone().endEvent()
+          .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START,
+              RecorderExecutionListener.class.getName())
+          .done()).addSubProcessTo("process").triggerByEvent().embeddedSubProcess()
+              .startEvent("startSubEvent")
+              .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+                  RecorderExecutionListener.class.getName())
+              .message(MESSAGE).endEvent("endEventSubEvent")
+              .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+                  RecorderExecutionListener.class.getName())
+              .done();
 
-  public static final BpmnModelInstance PROCESS_WITH_SUBPROCESS_AND_DELEGATE_MSG_SEND = modify(Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .subProcess()
-          .embeddedSubProcess()
-            .startEvent()
-            .userTask()
-            .serviceTask("sendTask")
-              .camundaClass(SendMessageDelegate.class.getName())
-              .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
-            .endEvent("endEventSubProc")
-              .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
-            .subProcessDone()
-        .endEvent()
-          .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
-        .done())
-      .addSubProcessTo("process")
-        .triggerByEvent()
-        .embeddedSubProcess()
-          .startEvent("startSubEvent")
-            .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
-            .message(MESSAGE)
-          .endEvent("endEventSubEvent")
-            .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
-      .done();
-
-  public static final BpmnModelInstance PROCESS_WITH_PARALLEL_SEND_TASK_AND_BOUNDARY_EVENT = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .parallelGateway("fork")
-      .userTask()
-      .endEvent()
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
-      .moveToLastGateway()
-      .sendTask("sendTask")
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
-        .camundaClass(SignalDelegate.class.getName())
-      .boundaryEvent("boundary")
-        .message(MESSAGE)
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
+  public static final BpmnModelInstance PROCESS_WITH_PARALLEL_SEND_TASK_AND_BOUNDARY_EVENT = Bpmn
+      .createExecutableProcess("process").startEvent().parallelGateway("fork").userTask().endEvent()
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START,
+          RecorderExecutionListener.class.getName())
+      .moveToLastGateway().sendTask("sendTask")
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+          RecorderExecutionListener.class.getName())
+      .camundaClass(SignalDelegate.class.getName()).boundaryEvent("boundary").message(MESSAGE)
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+          RecorderExecutionListener.class.getName())
       .endEvent("endEventBoundary")
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
-      .moveToNode("sendTask")
-      .endEvent("endEvent")
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+          RecorderExecutionListener.class.getName())
+      .moveToNode("sendTask").endEvent("endEvent")
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START,
+          RecorderExecutionListener.class.getName())
       .done();
 
-
-  public static final BpmnModelInstance PROCESS_WITH_SEND_TASK_AND_BOUNDARY_EVENT = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .sendTask("sendTask")
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
-        .camundaClass(SignalDelegate.class.getName())
-      .boundaryEvent("boundary")
-        .message(MESSAGE)
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
+  public static final BpmnModelInstance PROCESS_WITH_SEND_TASK_AND_BOUNDARY_EVENT = Bpmn
+      .createExecutableProcess("process").startEvent().sendTask("sendTask")
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+          RecorderExecutionListener.class.getName())
+      .camundaClass(SignalDelegate.class.getName()).boundaryEvent("boundary").message(MESSAGE)
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+          RecorderExecutionListener.class.getName())
       .endEvent("endEventBoundary")
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
-      .moveToNode("sendTask")
-      .endEvent("endEvent")
-        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_END,
+          RecorderExecutionListener.class.getName())
+      .moveToNode("sendTask").endEvent("endEvent")
+      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START,
+          RecorderExecutionListener.class.getName())
       .done();
 
-
-  //========================================================================================================================
-  //=========================================================INIT===========================================================
-  //========================================================================================================================
+  // ========================================================================================================================
+  // =========================================================INIT===========================================================
+  // ========================================================================================================================
 
   static {
     initEndEvent(PROCESS_WITH_CANCELING_RECEIVE_TASK, "terminateEnd");
     initEndEvent(PROCESS_WITH_CANCELING_RECEIVE_TASK_AND_USER_TASK_AFTER_SEND, "terminateEnd");
     initEndEvent(PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE, "terminateEnd");
     initEndEvent(PROCESS_WITH_CANCELING_RECEIVE_TASK_WITHOUT_END_AFTER_SEND, "terminateEnd");
-    initEndEvent(PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE_WITHOUT_END, "terminateEnd");
+    initEndEvent(PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE_WITHOUT_END,
+        "terminateEnd");
   }
 
   public static void initEndEvent(BpmnModelInstance modelInstance, String endEventId) {
     EndEvent endEvent = modelInstance.getModelElementById(endEventId);
-    TerminateEventDefinition terminateDefinition = modelInstance.newInstance(TerminateEventDefinition.class);
+    TerminateEventDefinition terminateDefinition = modelInstance
+        .newInstance(TerminateEventDefinition.class);
     endEvent.addChildElement(terminateDefinition);
   }
 
-  //========================================================================================================================
-  //=======================================================TESTS============================================================
-  //========================================================================================================================
-
+  // ========================================================================================================================
+  // =======================================================TESTS============================================================
+  // ========================================================================================================================
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
 
   @Before
-  public void clearRecorderListener()
-  {
+  public void clearRecorderListener() {
     RecorderExecutionListener.clear();
   }
 
   @Before
-  public void initServices()
-  {
+  public void initServices() {
     runtimeService = processEngineRule.getRuntimeService();
     taskService = processEngineRule.getTaskService();
   }
 
-  private void checkRecordedEvents(String ...activityIds) {
-    List<RecorderExecutionListener.RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+  private void checkRecordedEvents(String... activityIds) {
+    List<RecorderExecutionListener.RecordedEvent> recordedEvents = RecorderExecutionListener
+        .getRecordedEvents();
     assertEquals(activityIds.length, recordedEvents.size());
 
     for (int i = 0; i < activityIds.length; i++) {
@@ -254,7 +240,8 @@ public class SelfCancellationTest {
 
   @Test
   public void testTriggerParallelTerminateEndEventWithSendAsScopeWithoutEnd() throws Exception {
-    testParallelTerminationWithSend(PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE_WITHOUT_END);
+    testParallelTerminationWithSend(
+        PROCESS_WITH_CANCELING_RECEIVE_TASK_WITH_SEND_AS_SCOPE_WITHOUT_END);
   }
 
   @Test
@@ -279,7 +266,8 @@ public class SelfCancellationTest {
     testHelper.deploy(PROCESS_WITH_PARALLEL_SEND_TASK_AND_BOUNDARY_EVENT);
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey("process");
 
-    Execution activity = runtimeService.createExecutionQuery().activityId("sendTask").singleResult();
+    Execution activity = runtimeService.createExecutionQuery().activityId("sendTask")
+        .singleResult();
     runtimeService.signal(activity.getId());
 
     // then
@@ -295,16 +283,18 @@ public class SelfCancellationTest {
     testHelper.deploy(PROCESS_WITH_SEND_TASK_AND_BOUNDARY_EVENT);
     runtimeService.startProcessInstanceByKey("process");
 
-    Execution activity = runtimeService.createExecutionQuery().activityId("sendTask").singleResult();
+    Execution activity = runtimeService.createExecutionQuery().activityId("sendTask")
+        .singleResult();
     runtimeService.signal(activity.getId());
 
     // then
     checkRecordedEvents("sendTask", "boundary", "endEventBoundary");
   }
 
-  //========================================================================================================================
-  //===================================================STATIC CLASSES=======================================================
-  //========================================================================================================================
+  // ========================================================================================================================
+  // ===================================================STATIC
+  // CLASSES=======================================================
+  // ========================================================================================================================
   public static class SendMessageDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
@@ -320,7 +310,8 @@ public class SelfCancellationTest {
     }
 
     @Override
-    public void signal(ActivityExecution execution, String signalEvent, Object signalData) throws Exception {
+    public void signal(ActivityExecution execution, String signalEvent, Object signalData)
+        throws Exception {
       RuntimeService runtimeService = execution.getProcessEngineServices().getRuntimeService();
       runtimeService.correlateMessage(MESSAGE);
     }

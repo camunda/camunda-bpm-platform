@@ -25,8 +25,7 @@ import java.util.Map;
 public class DatabasePurgeReport implements PurgeReporting<Long> {
 
   /**
-   * Key: table name
-   * Value: entity count
+   * Key: table name Value: entity count
    */
   Map<String, Long> deletedEntities = new HashMap<String, Long>();
 
@@ -44,9 +43,8 @@ public class DatabasePurgeReport implements PurgeReporting<Long> {
   public String getPurgeReportAsString() {
     StringBuilder builder = new StringBuilder();
     for (String key : deletedEntities.keySet()) {
-      builder.append("Table: ").append(key)
-        .append(" contains: ").append(getReportValue(key))
-        .append(" rows\n");
+      builder.append("Table: ").append(key).append(" contains: ").append(getReportValue(key))
+          .append(" rows\n");
     }
     return builder.toString();
   }

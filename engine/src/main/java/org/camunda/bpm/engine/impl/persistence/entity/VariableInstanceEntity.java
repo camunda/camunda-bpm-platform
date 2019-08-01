@@ -48,8 +48,9 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * @author Tom Baeyens
  */
-public class VariableInstanceEntity implements VariableInstance, CoreVariableInstance, ValueFields, DbEntity, DbEntityLifecycleAware, TypedValueUpdateListener, HasDbRevision,
-  HasDbReferences, Serializable {
+public class VariableInstanceEntity
+    implements VariableInstance, CoreVariableInstance, ValueFields, DbEntity,
+    DbEntityLifecycleAware, TypedValueUpdateListener, HasDbRevision, HasDbReferences, Serializable {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -84,25 +85,24 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   protected long sequenceCounter = 1;
 
   /**
-   * <p>Determines whether this variable is supposed to be a local variable
-   * in case of concurrency in its scope. This affects
+   * <p>
+   * Determines whether this variable is supposed to be a local variable in case of concurrency in
+   * its scope. This affects
    * </p>
    *
    * <ul>
    * <li>tree expansion (not evaluated yet by the engine)
-   * <li>activity instance IDs of variable instances: concurrentLocal
-   *   variables always receive the activity instance id of their execution
-   *   (which may not be the scope execution), while non-concurrentLocal variables
-   *   always receive the activity instance id of their scope (which is set in the
-   *   parent execution)
+   * <li>activity instance IDs of variable instances: concurrentLocal variables always receive the
+   * activity instance id of their execution (which may not be the scope execution), while
+   * non-concurrentLocal variables always receive the activity instance id of their scope (which is
+   * set in the parent execution)
    * </ul>
    *
    * <p>
-   *   In the future, this field could be used for restoring the variable distribution
-   *   when the tree is expanded/compacted multiple times.
-   *   On expansion, the goal would be to keep concurrentLocal variables always with
-   *   their concurrent replacing executions while non-concurrentLocal variables
-   *   stay in the scope execution
+   * In the future, this field could be used for restoring the variable distribution when the tree
+   * is expanded/compacted multiple times. On expansion, the goal would be to keep concurrentLocal
+   * variables always with their concurrent replacing executions while non-concurrentLocal variables
+   * stay in the scope execution
    * </p>
    */
   protected boolean isConcurrentLocal = false;
@@ -135,10 +135,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public static void insert(VariableInstanceEntity variableInstance) {
     if (!variableInstance.isTransient()) {
-      Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .insert(variableInstance);
+      Context.getCommandContext().getDbEntityManager().insert(variableInstance);
     }
   }
 
@@ -195,7 +192,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public int getRevisionNext() {
-    return revision+1;
+    return revision + 1;
   }
 
   // lazy initialized relations ///////////////////////////////////////////////
@@ -221,8 +218,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
       this.caseInstanceId = caseExecution.getCaseInstanceId();
       this.caseExecutionId = caseExecution.getId();
       this.tenantId = caseExecution.getTenantId();
-    }
-    else {
+    } else {
       this.caseInstanceId = null;
       this.caseExecutionId = null;
       this.tenantId = null;
@@ -232,7 +228,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   // byte array value /////////////////////////////////////////////////////////
 
   // i couldn't find a easy readable way to extract the common byte array value logic
-  // into a common class.  therefor it's duplicated in VariableInstanceEntity,
+  // into a common class. therefor it's duplicated in VariableInstanceEntity,
   // HistoricVariableInstance and HistoricDetailVariableInstanceUpdateEntity
 
   public String getByteArrayValueId() {
@@ -283,7 +279,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     this.textValue2 = null;
     typedValueField.clear();
 
-    if(byteArrayField.getByteArrayId() != null) {
+    if (byteArrayField.getByteArrayId() != null) {
       deleteByteArrayValue();
       setByteArrayValueId(null);
     }
@@ -304,10 +300,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   protected void ensureExecutionInitialized() {
     if (execution == null && executionId != null) {
-      execution = Context
-          .getCommandContext()
-          .getExecutionManager()
-          .findExecutionById(executionId);
+      execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
     }
   }
 
@@ -323,8 +316,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
       this.executionId = null;
       this.processInstanceId = null;
       this.tenantId = null;
-    }
-    else {
+    } else {
       setExecutionId(execution.getId());
       this.processInstanceId = execution.getProcessInstanceId();
       this.tenantId = execution.getTenantId();
@@ -336,9 +328,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public CaseExecutionEntity getCaseExecution() {
     if (caseExecutionId != null) {
-      return Context
-          .getCommandContext()
-          .getCaseExecutionManager()
+      return Context.getCommandContext().getCaseExecutionManager()
           .findCaseExecutionById(caseExecutionId);
     }
     return null;
@@ -449,14 +439,12 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
       if (task.getCaseExecution() != null) {
         setCaseExecution(task.getCaseExecution());
       }
-    }
-    else {
+    } else {
       this.taskId = null;
       this.tenantId = null;
       setExecution(null);
       setCaseExecution(null);
     }
-
 
   }
 
@@ -492,14 +480,11 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
     if (taskId != null) {
       return getTask();
-    }
-    else if (executionId != null) {
+    } else if (executionId != null) {
       return getExecution();
-    }
-    else if (caseExecutionId != null) {
+    } else if (caseExecutionId != null) {
       return getCaseExecution();
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -507,13 +492,12 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   protected TaskEntity getTask() {
     if (taskId != null) {
       return Context.getCommandContext().getTaskManager().findTaskById(taskId);
-    }
-    else {
+    } else {
       return null;
     }
   }
 
-  //sequence counter ///////////////////////////////////////////////////////////
+  // sequence counter ///////////////////////////////////////////////////////////
 
   public long getSequenceCounter() {
     return sequenceCounter;
@@ -523,10 +507,9 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     this.sequenceCounter = sequenceCounter;
   }
 
-   public void incrementSequenceCounter() {
+  public void incrementSequenceCounter() {
     sequenceCounter++;
   }
-
 
   public boolean isConcurrentLocal() {
     return isConcurrentLocal;
@@ -539,8 +522,8 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   @Override
   public void onImplicitValueUpdate(final TypedValue updatedValue) {
     // note: this implementation relies on the
-    //   behavior that the variable scope
-    //   of variable value can never become null
+    // behavior that the variable scope
+    // of variable value can never become null
 
     ProcessApplicationReference targetProcessApplication = getContextProcessApplication();
     if (targetProcessApplication != null) {
@@ -554,8 +537,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
       }, targetProcessApplication, new InvocationContext(getExecution()));
 
-    }
-    else {
+    } else {
       if (!isTransient) {
         getVariableScope().setVariableLocal(name, updatedValue);
       }
@@ -565,39 +547,24 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   protected ProcessApplicationReference getContextProcessApplication() {
     if (taskId != null) {
       return ProcessApplicationContextUtil.getTargetProcessApplication(getTask());
-    }
-    else if (executionId != null) {
+    } else if (executionId != null) {
       return ProcessApplicationContextUtil.getTargetProcessApplication(getExecution());
-    }
-    else if (caseExecutionId != null) {
+    } else if (caseExecutionId != null) {
       return ProcessApplicationContextUtil.getTargetProcessApplication(getCaseExecution());
-    }
-    else {
+    } else {
       return null;
     }
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-      + "[id=" + id
-      + ", revision=" + revision
-      + ", name=" + name
-      + ", processInstanceId=" + processInstanceId
-      + ", executionId=" + executionId
-      + ", caseInstanceId=" + caseInstanceId
-      + ", caseExecutionId=" + caseExecutionId
-      + ", taskId=" + taskId
-      + ", activityInstanceId=" + activityInstanceId
-      + ", tenantId=" + tenantId
-      + ", longValue=" + longValue
-      + ", doubleValue=" + doubleValue
-      + ", textValue=" + textValue
-      + ", textValue2=" + textValue2
-      + ", byteArrayValueId=" + getByteArrayValueId()
-      + ", configuration=" + configuration
-      + ", isConcurrentLocal=" + isConcurrentLocal
-      + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", revision=" + revision + ", name="
+        + name + ", processInstanceId=" + processInstanceId + ", executionId=" + executionId
+        + ", caseInstanceId=" + caseInstanceId + ", caseExecutionId=" + caseExecutionId
+        + ", taskId=" + taskId + ", activityInstanceId=" + activityInstanceId + ", tenantId="
+        + tenantId + ", longValue=" + longValue + ", doubleValue=" + doubleValue + ", textValue="
+        + textValue + ", textValue2=" + textValue2 + ", byteArrayValueId=" + getByteArrayValueId()
+        + ", configuration=" + configuration + ", isConcurrentLocal=" + isConcurrentLocal + "]";
   }
 
   @Override
@@ -627,16 +594,16 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   /**
    * @param isTransient
-   *          <code>true</code>, if the variable is not stored in the data base.
-   *          Default is <code>false</code>.
+   *          <code>true</code>, if the variable is not stored in the data base. Default is
+   *          <code>false</code>.
    */
   public void setTransient(boolean isTransient) {
     this.isTransient = isTransient;
   }
 
   /**
-   * @return <code>true</code>, if the variable is transient. A transient
-   *         variable is not stored in the data base.
+   * @return <code>true</code>, if the variable is transient. A transient variable is not stored in
+   *         the data base.
    */
   public boolean isTransient() {
     return isTransient;
@@ -660,19 +627,19 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   public Map<String, Class> getReferencedEntitiesIdAndClass() {
     Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
 
-    if (processInstanceId != null){
+    if (processInstanceId != null) {
       referenceIdAndClass.put(processInstanceId, ExecutionEntity.class);
     }
-    if (executionId != null){
+    if (executionId != null) {
       referenceIdAndClass.put(executionId, ExecutionEntity.class);
     }
-    if (caseInstanceId != null){
+    if (caseInstanceId != null) {
       referenceIdAndClass.put(caseInstanceId, CaseExecutionEntity.class);
     }
-    if (caseExecutionId != null){
+    if (caseExecutionId != null) {
       referenceIdAndClass.put(caseExecutionId, CaseExecutionEntity.class);
     }
-    if (getByteArrayValueId() != null){
+    if (getByteArrayValueId() != null) {
       referenceIdAndClass.put(getByteArrayValueId(), ByteArrayEntity.class);
     }
 

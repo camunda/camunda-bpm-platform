@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.repository;
 
 import java.util.List;
 
-
 /**
  * Stores waypoints of a diagram edge.
  *
@@ -27,7 +26,7 @@ import java.util.List;
 public class DiagramEdge extends DiagramElement {
 
   private static final long serialVersionUID = 1L;
-  
+
   private List<DiagramEdgeWaypoint> waypoints;
 
   public DiagramEdge() {

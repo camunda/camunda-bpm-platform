@@ -19,15 +19,16 @@ package org.camunda.bpm.engine.impl.migration.validation.activity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
- * Check if an activity can be migrated. For example
- * if the activity type is supported by the migration.
+ * Check if an activity can be migrated. For example if the activity type is supported by the
+ * migration.
  */
 public interface MigrationActivityValidator {
 
   /**
    * Check that an activity can be migrated.
    *
-   * @param activity the activity to migrate
+   * @param activity
+   *          the activity to migrate
    * @return true if the activity can be migrated, false otherwise
    */
   boolean valid(ActivityImpl activity);

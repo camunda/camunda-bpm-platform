@@ -39,14 +39,14 @@ public class DeleteUserOperationLogEntryCmd implements Command<Void> {
   public Void execute(CommandContext commandContext) {
     ensureNotNull(NotValidException.class, "entryId", entryId);
 
-    UserOperationLogEntry entry = commandContext
-      .getOperationLogManager()
-      .findOperationLogById(entryId);
+    UserOperationLogEntry entry = commandContext.getOperationLogManager()
+        .findOperationLogById(entryId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkDeleteUserOperationLog(entry);
     }
-    
+
     commandContext.getOperationLogManager().deleteOperationLogEntryById(entryId);
     return null;
   }

@@ -50,13 +50,13 @@ public class DmnDisabledTest {
     TestHelper.createSchema(processEngineImpl.getProcessEngineConfiguration());
 
     // let the engine do their schema operations thing
-    processEngineImpl.getProcessEngineConfiguration()
-      .getCommandExecutorSchemaOperations()
-      .execute(new SchemaOperationsProcessEngineBuild());
+    processEngineImpl.getProcessEngineConfiguration().getCommandExecutorSchemaOperations()
+        .execute(new SchemaOperationsProcessEngineBuild());
   }
 
   // allows to return a process engine configuration which doesn't create a schema when it's build.
-  protected static class CustomStandaloneInMemProcessEngineConfiguration extends StandaloneInMemProcessEngineConfiguration {
+  protected static class CustomStandaloneInMemProcessEngineConfiguration
+      extends StandaloneInMemProcessEngineConfiguration {
 
     public ProcessEngine buildProcessEngine() {
       init();
@@ -66,7 +66,8 @@ public class DmnDisabledTest {
 
   protected static class CreateNoSchemaProcessEngineImpl extends ProcessEngineImpl {
 
-    public CreateNoSchemaProcessEngineImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public CreateNoSchemaProcessEngineImpl(
+        ProcessEngineConfigurationImpl processEngineConfiguration) {
       super(processEngineConfiguration);
     }
 
@@ -76,12 +77,10 @@ public class DmnDisabledTest {
   }
 
   protected static ProcessEngineImpl createProcessEngineImpl(boolean dmnEnabled) {
-    StandaloneInMemProcessEngineConfiguration config =
-        (StandaloneInMemProcessEngineConfiguration) new CustomStandaloneInMemProcessEngineConfiguration()
-               .setProcessEngineName("database-dmn-test-engine")
-               .setDatabaseSchemaUpdate("false")
-               .setHistory(ProcessEngineConfiguration.HISTORY_FULL)
-               .setJdbcUrl("jdbc:h2:mem:DatabaseDmnTest");
+    StandaloneInMemProcessEngineConfiguration config = (StandaloneInMemProcessEngineConfiguration) new CustomStandaloneInMemProcessEngineConfiguration()
+        .setProcessEngineName("database-dmn-test-engine").setDatabaseSchemaUpdate("false")
+        .setHistory(ProcessEngineConfiguration.HISTORY_FULL)
+        .setJdbcUrl("jdbc:h2:mem:DatabaseDmnTest");
 
     config.setDmnEnabled(dmnEnabled);
 

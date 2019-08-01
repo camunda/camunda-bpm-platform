@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.test.standalone.db;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -26,12 +25,12 @@ public class MetaDataTest extends PluggableProcessEngineTestCase {
 
   public void testMariaDbDatabaseType() {
     if (isMariaDbConfigured()) {
-      assertEquals("mariadb",  processEngineConfiguration.getDatabaseType());
+      assertEquals("mariadb", processEngineConfiguration.getDatabaseType());
     }
   }
 
   public boolean isMariaDbConfigured() {
-    return processEngineConfiguration.getJdbcUrl().toLowerCase().contains("mariadb") ||
-      processEngineConfiguration.getJdbcDriver().toLowerCase().contains("mariadb");
+    return processEngineConfiguration.getJdbcUrl().toLowerCase().contains("mariadb")
+        || processEngineConfiguration.getJdbcDriver().toLowerCase().contains("mariadb");
   }
 }

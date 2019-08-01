@@ -25,27 +25,30 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
 /**
- * <p>A QueryOrderingProperty specifies a condition by which the results of a query should be
- * sorted. It can either specify a sorting by a property of the entities to be selected or
- * a sorting by a property of a related entity. For example in a {@link TaskQuery},
- * the entity to be selected is {@link Task} while a related entity could be a
- * {@link VariableInstance}.</p>
+ * <p>
+ * A QueryOrderingProperty specifies a condition by which the results of a query should be sorted.
+ * It can either specify a sorting by a property of the entities to be selected or a sorting by a
+ * property of a related entity. For example in a {@link TaskQuery}, the entity to be selected is
+ * {@link Task} while a related entity could be a {@link VariableInstance}.
+ * </p>
  *
- * <p>It is made up of the following:</p>
+ * <p>
+ * It is made up of the following:
+ * </p>
  *
  * <p>
  * <dl>
- *   <dt>relation</dt>
- *     <dd>A symbolic name that identifies a related entity. <code>null</code> if
- *     an ordering over a property of the entity to be selected is expressed.</dd>
- *   <dt>queryProperty</dt>
- *     <dd>The property to be sorted on. An instance of {@link QueryProperty}.</dd>
- *   <dt>direction</dt>
- *     <dd>The ordering direction, refer to {@link Direction}</dd>
- *   <dt>relationConditions</dt>
- *     <dd>A list of constraints that describe the nature of the relation to another entity
- *     (or in SQL terms, the joining conditions). Is <code>null</code> if relation
- *     is <code>null</code>. Contains instances of {@link QueryEntityRelationCondition}.</dd>
+ * <dt>relation</dt>
+ * <dd>A symbolic name that identifies a related entity. <code>null</code> if an ordering over a
+ * property of the entity to be selected is expressed.</dd>
+ * <dt>queryProperty</dt>
+ * <dd>The property to be sorted on. An instance of {@link QueryProperty}.</dd>
+ * <dt>direction</dt>
+ * <dd>The ordering direction, refer to {@link Direction}</dd>
+ * <dt>relationConditions</dt>
+ * <dd>A list of constraints that describe the nature of the relation to another entity (or in SQL
+ * terms, the joining conditions). Is <code>null</code> if relation is <code>null</code>. Contains
+ * instances of {@link QueryEntityRelationCondition}.</dd>
  * <dl>
  * </p>
  *
@@ -114,9 +117,9 @@ public class QueryOrderingProperty implements Serializable {
   }
 
   /**
-   * @return whether this ordering property is contained in the default fields
-   * of the base entity (e.g. task.NAME_ is a contained property; LOWER(task.NAME_) or
-   * variable.TEXT_ (given a task query) is not contained)
+   * @return whether this ordering property is contained in the default fields of the base entity
+   *         (e.g. task.NAME_ is a contained property; LOWER(task.NAME_) or variable.TEXT_ (given a
+   *         task query) is not contained)
    */
   public boolean isContainedProperty() {
     return relation == null && queryProperty.getFunction() == null;
@@ -125,18 +128,15 @@ public class QueryOrderingProperty implements Serializable {
   @Override
   public String toString() {
 
-    return "QueryOrderingProperty["
-      + "relation=" + relation
-      + ", queryProperty=" + queryProperty
-      + ", direction=" + direction
-      + ", relationConditions=" + getRelationConditionsString()
-      + "]";
+    return "QueryOrderingProperty[" + "relation=" + relation + ", queryProperty=" + queryProperty
+        + ", direction=" + direction + ", relationConditions=" + getRelationConditionsString()
+        + "]";
   }
 
   public String getRelationConditionsString() {
     StringBuilder builder = new StringBuilder();
     builder.append("[");
-    if(relationConditions != null) {
+    if (relationConditions != null) {
       for (int i = 0; i < relationConditions.size(); i++) {
         if (i > 0) {
           builder.append(",");

@@ -28,37 +28,36 @@ public class DeploymentStatisticsEntity extends DeploymentEntity implements Depl
   protected int instances;
   protected int failedJobs;
   protected List<IncidentStatistics> incidentStatistics;
-  
+
   public int getInstances() {
     return instances;
   }
+
   public void setInstances(int instances) {
     this.instances = instances;
   }
+
   public int getFailedJobs() {
     return failedJobs;
   }
+
   public void setFailedJobs(int failedJobs) {
     this.failedJobs = failedJobs;
   }
+
   public List<IncidentStatistics> getIncidentStatistics() {
     return incidentStatistics;
   }
+
   public void setIncidentStatistics(List<IncidentStatistics> incidentStatistics) {
     this.incidentStatistics = incidentStatistics;
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[instances=" + instances
-           + ", failedJobs=" + failedJobs
-           + ", id=" + id
-           + ", name=" + name
-           + ", resources=" + resources
-           + ", deploymentTime=" + deploymentTime
-           + ", validatingSchema=" + validatingSchema
-           + ", isNew=" + isNew
-           + "]";
+    return this.getClass().getSimpleName() + "[instances=" + instances + ", failedJobs="
+        + failedJobs + ", id=" + id + ", name=" + name + ", resources=" + resources
+        + ", deploymentTime=" + deploymentTime + ", validatingSchema=" + validatingSchema
+        + ", isNew=" + isNew + "]";
   }
 }

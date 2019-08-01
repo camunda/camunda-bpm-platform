@@ -34,8 +34,8 @@ public interface JmxManagedProcessEngineMBean {
   public String getName();
 
   /**
-   * If the engine's job executor is deloyment aware, these are the deployments it
-   * acquires jobs for.
+   * If the engine's job executor is deloyment aware, these are the deployments it acquires jobs
+   * for.
    *
    * @return all deployments that are registered with this {@link ProcessEngine}
    */

@@ -21,18 +21,21 @@ import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
- * <p>Base Atomic operation for implementing atomic operations which mark the creation
- * of a new activity instance.</p>
+ * <p>
+ * Base Atomic operation for implementing atomic operations which mark the creation of a new
+ * activity instance.
+ * </p>
  *
- * <p>The new activity instance is created *before* the START listeners are invoked
- * on the execution.</p>
+ * <p>
+ * The new activity instance is created *before* the START listeners are invoked on the execution.
+ * </p>
  *
  * @author Daniel Meyer
  *
  */
-public abstract class PvmAtomicOperationActivityInstanceStart extends AbstractPvmEventAtomicOperation {
+public abstract class PvmAtomicOperationActivityInstanceStart
+    extends AbstractPvmEventAtomicOperation {
 
   @Override
   protected PvmExecutionImpl eventNotificationsStarted(PvmExecutionImpl execution) {
@@ -50,7 +53,8 @@ public abstract class PvmAtomicOperationActivityInstanceStart extends AbstractPv
     // if we start a scope activity, remember current activity instance in parent
     PvmExecutionImpl parent = execution.getParent();
     PvmActivity activity = execution.getActivity();
-    if(parent != null && execution.isScope() && activity.isScope() && canHaveChildScopes(execution)) {
+    if (parent != null && execution.isScope() && activity.isScope()
+        && canHaveChildScopes(execution)) {
       parent.setActivityInstanceId(execution.getActivityInstanceId());
     }
 

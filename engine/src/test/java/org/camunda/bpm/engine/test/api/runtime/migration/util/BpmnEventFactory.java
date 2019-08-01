@@ -25,6 +25,9 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  */
 public interface BpmnEventFactory {
 
-  MigratingBpmnEventTrigger addBoundaryEvent(ProcessEngine engine, BpmnModelInstance modelInstance, String activityId, String boundaryEventId);
-  MigratingBpmnEventTrigger addEventSubProcess(ProcessEngine engine, BpmnModelInstance modelInstance, String parentId, String subProcessId, String startEventId);
+  MigratingBpmnEventTrigger addBoundaryEvent(ProcessEngine engine, BpmnModelInstance modelInstance,
+      String activityId, String boundaryEventId);
+
+  MigratingBpmnEventTrigger addEventSubProcess(ProcessEngine engine,
+      BpmnModelInstance modelInstance, String parentId, String subProcessId, String startEventId);
 }

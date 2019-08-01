@@ -56,9 +56,8 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   private static final String EXCEPTION_NAME = "externalTask.exceptionByteArray";
 
   /**
-   * Note: {@link String#length()} counts Unicode supplementary
-   * characters twice, so for a String consisting only of those,
-   * the limit is effectively MAX_EXCEPTION_MESSAGE_LENGTH / 2
+   * Note: {@link String#length()} counts Unicode supplementary characters twice, so for a String
+   * consisting only of those, the limit is effectively MAX_EXCEPTION_MESSAGE_LENGTH / 2
    */
   public static final int MAX_EXCEPTION_MESSAGE_LENGTH = 666;
 
@@ -92,109 +91,139 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public String getId() {
     return id;
   }
+
   @Override
   public void setId(String id) {
     this.id = id;
   }
+
   @Override
   public String getTopicName() {
     return topicName;
   }
+
   public void setTopicName(String topic) {
     this.topicName = topic;
   }
+
   @Override
   public String getWorkerId() {
     return workerId;
   }
+
   public void setWorkerId(String workerId) {
     this.workerId = workerId;
   }
+
   @Override
   public Date getLockExpirationTime() {
     return lockExpirationTime;
   }
+
   public void setLockExpirationTime(Date lockExpirationTime) {
     this.lockExpirationTime = lockExpirationTime;
   }
+
   @Override
   public String getExecutionId() {
     return executionId;
   }
+
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
+
   @Override
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
+
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
   }
+
   @Override
   public String getActivityId() {
     return activityId;
   }
+
   public void setActivityId(String activityId) {
     this.activityId = activityId;
   }
+
   @Override
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
+
   public void setActivityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
   }
+
   @Override
   public int getRevision() {
     return revision;
   }
+
   @Override
   public void setRevision(int revision) {
     this.revision = revision;
   }
+
   @Override
   public int getRevisionNext() {
     return revision + 1;
   }
+
   public int getSuspensionState() {
     return suspensionState;
   }
+
   public void setSuspensionState(int suspensionState) {
     this.suspensionState = suspensionState;
   }
+
   @Override
   public boolean isSuspended() {
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
   }
+
   @Override
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
+
   @Override
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
+
   @Override
   public String getTenantId() {
     return tenantId;
   }
+
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
   }
+
   @Override
   public Integer getRetries() {
     return retries;
   }
+
   public void setRetries(Integer retries) {
     this.retries = retries;
   }
+
   @Override
   public String getErrorMessage() {
     return errorMessage;
@@ -224,7 +253,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   @Override
   public Object getPersistentState() {
-    Map<String, Object> persistentState = new  HashMap<String, Object>();
+    Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("topic", topicName);
     persistentState.put("workerId", workerId);
     persistentState.put("lockExpirationTime", lockExpirationTime);
@@ -240,7 +269,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     persistentState.put("tenantId", tenantId);
     persistentState.put("priority", priority);
 
-    if(errorDetailsByteArrayId != null) {
+    if (errorDetailsByteArrayId != null) {
       persistentState.put("errorDetailsByteArrayId", errorDetailsByteArrayId);
     }
 
@@ -248,16 +277,14 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   }
 
   public void insert() {
-    Context.getCommandContext()
-      .getExternalTaskManager()
-      .insert(this);
+    Context.getCommandContext().getExternalTaskManager().insert(this);
 
     getExecution().addExternalTask(this);
   }
 
   /**
-   * Method implementation relies on the command context object,
-   * therefore should be invoked from the commands only
+   * Method implementation relies on the command context object, therefore should be invoked from
+   * the commands only
    *
    * @return error details persisted in byte array table
    */
@@ -267,7 +294,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   }
 
   public void setErrorMessage(String errorMessage) {
-    if(errorMessage != null && errorMessage.length() > MAX_EXCEPTION_MESSAGE_LENGTH) {
+    if (errorMessage != null && errorMessage.length() > MAX_EXCEPTION_MESSAGE_LENGTH) {
       this.errorMessage = errorMessage.substring(0, MAX_EXCEPTION_MESSAGE_LENGTH);
     } else {
       this.errorMessage = errorMessage;
@@ -281,12 +308,11 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
     ByteArrayEntity byteArray = getErrorByteArray();
 
-    if(byteArray == null) {
-      byteArray = createExceptionByteArray(EXCEPTION_NAME,exceptionBytes, ResourceTypes.RUNTIME);
+    if (byteArray == null) {
+      byteArray = createExceptionByteArray(EXCEPTION_NAME, exceptionBytes, ResourceTypes.RUNTIME);
       errorDetailsByteArrayId = byteArray.getId();
       errorDetailsByteArray = byteArray;
-    }
-    else {
+    } else {
       byteArray.setBytes(exceptionBytes);
     }
   }
@@ -302,9 +328,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   protected void ensureErrorByteArrayInitialized() {
     if (errorDetailsByteArray == null && errorDetailsByteArrayId != null) {
-      errorDetailsByteArray = Context
-          .getCommandContext()
-          .getDbEntityManager()
+      errorDetailsByteArray = Context.getCommandContext().getDbEntityManager()
           .selectById(ByteArrayEntity.class, errorDetailsByteArrayId);
     }
   }
@@ -319,9 +343,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
     CommandContext commandContext = Context.getCommandContext();
 
-    commandContext
-      .getExternalTaskManager()
-      .delete(this);
+    commandContext.getExternalTaskManager().delete(this);
 
     // Also delete the external tasks's error details byte array
     if (errorDetailsByteArrayId != null) {
@@ -353,10 +375,14 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
    * process failed state, make sure that binary entity is created for the errorMessage, shortError
    * message does not exceed limit, handle properly retry counts and incidents
    *
-   * @param errorMessage - short error message text
-   * @param errorDetails - full error details
-   * @param retries - updated value of retries left
-   * @param retryDuration - used for lockExpirationTime calculation
+   * @param errorMessage
+   *          - short error message text
+   * @param errorDetails
+   *          - full error details
+   * @param retries
+   *          - updated value of retries left
+   * @param retryDuration
+   *          - used for lockExpirationTime calculation
    */
   public void failed(String errorMessage, String errorDetails, int retries, long retryDuration) {
     ensureActive();
@@ -380,7 +406,8 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       bpmnError = new BpmnError(errorCode);
     }
     try {
-      ExternalTaskActivityBehavior behavior = ((ExternalTaskActivityBehavior) activityExecution.getActivity().getActivityBehavior());
+      ExternalTaskActivityBehavior behavior = ((ExternalTaskActivityBehavior) activityExecution
+          .getActivity().getActivityBehavior());
       if (variables != null && !variables.isEmpty()) {
         activityExecution.setVariables(variables);
       }
@@ -394,8 +421,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
     if (areRetriesLeft() && retries <= 0) {
       createIncident();
-    }
-    else if (!areRetriesLeft() && retries > 0) {
+    } else if (!areRetriesLeft() && retries > 0) {
       removeIncident();
     }
 
@@ -403,16 +429,14 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   }
 
   protected void createIncident() {
-    IncidentHandler incidentHandler = Context
-        .getProcessEngineConfiguration()
+    IncidentHandler incidentHandler = Context.getProcessEngineConfiguration()
         .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
     incidentHandler.handleIncident(createIncidentContext(), errorMessage);
   }
 
   protected void removeIncident() {
-    IncidentHandler handler = Context
-        .getProcessEngineConfiguration()
+    IncidentHandler handler = Context.getProcessEngineConfiguration()
         .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
     handler.resolveIncident(createIncidentContext());
@@ -446,8 +470,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     if (execution == null) {
       execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
       EnsureUtil.ensureNotNull(
-          "Cannot find execution with id " + executionId + " for external task " + id,
-          "execution",
+          "Cannot find execution with id " + executionId + " for external task " + id, "execution",
           execution);
     }
   }
@@ -460,16 +483,10 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   @Override
   public String toString() {
-    return "ExternalTaskEntity ["
-        + "id=" + id
-        + ", revision=" + revision
-        + ", topicName=" + topicName
-        + ", workerId=" + workerId
-        + ", lockExpirationTime=" + lockExpirationTime
-        + ", priority=" + priority
-        + ", errorMessage=" + errorMessage
-        + ", errorDetailsByteArray=" + errorDetailsByteArray
-        + ", errorDetailsByteArrayId=" + errorDetailsByteArrayId
+    return "ExternalTaskEntity [" + "id=" + id + ", revision=" + revision + ", topicName="
+        + topicName + ", workerId=" + workerId + ", lockExpirationTime=" + lockExpirationTime
+        + ", priority=" + priority + ", errorMessage=" + errorMessage + ", errorDetailsByteArray="
+        + errorDetailsByteArray + ", errorDetailsByteArrayId=" + errorDetailsByteArrayId
         + ", executionId=" + executionId + "]";
   }
 
@@ -477,12 +494,11 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     workerId = null;
     lockExpirationTime = null;
 
-    Context.getCommandContext()
-      .getExternalTaskManager()
-      .fireExternalTaskAvailableEvent();
+    Context.getCommandContext().getExternalTaskManager().fireExternalTaskAvailableEvent();
   }
 
-  public static ExternalTaskEntity createAndInsert(ExecutionEntity execution, String topic, long priority) {
+  public static ExternalTaskEntity createAndInsert(ExecutionEntity execution, String topic,
+      long priority) {
     ExternalTaskEntity externalTask = new ExternalTaskEntity();
 
     externalTask.setTopicName(topic);

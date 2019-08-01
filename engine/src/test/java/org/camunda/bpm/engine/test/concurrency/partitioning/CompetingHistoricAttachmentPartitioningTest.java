@@ -37,8 +37,8 @@ public class CompetingHistoricAttachmentPartitioningTest extends AbstractPartiti
     // given
     String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK).getId();
 
-    final Attachment attachment = taskService.createAttachment("anAttachmentType", null, processInstanceId,
-      "anAttachmentName", null, "http://camunda.com");
+    final Attachment attachment = taskService.createAttachment("anAttachmentType", null,
+        processInstanceId, "anAttachmentName", null, "http://camunda.com");
 
     ThreadControl asyncThread = executeControllableCommand(new AsyncThread(attachment.getId()));
 
@@ -74,8 +74,7 @@ public class CompetingHistoricAttachmentPartitioningTest extends AbstractPartiti
 
     public Void execute(CommandContext commandContext) {
 
-      commandContext.getDbEntityManager()
-        .selectById(AttachmentEntity.class, attachmentId); // cache
+      commandContext.getDbEntityManager().selectById(AttachmentEntity.class, attachmentId); // cache
 
       monitor.sync();
 

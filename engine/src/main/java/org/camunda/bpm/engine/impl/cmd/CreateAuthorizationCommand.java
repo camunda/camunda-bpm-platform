@@ -32,7 +32,7 @@ public class CreateAuthorizationCommand implements Command<Authorization> {
     this.type = type;
   }
 
-  public Authorization execute(CommandContext commandContext) {    
+  public Authorization execute(CommandContext commandContext) {
     return commandContext.getAuthorizationManager().createNewAuthorization(type);
   }
 

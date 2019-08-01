@@ -24,10 +24,8 @@ public enum DbOperationType {
 
   INSERT,
 
-  UPDATE,
-  UPDATE_BULK,
+  UPDATE, UPDATE_BULK,
 
-  DELETE,
-  DELETE_BULK
+  DELETE, DELETE_BULK
 
 }

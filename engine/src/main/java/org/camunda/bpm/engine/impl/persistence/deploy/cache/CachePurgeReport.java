@@ -37,8 +37,7 @@ public class CachePurgeReport implements PurgeReporting<Set<String>> {
   public static final String DMN_MODEL_INST_CACHE = "DMN_MODEL_INST_CACHE";
 
   /**
-   * Key: cache name
-   * Value: values
+   * Key: cache name Value: values
    */
   Map<String, Set<String>> deletedCache = new HashMap<String, Set<String>>();
 
@@ -56,9 +55,8 @@ public class CachePurgeReport implements PurgeReporting<Set<String>> {
   public String getPurgeReportAsString() {
     StringBuilder builder = new StringBuilder();
     for (String key : deletedCache.keySet()) {
-      builder.append("Cache: ").append(key)
-             .append(" contains: ").append(getReportValue(key))
-             .append("\n");
+      builder.append("Cache: ").append(key).append(" contains: ").append(getReportValue(key))
+          .append("\n");
     }
     return builder.toString();
   }

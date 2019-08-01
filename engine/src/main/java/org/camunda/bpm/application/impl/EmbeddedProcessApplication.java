@@ -24,11 +24,12 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>An embedded process application is a ProcessApplication that uses an embedded
- * process engine. An embedded process engine is loaded by the same classloader as
- * the process application which usually means that the <code>camunda-engine.jar</code>
- * is deployed as a web application library (in case of WAR deployments) or as an
- * application library (in case of EAR deployments).</p>
+ * <p>
+ * An embedded process application is a ProcessApplication that uses an embedded process engine. An
+ * embedded process engine is loaded by the same classloader as the process application which
+ * usually means that the <code>camunda-engine.jar</code> is deployed as a web application library
+ * (in case of WAR deployments) or as an application library (in case of EAR deployments).
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -47,14 +48,13 @@ public class EmbeddedProcessApplication extends AbstractProcessApplication {
   }
 
   /**
-   * Since the process engine is loaded by the same classloader
-   * as the process application, nothing needs to be done.
+   * Since the process engine is loaded by the same classloader as the process application, nothing
+   * needs to be done.
    */
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
     try {
       return callable.call();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.processApplicationExecutionException(e);
     }
   }

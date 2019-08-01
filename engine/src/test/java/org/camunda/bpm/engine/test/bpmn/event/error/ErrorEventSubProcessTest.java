@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
-
 /**
  * @author Falko Menge
  */
@@ -40,19 +39,21 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   @Deployment
   // an event subprocesses takes precedence over a boundary event
   public void testEventSubprocessTakesPrecedence() {
-    String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess").getId();
+    String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess")
+        .getId();
     assertThatErrorHasBeenCaught(procId);
   }
 
   @Deployment
   // an event subprocess with errorCode takes precedence over a catch-all handler
   public void testErrorCodeTakesPrecedence() {
-    String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess").getId();
+    String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess")
+        .getId();
 
     // The process will throw an error event,
     // which is caught and escalated by a User Task
-    assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery()
-            .taskDefinitionKey("taskAfterErrorCatch2") // <!>
+    assertEquals("No tasks found in task list.", 1,
+        taskService.createTaskQuery().taskDefinitionKey("taskAfterErrorCatch2") // <!>
             .count());
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("Escalated Task", task.getName());
@@ -65,31 +66,38 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testCatchErrorInEmbeddedSubProcess() {
-    String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess").getId();
+    String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess")
+        .getId();
     assertThatErrorHasBeenCaught(procId);
   }
 
   @Deployment
   public void testCatchErrorThrownByScriptTaskInEmbeddedSubProcess() {
-    String procId = runtimeService.startProcessInstanceByKey("CatchErrorThrownByScriptTaskInEmbeddedSubProcess").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("CatchErrorThrownByScriptTaskInEmbeddedSubProcess").getId();
     assertThatErrorHasBeenCaught(procId);
   }
 
   @Deployment
   public void testCatchErrorThrownByScriptTaskInEmbeddedSubProcessWithErrorCode() {
-    String procId = runtimeService.startProcessInstanceByKey("CatchErrorThrownByScriptTaskInEmbeddedSubProcessWithErrorCode").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("CatchErrorThrownByScriptTaskInEmbeddedSubProcessWithErrorCode")
+        .getId();
     assertThatErrorHasBeenCaught(procId);
   }
 
   @Deployment
   public void testCatchErrorThrownByScriptTaskInTopLevelProcess() {
-    String procId = runtimeService.startProcessInstanceByKey("CatchErrorThrownByScriptTaskInTopLevelProcess").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("CatchErrorThrownByScriptTaskInTopLevelProcess").getId();
     assertThatErrorHasBeenCaught(procId);
   }
 
   @Deployment
   public void testCatchErrorThrownByScriptTaskInsideSubProcessInTopLevelProcess() {
-    String procId = runtimeService.startProcessInstanceByKey("CatchErrorThrownByScriptTaskInsideSubProcessInTopLevelProcess").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("CatchErrorThrownByScriptTaskInsideSubProcessInTopLevelProcess")
+        .getId();
     assertThatErrorHasBeenCaught(procId);
   }
 
@@ -97,13 +105,13 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByJavaDelegateOnCallActivity-child.bpmn20.xml" })
   public void testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess() {
-    String procId = runtimeService.startProcessInstanceByKey("testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess").getId();
+    String procId = runtimeService.startProcessInstanceByKey(
+        "testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess").getId();
     assertThatErrorHasBeenCaught(procId);
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchExceptionThrownByExecuteOfAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess", throwException()).getId();
 
@@ -118,8 +126,7 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchErrorThrownByExecuteOfAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess", throwError()).getId();
 
@@ -134,15 +141,15 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchExceptionThrownBySignalOfAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess").getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
     assertNull(runtimeService.getVariable(pi, "signaled"));
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult();
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwException());
@@ -159,15 +166,15 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchErrorThrownBySignalOfAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess").getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
     assertNull(runtimeService.getVariable(pi, "signaled"));
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult();
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwError());
@@ -184,10 +191,10 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml" })
   public void testCatchExceptionThrownByExecuteOfDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     variables.putAll(throwException());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
@@ -202,10 +209,10 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml" })
   public void testCatchErrorThrownByExecuteOfDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     variables.putAll(throwError());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
@@ -220,16 +227,17 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml" })
   public void testCatchExceptionThrownBySignalOfDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
     assertNull(runtimeService.getVariable(pi, "signaled"));
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult();
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwException());
@@ -246,16 +254,17 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorThrownByDelegateExpression.bpmn20.xml" })
   public void testCatchErrorThrownBySignalOfDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
     assertNull(runtimeService.getVariable(pi, "signaled"));
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult();
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwError());
@@ -284,58 +293,58 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testCatchErrorEventSubprocessSetErrorVariables(){
+  public void testCatchErrorEventSubprocessSetErrorVariables() {
     runtimeService.startProcessInstanceByKey("Process_1");
-    //the name used in "camunda:errorCodeVariable" in the BPMN
+    // the name used in "camunda:errorCodeVariable" in the BPMN
     String variableName = "errorCode";
-    VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
+    VariableInstance errorVariable = runtimeService.createVariableInstanceQuery()
+        .variableName(variableName).singleResult();
 
     assertThat(errorVariable, is(notNullValue()));
-    //the code we gave the thrown error
+    // the code we gave the thrown error
     Object errorCode = "error";
     assertThat(errorVariable.getValue(), is(errorCode));
 
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorProcess.bpmn",
-      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorFromCallActivitySetsErrorVariables.bpmn"
-  })
-  public void testCatchErrorFromCallActivitySetsErrorVariable(){
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorProcess.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorFromCallActivitySetsErrorVariables.bpmn" })
+  public void testCatchErrorFromCallActivitySetsErrorVariable() {
     runtimeService.startProcessInstanceByKey("Process_1");
-    //the name used in "camunda:errorCodeVariable" in the BPMN
+    // the name used in "camunda:errorCodeVariable" in the BPMN
     String variableName = "errorCode";
-    VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
+    VariableInstance errorVariable = runtimeService.createVariableInstanceQuery()
+        .variableName(variableName).singleResult();
 
     assertThat(errorVariable, is(notNullValue()));
-    //the code we gave the thrown error
+    // the code we gave the thrown error
     Object errorCode = "error";
     assertThat(errorVariable.getValue(), is(errorCode));
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchBpmnErrorFromJavaDelegateInsideCallActivitySetsErrorVariable.bpmn",
-      "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn"
-    })
-  public void testCatchBpmnErrorFromJavaDelegateInsideCallActivitySetsErrorVariable(){
+      "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn" })
+  public void testCatchBpmnErrorFromJavaDelegateInsideCallActivitySetsErrorVariable() {
     runtimeService.startProcessInstanceByKey("Process_1");
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
-    //the name used in "camunda:errorCodeVariable" in the BPMN
+    // the name used in "camunda:errorCodeVariable" in the BPMN
     String variableName = "errorCode";
-    //the code we gave the thrown error
+    // the code we gave the thrown error
     Object errorCode = "errorCode";
-    VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
+    VariableInstance errorVariable = runtimeService.createVariableInstanceQuery()
+        .variableName(variableName).singleResult();
     assertThat(errorVariable.getValue(), is(errorCode));
 
-    errorVariable = runtimeService.createVariableInstanceQuery().variableName("errorMessageVariable").singleResult();
-    assertThat(errorVariable.getValue(), is((Object)"ouch!"));
+    errorVariable = runtimeService.createVariableInstanceQuery()
+        .variableName("errorMessageVariable").singleResult();
+    assertThat(errorVariable.getValue(), is((Object) "ouch!"));
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInLoop.bpmn20.xml"
-    })
-  public void testShouldNotThrowErrorInLoop(){
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInLoop.bpmn20.xml" })
+  public void testShouldNotThrowErrorInLoop() {
     runtimeService.startProcessInstanceByKey("looping-error");
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -345,11 +354,10 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     assertEquals("ErrorHandlingUserTask", taskService.createTaskQuery().singleResult().getName());
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInLoopWithCallActivity.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorToCallActivity.bpmn20.xml"
-    })
-  public void testShouldNotThrowErrorInLoopWithCallActivity(){
+      "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorToCallActivity.bpmn20.xml" })
+  public void testShouldNotThrowErrorInLoopWithCallActivity() {
     runtimeService.startProcessInstanceByKey("CallActivityErrorInLoop");
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -359,10 +367,9 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     assertEquals("ErrorHandlingUserTask", taskService.createTaskQuery().singleResult().getName());
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInLoopWithMultipleSubProcess.bpmn20.xml",
-    })
-  public void testShouldNotThrowErrorInLoopForMultipleSubProcess(){
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInLoopWithMultipleSubProcess.bpmn20.xml", })
+  public void testShouldNotThrowErrorInLoopForMultipleSubProcess() {
     runtimeService.startProcessInstanceByKey("looping-error");
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -372,11 +379,10 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     assertEquals("ErrorHandlingTask", taskService.createTaskQuery().singleResult().getName());
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInLoopFromCallActivityToEventSubProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorToCallActivity.bpmn20.xml"
-    })
-  public void FAILING_testShouldNotThrowErrorInLoopFromCallActivityToEventSubProcess(){
+      "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorToCallActivity.bpmn20.xml" })
+  public void FAILING_testShouldNotThrowErrorInLoopFromCallActivityToEventSubProcess() {
     runtimeService.startProcessInstanceByKey("Process_1");
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -403,7 +409,7 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
 
-    //when job is executed task is created
+    // when job is executed task is created
     managementService.executeJob(job.getId());
 
     Task taskDuring = taskService.createTaskQuery().taskName("inside event sub").singleResult();
@@ -430,7 +436,7 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
 
-    //when job is executed task is created
+    // when job is executed task is created
     managementService.executeJob(job.getId());
 
     Task taskAfter = taskService.createTaskQuery().singleResult();

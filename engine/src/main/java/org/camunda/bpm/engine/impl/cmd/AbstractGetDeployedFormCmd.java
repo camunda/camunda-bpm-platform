@@ -55,12 +55,14 @@ public abstract class AbstractGetDeployedFormCmd implements Command<InputStream>
       return commandContext.runWithoutAuthorization(new Callable<InputStream>() {
         @Override
         public InputStream call() throws Exception {
-          return new GetDeploymentResourceCmd(formData.getDeploymentId(), resourceName).execute(commandContext);
+          return new GetDeploymentResourceCmd(formData.getDeploymentId(), resourceName)
+              .execute(commandContext);
         }
       });
-    }
-    catch (DeploymentResourceNotFoundException e) {
-      throw new NotFoundException("The form with the resource name '" + resourceName + "' cannot be found in deployment.", e);
+    } catch (DeploymentResourceNotFoundException e) {
+      throw new NotFoundException(
+          "The form with the resource name '" + resourceName + "' cannot be found in deployment.",
+          e);
     }
   }
 
@@ -72,7 +74,8 @@ public abstract class AbstractGetDeployedFormCmd implements Command<InputStream>
     }
 
     if (!resourceName.startsWith(DEPLOYMENT_KEY)) {
-      throw new BadUserRequestException("The form key '" + formKey + "' does not reference a deployed form.");
+      throw new BadUserRequestException(
+          "The form key '" + formKey + "' does not reference a deployed form.");
     }
 
     resourceName = resourceName.substring(DEPLOYMENT_KEY_LENGTH, resourceName.length());

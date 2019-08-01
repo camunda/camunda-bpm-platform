@@ -32,11 +32,9 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 
-
 /**
- * Test runners follow the this rule:
- *   - if the class extends Testcase, run as Junit 3
- *   - otherwise use Junit 4
+ * Test runners follow the this rule: - if the class extends Testcase, run as Junit 3 - otherwise
+ * use Junit 4
  *
  * So this test can be included in the regular test suite without problems.
  *
@@ -74,8 +72,8 @@ public class ProcessEngineRuleJunit4Test {
   public void requiredHistoryLevelAudit() {
 
     assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+        CoreMatchers.<String> either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+            .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
   @Test
@@ -83,9 +81,9 @@ public class ProcessEngineRuleJunit4Test {
   public void requiredHistoryLevelActivity() {
 
     assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
-        .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+        CoreMatchers.<String> either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+            .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+            .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
   @Test

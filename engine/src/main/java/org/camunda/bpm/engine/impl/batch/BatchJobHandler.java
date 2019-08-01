@@ -21,8 +21,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
 /**
- * A batch job handler manages batch jobs based
- * on the configuration {@link T}.
+ * A batch job handler manages batch jobs based on the configuration {@link T}.
  *
  * Used by a seed job to manage lifecycle of execution jobs.
  */
@@ -31,7 +30,8 @@ public interface BatchJobHandler<T> extends JobHandler<BatchJobConfiguration> {
   /**
    * Converts the configuration of the batch to a byte array.
    *
-   * @param configuration the configuration object
+   * @param configuration
+   *          the configuration object
    * @return the serialized configuration
    */
   byte[] writeConfiguration(T configuration);
@@ -39,7 +39,8 @@ public interface BatchJobHandler<T> extends JobHandler<BatchJobConfiguration> {
   /**
    * Read the serialized configuration of the batch.
    *
-   * @param serializedConfiguration the serialized configuration
+   * @param serializedConfiguration
+   *          the serialized configuration
    * @return the deserialized configuration object
    */
   T readConfiguration(byte[] serializedConfiguration);
@@ -54,7 +55,8 @@ public interface BatchJobHandler<T> extends JobHandler<BatchJobConfiguration> {
   /**
    * Creates batch jobs for a batch.
    *
-   * @param batch the batch to create jobs for
+   * @param batch
+   *          the batch to create jobs for
    * @return true of no more jobs have to be created for this batch, false otherwise
    */
   boolean createJobs(BatchEntity batch);
@@ -62,7 +64,8 @@ public interface BatchJobHandler<T> extends JobHandler<BatchJobConfiguration> {
   /**
    * Delete all jobs for a batch.
    *
-   * @param batch the batch to delete jobs for
+   * @param batch
+   *          the batch to delete jobs for
    */
   void deleteJobs(BatchEntity batch);
 

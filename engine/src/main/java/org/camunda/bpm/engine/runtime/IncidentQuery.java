@@ -93,10 +93,9 @@ public interface IncidentQuery extends Query<IncidentQuery, Incident> {
   IncidentQuery orderByConfiguration();
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of incidents without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of incidents without tenant id is database-specific.
    */
   IncidentQuery orderByTenantId();
 
 }
-

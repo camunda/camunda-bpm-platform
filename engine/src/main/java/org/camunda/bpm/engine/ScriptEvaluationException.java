@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine;
 
 /**
- * <p>Exception resulting from a error during a script evaluation.</p>
+ * <p>
+ * Exception resulting from a error during a script evaluation.
+ * </p>
  *
  * @author Sebastian Menski
  */

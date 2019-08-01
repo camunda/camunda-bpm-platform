@@ -36,17 +36,16 @@ public class CustomActivityBehavior implements ActivityBehavior, SignallableActi
   }
 
   public void execute(ActivityExecution execution) throws Exception {
-    Context
-      .getProcessEngineConfiguration()
-      .getDelegateInterceptor()
-      .handleInvocation(new ActivityBehaviorInvocation(delegateActivityBehavior, execution));
+    Context.getProcessEngineConfiguration().getDelegateInterceptor()
+        .handleInvocation(new ActivityBehaviorInvocation(delegateActivityBehavior, execution));
   }
 
-  public void signal(ActivityExecution execution, String signalEvent, Object signalData) throws Exception {
-    Context
-      .getProcessEngineConfiguration()
-      .getDelegateInterceptor()
-      .handleInvocation(new ActivityBehaviorSignalInvocation((SignallableActivityBehavior) delegateActivityBehavior, execution, signalEvent, signalData));
+  public void signal(ActivityExecution execution, String signalEvent, Object signalData)
+      throws Exception {
+    Context.getProcessEngineConfiguration().getDelegateInterceptor()
+        .handleInvocation(new ActivityBehaviorSignalInvocation(
+            (SignallableActivityBehavior) delegateActivityBehavior, execution, signalEvent,
+            signalData));
   }
 
   public ActivityBehavior getDelegateActivityBehavior() {

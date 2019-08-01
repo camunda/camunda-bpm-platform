@@ -29,7 +29,8 @@ public class DbBulkOperation extends DbOperation {
   public DbBulkOperation() {
   }
 
-  public DbBulkOperation(DbOperationType operationType, Class<? extends DbEntity> entityType, String statement, Object parameter) {
+  public DbBulkOperation(DbOperationType operationType, Class<? extends DbEntity> entityType,
+      String statement, Object parameter) {
     this.operationType = operationType;
     this.entityType = entityType;
     this.statement = statement;
@@ -63,7 +64,7 @@ public class DbBulkOperation extends DbOperation {
   }
 
   public String toString() {
-    return operationType + " "+ statement +" " +parameter;
+    return operationType + " " + statement + " " + parameter;
   }
 
   @Override
@@ -96,6 +97,5 @@ public class DbBulkOperation extends DbOperation {
       return false;
     return true;
   }
-
 
 }

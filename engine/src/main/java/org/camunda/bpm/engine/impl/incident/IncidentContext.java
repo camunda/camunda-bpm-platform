@@ -30,7 +30,8 @@ public class IncidentContext {
   protected String tenantId;
   protected String jobDefinitionId;
 
-  public IncidentContext() {}
+  public IncidentContext() {
+  }
 
   public IncidentContext(Incident incident) {
     this.processDefinitionId = incident.getProcessDefinitionId();

@@ -32,10 +32,12 @@ public class EntityManagerSessionFactory implements SessionFactory {
   protected boolean handleTransactions;
   protected boolean closeEntityManager;
 
-  public EntityManagerSessionFactory(Object entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
+  public EntityManagerSessionFactory(Object entityManagerFactory, boolean handleTransactions,
+      boolean closeEntityManager) {
     ensureNotNull("entityManagerFactory", entityManagerFactory);
     if (!(entityManagerFactory instanceof EntityManagerFactory)) {
-      throw new ProcessEngineException("EntityManagerFactory must implement 'javax.persistence.EntityManagerFactory'");
+      throw new ProcessEngineException(
+          "EntityManagerFactory must implement 'javax.persistence.EntityManagerFactory'");
     }
 
     this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;
@@ -43,12 +45,13 @@ public class EntityManagerSessionFactory implements SessionFactory {
     this.closeEntityManager = closeEntityManager;
   }
 
-  public Class< ? > getSessionType() {
+  public Class<?> getSessionType() {
     return EntityManagerSession.class;
   }
 
   public Session openSession() {
-    return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
+    return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions,
+        closeEntityManager);
   }
 
   public EntityManagerFactory getEntityManagerFactory() {

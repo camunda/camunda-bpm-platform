@@ -52,14 +52,14 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
   ExternalTaskQuery topicName(String topicName);
 
   /**
-   * Only select external tasks that are currently locked, i.e. that have a lock expiration
-   * time that is in the future
+   * Only select external tasks that are currently locked, i.e. that have a lock expiration time
+   * that is in the future
    */
   ExternalTaskQuery locked();
 
   /**
-   * Only select external tasks that are not currently locked, i.e. that have no
-   * lock expiration time or one that is overdue
+   * Only select external tasks that are not currently locked, i.e. that have no lock expiration
+   * time or one that is overdue
    */
   ExternalTaskQuery notLocked();
 
@@ -92,12 +92,13 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Only select external tasks that belong to an instances of the given activities.
    */
   ExternalTaskQuery activityIdIn(String... activityIdIn);
-  
+
   /**
    * Only select external tasks with a priority that is higher than or equal to the given priority.
    *
    * @since 7.5
-   * @param priority the priority which is used for the query
+   * @param priority
+   *          the priority which is used for the query
    * @return the builded external task query
    */
   ExternalTaskQuery priorityHigherThanOrEquals(long priority);
@@ -106,11 +107,12 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Only select external tasks with a priority that is lower than or equal to the given priority.
    *
    * @since 7.5
-   * @param priority the priority which is used for the query
+   * @param priority
+   *          the priority which is used for the query
    * @return the builded external task query
    */
   ExternalTaskQuery priorityLowerThanOrEquals(long priority);
-    
+
   /**
    * Only select external tasks that are currently suspended
    */
@@ -130,7 +132,7 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Only select external tasks that have retries = 0
    */
   ExternalTaskQuery noRetriesLeft();
-  
+
   /** Only select external tasks that belong to one of the given tenant ids. */
   ExternalTaskQuery tenantIdIn(String... tenantIds);
 
@@ -161,13 +163,14 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
   ExternalTaskQuery orderByProcessDefinitionKey();
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of external tasks without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of external tasks without tenant id is database-specific.
    */
   ExternalTaskQuery orderByTenantId();
-  
+
   /**
    * Order by priority (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * 
    * @since 7.5
    */
   ExternalTaskQuery orderByPriority();

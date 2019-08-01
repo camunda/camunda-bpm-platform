@@ -33,20 +33,28 @@ public interface HistoricDecisionOutputInstance {
   /** The unique identifier of the historic decision instance. */
   String getDecisionInstanceId();
 
-  /** The unique identifier of the clause that the value is assigned for.
-   * Can be <code>null</code> if the decision is not implemented as decision table. */
+  /**
+   * The unique identifier of the clause that the value is assigned for. Can be <code>null</code> if
+   * the decision is not implemented as decision table.
+   */
   String getClauseId();
 
-  /** The name of the clause that the value is assigned for.
-   * Can be <code>null</code> if the decision is not implemented as decision table. */
+  /**
+   * The name of the clause that the value is assigned for. Can be <code>null</code> if the decision
+   * is not implemented as decision table.
+   */
   String getClauseName();
 
-  /** The unique identifier of the rule that is matched.
-   * Can be <code>null</code> if the decision is not implemented as decision table. */
+  /**
+   * The unique identifier of the rule that is matched. Can be <code>null</code> if the decision is
+   * not implemented as decision table.
+   */
   String getRuleId();
 
-  /** The order of the rule that is matched.
-   * Can be <code>null</code> if the decision is not implemented as decision table. */
+  /**
+   * The order of the rule that is matched. Can be <code>null</code> if the decision is not
+   * implemented as decision table.
+   */
   Integer getRuleOrder();
 
   /** The name of the output variable. */
@@ -80,8 +88,8 @@ public interface HistoricDecisionOutputInstance {
   Date getCreateTime();
 
   /**
-   * Returns the root process instance id of the process instance
-   * on which the associated business rule task has been called.
+   * Returns the root process instance id of the process instance on which the associated business
+   * rule task has been called.
    */
   String getRootProcessInstanceId();
 

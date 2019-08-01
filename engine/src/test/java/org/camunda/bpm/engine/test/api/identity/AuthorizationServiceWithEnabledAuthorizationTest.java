@@ -39,7 +39,8 @@ import static org.camunda.bpm.engine.test.api.identity.TestPermissions.UPDATE;
 /**
  * @author Stefan Hentschel.
  */
-public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableProcessEngineTestCase {
+public class AuthorizationServiceWithEnabledAuthorizationTest
+    extends PluggableProcessEngineTestCase {
 
   @Override
   public void setUp() throws Exception {
@@ -63,17 +64,21 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
 
     // if no authorizations are in Db, nothing is authorized
     assertFalse(authorizationService.isUserAuthorized("jonny", jonnysGroups, ALL, resource1));
-    assertFalse(authorizationService.isUserAuthorized("someone", someOneElsesGroups, CREATE, resource2));
+    assertFalse(
+        authorizationService.isUserAuthorized("someone", someOneElsesGroups, CREATE, resource2));
     assertFalse(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1));
-    assertFalse(authorizationService.isUserAuthorized("jonny", jonnysGroups, ALL, resource1, "someId"));
-    assertFalse(authorizationService.isUserAuthorized("someone", someOneElsesGroups, CREATE, resource2, "someId"));
-    assertFalse(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1, "someOtherId"));
+    assertFalse(
+        authorizationService.isUserAuthorized("jonny", jonnysGroups, ALL, resource1, "someId"));
+    assertFalse(authorizationService.isUserAuthorized("someone", someOneElsesGroups, CREATE,
+        resource2, "someId"));
+    assertFalse(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1,
+        "someOtherId"));
   }
 
   public void testUserOverrideGlobalGrantAuthorizationCheck() {
     Resource resource1 = TestResource.RESOURCE1;
 
-    // create global authorization which grants all permissions to all users  (on resource1):
+    // create global authorization which grants all permissions to all users (on resource1):
     Authorization globalGrant = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     globalGrant.setResource(resource1);
     globalGrant.setResourceId(ANY);
@@ -99,9 +104,11 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     assertFalse(authorizationService.isUserAuthorized("jonny", jonnysGroups, READ, resource1));
     // someone else can
     assertTrue(authorizationService.isUserAuthorized("someone else", null, ALL, resource1));
-    assertTrue(authorizationService.isUserAuthorized("someone else", someOneElsesGroups, READ, resource1));
+    assertTrue(
+        authorizationService.isUserAuthorized("someone else", someOneElsesGroups, READ, resource1));
     assertTrue(authorizationService.isUserAuthorized("someone else", null, ALL, resource1));
-    assertTrue(authorizationService.isUserAuthorized("someone else", someOneElsesGroups, READ, resource1));
+    assertTrue(
+        authorizationService.isUserAuthorized("someone else", someOneElsesGroups, READ, resource1));
     // jonny can still delete
     assertTrue(authorizationService.isUserAuthorized("jonny", null, DELETE, resource1));
     assertTrue(authorizationService.isUserAuthorized("jonny", jonnysGroups, DELETE, resource1));
@@ -110,7 +117,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
   public void testGroupOverrideGlobalGrantAuthorizationCheck() {
     Resource resource1 = TestResource.RESOURCE1;
 
-    // create global authorization which grants all permissions to all users  (on resource1):
+    // create global authorization which grants all permissions to all users (on resource1):
     Authorization globalGrant = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     globalGrant.setResource(resource1);
     globalGrant.setResourceId(ANY);
@@ -139,13 +146,17 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     assertTrue(authorizationService.isUserAuthorized("jonny", null, READ, resource1));
 
     // someone else who is in group "marketing" but but not "sales" can
-    assertTrue(authorizationService.isUserAuthorized("someone else", someOneElsesGroups, ALL, resource1));
-    assertTrue(authorizationService.isUserAuthorized("someone else", someOneElsesGroups, READ, resource1));
+    assertTrue(
+        authorizationService.isUserAuthorized("someone else", someOneElsesGroups, ALL, resource1));
+    assertTrue(
+        authorizationService.isUserAuthorized("someone else", someOneElsesGroups, READ, resource1));
     assertTrue(authorizationService.isUserAuthorized("someone else", null, ALL, resource1));
     assertTrue(authorizationService.isUserAuthorized("someone else", null, READ, resource1));
     // he could'nt if he were in jonny's groups
-    assertFalse(authorizationService.isUserAuthorized("someone else", jonnysGroups, ALL, resource1));
-    assertFalse(authorizationService.isUserAuthorized("someone else", jonnysGroups, READ, resource1));
+    assertFalse(
+        authorizationService.isUserAuthorized("someone else", jonnysGroups, ALL, resource1));
+    assertFalse(
+        authorizationService.isUserAuthorized("someone else", jonnysGroups, READ, resource1));
 
     // jonny can still delete
     assertTrue(authorizationService.isUserAuthorized("jonny", jonnysGroups, DELETE, resource1));
@@ -155,7 +166,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
   public void testUserOverrideGlobalRevokeAuthorizationCheck() {
     Resource resource1 = TestResource.RESOURCE1;
 
-    // create global authorization which revokes all permissions to all users  (on resource1):
+    // create global authorization which revokes all permissions to all users (on resource1):
     Authorization globalGrant = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     globalGrant.setResource(resource1);
     globalGrant.setResourceId(ANY);
@@ -213,7 +224,7 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
   public void testUserOverrideGroupOverrideGlobalAuthorizationCheck() {
     Resource resource1 = TestResource.RESOURCE1;
 
-    // create global authorization which grants all permissions to all users  (on resource1):
+    // create global authorization which grants all permissions to all users (on resource1):
     Authorization globalGrant = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
     globalGrant.setResource(resource1);
     globalGrant.setResourceId(ANY);
@@ -244,10 +255,12 @@ public class AuthorizationServiceWithEnabledAuthorizationTest extends PluggableP
     assertTrue(authorizationService.isUserAuthorized("jonny", null, READ, resource1));
 
     // someone else in the same groups cannot
-    assertFalse(authorizationService.isUserAuthorized("someone else", jonnysGroups, READ, resource1));
+    assertFalse(
+        authorizationService.isUserAuthorized("someone else", jonnysGroups, READ, resource1));
 
     // someone else in different groups can
-    assertTrue(authorizationService.isUserAuthorized("someone else", someOneElsesGroups, READ, resource1));
+    assertTrue(
+        authorizationService.isUserAuthorized("someone else", someOneElsesGroups, READ, resource1));
   }
 
   public void testEnabledAuthorizationCheck() {

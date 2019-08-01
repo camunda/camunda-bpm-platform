@@ -16,13 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-
-
 /**
  * @author Tom Baeyens
  */
 public interface SessionFactory {
-  
+
   Class<?> getSessionType();
 
   Session openSession();

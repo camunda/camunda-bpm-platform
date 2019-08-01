@@ -44,35 +44,23 @@ import org.junit.rules.RuleChain;
  */
 public class JobExecutorFollowUpTest {
 
-  protected static final BpmnModelInstance TWO_TASKS_PROCESS = Bpmn.createExecutableProcess("process")
-    .startEvent()
-    .serviceTask("serviceTask1")
-      .camundaAsyncBefore()
-      .camundaClass(SyncDelegate.class.getName())
-    .serviceTask("serviceTask2")
-      .camundaAsyncBefore()
-      .camundaClass(SyncDelegate.class.getName())
-    .endEvent()
-    .done();
+  protected static final BpmnModelInstance TWO_TASKS_PROCESS = Bpmn
+      .createExecutableProcess("process").startEvent().serviceTask("serviceTask1")
+      .camundaAsyncBefore().camundaClass(SyncDelegate.class.getName()).serviceTask("serviceTask2")
+      .camundaAsyncBefore().camundaClass(SyncDelegate.class.getName()).endEvent().done();
 
-  protected static final BpmnModelInstance CALL_ACTIVITY_PROCESS = Bpmn.createExecutableProcess("callActivityProcess")
-      .startEvent()
-      .callActivity("callActivity")
-        .camundaAsyncBefore()
-        .calledElement("oneTaskProcess")
-      .endEvent()
-      .done();
+  protected static final BpmnModelInstance CALL_ACTIVITY_PROCESS = Bpmn
+      .createExecutableProcess("callActivityProcess").startEvent().callActivity("callActivity")
+      .camundaAsyncBefore().calledElement("oneTaskProcess").endEvent().done();
 
-  protected static final BpmnModelInstance ONE_TASK_PROCESS = Bpmn.createExecutableProcess("oneTaskProcess")
-      .startEvent()
-      .userTask("serviceTask")
-        .camundaAsyncBefore()
-      .endEvent()
-      .done();
+  protected static final BpmnModelInstance ONE_TASK_PROCESS = Bpmn
+      .createExecutableProcess("oneTaskProcess").startEvent().userTask("serviceTask")
+      .camundaAsyncBefore().endEvent().done();
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configuration.setJobExecutor(buildControllableJobExecutor());
     }
   };
@@ -87,7 +75,8 @@ public class JobExecutorFollowUpTest {
   }
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testHelper);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testHelper);
 
   protected ControllableJobExecutor jobExecutor;
   protected ThreadControl acquisitionThread;
@@ -95,8 +84,8 @@ public class JobExecutorFollowUpTest {
 
   @Before
   public void setUp() throws Exception {
-    jobExecutor = (ControllableJobExecutor)
-        ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration()).getJobExecutor();
+    jobExecutor = (ControllableJobExecutor) ((ProcessEngineConfigurationImpl) engineRule
+        .getProcessEngine().getProcessEngineConfiguration()).getJobExecutor();
     jobExecutor.setMaxJobsPerAcquisition(2);
     acquisitionThread = jobExecutor.getAcquisitionThreadControl();
     executionThread = jobExecutor.getExecutionThreadControl();
@@ -113,7 +102,8 @@ public class JobExecutorFollowUpTest {
 
     // given
     // a process instance with a single job
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
 
     jobExecutor.start();
 
@@ -132,11 +122,13 @@ public class JobExecutorFollowUpTest {
     // then
     // the follow-up job should be executed right away
     // i.e., there is a transition instance for the second service task
-    ActivityInstance activityInstance = engineRule.getRuntimeService().getActivityInstance(processInstance.getId());
+    ActivityInstance activityInstance = engineRule.getRuntimeService()
+        .getActivityInstance(processInstance.getId());
     Assert.assertEquals(1, activityInstance.getTransitionInstances("serviceTask2").length);
 
     // and the corresponding job is locked
-    JobEntity followUpJob = (JobEntity) engineRule.getManagementService().createJobQuery().singleResult();
+    JobEntity followUpJob = (JobEntity) engineRule.getManagementService().createJobQuery()
+        .singleResult();
     Assert.assertNotNull(followUpJob);
     Assert.assertNotNull(followUpJob.getLockOwner());
     Assert.assertNotNull(followUpJob.getLockExpirationTime());
@@ -155,7 +147,8 @@ public class JobExecutorFollowUpTest {
 
     // given
     // a process instance with a single job
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("callActivityProcess");
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("callActivityProcess");
 
     jobExecutor.start();
 
@@ -167,23 +160,22 @@ public class JobExecutorFollowUpTest {
 
     // then
     // the called instance has been created
-    ProcessInstance calledInstance = engineRule.getRuntimeService()
-      .createProcessInstanceQuery()
-      .superProcessInstanceId(processInstance.getId())
-      .singleResult();
+    ProcessInstance calledInstance = engineRule.getRuntimeService().createProcessInstanceQuery()
+        .superProcessInstanceId(processInstance.getId()).singleResult();
     Assert.assertNotNull(calledInstance);
 
     // and there is a transition instance for the service task
-    ActivityInstance activityInstance = engineRule.getRuntimeService().getActivityInstance(calledInstance.getId());
+    ActivityInstance activityInstance = engineRule.getRuntimeService()
+        .getActivityInstance(calledInstance.getId());
     Assert.assertEquals(1, activityInstance.getTransitionInstances("serviceTask").length);
 
     // but the corresponding job is not locked
-    JobEntity followUpJob = (JobEntity) engineRule.getManagementService().createJobQuery().singleResult();
+    JobEntity followUpJob = (JobEntity) engineRule.getManagementService().createJobQuery()
+        .singleResult();
     Assert.assertNotNull(followUpJob);
     Assert.assertNull(followUpJob.getLockOwner());
     Assert.assertNull(followUpJob.getLockExpirationTime());
   }
-
 
   public static class SyncDelegate implements JavaDelegate {
 

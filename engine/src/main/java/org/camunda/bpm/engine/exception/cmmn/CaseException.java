@@ -19,8 +19,9 @@ package org.camunda.bpm.engine.exception.cmmn;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
- * <p>This is exception is thrown when something happens in the execution
- * of a case instance.</p>
+ * <p>
+ * This is exception is thrown when something happens in the execution of a case instance.
+ * </p>
  *
  * @author Roman Smirnov
  *

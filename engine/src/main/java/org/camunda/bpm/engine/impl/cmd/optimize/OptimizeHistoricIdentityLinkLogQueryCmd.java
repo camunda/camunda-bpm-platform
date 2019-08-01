@@ -23,20 +23,23 @@ import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricI
 import java.util.Date;
 import java.util.List;
 
-public class OptimizeHistoricIdentityLinkLogQueryCmd implements Command<List<OptimizeHistoricIdentityLinkLogEntity>> {
+public class OptimizeHistoricIdentityLinkLogQueryCmd
+    implements Command<List<OptimizeHistoricIdentityLinkLogEntity>> {
 
   protected Date occurredAfter;
   protected Date occurredAt;
   protected int maxResults;
 
-  public OptimizeHistoricIdentityLinkLogQueryCmd(Date occurredAfter, Date occurredAt, int maxResults) {
+  public OptimizeHistoricIdentityLinkLogQueryCmd(Date occurredAfter, Date occurredAt,
+      int maxResults) {
     this.occurredAfter = occurredAfter;
     this.occurredAt = occurredAt;
     this.maxResults = maxResults;
   }
 
   public List<OptimizeHistoricIdentityLinkLogEntity> execute(CommandContext commandContext) {
-    return commandContext.getOptimizeManager().getHistoricIdentityLinkLogs(occurredAfter, occurredAt, maxResults);
+    return commandContext.getOptimizeManager().getHistoricIdentityLinkLogs(occurredAfter,
+        occurredAt, maxResults);
   }
 
 }

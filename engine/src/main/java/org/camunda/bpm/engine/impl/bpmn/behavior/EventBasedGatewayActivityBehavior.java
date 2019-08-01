@@ -37,9 +37,11 @@ public class EventBasedGatewayActivityBehavior extends FlowNodeActivityBehavior 
       ActivityBehavior activityBehavior = act.getActivityBehavior();
       if (activityBehavior instanceof ConditionalEventBehavior) {
         ConditionalEventBehavior conditionalEventBehavior = (ConditionalEventBehavior) activityBehavior;
-        ConditionalEventDefinition conditionalEventDefinition = conditionalEventBehavior.getConditionalEventDefinition();
+        ConditionalEventDefinition conditionalEventDefinition = conditionalEventBehavior
+            .getConditionalEventDefinition();
         if (conditionalEventDefinition.tryEvaluate(execution)) {
-          ((ExecutionEntity) execution).executeEventHandlerActivity(conditionalEventDefinition.getConditionalActivity());
+          ((ExecutionEntity) execution)
+              .executeEventHandlerActivity(conditionalEventDefinition.getConditionalActivity());
           return;
         }
       }

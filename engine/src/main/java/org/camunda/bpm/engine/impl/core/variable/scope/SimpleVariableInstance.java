@@ -38,17 +38,21 @@ public class SimpleVariableInstance implements CoreVariableInstance {
   public String getName() {
     return name;
   }
+
   public void setName(String name) {
     this.name = name;
   }
+
   public TypedValue getTypedValue(boolean deserialize) {
     return value;
   }
+
   public void setValue(TypedValue value) {
     this.value = value;
   }
 
-  public static class SimpleVariableInstanceFactory implements VariableInstanceFactory<SimpleVariableInstance> {
+  public static class SimpleVariableInstanceFactory
+      implements VariableInstanceFactory<SimpleVariableInstance> {
 
     public static final SimpleVariableInstanceFactory INSTANCE = new SimpleVariableInstanceFactory();
 

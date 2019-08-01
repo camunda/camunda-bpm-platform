@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  * @author Daniel Meyer
  *
  */
-public class JmxManagedThreadPool extends SeExecutorService implements JmxManagedThreadPoolMBean, PlatformService<JmxManagedThreadPool> {
+public class JmxManagedThreadPool extends SeExecutorService
+    implements JmxManagedThreadPoolMBean, PlatformService<JmxManagedThreadPool> {
 
   private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
@@ -54,11 +55,10 @@ public class JmxManagedThreadPool extends SeExecutorService implements JmxManage
 
     // Waits for 1 minute to finish all currently executing jobs
     try {
-      if(!threadPoolExecutor.awaitTermination(60L, TimeUnit.SECONDS)) {
+      if (!threadPoolExecutor.awaitTermination(60L, TimeUnit.SECONDS)) {
         LOG.timeoutDuringShutdownOfThreadPool(60, TimeUnit.SECONDS);
       }
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       LOG.interruptedWhileShuttingDownThreadPool(e);
     }
 

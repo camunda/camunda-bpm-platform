@@ -49,7 +49,8 @@ public class MigratingProcessInstance {
   protected ProcessDefinitionEntity sourceDefinition;
   protected ProcessDefinitionEntity targetDefinition;
 
-  public MigratingProcessInstance(String processInstanceId, ProcessDefinitionEntity sourceDefinition, ProcessDefinitionEntity targetDefinition) {
+  public MigratingProcessInstance(String processInstanceId,
+      ProcessDefinitionEntity sourceDefinition, ProcessDefinitionEntity targetDefinition) {
     this.processInstanceId = processInstanceId;
     this.migratingActivityInstances = new ArrayList<MigratingActivityInstance>();
     this.migratingTransitionInstances = new ArrayList<MigratingTransitionInstance>();
@@ -104,19 +105,12 @@ public class MigratingProcessInstance {
     return processInstanceId;
   }
 
-  public MigratingActivityInstance addActivityInstance(
-      MigrationInstruction migrationInstruction,
-      ActivityInstance activityInstance,
-      ScopeImpl sourceScope,
-      ScopeImpl targetScope,
+  public MigratingActivityInstance addActivityInstance(MigrationInstruction migrationInstruction,
+      ActivityInstance activityInstance, ScopeImpl sourceScope, ScopeImpl targetScope,
       ExecutionEntity scopeExecution) {
 
     MigratingActivityInstance migratingActivityInstance = new MigratingActivityInstance(
-        activityInstance,
-        migrationInstruction,
-        sourceScope,
-        targetScope,
-        scopeExecution);
+        activityInstance, migrationInstruction, sourceScope, targetScope, scopeExecution);
 
     migratingActivityInstances.add(migratingActivityInstance);
 
@@ -128,18 +122,11 @@ public class MigratingProcessInstance {
   }
 
   public MigratingTransitionInstance addTransitionInstance(
-      MigrationInstruction migrationInstruction,
-      TransitionInstance transitionInstance,
-      ScopeImpl sourceScope,
-      ScopeImpl targetScope,
-      ExecutionEntity asyncExecution) {
+      MigrationInstruction migrationInstruction, TransitionInstance transitionInstance,
+      ScopeImpl sourceScope, ScopeImpl targetScope, ExecutionEntity asyncExecution) {
 
     MigratingTransitionInstance migratingTransitionInstance = new MigratingTransitionInstance(
-        transitionInstance,
-        migrationInstruction,
-        sourceScope,
-        targetScope,
-        asyncExecution);
+        transitionInstance, migrationInstruction, sourceScope, targetScope, asyncExecution);
 
     migratingTransitionInstances.add(migratingTransitionInstance);
 
@@ -147,23 +134,14 @@ public class MigratingProcessInstance {
   }
 
   public MigratingEventScopeInstance addEventScopeInstance(
-      MigrationInstruction migrationInstruction,
-      ExecutionEntity eventScopeExecution,
-      ScopeImpl sourceScope,
-      ScopeImpl targetScope,
-      MigrationInstruction eventSubscriptionInstruction,
-      EventSubscriptionEntity eventSubscription,
-      ScopeImpl eventSubscriptionSourceScope,
-      ScopeImpl eventSubscriptionTargetScope) {
+      MigrationInstruction migrationInstruction, ExecutionEntity eventScopeExecution,
+      ScopeImpl sourceScope, ScopeImpl targetScope,
+      MigrationInstruction eventSubscriptionInstruction, EventSubscriptionEntity eventSubscription,
+      ScopeImpl eventSubscriptionSourceScope, ScopeImpl eventSubscriptionTargetScope) {
 
     MigratingEventScopeInstance compensationInstance = new MigratingEventScopeInstance(
-        migrationInstruction,
-        eventScopeExecution,
-        sourceScope,
-        targetScope,
-        eventSubscriptionInstruction,
-        eventSubscription,
-        eventSubscriptionSourceScope,
+        migrationInstruction, eventScopeExecution, sourceScope, targetScope,
+        eventSubscriptionInstruction, eventSubscription, eventSubscriptionSourceScope,
         eventSubscriptionTargetScope);
 
     migratingEventScopeInstances.add(compensationInstance);
@@ -172,15 +150,10 @@ public class MigratingProcessInstance {
   }
 
   public MigratingCompensationEventSubscriptionInstance addCompensationSubscriptionInstance(
-      MigrationInstruction eventSubscriptionInstruction,
-      EventSubscriptionEntity eventSubscription,
-      ScopeImpl sourceScope,
-      ScopeImpl targetScope) {
+      MigrationInstruction eventSubscriptionInstruction, EventSubscriptionEntity eventSubscription,
+      ScopeImpl sourceScope, ScopeImpl targetScope) {
     MigratingCompensationEventSubscriptionInstance compensationInstance = new MigratingCompensationEventSubscriptionInstance(
-        eventSubscriptionInstruction,
-        sourceScope,
-        targetScope,
-        eventSubscription);
+        eventSubscriptionInstruction, sourceScope, targetScope, eventSubscription);
 
     migratingCompensationSubscriptionInstances.add(compensationInstance);
 

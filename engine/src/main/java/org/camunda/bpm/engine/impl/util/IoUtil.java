@@ -31,7 +31,6 @@ import java.nio.charset.Charset;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
-
 /**
  * @author Tom Baeyens
  * @author Frederik Heremans
@@ -43,15 +42,14 @@ public class IoUtil {
 
   public static byte[] readInputStream(InputStream inputStream, String inputStreamName) {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    byte[] buffer = new byte[16*1024];
+    byte[] buffer = new byte[16 * 1024];
     try {
       int bytesRead = inputStream.read(buffer);
-      while (bytesRead!=-1) {
+      while (bytesRead != -1) {
         outputStream.write(buffer, 0, bytesRead);
         bytesRead = inputStream.read(buffer);
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileReadingStream(inputStreamName, e);
     }
     return outputStream.toByteArray();
@@ -60,8 +58,7 @@ public class IoUtil {
   public static String readClasspathResourceAsString(String resourceName) {
     InputStream resourceAsStream = IoUtil.class.getClassLoader().getResourceAsStream(resourceName);
 
-    if (resourceAsStream == null)
-    {
+    if (resourceAsStream == null) {
       throw new ProcessEngineException("resource " + resourceName + " not found");
     }
 
@@ -74,17 +71,14 @@ public class IoUtil {
     BufferedInputStream inputStream = null;
     try {
       inputStream = new BufferedInputStream(resourceAsStream);
-      while ((next = inputStream.read(buffer)) >= 0)
-      {
+      while ((next = inputStream.read(buffer)) >= 0) {
         outStream.write(buffer, 0, next);
       }
 
       result = outStream.toByteArray();
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileReadingFile(resourceName, e);
-    }
-    finally {
+    } finally {
       IoUtil.closeSilently(inputStream);
       IoUtil.closeSilently(outStream);
     }
@@ -95,8 +89,7 @@ public class IoUtil {
     URL url = IoUtil.class.getClassLoader().getResource(filePath);
     try {
       return new File(url.toURI());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileGettingFile(filePath, e);
     }
   }
@@ -107,41 +100,37 @@ public class IoUtil {
       outputStream = new BufferedOutputStream(new FileOutputStream(getFile(filePath)));
       outputStream.write(content.getBytes());
       outputStream.flush();
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileWritingToFile(filePath, e);
-    }
-    finally {
+    } finally {
       IoUtil.closeSilently(outputStream);
     }
   }
 
   /**
-   * Closes the given stream. The same as calling {@link Closeable#close()}, but
-   * errors while closing are silently ignored.
+   * Closes the given stream. The same as calling {@link Closeable#close()}, but errors while
+   * closing are silently ignored.
    */
   public static void closeSilently(Closeable closeable) {
     try {
-      if(closeable != null) {
+      if (closeable != null) {
         closeable.close();
       }
-    }
-    catch(IOException ignore) {
+    } catch (IOException ignore) {
       LOG.debugCloseException(ignore);
     }
   }
 
   /**
-   * Flushes the given object. The same as calling {@link Flushable#flush()}, but
-   * errors while flushing are silently ignored.
+   * Flushes the given object. The same as calling {@link Flushable#flush()}, but errors while
+   * flushing are silently ignored.
    */
   public static void flushSilently(Flushable flushable) {
     try {
-      if(flushable != null) {
+      if (flushable != null) {
         flushable.flush();
       }
-    }
-    catch(IOException ignore) {
+    } catch (IOException ignore) {
       LOG.debugCloseException(ignore);
     }
   }

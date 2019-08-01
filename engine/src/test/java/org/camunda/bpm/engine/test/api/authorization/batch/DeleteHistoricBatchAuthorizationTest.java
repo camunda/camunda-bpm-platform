@@ -73,15 +73,12 @@ public class DeleteHistoricBatchAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.DELETE_HISTORY)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.DELETE_HISTORY))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.BATCH, "batchId", "userId", Permissions.DELETE_HISTORY)),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.BATCH, "batchId", "userId", Permissions.DELETE_HISTORY))
+            .succeeds());
   }
 
   protected MigrationPlan migrationPlan;
@@ -94,13 +91,13 @@ public class DeleteHistoricBatchAuthorizationTest {
 
   @Before
   public void deployProcessesAndCreateMigrationPlan() {
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    migrationPlan = engineRule
-        .getRuntimeService()
-        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .build();
+    migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId()).build();
   }
 
   @After
@@ -117,19 +114,13 @@ public class DeleteHistoricBatchAuthorizationTest {
   public void testDeleteBatch() {
 
     // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
-    batch = engineRule
-        .getRuntimeService()
-        .newMigration(migrationPlan)
-        .processInstanceIds(Arrays.asList(processInstance.getId()))
-        .executeAsync();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("batchId", batch.getId())
-      .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", batch.getId()).start();
 
     engineRule.getHistoryService().deleteHistoricBatch(batch.getId());
 
@@ -138,9 +129,7 @@ public class DeleteHistoricBatchAuthorizationTest {
       assertEquals(0, engineRule.getHistoryService().createHistoricBatchQuery().count());
 
       List<UserOperationLogEntry> userOperationLogEntries = engineRule.getHistoryService()
-        .createUserOperationLogQuery()
-        .operationType(OPERATION_TYPE_DELETE_HISTORY)
-        .list();
+          .createUserOperationLogQuery().operationType(OPERATION_TYPE_DELETE_HISTORY).list();
 
       assertEquals(1, userOperationLogEntries.size());
 

@@ -60,7 +60,8 @@ public class DmnEngineConfigurationTest {
   @Test
   public void setDefaultInputExpressionLanguage() {
     // given a DMN engine configuration with default expression language
-    DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
+    DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration
+        .createDefaultDmnEngineConfiguration();
     dmnEngineConfiguration.setDefaultInputExpressionExpressionLanguage("groovy");
 
     ProcessEngineConfigurationImpl processEngineConfiguration = createProcessEngineConfiguration();
@@ -70,14 +71,17 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the default expression language should be set on the DMN engine
-    assertThat(getConfigurationOfDmnEngine().getDefaultInputExpressionExpressionLanguage(), is("groovy"));
+    assertThat(getConfigurationOfDmnEngine().getDefaultInputExpressionExpressionLanguage(),
+        is("groovy"));
   }
 
   @Test
   public void setCustomPostTableExecutionListener() {
     // given a DMN engine configuration with custom listener
-    DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
-    DmnDecisionTableEvaluationListener customEvaluationListener = mock(DmnDecisionTableEvaluationListener.class);
+    DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration
+        .createDefaultDmnEngineConfiguration();
+    DmnDecisionTableEvaluationListener customEvaluationListener = mock(
+        DmnDecisionTableEvaluationListener.class);
     List<DmnDecisionTableEvaluationListener> customListeners = new ArrayList<DmnDecisionTableEvaluationListener>();
     customListeners.add(customEvaluationListener);
     dmnEngineConfiguration.setCustomPostDecisionTableEvaluationListeners(customListeners);
@@ -89,13 +93,15 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the custom listener should be set on the DMN engine
-    assertThat(getConfigurationOfDmnEngine().getCustomPostDecisionTableEvaluationListeners(), hasItem(customEvaluationListener));
+    assertThat(getConfigurationOfDmnEngine().getCustomPostDecisionTableEvaluationListeners(),
+        hasItem(customEvaluationListener));
   }
 
   @Test
   public void setFeelEngineFactory() {
     // given a DMN engine configuration with feel engine factory
-    DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
+    DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration
+        .createDefaultDmnEngineConfiguration();
     FeelEngineFactory feelEngineFactory = mock(FeelEngineFactory.class);
     dmnEngineConfiguration.setFeelEngineFactory(feelEngineFactory);
 
@@ -112,7 +118,8 @@ public class DmnEngineConfigurationTest {
   @Test
   public void setScriptEngineResolver() {
     // given a DMN engine configuration with script engine resolver
-    DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
+    DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration
+        .createDefaultDmnEngineConfiguration();
     DmnScriptEngineResolver scriptEngineResolver = mock(DmnScriptEngineResolver.class);
     dmnEngineConfiguration.setScriptEngineResolver(scriptEngineResolver);
 
@@ -129,7 +136,8 @@ public class DmnEngineConfigurationTest {
   @Test
   public void setElProvider() {
     // given a DMN engine configuration with el provider
-    DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
+    DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration
+        .createDefaultDmnEngineConfiguration();
     ElProvider elProvider = mock(ElProvider.class);
     dmnEngineConfiguration.setElProvider(elProvider);
 
@@ -152,7 +160,8 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the DMN engine should use the process engine el provider
-    assertEquals(ProcessEngineElProvider.class, getConfigurationOfDmnEngine().getElProvider().getClass());
+    assertEquals(ProcessEngineElProvider.class,
+        getConfigurationOfDmnEngine().getElProvider().getClass());
   }
 
   @Test
@@ -164,7 +173,8 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the DMN engine should use the script engines from the process engine
-    assertEquals(processEngineConfiguration.getScriptingEngines(), getConfigurationOfDmnEngine().getScriptEngineResolver());
+    assertEquals(processEngineConfiguration.getScriptingEngines(),
+        getConfigurationOfDmnEngine().getScriptEngineResolver());
   }
 
   @Test
@@ -175,7 +185,8 @@ public class DmnEngineConfigurationTest {
         .createProcessEngineConfigurationFromResource(CONFIGURATION_XML);
 
     // checks that the configuration is set as on XML
-    DefaultDmnEngineConfiguration dmnEngineConfiguration = processEngineConfiguration.getDmnEngineConfiguration();
+    DefaultDmnEngineConfiguration dmnEngineConfiguration = processEngineConfiguration
+        .getDmnEngineConfiguration();
     assertThat(dmnEngineConfiguration, is(notNullValue()));
     assertThat(dmnEngineConfiguration.getDefaultInputExpressionExpressionLanguage(), is("groovy"));
 
@@ -183,16 +194,19 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the default expression language should be set in the DMN engine
-    assertThat(getConfigurationOfDmnEngine().getDefaultInputExpressionExpressionLanguage(), is("groovy"));
+    assertThat(getConfigurationOfDmnEngine().getDefaultInputExpressionExpressionLanguage(),
+        is("groovy"));
   }
 
   protected ProcessEngineConfigurationImpl createProcessEngineConfiguration() {
-    return (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration()
+    return (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+        .createStandaloneInMemProcessEngineConfiguration()
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
   }
 
   protected DefaultDmnEngineConfiguration getConfigurationOfDmnEngine() {
-    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engine
+        .getProcessEngineConfiguration();
 
     DmnEngine dmnEngine = processEngineConfiguration.getDmnEngine();
     return (DefaultDmnEngineConfiguration) dmnEngine.getConfiguration();

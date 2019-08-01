@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -46,9 +45,7 @@ public class GetExecutionVariableCmd implements Command<Object>, Serializable {
     ensureNotNull("executionId", executionId);
     ensureNotNull("variableName", variableName);
 
-    ExecutionEntity execution = commandContext
-      .getExecutionManager()
-      .findExecutionById(executionId);
+    ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(executionId);
 
     ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 
@@ -65,8 +62,10 @@ public class GetExecutionVariableCmd implements Command<Object>, Serializable {
     return value;
   }
 
-  protected void checkGetExecutionVariable(ExecutionEntity execution, CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+  protected void checkGetExecutionVariable(ExecutionEntity execution,
+      CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessInstanceVariable(execution);
     }
   }

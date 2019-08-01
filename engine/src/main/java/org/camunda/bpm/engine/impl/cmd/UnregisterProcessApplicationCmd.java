@@ -37,22 +37,22 @@ public class UnregisterProcessApplicationCmd implements Command<Void> {
     this(Collections.singleton(deploymentId), removeProcessesFromCache);
   }
 
-  public UnregisterProcessApplicationCmd(Set<String> deploymentIds, boolean removeProcessesFromCache) {
+  public UnregisterProcessApplicationCmd(Set<String> deploymentIds,
+      boolean removeProcessesFromCache) {
     this.deploymentIds = deploymentIds;
     this.removeProcessesFromCache = removeProcessesFromCache;
   }
 
   public Void execute(CommandContext commandContext) {
 
-    if(deploymentIds == null) {
+    if (deploymentIds == null) {
       throw new ProcessEngineException("Deployment Ids cannot be null.");
     }
 
     commandContext.getAuthorizationManager().checkCamundaAdmin();
 
-    Context.getProcessEngineConfiguration()
-      .getProcessApplicationManager()
-      .unregisterProcessApplicationForDeployments(deploymentIds, removeProcessesFromCache);
+    Context.getProcessEngineConfiguration().getProcessApplicationManager()
+        .unregisterProcessApplicationForDeployments(deploymentIds, removeProcessesFromCache);
 
     return null;
 

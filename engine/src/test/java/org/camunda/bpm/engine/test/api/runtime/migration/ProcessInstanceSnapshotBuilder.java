@@ -34,21 +34,25 @@ public class ProcessInstanceSnapshotBuilder {
   protected String processInstanceId;
   protected ProcessInstanceSnapshot snapshot;
 
-  public ProcessInstanceSnapshotBuilder(ProcessInstance processInstance, ProcessEngine processEngine) {
+  public ProcessInstanceSnapshotBuilder(ProcessInstance processInstance,
+      ProcessEngine processEngine) {
     this.processEngine = processEngine;
     this.processInstanceId = processInstance.getId();
-    this.snapshot = new ProcessInstanceSnapshot(processInstance.getId(), processInstance.getProcessDefinitionId());
+    this.snapshot = new ProcessInstanceSnapshot(processInstance.getId(),
+        processInstance.getProcessDefinitionId());
   }
 
   public ProcessInstanceSnapshotBuilder deploymentId() {
-    String deploymentId = processEngine.getRepositoryService().getProcessDefinition(snapshot.getProcessDefinitionId()).getDeploymentId();
+    String deploymentId = processEngine.getRepositoryService()
+        .getProcessDefinition(snapshot.getProcessDefinitionId()).getDeploymentId();
     snapshot.setDeploymentId(deploymentId);
 
     return this;
   }
 
   public ProcessInstanceSnapshotBuilder activityTree() {
-    ActivityInstance activityInstance = processEngine.getRuntimeService().getActivityInstance(processInstanceId);
+    ActivityInstance activityInstance = processEngine.getRuntimeService()
+        .getActivityInstance(processInstanceId);
     snapshot.setActivityTree(activityInstance);
 
     return this;
@@ -62,33 +66,38 @@ public class ProcessInstanceSnapshotBuilder {
   }
 
   public ProcessInstanceSnapshotBuilder tasks() {
-    List<Task> tasks = processEngine.getTaskService().createTaskQuery().processInstanceId(processInstanceId).list();
+    List<Task> tasks = processEngine.getTaskService().createTaskQuery()
+        .processInstanceId(processInstanceId).list();
     snapshot.setTasks(tasks);
 
     return this;
   }
 
   public ProcessInstanceSnapshotBuilder eventSubscriptions() {
-    List<EventSubscription> eventSubscriptions = processEngine.getRuntimeService().createEventSubscriptionQuery().processInstanceId(processInstanceId).list();
+    List<EventSubscription> eventSubscriptions = processEngine.getRuntimeService()
+        .createEventSubscriptionQuery().processInstanceId(processInstanceId).list();
     snapshot.setEventSubscriptions(eventSubscriptions);
 
     return this;
   }
 
   public ProcessInstanceSnapshotBuilder jobs() {
-    List<Job> jobs = processEngine.getManagementService().createJobQuery().processInstanceId(processInstanceId).list();
+    List<Job> jobs = processEngine.getManagementService().createJobQuery()
+        .processInstanceId(processInstanceId).list();
     snapshot.setJobs(jobs);
 
-    String processDefinitionId = processEngine.getRuntimeService()
-      .createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult().getProcessDefinitionId();
-    List<JobDefinition> jobDefinitions = processEngine.getManagementService().createJobDefinitionQuery().processDefinitionId(processDefinitionId).list();
+    String processDefinitionId = processEngine.getRuntimeService().createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).singleResult().getProcessDefinitionId();
+    List<JobDefinition> jobDefinitions = processEngine.getManagementService()
+        .createJobDefinitionQuery().processDefinitionId(processDefinitionId).list();
     snapshot.setJobDefinitions(jobDefinitions);
 
     return this;
   }
 
   public ProcessInstanceSnapshotBuilder variables() {
-    List<VariableInstance> variables = processEngine.getRuntimeService().createVariableInstanceQuery().processInstanceIdIn(processInstanceId).list();
+    List<VariableInstance> variables = processEngine.getRuntimeService()
+        .createVariableInstanceQuery().processInstanceIdIn(processInstanceId).list();
     snapshot.setVariables(variables);
 
     return this;

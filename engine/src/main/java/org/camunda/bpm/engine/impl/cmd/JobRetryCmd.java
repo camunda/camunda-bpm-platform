@@ -42,14 +42,11 @@ public abstract class JobRetryCmd implements Command<Object> {
   }
 
   protected JobEntity getJob() {
-    return Context
-        .getCommandContext()
-        .getJobManager()
-        .findJobById(jobId);
+    return Context.getCommandContext().getJobManager().findJobById(jobId);
   }
 
   protected void logException(JobEntity job) {
-    if(exception != null) {
+    if (exception != null) {
       job.setExceptionMessage(exception.getMessage());
       job.setExceptionStacktrace(getExceptionStacktrace());
     }

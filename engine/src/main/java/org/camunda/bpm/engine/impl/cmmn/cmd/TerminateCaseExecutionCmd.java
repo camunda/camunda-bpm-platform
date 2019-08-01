@@ -36,12 +36,14 @@ public class TerminateCaseExecutionCmd extends StateTransitionCaseExecutionCmd {
     super(builder);
   }
 
-  public TerminateCaseExecutionCmd(String caseExecutionId, Map<String, Object> variables, Map<String, Object> variablesLocal,
-      Collection<String> variableDeletions, Collection<String> variableLocalDeletions) {
+  public TerminateCaseExecutionCmd(String caseExecutionId, Map<String, Object> variables,
+      Map<String, Object> variablesLocal, Collection<String> variableDeletions,
+      Collection<String> variableLocalDeletions) {
     super(caseExecutionId, variables, variablesLocal, variableDeletions, variableLocalDeletions);
   }
- 
-  protected void performStateTransition(CommandContext commandContext, CaseExecutionEntity caseExecution) {
+
+  protected void performStateTransition(CommandContext commandContext,
+      CaseExecutionEntity caseExecution) {
     caseExecution.terminate();
   }
 

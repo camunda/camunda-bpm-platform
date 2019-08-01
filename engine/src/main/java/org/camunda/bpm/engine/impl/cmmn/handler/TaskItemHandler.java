@@ -31,13 +31,15 @@ import org.camunda.bpm.model.cmmn.instance.Task;
 public class TaskItemHandler extends ItemHandler {
 
   @Override
-  protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeActivity(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     super.initializeActivity(element, activity, context);
 
     initializeBlocking(element, activity, context);
   }
 
-  protected void initializeBlocking(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeBlocking(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     Task task = (Task) getDefinition(element);
     activity.setProperty("isBlocking", task.isBlocking());
   }

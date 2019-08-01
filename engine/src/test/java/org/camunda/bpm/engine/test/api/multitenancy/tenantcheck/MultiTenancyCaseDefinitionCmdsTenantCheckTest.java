@@ -56,7 +56,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected IdentityService identityService;
@@ -221,7 +221,7 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
   }
 
   @Test
-  public void updateHistoryTimeToLiveNoAuthenticatedTenants(){
+  public void updateHistoryTimeToLiveNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
     // declare expected exception

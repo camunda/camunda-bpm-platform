@@ -50,7 +50,8 @@ import static org.junit.Assert.assertNull;
 public class FailedJobListenerWithRetriesTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setFailedJobCommandFactory(new OLEFailedJobCommandFactory());
       configuration.setFailedJobListenerMaxRetries(5);
       return configuration;
@@ -81,22 +82,21 @@ public class FailedJobListenerWithRetriesTest {
 
   @Parameterized.Parameters
   public static Collection<Object[]> scenarios() {
-    return Arrays.asList(new Object[][] {
-        { 4, 0, false },
-        //all retries are depleted without success -> the job is still locked
-        { 5, 1, true }
-    });
+    return Arrays.asList(new Object[][] { { 4, 0, false },
+        // all retries are depleted without success -> the job is still locked
+        { 5, 1, true } });
   }
 
   @Test
-  @org.camunda.bpm.engine.test.Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn"})
+  @org.camunda.bpm.engine.test.Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
   public void testFailedJobListenerRetries() {
-    //given
+    // given
     runtimeService.startProcessInstanceByKey("failingProcess");
 
-    //when the job is run several times till the incident creation
+    // when the job is run several times till the incident creation
     Job job = getJob();
-    while (job.getRetries() > 0 && ((JobEntity)job).getLockOwner() == null ) {
+    while (job.getRetries() > 0 && ((JobEntity) job).getLockOwner() == null) {
       try {
         lockTheJob(job.getId());
         engineRule.getManagementService().executeJob(job.getId());
@@ -105,8 +105,9 @@ public class FailedJobListenerWithRetriesTest {
       job = getJob();
     }
 
-    //then
-    JobEntity jobFinalState = (JobEntity)engineRule.getManagementService().createJobQuery().jobId(job.getId()).list().get(0);
+    // then
+    JobEntity jobFinalState = (JobEntity) engineRule.getManagementService().createJobQuery()
+        .jobId(job.getId()).list().get(0);
     assertEquals(jobRetries, jobFinalState.getRetries());
     if (jobLocked) {
       assertNotNull(jobFinalState.getLockOwner());
@@ -118,15 +119,16 @@ public class FailedJobListenerWithRetriesTest {
   }
 
   void lockTheJob(final String jobId) {
-    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew().execute(new Command<Object>() {
-      @Override
-      public Object execute(CommandContext commandContext) {
-        final JobEntity job = commandContext.getJobManager().findJobById(jobId);
-        job.setLockOwner("someLockOwner");
-        job.setLockExpirationTime(DateUtils.addHours(ClockUtil.getCurrentTime(), 1));
-        return null;
-      }
-    });
+    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew()
+        .execute(new Command<Object>() {
+          @Override
+          public Object execute(CommandContext commandContext) {
+            final JobEntity job = commandContext.getJobManager().findJobById(jobId);
+            job.setLockOwner("someLockOwner");
+            job.setLockExpirationTime(DateUtils.addHours(ClockUtil.getCurrentTime(), 1));
+            return null;
+          }
+        });
   }
 
   private Job getJob() {
@@ -162,7 +164,7 @@ public class FailedJobListenerWithRetriesTest {
     @Override
     public Object execute(CommandContext commandContext) {
       Job job = getJob();
-      //on last attempt the incident will be created, we imitate OLE
+      // on last attempt the incident will be created, we imitate OLE
       if (job.getRetries() == 1) {
         countRuns++;
         if (countRuns <= failedRetriesNumber) {

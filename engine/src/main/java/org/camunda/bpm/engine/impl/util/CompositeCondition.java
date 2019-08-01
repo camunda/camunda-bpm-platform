@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.impl.util;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Composite Condition implementation which allows multiple consumers
- * to subscribe to signals with their own {@link SingleConsumerCondition}.
+ * Composite Condition implementation which allows multiple consumers to subscribe to signals with
+ * their own {@link SingleConsumerCondition}.
  */
 public class CompositeCondition {
 

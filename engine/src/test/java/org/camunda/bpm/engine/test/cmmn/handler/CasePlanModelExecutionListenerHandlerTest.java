@@ -40,7 +40,8 @@ public class CasePlanModelExecutionListenerHandlerTest extends CmmnElementHandle
 
   protected AbstractExecutionListenerSpec testSpecification;
 
-  public CasePlanModelExecutionListenerHandlerTest(AbstractExecutionListenerSpec testSpecification) {
+  public CasePlanModelExecutionListenerHandlerTest(
+      AbstractExecutionListenerSpec testSpecification) {
     this.testSpecification = testSpecification;
   }
 

@@ -36,7 +36,8 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  * @author Thorben Lindhauer
  *
  */
-public class CompensationInstanceHandler implements MigratingInstanceParseHandler<EventSubscriptionEntity> {
+public class CompensationInstanceHandler
+    implements MigratingInstanceParseHandler<EventSubscriptionEntity> {
 
   @Override
   public void handle(MigratingInstanceParseContext parseContext, EventSubscriptionEntity element) {
@@ -44,80 +45,76 @@ public class CompensationInstanceHandler implements MigratingInstanceParseHandle
     MigratingProcessElementInstance migratingInstance;
     if (element.getConfiguration() != null) {
       migratingInstance = createMigratingEventScopeInstance(parseContext, element);
-    }
-    else {
+    } else {
       migratingInstance = createMigratingEventSubscriptionInstance(parseContext, element);
     }
-
 
     ExecutionEntity owningExecution = element.getExecution();
     MigratingScopeInstance parentInstance = null;
     if (owningExecution.isEventScope()) {
-      parentInstance = parseContext.getMigratingCompensationInstanceByExecutionId(owningExecution.getId());
-    }
-    else {
-      parentInstance = parseContext.getMigratingActivityInstanceById(owningExecution.getParentActivityInstanceId());
+      parentInstance = parseContext
+          .getMigratingCompensationInstanceByExecutionId(owningExecution.getId());
+    } else {
+      parentInstance = parseContext
+          .getMigratingActivityInstanceById(owningExecution.getParentActivityInstanceId());
     }
     migratingInstance.setParent(parentInstance);
   }
 
-  protected MigratingProcessElementInstance createMigratingEventSubscriptionInstance(MigratingInstanceParseContext parseContext,
-      EventSubscriptionEntity element) {
-    ActivityImpl compensationHandler = parseContext.getSourceProcessDefinition().findActivity(element.getActivityId());
+  protected MigratingProcessElementInstance createMigratingEventSubscriptionInstance(
+      MigratingInstanceParseContext parseContext, EventSubscriptionEntity element) {
+    ActivityImpl compensationHandler = parseContext.getSourceProcessDefinition()
+        .findActivity(element.getActivityId());
 
-    MigrationInstruction migrationInstruction = getMigrationInstruction(parseContext, compensationHandler);
+    MigrationInstruction migrationInstruction = getMigrationInstruction(parseContext,
+        compensationHandler);
 
     ActivityImpl targetScope = null;
     if (migrationInstruction != null) {
-      ActivityImpl targetEventScope = (ActivityImpl) parseContext.getTargetActivity(migrationInstruction).getEventScope();
+      ActivityImpl targetEventScope = (ActivityImpl) parseContext
+          .getTargetActivity(migrationInstruction).getEventScope();
       targetScope = targetEventScope.findCompensationHandler();
     }
 
-    MigratingCompensationEventSubscriptionInstance migratingCompensationInstance =
-        parseContext.getMigratingProcessInstance().addCompensationSubscriptionInstance(
-            migrationInstruction,
-            element,
-            compensationHandler,
-            targetScope);
+    MigratingCompensationEventSubscriptionInstance migratingCompensationInstance = parseContext
+        .getMigratingProcessInstance().addCompensationSubscriptionInstance(migrationInstruction,
+            element, compensationHandler, targetScope);
 
     parseContext.consume(element);
 
     return migratingCompensationInstance;
   }
 
-  protected MigratingProcessElementInstance createMigratingEventScopeInstance(MigratingInstanceParseContext parseContext,
-      EventSubscriptionEntity element) {
+  protected MigratingProcessElementInstance createMigratingEventScopeInstance(
+      MigratingInstanceParseContext parseContext, EventSubscriptionEntity element) {
 
-    ActivityImpl compensatingActivity = parseContext.getSourceProcessDefinition().findActivity(element.getActivityId());
+    ActivityImpl compensatingActivity = parseContext.getSourceProcessDefinition()
+        .findActivity(element.getActivityId());
 
-    MigrationInstruction migrationInstruction = getMigrationInstruction(parseContext, compensatingActivity);
+    MigrationInstruction migrationInstruction = getMigrationInstruction(parseContext,
+        compensatingActivity);
 
     ActivityImpl eventSubscriptionTargetScope = null;
 
     if (migrationInstruction != null) {
       if (compensatingActivity.isCompensationHandler()) {
-        ActivityImpl targetEventScope = (ActivityImpl) parseContext.getTargetActivity(migrationInstruction).getEventScope();
+        ActivityImpl targetEventScope = (ActivityImpl) parseContext
+            .getTargetActivity(migrationInstruction).getEventScope();
         eventSubscriptionTargetScope = targetEventScope.findCompensationHandler();
-      }
-      else {
+      } else {
         eventSubscriptionTargetScope = parseContext.getTargetActivity(migrationInstruction);
       }
     }
 
     ExecutionEntity eventScopeExecution = CompensationUtil.getCompensatingExecution(element);
-    MigrationInstruction eventScopeInstruction = parseContext.findSingleMigrationInstruction(eventScopeExecution.getActivityId());
+    MigrationInstruction eventScopeInstruction = parseContext
+        .findSingleMigrationInstruction(eventScopeExecution.getActivityId());
     ActivityImpl targetScope = parseContext.getTargetActivity(eventScopeInstruction);
 
-    MigratingEventScopeInstance migratingCompensationInstance =
-        parseContext.getMigratingProcessInstance().addEventScopeInstance(
-          eventScopeInstruction,
-          eventScopeExecution,
-          eventScopeExecution.getActivity(),
-          targetScope,
-          migrationInstruction,
-          element,
-          compensatingActivity,
-          eventSubscriptionTargetScope);
+    MigratingEventScopeInstance migratingCompensationInstance = parseContext
+        .getMigratingProcessInstance().addEventScopeInstance(eventScopeInstruction,
+            eventScopeExecution, eventScopeExecution.getActivity(), targetScope,
+            migrationInstruction, element, compensatingActivity, eventSubscriptionTargetScope);
 
     parseContext.consume(element);
     parseContext.submit(migratingCompensationInstance);
@@ -127,22 +124,24 @@ public class CompensationInstanceHandler implements MigratingInstanceParseHandle
     return migratingCompensationInstance;
   }
 
-  protected MigrationInstruction getMigrationInstruction(MigratingInstanceParseContext parseContext, ActivityImpl activity) {
+  protected MigrationInstruction getMigrationInstruction(MigratingInstanceParseContext parseContext,
+      ActivityImpl activity) {
     if (activity.isCompensationHandler()) {
       Properties compensationHandlerProperties = activity.getProperties();
-      ActivityImpl eventTrigger = compensationHandlerProperties.get(BpmnProperties.COMPENSATION_BOUNDARY_EVENT);
+      ActivityImpl eventTrigger = compensationHandlerProperties
+          .get(BpmnProperties.COMPENSATION_BOUNDARY_EVENT);
       if (eventTrigger == null) {
         eventTrigger = compensationHandlerProperties.get(BpmnProperties.INITIAL_ACTIVITY);
       }
 
       return parseContext.findSingleMigrationInstruction(eventTrigger.getActivityId());
-    }
-    else {
+    } else {
       return parseContext.findSingleMigrationInstruction(activity.getActivityId());
     }
   }
 
-  protected void parseDependentEntities(MigratingInstanceParseContext parseContext, MigratingEventScopeInstance migratingInstance) {
+  protected void parseDependentEntities(MigratingInstanceParseContext parseContext,
+      MigratingEventScopeInstance migratingInstance) {
 
     ExecutionEntity representativeExecution = migratingInstance.resolveRepresentativeExecution();
 

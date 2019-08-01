@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEnt
  * @author Tom Baeyens
  * @author Christian Stettler
  */
-public class HistoricProcessInstanceEntity extends HistoricProcessInstanceEventEntity implements HistoricProcessInstance {
+public class HistoricProcessInstanceEntity extends HistoricProcessInstanceEventEntity
+    implements HistoricProcessInstance {
 
   private static final long serialVersionUID = 1L;
 

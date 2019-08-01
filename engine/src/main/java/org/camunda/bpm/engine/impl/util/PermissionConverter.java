@@ -27,8 +27,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
  * <p>
- * Converts between the String-Array based and the Integer-based representation
- * of permissions.
+ * Converts between the String-Array based and the Integer-based representation of permissions.
  * </p>
  * 
  * @author Daniel Meyer
@@ -37,18 +36,21 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public class PermissionConverter {
 
-  public static Permission[] getPermissionsForNames(String[] names, int resourceType, ProcessEngineConfiguration engineConfiguration) {
-    
+  public static Permission[] getPermissionsForNames(String[] names, int resourceType,
+      ProcessEngineConfiguration engineConfiguration) {
+
     final Permission[] permissions = new Permission[names.length];
-    
+
     for (int i = 0; i < names.length; i++) {
-      permissions[i] = ((ProcessEngineConfigurationImpl) engineConfiguration).getPermissionProvider().getPermissionForName(names[i], resourceType);
+      permissions[i] = ((ProcessEngineConfigurationImpl) engineConfiguration)
+          .getPermissionProvider().getPermissionForName(names[i], resourceType);
     }
-        
-    return permissions;    
+
+    return permissions;
   }
 
-  public static String[] getNamesForPermissions(Authorization authorization, Permission[] permissions) {
+  public static String[] getNamesForPermissions(Authorization authorization,
+      Permission[] permissions) {
 
     int type = authorization.getAuthorizationType();
 

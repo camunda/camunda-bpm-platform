@@ -37,12 +37,14 @@ import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 
 /**
- * <p>This class is responsible for wiring history as execution listeners into process execution.
+ * <p>
+ * This class is responsible for wiring history as execution listeners into process execution.
  *
- * <p>NOTE: the role of this class has changed since 7.0: in order to customize history behavior it is
+ * <p>
+ * NOTE: the role of this class has changed since 7.0: in order to customize history behavior it is
  * usually not necessary to override this class but rather the {@link HistoryEventProducer} for
- * customizing data acquisition and {@link HistoryEventHandler} for customizing the persistence behavior
- * or if you need a history event stream.
+ * customizing data acquisition and {@link HistoryEventHandler} for customizing the persistence
+ * behavior or if you need a history event stream.
  *
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -55,8 +57,10 @@ import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 public class HistoryParseListener implements BpmnParseListener {
 
   // Cached listeners
-  // listeners can be reused for a given process engine instance but cannot be cached in static fields since
-  // different process engine instances on the same Classloader may have different HistoryEventProducer
+  // listeners can be reused for a given process engine instance but cannot be cached in static
+  // fields since
+  // different process engine instances on the same Classloader may have different
+  // HistoryEventProducer
   // configurations wired
   protected ExecutionListener PROCESS_INSTANCE_START_LISTENER;
   protected ExecutionListener PROCESS_INSTANCE_END_LISTENER;
@@ -92,15 +96,18 @@ public class HistoryParseListener implements BpmnParseListener {
     }
   }
 
-  public void parseExclusiveGateway(Element exclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseExclusiveGateway(Element exclusiveGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addActivityHandlers(activity);
   }
 
-  public void parseInclusiveGateway(Element inclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseInclusiveGateway(Element inclusiveGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addActivityHandlers(activity);
   }
 
-  public void parseCallActivity(Element callActivityElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseCallActivity(Element callActivityElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addActivityHandlers(activity);
   }
 
@@ -125,8 +132,10 @@ public class HistoryParseListener implements BpmnParseListener {
     addActivityHandlers(activity);
 
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_CREATE, null)) {
-      TaskDefinition taskDefinition = ((UserTaskActivityBehavior) activity.getActivityBehavior()).getTaskDefinition();
-      taskDefinition.addBuiltInTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, USER_TASK_ASSIGNMENT_HANDLER);
+      TaskDefinition taskDefinition = ((UserTaskActivityBehavior) activity.getActivityBehavior())
+          .getTaskDefinition();
+      taskDefinition.addBuiltInTaskListener(TaskListener.EVENTNAME_ASSIGNMENT,
+          USER_TASK_ASSIGNMENT_HANDLER);
       taskDefinition.addBuiltInTaskListener(TaskListener.EVENTNAME_CREATE, USER_TASK_ID_HANDLER);
     }
   }
@@ -135,7 +144,8 @@ public class HistoryParseListener implements BpmnParseListener {
     addActivityHandlers(activity);
   }
 
-  public void parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addActivityHandlers(activity);
   }
 
@@ -155,81 +165,101 @@ public class HistoryParseListener implements BpmnParseListener {
     addActivityHandlers(activity);
   }
 
-  public void parseParallelGateway(Element parallelGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseParallelGateway(Element parallelGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addActivityHandlers(activity);
   }
 
-  public void parseBoundaryTimerEventDefinition(Element timerEventDefinition, boolean interrupting, ActivityImpl timerActivity) {
+  public void parseBoundaryTimerEventDefinition(Element timerEventDefinition, boolean interrupting,
+      ActivityImpl timerActivity) {
   }
 
-  public void parseBoundaryErrorEventDefinition(Element errorEventDefinition, boolean interrupting, ActivityImpl activity, ActivityImpl nestedErrorEventActivity) {
+  public void parseBoundaryErrorEventDefinition(Element errorEventDefinition, boolean interrupting,
+      ActivityImpl activity, ActivityImpl nestedErrorEventActivity) {
   }
 
-  public void parseIntermediateTimerEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity) {
+  public void parseIntermediateTimerEventDefinition(Element timerEventDefinition,
+      ActivityImpl timerActivity) {
   }
 
-  public void parseProperty(Element propertyElement, VariableDeclaration variableDeclaration, ActivityImpl activity) {
+  public void parseProperty(Element propertyElement, VariableDeclaration variableDeclaration,
+      ActivityImpl activity) {
   }
 
-  public void parseSequenceFlow(Element sequenceFlowElement, ScopeImpl scopeElement, TransitionImpl transition) {
+  public void parseSequenceFlow(Element sequenceFlowElement, ScopeImpl scopeElement,
+      TransitionImpl transition) {
   }
 
-  public void parseRootElement(Element rootElement, List<ProcessDefinitionEntity> processDefinitions) {
+  public void parseRootElement(Element rootElement,
+      List<ProcessDefinitionEntity> processDefinitions) {
   }
 
-  public void parseBoundarySignalEventDefinition(Element signalEventDefinition, boolean interrupting, ActivityImpl signalActivity) {
+  public void parseBoundarySignalEventDefinition(Element signalEventDefinition,
+      boolean interrupting, ActivityImpl signalActivity) {
   }
 
-  public void parseEventBasedGateway(Element eventBasedGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseEventBasedGateway(Element eventBasedGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addActivityHandlers(activity);
   }
 
   public void parseMultiInstanceLoopCharacteristics(Element activityElement,
-          Element multiInstanceLoopCharacteristicsElement, ActivityImpl activity) {
+      Element multiInstanceLoopCharacteristicsElement, ActivityImpl activity) {
     addActivityHandlers(activity);
   }
 
-  public void parseIntermediateSignalCatchEventDefinition(Element signalEventDefinition, ActivityImpl signalActivity) {
+  public void parseIntermediateSignalCatchEventDefinition(Element signalEventDefinition,
+      ActivityImpl signalActivity) {
   }
 
   public void parseTransaction(Element transactionElement, ScopeImpl scope, ActivityImpl activity) {
     addActivityHandlers(activity);
   }
 
-  public void parseCompensateEventDefinition(Element compensateEventDefinition, ActivityImpl compensationActivity) {
+  public void parseCompensateEventDefinition(Element compensateEventDefinition,
+      ActivityImpl compensationActivity) {
   }
 
-  public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addActivityHandlers(activity);
   }
 
-  public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope,
+      ActivityImpl activity) {
     // do not write history for link events
-    if(!activity.getProperty("type").equals("intermediateLinkCatch")) {
+    if (!activity.getProperty("type").equals("intermediateLinkCatch")) {
       addActivityHandlers(activity);
     }
   }
 
-  public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl activity) {
+  public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement,
+      ActivityImpl activity) {
     addActivityHandlers(activity);
   }
 
-  public void parseIntermediateMessageCatchEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity) {
+  public void parseIntermediateMessageCatchEventDefinition(Element messageEventDefinition,
+      ActivityImpl nestedActivity) {
   }
 
-  public void parseBoundaryMessageEventDefinition(Element element, boolean interrupting, ActivityImpl messageActivity) {
+  public void parseBoundaryMessageEventDefinition(Element element, boolean interrupting,
+      ActivityImpl messageActivity) {
   }
 
-  public void parseBoundaryEscalationEventDefinition(Element escalationEventDefinition, boolean interrupting, ActivityImpl boundaryEventActivity) {
+  public void parseBoundaryEscalationEventDefinition(Element escalationEventDefinition,
+      boolean interrupting, ActivityImpl boundaryEventActivity) {
   }
 
-  public void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity) {
+  public void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting,
+      ActivityImpl conditionalActivity) {
   }
 
-  public void parseIntermediateConditionalEventDefinition(Element conditionalEventDefinition, ActivityImpl conditionalActivity) {
+  public void parseIntermediateConditionalEventDefinition(Element conditionalEventDefinition,
+      ActivityImpl conditionalActivity) {
   }
 
-  public void parseConditionalStartEventForEventSubprocess(Element element, ActivityImpl conditionalActivity, boolean interrupting) {
+  public void parseConditionalStartEventForEventSubprocess(Element element,
+      ActivityImpl conditionalActivity, boolean interrupting) {
   }
 
   // helper methods ///////////////////////////////////////////////////////////
@@ -243,7 +273,7 @@ public class HistoryParseListener implements BpmnParseListener {
       activity.addBuiltInListener(PvmEvent.EVENTNAME_END, ACTIVITY_INSTANCE_END_LISTENER);
     }
   }
-  
+
   protected void ensureHistoryLevelInitialized() {
     if (historyLevel == null) {
       historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();

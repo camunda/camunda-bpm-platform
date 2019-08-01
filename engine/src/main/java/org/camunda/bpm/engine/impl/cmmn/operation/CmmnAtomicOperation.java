@@ -61,7 +61,6 @@ public interface CmmnAtomicOperation extends CoreAtomicOperation<CmmnExecution> 
   CmmnAtomicOperation CASE_EXECUTION_FIRE_ENTRY_CRITERIA = new AtomicOperationCaseExecutionFireEntryCriteria();
   CmmnAtomicOperation CASE_EXECUTION_FIRE_EXIT_CRITERIA = new AtomicOperationCaseExecutionFireExitCriteria();
 
-
   // delete cascade a case execution
   CmmnAtomicOperation CASE_EXECUTION_DELETE_CASCADE = new AtomicOperationCaseExecutionDeleteCascade();
 

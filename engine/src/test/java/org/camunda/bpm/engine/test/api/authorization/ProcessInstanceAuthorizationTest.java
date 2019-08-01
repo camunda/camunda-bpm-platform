@@ -77,9 +77,10 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
         "org/camunda/bpm/engine/test/api/authorization/signalBoundaryEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/signalStartEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/throwWarningSignalEventProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/authorization/throwAlertSignalEventProcess.bpmn20.xml"
-        ).getId();
-    ensureSpecificVariablePermission = processEngineConfiguration.isEnforceSpecificVariablePermission();
+        "org/camunda/bpm/engine/test/api/authorization/throwAlertSignalEventProcess.bpmn20.xml")
+            .getId();
+    ensureSpecificVariablePermission = processEngineConfiguration
+        .isEnforceSpecificVariablePermission();
     super.setUp();
   }
 
@@ -87,7 +88,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
-    processEngineConfiguration.setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
+    processEngineConfiguration
+        .setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   // process instance query //////////////////////////////////////////////////////////
@@ -297,7 +299,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -312,7 +316,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'oneTaskProcess' of type 'ProcessDefinition'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'oneTaskProcess' of type 'ProcessDefinition'",
+          e.getMessage());
     }
   }
 
@@ -327,7 +333,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -361,7 +369,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -378,7 +388,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'oneTaskProcess' of type 'ProcessDefinition'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'oneTaskProcess' of type 'ProcessDefinition'",
+          e.getMessage());
     }
   }
 
@@ -395,7 +407,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -437,12 +451,15 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService.createProcessInstanceByKey(PROCESS_KEY).startBeforeActivity("theTask").execute();
+      runtimeService.createProcessInstanceByKey(PROCESS_KEY).startBeforeActivity("theTask")
+          .execute();
       fail("Exception expected: It should not be possible to start a process instance");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -452,12 +469,15 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService.createProcessInstanceByKey(PROCESS_KEY).startBeforeActivity("theTask").execute();
+      runtimeService.createProcessInstanceByKey(PROCESS_KEY).startBeforeActivity("theTask")
+          .execute();
       fail("Exception expected: It should not be possible to start a process instance");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'oneTaskProcess' of type 'ProcessDefinition'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'oneTaskProcess' of type 'ProcessDefinition'",
+          e.getMessage());
     }
   }
 
@@ -467,12 +487,15 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService.createProcessInstanceByKey(PROCESS_KEY).startBeforeActivity("theTask").execute();
+      runtimeService.createProcessInstanceByKey(PROCESS_KEY).startBeforeActivity("theTask")
+          .execute();
       fail("Exception expected: It should not be possible to start a process instance");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -484,7 +507,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processDefinitionId = selectProcessDefinitionByKey(PROCESS_KEY).getId();
 
     // when
-    runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask").execute();
+    runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask")
+        .execute();
 
     // then
     disableAuthorization();
@@ -501,12 +525,15 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask").execute();
+      runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask")
+          .execute();
       fail("Exception expected: It should not be possible to start a process instance");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -518,12 +545,15 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask").execute();
+      runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask")
+          .execute();
       fail("Exception expected: It should not be possible to start a process instance");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'oneTaskProcess' of type 'ProcessDefinition'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'oneTaskProcess' of type 'ProcessDefinition'",
+          e.getMessage());
     }
   }
 
@@ -535,12 +565,15 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask").execute();
+      runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask")
+          .execute();
       fail("Exception expected: It should not be possible to start a process instance");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -557,7 +590,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -572,13 +607,16 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'messageStartProcess' of type 'ProcessDefinition'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'messageStartProcess' of type 'ProcessDefinition'",
+          e.getMessage());
     }
   }
 
   public void testStartProcessInstanceByMessageWithCreateInstancesPermissionOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
 
     try {
       // when
@@ -587,13 +625,16 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
   public void testStartProcessInstanceByMessage() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
@@ -616,12 +657,15 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startInvoiceMessage", processDefinitionId);
+      runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startInvoiceMessage",
+          processDefinitionId);
       fail("Exception expected: It should not be possible to start a process instance");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -633,41 +677,50 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startInvoiceMessage", processDefinitionId);
+      runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startInvoiceMessage",
+          processDefinitionId);
       fail("Exception expected: It should not be possible to start a process instance");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'messageStartProcess' of type 'ProcessDefinition'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'messageStartProcess' of type 'ProcessDefinition'",
+          e.getMessage());
     }
   }
 
   public void testStartProcessInstanceByMessageAndProcDefIdWithCreateInstancesPermissionOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
 
     String processDefinitionId = selectProcessDefinitionByKey(MESSAGE_START_PROCESS_KEY).getId();
 
     try {
       // when
-      runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startInvoiceMessage", processDefinitionId);
+      runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startInvoiceMessage",
+          processDefinitionId);
       fail("Exception expected: It should not be possible to start a process instance");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
   public void testStartProcessInstanceByMessageAndProcDefId() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     String processDefinitionId = selectProcessDefinitionByKey(MESSAGE_START_PROCESS_KEY).getId();
 
     // when
-    runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startInvoiceMessage", processDefinitionId);
+    runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startInvoiceMessage",
+        processDefinitionId);
 
     // then
     disableAuthorization();
@@ -772,11 +825,11 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-//      String message = e.getMessage();
-//      assertTextPresent(userId, message);
-//      assertTextPresent(READ.getName(), message);
-//      assertTextPresent(processInstanceId, message);
-//      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      // String message = e.getMessage();
+      // assertTextPresent(userId, message);
+      // assertTextPresent(READ.getName(), message);
+      // assertTextPresent(processInstanceId, message);
+      // assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
     }
   }
 
@@ -1032,7 +1085,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceivedWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     runtimeService.signalEventReceived("alert");
@@ -1047,7 +1101,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     runtimeService.signalEventReceived("alert");
@@ -1162,7 +1217,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceivedByExecutionIdWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -1179,7 +1235,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -1202,7 +1259,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -1216,7 +1275,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'signalStartProcess' of type 'ProcessDefinition'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'signalStartProcess' of type 'ProcessDefinition'",
+          e.getMessage());
     }
   }
 
@@ -1240,7 +1301,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void FAILING_testStartProcessInstanceByThrowSignalEventWithCreatePermissionOnProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
-    createGrantAuthorization(PROCESS_DEFINITION, THROW_WARNING_SIGNAL_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, THROW_WARNING_SIGNAL_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
 
     try {
       // when
@@ -1248,7 +1310,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'signalStartProcess' of type 'ProcessDefinition'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'signalStartProcess' of type 'ProcessDefinition'",
+          e.getMessage());
     }
   }
 
@@ -1256,7 +1320,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
     createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_START_PROCESS_KEY, userId, CREATE_INSTANCE);
-    createGrantAuthorization(PROCESS_DEFINITION, THROW_WARNING_SIGNAL_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, THROW_WARNING_SIGNAL_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
 
     // when
     runtimeService.startProcessInstanceByKey(THROW_WARNING_SIGNAL_PROCESS_KEY);
@@ -1273,7 +1338,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void FAILING_testThrowSignalEventWithoutAuthorization() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
-    createGrantAuthorization(PROCESS_DEFINITION, THROW_ALERT_SIGNAL_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, THROW_ALERT_SIGNAL_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
 
     String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
 
@@ -1298,12 +1364,14 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testThrowSignalEvent() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
-    createGrantAuthorization(PROCESS_DEFINITION, THROW_ALERT_SIGNAL_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, THROW_ALERT_SIGNAL_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
 
     String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
 
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     runtimeService.startProcessInstanceByKey(THROW_ALERT_SIGNAL_PROCESS_KEY);
@@ -1373,7 +1441,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testMessageEventReceivedByExecutionIdWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -1390,7 +1459,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     String executionId = selectSingleTask().getExecutionId();
 
@@ -1457,7 +1527,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateMessageExecutionWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     runtimeService.correlateMessage("boundaryInvoiceMessage");
@@ -1472,7 +1543,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     runtimeService.correlateMessage("boundaryInvoiceMessage");
@@ -1494,7 +1566,9 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to correlate a message.");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -1509,13 +1583,16 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'messageStartProcess' of type 'ProcessDefinition'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'messageStartProcess' of type 'ProcessDefinition'",
+          e.getMessage());
     }
   }
 
   public void testCorrelateMessageProcessDefinitionWithCreateInstancesPermissionOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
 
     try {
       // when
@@ -1524,14 +1601,17 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
   public void testCorrelateMessageProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
 
     // when
     runtimeService.correlateMessage("startInvoiceMessage");
@@ -1550,9 +1630,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService
-        .createMessageCorrelation("boundaryInvoiceMessage")
-        .correlateAll();
+      runtimeService.createMessageCorrelation("boundaryInvoiceMessage").correlateAll();
       fail("Exception expected: It should not be possible to correlate a message.");
     } catch (AuthorizationException e) {
       // then
@@ -1573,9 +1651,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
     // when
-    runtimeService
-      .createMessageCorrelation("boundaryInvoiceMessage")
-      .correlateAll();
+    runtimeService.createMessageCorrelation("boundaryInvoiceMessage").correlateAll();
 
     // then
     Task task = selectSingleTask();
@@ -1589,9 +1665,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
     // when
-    runtimeService
-      .createMessageCorrelation("boundaryInvoiceMessage")
-      .correlateAll();
+    runtimeService.createMessageCorrelation("boundaryInvoiceMessage").correlateAll();
 
     // then
     Task task = selectSingleTask();
@@ -1602,12 +1676,11 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateAllExecutionWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
-    runtimeService
-      .createMessageCorrelation("boundaryInvoiceMessage")
-      .correlateAll();
+    runtimeService.createMessageCorrelation("boundaryInvoiceMessage").correlateAll();
 
     // then
     Task task = selectSingleTask();
@@ -1619,12 +1692,11 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
-    runtimeService
-      .createMessageCorrelation("boundaryInvoiceMessage")
-      .correlateAll();
+    runtimeService.createMessageCorrelation("boundaryInvoiceMessage").correlateAll();
 
     // then
     Task task = selectSingleTask();
@@ -1635,15 +1707,14 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateAllTwoExecutionsShouldFail() {
     // given
     String firstProcessInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    String secondProcessInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
+    String secondProcessInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, userId, UPDATE);
 
     try {
       // when
-      runtimeService
-        .createMessageCorrelation("boundaryInvoiceMessage")
-        .correlateAll();
+      runtimeService.createMessageCorrelation("boundaryInvoiceMessage").correlateAll();
       fail("Exception expected: It should not be possible to trigger a signal event");
     } catch (AuthorizationException e) {
       // then
@@ -1661,15 +1732,14 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testCorrelateAllTwoExecutionsShouldSuccess() {
     // given
     String firstProcessInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    String secondProcessInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
+    String secondProcessInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, userId, UPDATE);
     createGrantAuthorization(PROCESS_INSTANCE, secondProcessInstanceId, userId, UPDATE);
 
     // when
-    runtimeService
-      .createMessageCorrelation("boundaryInvoiceMessage")
-      .correlateAll();
+    runtimeService.createMessageCorrelation("boundaryInvoiceMessage").correlateAll();
 
     // then
     disableAuthorization();
@@ -1688,13 +1758,13 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService
-        .createMessageCorrelation("startInvoiceMessage")
-        .correlateAll();
+      runtimeService.createMessageCorrelation("startInvoiceMessage").correlateAll();
       fail("Exception expected: It should not be possible to correlate a message.");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
@@ -1704,43 +1774,43 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      runtimeService
-        .createMessageCorrelation("startInvoiceMessage")
-        .correlateAll();
+      runtimeService.createMessageCorrelation("startInvoiceMessage").correlateAll();
       fail("Exception expected: It should not be possible to correlate a message.");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'messageStartProcess' of type 'ProcessDefinition'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'messageStartProcess' of type 'ProcessDefinition'",
+          e.getMessage());
     }
   }
 
   public void testCorrelateAllProcessDefinitionWithCreateInstancesPermissionOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
 
     try {
       // when
-      runtimeService
-        .createMessageCorrelation("startInvoiceMessage")
-        .correlateAll();
+      runtimeService.createMessageCorrelation("startInvoiceMessage").correlateAll();
       fail("Exception expected: It should not be possible to correlate a message.");
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'",
+          e.getMessage());
     }
   }
 
   public void testCorrelateAllProcessDefinition() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
 
     // when
-    runtimeService
-      .createMessageCorrelation("startInvoiceMessage")
-      .correlateAll();
+    runtimeService.createMessageCorrelation("startInvoiceMessage").correlateAll();
 
     // then
     Task task = selectSingleTask();
@@ -1817,7 +1887,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE, SUSPEND);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE, SUSPEND_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE,
+        SUSPEND_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceById(processInstanceId);
@@ -1940,7 +2011,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
     suspendProcessInstanceById(processInstanceId);
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE, SUSPEND);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE, SUSPEND_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE,
+        SUSPEND_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceById(processInstanceId);
@@ -2077,7 +2149,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processDefinitionId = instance.getProcessDefinitionId();
 
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE, SUSPEND);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE, SUSPEND_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE,
+        SUSPEND_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinitionId);
@@ -2139,7 +2212,6 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     instance = selectSingleProcessInstance();
     assertTrue(instance.isSuspended());
   }
-
 
   // activate process instance by process definition id /////////////////////////////
 
@@ -2238,7 +2310,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     suspendProcessInstanceById(processInstanceId);
 
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE, SUSPEND);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE, SUSPEND_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE,
+        SUSPEND_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinitionId);
@@ -2331,7 +2404,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
       assertTextPresent(SUSPEND.getName(), message);
       assertTextPresent(SUSPEND_INSTANCE.getName(), message);
-   }
+    }
   }
 
   public void testSuspendProcessInstanceByProcessDefinitionKeyWithUpdatePermissionOnProcessInstance() {
@@ -2542,7 +2615,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     suspendProcessInstanceById(processInstanceId);
 
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE, SUSPEND);
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE, SUSPEND_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE,
+        SUSPEND_INSTANCE);
 
     // when
     runtimeService.activateProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
@@ -2619,8 +2693,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     try {
       // when
       runtimeService.createProcessInstanceModification(processInstanceId)
-        .startBeforeActivity("taskAfterBoundaryEvent")
-        .execute();
+          .startBeforeActivity("taskAfterBoundaryEvent").execute();
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
@@ -2641,8 +2714,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     // when
     runtimeService.createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("taskAfterBoundaryEvent")
-      .execute();
+        .startBeforeActivity("taskAfterBoundaryEvent").execute();
 
     // then
     disableAuthorization();
@@ -2660,8 +2732,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     // when
     runtimeService.createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("taskAfterBoundaryEvent")
-      .execute();
+        .startBeforeActivity("taskAfterBoundaryEvent").execute();
 
     // then
     disableAuthorization();
@@ -2675,12 +2746,12 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testModifyProcessInstanceWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     runtimeService.createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("taskAfterBoundaryEvent")
-      .execute();
+        .startBeforeActivity("taskAfterBoundaryEvent").execute();
 
     // then
     disableAuthorization();
@@ -2695,12 +2766,12 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     runtimeService.createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("taskAfterBoundaryEvent")
-      .execute();
+        .startBeforeActivity("taskAfterBoundaryEvent").execute();
 
     // then
     disableAuthorization();
@@ -2714,13 +2785,13 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceByModifyingWithoutDeleteAuthorization() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     try {
       // when
       runtimeService.createProcessInstanceModification(processInstanceId)
-        .cancelAllForActivity("task")
-        .execute();
+          .cancelAllForActivity("task").execute();
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
@@ -2737,13 +2808,13 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceByModifyingWithoutDeletePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, DELETE);
 
     // when
-    runtimeService.createProcessInstanceModification(processInstanceId)
-      .cancelAllForActivity("task")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId).cancelAllForActivity("task")
+        .execute();
 
     // then
     assertProcessEnded(processInstanceId);
@@ -2752,13 +2823,13 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceByModifyingWithoutDeletePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, DELETE);
 
     // when
-    runtimeService.createProcessInstanceModification(processInstanceId)
-      .cancelAllForActivity("task")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId).cancelAllForActivity("task")
+        .execute();
 
     // then
     assertProcessEnded(processInstanceId);
@@ -2767,16 +2838,16 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testDeleteProcessInstanceByModifyingWithoutDeleteInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY).getId();
-    Authorization authorization = createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_BOUNDARY_PROCESS_KEY);
+    Authorization authorization = createGrantAuthorization(PROCESS_DEFINITION,
+        MESSAGE_BOUNDARY_PROCESS_KEY);
     authorization.setUserId(userId);
     authorization.addPermission(UPDATE_INSTANCE);
     authorization.addPermission(DELETE_INSTANCE);
     saveAuthorization(authorization);
 
     // when
-    runtimeService.createProcessInstanceModification(processInstanceId)
-      .cancelAllForActivity("task")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId).cancelAllForActivity("task")
+        .execute();
 
     // then
     assertProcessEnded(processInstanceId);
@@ -2791,10 +2862,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(TASK, ANY, userId, ALL);
 
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .resourceId(processInstanceId)
-        .singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .resourceId(processInstanceId).singleResult();
     enableAuthorization();
     assertNotNull(authorization);
 
@@ -2805,9 +2874,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    authorization = authorizationService
-        .createAuthorizationQuery()
-        .resourceId(processInstanceId)
+    authorization = authorizationService.createAuthorizationQuery().resourceId(processInstanceId)
         .singleResult();
     enableAuthorization();
 
@@ -2820,10 +2887,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, ALL);
 
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .resourceId(processInstanceId)
-        .singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .resourceId(processInstanceId).singleResult();
     enableAuthorization();
     assertNotNull(authorization);
 
@@ -2832,9 +2897,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    authorization = authorizationService
-        .createAuthorizationQuery()
-        .resourceId(processInstanceId)
+    authorization = authorizationService.createAuthorizationQuery().resourceId(processInstanceId)
         .singleResult();
     enableAuthorization();
 
@@ -3872,7 +3935,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     assertNotNull(variables);
@@ -3888,7 +3952,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     assertNotNull(variables);
@@ -3904,7 +3969,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     assertNotNull(variables);
@@ -3920,7 +3986,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     assertNotNull(variables);
@@ -3937,7 +4004,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     verifyGetVariables(variables);
@@ -3950,7 +4018,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariables(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     verifyGetVariables(variables);
@@ -4001,7 +4070,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     assertNotNull(variables);
@@ -4017,7 +4087,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     assertNotNull(variables);
@@ -4033,7 +4104,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     assertNotNull(variables);
@@ -4049,7 +4121,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     assertNotNull(variables);
@@ -4066,7 +4139,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     verifyGetVariables(variables);
@@ -4079,7 +4153,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
 
     // when
-    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     verifyGetVariables(variables);
@@ -4130,7 +4205,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
-    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     assertNotNull(variables);
@@ -4146,7 +4222,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
-    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     assertNotNull(variables);
@@ -4162,7 +4239,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
-    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     assertNotNull(variables);
@@ -4178,7 +4256,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
 
     // when
-    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     assertNotNull(variables);
@@ -4195,7 +4274,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
 
     // when
-    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     verifyGetVariables(variables);
@@ -4208,7 +4288,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
 
     // when
-    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     verifyGetVariables(variables);
@@ -4259,7 +4340,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
-    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     assertNotNull(variables);
@@ -4275,7 +4357,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
-    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     assertNotNull(variables);
@@ -4291,7 +4374,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
-    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     assertNotNull(variables);
@@ -4307,7 +4391,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
 
     // when
-    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     assertNotNull(variables);
@@ -4324,7 +4409,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE_VARIABLE);
 
     // when
-    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     verifyGetVariables(variables);
@@ -4337,7 +4423,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE_VARIABLE);
 
     // when
-    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = runtimeService.getVariablesLocalTyped(processInstanceId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     verifyGetVariables(variables);
@@ -5006,7 +5093,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (1)
-      ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), null);
+      ((RuntimeServiceImpl) runtimeService).updateVariables(processInstanceId, getVariables(),
+          null);
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (1)
@@ -5015,7 +5103,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (2)
-      ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
+      ((RuntimeServiceImpl) runtimeService).updateVariables(processInstanceId, null,
+          Arrays.asList(VARIABLE_NAME));
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (2)
@@ -5024,7 +5113,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (3)
-      ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
+      ((RuntimeServiceImpl) runtimeService).updateVariables(processInstanceId, getVariables(),
+          Arrays.asList(VARIABLE_NAME));
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (3)
@@ -5104,7 +5194,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (1)
-      ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), null);
+      ((RuntimeServiceImpl) runtimeService).updateVariablesLocal(processInstanceId, getVariables(),
+          null);
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (1)
@@ -5113,7 +5204,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (2)
-      ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
+      ((RuntimeServiceImpl) runtimeService).updateVariablesLocal(processInstanceId, null,
+          Arrays.asList(VARIABLE_NAME));
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (2)
@@ -5122,7 +5214,8 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (3)
-      ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
+      ((RuntimeServiceImpl) runtimeService).updateVariablesLocal(processInstanceId, getVariables(),
+          Arrays.asList(VARIABLE_NAME));
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (3)
@@ -5288,19 +5381,21 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   protected void verifyUpdateVariables(String processInstanceId) {
     // when (1)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), null);
+    ((RuntimeServiceImpl) runtimeService).updateVariables(processInstanceId, getVariables(), null);
 
     // then (1)
     verifyVariableInstanceCountDisabledAuthorization(1);
 
     // when (2)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
+    ((RuntimeServiceImpl) runtimeService).updateVariables(processInstanceId, null,
+        Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     verifyVariableInstanceCountDisabledAuthorization(0);
 
     // when (3)
-    ((RuntimeServiceImpl)runtimeService).updateVariables(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((RuntimeServiceImpl) runtimeService).updateVariables(processInstanceId, getVariables(),
+        Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     verifyVariableInstanceCountDisabledAuthorization(0);
@@ -5308,19 +5403,22 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   protected void verifyUpdateVariablesLocal(String processInstanceId) {
     // when (1)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), null);
+    ((RuntimeServiceImpl) runtimeService).updateVariablesLocal(processInstanceId, getVariables(),
+        null);
 
     // then (1)
     verifyVariableInstanceCountDisabledAuthorization(1);
 
     // when (2)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, null, Arrays.asList(VARIABLE_NAME));
+    ((RuntimeServiceImpl) runtimeService).updateVariablesLocal(processInstanceId, null,
+        Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     verifyVariableInstanceCountDisabledAuthorization(0);
-  
+
     // when (3)
-    ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((RuntimeServiceImpl) runtimeService).updateVariablesLocal(processInstanceId, getVariables(),
+        Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     verifyVariableInstanceCountDisabledAuthorization(0);

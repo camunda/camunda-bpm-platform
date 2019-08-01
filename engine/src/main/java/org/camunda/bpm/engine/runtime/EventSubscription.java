@@ -31,9 +31,9 @@ public interface EventSubscription {
   String getId();
 
   /**
-   * The event subscriptions type. "message" identifies message event subscriptions,
-   * "signal" identifies signal event subscription, "compensation" identifies event subscriptions
-   * used for compensation events.
+   * The event subscriptions type. "message" identifies message event subscriptions, "signal"
+   * identifies signal event subscription, "compensation" identifies event subscriptions used for
+   * compensation events.
    */
   String getEventType();
 
@@ -53,14 +53,14 @@ public interface EventSubscription {
   String getProcessInstanceId();
 
   /**
-   * The identifier of the activity that this event subscription belongs to.
-   * This could for example be the id of a receive task.
+   * The identifier of the activity that this event subscription belongs to. This could for example
+   * be the id of a receive task.
    */
   String getActivityId();
 
   /**
-   * The id of the tenant this event subscription belongs to. Can be <code>null</code>
-   * if the subscription belongs to no single tenant.
+   * The id of the tenant this event subscription belongs to. Can be <code>null</code> if the
+   * subscription belongs to no single tenant.
    */
   String getTenantId();
 

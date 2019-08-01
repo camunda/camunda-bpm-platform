@@ -48,8 +48,10 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTestCase {
     }
 
     // then querying and ordering by priority works
-    verifySortingAndCount(managementService.createJobQuery().orderByJobPriority().asc(), 5, jobByPriority());
-    verifySortingAndCount(managementService.createJobQuery().orderByJobPriority().desc(), 5, inverted(jobByPriority()));
+    verifySortingAndCount(managementService.createJobQuery().orderByJobPriority().asc(), 5,
+        jobByPriority());
+    verifySortingAndCount(managementService.createJobQuery().orderByJobPriority().desc(), 5,
+        inverted(jobByPriority()));
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
@@ -90,7 +92,8 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTestCase {
 
     // when making a job query and filtering by disjunctive job priority
     // then the no jobs are returned
-    assertEquals(0, managementService.createJobQuery().priorityLowerThanOrEquals(2).priorityHigherThanOrEquals(3).count());
+    assertEquals(0, managementService.createJobQuery().priorityLowerThanOrEquals(2)
+        .priorityHigherThanOrEquals(3).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")

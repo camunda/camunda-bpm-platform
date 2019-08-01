@@ -29,7 +29,8 @@ import com.google.gson.JsonObject;
 /**
  * @author roman.smirnov
  */
-public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implements JobHandler<JobDefinitionSuspensionStateConfiguration> {
+public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler
+    implements JobHandler<JobDefinitionSuspensionStateConfiguration> {
 
   protected static final String JOB_HANDLER_CFG_BY = "by";
   protected static final String JOB_HANDLER_CFG_JOB_DEFINITION_ID = "jobDefinitionId";
@@ -39,13 +40,15 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
 
   protected static final String JOB_HANDLER_CFG_INCLUDE_JOBS = "includeJobs";
 
-  public void execute(JobDefinitionSuspensionStateConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(JobDefinitionSuspensionStateConfiguration configuration,
+      ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     AbstractSetJobDefinitionStateCmd cmd = getCommand(configuration);
     cmd.disableLogUserOperation();
     cmd.execute(commandContext);
   }
 
-  protected abstract AbstractSetJobDefinitionStateCmd getCommand(JobDefinitionSuspensionStateConfiguration configuration);
+  protected abstract AbstractSetJobDefinitionStateCmd getCommand(
+      JobDefinitionSuspensionStateConfiguration configuration);
 
   @Override
   public JobDefinitionSuspensionStateConfiguration newConfiguration(String canonicalString) {
@@ -91,11 +94,9 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
       if (JOB_HANDLER_CFG_PROCESS_DEFINITION_ID.equals(by)) {
         builder.byProcessDefinitionId(processDefinitionId);
 
-      }
-      else if (JOB_HANDLER_CFG_JOB_DEFINITION_ID.equals(by)) {
+      } else if (JOB_HANDLER_CFG_JOB_DEFINITION_ID.equals(by)) {
         builder.byJobDefinitionId(jobDefinitionId);
-      }
-      else if (JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY.equals(by)) {
+      } else if (JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY.equals(by)) {
         builder.byProcessDefinitionKey(processDefinitionKey);
 
         if (isTenantIdSet) {
@@ -109,7 +110,8 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
         }
 
       } else {
-        throw new ProcessEngineException("Unexpected job handler configuration for property '" + JOB_HANDLER_CFG_BY + "': " + by);
+        throw new ProcessEngineException("Unexpected job handler configuration for property '"
+            + JOB_HANDLER_CFG_BY + "': " + by);
       }
 
       builder.includeJobs(includeJobs);
@@ -125,15 +127,18 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
         config.jobDefinitionId = JsonUtil.getString(jsonObject, JOB_HANDLER_CFG_JOB_DEFINITION_ID);
       }
       if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
-        config.processDefinitionId = JsonUtil.getString(jsonObject, JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
+        config.processDefinitionId = JsonUtil.getString(jsonObject,
+            JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
       }
       if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
-        config.processDefinitionKey = JsonUtil.getString(jsonObject, JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
+        config.processDefinitionKey = JsonUtil.getString(jsonObject,
+            JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
       }
       if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID)) {
         config.isTenantIdSet = true;
         if (!JsonUtil.isNull(jsonObject, JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID)) {
-          config.tenantId = JsonUtil.getString(jsonObject, JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID);
+          config.tenantId = JsonUtil.getString(jsonObject,
+              JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID);
         }
       }
       if (jsonObject.has(JOB_HANDLER_CFG_INCLUDE_JOBS)) {
@@ -143,7 +148,8 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
       return config;
     }
 
-    public static JobDefinitionSuspensionStateConfiguration byJobDefinitionId(String jobDefinitionId, boolean includeJobs) {
+    public static JobDefinitionSuspensionStateConfiguration byJobDefinitionId(
+        String jobDefinitionId, boolean includeJobs) {
       JobDefinitionSuspensionStateConfiguration configuration = new JobDefinitionSuspensionStateConfiguration();
       configuration.by = JOB_HANDLER_CFG_JOB_DEFINITION_ID;
       configuration.jobDefinitionId = jobDefinitionId;
@@ -152,7 +158,8 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
       return configuration;
     }
 
-    public static JobDefinitionSuspensionStateConfiguration byProcessDefinitionId(String processDefinitionId, boolean includeJobs) {
+    public static JobDefinitionSuspensionStateConfiguration byProcessDefinitionId(
+        String processDefinitionId, boolean includeJobs) {
       JobDefinitionSuspensionStateConfiguration configuration = new JobDefinitionSuspensionStateConfiguration();
 
       configuration.by = JOB_HANDLER_CFG_PROCESS_DEFINITION_ID;
@@ -162,7 +169,8 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
       return configuration;
     }
 
-    public static JobDefinitionSuspensionStateConfiguration byProcessDefinitionKey(String processDefinitionKey, boolean includeJobs) {
+    public static JobDefinitionSuspensionStateConfiguration byProcessDefinitionKey(
+        String processDefinitionKey, boolean includeJobs) {
       JobDefinitionSuspensionStateConfiguration configuration = new JobDefinitionSuspensionStateConfiguration();
 
       configuration.by = JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY;
@@ -172,8 +180,10 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
       return configuration;
     }
 
-    public static JobDefinitionSuspensionStateConfiguration ByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String tenantId, boolean includeProcessInstances) {
-      JobDefinitionSuspensionStateConfiguration configuration = byProcessDefinitionKey(processDefinitionKey, includeProcessInstances);
+    public static JobDefinitionSuspensionStateConfiguration ByProcessDefinitionKeyAndTenantId(
+        String processDefinitionKey, String tenantId, boolean includeProcessInstances) {
+      JobDefinitionSuspensionStateConfiguration configuration = byProcessDefinitionKey(
+          processDefinitionKey, includeProcessInstances);
 
       configuration.isTenantIdSet = true;
       configuration.tenantId = tenantId;
@@ -182,10 +192,10 @@ public abstract class TimerChangeJobDefinitionSuspensionStateJobHandler implemen
 
     }
 
-
   }
 
-  public void onDelete(JobDefinitionSuspensionStateConfiguration configuration, JobEntity jobEntity) {
+  public void onDelete(JobDefinitionSuspensionStateConfiguration configuration,
+      JobEntity jobEntity) {
     // do nothing
   }
 

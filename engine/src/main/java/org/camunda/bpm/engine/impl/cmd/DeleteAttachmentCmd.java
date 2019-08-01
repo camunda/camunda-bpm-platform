@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -40,29 +39,22 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
   }
 
   public Object execute(CommandContext commandContext) {
-    AttachmentEntity attachment = commandContext
-      .getDbEntityManager()
-      .selectById(AttachmentEntity.class, attachmentId);
+    AttachmentEntity attachment = commandContext.getDbEntityManager()
+        .selectById(AttachmentEntity.class, attachmentId);
 
-    commandContext
-      .getDbEntityManager()
-      .delete(attachment);
+    commandContext.getDbEntityManager().delete(attachment);
 
     if (attachment.getContentId() != null) {
-      commandContext
-        .getByteArrayManager()
-        .deleteByteArrayById(attachment.getContentId());
+      commandContext.getByteArrayManager().deleteByteArrayById(attachment.getContentId());
     }
 
-    if (attachment.getTaskId()!=null) {
-      TaskEntity task = commandContext
-          .getTaskManager()
-          .findTaskById(attachment.getTaskId());
+    if (attachment.getTaskId() != null) {
+      TaskEntity task = commandContext.getTaskManager().findTaskById(attachment.getTaskId());
 
       PropertyChange propertyChange = new PropertyChange("name", null, attachment.getName());
 
-      commandContext.getOperationLogManager()
-          .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, task, propertyChange);
+      commandContext.getOperationLogManager().logAttachmentOperation(
+          UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, task, propertyChange);
     }
 
     return null;

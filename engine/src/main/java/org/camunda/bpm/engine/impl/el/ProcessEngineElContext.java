@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
 import org.camunda.bpm.engine.impl.javax.el.VariableMapper;
 
-
 /**
  * {@link ELContext} used by the process engine.
  *
@@ -40,7 +39,6 @@ public class ProcessEngineElContext extends ELContext {
     this(functionMappers);
     this.elResolver = elResolver;
   }
-
 
   public ProcessEngineElContext(List<FunctionMapper> functionMappers) {
     this.functionMapper = new CompositeFunctionMapper(functionMappers);

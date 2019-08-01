@@ -108,28 +108,31 @@ public class HistoricBatchManagerBatchesForCleanupTest {
     final Map<String, Integer> batchOperationsMap = new HashedMap();
     batchOperationsMap.put(batchType, historicBatchHistoryTTL);
 
+    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new Command<Object>() {
+          @Override
+          public Object execute(CommandContext commandContext) {
+            // when
+            List<String> historicBatchIdsForCleanup = commandContext.getHistoricBatchManager()
+                .findHistoricBatchIdsForCleanup(batchSize, batchOperationsMap, 0, 59);
 
-    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Object>() {
-      @Override
-      public Object execute(CommandContext commandContext) {
-        // when
-        List<String> historicBatchIdsForCleanup = commandContext.getHistoricBatchManager().findHistoricBatchIdsForCleanup(batchSize, batchOperationsMap, 0, 59);
+            // then
+            assertEquals(resultCount, historicBatchIdsForCleanup.size());
 
-        // then
-        assertEquals(resultCount, historicBatchIdsForCleanup.size());
+            if (resultCount > 0) {
 
-        if (resultCount > 0) {
+              List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery()
+                  .list();
 
-          List<HistoricBatch> historicBatches = historyService.createHistoricBatchQuery().list();
+              for (HistoricBatch historicBatch : historicBatches) {
+                historicBatch.getEndTime()
+                    .before(DateUtils.addDays(ClockUtil.getCurrentTime(), historicBatchHistoryTTL));
+              }
+            }
 
-          for (HistoricBatch historicBatch : historicBatches) {
-            historicBatch.getEndTime().before(DateUtils.addDays(ClockUtil.getCurrentTime(), historicBatchHistoryTTL));
+            return null;
           }
-        }
-
-        return null;
-      }
-    });
+        });
   }
 
   private String prepareHistoricBatches(int batchesCount) {

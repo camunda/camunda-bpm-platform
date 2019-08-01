@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -35,16 +34,15 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
 
   private static final long serialVersionUID = 1L;
 
-  public SetTaskVariablesCmd(String taskId, Map<String, ? extends Object> variables, boolean isLocal) {
+  public SetTaskVariablesCmd(String taskId, Map<String, ? extends Object> variables,
+      boolean isLocal) {
     super(taskId, variables, isLocal);
   }
 
   protected TaskEntity getEntity() {
     ensureNotNull("taskId", entityId);
 
-    TaskEntity task =  commandContext
-      .getTaskManager()
-      .findTaskById(entityId);
+    TaskEntity task = commandContext.getTaskManager().findTaskById(entityId);
 
     ensureNotNull("task " + entityId + " doesn't exist", "task", task);
 
@@ -60,12 +58,13 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
 
   protected void logVariableOperation(AbstractVariableScope scope) {
     TaskEntity task = (TaskEntity) scope;
-    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), null, task.getId(),
-      PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), null,
+        task.getId(), PropertyChange.EMPTY_CHANGE);
   }
 
   protected void checkSetTaskVariables(TaskEntity task) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateTaskVariable(task);
     }
   }

@@ -63,8 +63,8 @@ public interface JobDefinitionQuery extends Query<JobDefinitionQuery, JobDefinit
   JobDefinitionQuery withoutTenantId();
 
   /**
-   * Select job definitions which have no tenant id. Can be used in combination
-   * with {@link #tenantIdIn(String...)}.
+   * Select job definitions which have no tenant id. Can be used in combination with
+   * {@link #tenantIdIn(String...)}.
    */
   JobDefinitionQuery includeJobDefinitionsWithoutTenantId();
 
@@ -77,7 +77,9 @@ public interface JobDefinitionQuery extends Query<JobDefinitionQuery, JobDefinit
   /** Order by process defintion id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobDefinitionQuery orderByProcessDefinitionId();
 
-  /** Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   JobDefinitionQuery orderByProcessDefinitionKey();
 
   /** Order by job type (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -87,8 +89,8 @@ public interface JobDefinitionQuery extends Query<JobDefinitionQuery, JobDefinit
   JobDefinitionQuery orderByJobConfiguration();
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of job definitions without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of job definitions without tenant id is database-specific.
    */
   JobDefinitionQuery orderByTenantId();
 

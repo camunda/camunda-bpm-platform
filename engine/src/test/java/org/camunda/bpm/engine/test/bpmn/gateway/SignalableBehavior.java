@@ -25,7 +25,8 @@ public class SignalableBehavior extends AbstractBpmnActivityBehavior {
     // noop;
   }
 
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
     leave(execution);
   }
 }

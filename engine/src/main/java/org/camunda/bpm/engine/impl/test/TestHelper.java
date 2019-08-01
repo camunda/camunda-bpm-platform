@@ -56,7 +56,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -66,10 +65,8 @@ public abstract class TestHelper {
 
   public static final String EMPTY_LINE = "                                                                                           ";
 
-  public static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-    "ACT_GE_PROPERTY",
-    "ACT_GE_SCHEMA_LOG"
-  );
+  public static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays
+      .asList("ACT_GE_PROPERTY", "ACT_GE_SCHEMA_LOG");
 
   static Map<String, ProcessEngine> processEngines = new HashMap<>();
 
@@ -89,7 +86,8 @@ public abstract class TestHelper {
     ProcessEngineAssert.assertProcessEnded(processEngine, processInstanceId);
   }
 
-  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName, Deployment deploymentAnnotation) {
+  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass,
+      String methodName, Deployment deploymentAnnotation) {
     String deploymentId = null;
     Method method = null;
     boolean onMethod = true;
@@ -121,19 +119,19 @@ public abstract class TestHelper {
     }
 
     if (deploymentAnnotation != null) {
-      LOG.debug("annotation @Deployment creates deployment for {}.{}", ClassNameUtil.getClassNameWithoutPackage(testClass), methodName);
+      LOG.debug("annotation @Deployment creates deployment for {}.{}",
+          ClassNameUtil.getClassNameWithoutPackage(testClass), methodName);
       String[] resources = deploymentAnnotation.resources();
       if (resources.length == 0 && method != null) {
         String name = onMethod ? method.getName() : null;
         String resource = getBpmnProcessDefinitionResource(testClass, name);
-        resources = new String[]{resource};
+        resources = new String[] { resource };
       }
 
-      DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService()
-        .createDeployment()
-        .name(ClassNameUtil.getClassNameWithoutPackage(testClass)+"."+methodName);
+      DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment()
+          .name(ClassNameUtil.getClassNameWithoutPackage(testClass) + "." + methodName);
 
-      for (String resource: resources) {
+      for (String resource : resources) {
         deploymentBuilder.addClasspathResource(resource);
       }
 
@@ -143,29 +141,31 @@ public abstract class TestHelper {
     return deploymentId;
   }
 
-  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName) {
+  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass,
+      String methodName) {
     return annotationDeploymentSetUp(processEngine, testClass, methodName, null);
   }
 
-  public static void annotationDeploymentTearDown(ProcessEngine processEngine, String deploymentId, Class<?> testClass, String methodName) {
-    LOG.debug("annotation @Deployment deletes deployment for {}.{}", ClassNameUtil.getClassNameWithoutPackage(testClass), methodName);
+  public static void annotationDeploymentTearDown(ProcessEngine processEngine, String deploymentId,
+      Class<?> testClass, String methodName) {
+    LOG.debug("annotation @Deployment deletes deployment for {}.{}",
+        ClassNameUtil.getClassNameWithoutPackage(testClass), methodName);
     deleteDeployment(processEngine, deploymentId);
   }
 
   public static void deleteDeployment(ProcessEngine processEngine, String deploymentId) {
-    if(deploymentId != null) {
+    if (deploymentId != null) {
       processEngine.getRepositoryService().deleteDeployment(deploymentId, true);
     }
   }
 
   /**
-   * get a resource location by convention based on a class (type) and a
-   * relative resource name. The return value will be the full classpath
-   * location of the type, plus a suffix built from the name parameter:
-   * <code>BpmnDeployer.BPMN_RESOURCE_SUFFIXES</code>.
-   * The first resource matching a suffix will be returned.
+   * get a resource location by convention based on a class (type) and a relative resource name. The
+   * return value will be the full classpath location of the type, plus a suffix built from the name
+   * parameter: <code>BpmnDeployer.BPMN_RESOURCE_SUFFIXES</code>. The first resource matching a
+   * suffix will be returned.
    */
-  public static String getBpmnProcessDefinitionResource(Class< ? > type, String name) {
+  public static String getBpmnProcessDefinitionResource(Class<?> type, String name) {
     for (String suffix : RESOURCE_SUFFIXES) {
       String resource = createResourceName(type, name, suffix);
       InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
@@ -178,7 +178,7 @@ public abstract class TestHelper {
     return createResourceName(type, name, BpmnDeployer.BPMN_RESOURCE_SUFFIXES[0]);
   }
 
-  private static String createResourceName(Class< ? > type, String name, String suffix) {
+  private static String createResourceName(Class<?> type, String name, String suffix) {
     StringBuilder r = new StringBuilder(type.getName().replace('.', '/'));
     if (name != null) {
       r.append("." + name);
@@ -186,27 +186,33 @@ public abstract class TestHelper {
     return r.append("." + suffix).toString();
   }
 
-  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine, Description description) {
+  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine,
+      Description description) {
     RequiredHistoryLevel annotation = description.getAnnotation(RequiredHistoryLevel.class);
 
     if (annotation != null) {
       return historyLevelCheck(processEngine, annotation);
 
     } else {
-      return annotationRequiredHistoryLevelCheck(processEngine, description.getTestClass(), description.getMethodName());
+      return annotationRequiredHistoryLevelCheck(processEngine, description.getTestClass(),
+          description.getMethodName());
     }
   }
 
-  private static boolean historyLevelCheck(ProcessEngine processEngine, RequiredHistoryLevel annotation) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+  private static boolean historyLevelCheck(ProcessEngine processEngine,
+      RequiredHistoryLevel annotation) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+        .getProcessEngineConfiguration();
 
-    HistoryLevel requiredHistoryLevel = getHistoryLevelForName(processEngineConfiguration.getHistoryLevels(), annotation.value());
+    HistoryLevel requiredHistoryLevel = getHistoryLevelForName(
+        processEngineConfiguration.getHistoryLevels(), annotation.value());
     HistoryLevel currentHistoryLevel = processEngineConfiguration.getHistoryLevel();
 
     return currentHistoryLevel.getId() >= requiredHistoryLevel.getId();
   }
 
-  private static HistoryLevel getHistoryLevelForName(List<HistoryLevel> historyLevels, String name) {
+  private static HistoryLevel getHistoryLevelForName(List<HistoryLevel> historyLevels,
+      String name) {
     for (HistoryLevel historyLevel : historyLevels) {
 
       if (historyLevel.getName().equalsIgnoreCase(name)) {
@@ -216,8 +222,10 @@ public abstract class TestHelper {
     throw new IllegalArgumentException("Unknown history level: " + name);
   }
 
-  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine, Class<?> testClass, String methodName) {
-    RequiredHistoryLevel annotation = getAnnotation(processEngine, testClass, methodName, RequiredHistoryLevel.class);
+  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine,
+      Class<?> testClass, String methodName) {
+    RequiredHistoryLevel annotation = getAnnotation(processEngine, testClass, methodName,
+        RequiredHistoryLevel.class);
 
     if (annotation != null) {
       return historyLevelCheck(processEngine, annotation);
@@ -226,19 +234,23 @@ public abstract class TestHelper {
     }
   }
 
-  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, Description description) {
+  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine,
+      Description description) {
     RequiredDatabase annotation = description.getAnnotation(RequiredDatabase.class);
 
     if (annotation != null) {
       return databaseCheck(processEngine, annotation);
 
     } else {
-      return annotationRequiredDatabaseCheck(processEngine, description.getTestClass(), description.getMethodName());
+      return annotationRequiredDatabaseCheck(processEngine, description.getTestClass(),
+          description.getMethodName());
     }
   }
 
-  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, Class<?> testClass, String methodName) {
-    RequiredDatabase annotation = getAnnotation(processEngine, testClass, methodName, RequiredDatabase.class);
+  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine,
+      Class<?> testClass, String methodName) {
+    RequiredDatabase annotation = getAnnotation(processEngine, testClass, methodName,
+        RequiredDatabase.class);
 
     if (annotation != null) {
       return databaseCheck(processEngine, annotation);
@@ -249,7 +261,8 @@ public abstract class TestHelper {
 
   private static boolean databaseCheck(ProcessEngine processEngine, RequiredDatabase annotation) {
 
-    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+        .getProcessEngineConfiguration();
     String actualDbType = processEngineConfiguration.getDbSqlSessionFactory().getDatabaseType();
 
     String[] excludes = annotation.excludes();
@@ -265,8 +278,8 @@ public abstract class TestHelper {
     return true;
   }
 
-
-  private static <T extends Annotation> T getAnnotation(ProcessEngine processEngine, Class<?> testClass, String methodName, Class<T> annotationClass) {
+  private static <T extends Annotation> T getAnnotation(ProcessEngine processEngine,
+      Class<?> testClass, String methodName, Class<T> annotationClass) {
     Method method = null;
     T annotation = null;
 
@@ -276,9 +289,10 @@ public abstract class TestHelper {
     } catch (Exception e) {
       // - ignore if we cannot access the method
       // - just try again with the class
-      // => can for example be the case for parameterized tests where methodName does not correspond to the actual method name
-      //    (note that method-level annotations still work in this
-      //     scenario due to Description#getAnnotation in annotationRequiredHistoryLevelCheck)
+      // => can for example be the case for parameterized tests where methodName does not correspond
+      // to the actual method name
+      // (note that method-level annotations still work in this
+      // scenario due to Description#getAnnotation in annotationRequiredHistoryLevelCheck)
     }
 
     // if not found on method, try on class level
@@ -288,38 +302,47 @@ public abstract class TestHelper {
     return annotation;
   }
 
-  protected static Method getMethod(Class<?> clazz, String methodName) throws SecurityException, NoSuchMethodException {
+  protected static Method getMethod(Class<?> clazz, String methodName)
+      throws SecurityException, NoSuchMethodException {
     return clazz.getMethod(methodName, (Class<?>[]) null);
   }
 
   /**
-   * Ensures that the deployment cache and database is clean after a test. If not the cache
-   * and database will be cleared.
+   * Ensures that the deployment cache and database is clean after a test. If not the cache and
+   * database will be cleared.
    *
-   * @param processEngine the {@link ProcessEngine} to test
-   * @throws AssertionError if the deployment cache or database was not clean
+   * @param processEngine
+   *          the {@link ProcessEngine} to test
+   * @throws AssertionError
+   *           if the deployment cache or database was not clean
    */
   public static void assertAndEnsureCleanDbAndCache(ProcessEngine processEngine) {
     assertAndEnsureCleanDbAndCache(processEngine, true);
   }
 
   /**
-   * Ensures that the deployment cache and database is clean after a test. If not the cache
-   * and database will be cleared.
+   * Ensures that the deployment cache and database is clean after a test. If not the cache and
+   * database will be cleared.
    *
-   * @param processEngine the {@link ProcessEngine} to test
-   * @param fail if true the method will throw an {@link AssertionError} if the deployment cache or database is not clean
-   * @throws AssertionError if the deployment cache or database was not clean
+   * @param processEngine
+   *          the {@link ProcessEngine} to test
+   * @param fail
+   *          if true the method will throw an {@link AssertionError} if the deployment cache or
+   *          database is not clean
+   * @throws AssertionError
+   *           if the deployment cache or database was not clean
    */
   public static String assertAndEnsureCleanDbAndCache(ProcessEngine processEngine, boolean fail) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine)
+        .getProcessEngineConfiguration();
 
     // clear user operation log in case some operations are
     // executed with an authenticated user
     clearUserOperationLog(processEngineConfiguration);
 
     LOG.debug("verifying that db is clean after test");
-    PurgeReport purgeReport = ((ManagementServiceImpl) processEngine.getManagementService()).purge();
+    PurgeReport purgeReport = ((ManagementServiceImpl) processEngine.getManagementService())
+        .purge();
 
     String paRegistrationMessage = assertAndEnsureNoProcessApplicationsRegistered(processEngine);
 
@@ -327,14 +350,14 @@ public abstract class TestHelper {
     CachePurgeReport cachePurgeReport = purgeReport.getCachePurgeReport();
     if (!cachePurgeReport.isEmpty()) {
       message.append("Deployment cache is not clean:\n")
-             .append(cachePurgeReport.getPurgeReportAsString());
+          .append(cachePurgeReport.getPurgeReportAsString());
     } else {
       LOG.debug("Deployment cache was clean.");
     }
     DatabasePurgeReport databasePurgeReport = purgeReport.getDatabasePurgeReport();
     if (!databasePurgeReport.isEmpty()) {
       message.append("Database is not clean:\n")
-             .append(databasePurgeReport.getPurgeReportAsString());
+          .append(databasePurgeReport.getPurgeReportAsString());
     } else {
       LOG.debug("Database was clean.");
     }
@@ -349,29 +372,37 @@ public abstract class TestHelper {
   }
 
   /**
-   * Ensures that the deployment cache is empty after a test. If not the cache
-   * will be cleared.
+   * Ensures that the deployment cache is empty after a test. If not the cache will be cleared.
    *
-   * @param processEngine the {@link ProcessEngine} to test
-   * @throws AssertionError if the deployment cache was not clean
+   * @param processEngine
+   *          the {@link ProcessEngine} to test
+   * @throws AssertionError
+   *           if the deployment cache was not clean
    */
   public static void assertAndEnsureCleanDeploymentCache(ProcessEngine processEngine) {
     assertAndEnsureCleanDeploymentCache(processEngine, true);
   }
 
   /**
-   * Ensures that the deployment cache is empty after a test. If not the cache
-   * will be cleared.
+   * Ensures that the deployment cache is empty after a test. If not the cache will be cleared.
    *
-   * @param processEngine the {@link ProcessEngine} to test
-   * @param fail if true the method will throw an {@link AssertionError} if the deployment cache is not clean
-   * @return the deployment cache summary if fail is set to false or null if deployment cache was clean
-   * @throws AssertionError if the deployment cache was not clean and fail is set to true
+   * @param processEngine
+   *          the {@link ProcessEngine} to test
+   * @param fail
+   *          if true the method will throw an {@link AssertionError} if the deployment cache is not
+   *          clean
+   * @return the deployment cache summary if fail is set to false or null if deployment cache was
+   *         clean
+   * @throws AssertionError
+   *           if the deployment cache was not clean and fail is set to true
    */
-  public static String assertAndEnsureCleanDeploymentCache(ProcessEngine processEngine, boolean fail) {
+  public static String assertAndEnsureCleanDeploymentCache(ProcessEngine processEngine,
+      boolean fail) {
     StringBuilder outputMessage = new StringBuilder();
-    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
-    CachePurgeReport cachePurgeReport = processEngineConfiguration.getDeploymentCache().purgeCache();
+    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine)
+        .getProcessEngineConfiguration();
+    CachePurgeReport cachePurgeReport = processEngineConfiguration.getDeploymentCache()
+        .purgeCache();
 
     outputMessage.append(cachePurgeReport.getPurgeReportAsString());
     if (outputMessage.length() > 0) {
@@ -383,29 +414,30 @@ public abstract class TestHelper {
       }
 
       return outputMessage.toString();
-    }
-    else {
+    } else {
       LOG.debug("Deployment cache was clean");
       return null;
     }
   }
 
-
   public static String assertAndEnsureNoProcessApplicationsRegistered(ProcessEngine processEngine) {
-    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
-    ProcessApplicationManager processApplicationManager = engineConfiguration.getProcessApplicationManager();
+    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+        .getProcessEngineConfiguration();
+    ProcessApplicationManager processApplicationManager = engineConfiguration
+        .getProcessApplicationManager();
 
     if (processApplicationManager.hasRegistrations()) {
       processApplicationManager.clearRegistrations();
       return "There are still process applications registered";
-    }
-    else {
+    } else {
       return null;
     }
 
   }
 
-  public static void waitForJobExecutorToProcessAllJobs(ProcessEngineConfigurationImpl processEngineConfiguration, long maxMillisToWait, long intervalMillis) {
+  public static void waitForJobExecutorToProcessAllJobs(
+      ProcessEngineConfigurationImpl processEngineConfiguration, long maxMillisToWait,
+      long intervalMillis) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
 
@@ -432,13 +464,10 @@ public abstract class TestHelper {
     }
   }
 
-  public static boolean areJobsAvailable(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return !processEngineConfiguration
-      .getManagementService()
-      .createJobQuery()
-      .executable()
-      .list()
-      .isEmpty();
+  public static boolean areJobsAvailable(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
+    return !processEngineConfiguration.getManagementService().createJobQuery().executable().list()
+        .isEmpty();
   }
 
   public static void resetIdGenerator(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -452,12 +481,15 @@ public abstract class TestHelper {
   private static class InteruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
+
     public InteruptTask(Thread thread) {
       this.thread = thread;
     }
+
     public boolean isTimeLimitExceeded() {
       return timeLimitExceeded;
     }
+
     @Override
     public void run() {
       timeLimitExceeded = true;
@@ -467,79 +499,82 @@ public abstract class TestHelper {
 
   public static ProcessEngine getProcessEngine(String configurationResource) {
     ProcessEngine processEngine = processEngines.get(configurationResource);
-    if (processEngine==null) {
-      LOG.debug("==== BUILDING PROCESS ENGINE ========================================================================");
+    if (processEngine == null) {
+      LOG.debug(
+          "==== BUILDING PROCESS ENGINE ========================================================================");
       processEngine = ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource(configurationResource)
-        .buildProcessEngine();
-      LOG.debug("==== PROCESS ENGINE CREATED =========================================================================");
+          .createProcessEngineConfigurationFromResource(configurationResource).buildProcessEngine();
+      LOG.debug(
+          "==== PROCESS ENGINE CREATED =========================================================================");
       processEngines.put(configurationResource, processEngine);
     }
     return processEngine;
   }
 
   public static void closeProcessEngines() {
-    for (ProcessEngine processEngine: processEngines.values()) {
+    for (ProcessEngine processEngine : processEngines.values()) {
       processEngine.close();
     }
     processEngines.clear();
   }
 
   public static void createSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-        .execute(new Command<Object>() {
-          public Object execute(CommandContext commandContext) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
 
-            commandContext.getSession(PersistenceSession.class).dbSchemaCreate();
-            return null;
-          }
-        });
+        commandContext.getSession(PersistenceSession.class).dbSchemaCreate();
+        return null;
+      }
+    });
   }
 
   public static void dropSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-        .execute(new Command<Object>() {
-         public Object execute(CommandContext commandContext) {
-           commandContext.getDbSqlSession().dbSchemaDrop();
-           return null;
-         }
-        });
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getDbSqlSession().dbSchemaDrop();
+        return null;
+      }
+    });
   }
 
-  public static void createOrUpdateHistoryLevel(final ProcessEngineConfigurationImpl processEngineConfiguration) {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
-       public Object execute(CommandContext commandContext) {
-         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
-         PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
-         if (historyLevelProperty != null) {
-           if (processEngineConfiguration.getHistoryLevel().getId() != new Integer(historyLevelProperty.getValue())) {
-             historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel().getId()));
-             dbEntityManager.merge(historyLevelProperty);
-           }
-         } else {
-           HistoryLevelSetupCommand.dbCreateHistoryLevel(commandContext);
-         }
-         return null;
-       }
-      });
+  public static void createOrUpdateHistoryLevel(
+      final ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+        PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class,
+            "historyLevel");
+        if (historyLevelProperty != null) {
+          if (processEngineConfiguration.getHistoryLevel()
+              .getId() != new Integer(historyLevelProperty.getValue())) {
+            historyLevelProperty
+                .setValue(Integer.toString(processEngineConfiguration.getHistoryLevel().getId()));
+            dbEntityManager.merge(historyLevelProperty);
+          }
+        } else {
+          HistoryLevelSetupCommand.dbCreateHistoryLevel(commandContext);
+        }
+        return null;
+      }
+    });
   }
 
   public static void deleteHistoryLevel(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
-       public Object execute(CommandContext commandContext) {
-         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
-         PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class, "historyLevel");
-         if (historyLevelProperty != null) {
-           dbEntityManager.delete(historyLevelProperty);
-         }
-         return null;
-       }
-      });
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
+        PropertyEntity historyLevelProperty = dbEntityManager.selectById(PropertyEntity.class,
+            "historyLevel");
+        if (historyLevelProperty != null) {
+          dbEntityManager.delete(historyLevelProperty);
+        }
+        return null;
+      }
+    });
   }
 
-  public static void clearUserOperationLog(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  public static void clearUserOperationLog(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
       HistoryService historyService = processEngineConfiguration.getHistoryService();
       List<UserOperationLogEntry> logs = historyService.createUserOperationLogQuery().list();
@@ -548,8 +583,5 @@ public abstract class TestHelper {
       }
     }
   }
-
-
-
 
 }

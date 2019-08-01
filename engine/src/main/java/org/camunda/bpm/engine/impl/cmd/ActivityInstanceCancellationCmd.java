@@ -38,7 +38,8 @@ public class ActivityInstanceCancellationCmd extends AbstractInstanceCancellatio
     this.activityInstanceId = activityInstanceId;
   }
 
-  public ActivityInstanceCancellationCmd(String processInstanceId, String activityInstanceId, String cancellationReason) {
+  public ActivityInstanceCancellationCmd(String processInstanceId, String activityInstanceId,
+      String cancellationReason) {
     super(processInstanceId, cancellationReason);
     this.activityInstanceId = activityInstanceId;
   }
@@ -48,23 +49,26 @@ public class ActivityInstanceCancellationCmd extends AbstractInstanceCancellatio
   }
 
   protected ExecutionEntity determineSourceInstanceExecution(final CommandContext commandContext) {
-    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    ExecutionEntity processInstance = commandContext.getExecutionManager()
+        .findExecutionById(processInstanceId);
 
     // rebuild the mapping because the execution tree changes with every iteration
-    ActivityExecutionTreeMapping mapping = new ActivityExecutionTreeMapping(commandContext, processInstanceId);
+    ActivityExecutionTreeMapping mapping = new ActivityExecutionTreeMapping(commandContext,
+        processInstanceId);
 
-    ActivityInstance instance = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
-      public ActivityInstance call() throws Exception {
-        return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
-      }
-    });
+    ActivityInstance instance = commandContext
+        .runWithoutAuthorization(new Callable<ActivityInstance>() {
+          public ActivityInstance call() throws Exception {
+            return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
+          }
+        });
 
     ActivityInstance instanceToCancel = findActivityInstance(instance, activityInstanceId);
     EnsureUtil.ensureNotNull(NotValidException.class,
         describeFailure("Activity instance '" + activityInstanceId + "' does not exist"),
-        "activityInstance",
+        "activityInstance", instanceToCancel);
+    ExecutionEntity scopeExecution = getScopeExecutionForActivityInstance(processInstance, mapping,
         instanceToCancel);
-    ExecutionEntity scopeExecution = getScopeExecutionForActivityInstance(processInstance, mapping, instanceToCancel);
 
     return scopeExecution;
   }
@@ -72,6 +76,5 @@ public class ActivityInstanceCancellationCmd extends AbstractInstanceCancellatio
   protected String describe() {
     return "Cancel activity instance '" + activityInstanceId + "'";
   }
-
 
 }

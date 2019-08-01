@@ -26,7 +26,9 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 /**
- * <p>Represents an executable script.</p>
+ * <p>
+ * Represents an executable script.
+ * </p>
  *
  *
  * @author Daniel Meyer
@@ -34,8 +36,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
  */
 public abstract class ExecutableScript {
 
-  /** The language of the script. Used to resolve the
-   * {@link ScriptEngine}. */
+  /**
+   * The language of the script. Used to resolve the {@link ScriptEngine}.
+   */
   protected final String language;
 
   protected ExecutableScript(String language) {
@@ -44,6 +47,7 @@ public abstract class ExecutableScript {
 
   /**
    * The language in which the script is written.
+   * 
    * @return the language
    */
   public String getLanguage() {
@@ -51,12 +55,18 @@ public abstract class ExecutableScript {
   }
 
   /**
-   * <p>Evaluates the script using the provided engine and bindings</p>
+   * <p>
+   * Evaluates the script using the provided engine and bindings
+   * </p>
    *
-   * @param scriptEngine the script engine to use for evaluating the script.
-   * @param variableScope the variable scope of the execution
-   * @param bindings the bindings to use for evaluating the script.
-   * @throws ProcessEngineException in case the script cannot be evaluated.
+   * @param scriptEngine
+   *          the script engine to use for evaluating the script.
+   * @param variableScope
+   *          the variable scope of the execution
+   * @param bindings
+   *          the bindings to use for evaluating the script.
+   * @throws ProcessEngineException
+   *           in case the script cannot be evaluated.
    * @return the result of the script evaluation
    */
   public Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
@@ -69,20 +79,24 @@ public abstract class ExecutableScript {
 
     if (variableScope instanceof DelegateExecution) {
       activityId = ((DelegateExecution) variableScope).getCurrentActivityId();
-      definitionIdMessage = " in the process definition with id '" + ((DelegateExecution) variableScope).getProcessDefinitionId() + "'";
+      definitionIdMessage = " in the process definition with id '"
+          + ((DelegateExecution) variableScope).getProcessDefinitionId() + "'";
     } else if (variableScope instanceof TaskEntity) {
       TaskEntity task = (TaskEntity) variableScope;
       if (task.getExecution() != null) {
         activityId = task.getExecution().getActivityId();
-        definitionIdMessage = " in the process definition with id '" + task.getProcessDefinitionId() + "'";
+        definitionIdMessage = " in the process definition with id '" + task.getProcessDefinitionId()
+            + "'";
       }
       if (task.getCaseExecution() != null) {
         activityId = task.getCaseExecution().getActivityId();
-        definitionIdMessage = " in the case definition with id '" + task.getCaseDefinitionId() + "'";
+        definitionIdMessage = " in the case definition with id '" + task.getCaseDefinitionId()
+            + "'";
       }
     } else if (variableScope instanceof DelegateCaseExecution) {
       activityId = ((DelegateCaseExecution) variableScope).getActivityId();
-      definitionIdMessage = " in the case definition with id '" + ((DelegateCaseExecution) variableScope).getCaseDefinitionId() + "'";
+      definitionIdMessage = " in the case definition with id '"
+          + ((DelegateCaseExecution) variableScope).getCaseDefinitionId() + "'";
     }
 
     if (activityId == null) {
@@ -92,6 +106,7 @@ public abstract class ExecutableScript {
     }
   }
 
-  protected abstract Object evaluate(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings);
+  protected abstract Object evaluate(ScriptEngine scriptEngine, VariableScope variableScope,
+      Bindings bindings);
 
 }

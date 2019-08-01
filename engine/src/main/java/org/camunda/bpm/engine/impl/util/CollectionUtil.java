@@ -34,14 +34,14 @@ import java.util.Set;
 public class CollectionUtil {
 
   // No need to instantiate
-  private CollectionUtil() {}
+  private CollectionUtil() {
+  }
 
   /**
    * Helper method that creates a singleton map.
    *
-   * Alternative for Collections.singletonMap(), since that method returns a
-   * generic typed map <K,T> depending on the input type, but we often need a
-   * <String, Object> map.
+   * Alternative for Collections.singletonMap(), since that method returns a generic typed map <K,T>
+   * depending on the input type, but we often need a <String, Object> map.
    */
   public static Map<String, Object> singletonMap(String key, Object value) {
     Map<String, Object> map = new HashMap<>();
@@ -84,7 +84,8 @@ public class CollectionUtil {
     set.add(value);
   }
 
-  public static <S, T> void addCollectionToMapOfSets(Map<S, Set<T>> map, S key, Collection<T> values) {
+  public static <S, T> void addCollectionToMapOfSets(Map<S, Set<T>> map, S key,
+      Collection<T> values) {
     Set<T> set = map.get(key);
     if (set == null) {
       set = new HashSet<>();
@@ -94,8 +95,8 @@ public class CollectionUtil {
   }
 
   /**
-   * Chops a list into non-view sublists of length partitionSize. Note: the argument list
-   * may be included in the result.
+   * Chops a list into non-view sublists of length partitionSize. Note: the argument list may be
+   * included in the result.
    */
   public static <T> List<List<T>> partition(List<T> list, final int partitionSize) {
     List<List<T>> parts = new ArrayList<>();

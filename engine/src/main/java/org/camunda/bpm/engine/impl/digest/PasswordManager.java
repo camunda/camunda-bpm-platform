@@ -25,14 +25,11 @@ import java.util.Map;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
- * Different Camunda versions use different hashing algorithms. In addition, it is possible
- * to add a custom hashing algorithm. The {@link PasswordManager} ensures that the right
- * algorithm is used for the encryption.
+ * Different Camunda versions use different hashing algorithms. In addition, it is possible to add a
+ * custom hashing algorithm. The {@link PasswordManager} ensures that the right algorithm is used
+ * for the encryption.
  *
- * Default algorithms:
- * Version:           |    Algorithm
- * <= Camunda 7.6     | SHA1
- * >= Camunda 7.7     | SHA512
+ * Default algorithms: Version: | Algorithm <= Camunda 7.6 | SHA1 >= Camunda 7.7 | SHA512
  */
 public class PasswordManager {
 
@@ -43,7 +40,8 @@ public class PasswordManager {
 
   protected DatabasePrefixHandler prefixHandler = new DatabasePrefixHandler();
 
-  public PasswordManager(PasswordEncryptor defaultPasswordEncryptor, List<PasswordEncryptor> customPasswordChecker) {
+  public PasswordManager(PasswordEncryptor defaultPasswordEncryptor,
+      List<PasswordEncryptor> customPasswordChecker) {
     // add default password encryptors for password checking
     // for Camunda 7.6 and earlier
     addPasswordCheckerAndThrowErrorIfAlreadyAvailable(new ShaHashDigest());
@@ -63,8 +61,9 @@ public class PasswordManager {
   }
 
   protected void addPasswordCheckerAndThrowErrorIfAlreadyAvailable(PasswordEncryptor encryptor) {
-    if(passwordChecker.containsKey(encryptor.hashAlgorithmName())){
-      throw LOG.hashAlgorithmForPasswordEncryptionAlreadyAvailableException(encryptor.hashAlgorithmName());
+    if (passwordChecker.containsKey(encryptor.hashAlgorithmName())) {
+      throw LOG.hashAlgorithmForPasswordEncryptionAlreadyAvailableException(
+          encryptor.hashAlgorithmName());
     }
     passwordChecker.put(encryptor.hashAlgorithmName(), encryptor);
   }
@@ -74,12 +73,12 @@ public class PasswordManager {
     passwordChecker.put(defaultPasswordEncryptor.hashAlgorithmName(), defaultPasswordEncryptor);
   }
 
-  public String encrypt(String password){
+  public String encrypt(String password) {
     String prefix = prefixHandler.generatePrefix(defaultPasswordEncryptor.hashAlgorithmName());
     return prefix + defaultPasswordEncryptor.encrypt(password);
   }
 
-  public boolean check(String password, String encrypted){
+  public boolean check(String password, String encrypted) {
     PasswordEncryptor encryptor = getCorrectEncryptorForPassword(encrypted);
     String encryptedPasswordWithoutPrefix = prefixHandler.removePrefix(encrypted);
     ensureNotNull("encryptedPasswordWithoutPrefix", encryptedPasswordWithoutPrefix);
@@ -88,8 +87,9 @@ public class PasswordManager {
 
   protected PasswordEncryptor getCorrectEncryptorForPassword(String encryptedPassword) {
     String hashAlgorithmName = prefixHandler.retrieveAlgorithmName(encryptedPassword);
-    if(hashAlgorithmName == null || !passwordChecker.containsKey(hashAlgorithmName)){
-      throw LOG.cannotResolveAlgorithmPrefixFromGivenPasswordException(hashAlgorithmName, passwordChecker.keySet());
+    if (hashAlgorithmName == null || !passwordChecker.containsKey(hashAlgorithmName)) {
+      throw LOG.cannotResolveAlgorithmPrefixFromGivenPasswordException(hashAlgorithmName,
+          passwordChecker.keySet());
     }
     return passwordChecker.get(hashAlgorithmName);
   }

@@ -30,7 +30,8 @@ import org.junit.Ignore;
 @Ignore
 public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testParentResumeInsideStage.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testParentResumeInsideStage.cmmn" })
   public void FAILING_testParentResumeInsideStage() {
     // given
     createCaseInstance();
@@ -60,16 +61,16 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
 
     // (1) then
     stage = queryCaseExecutionById(stageId);
-    assertTrue(((CaseExecutionEntity)stage).isSuspended());
+    assertTrue(((CaseExecutionEntity) stage).isSuspended());
 
     firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
-    assertTrue(((CaseExecutionEntity)firstHumanTask).isSuspended());
+    assertTrue(((CaseExecutionEntity) firstHumanTask).isSuspended());
 
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(((CaseExecutionEntity)secondHumanTask).isSuspended());
+    assertTrue(((CaseExecutionEntity) secondHumanTask).isSuspended());
 
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(((CaseExecutionEntity)thirdHumanTask).isSuspended());
+    assertTrue(((CaseExecutionEntity) thirdHumanTask).isSuspended());
 
     // (2) when
     resume(stageId);
@@ -89,7 +90,8 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testParentSuspendInsideStage.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testParentSuspendInsideStage.cmmn" })
   public void FAILING_testParentSuspendInsideStage() {
     // given
     createCaseInstance();
@@ -119,21 +121,23 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
 
     // then
     stage = queryCaseExecutionById(stageId);
-    assertTrue(((CaseExecutionEntity)stage).isSuspended());
+    assertTrue(((CaseExecutionEntity) stage).isSuspended());
 
     firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
-    assertTrue(((CaseExecutionEntity)firstHumanTask).isSuspended());
+    assertTrue(((CaseExecutionEntity) firstHumanTask).isSuspended());
 
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
     assertNull(secondHumanTask);
 
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(((CaseExecutionEntity)thirdHumanTask).isSuspended());
-    assertEquals(CaseExecutionState.ENABLED, ((CaseExecutionEntity) thirdHumanTask).getPreviousState());
+    assertTrue(((CaseExecutionEntity) thirdHumanTask).isSuspended());
+    assertEquals(CaseExecutionState.ENABLED,
+        ((CaseExecutionEntity) thirdHumanTask).getPreviousState());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testParentResumeInsideStageDifferentPlanItemOrder.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testParentResumeInsideStageDifferentPlanItemOrder.cmmn" })
   public void FAILING_testParentResumeInsideStageDifferentPlanItemOrder() {
     // given
     createCaseInstance();
@@ -163,16 +167,16 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
 
     // (1) then
     stage = queryCaseExecutionById(stageId);
-    assertTrue(((CaseExecutionEntity)stage).isSuspended());
+    assertTrue(((CaseExecutionEntity) stage).isSuspended());
 
     firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
-    assertTrue(((CaseExecutionEntity)firstHumanTask).isSuspended());
+    assertTrue(((CaseExecutionEntity) firstHumanTask).isSuspended());
 
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
-    assertTrue(((CaseExecutionEntity)secondHumanTask).isSuspended());
+    assertTrue(((CaseExecutionEntity) secondHumanTask).isSuspended());
 
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(((CaseExecutionEntity)thirdHumanTask).isSuspended());
+    assertTrue(((CaseExecutionEntity) thirdHumanTask).isSuspended());
 
     // (2) when
     resume(stageId);
@@ -192,7 +196,8 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testParentSuspendInsideStageDifferentPlanItemOrder.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryCombinedEntryAndExitCriteriaTest.testParentSuspendInsideStageDifferentPlanItemOrder.cmmn" })
   public void FAILING_testParentSuspendInsideStageDifferentPlanItemOrder() {
     // given
     createCaseInstance();
@@ -222,17 +227,18 @@ public class SentryCombinedEntryAndExitCriteriaTest extends CmmnProcessEngineTes
 
     // then
     stage = queryCaseExecutionById(stageId);
-    assertTrue(((CaseExecutionEntity)stage).isSuspended());
+    assertTrue(((CaseExecutionEntity) stage).isSuspended());
 
     firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
-    assertTrue(((CaseExecutionEntity)firstHumanTask).isSuspended());
+    assertTrue(((CaseExecutionEntity) firstHumanTask).isSuspended());
 
     secondHumanTask = queryCaseExecutionById(secondHumanTaskId);
     assertNull(secondHumanTask);
 
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
-    assertTrue(((CaseExecutionEntity)thirdHumanTask).isSuspended());
-    assertEquals(CaseExecutionState.ENABLED, ((CaseExecutionEntity) thirdHumanTask).getPreviousState());
+    assertTrue(((CaseExecutionEntity) thirdHumanTask).isSuspended());
+    assertEquals(CaseExecutionState.ENABLED,
+        ((CaseExecutionEntity) thirdHumanTask).getPreviousState());
 
   }
 }

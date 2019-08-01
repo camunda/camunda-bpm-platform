@@ -46,17 +46,21 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
     this.migrationActivityMatcher = migrationActivityMatcher;
   }
 
-  public MigrationInstructionGenerator migrationActivityValidators(List<MigrationActivityValidator> migrationActivityValidators) {
+  public MigrationInstructionGenerator migrationActivityValidators(
+      List<MigrationActivityValidator> migrationActivityValidators) {
     this.migrationActivityValidators = migrationActivityValidators;
     return this;
   }
 
-  public MigrationInstructionGenerator migrationInstructionValidators(List<MigrationInstructionValidator> migrationInstructionValidators) {
+  public MigrationInstructionGenerator migrationInstructionValidators(
+      List<MigrationInstructionValidator> migrationInstructionValidators) {
 
     this.migrationInstructionValidators = new ArrayList<MigrationInstructionValidator>();
     for (MigrationInstructionValidator validator : migrationInstructionValidators) {
-      // ignore the following two validators during generation. Enables multi-instance bodies to be mapped.
-      // this procedure is fine because these validators are again applied after all instructions have been generated
+      // ignore the following two validators during generation. Enables multi-instance bodies to be
+      // mapped.
+      // this procedure is fine because these validators are again applied after all instructions
+      // have been generated
       if (!(validator instanceof CannotAddMultiInstanceInnerActivityValidator
           || validator instanceof CannotRemoveMultiInstanceInnerActivityValidator)) {
         this.migrationInstructionValidators.add(validator);
@@ -67,23 +71,16 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
   }
 
   public ValidatingMigrationInstructions generate(ProcessDefinitionImpl sourceProcessDefinition,
-      ProcessDefinitionImpl targetProcessDefinition,
-      boolean updateEventTriggers) {
+      ProcessDefinitionImpl targetProcessDefinition, boolean updateEventTriggers) {
     ValidatingMigrationInstructions migrationInstructions = new ValidatingMigrationInstructions();
-    generate(sourceProcessDefinition,
-        targetProcessDefinition,
-        sourceProcessDefinition,
-        targetProcessDefinition,
-        migrationInstructions,
-        updateEventTriggers);
+    generate(sourceProcessDefinition, targetProcessDefinition, sourceProcessDefinition,
+        targetProcessDefinition, migrationInstructions, updateEventTriggers);
     return migrationInstructions;
   }
 
   protected List<ValidatingMigrationInstruction> generateInstructionsForActivities(
-      Collection<ActivityImpl> sourceActivities,
-      Collection<ActivityImpl> targetActivities,
-      boolean updateEventTriggers,
-      ValidatingMigrationInstructions existingInstructions) {
+      Collection<ActivityImpl> sourceActivities, Collection<ActivityImpl> targetActivities,
+      boolean updateEventTriggers, ValidatingMigrationInstructions existingInstructions) {
 
     List<ValidatingMigrationInstruction> generatedInstructions = new ArrayList<ValidatingMigrationInstruction>();
 
@@ -91,16 +88,17 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
       if (!existingInstructions.containsInstructionForSourceScope(sourceActivity)) {
         for (ActivityImpl targetActivity : targetActivities) {
 
+          if (isValidActivity(sourceActivity) && isValidActivity(targetActivity)
+              && migrationActivityMatcher.matchActivities(sourceActivity, targetActivity)) {
 
-          if (isValidActivity(sourceActivity)
-            && isValidActivity(targetActivity)
-            && migrationActivityMatcher.matchActivities(sourceActivity, targetActivity)) {
+            // for conditional events the update event trigger must be set
+            boolean updateEventTriggersForInstruction = sourceActivity
+                .getActivityBehavior() instanceof ConditionalEventBehavior
+                || updateEventTriggers
+                    && UpdateEventTriggersValidator.definesPersistentEventTrigger(sourceActivity);
 
-            //for conditional events the update event trigger must be set
-            boolean updateEventTriggersForInstruction = sourceActivity.getActivityBehavior() instanceof ConditionalEventBehavior ||
-                                                        updateEventTriggers && UpdateEventTriggersValidator.definesPersistentEventTrigger(sourceActivity);
-
-            ValidatingMigrationInstruction generatedInstruction = new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity, updateEventTriggersForInstruction);
+            ValidatingMigrationInstruction generatedInstruction = new ValidatingMigrationInstructionImpl(
+                sourceActivity, targetActivity, updateEventTriggersForInstruction);
             generatedInstructions.add(generatedInstruction);
           }
         }
@@ -110,26 +108,19 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
     return generatedInstructions;
   }
 
-  public void generate(ScopeImpl sourceScope,
-      ScopeImpl targetScope,
-      ProcessDefinitionImpl sourceProcessDefinition,
-      ProcessDefinitionImpl targetProcessDefinition,
-      ValidatingMigrationInstructions existingInstructions,
-      boolean updateEventTriggers) {
+  public void generate(ScopeImpl sourceScope, ScopeImpl targetScope,
+      ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition,
+      ValidatingMigrationInstructions existingInstructions, boolean updateEventTriggers) {
 
     List<ValidatingMigrationInstruction> flowScopeInstructions = generateInstructionsForActivities(
-      sourceScope.getActivities(),
-      targetScope.getActivities(),
-      updateEventTriggers,
-      existingInstructions);
+        sourceScope.getActivities(), targetScope.getActivities(), updateEventTriggers,
+        existingInstructions);
 
     existingInstructions.addAll(flowScopeInstructions);
 
     List<ValidatingMigrationInstruction> eventScopeInstructions = generateInstructionsForActivities(
-      sourceScope.getEventActivities(),
-      targetScope.getEventActivities(),
-      updateEventTriggers,
-      existingInstructions);
+        sourceScope.getEventActivities(), targetScope.getEventActivities(), updateEventTriggers,
+        existingInstructions);
 
     existingInstructions.addAll(eventScopeInstructions);
 
@@ -137,12 +128,8 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
 
     for (ValidatingMigrationInstruction generatedInstruction : flowScopeInstructions) {
       if (existingInstructions.contains(generatedInstruction)) {
-        generate(
-            generatedInstruction.getSourceActivity(),
-            generatedInstruction.getTargetActivity(),
-            sourceProcessDefinition,
-            targetProcessDefinition,
-            existingInstructions,
+        generate(generatedInstruction.getSourceActivity(), generatedInstruction.getTargetActivity(),
+            sourceProcessDefinition, targetProcessDefinition, existingInstructions,
             updateEventTriggers);
       }
     }

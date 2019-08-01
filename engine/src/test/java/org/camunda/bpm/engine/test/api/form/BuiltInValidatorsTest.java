@@ -44,7 +44,8 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
   public void testDefaultFormFieldValidators() {
 
     // assert default validators are registered
-    FormValidators formValidators = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getFormValidators();
+    FormValidators formValidators = ((ProcessEngineImpl) processEngine)
+        .getProcessEngineConfiguration().getFormValidators();
 
     Map<String, Class<? extends FormFieldValidator>> validators = formValidators.getValidators();
     assertEquals(RequiredValidator.class, validators.get("required"));
@@ -96,7 +97,8 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
       validator.validate(4, new TestValidatorContext("4.4"));
       fail("exception expected");
     } catch (FormException e) {
-      assertTrue(e.getMessage().contains("Cannot validate Integer value 4: configuration 4.4 cannot be parsed as Integer."));
+      assertTrue(e.getMessage().contains(
+          "Cannot validate Integer value 4: configuration 4.4 cannot be parsed as Integer."));
     }
 
     assertFalse(validator.validate(4d, new TestValidatorContext("4.1")));
@@ -119,7 +121,8 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
       validator.validate(4, new TestValidatorContext("4.4"));
       fail("exception expected");
     } catch (FormException e) {
-      assertTrue(e.getMessage().contains("Cannot validate Integer value 4: configuration 4.4 cannot be parsed as Integer."));
+      assertTrue(e.getMessage().contains(
+          "Cannot validate Integer value 4: configuration 4.4 cannot be parsed as Integer."));
     }
 
     assertFalse(validator.validate(4.1d, new TestValidatorContext("4")));
@@ -142,7 +145,8 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
       validator.validate("test", new TestValidatorContext("4.4"));
       fail("exception expected");
     } catch (FormException e) {
-      assertTrue(e.getMessage().contains("Cannot validate \"maxlength\": configuration 4.4 cannot be interpreted as Integer"));
+      assertTrue(e.getMessage().contains(
+          "Cannot validate \"maxlength\": configuration 4.4 cannot be interpreted as Integer"));
     }
   }
 
@@ -158,7 +162,8 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
       validator.validate("test", new TestValidatorContext("4.4"));
       fail("exception expected");
     } catch (FormException e) {
-      assertTrue(e.getMessage().contains("Cannot validate \"minlength\": configuration 4.4 cannot be interpreted as Integer"));
+      assertTrue(e.getMessage().contains(
+          "Cannot validate \"minlength\": configuration 4.4 cannot be interpreted as Integer"));
     }
   }
 

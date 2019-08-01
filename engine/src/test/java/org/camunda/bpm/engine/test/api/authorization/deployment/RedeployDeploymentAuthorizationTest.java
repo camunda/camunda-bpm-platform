@@ -44,7 +44,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-
 /**
  * @author Roman Smirnov
  *
@@ -64,21 +63,15 @@ public class RedeployDeploymentAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.DEPLOYMENT, "*", "userId", Permissions.CREATE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.DEPLOYMENT, "*", "userId", Permissions.CREATE))
-        .failsDueToRequired(
-          grant(Resources.DEPLOYMENT, "deploymentId", "userId", Permissions.READ)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.DEPLOYMENT, "deploymentId", "userId", Permissions.READ),
-          grant(Resources.DEPLOYMENT, "*", "userId", Permissions.CREATE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations()
+            .failsDueToRequired(grant(Resources.DEPLOYMENT, "*", "userId", Permissions.CREATE)),
+        scenario()
+            .withAuthorizations(grant(Resources.DEPLOYMENT, "*", "userId", Permissions.CREATE))
+            .failsDueToRequired(
+                grant(Resources.DEPLOYMENT, "deploymentId", "userId", Permissions.READ)),
+        scenario().withAuthorizations(
+            grant(Resources.DEPLOYMENT, "deploymentId", "userId", Permissions.READ),
+            grant(Resources.DEPLOYMENT, "*", "userId", Permissions.CREATE)).succeeds());
   }
 
   @Before
@@ -101,23 +94,16 @@ public class RedeployDeploymentAuthorizationTest {
     BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
 
     // first deployment
-    Deployment deployment1 = repositoryService
-        .createDeployment()
-        .addModelInstance("process1.bpmn", model1)
-        .addModelInstance("process2.bpmn", model2)
+    Deployment deployment1 = repositoryService.createDeployment()
+        .addModelInstance("process1.bpmn", model1).addModelInstance("process2.bpmn", model2)
         .deploy();
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("deploymentId", deployment1.getId())
-      .start();
+    authRule.init(scenario).withUser("userId").bindResource("deploymentId", deployment1.getId())
+        .start();
 
-    Deployment deployment2 = repositoryService
-      .createDeployment()
-      .addDeploymentResources(deployment1.getId())
-      .deploy();
+    Deployment deployment2 = repositoryService.createDeployment()
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -129,7 +115,7 @@ public class RedeployDeploymentAuthorizationTest {
     deleteDeployments(deployment1);
   }
 
-  protected void deleteDeployments(Deployment... deployments){
+  protected void deleteDeployments(Deployment... deployments) {
     for (Deployment deployment : deployments) {
       engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
     }

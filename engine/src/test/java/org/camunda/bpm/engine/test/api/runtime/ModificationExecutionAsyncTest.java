@@ -99,10 +99,7 @@ public class ModificationExecutionAsyncTest {
 
   @Parameterized.Parameters(name = "Job DueDate is set: {0}")
   public static Collection<Object[]> scenarios() throws ParseException {
-    return Arrays.asList(new Object[][] {
-      { false, null },
-      { true, START_DATE }
-    });
+    return Arrays.asList(new Object[][] { { false, null }, { true, START_DATE } });
   }
 
   @Before
@@ -126,13 +123,8 @@ public class ModificationExecutionAsyncTest {
 
   @Before
   public void createBpmnModelInstance() {
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .userTask("user1")
-        .sequenceFlowId("seq")
-        .userTask("user2")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").userTask("user1")
+        .sequenceFlowId("seq").userTask("user2").endEvent("end").done();
   }
 
   @After
@@ -162,7 +154,8 @@ public class ModificationExecutionAsyncTest {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    Batch batch = runtimeService.createModification(processDefinition.getId()).startAfterActivity("user2").processInstanceIds(processInstanceIds).executeAsync();
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startAfterActivity("user2").processInstanceIds(processInstanceIds).executeAsync();
 
     assertBatchCreated(batch, 2);
   }
@@ -171,7 +164,8 @@ public class ModificationExecutionAsyncTest {
   public void createModificationWithNullProcessInstanceIdsListAsync() {
 
     try {
-      runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds((List<String>) null).executeAsync();
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1")
+          .processInstanceIds((List<String>) null).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids is empty"));
@@ -181,19 +175,20 @@ public class ModificationExecutionAsyncTest {
   @Test
   public void createModificationWithNullProcessDefinitionId() {
     try {
-      runtimeService.createModification(null).cancelAllForActivity("activityId").processInstanceIds(Arrays.asList("20", "1--0")).executeAsync();
+      runtimeService.createModification(null).cancelAllForActivity("activityId")
+          .processInstanceIds(Arrays.asList("20", "1--0")).executeAsync();
       fail("Should not succed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("processDefinitionId is null"));
     }
   }
 
-
   @Test
   public void createModificationUsingProcessInstanceIdsListWithNullValueAsync() {
 
     try {
-      runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds(Arrays.asList("foo", null, "bar")).executeAsync();
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1")
+          .processInstanceIds(Arrays.asList("foo", null, "bar")).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids contains null value"));
@@ -203,7 +198,8 @@ public class ModificationExecutionAsyncTest {
   @Test
   public void createModificationWithEmptyProcessInstanceIdsListAsync() {
     try {
-      runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds(Collections.<String> emptyList()).executeAsync();
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1")
+          .processInstanceIds(Collections.<String> emptyList()).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids is empty"));
@@ -214,7 +210,8 @@ public class ModificationExecutionAsyncTest {
   public void createModificationWithNullProcessInstanceIdsArrayAsync() {
 
     try {
-      runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds((String[]) null).executeAsync();
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1")
+          .processInstanceIds((String[]) null).executeAsync();
       fail("Should not be able to modify");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), CoreMatchers.containsString("Process instance ids is empty"));
@@ -225,7 +222,8 @@ public class ModificationExecutionAsyncTest {
   public void createModificationUsingProcessInstanceIdsArrayWithNullValueAsync() {
 
     try {
-      runtimeService.createModification("processDefinitionId").cancelAllForActivity("user1").processInstanceIds("foo", null, "bar").executeAsync();
+      runtimeService.createModification("processDefinitionId").cancelAllForActivity("user1")
+          .processInstanceIds("foo", null, "bar").executeAsync();
       fail("Should not be able to modify");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids contains null value"));
@@ -236,7 +234,8 @@ public class ModificationExecutionAsyncTest {
   public void testNullProcessInstanceQueryAsync() {
 
     try {
-      runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceQuery(null).executeAsync();
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1")
+          .processInstanceQuery(null).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids is empty"));
@@ -250,7 +249,8 @@ public class ModificationExecutionAsyncTest {
 
     List<String> processInstanceIds = helper.startInstances("process1", 2);
     try {
-      runtimeService.createModification("foo").cancelAllForActivity("activityId").processInstanceIds(processInstanceIds).executeAsync();
+      runtimeService.createModification("foo").cancelAllForActivity("activityId")
+          .processInstanceIds(processInstanceIds).executeAsync();
       fail("Should not succed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("processDefinition is null"));
@@ -297,7 +297,8 @@ public class ModificationExecutionAsyncTest {
     rule.getProcessEngineConfiguration().setBatchJobsPerSeed(10);
     Batch batch = helper.startAfterAsync("process1", 20, "user1", processDefinition.getId());
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
-    JobDefinition modificationJobDefinition = helper.getExecutionJobDefinition(batch);;
+    JobDefinition modificationJobDefinition = helper.getExecutionJobDefinition(batch);
+    ;
 
     helper.executeSeedJob(batch);
 
@@ -361,12 +362,8 @@ public class ModificationExecutionAsyncTest {
       assertNotNull(updatedTree);
       assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-      assertThat(updatedTree).hasStructure(
-          describeActivityInstanceTree(
-              processDefinition.getId())
-          .activity("user1")
-          .activity("user2")
-          .done());
+      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId())
+          .activity("user1").activity("user2").done());
     }
 
     // and the no modification jobs exist
@@ -396,12 +393,8 @@ public class ModificationExecutionAsyncTest {
       assertNotNull(updatedTree);
       assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-      assertThat(updatedTree).hasStructure(
-          describeActivityInstanceTree(
-              processDefinition.getId())
-          .activity("user1")
-          .activity("user2")
-          .done());
+      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId())
+          .activity("user1").activity("user2").done());
     }
 
     // and the no modification jobs exist
@@ -431,12 +424,8 @@ public class ModificationExecutionAsyncTest {
       assertNotNull(updatedTree);
       assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-      assertThat(updatedTree).hasStructure(
-          describeActivityInstanceTree(
-              processDefinition.getId())
-          .activity("user1")
-          .activity("user2")
-          .done());
+      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId())
+          .activity("user1").activity("user2").done());
     }
 
     // and the no modification jobs exist
@@ -477,11 +466,8 @@ public class ModificationExecutionAsyncTest {
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
     List<String> instances = helper.startInstances("process1", 10);
 
-    Batch batch = runtimeService
-        .createModification(processDefinition.getId())
-        .startAfterActivity("user1")
-        .cancelAllForActivity("user1")
-        .processInstanceIds(instances)
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startAfterActivity("user1").cancelAllForActivity("user1").processInstanceIds(instances)
         .executeAsync();
 
     helper.executeSeedJob(batch);
@@ -499,10 +485,7 @@ public class ModificationExecutionAsyncTest {
       assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
       assertThat(updatedTree).hasStructure(
-          describeActivityInstanceTree(
-              processDefinition.getId())
-          .activity("user2")
-          .done());
+          describeActivityInstanceTree(processDefinition.getId()).activity("user2").done());
     }
 
     // and the no modification jobs exist
@@ -517,11 +500,8 @@ public class ModificationExecutionAsyncTest {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     List<String> instances = helper.startInstances("process1", 10);
 
-    Batch batch = runtimeService
-        .createModification(processDefinition.getId())
-        .startBeforeActivity("user1")
-        .cancelAllForActivity("user1")
-        .processInstanceIds(instances)
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startBeforeActivity("user1").cancelAllForActivity("user1").processInstanceIds(instances)
         .executeAsync();
 
     helper.executeSeedJob(batch);
@@ -552,11 +532,8 @@ public class ModificationExecutionAsyncTest {
 
     List<String> instances = helper.startInstances("process1", 10);
 
-    Batch batch = runtimeService
-        .createModification(processDefinition.getId())
-        .startTransition("seq")
-        .cancelAllForActivity("user1")
-        .processInstanceIds(instances)
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startTransition("seq").cancelAllForActivity("user1").processInstanceIds(instances)
         .executeAsync();
 
     helper.executeSeedJob(batch);
@@ -572,10 +549,7 @@ public class ModificationExecutionAsyncTest {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
       assertNotNull(updatedTree);
       assertThat(updatedTree).hasStructure(
-          describeActivityInstanceTree(
-              processDefinition.getId())
-          .activity("user2")
-          .done());
+          describeActivityInstanceTree(processDefinition.getId()).activity("user2").done());
     }
 
     // and the no modification jobs exist
@@ -598,7 +572,8 @@ public class ModificationExecutionAsyncTest {
     List<String> anotherProcessInstanceIds = helper.startInstances("process1", 1);
     processInstanceIds.addAll(anotherProcessInstanceIds);
 
-    Batch batch = runtimeService.createModification(processDefinition.getId()).startBeforeActivity("user2").processInstanceIds(processInstanceIds).executeAsync();
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startBeforeActivity("user2").processInstanceIds(processInstanceIds).executeAsync();
 
     helper.executeSeedJob(batch);
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
@@ -614,12 +589,14 @@ public class ModificationExecutionAsyncTest {
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
-    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId()).activity("user2").activity("user2").done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId())
+        .activity("user2").activity("user2").done());
 
     processInstanceId = processInstanceIds.get(1);
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
-    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId()).activity("user1").activity("user2").done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId())
+        .activity("user1").activity("user2").done());
 
     // and the no modification jobs exist
     assertEquals(0, helper.getExecutionJobs(batch).size());
@@ -763,10 +740,12 @@ public class ModificationExecutionAsyncTest {
 
   @Test
   public void testModificationJobsExecutionByJobExecutorWithAuthorizationEnabledAndTenant() {
-    ProcessEngineConfigurationImpl processEngineConfiguration = rule.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = rule
+        .getProcessEngineConfiguration();
 
     processEngineConfiguration.setAuthorizationEnabled(true);
-    ProcessDefinition processDefinition = testRule.deployForTenantAndGetDefinition("tenantId", instance);
+    ProcessDefinition processDefinition = testRule.deployForTenantAndGetDefinition("tenantId",
+        instance);
 
     try {
       Batch batch = helper.startAfterAsync("process1", 10, "user1", processDefinition.getId());
@@ -780,12 +759,8 @@ public class ModificationExecutionAsyncTest {
         assertNotNull(updatedTree);
         assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-        assertThat(updatedTree).hasStructure(
-            describeActivityInstanceTree(
-                processDefinition.getId())
-            .activity("user1")
-            .activity("user2")
-            .done());
+        assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId())
+            .activity("user1").activity("user2").done());
       }
 
     } finally {
@@ -820,12 +795,8 @@ public class ModificationExecutionAsyncTest {
       assertNotNull(updatedTree);
       assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-      assertThat(updatedTree).hasStructure(
-          describeActivityInstanceTree(
-              processDefinition.getId())
-          .activity("user1")
-          .activity("user2")
-          .done());
+      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId())
+          .activity("user1").activity("user2").done());
     }
 
     // and one batch job failed and has 2 retries left
@@ -835,7 +806,8 @@ public class ModificationExecutionAsyncTest {
     Job failedJob = modificationJobs.get(0);
     assertEquals(2, failedJob.getRetries());
     assertThat(failedJob.getExceptionMessage(), startsWith("ENGINE-13036"));
-    assertThat(failedJob.getExceptionMessage(), containsString("Process instance '" + deletedProcessInstanceId + "' cannot be modified"));
+    assertThat(failedJob.getExceptionMessage(),
+        containsString("Process instance '" + deletedProcessInstanceId + "' cannot be modified"));
   }
 
   @Test
@@ -845,15 +817,13 @@ public class ModificationExecutionAsyncTest {
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
     helper.startInstances("process1", 15);
 
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(processDefinition.getId());
     assertEquals(processInstanceCount, processInstanceQuery.count());
 
     // when
-    Batch batch = runtimeService
-      .createModification(processDefinition.getId())
-      .startAfterActivity("user1")
-      .processInstanceQuery(processInstanceQuery)
-      .executeAsync();
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startAfterActivity("user1").processInstanceQuery(processInstanceQuery).executeAsync();
 
     // then a batch is created
     assertBatchCreated(batch, processInstanceCount);
@@ -866,16 +836,14 @@ public class ModificationExecutionAsyncTest {
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
     List<String> processInstanceIds = helper.startInstances("process1", 15);
 
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(processDefinition.getId());
     assertEquals(processInstanceCount, processInstanceQuery.count());
 
     // when
-    Batch batch = runtimeService
-      .createModification(processDefinition.getId())
-      .startTransition("seq")
-      .processInstanceIds(processInstanceIds)
-      .processInstanceQuery(processInstanceQuery)
-      .executeAsync();
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startTransition("seq").processInstanceIds(processInstanceIds)
+        .processInstanceQuery(processInstanceQuery).executeAsync();
 
     // then a batch is created
     assertBatchCreated(batch, processInstanceCount);
@@ -885,19 +853,16 @@ public class ModificationExecutionAsyncTest {
   public void testListenerInvocation() {
     // given
     DelegateEvent.clearEvents();
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(modify(instance)
-        .activityBuilder("user2")
-        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName())
-        .done()
-      );
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(
+        modify(instance).activityBuilder("user2").camundaExecutionListenerClass(
+            ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName()).done());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
 
-    Batch batch = runtimeService
-      .createModification(processDefinition.getId())
-      .startBeforeActivity("user2")
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startBeforeActivity("user2").processInstanceIds(Arrays.asList(processInstance.getId()))
+        .executeAsync();
 
     helper.executeSeedJob(batch);
 
@@ -919,19 +884,16 @@ public class ModificationExecutionAsyncTest {
   public void testSkipListenerInvocationF() {
     // given
     DelegateEvent.clearEvents();
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(modify(instance)
-        .activityBuilder("user2")
-        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName())
-        .done());
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(
+        modify(instance).activityBuilder("user2").camundaExecutionListenerClass(
+            ExecutionListener.EVENTNAME_START, DelegateExecutionListener.class.getName()).done());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
 
-    Batch batch = runtimeService
-      .createModification(processDefinition.getId())
-      .cancelAllForActivity("user2")
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .skipCustomListeners()
-      .executeAsync();
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .cancelAllForActivity("user2").processInstanceIds(Arrays.asList(processInstance.getId()))
+        .skipCustomListeners().executeAsync();
 
     helper.executeSeedJob(batch);
 
@@ -945,19 +907,15 @@ public class ModificationExecutionAsyncTest {
   @Test
   public void testIoMappingInvocation() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(modify(instance)
-      .activityBuilder("user1")
-      .camundaInputParameter("foo", "bar")
-      .done()
-    );
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(
+        modify(instance).activityBuilder("user1").camundaInputParameter("foo", "bar").done());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
 
-    Batch batch = runtimeService
-      .createModification(processDefinition.getId())
-      .startAfterActivity("user2")
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startAfterActivity("user2").processInstanceIds(Arrays.asList(processInstance.getId()))
+        .executeAsync();
 
     helper.executeSeedJob(batch);
 
@@ -971,27 +929,23 @@ public class ModificationExecutionAsyncTest {
     assertEquals("bar", inputVariable.getValue());
 
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
-    assertEquals(activityInstance.getActivityInstances("user1")[0].getId(), inputVariable.getActivityInstanceId());
+    assertEquals(activityInstance.getActivityInstances("user1")[0].getId(),
+        inputVariable.getActivityInstanceId());
   }
 
   @Test
   public void testSkipIoMappingInvocation() {
     // given
 
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(modify(instance)
-        .activityBuilder("user2")
-        .camundaInputParameter("foo", "bar")
-        .done());
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(
+        modify(instance).activityBuilder("user2").camundaInputParameter("foo", "bar").done());
 
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-
-    Batch batch = runtimeService
-      .createModification(processDefinition.getId())
-      .startBeforeActivity("user2")
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .skipIoMappings()
-      .executeAsync();
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+        .startBeforeActivity("user2").processInstanceIds(Arrays.asList(processInstance.getId()))
+        .skipIoMappings().executeAsync();
 
     helper.executeSeedJob(batch);
 
@@ -1005,12 +959,8 @@ public class ModificationExecutionAsyncTest {
   @Test
   public void testCancelWithoutFlag() {
     // given
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .serviceTask("ser").camundaExpression("${true}")
-        .userTask("user")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").serviceTask("ser")
+        .camundaExpression("${true}").userTask("user").endEvent("end").done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
@@ -1018,10 +968,8 @@ public class ModificationExecutionAsyncTest {
 
     // when
     Batch batch = runtimeService.createModification(processDefinition.getId())
-      .startBeforeActivity("ser")
-      .cancelAllForActivity("user")
-      .processInstanceIds(processInstanceIds)
-      .executeAsync();
+        .startBeforeActivity("ser").cancelAllForActivity("user")
+        .processInstanceIds(processInstanceIds).executeAsync();
 
     helper.executeSeedJob(batch);
     helper.executeJobs(batch);
@@ -1033,12 +981,8 @@ public class ModificationExecutionAsyncTest {
   @Test
   public void testCancelWithoutFlag2() {
     // given
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .serviceTask("ser").camundaExpression("${true}")
-        .userTask("user")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").serviceTask("ser")
+        .camundaExpression("${true}").userTask("user").endEvent("end").done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
@@ -1046,10 +990,8 @@ public class ModificationExecutionAsyncTest {
 
     // when
     Batch batch = runtimeService.createModification(processDefinition.getId())
-      .startBeforeActivity("ser")
-      .cancelAllForActivity("user", false)
-      .processInstanceIds(processInstanceIds)
-      .executeAsync();
+        .startBeforeActivity("ser").cancelAllForActivity("user", false)
+        .processInstanceIds(processInstanceIds).executeAsync();
 
     helper.executeSeedJob(batch);
     helper.executeJobs(batch);
@@ -1061,12 +1003,8 @@ public class ModificationExecutionAsyncTest {
   @Test
   public void testCancelWithFlag() {
     // given
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .serviceTask("ser").camundaExpression("${true}")
-        .userTask("user")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").serviceTask("ser")
+        .camundaExpression("${true}").userTask("user").endEvent("end").done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
@@ -1074,16 +1012,15 @@ public class ModificationExecutionAsyncTest {
 
     // when
     Batch batch = runtimeService.createModification(processDefinition.getId())
-      .startBeforeActivity("ser")
-      .cancelAllForActivity("user", true)
-      .processInstanceIds(processInstanceIds)
-      .executeAsync();
+        .startBeforeActivity("ser").cancelAllForActivity("user", true)
+        .processInstanceIds(processInstanceIds).executeAsync();
 
     helper.executeSeedJob(batch);
     helper.executeJobs(batch);
 
     // then
-    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().singleResult();
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .singleResult();
     assertNotNull(execution);
     assertEquals("user", execution.getActivityId());
   }
@@ -1091,12 +1028,8 @@ public class ModificationExecutionAsyncTest {
   @Test
   public void testCancelWithFlagForManyInstances() {
     // given
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .serviceTask("ser").camundaExpression("${true}")
-        .userTask("user")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").serviceTask("ser")
+        .camundaExpression("${true}").userTask("user").endEvent("end").done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
@@ -1104,17 +1037,16 @@ public class ModificationExecutionAsyncTest {
 
     // when
     Batch batch = runtimeService.createModification(processDefinition.getId())
-      .startBeforeActivity("ser")
-      .cancelAllForActivity("user", true)
-      .processInstanceIds(processInstanceIds)
-      .executeAsync();
+        .startBeforeActivity("ser").cancelAllForActivity("user", true)
+        .processInstanceIds(processInstanceIds).executeAsync();
 
     helper.executeSeedJob(batch);
     helper.executeJobs(batch);
 
     // then
     for (String processInstanceId : processInstanceIds) {
-      Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).singleResult();
+      Execution execution = runtimeService.createExecutionQuery()
+          .processInstanceId(processInstanceId).singleResult();
       assertNotNull(execution);
       assertEquals("user", ((ExecutionEntity) execution).getActivityId());
     }

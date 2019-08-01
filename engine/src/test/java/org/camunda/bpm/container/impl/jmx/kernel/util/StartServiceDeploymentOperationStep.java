@@ -31,7 +31,7 @@ public class StartServiceDeploymentOperationStep extends DeploymentOperationStep
   }
 
   public String getName() {
-    return "start "+serviceName;
+    return "start " + serviceName;
   }
 
   public void performOperationStep(DeploymentOperation operationContext) {

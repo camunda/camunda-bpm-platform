@@ -41,25 +41,13 @@ public class ProcessTaskReadPermissionAuthorizationTest extends ProcessTaskAutho
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(TASK, "taskId", userId, READ),
-          grant(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "taskId", userId, READ)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "*", userId, READ)),
-      scenario()
-        .withAuthorizations(
-          grant(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK)),
-      scenario()
-        .withAuthorizations(
-          grant(PROCESS_DEFINITION, "*", userId, READ_TASK))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations().failsDueToRequired(grant(TASK, "taskId", userId, READ),
+            grant(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK)),
+        scenario().withAuthorizations(grant(TASK, "taskId", userId, READ)),
+        scenario().withAuthorizations(grant(TASK, "*", userId, READ)),
+        scenario().withAuthorizations(grant(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK)),
+        scenario().withAuthorizations(grant(PROCESS_DEFINITION, "*", userId, READ_TASK))
+            .succeeds());
   }
 
 }

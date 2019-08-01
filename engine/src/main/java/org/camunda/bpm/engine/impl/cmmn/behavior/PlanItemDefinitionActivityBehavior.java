@@ -38,7 +38,6 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 
-
 /**
  * @author Roman Smirnov
  *
@@ -95,7 +94,6 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
     creating(execution);
   }
 
-
   protected void creating(CmmnActivityExecution execution) {
     // noop
   }
@@ -127,7 +125,8 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
       }
 
       if (execution.isActive()) {
-        throw LOG.wrongCaseStateException("close", id, "[completed|terminated|suspended]", "active");
+        throw LOG.wrongCaseStateException("close", id, "[completed|terminated|suspended]",
+            "active");
       }
 
     } else {
@@ -190,10 +189,10 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
       if (events != null && events.contains(standardEvent)) {
         repeat = evaluateRepetitionRule(execution);
       }
-    }
-    else {
+    } else {
 
-      if (ENABLE.equals(standardEvent) || START.equals(standardEvent) || OCCUR.equals(standardEvent)) {
+      if (ENABLE.equals(standardEvent) || START.equals(standardEvent)
+          || OCCUR.equals(standardEvent)) {
         repeat = evaluateRepetitionRule(execution);
       }
     }
@@ -212,7 +211,8 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
 
   // helper //////////////////////////////////////////////////////////////////////
 
-  protected void ensureTransitionAllowed(CmmnActivityExecution execution, CaseExecutionState expected, CaseExecutionState target, String transition) {
+  protected void ensureTransitionAllowed(CmmnActivityExecution execution,
+      CaseExecutionState expected, CaseExecutionState target, String transition) {
     String id = execution.getId();
 
     CaseExecutionState currentState = execution.getCurrentState();
@@ -246,7 +246,8 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
   protected CmmnActivity getActivity(CmmnActivityExecution execution) {
     String id = execution.getId();
     CmmnActivity activity = execution.getActivity();
-    ensureNotNull(PvmException.class, "Case execution '"+id+"': has no current activity.", "activity", activity);
+    ensureNotNull(PvmException.class, "Case execution '" + id + "': has no current activity.",
+        "activity", activity);
 
     return activity;
   }

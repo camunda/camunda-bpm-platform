@@ -31,8 +31,9 @@ public class ManualStartCaseExecutionCmd extends StateTransitionCaseExecutionCmd
 
   private static final long serialVersionUID = 1L;
 
-  public ManualStartCaseExecutionCmd(String caseExecutionId, Map<String, Object> variables, Map<String, Object> variablesLocal,
-      Collection<String> variableDeletions, Collection<String> variableLocalDeletions) {
+  public ManualStartCaseExecutionCmd(String caseExecutionId, Map<String, Object> variables,
+      Map<String, Object> variablesLocal, Collection<String> variableDeletions,
+      Collection<String> variableLocalDeletions) {
     super(caseExecutionId, variables, variablesLocal, variableDeletions, variableLocalDeletions);
   }
 
@@ -40,7 +41,8 @@ public class ManualStartCaseExecutionCmd extends StateTransitionCaseExecutionCmd
     super(builder);
   }
 
-  protected void performStateTransition(CommandContext commandContext, CaseExecutionEntity caseExecution) {
+  protected void performStateTransition(CommandContext commandContext,
+      CaseExecutionEntity caseExecution) {
     caseExecution.manualStart();
   }
 

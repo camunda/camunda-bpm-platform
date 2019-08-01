@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine;
 
 /**
- * Runtime exception indicating the requested class was not found or an error occurred
- * while loading the class.
+ * Runtime exception indicating the requested class was not found or an error occurred while loading
+ * the class.
  *
  * @author Frederik Heremans
  */
@@ -43,6 +43,5 @@ public class ClassLoadingException extends ProcessEngineException {
   public String getClassName() {
     return className;
   }
-
 
 }

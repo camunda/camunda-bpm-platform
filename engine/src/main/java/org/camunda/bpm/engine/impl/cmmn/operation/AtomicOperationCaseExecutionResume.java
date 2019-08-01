@@ -39,5 +39,4 @@ public class AtomicOperationCaseExecutionResume extends AbstractAtomicOperationC
     behavior.onResume(execution);
   }
 
-
 }

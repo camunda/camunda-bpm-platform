@@ -31,8 +31,9 @@ public class SetVariableOnConcurrentExecutionDelegate implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    Task task = execution.getProcessEngineServices().getTaskService().createTaskQuery().taskName(TASK_WITH_CONDITION).singleResult();
+    Task task = execution.getProcessEngineServices().getTaskService().createTaskQuery()
+        .taskName(TASK_WITH_CONDITION).singleResult();
     ((TaskEntity) task).getExecution().setVariableLocal(VARIABLE_NAME, 1);
-    execution.setVariableLocal(VARIABLE_NAME+1, 1);
+    execution.setVariableLocal(VARIABLE_NAME + 1, 1);
   }
 }

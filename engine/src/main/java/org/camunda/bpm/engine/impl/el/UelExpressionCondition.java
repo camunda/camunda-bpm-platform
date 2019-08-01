@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
 
-
 /**
  * {@link Condition} that resolves an UEL expression at runtime.
  *

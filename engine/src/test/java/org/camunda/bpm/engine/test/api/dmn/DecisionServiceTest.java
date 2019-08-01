@@ -77,54 +77,60 @@ public class DecisionServiceTest {
 
   @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionTableById() {
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+  public void evaluateDecisionTableById() {
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableById(decisionDefinition.getId(), createVariables());
-
-    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
-  }
-
-  @Deployment(resources = DMN_DECISION_TABLE)
-  @Test
-	public void evaluateDecisionTableByKey() {
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableById(decisionDefinition.getId(), createVariables());
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 
   @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionTableByKeyAndLatestVersion() {
+  public void evaluateDecisionTableByKey() {
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
+
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+  }
+
+  @Deployment(resources = DMN_DECISION_TABLE)
+  @Test
+  public void evaluateDecisionTableByKeyAndLatestVersion() {
     testRule.deploy(DMN_DECISION_TABLE_V2);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
   }
 
   @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionTableByKeyAndVersion() {
+  public void evaluateDecisionTableByKeyAndVersion() {
     testRule.deploy(DMN_DECISION_TABLE_V2);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, 1, createVariables());
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, 1, createVariables());
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 
   @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionTableByKeyAndNullVersion() {
+  public void evaluateDecisionTableByKeyAndNullVersion() {
     testRule.deploy(DMN_DECISION_TABLE_V2);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, null, createVariables());
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, null, createVariables());
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
   }
 
   @Test
-	public void evaluateDecisionTableByNullId() {
+  public void evaluateDecisionTableByNullId() {
     thrown.expect(NotValidException.class);
     thrown.expectMessage("either decision definition id or key must be set");
 
@@ -132,7 +138,7 @@ public class DecisionServiceTest {
   }
 
   @Test
-	public void evaluateDecisionTableByNonExistingId() {
+  public void evaluateDecisionTableByNonExistingId() {
     thrown.expect(NotFoundException.class);
     thrown.expectMessage("no deployed decision definition found with id 'unknown'");
 
@@ -140,7 +146,7 @@ public class DecisionServiceTest {
   }
 
   @Test
-	public void evaluateDecisionTableByNullKey() {
+  public void evaluateDecisionTableByNullKey() {
     thrown.expect(NotValidException.class);
     thrown.expectMessage("either decision definition id or key must be set");
 
@@ -148,7 +154,7 @@ public class DecisionServiceTest {
   }
 
   @Test
-	public void evaluateDecisionTableByNonExistingKey() {
+  public void evaluateDecisionTableByNonExistingKey() {
     thrown.expect(NotFoundException.class);
     thrown.expectMessage("no decision definition deployed with key 'unknown'");
 
@@ -157,11 +163,13 @@ public class DecisionServiceTest {
 
   @Deployment(resources = DMN_DECISION_TABLE)
   @Test
-	public void evaluateDecisionTableByKeyWithNonExistingVersion() {
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+  public void evaluateDecisionTableByKeyWithNonExistingVersion() {
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
 
     thrown.expect(NotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key = 'decision' and version = '42'");
+    thrown
+        .expectMessage("no decision definition deployed with key = 'decision' and version = '42'");
 
     decisionService.evaluateDecisionTableByKeyAndVersion(decisionDefinition.getKey(), 42, null);
   }
@@ -169,12 +177,11 @@ public class DecisionServiceTest {
   @Deployment(resources = DMN_DECISION_LITERAL_EXPRESSION)
   @Test
   public void evaluateDecisionById() {
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
 
     DmnDecisionResult decisionResult = decisionService
-        .evaluateDecisionById(decisionDefinition.getId())
-        .variables(createVariables())
-        .evaluate();
+        .evaluateDecisionById(decisionDefinition.getId()).variables(createVariables()).evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
@@ -183,9 +190,7 @@ public class DecisionServiceTest {
   @Test
   public void evaluateDecisionByKey() {
     DmnDecisionResult decisionResult = decisionService
-        .evaluateDecisionByKey(DECISION_DEFINITION_KEY)
-        .variables(createVariables())
-        .evaluate();
+        .evaluateDecisionByKey(DECISION_DEFINITION_KEY).variables(createVariables()).evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
@@ -196,9 +201,7 @@ public class DecisionServiceTest {
     testRule.deploy(DMN_DECISION_LITERAL_EXPRESSION_V2);
 
     DmnDecisionResult decisionResult = decisionService
-        .evaluateDecisionByKey(DECISION_DEFINITION_KEY)
-        .variables(createVariables())
-        .evaluate();
+        .evaluateDecisionByKey(DECISION_DEFINITION_KEY).variables(createVariables()).evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
   }
@@ -209,9 +212,7 @@ public class DecisionServiceTest {
     testRule.deploy(DMN_DECISION_LITERAL_EXPRESSION_V2);
 
     DmnDecisionResult decisionResult = decisionService
-        .evaluateDecisionByKey(DECISION_DEFINITION_KEY)
-        .version(1)
-        .variables(createVariables())
+        .evaluateDecisionByKey(DECISION_DEFINITION_KEY).version(1).variables(createVariables())
         .evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
@@ -223,9 +224,7 @@ public class DecisionServiceTest {
     testRule.deploy(DMN_DECISION_LITERAL_EXPRESSION_V2);
 
     DmnDecisionResult decisionResult = decisionService
-        .evaluateDecisionByKey(DECISION_DEFINITION_KEY)
-        .version(null)
-        .variables(createVariables())
+        .evaluateDecisionByKey(DECISION_DEFINITION_KEY).version(null).variables(createVariables())
         .evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
@@ -266,24 +265,23 @@ public class DecisionServiceTest {
   @Deployment(resources = DMN_DECISION_LITERAL_EXPRESSION)
   @Test
   public void evaluateDecisionByKeyWithNonExistingVersion() {
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
 
     thrown.expect(NotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key = 'decision' and version = '42'");
+    thrown
+        .expectMessage("no decision definition deployed with key = 'decision' and version = '42'");
 
-    decisionService
-      .evaluateDecisionByKey(decisionDefinition.getKey())
-      .version(42)
-      .evaluate();
+    decisionService.evaluateDecisionByKey(decisionDefinition.getKey()).version(42).evaluate();
   }
 
-  @Deployment( resources = DRD_DISH_DECISION_TABLE )
+  @Deployment(resources = DRD_DISH_DECISION_TABLE)
   @Test
   public void evaluateDecisionWithRequiredDecisions() {
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
-          .putValue("temperature", 32)
-          .putValue("dayType", "Weekend"));
+    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(
+        "dish-decision",
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     assertThatDecisionHasResult(decisionResult, "Light salad");
   }
@@ -292,14 +290,16 @@ public class DecisionServiceTest {
     return Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
   }
 
-  protected void assertThatDecisionHasResult(DmnDecisionTableResult decisionResult, Object expectedValue) {
+  protected void assertThatDecisionHasResult(DmnDecisionTableResult decisionResult,
+      Object expectedValue) {
     assertThat(decisionResult, is(notNullValue()));
     assertThat(decisionResult.size(), is(1));
     String value = decisionResult.getSingleResult().getFirstEntry();
     assertThat(value, is(expectedValue));
   }
 
-  protected void assertThatDecisionHasResult(DmnDecisionResult decisionResult, Object expectedValue) {
+  protected void assertThatDecisionHasResult(DmnDecisionResult decisionResult,
+      Object expectedValue) {
     assertThat(decisionResult, is(notNullValue()));
     assertThat(decisionResult.size(), is(1));
     String value = decisionResult.getSingleResult().getFirstEntry();

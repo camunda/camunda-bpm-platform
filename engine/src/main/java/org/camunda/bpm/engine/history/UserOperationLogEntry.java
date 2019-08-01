@@ -20,43 +20,44 @@ import org.camunda.bpm.engine.EntityTypes;
 
 import java.util.Date;
 
-
 /**
- * Log entry about an operation performed by a user. This is used for logging
- * actions such as creating a new task, completing a task,
- * canceling a process instance, ...
+ * Log entry about an operation performed by a user. This is used for logging actions such as
+ * creating a new task, completing a task, canceling a process instance, ...
  *
  * <h2>Operation Type</h2>
- * <p>The type of the operation which has been performed. A user may create a new task,
- * complete a task, delegate a tasks, etc... Check this class for a list of built-in
- * operation type constants.</p>
+ * <p>
+ * The type of the operation which has been performed. A user may create a new task, complete a
+ * task, delegate a tasks, etc... Check this class for a list of built-in operation type constants.
+ * </p>
  *
  * <h2>Entity Type</h2>
- * <p>The type of the entity on which the operation was performed. Operations may be
- * performed on tasks, attachments, ...</p>
+ * <p>
+ * The type of the entity on which the operation was performed. Operations may be performed on
+ * tasks, attachments, ...
+ * </p>
  *
  * <h2>Affected Entity Criteria</h2>
  * <p>
- *   The methods that reference other entities (except users), such as {@link #getProcessInstanceId()}
- *   or {@link #getProcessDefinitionId()}, describe which entities were affected
- *   by the operation and represent restriction criteria.
- *   A <code>null</code> return value of any of those methods means that regarding
- *   this criterion, any entity was affected.
+ * The methods that reference other entities (except users), such as {@link #getProcessInstanceId()}
+ * or {@link #getProcessDefinitionId()}, describe which entities were affected by the operation and
+ * represent restriction criteria. A <code>null</code> return value of any of those methods means
+ * that regarding this criterion, any entity was affected.
  * </p>
  * <p>
- *   For example, if an operation suspends all process instances that belong to a certain
- *   process definition id, one operation log entry is created.
- *   Its return value for the method {@link #getProcessInstanceId()} is <code>null</code>,
- *   while {@link #getProcessDefinitionId()} returns an id. Thus, the return values
- *   of these methods can be understood as selection criteria of instances of the entity type
- *   that were affected by the operation.
+ * For example, if an operation suspends all process instances that belong to a certain process
+ * definition id, one operation log entry is created. Its return value for the method
+ * {@link #getProcessInstanceId()} is <code>null</code>, while {@link #getProcessDefinitionId()}
+ * returns an id. Thus, the return values of these methods can be understood as selection criteria
+ * of instances of the entity type that were affected by the operation.
  * </p>
  *
  * <h2>Additional Considerations</h2>
- * <p>The event describes which user has requested out the operation and the time
- * at which the operation was performed. Furthermore, one operation can result in multiple
+ * <p>
+ * The event describes which user has requested out the operation and the time at which the
+ * operation was performed. Furthermore, one operation can result in multiple
  * {@link UserOperationLogEntry} entities whicha are linked by the value of the
- * {@link #getOperationId()} method.</p>
+ * {@link #getOperationId()} method.
+ * </p>
  *
  * @author Danny Gräf
  * @author Daniel Meyer
@@ -110,7 +111,7 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_DELETE_HISTORY = "DeleteHistory";
 
   public static String OPERATION_TYPE_MODIFY_PROCESS_INSTANCE = "ModifyProcessInstance";
-  public static String OPERATION_TYPE_RESTART_PROCESS_INSTANCE  = "RestartProcessInstance";
+  public static String OPERATION_TYPE_RESTART_PROCESS_INSTANCE = "RestartProcessInstance";
   public static String OPERATION_TYPE_SUSPEND_JOB = "SuspendJob";
   public static String OPERATION_TYPE_ACTIVATE_JOB = "ActivateJob";
   public static String OPERATION_TYPE_SET_JOB_RETRIES = "SetJobRetries";
@@ -122,7 +123,7 @@ public interface UserOperationLogEntry {
 
   public static String OPERATION_TYPE_SUSPEND_BATCH = "SuspendBatch";
   public static String OPERATION_TYPE_ACTIVATE_BATCH = "ActivateBatch";
-  
+
   public static String OPERATION_TYPE_CREATE_INCIDENT = "CreateIncident";
 
   public static String OPERATION_TYPE_SET_REMOVAL_TIME = "SetRemovalTime";
@@ -184,11 +185,12 @@ public interface UserOperationLogEntry {
   /**
    * The unique identifier of this operation.
    *
-   * If an operation modifies multiple properties, multiple {@link UserOperationLogEntry} instances will be
-   * created with a common operationId. This allows grouping multiple entries which are part of a composite operation.
+   * If an operation modifies multiple properties, multiple {@link UserOperationLogEntry} instances
+   * will be created with a common operationId. This allows grouping multiple entries which are part
+   * of a composite operation.
    */
   String getOperationId();
-  
+
   /** External task reference. */
   String getExternalTaskId();
 
@@ -217,7 +219,7 @@ public interface UserOperationLogEntry {
 
   /** The time the historic user operation log will be removed. */
   Date getRemovalTime();
-  
+
   /** The category this entry is associated with */
   String getCategory();
 

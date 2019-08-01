@@ -37,11 +37,13 @@ public class MilestoneItemHandler extends ItemHandler {
     return new MilestoneActivityBehavior();
   }
 
-  protected void initializeManualActivationRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeManualActivationRule(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     // manual activation rule is not applicable on milestones
   }
 
-  protected void initializeExitCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeExitCriterias(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     // exit criteria is not applicable on milestones
   }
 

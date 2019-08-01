@@ -36,7 +36,8 @@ public class CustomExpressionManagerTest {
   @Test
   public void testBuiltinFunctionMapperRegistration() {
     // given a process engine configuration with a custom function mapper
-    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration()
+    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+        .createStandaloneInMemProcessEngineConfiguration()
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
 
     CustomExpressionManager customExpressionManager = new CustomExpressionManager();

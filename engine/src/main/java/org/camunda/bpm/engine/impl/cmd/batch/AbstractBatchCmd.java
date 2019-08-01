@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 public abstract class AbstractBatchCmd<T> implements Command<T> {
 
   protected void checkAuthorizations(CommandContext commandContext, Permission permission) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateBatch(permission);
     }
   }

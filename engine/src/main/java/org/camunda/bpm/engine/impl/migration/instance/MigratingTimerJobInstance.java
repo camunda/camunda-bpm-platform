@@ -38,11 +38,8 @@ public class MigratingTimerJobInstance extends MigratingJobInstance {
     super(jobEntity);
   }
 
-  public MigratingTimerJobInstance(JobEntity jobEntity,
-      JobDefinitionEntity jobDefinitionEntity,
-      ScopeImpl targetScope,
-      boolean updateEvent,
-      TimerDeclarationImpl targetTimerDeclaration) {
+  public MigratingTimerJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity,
+      ScopeImpl targetScope, boolean updateEvent, TimerDeclarationImpl targetTimerDeclaration) {
     super(jobEntity, jobDefinitionEntity, targetScope);
     timerTriggerTargetScope = determineTimerTriggerTargetScope(jobEntity, targetScope);
     this.updateEvent = updateEvent;
@@ -51,18 +48,19 @@ public class MigratingTimerJobInstance extends MigratingJobInstance {
 
   protected ScopeImpl determineTimerTriggerTargetScope(JobEntity jobEntity, ScopeImpl targetScope) {
     if (TimerStartEventSubprocessJobHandler.TYPE.equals(jobEntity.getJobHandlerType())) {
-      // for event subprocess start jobs, the job handler configuration references the subprocess while
+      // for event subprocess start jobs, the job handler configuration references the subprocess
+      // while
       // the job references the start event
       return targetScope.getFlowScope();
-    }
-    else {
+    } else {
       return targetScope;
     }
   }
 
   @Override
   protected void migrateJobHandlerConfiguration() {
-    TimerJobConfiguration configuration = (TimerJobConfiguration) jobEntity.getJobHandlerConfiguration();
+    TimerJobConfiguration configuration = (TimerJobConfiguration) jobEntity
+        .getJobHandlerConfiguration();
     configuration.setTimerElementKey(timerTriggerTargetScope.getId());
     jobEntity.setJobHandlerConfiguration(configuration);
 

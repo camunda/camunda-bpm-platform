@@ -31,22 +31,24 @@ import org.camunda.bpm.engine.impl.delegate.ClassDelegate;
  * @author Thorben Lindhauer
  *
  */
-public class ClassDelegateCaseVariableListener extends ClassDelegate implements CaseVariableListener {
+public class ClassDelegateCaseVariableListener extends ClassDelegate
+    implements CaseVariableListener {
 
-  public ClassDelegateCaseVariableListener(String className, List<FieldDeclaration> fieldDeclarations) {
+  public ClassDelegateCaseVariableListener(String className,
+      List<FieldDeclaration> fieldDeclarations) {
     super(className, fieldDeclarations);
   }
 
-  public ClassDelegateCaseVariableListener(Class<?> clazz, List<FieldDeclaration> fieldDeclarations) {
+  public ClassDelegateCaseVariableListener(Class<?> clazz,
+      List<FieldDeclaration> fieldDeclarations) {
     super(clazz, fieldDeclarations);
   }
 
   public void notify(DelegateCaseVariableInstance variableInstance) throws Exception {
     CaseVariableListener variableListenerInstance = getVariableListenerInstance();
 
-    Context.getProcessEngineConfiguration()
-      .getDelegateInterceptor()
-      .handleInvocation(new CaseVariableListenerInvocation(variableListenerInstance, variableInstance));
+    Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(
+        new CaseVariableListenerInvocation(variableListenerInstance, variableInstance));
   }
 
   protected CaseVariableListener getVariableListenerInstance() {
@@ -55,7 +57,8 @@ public class ClassDelegateCaseVariableListener extends ClassDelegate implements 
       return (CaseVariableListener) delegateInstance;
 
     } else {
-      throw new ProcessEngineException(delegateInstance.getClass().getName()+" doesn't implement "+CaseVariableListener.class);
+      throw new ProcessEngineException(delegateInstance.getClass().getName() + " doesn't implement "
+          + CaseVariableListener.class);
     }
   }
 

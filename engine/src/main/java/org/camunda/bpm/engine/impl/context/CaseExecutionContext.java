@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
  * @author Roman Smirnov
  * @author Daniel Meyer
  */
-public class CaseExecutionContext extends CoreExecutionContext<CaseExecutionEntity>{
+public class CaseExecutionContext extends CoreExecutionContext<CaseExecutionEntity> {
 
   public CaseExecutionContext(CaseExecutionEntity execution) {
     super(execution);

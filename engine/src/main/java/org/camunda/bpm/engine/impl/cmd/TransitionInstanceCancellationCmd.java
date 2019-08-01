@@ -44,18 +44,19 @@ public class TransitionInstanceCancellationCmd extends AbstractInstanceCancellat
   }
 
   protected ExecutionEntity determineSourceInstanceExecution(final CommandContext commandContext) {
-    ActivityInstance instance = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
-      public ActivityInstance call() throws Exception {
-        return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
-      }
-    });
+    ActivityInstance instance = commandContext
+        .runWithoutAuthorization(new Callable<ActivityInstance>() {
+          public ActivityInstance call() throws Exception {
+            return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
+          }
+        });
     TransitionInstance instanceToCancel = findTransitionInstance(instance, transitionInstanceId);
     EnsureUtil.ensureNotNull(NotValidException.class,
         describeFailure("Transition instance '" + transitionInstanceId + "' does not exist"),
-        "transitionInstance",
-        instanceToCancel);
+        "transitionInstance", instanceToCancel);
 
-    ExecutionEntity transitionExecution = commandContext.getExecutionManager().findExecutionById(instanceToCancel.getExecutionId());
+    ExecutionEntity transitionExecution = commandContext.getExecutionManager()
+        .findExecutionById(instanceToCancel.getExecutionId());
 
     return transitionExecution;
   }
@@ -63,6 +64,5 @@ public class TransitionInstanceCancellationCmd extends AbstractInstanceCancellat
   protected String describe() {
     return "Cancel transition instance '" + transitionInstanceId + "'";
   }
-
 
 }

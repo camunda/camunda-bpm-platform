@@ -21,7 +21,7 @@ public final class EncryptionUtil {
   public static String saltPassword(String password, String salt) {
     // Before version 7.7 no salt was used. Thus, if no salt
     // is available an empty salt should be used.
-    if(salt == null){
+    if (salt == null) {
       salt = "";
     }
     return password.concat(salt);

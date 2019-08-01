@@ -32,7 +32,8 @@ import org.junit.Assert;
  * @author Daniel Meyer
  *
  */
-public abstract class AbstractProcessEngineServicesAccessTest extends PluggableProcessEngineTestCase {
+public abstract class AbstractProcessEngineServicesAccessTest
+    extends PluggableProcessEngineTestCase {
 
   private static final String TASK_DEF_KEY = "someTask";
 
@@ -92,12 +93,8 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
 
   protected void assertStartProcessInstanceFails() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CALLED_PROCESS_DEF_ID)
-        .startEvent()
-        .scriptTask("scriptTask")
-          .scriptFormat("groovy")
-          .scriptText("throw new RuntimeException(\"BOOOM!\")")
-        .endEvent()
-      .done();
+        .startEvent().scriptTask("scriptTask").scriptFormat("groovy")
+        .scriptText("throw new RuntimeException(\"BOOOM!\")").endEvent().done();
 
     deployModel(modelInstance);
 
@@ -105,7 +102,7 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
     try {
       runtimeService.startProcessInstanceByKey(PROCESS_DEF_KEY);
       fail("exception expected");
-    } catch(RuntimeException e) {
+    } catch (RuntimeException e) {
       assertTextPresent("BOOOM", e.getMessage());
     }
 
@@ -122,37 +119,31 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
 
   protected abstract Class<?> getProcessEngineStartProcessClass();
 
-  protected abstract Task createModelAccessTask(BpmnModelInstance modelInstance, Class<?> delegateClass);
+  protected abstract Task createModelAccessTask(BpmnModelInstance modelInstance,
+      Class<?> delegateClass);
 
   // Helper methods //////////////////////////////////////////////
 
   private void createAndDeployModelForClass(Class<?> delegateClass) {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_DEF_KEY)
-      .startEvent()
-      .manualTask("templateTask")
-      .endEvent()
-    .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_DEF_KEY).startEvent()
+        .manualTask("templateTask").endEvent().done();
 
     // replace the template task with the actual task provided by the subtask
     modelInstance.getModelElementById("templateTask")
-      .replaceWithElement(createModelAccessTask(modelInstance, delegateClass));
+        .replaceWithElement(createModelAccessTask(modelInstance, delegateClass));
 
     deployModel(modelInstance);
   }
 
-
   private void deployModel(BpmnModelInstance model) {
-    Deployment deployment = repositoryService.createDeployment().addModelInstance("testProcess.bpmn", model).deploy();
+    Deployment deployment = repositoryService.createDeployment()
+        .addModelInstance("testProcess.bpmn", model).deploy();
     deploymentIds.add(deployment.getId());
   }
 
-
   protected void assertStartProcessInstance() {
-    deployModel(Bpmn.createExecutableProcess(CALLED_PROCESS_DEF_ID)
-      .startEvent()
-      .userTask(TASK_DEF_KEY)
-      .endEvent()
-    .done());
+    deployModel(Bpmn.createExecutableProcess(CALLED_PROCESS_DEF_ID).startEvent()
+        .userTask(TASK_DEF_KEY).endEvent().done());
 
     // if
     runtimeService.startProcessInstanceByKey(PROCESS_DEF_KEY);
@@ -182,9 +173,7 @@ public abstract class AbstractProcessEngineServicesAccessTest extends PluggableP
   }
 
   public static void assertCanPerformQuery(ProcessEngineServices services) {
-    services.getRepositoryService()
-      .createProcessDefinitionQuery()
-      .count();
+    services.getRepositoryService().createProcessDefinitionQuery().count();
   }
 
   public static void assertCanStartProcessInstance(ProcessEngineServices services) {

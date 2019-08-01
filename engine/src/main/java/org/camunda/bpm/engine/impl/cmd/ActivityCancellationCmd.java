@@ -52,7 +52,8 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
   @Override
   public Void execute(final CommandContext commandContext) {
     ActivityInstance activityInstanceTree = getActivityInstanceTree(commandContext);
-    List<AbstractInstanceCancellationCmd> commands = createActivityInstanceCancellations(activityInstanceTree, commandContext);
+    List<AbstractInstanceCancellationCmd> commands = createActivityInstanceCancellations(
+        activityInstanceTree, commandContext);
 
     for (AbstractInstanceCancellationCmd cmd : commands) {
       cmd.setSkipCustomListeners(skipCustomListeners);
@@ -63,7 +64,8 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
     return null;
   }
 
-  protected Set<String> collectParentScopeIdsForActivity(ProcessDefinitionImpl processDefinition, String activityId) {
+  protected Set<String> collectParentScopeIdsForActivity(ProcessDefinitionImpl processDefinition,
+      String activityId) {
     Set<String> parentScopeIds = new HashSet<String>();
     ScopeImpl scope = processDefinition.findActivity(activityId);
 
@@ -75,7 +77,8 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
     return parentScopeIds;
   }
 
-  protected List<TransitionInstance> getTransitionInstancesForActivity(ActivityInstance tree, Set<String> parentScopeIds) {
+  protected List<TransitionInstance> getTransitionInstancesForActivity(ActivityInstance tree,
+      Set<String> parentScopeIds) {
     // prune all search paths that are not in the scope hierarchy of the activity in question
     if (!parentScopeIds.contains(tree.getActivityId())) {
       return Collections.emptyList();
@@ -97,7 +100,8 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
     return instances;
   }
 
-  protected List<ActivityInstance> getActivityInstancesForActivity(ActivityInstance tree, Set<String> parentScopeIds) {
+  protected List<ActivityInstance> getActivityInstancesForActivity(ActivityInstance tree,
+      Set<String> parentScopeIds) {
     // prune all search paths that are not in the scope hierarchy of the activity in question
     if (!parentScopeIds.contains(tree.getActivityId())) {
       return Collections.emptyList();
@@ -138,19 +142,23 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
     return "Cancel all instances of activity '" + activityId + "'";
   }
 
-  public List<AbstractInstanceCancellationCmd> createActivityInstanceCancellations(ActivityInstance activityInstanceTree, CommandContext commandContext) {
+  public List<AbstractInstanceCancellationCmd> createActivityInstanceCancellations(
+      ActivityInstance activityInstanceTree, CommandContext commandContext) {
     List<AbstractInstanceCancellationCmd> commands = new ArrayList<AbstractInstanceCancellationCmd>();
 
-    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    ExecutionEntity processInstance = commandContext.getExecutionManager()
+        .findExecutionById(processInstanceId);
     ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
     Set<String> parentScopeIds = collectParentScopeIdsForActivity(processDefinition, activityId);
 
-    List<ActivityInstance> childrenForActivity = getActivityInstancesForActivity(activityInstanceTree, parentScopeIds);
+    List<ActivityInstance> childrenForActivity = getActivityInstancesForActivity(
+        activityInstanceTree, parentScopeIds);
     for (ActivityInstance instance : childrenForActivity) {
       commands.add(new ActivityInstanceCancellationCmd(processInstanceId, instance.getId()));
     }
 
-    List<TransitionInstance> transitionInstancesForActivity = getTransitionInstancesForActivity(activityInstanceTree, parentScopeIds);
+    List<TransitionInstance> transitionInstancesForActivity = getTransitionInstancesForActivity(
+        activityInstanceTree, parentScopeIds);
     for (TransitionInstance instance : transitionInstancesForActivity) {
       commands.add(new TransitionInstanceCancellationCmd(processInstanceId, instance.getId()));
     }
@@ -162,7 +170,8 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
     return cancelCurrentActiveActivityInstances;
   }
 
-  public void setCancelCurrentActiveActivityInstances(boolean cancelCurrentActiveActivityInstances) {
+  public void setCancelCurrentActiveActivityInstances(
+      boolean cancelCurrentActiveActivityInstances) {
     this.cancelCurrentActiveActivityInstances = cancelCurrentActiveActivityInstances;
   }
 }

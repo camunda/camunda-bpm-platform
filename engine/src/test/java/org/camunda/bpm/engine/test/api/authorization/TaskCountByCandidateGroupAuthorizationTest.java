@@ -50,10 +50,7 @@ public class TaskCountByCandidateGroupAuthorizationTest {
   public ProcessEngineTestRule processEngineTestRule = new ProcessEngineTestRule(processEngineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain
-    .outerRule(processEngineTestRule)
-    .around(processEngineRule);
-
+  public RuleChain ruleChain = RuleChain.outerRule(processEngineTestRule).around(processEngineRule);
 
   protected TaskService taskService;
   protected IdentityService identityService;
@@ -87,7 +84,8 @@ public class TaskCountByCandidateGroupAuthorizationTest {
     authenticate();
 
     // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
+    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport()
+        .taskCountByCandidateGroup();
     processEngineConfiguration.setAuthorizationEnabled(false);
     authorizationService.deleteAuthorization(authorization.getId());
     identityService.deleteUser(userId);
@@ -108,7 +106,8 @@ public class TaskCountByCandidateGroupAuthorizationTest {
       testFailed = true;
 
     } catch (AuthorizationException aex) {
-      if (!aex.getMessage().contains(userId + "' does not have 'READ' permission on resource '*' of type 'Task'")) {
+      if (!aex.getMessage()
+          .contains(userId + "' does not have 'READ' permission on resource '*' of type 'Task'")) {
         testFailed = true;
       }
     }
@@ -117,7 +116,8 @@ public class TaskCountByCandidateGroupAuthorizationTest {
     processEngineConfiguration.setAuthorizationEnabled(false);
 
     if (testFailed) {
-      fail("There should be an authorization exception for '" + userId + "' because of a missing 'READ' permission on 'Task'.");
+      fail("There should be an authorization exception for '" + userId
+          + "' because of a missing 'READ' permission on 'Task'.");
     }
   }
 

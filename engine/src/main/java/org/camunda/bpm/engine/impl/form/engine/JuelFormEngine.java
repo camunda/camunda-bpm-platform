@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -45,16 +44,15 @@ public class JuelFormEngine implements FormEngine {
   }
 
   public Object renderStartForm(StartFormData startForm) {
-    if (startForm.getFormKey()==null) {
+    if (startForm.getFormKey() == null) {
       return null;
     }
     String formTemplateString = getFormTemplateString(startForm, startForm.getFormKey());
     return executeScript(formTemplateString, null);
   }
 
-
   public Object renderTaskForm(TaskFormData taskForm) {
-    if (taskForm.getFormKey()==null) {
+    if (taskForm.getFormKey() == null) {
       return null;
     }
     String formTemplateString = getFormTemplateString(taskForm, taskForm.getFormKey());
@@ -63,15 +61,15 @@ public class JuelFormEngine implements FormEngine {
   }
 
   protected Object executeScript(String scriptSrc, VariableScope scope) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     ScriptFactory scriptFactory = processEngineConfiguration.getScriptFactory();
-    ExecutableScript script = scriptFactory.createScriptFromSource(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, scriptSrc);
+    ExecutableScript script = scriptFactory
+        .createScriptFromSource(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, scriptSrc);
 
     ScriptInvocation invocation = new ScriptInvocation(script, scope);
     try {
-      processEngineConfiguration
-        .getDelegateInterceptor()
-        .handleInvocation(invocation);
+      processEngineConfiguration.getDelegateInterceptor().handleInvocation(invocation);
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -84,12 +82,11 @@ public class JuelFormEngine implements FormEngine {
   protected String getFormTemplateString(FormData formInstance, String formKey) {
     String deploymentId = formInstance.getDeploymentId();
 
-    ResourceEntity resourceStream = Context
-      .getCommandContext()
-      .getResourceManager()
-      .findResourceByDeploymentIdAndResourceName(deploymentId, formKey);
+    ResourceEntity resourceStream = Context.getCommandContext().getResourceManager()
+        .findResourceByDeploymentIdAndResourceName(deploymentId, formKey);
 
-    ensureNotNull("Form with formKey '" + formKey + "' does not exist", "resourceStream", resourceStream);
+    ensureNotNull("Form with formKey '" + formKey + "' does not exist", "resourceStream",
+        resourceStream);
 
     byte[] resourceBytes = resourceStream.getBytes();
     String encoding = "UTF-8";

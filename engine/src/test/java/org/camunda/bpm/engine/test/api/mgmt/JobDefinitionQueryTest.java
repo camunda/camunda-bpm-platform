@@ -32,50 +32,63 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByNoCriteria() {
     JobDefinitionQuery query = managementService.createJobDefinitionQuery();
     verifyQueryResults(query, 4);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByJobDefinitionId() {
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().jobType(TimerStartEventJobHandler.TYPE).singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+        .jobType(TimerStartEventJobHandler.TYPE).singleResult();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().jobDefinitionId(jobDefinition.getId());
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery()
+        .jobDefinitionId(jobDefinition.getId());
 
     verifyQueryResults(query, 1);
 
     assertEquals(jobDefinition.getId(), query.singleResult().getId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByInvalidJobDefinitionId() {
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().jobDefinitionId("invalid");
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery()
+        .jobDefinitionId("invalid");
     verifyQueryResults(query, 0);
 
     try {
       managementService.createJobDefinitionQuery().jobDefinitionId(null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByActivityId() {
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1");
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery()
+        .activityIdIn("ServiceTask_1");
     verifyQueryResults(query, 1);
 
-    query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1", "BoundaryEvent_1");
+    query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1",
+        "BoundaryEvent_1");
     verifyQueryResults(query, 2);
 
-    query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1", "BoundaryEvent_1", "StartEvent_1");
+    query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1",
+        "BoundaryEvent_1", "StartEvent_1");
     verifyQueryResults(query, 3);
 
-    query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1", "BoundaryEvent_1", "StartEvent_1", "IntermediateCatchEvent_1");
+    query = managementService.createJobDefinitionQuery().activityIdIn("ServiceTask_1",
+        "BoundaryEvent_1", "StartEvent_1", "IntermediateCatchEvent_1");
     verifyQueryResults(query, 4);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByInvalidActivityId() {
     JobDefinitionQuery query = managementService.createJobDefinitionQuery().activityIdIn("invalid");
     verifyQueryResults(query, 0);
@@ -83,68 +96,87 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       managementService.createJobDefinitionQuery().activityIdIn(null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
     try {
-      managementService.createJobDefinitionQuery().activityIdIn((String)null);
+      managementService.createJobDefinitionQuery().activityIdIn((String) null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByProcessDefinitionId() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().processDefinitionId(processDefinition.getId());
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery()
+        .processDefinitionId(processDefinition.getId());
     verifyQueryResults(query, 4);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByInvalidDefinitionId() {
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().processDefinitionId("invalid");
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery()
+        .processDefinitionId("invalid");
     verifyQueryResults(query, 0);
 
     try {
       managementService.createJobDefinitionQuery().processDefinitionId(null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByProcessDefinitionKey() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().processDefinitionKey(processDefinition.getKey());
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery()
+        .processDefinitionKey(processDefinition.getKey());
     verifyQueryResults(query, 4);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByInvalidDefinitionKey() {
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().processDefinitionKey("invalid");
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery()
+        .processDefinitionKey("invalid");
     verifyQueryResults(query, 0);
 
     try {
       managementService.createJobDefinitionQuery().processDefinitionKey(null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByJobType() {
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().jobType(AsyncContinuationJobHandler.TYPE);
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery()
+        .jobType(AsyncContinuationJobHandler.TYPE);
     verifyQueryResults(query, 1);
 
     query = managementService.createJobDefinitionQuery().jobType(TimerStartEventJobHandler.TYPE);
     verifyQueryResults(query, 1);
 
-    query = managementService.createJobDefinitionQuery().jobType(TimerCatchIntermediateEventJobHandler.TYPE);
+    query = managementService.createJobDefinitionQuery()
+        .jobType(TimerCatchIntermediateEventJobHandler.TYPE);
     verifyQueryResults(query, 1);
 
-    query = managementService.createJobDefinitionQuery().jobType(TimerExecuteNestedActivityJobHandler.TYPE);
+    query = managementService.createJobDefinitionQuery()
+        .jobType(TimerExecuteNestedActivityJobHandler.TYPE);
     verifyQueryResults(query, 1);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByInvalidJobType() {
     JobDefinitionQuery query = managementService.createJobDefinitionQuery().jobType("invalid");
     verifyQueryResults(query, 0);
@@ -152,82 +184,96 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       managementService.createJobDefinitionQuery().jobType(null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByInvalidJobConfiguration() {
-    JobDefinitionQuery query = managementService.createJobDefinitionQuery().jobConfiguration("invalid");
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery()
+        .jobConfiguration("invalid");
     verifyQueryResults(query, 0);
 
     try {
       managementService.createJobDefinitionQuery().jobConfiguration(null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryByActive() {
     JobDefinitionQuery query = managementService.createJobDefinitionQuery().active();
     verifyQueryResults(query, 4);
 
     // suspend first one
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().jobType(AsyncContinuationJobHandler.TYPE).singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+        .jobType(AsyncContinuationJobHandler.TYPE).singleResult();
     managementService.suspendJobDefinitionById(jobDefinition.getId());
 
     // only three active job definitions left
     verifyQueryResults(query, 3);
 
     // Suspend second one
-    jobDefinition = managementService.createJobDefinitionQuery().jobType(TimerStartEventJobHandler.TYPE).singleResult();
+    jobDefinition = managementService.createJobDefinitionQuery()
+        .jobType(TimerStartEventJobHandler.TYPE).singleResult();
     managementService.suspendJobDefinitionById(jobDefinition.getId());
 
     // only two active job definitions left
     verifyQueryResults(query, 2);
 
     // suspend third one
-    jobDefinition = managementService.createJobDefinitionQuery().jobType(TimerCatchIntermediateEventJobHandler.TYPE).singleResult();
+    jobDefinition = managementService.createJobDefinitionQuery()
+        .jobType(TimerCatchIntermediateEventJobHandler.TYPE).singleResult();
     managementService.suspendJobDefinitionById(jobDefinition.getId());
 
     // only two active job definitions left
     verifyQueryResults(query, 1);
 
     // suspend fourth one
-    jobDefinition = managementService.createJobDefinitionQuery().jobType(TimerExecuteNestedActivityJobHandler.TYPE).singleResult();
+    jobDefinition = managementService.createJobDefinitionQuery()
+        .jobType(TimerExecuteNestedActivityJobHandler.TYPE).singleResult();
     managementService.suspendJobDefinitionById(jobDefinition.getId());
 
     // no one is active
     verifyQueryResults(query, 0);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryBySuspended() {
     JobDefinitionQuery query = managementService.createJobDefinitionQuery().suspended();
     verifyQueryResults(query, 0);
 
     // suspend first one
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().jobType(AsyncContinuationJobHandler.TYPE).singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+        .jobType(AsyncContinuationJobHandler.TYPE).singleResult();
     managementService.suspendJobDefinitionById(jobDefinition.getId());
 
     // only one is suspended
     verifyQueryResults(query, 1);
 
     // Suspend second one
-    jobDefinition = managementService.createJobDefinitionQuery().jobType(TimerStartEventJobHandler.TYPE).singleResult();
+    jobDefinition = managementService.createJobDefinitionQuery()
+        .jobType(TimerStartEventJobHandler.TYPE).singleResult();
     managementService.suspendJobDefinitionById(jobDefinition.getId());
 
     // only two are suspended
     verifyQueryResults(query, 2);
 
     // suspend third one
-    jobDefinition = managementService.createJobDefinitionQuery().jobType(TimerCatchIntermediateEventJobHandler.TYPE).singleResult();
+    jobDefinition = managementService.createJobDefinitionQuery()
+        .jobType(TimerCatchIntermediateEventJobHandler.TYPE).singleResult();
     managementService.suspendJobDefinitionById(jobDefinition.getId());
 
     // only three are suspended
     verifyQueryResults(query, 3);
 
     // suspend fourth one
-    jobDefinition = managementService.createJobDefinitionQuery().jobType(TimerExecuteNestedActivityJobHandler.TYPE).singleResult();
+    jobDefinition = managementService.createJobDefinitionQuery()
+        .jobType(TimerExecuteNestedActivityJobHandler.TYPE).singleResult();
     managementService.suspendJobDefinitionById(jobDefinition.getId());
 
     // all are suspended
@@ -236,7 +282,8 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
   // Pagination //////////////////////////////////////////////////////////
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryPaging() {
     assertEquals(4, managementService.createJobDefinitionQuery().listPage(0, 4).size());
     assertEquals(1, managementService.createJobDefinitionQuery().listPage(2, 1).size());
@@ -246,23 +293,36 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
   // Sorting /////////////////////////////////////////////////////////////
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQuerySorting() {
     // asc
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByActivityId().asc().list().size());
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByJobConfiguration().asc().list().size());
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByJobDefinitionId().asc().list().size());
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByJobType().asc().list().size());
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByProcessDefinitionId().asc().list().size());
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByProcessDefinitionKey().asc().list().size());
+    assertEquals(4,
+        managementService.createJobDefinitionQuery().orderByActivityId().asc().list().size());
+    assertEquals(4,
+        managementService.createJobDefinitionQuery().orderByJobConfiguration().asc().list().size());
+    assertEquals(4,
+        managementService.createJobDefinitionQuery().orderByJobDefinitionId().asc().list().size());
+    assertEquals(4,
+        managementService.createJobDefinitionQuery().orderByJobType().asc().list().size());
+    assertEquals(4, managementService.createJobDefinitionQuery().orderByProcessDefinitionId().asc()
+        .list().size());
+    assertEquals(4, managementService.createJobDefinitionQuery().orderByProcessDefinitionKey().asc()
+        .list().size());
 
     // desc
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByActivityId().desc().list().size());
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByJobConfiguration().desc().list().size());
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByJobDefinitionId().desc().list().size());
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByJobType().desc().list().size());
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByProcessDefinitionId().desc().list().size());
-    assertEquals(4, managementService.createJobDefinitionQuery().orderByProcessDefinitionKey().desc().list().size());
+    assertEquals(4,
+        managementService.createJobDefinitionQuery().orderByActivityId().desc().list().size());
+    assertEquals(4, managementService.createJobDefinitionQuery().orderByJobConfiguration().desc()
+        .list().size());
+    assertEquals(4,
+        managementService.createJobDefinitionQuery().orderByJobDefinitionId().desc().list().size());
+    assertEquals(4,
+        managementService.createJobDefinitionQuery().orderByJobType().desc().list().size());
+    assertEquals(4, managementService.createJobDefinitionQuery().orderByProcessDefinitionId().desc()
+        .list().size());
+    assertEquals(4, managementService.createJobDefinitionQuery().orderByProcessDefinitionKey()
+        .desc().list().size());
 
   }
 
@@ -278,18 +338,23 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
       managementService.createJobQuery().asc();
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("You should call any of the orderBy methods first before specifying a direction", e.getMessage());
+      assertTextPresent(
+          "You should call any of the orderBy methods first before specifying a direction",
+          e.getMessage());
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn" })
   public void testQueryWithOverridingJobPriority() {
     // given
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().listPage(0, 1).get(0);
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().listPage(0, 1)
+        .get(0);
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42);
 
     // when
-    JobDefinition queriedDefinition = managementService.createJobDefinitionQuery().withOverridingJobPriority().singleResult();
+    JobDefinition queriedDefinition = managementService.createJobDefinitionQuery()
+        .withOverridingJobPriority().singleResult();
 
     // then
     assertNotNull(queriedDefinition);
@@ -297,7 +362,8 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(42L, (long) queriedDefinition.getOverridingJobPriority());
 
     // and
-    assertEquals(1, managementService.createJobDefinitionQuery().withOverridingJobPriority().count());
+    assertEquals(1,
+        managementService.createJobDefinitionQuery().withOverridingJobPriority().count());
 
   }
 
@@ -309,7 +375,7 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
     if (countExpected == 1) {
       assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
+    } else if (countExpected > 1) {
       verifySingleResultFails(query);
     } else if (countExpected == 0) {
       assertNull(query.singleResult());
@@ -320,7 +386,8 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
 }

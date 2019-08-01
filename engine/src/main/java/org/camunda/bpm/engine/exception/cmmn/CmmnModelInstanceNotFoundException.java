@@ -18,9 +18,10 @@ package org.camunda.bpm.engine.exception.cmmn;
 
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 
-
 /**
- * <p>This is exception is thrown when a {@link CmmnModelInstance} is not found.</p>
+ * <p>
+ * This is exception is thrown when a {@link CmmnModelInstance} is not found.
+ * </p>
  *
  * @author Roman Smirnov
  *

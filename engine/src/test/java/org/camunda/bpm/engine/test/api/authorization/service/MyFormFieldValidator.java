@@ -30,7 +30,8 @@ import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorContext;
 public class MyFormFieldValidator extends MyDelegationService implements FormFieldValidator {
 
   public boolean validate(Object submittedValue, FormFieldValidatorContext validatorContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     IdentityService identityService = processEngineConfiguration.getIdentityService();
     RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
 

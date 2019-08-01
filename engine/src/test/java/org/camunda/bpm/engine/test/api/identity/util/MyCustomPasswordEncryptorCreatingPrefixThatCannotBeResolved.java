@@ -18,7 +18,8 @@ package org.camunda.bpm.engine.test.api.identity.util;
 
 import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 
-public class MyCustomPasswordEncryptorCreatingPrefixThatCannotBeResolved implements PasswordEncryptor {
+public class MyCustomPasswordEncryptorCreatingPrefixThatCannotBeResolved
+    implements PasswordEncryptor {
 
   protected int counter = 0;
 

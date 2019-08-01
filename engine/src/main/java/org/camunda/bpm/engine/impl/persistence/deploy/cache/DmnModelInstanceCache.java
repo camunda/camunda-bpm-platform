@@ -28,9 +28,11 @@ import java.util.List;
 /**
  * @author: Johannes Heinemann
  */
-public class DmnModelInstanceCache extends ModelInstanceCache<DmnModelInstance, DecisionDefinitionEntity> {
+public class DmnModelInstanceCache
+    extends ModelInstanceCache<DmnModelInstance, DecisionDefinitionEntity> {
 
-  public DmnModelInstanceCache(CacheFactory factory, int cacheCapacity, ResourceDefinitionCache<DecisionDefinitionEntity> definitionCache) {
+  public DmnModelInstanceCache(CacheFactory factory, int cacheCapacity,
+      ResourceDefinitionCache<DecisionDefinitionEntity> definitionCache) {
     super(factory, cacheCapacity, definitionCache);
   }
 
@@ -51,8 +53,6 @@ public class DmnModelInstanceCache extends ModelInstanceCache<DmnModelInstance, 
 
   @Override
   protected List<DecisionDefinition> getAllDefinitionsForDeployment(String deploymentId) {
-    return new DecisionDefinitionQueryImpl()
-        .deploymentId(deploymentId)
-        .list();
+    return new DecisionDefinitionQueryImpl().deploymentId(deploymentId).list();
   }
 }

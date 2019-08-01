@@ -21,50 +21,45 @@ import java.util.List;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 
-public class ProcessDefinitionStatisticsEntity extends ProcessDefinitionEntity implements ProcessDefinitionStatistics {
+public class ProcessDefinitionStatisticsEntity extends ProcessDefinitionEntity
+    implements ProcessDefinitionStatistics {
 
   protected static final long serialVersionUID = 1L;
   protected int instances;
   protected int failedJobs;
   protected List<IncidentStatistics> incidentStatistics;
-  
+
   public int getInstances() {
     return instances;
   }
+
   public void setInstances(int instances) {
     this.instances = instances;
   }
+
   public int getFailedJobs() {
     return failedJobs;
   }
+
   public void setFailedJobs(int failedJobs) {
     this.failedJobs = failedJobs;
   }
+
   public List<IncidentStatistics> getIncidentStatistics() {
     return incidentStatistics;
   }
+
   public void setIncidentStatistics(List<IncidentStatistics> incidentStatistics) {
     this.incidentStatistics = incidentStatistics;
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[instances=" + instances
-           + ", failedJobs=" + failedJobs
-           + ", id=" + id
-           + ", deploymentId=" + deploymentId
-           + ", description=" + description
-           + ", historyLevel=" + historyLevel
-           + ", category=" + category
-           + ", hasStartFormKey=" + hasStartFormKey
-           + ", diagramResourceName=" + diagramResourceName
-           + ", key=" + key
-           + ", name=" + name
-           + ", resourceName=" + resourceName
-           + ", revision=" + revision
-           + ", version=" + version
-           + ", suspensionState=" + suspensionState
-           + "]";
+    return this.getClass().getSimpleName() + "[instances=" + instances + ", failedJobs="
+        + failedJobs + ", id=" + id + ", deploymentId=" + deploymentId + ", description="
+        + description + ", historyLevel=" + historyLevel + ", category=" + category
+        + ", hasStartFormKey=" + hasStartFormKey + ", diagramResourceName=" + diagramResourceName
+        + ", key=" + key + ", name=" + name + ", resourceName=" + resourceName + ", revision="
+        + revision + ", version=" + version + ", suspensionState=" + suspensionState + "]";
   }
 }

@@ -26,7 +26,6 @@ import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
-
 /**
  * @author Sebastian Menski
  */
@@ -36,15 +35,18 @@ public class BpmnModelInstanceCmdTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
   public void testRepositoryService() {
-    String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(PROCESS_KEY).singleResult().getId();
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_KEY).singleResult().getId();
 
     BpmnModelInstance modelInstance = repositoryService.getBpmnModelInstance(processDefinitionId);
     assertNotNull(modelInstance);
 
-    Collection<ModelElementInstance> events = modelInstance.getModelElementsByType(modelInstance.getModel().getType(Event.class));
+    Collection<ModelElementInstance> events = modelInstance
+        .getModelElementsByType(modelInstance.getModel().getType(Event.class));
     assertEquals(2, events.size());
 
-    Collection<ModelElementInstance> sequenceFlows = modelInstance.getModelElementsByType(modelInstance.getModel().getType(SequenceFlow.class));
+    Collection<ModelElementInstance> sequenceFlows = modelInstance
+        .getModelElementsByType(modelInstance.getModel().getType(SequenceFlow.class));
     assertEquals(1, sequenceFlows.size());
 
     StartEvent startEvent = modelInstance.getModelElementById("start");

@@ -36,7 +36,6 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.task.IdentityLink;
 
-
 /**
  * @author Joram Barrez
  * @author Deivarayan Azhagappan
@@ -76,14 +75,11 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity,
 
   public static IdentityLinkEntity newIdentityLink() {
     IdentityLinkEntity identityLinkEntity = new IdentityLinkEntity();
-     return identityLinkEntity;
+    return identityLinkEntity;
   }
 
   public void insert() {
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .insert(this);
+    Context.getCommandContext().getDbEntityManager().insert(this);
     fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_ADD);
   }
 
@@ -92,10 +88,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity,
   }
 
   public void delete(boolean withHistory) {
-    Context
-        .getCommandContext()
-        .getDbEntityManager()
-        .delete(this);
+    Context.getCommandContext().getDbEntityManager().delete(this);
     if (withHistory) {
       fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_DELETE);
     }
@@ -172,11 +165,8 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity,
   }
 
   public TaskEntity getTask() {
-    if ( (task==null) && (taskId!=null) ) {
-      this.task = Context
-        .getCommandContext()
-        .getTaskManager()
-        .findTaskById(taskId);
+    if ((task == null) && (taskId != null)) {
+      this.task = Context.getCommandContext().getTaskManager().findTaskById(taskId);
     }
     return task;
   }
@@ -188,10 +178,8 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity,
 
   public ProcessDefinitionEntity getProcessDef() {
     if ((processDef == null) && (processDefId != null)) {
-      this.processDef = Context
-              .getCommandContext()
-              .getProcessDefinitionManager()
-              .findLatestProcessDefinitionById(processDefId);
+      this.processDef = Context.getCommandContext().getProcessDefinitionManager()
+          .findLatestProcessDefinitionById(processDefId);
     }
     return processDef;
   }
@@ -202,10 +190,11 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity,
   }
 
   public void fireHistoricIdentityLinkEvent(final HistoryEventType eventType) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
-    if(historyLevel.isHistoryEventProduced(eventType, this)) {
+    if (historyLevel.isHistoryEventProduced(eventType, this)) {
 
       HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
         @Override
@@ -245,16 +234,8 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity,
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", type=" + type
-           + ", userId=" + userId
-           + ", groupId=" + groupId
-           + ", taskId=" + taskId
-           + ", processDefId=" + processDefId
-           + ", task=" + task
-           + ", processDef=" + processDef
-           + ", tenantId=" + tenantId
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", type=" + type + ", userId=" + userId
+        + ", groupId=" + groupId + ", taskId=" + taskId + ", processDefId=" + processDefId
+        + ", task=" + task + ", processDef=" + processDef + ", tenantId=" + tenantId + "]";
   }
 }

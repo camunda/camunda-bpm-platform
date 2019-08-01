@@ -36,8 +36,10 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
- * <p>Tests a concurrent attempt of a bootstrapping Process Engine to reconfigure
- * the HistoryCleanupJob while the JobExecutor tries to execute it.</p>
+ * <p>
+ * Tests a concurrent attempt of a bootstrapping Process Engine to reconfigure the HistoryCleanupJob
+ * while the JobExecutor tries to execute it.
+ * </p>
  *
  * @author Nikola Koevski
  */
@@ -64,20 +66,21 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
     final ProcessEngine otherProcessEngine = ProcessEngines.getProcessEngine(PROCESS_ENGINE_NAME);
     if (otherProcessEngine != null) {
 
-      ((ProcessEngineConfigurationImpl)otherProcessEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
+      ((ProcessEngineConfigurationImpl) otherProcessEngine.getProcessEngineConfiguration())
+          .getCommandExecutorTxRequired().execute(new Command<Void>() {
+            public Void execute(CommandContext commandContext) {
 
-          List<Job> jobs = otherProcessEngine.getManagementService().createJobQuery().list();
-          if (jobs.size() > 0) {
-            assertEquals(1, jobs.size());
-            String jobId = jobs.get(0).getId();
-            commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
-            commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-          }
+              List<Job> jobs = otherProcessEngine.getManagementService().createJobQuery().list();
+              if (jobs.size() > 0) {
+                assertEquals(1, jobs.size());
+                String jobId = jobs.get(0).getId();
+                commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
+                commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+              }
 
-          return null;
-        }
-      });
+              return null;
+            }
+          });
 
       otherProcessEngine.close();
       ProcessEngines.unregister(otherProcessEngine);
@@ -86,25 +89,27 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
 
   @Override
   public void tearDown() throws Exception {
-    ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+        .getCommandExecutorTxRequired().execute(new Command<Void>() {
+          public Void execute(CommandContext commandContext) {
 
-        List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
-        if (jobs.size() > 0) {
-          assertEquals(1, jobs.size());
-          String jobId = jobs.get(0).getId();
-          commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-        }
+            List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
+            if (jobs.size() > 0) {
+              assertEquals(1, jobs.size());
+              String jobId = jobs.get(0).getId();
+              commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
+              commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+            }
 
-        return null;
-      }
-    });
+            return null;
+          }
+        });
     ClockUtil.setCurrentTime(new Date());
     super.tearDown();
   }
 
-  public void testConcurrentHistoryCleanupJobReconfigurationExecution() throws InterruptedException {
+  public void testConcurrentHistoryCleanupJobReconfigurationExecution()
+      throws InterruptedException {
 
     getProcessEngine().getHistoryService().cleanUpHistoryAsync(true);
 
@@ -131,24 +136,25 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
 
     assertNull(thread1.getException());
     assertNull(thread2.getException());
-    
+
     assertNull(bootstrapCommand.getContextSpy().getThrowable());
 
     assertNotNull(ProcessEngines.getProcessEngines().get(PROCESS_ENGINE_NAME));
   }
 
-  protected static class ControllableProcessEngineBootstrapCommand extends ControllableCommand<Void> {
+  protected static class ControllableProcessEngineBootstrapCommand
+      extends ControllableCommand<Void> {
 
     protected ControllableBootstrapEngineCommand bootstrapCommand;
-    
+
     @Override
     public Void execute(CommandContext commandContext) {
 
       bootstrapCommand = new ControllableBootstrapEngineCommand(this.monitor);
 
       ProcessEngineConfiguration processEngineConfiguration = ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/concurrency/historycleanup.camunda.cfg.xml");
-
+          .createProcessEngineConfigurationFromResource(
+              "org/camunda/bpm/engine/test/concurrency/historycleanup.camunda.cfg.xml");
 
       processEngineConfiguration.setProcessEngineBootstrapCommand(bootstrapCommand);
 
@@ -157,7 +163,7 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
 
       return null;
     }
-    
+
     public CommandInvocationContext getContextSpy() {
       return bootstrapCommand.getSpy();
     }
@@ -170,10 +176,12 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
 
       monitor.sync();
 
-      List<Job> historyCleanupJobs = commandContext.getProcessEngineConfiguration().getHistoryService().findHistoryCleanupJobs();
+      List<Job> historyCleanupJobs = commandContext.getProcessEngineConfiguration()
+          .getHistoryService().findHistoryCleanupJobs();
 
       for (Job job : historyCleanupJobs) {
-        commandContext.getProcessEngineConfiguration().getManagementService().executeJob(job.getId());
+        commandContext.getProcessEngineConfiguration().getManagementService()
+            .executeJob(job.getId());
       }
 
       monitor.sync();
@@ -182,7 +190,8 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
     }
   }
 
-  protected static class ControllableBootstrapEngineCommand extends BootstrapEngineCommand implements Command<Void> {
+  protected static class ControllableBootstrapEngineCommand extends BootstrapEngineCommand
+      implements Command<Void> {
 
     protected final ThreadControl monitor;
     protected CommandInvocationContext spy;
@@ -201,7 +210,7 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
 
       monitor.sync();
     }
-    
+
     public CommandInvocationContext getSpy() {
       return spy;
     }

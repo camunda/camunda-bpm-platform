@@ -58,7 +58,8 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     // given
 
     // when
-    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+    ProcessDefinitionStatisticsQuery query = managementService
+        .createProcessDefinitionStatisticsQuery();
 
     // then
     verifyQueryResults(query, 0);
@@ -69,7 +70,8 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
 
     // when
-    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+    ProcessDefinitionStatisticsQuery query = managementService
+        .createProcessDefinitionStatisticsQuery();
 
     // then
     verifyQueryResults(query, 1);
@@ -87,7 +89,8 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
 
     // when
-    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+    ProcessDefinitionStatisticsQuery query = managementService
+        .createProcessDefinitionStatisticsQuery();
 
     // then
     verifyQueryResults(query, 2);
@@ -98,7 +101,8 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
 
     // when
-    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+    ProcessDefinitionStatisticsQuery query = managementService
+        .createProcessDefinitionStatisticsQuery();
 
     // then
     verifyQueryResults(query, 2);
@@ -123,15 +127,18 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
 
     // when
-    List<ProcessDefinitionStatistics> statistics = managementService.createProcessDefinitionStatisticsQuery().list();
+    List<ProcessDefinitionStatistics> statistics = managementService
+        .createProcessDefinitionStatisticsQuery().list();
 
     // then
     assertEquals(2, statistics.size());
 
-    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
+    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics,
+        ONE_TASK_PROCESS_KEY);
     verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
-    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
+    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics,
+        ONE_INCIDENT_PROCESS_KEY);
     verifyStatisticsResult(oneIncidentProcessStatistics, 3, 0, 0);
   }
 
@@ -150,17 +157,17 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
 
     // when
     List<ProcessDefinitionStatistics> statistics = managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeFailedJobs()
-        .list();
+        .createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
 
     // then
     assertEquals(2, statistics.size());
 
-    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
+    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics,
+        ONE_TASK_PROCESS_KEY);
     verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
-    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
+    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics,
+        ONE_INCIDENT_PROCESS_KEY);
     verifyStatisticsResult(oneIncidentProcessStatistics, 3, 3, 0);
   }
 
@@ -179,21 +186,22 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
 
     // when
     List<ProcessDefinitionStatistics> statistics = managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeIncidents()
-        .list();
+        .createProcessDefinitionStatisticsQuery().includeIncidents().list();
 
     // then
     assertEquals(2, statistics.size());
 
-    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
+    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics,
+        ONE_TASK_PROCESS_KEY);
     verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
-    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
+    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics,
+        ONE_INCIDENT_PROCESS_KEY);
     verifyStatisticsResult(oneIncidentProcessStatistics, 3, 0, 3);
   }
 
-  // including incidents and failed jobs ///////////////////////////////////////////////////////////////
+  // including incidents and failed jobs
+  // ///////////////////////////////////////////////////////////////
 
   public void testQueryIncludingIncidentsAndFailedJobsWithoutProcessInstanceAuthorizations() {
     // given
@@ -208,18 +216,17 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
 
     // when
     List<ProcessDefinitionStatistics> statistics = managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeIncidents()
-        .includeFailedJobs()
-        .list();
+        .createProcessDefinitionStatisticsQuery().includeIncidents().includeFailedJobs().list();
 
     // then
     assertEquals(2, statistics.size());
 
-    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
+    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics,
+        ONE_TASK_PROCESS_KEY);
     verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
-    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
+    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics,
+        ONE_INCIDENT_PROCESS_KEY);
     verifyStatisticsResult(oneIncidentProcessStatistics, 3, 3, 3);
   }
 
@@ -229,21 +236,22 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
 
-  protected void verifyStatisticsResult(ProcessDefinitionStatistics statistics, int instances, int failedJobs, int incidents) {
+  protected void verifyStatisticsResult(ProcessDefinitionStatistics statistics, int instances,
+      int failedJobs, int incidents) {
     assertEquals("Instances", instances, statistics.getInstances());
     assertEquals("Failed Jobs", failedJobs, statistics.getFailedJobs());
 
     List<IncidentStatistics> incidentStatistics = statistics.getIncidentStatistics();
     if (incidents == 0) {
       assertTrue("Incidents supposed to be empty", incidentStatistics.isEmpty());
-    }
-    else {
+    } else {
       // the test does have only one type of incidents
       assertEquals("Incidents", incidents, incidentStatistics.get(0).getIncidentCount());
     }
   }
 
-  protected ProcessDefinitionStatistics getStatisticsByKey(List<ProcessDefinitionStatistics> statistics, String key) {
+  protected ProcessDefinitionStatistics getStatisticsByKey(
+      List<ProcessDefinitionStatistics> statistics, String key) {
     for (ProcessDefinitionStatistics result : statistics) {
       if (key.equals(result.getKey())) {
         return result;

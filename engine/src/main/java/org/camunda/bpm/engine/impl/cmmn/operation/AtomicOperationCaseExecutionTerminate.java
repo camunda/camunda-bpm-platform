@@ -22,7 +22,8 @@ import static org.camunda.bpm.engine.delegate.CaseExecutionListener.TERMINATE;
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionTerminate extends AbstractAtomicOperationCaseExecutionTerminate {
+public class AtomicOperationCaseExecutionTerminate
+    extends AbstractAtomicOperationCaseExecutionTerminate {
 
   public String getCanonicalName() {
     return "case-execution-terminate";

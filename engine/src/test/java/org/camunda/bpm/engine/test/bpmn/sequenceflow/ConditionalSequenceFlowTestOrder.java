@@ -18,30 +18,29 @@ package org.camunda.bpm.engine.test.bpmn.sequenceflow;
 
 import java.io.Serializable;
 
-
 /**
  * Simple POJO, just for test purposes
  * 
  * @author Joram Barrez
  */
 public class ConditionalSequenceFlowTestOrder implements Serializable {
-  
+
   private static final long serialVersionUID = 1L;
-  
+
   protected int price;
-  
+
   public ConditionalSequenceFlowTestOrder(int price) {
     this.price = price;
   }
-  
+
   public void setPrice(int price) {
     this.price = price;
   }
-  
+
   public int getPrice() {
     return price;
   }
-  
+
   public boolean isPremiumOrder() {
     return price >= 250;
   }

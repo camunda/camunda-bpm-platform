@@ -43,10 +43,10 @@ public class FormPropertyAdapter implements FormField {
     this.formProperty = formProperty;
 
     validationConstraints = new ArrayList<FormFieldValidationConstraint>();
-    if(formProperty.isRequired()) {
+    if (formProperty.isRequired()) {
       validationConstraints.add(new FormFieldValidationConstraintImpl("required", null));
     }
-    if(!formProperty.isWritable()) {
+    if (!formProperty.isWritable()) {
       validationConstraints.add(new FormFieldValidationConstraintImpl("readonly", null));
     }
   }
@@ -58,6 +58,7 @@ public class FormPropertyAdapter implements FormField {
   public String getLabel() {
     return formProperty.getName();
   }
+
   public FormType getType() {
     return formProperty.getType();
   }

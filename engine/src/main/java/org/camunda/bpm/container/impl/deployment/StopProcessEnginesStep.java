@@ -25,7 +25,9 @@ import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>Deployment operation step that stops ALL process engines registered inside the container.</p>
+ * <p>
+ * Deployment operation step that stops ALL process engines registered inside the container.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -57,8 +59,7 @@ public class StopProcessEnginesStep extends DeploymentOperationStep {
 
     try {
       serviceContainer.stopService(serviceName);
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       LOG.exceptionWhileStopping("Process Engine", serviceName, e);
     }
 

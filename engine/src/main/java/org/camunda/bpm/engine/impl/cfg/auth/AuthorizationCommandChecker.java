@@ -47,14 +47,15 @@ import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 
 /**
- * {@link CommandChecker} that uses the {@link AuthorizationManager} to perform
- * authorization checks.
+ * {@link CommandChecker} that uses the {@link AuthorizationManager} to perform authorization
+ * checks.
  */
 public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkEvaluateDecision(DecisionDefinition decisionDefinition) {
-    getAuthorizationManager().checkAuthorization(CREATE_INSTANCE, DECISION_DEFINITION, decisionDefinition.getKey());
+    getAuthorizationManager().checkAuthorization(CREATE_INSTANCE, DECISION_DEFINITION,
+        decisionDefinition.getKey());
   }
 
   @Override
@@ -64,12 +65,14 @@ public class AuthorizationCommandChecker implements CommandChecker {
     // AND
     // - CREATE_INSTANCE on PROCESS_DEFINITION
     getAuthorizationManager().checkAuthorization(CREATE, PROCESS_INSTANCE);
-    getAuthorizationManager().checkAuthorization(CREATE_INSTANCE, PROCESS_DEFINITION, processDefinition.getKey());
+    getAuthorizationManager().checkAuthorization(CREATE_INSTANCE, PROCESS_DEFINITION,
+        processDefinition.getKey());
   }
 
   @Override
   public void checkReadProcessDefinition(ProcessDefinition processDefinition) {
-    getAuthorizationManager().checkAuthorization(READ, PROCESS_DEFINITION, processDefinition.getKey());
+    getAuthorizationManager().checkAuthorization(READ, PROCESS_DEFINITION,
+        processDefinition.getKey());
   }
 
   @Override
@@ -80,7 +83,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkUpdateProcessDefinitionById(String processDefinitionId) {
     if (getAuthorizationManager().isAuthorizationEnabled()) {
-      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(
+          processDefinitionId);
       if (processDefinition != null) {
         checkUpdateProcessDefinitionByKey(processDefinition.getKey());
       }
@@ -90,7 +94,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkUpdateProcessDefinitionSuspensionStateById(String processDefinitionId) {
     if (getAuthorizationManager().isAuthorizationEnabled()) {
-      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(
+          processDefinitionId);
       if (processDefinition != null) {
         checkUpdateProcessDefinitionSuspensionStateByKey(processDefinition.getKey());
       }
@@ -100,7 +105,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkUpdateDecisionDefinitionById(String decisionDefinitionId) {
     if (getAuthorizationManager().isAuthorizationEnabled()) {
-      DecisionDefinitionEntity decisionDefinition = findLatestDecisionDefinitionById(decisionDefinitionId);
+      DecisionDefinitionEntity decisionDefinition = findLatestDecisionDefinitionById(
+          decisionDefinitionId);
       if (decisionDefinition != null) {
         checkUpdateDecisionDefinition(decisionDefinition);
       }
@@ -114,11 +120,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkUpdateProcessDefinitionSuspensionStateByKey(String processDefinitionKey) {
-    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, ProcessDefinitionPermissions.SUSPEND)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, UPDATE)
-        .build();
+    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder().disjunctive()
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey,
+            ProcessDefinitionPermissions.SUSPEND)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, UPDATE).build();
 
     getAuthorizationManager().checkAuthorization(suspensionStatePermission);
   }
@@ -126,7 +131,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkDeleteProcessDefinitionById(String processDefinitionId) {
     if (getAuthorizationManager().isAuthorizationEnabled()) {
-      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(
+          processDefinitionId);
       if (processDefinition != null) {
         checkDeleteProcessDefinitionByKey(processDefinition.getKey());
       }
@@ -141,7 +147,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId) {
     if (getAuthorizationManager().isAuthorizationEnabled()) {
-      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(
+          processDefinitionId);
       if (processDefinition != null) {
         checkUpdateProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
       }
@@ -151,15 +158,16 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkUpdateRetriesProcessInstanceByProcessDefinitionId(String processDefinitionId) {
     if (getAuthorizationManager().isAuthorizationEnabled()) {
-      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(
+          processDefinitionId);
       if (processDefinition != null) {
 
-        CompositePermissionCheck retryJobPermission = new PermissionCheckBuilder()
-            .disjunctive()
-              .atomicCheckForResourceId(PROCESS_INSTANCE, ANY, ProcessInstancePermissions.RETRY_JOB)
-              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionId, ProcessDefinitionPermissions.RETRY_JOB)
-              .atomicCheckForResourceId(PROCESS_INSTANCE, ANY, UPDATE)
-              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionId, UPDATE_INSTANCE)
+        CompositePermissionCheck retryJobPermission = new PermissionCheckBuilder().disjunctive()
+            .atomicCheckForResourceId(PROCESS_INSTANCE, ANY, ProcessInstancePermissions.RETRY_JOB)
+            .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionId,
+                ProcessDefinitionPermissions.RETRY_JOB)
+            .atomicCheckForResourceId(PROCESS_INSTANCE, ANY, UPDATE)
+            .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionId, UPDATE_INSTANCE)
             .build();
 
         getAuthorizationManager().checkAuthorization(retryJobPermission);
@@ -168,9 +176,11 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionId(String processDefinitionId) {
+  public void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionId(
+      String processDefinitionId) {
     if (getAuthorizationManager().isAuthorizationEnabled()) {
-      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(processDefinitionId);
+      ProcessDefinitionEntity processDefinition = findLatestProcessDefinitionById(
+          processDefinitionId);
       if (processDefinition != null) {
         checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(processDefinition.getKey());
       }
@@ -179,23 +189,23 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey) {
-    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheckForResourceId(PROCESS_INSTANCE, null, UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, UPDATE_INSTANCE)
+    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder().disjunctive()
+        .atomicCheckForResourceId(PROCESS_INSTANCE, null, UPDATE)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, UPDATE_INSTANCE)
         .build();
 
     getAuthorizationManager().checkAuthorization(suspensionStatePermission);
   }
 
   @Override
-  public void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(String processDefinitionKey) {
-    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheckForResourceId(PROCESS_INSTANCE, null, ProcessInstancePermissions.SUSPEND)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, ProcessDefinitionPermissions.SUSPEND_INSTANCE)
-          .atomicCheckForResourceId(PROCESS_INSTANCE, null, UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, UPDATE_INSTANCE)
+  public void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(
+      String processDefinitionKey) {
+    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder().disjunctive()
+        .atomicCheckForResourceId(PROCESS_INSTANCE, null, ProcessInstancePermissions.SUSPEND)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey,
+            ProcessDefinitionPermissions.SUSPEND_INSTANCE)
+        .atomicCheckForResourceId(PROCESS_INSTANCE, null, UPDATE)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, UPDATE_INSTANCE)
         .build();
 
     getAuthorizationManager().checkAuthorization(suspensionStatePermission);
@@ -209,17 +219,17 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   public void checkDeleteProcessInstance(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution
+        .getProcessDefinition();
 
     // necessary permissions:
     // - DELETE on PROCESS_INSTANCE
     // ... OR ...
     // - DELETE_INSTANCE on PROCESS_DEFINITION
 
-    CompositePermissionCheck deleteInstancePermission = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), DELETE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), DELETE_INSTANCE)
+    CompositePermissionCheck deleteInstancePermission = new PermissionCheckBuilder().disjunctive()
+        .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), DELETE)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), DELETE_INSTANCE)
         .build();
 
     getAuthorizationManager().checkAuthorization(deleteInstancePermission);
@@ -235,11 +245,11 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkUpdateProcessInstance(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
-    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_INSTANCE)
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution
+        .getProcessDefinition();
+    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder().disjunctive()
+        .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), UPDATE)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_INSTANCE)
         .build();
 
     getAuthorizationManager().checkAuthorization(suspensionStatePermission);
@@ -247,13 +257,15 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkUpdateProcessInstanceVariables(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
-    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), ProcessInstancePermissions.UPDATE_VARIABLE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), ProcessDefinitionPermissions.UPDATE_INSTANCE_VARIABLE)
-          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_INSTANCE)
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution
+        .getProcessDefinition();
+    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder().disjunctive()
+        .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(),
+            ProcessInstancePermissions.UPDATE_VARIABLE)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(),
+            ProcessDefinitionPermissions.UPDATE_INSTANCE_VARIABLE)
+        .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), UPDATE)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_INSTANCE)
         .build();
 
     getAuthorizationManager().checkAuthorization(suspensionStatePermission);
@@ -268,13 +280,15 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   public void checkUpdateProcessInstanceSuspensionState(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
-    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), ProcessInstancePermissions.SUSPEND)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), ProcessDefinitionPermissions.SUSPEND_INSTANCE)
-          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_INSTANCE)
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution
+        .getProcessDefinition();
+    CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder().disjunctive()
+        .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(),
+            ProcessInstancePermissions.SUSPEND)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(),
+            ProcessDefinitionPermissions.SUSPEND_INSTANCE)
+        .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), UPDATE)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_INSTANCE)
         .build();
 
     getAuthorizationManager().checkAuthorization(suspensionStatePermission);
@@ -286,10 +300,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
       return;
     }
 
-    CompositePermissionCheck retryJobPermission = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheckForResourceId(PROCESS_INSTANCE, job.getProcessInstanceId(), UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, job.getProcessDefinitionKey(), UPDATE_INSTANCE)
+    CompositePermissionCheck retryJobPermission = new PermissionCheckBuilder().disjunctive()
+        .atomicCheckForResourceId(PROCESS_INSTANCE, job.getProcessInstanceId(), UPDATE)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, job.getProcessDefinitionKey(),
+            UPDATE_INSTANCE)
         .build();
 
     getAuthorizationManager().checkAuthorization(retryJobPermission);
@@ -302,29 +316,34 @@ public class AuthorizationCommandChecker implements CommandChecker {
       return;
     }
 
-    CompositePermissionCheck retryJobPermission = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheckForResourceId(PROCESS_INSTANCE, job.getProcessInstanceId(), ProcessInstancePermissions.RETRY_JOB)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, job.getProcessDefinitionKey(), ProcessDefinitionPermissions.RETRY_JOB)
-          .atomicCheckForResourceId(PROCESS_INSTANCE, job.getProcessInstanceId(), UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, job.getProcessDefinitionKey(), UPDATE_INSTANCE)
+    CompositePermissionCheck retryJobPermission = new PermissionCheckBuilder().disjunctive()
+        .atomicCheckForResourceId(PROCESS_INSTANCE, job.getProcessInstanceId(),
+            ProcessInstancePermissions.RETRY_JOB)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, job.getProcessDefinitionKey(),
+            ProcessDefinitionPermissions.RETRY_JOB)
+        .atomicCheckForResourceId(PROCESS_INSTANCE, job.getProcessInstanceId(), UPDATE)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, job.getProcessDefinitionKey(),
+            UPDATE_INSTANCE)
         .build();
 
     getAuthorizationManager().checkAuthorization(retryJobPermission);
   }
 
   @Override
-  public void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
+  public void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition,
+      ProcessDefinition targetProcessDefinition) {
     checkReadProcessDefinition(sourceProcessDefinition);
     checkReadProcessDefinition(targetProcessDefinition);
   }
 
   @Override
-  public void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition) {
+  public void checkMigrateProcessInstance(ExecutionEntity processInstance,
+      ProcessDefinition targetProcessDefinition) {
   }
 
   public void checkReadProcessInstance(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution
+        .getProcessDefinition();
 
     // necessary permissions:
     // - READ on PROCESS_INSTANCE
@@ -332,8 +351,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
     // - READ_INSTANCE on PROCESS_DEFINITION
     CompositePermissionCheck readProcessInstancePermission = new PermissionCheckBuilder()
         .disjunctive()
-          .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), READ)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), READ_INSTANCE)
+        .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), READ)
+        .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), READ_INSTANCE)
         .build();
 
     getAuthorizationManager().checkAuthorization(readProcessInstancePermission);
@@ -342,13 +361,14 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkReadProcessInstanceVariable(ExecutionEntity execution) {
     if (getAuthorizationManager().isEnsureSpecificVariablePermission()) {
-      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution
+          .getProcessDefinition();
 
       // necessary permissions:
       // - READ_INSTANCE_VARIABLE on PROCESS_DEFINITION
       CompositePermissionCheck readProcessInstancePermission = new PermissionCheckBuilder()
-          .disjunctive()
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE)
+          .disjunctive().atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(),
+              ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE)
           .build();
 
       getAuthorizationManager().checkAuthorization(readProcessInstancePermission);
@@ -367,8 +387,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
     // - READ on PROCESS_INSTANCE
     // ... OR ...
     // - READ_INSTANCE on PROCESS_DEFINITION
-    CompositePermissionCheck readJobPermission = new PermissionCheckBuilder()
-        .disjunctive()
+    CompositePermissionCheck readJobPermission = new PermissionCheckBuilder().disjunctive()
         .atomicCheckForResourceId(PROCESS_INSTANCE, job.getProcessInstanceId(), READ)
         .atomicCheckForResourceId(PROCESS_DEFINITION, job.getProcessDefinitionKey(), READ_INSTANCE)
         .build();
@@ -395,7 +414,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
     checkTaskPermission(task, readProcessInstanceTaskPermission, readStandaloneTaskPermission);
   }
 
-  protected void checkTaskPermission(TaskEntity task, Permission processDefinitionPermission, Permission taskPermission) {
+  protected void checkTaskPermission(TaskEntity task, Permission processDefinitionPermission,
+      Permission taskPermission) {
     String taskId = task.getId();
     String executionId = task.getExecutionId();
 
@@ -409,11 +429,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
       ExecutionEntity execution = task.getExecution();
       ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
-      CompositePermissionCheck readTaskPermission = new PermissionCheckBuilder()
-          .disjunctive()
-          .atomicCheckForResourceId(TASK, taskId, taskPermission)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), processDefinitionPermission)
-        .build();
+      CompositePermissionCheck readTaskPermission = new PermissionCheckBuilder().disjunctive()
+          .atomicCheckForResourceId(TASK, taskId, taskPermission).atomicCheckForResourceId(
+              PROCESS_DEFINITION, processDefinition.getKey(), processDefinitionPermission)
+          .build();
 
       getAuthorizationManager().checkAuthorization(readTaskPermission);
 
@@ -451,14 +470,15 @@ public class AuthorizationCommandChecker implements CommandChecker {
       // - UPDATE_TASK on PROCESS_DEFINITION
 
       ExecutionEntity execution = task.getExecution();
-      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution
+          .getProcessDefinition();
 
       CompositePermissionCheck updateTaskPermissionCheck = new PermissionCheckBuilder()
-          .disjunctive()
-            .atomicCheckForResourceId(TASK, taskId, TaskPermissions.UPDATE_VARIABLE)
-            .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), ProcessDefinitionPermissions.UPDATE_TASK_VARIABLE)
-            .atomicCheckForResourceId(TASK, taskId, UPDATE)
-            .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_TASK)
+          .disjunctive().atomicCheckForResourceId(TASK, taskId, TaskPermissions.UPDATE_VARIABLE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(),
+              ProcessDefinitionPermissions.UPDATE_TASK_VARIABLE)
+          .atomicCheckForResourceId(TASK, taskId, UPDATE)
+          .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinition.getKey(), UPDATE_TASK)
           .build();
 
       getAuthorizationManager().checkAuthorization(updateTaskPermissionCheck);
@@ -479,10 +499,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
       if (caseExecutionId == null) {
         // standalone task
         CompositePermissionCheck updateTaskPermissionCheck = new PermissionCheckBuilder()
-            .disjunctive()
-              .atomicCheckForResourceId(TASK, taskId, TaskPermissions.UPDATE_VARIABLE)
-              .atomicCheckForResourceId(TASK, taskId, UPDATE)
-            .build();
+            .disjunctive().atomicCheckForResourceId(TASK, taskId, TaskPermissions.UPDATE_VARIABLE)
+            .atomicCheckForResourceId(TASK, taskId, UPDATE).build();
 
         getAuthorizationManager().checkAuthorization(updateTaskPermissionCheck);
       }
@@ -492,11 +510,9 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkCreateBatch(Permission permission) {
-    CompositePermissionCheck createBatchPermission = new PermissionCheckBuilder()
-      .disjunctive()
+    CompositePermissionCheck createBatchPermission = new PermissionCheckBuilder().disjunctive()
         .atomicCheckForResourceId(BATCH, null, permission)
-        .atomicCheckForResourceId(BATCH, null, CREATE)
-      .build();
+        .atomicCheckForResourceId(BATCH, null, CREATE).build();
 
     getAuthorizationManager().checkAuthorization(createBatchPermission);
   }
@@ -544,15 +560,19 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   public void checkReadDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
-    getAuthorizationManager().checkAuthorization(READ, DECISION_DEFINITION, decisionDefinition.getKey());
+    getAuthorizationManager().checkAuthorization(READ, DECISION_DEFINITION,
+        decisionDefinition.getKey());
   }
 
   public void checkUpdateDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
-    getAuthorizationManager().checkAuthorization(UPDATE, DECISION_DEFINITION, decisionDefinition.getKey());
+    getAuthorizationManager().checkAuthorization(UPDATE, DECISION_DEFINITION,
+        decisionDefinition.getKey());
   }
 
-  public void checkReadDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
-    getAuthorizationManager().checkAuthorization(READ, DECISION_REQUIREMENTS_DEFINITION, decisionRequirementsDefinition.getKey());
+  public void checkReadDecisionRequirementsDefinition(
+      DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
+    getAuthorizationManager().checkAuthorization(READ, DECISION_REQUIREMENTS_DEFINITION,
+        decisionRequirementsDefinition.getKey());
   }
 
   @Override
@@ -570,7 +590,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
     // see javaDoc HistoryService.deleteHistoricTaskInstance
     if (task != null) {
       if (task.getProcessDefinitionKey() != null) {
-        getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, task.getProcessDefinitionKey());
+        getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION,
+            task.getProcessDefinitionKey());
       }
     }
   }
@@ -578,25 +599,27 @@ public class AuthorizationCommandChecker implements CommandChecker {
   // delete permission /////////////////////////////////////////////////
 
   public void checkDeleteHistoricProcessInstance(HistoricProcessInstance instance) {
-    getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, instance.getProcessDefinitionKey());
+    getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION,
+        instance.getProcessDefinitionKey());
   }
 
   public void checkDeleteHistoricCaseInstance(HistoricCaseInstance instance) {
   }
 
   public void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey) {
-    getAuthorizationManager().checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION, decisionDefinitionKey);
+    getAuthorizationManager().checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION,
+        decisionDefinitionKey);
   }
 
   public void checkDeleteHistoricDecisionInstance(HistoricDecisionInstance decisionInstance) {
-    getAuthorizationManager().checkAuthorization(
-        DELETE_HISTORY, DECISION_DEFINITION, decisionInstance.getDecisionDefinitionKey()
-    );
+    getAuthorizationManager().checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION,
+        decisionInstance.getDecisionDefinitionKey());
   }
 
   public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
     if (historicJobLog.getProcessDefinitionKey() != null) {
-      getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicJobLog.getProcessDefinitionKey());
+      getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION,
+          historicJobLog.getProcessDefinitionKey());
     }
   }
 
@@ -605,7 +628,8 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   public void checkReadHistoryProcessDefinition(String processDefinitionKey) {
-    getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, processDefinitionKey);
+    getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION,
+        processDefinitionKey);
   }
 
   public void checkReadHistoryAnyTaskInstance() {
@@ -627,11 +651,13 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   protected ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
-    return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+    return Context.getCommandContext().getProcessDefinitionManager()
+        .findLatestProcessDefinitionById(processDefinitionId);
   }
 
   protected DecisionDefinitionEntity findLatestDecisionDefinitionById(String decisionDefinitionId) {
-    return Context.getCommandContext().getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
+    return Context.getCommandContext().getDecisionDefinitionManager()
+        .findDecisionDefinitionById(decisionDefinitionId);
   }
 
   protected ExecutionEntity findExecutionById(String processInstanceId) {
@@ -646,18 +672,17 @@ public class AuthorizationCommandChecker implements CommandChecker {
     if (executionId != null) {
 
       // Permissions to task actions is based on the order in which PermissioncheckBuilder is built
-      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
-        .disjunctive()
+      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder().disjunctive()
           .atomicCheckForResourceId(TASK, taskId, TASK_ASSIGN)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), TASK_ASSIGN)
-          .atomicCheckForResourceId(TASK, taskId, UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK)
-        .build();
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(),
+              TASK_ASSIGN)
+          .atomicCheckForResourceId(TASK, taskId, UPDATE).atomicCheckForResourceId(
+              PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK)
+          .build();
 
       getAuthorizationManager().checkAuthorization(taskWorkPermission);
 
-    }
-    else {
+    } else {
 
       // if task does not exist in context of process
       // instance, then it is either a (a) standalone task
@@ -672,11 +697,9 @@ public class AuthorizationCommandChecker implements CommandChecker {
       String caseExecutionId = task.getCaseExecutionId();
       if (caseExecutionId == null) {
         // standalone task
-        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
-            .disjunctive()
+        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder().disjunctive()
             .atomicCheckForResourceId(TASK, taskId, TASK_ASSIGN)
-            .atomicCheckForResourceId(TASK, taskId, UPDATE)
-          .build();
+            .atomicCheckForResourceId(TASK, taskId, UPDATE).build();
 
         getAuthorizationManager().checkAuthorization(taskWorkPermission);
       }
@@ -702,18 +725,17 @@ public class AuthorizationCommandChecker implements CommandChecker {
     if (executionId != null) {
 
       // Permissions to task actions is based on the order in which PermissioncheckBuilder is built
-      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
-          .disjunctive()
+      CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder().disjunctive()
           .atomicCheckForResourceId(TASK, taskId, TASK_WORK)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), TASK_WORK)
-          .atomicCheckForResourceId(TASK, taskId, UPDATE)
-          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK)
-        .build();
+          .atomicCheckForResourceId(PROCESS_DEFINITION, task.getProcessDefinition().getKey(),
+              TASK_WORK)
+          .atomicCheckForResourceId(TASK, taskId, UPDATE).atomicCheckForResourceId(
+              PROCESS_DEFINITION, task.getProcessDefinition().getKey(), UPDATE_TASK)
+          .build();
 
       getAuthorizationManager().checkAuthorization(taskWorkPermission);
 
-    }
-    else {
+    } else {
 
       // if task does not exist in context of process
       // instance, then it is either a (a) standalone task
@@ -728,13 +750,11 @@ public class AuthorizationCommandChecker implements CommandChecker {
       String caseExecutionId = task.getCaseExecutionId();
       if (caseExecutionId == null) {
         // standalone task
-        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder()
-            .disjunctive()
+        CompositePermissionCheck taskWorkPermission = new PermissionCheckBuilder().disjunctive()
             .atomicCheckForResourceId(TASK, taskId, TASK_WORK)
-            .atomicCheckForResourceId(TASK, taskId, UPDATE)
-          .build();
+            .atomicCheckForResourceId(TASK, taskId, UPDATE).build();
 
-          getAuthorizationManager().checkAuthorization(taskWorkPermission);
+        getAuthorizationManager().checkAuthorization(taskWorkPermission);
       }
     }
   }
@@ -760,23 +780,19 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
     /*
-     * (1) if entry has a category and a process definition key:
-     *   => entry in context of process definition
-     *   => check either 
-     *        DELETE_HISTORY on PROCESS_DEFINITION with processDefinitionKey OR
-     *        DELETE on OPERATION_LOG_CATEGORY with category
+     * (1) if entry has a category and a process definition key: => entry in context of process
+     * definition => check either DELETE_HISTORY on PROCESS_DEFINITION with processDefinitionKey OR
+     * DELETE on OPERATION_LOG_CATEGORY with category
      * 
-     * (2) if entry has a category but no process definition key:
-     *   => standalone entry (task, job, batch, ...), admin entry (user, tenant, ...) or CMMN related
-     *   => check DELETE on OPERATION_LOG_CATEGORY with category
-     *   
-     * (3) if entry has no category but a process definition key:
-     *   => pre-7.11.0 entry in context of process definition 
-     *   => check DELETE_HISTORY on PROCESS_DEFINITION with processDefinitionKey
-     *   
-     * (4) if entry has no category and no process definition key:
-     *   => pre-7.11.0 standalone entry (task, job, batch, ...) or CMMN related
-     *   => no authorization check like before 7.11.0
+     * (2) if entry has a category but no process definition key: => standalone entry (task, job,
+     * batch, ...), admin entry (user, tenant, ...) or CMMN related => check DELETE on
+     * OPERATION_LOG_CATEGORY with category
+     * 
+     * (3) if entry has no category but a process definition key: => pre-7.11.0 entry in context of
+     * process definition => check DELETE_HISTORY on PROCESS_DEFINITION with processDefinitionKey
+     * 
+     * (4) if entry has no category and no process definition key: => pre-7.11.0 standalone entry
+     * (task, job, batch, ...) or CMMN related => no authorization check like before 7.11.0
      */
     if (entry != null) {
       String category = entry.getCategory();
@@ -791,14 +807,15 @@ public class AuthorizationCommandChecker implements CommandChecker {
         } else if (processDefinitionKey == null) {
           // case (2)
           permissionCheck = new PermissionCheckBuilder()
-              .atomicCheckForResourceId(Resources.OPERATION_LOG_CATEGORY, category, UserOperationLogCategoryPermissions.DELETE)
+              .atomicCheckForResourceId(Resources.OPERATION_LOG_CATEGORY, category,
+                  UserOperationLogCategoryPermissions.DELETE)
               .build();
         } else {
           // case (1)
-          permissionCheck = new PermissionCheckBuilder()
-              .disjunctive()
-                .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, DELETE_HISTORY)
-                .atomicCheckForResourceId(Resources.OPERATION_LOG_CATEGORY, category, UserOperationLogCategoryPermissions.DELETE)
+          permissionCheck = new PermissionCheckBuilder().disjunctive()
+              .atomicCheckForResourceId(PROCESS_DEFINITION, processDefinitionKey, DELETE_HISTORY)
+              .atomicCheckForResourceId(Resources.OPERATION_LOG_CATEGORY, category,
+                  UserOperationLogCategoryPermissions.DELETE)
               .build();
         }
         getAuthorizationManager().checkAuthorization(permissionCheck);
@@ -808,22 +825,27 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   @Override
-  public void checkReadHistoricExternalTaskLog(HistoricExternalTaskLogEntity historicExternalTaskLog) {
+  public void checkReadHistoricExternalTaskLog(
+      HistoricExternalTaskLogEntity historicExternalTaskLog) {
     if (historicExternalTaskLog.getProcessDefinitionKey() != null) {
-      getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicExternalTaskLog.getProcessDefinitionKey());
+      getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION,
+          historicExternalTaskLog.getProcessDefinitionKey());
     }
   }
-  
+
   @Override
   public void checkDeleteHistoricVariableInstance(HistoricVariableInstanceEntity variable) {
     if (variable != null && variable.getProcessDefinitionKey() != null) {
-      getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, variable.getProcessDefinitionKey());
+      getAuthorizationManager().checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION,
+          variable.getProcessDefinitionKey());
     }
-    // XXX if CAM-6570 is implemented, there should be a check for variables of standalone tasks here as well
+    // XXX if CAM-6570 is implemented, there should be a check for variables of standalone tasks
+    // here as well
   }
-  
+
   @Override
-  public void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance) {
+  public void checkDeleteHistoricVariableInstancesByProcessInstance(
+      HistoricProcessInstanceEntity instance) {
     checkDeleteHistoricProcessInstance(instance);
   }
 

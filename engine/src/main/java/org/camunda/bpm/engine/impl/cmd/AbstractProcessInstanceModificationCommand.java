@@ -62,7 +62,8 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
     return processInstanceId;
   }
 
-  protected ActivityInstance findActivityInstance(ActivityInstance tree, String activityInstanceId) {
+  protected ActivityInstance findActivityInstance(ActivityInstance tree,
+      String activityInstanceId) {
     if (activityInstanceId.equals(tree.getId())) {
       return tree;
     } else {
@@ -77,7 +78,8 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
     return null;
   }
 
-  protected TransitionInstance findTransitionInstance(ActivityInstance tree, String transitionInstanceId) {
+  protected TransitionInstance findTransitionInstance(ActivityInstance tree,
+      String transitionInstanceId) {
     for (TransitionInstance childTransitionInstance : tree.getChildTransitionInstances()) {
       if (matchesRequestedTransitionInstance(childTransitionInstance, transitionInstanceId)) {
         return childTransitionInstance;
@@ -85,7 +87,8 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
     }
 
     for (ActivityInstance child : tree.getChildActivityInstances()) {
-      TransitionInstance matchingChildInstance = findTransitionInstance(child, transitionInstanceId);
+      TransitionInstance matchingChildInstance = findTransitionInstance(child,
+          transitionInstanceId);
       if (matchingChildInstance != null) {
         return matchingChildInstance;
       }
@@ -94,36 +97,40 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
     return null;
   }
 
-  protected boolean matchesRequestedTransitionInstance(TransitionInstance instance, String queryInstanceId) {
+  protected boolean matchesRequestedTransitionInstance(TransitionInstance instance,
+      String queryInstanceId) {
     boolean match = instance.getId().equals(queryInstanceId);
 
     // check if the execution queried for has been replaced by the given instance
     // => if yes, given instance is matched
-    // this is a fix for CAM-4090 to tolerate inconsistent transition instance ids as described in CAM-4143
+    // this is a fix for CAM-4090 to tolerate inconsistent transition instance ids as described in
+    // CAM-4143
     if (!match) {
       // note: execution id = transition instance id
-      ExecutionEntity cachedExecution = Context.getCommandContext()
-          .getDbEntityManager()
+      ExecutionEntity cachedExecution = Context.getCommandContext().getDbEntityManager()
           .getCachedEntity(ExecutionEntity.class, queryInstanceId);
 
       // follow the links of execution replacement;
       // note: this can be at most two hops:
       // case 1:
-      //   the query execution is the scope execution
-      //     => tree may have expanded meanwhile
-      //     => scope execution references replacing execution directly (one hop)
+      // the query execution is the scope execution
+      // => tree may have expanded meanwhile
+      // => scope execution references replacing execution directly (one hop)
       //
       // case 2:
-      //   the query execution is a concurrent execution
-      //     => tree may have compacted meanwhile
-      //     => concurrent execution references scope execution directly (one hop)
+      // the query execution is a concurrent execution
+      // => tree may have compacted meanwhile
+      // => concurrent execution references scope execution directly (one hop)
       //
       // case 3:
-      //   the query execution is a concurrent execution
-      //     => tree may have compacted/expanded/compacted/../expanded any number of times
-      //     => the concurrent execution has been removed and therefore references the scope execution (first hop)
-      //     => the scope execution may have been replaced itself again with another concurrent execution (second hop)
-      //   note that the scope execution may have a long "history" of replacements, but only the last replacement is relevant here
+      // the query execution is a concurrent execution
+      // => tree may have compacted/expanded/compacted/../expanded any number of times
+      // => the concurrent execution has been removed and therefore references the scope execution
+      // (first hop)
+      // => the scope execution may have been replaced itself again with another concurrent
+      // execution (second hop)
+      // note that the scope execution may have a long "history" of replacements, but only the last
+      // replacement is relevant here
       if (cachedExecution != null) {
         ExecutionEntity replacingExecution = cachedExecution.resolveReplacedBy();
 
@@ -142,8 +149,7 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
 
     if (processDefinition.getId().equals(scopeId)) {
       return processDefinition;
-    }
-    else {
+    } else {
       return processDefinition.findActivity(scopeId);
     }
   }
@@ -156,13 +162,13 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
     ScopeImpl scope = getScopeForActivityInstance(processDefinition, activityInstance);
 
     Set<ExecutionEntity> executions = mapping.getExecutions(scope);
-    Set<String> activityInstanceExecutions = new HashSet<String>(Arrays.asList(activityInstance.getExecutionIds()));
+    Set<String> activityInstanceExecutions = new HashSet<String>(
+        Arrays.asList(activityInstance.getExecutionIds()));
 
     // TODO: this is a hack around the activity instance tree
     // remove with fix of CAM-3574
     for (String activityInstanceExecutionId : activityInstance.getExecutionIds()) {
-      ExecutionEntity execution = Context.getCommandContext()
-          .getExecutionManager()
+      ExecutionEntity execution = Context.getCommandContext().getExecutionManager()
           .findExecutionById(activityInstanceExecutionId);
       if (execution.isConcurrent() && execution.hasChildren()) {
         // concurrent executions have at most one child

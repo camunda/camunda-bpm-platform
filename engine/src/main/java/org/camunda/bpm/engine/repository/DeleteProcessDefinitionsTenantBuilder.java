@@ -17,7 +17,8 @@
 package org.camunda.bpm.engine.repository;
 
 /**
- * Fluent builder to delete process definitions by a process definition key or process definition ids.
+ * Fluent builder to delete process definitions by a process definition key or process definition
+ * ids.
  *
  * @author Tassilo Weidner
  */
@@ -33,7 +34,8 @@ public interface DeleteProcessDefinitionsTenantBuilder extends DeleteProcessDefi
   /**
    * Process definitions which belong to the given tenant id will be removed.
    *
-   * @param tenantId id which identifies the tenant
+   * @param tenantId
+   *          id which identifies the tenant
    * @return the builder
    */
   DeleteProcessDefinitionsBuilder withTenantId(String tenantId);

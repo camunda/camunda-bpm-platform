@@ -38,18 +38,16 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
   protected String nestedJsonObject = "{\"id\":\"nested\"}";
   protected String nestedJsonArray = "[\"a\",\"b\"]";
 
-
   public void setUp() {
-    filter = filterService.newTaskFilter("name").setOwner("owner").setProperties(new HashMap<String, Object>());
+    filter = filterService.newTaskFilter("name").setOwner("owner")
+        .setProperties(new HashMap<String, Object>());
   }
 
   protected void tearDown() throws Exception {
-    if (filter.getId() != null)
-    {
+    if (filter.getId() != null) {
       filterService.deleteFilter(filter.getId());
     }
   }
-
 
   public void testPropertiesFromNull() {
     filter.setProperties(null);
@@ -144,7 +142,8 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
 
   public void testMapContainingMapContainingListProperty() {
     // given
-    Map properties = Collections.singletonMap("foo", Collections.singletonMap("bar", Collections.singletonList("foo")));
+    Map properties = Collections.singletonMap("foo",
+        Collections.singletonMap("bar", Collections.singletonList("foo")));
 
     filter.setProperties(properties);
     filterService.saveFilter(filter);

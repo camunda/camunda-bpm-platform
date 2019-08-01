@@ -32,7 +32,8 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
-public class DecisionDefinitionEntity extends DmnDecisionImpl implements DecisionDefinition, ResourceDefinitionEntity<DecisionDefinitionEntity>, DbEntity, HasDbRevision, Serializable {
+public class DecisionDefinitionEntity extends DmnDecisionImpl implements DecisionDefinition,
+    ResourceDefinitionEntity<DecisionDefinitionEntity>, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -180,12 +181,15 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
    * @param updatingDecisionDefinition
    */
   @Override
-  public void updateModifiableFieldsFromEntity(DecisionDefinitionEntity updatingDecisionDefinition) {
-    if (this.key.equals(updatingDecisionDefinition.key) && this.deploymentId.equals(updatingDecisionDefinition.deploymentId)) {
+  public void updateModifiableFieldsFromEntity(
+      DecisionDefinitionEntity updatingDecisionDefinition) {
+    if (this.key.equals(updatingDecisionDefinition.key)
+        && this.deploymentId.equals(updatingDecisionDefinition.deploymentId)) {
       this.revision = updatingDecisionDefinition.revision;
       this.historyTimeToLive = updatingDecisionDefinition.historyTimeToLive;
     } else {
-      LOG.logUpdateUnrelatedDecisionDefinitionEntity(this.key, updatingDecisionDefinition.key, this.deploymentId, updatingDecisionDefinition.deploymentId);
+      LOG.logUpdateUnrelatedDecisionDefinitionEntity(this.key, updatingDecisionDefinition.key,
+          this.deploymentId, updatingDecisionDefinition.deploymentId);
     }
   }
 
@@ -219,12 +223,15 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     DeploymentCache deploymentCache = configuration.getDeploymentCache();
 
-    DecisionDefinitionEntity decisionDefinition = deploymentCache.findDecisionDefinitionFromCache(decisionDefinitionId);
+    DecisionDefinitionEntity decisionDefinition = deploymentCache
+        .findDecisionDefinitionFromCache(decisionDefinitionId);
 
     if (decisionDefinition == null) {
       CommandContext commandContext = Context.getCommandContext();
-      DecisionDefinitionManager decisionDefinitionManager = commandContext.getDecisionDefinitionManager();
-      decisionDefinition = decisionDefinitionManager.findDecisionDefinitionById(decisionDefinitionId);
+      DecisionDefinitionManager decisionDefinitionManager = commandContext
+          .getDecisionDefinitionManager();
+      decisionDefinition = decisionDefinitionManager
+          .findDecisionDefinitionById(decisionDefinitionId);
 
       if (decisionDefinition != null) {
         decisionDefinition = deploymentCache.resolveDecisionDefinition(decisionDefinition);
@@ -251,9 +258,7 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
 
   protected void ensurePreviousDecisionDefinitionIdInitialized() {
     if (previousDecisionDefinitionId == null && !firstVersion) {
-      previousDecisionDefinitionId = Context
-          .getCommandContext()
-          .getDecisionDefinitionManager()
+      previousDecisionDefinitionId = Context.getCommandContext().getDecisionDefinitionManager()
           .findPreviousDecisionDefinitionId(key, version, tenantId);
 
       if (previousDecisionDefinitionId == null) {
@@ -282,19 +287,12 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
 
   @Override
   public String toString() {
-    return "DecisionDefinitionEntity{" +
-      "id='" + id + '\'' +
-      ", name='" + name + '\'' +
-      ", category='" + category + '\'' +
-      ", key='" + key + '\'' +
-      ", version=" + version +
-      ", versionTag=" + versionTag +
-      ", decisionRequirementsDefinitionId='" + decisionRequirementsDefinitionId + '\'' +
-      ", decisionRequirementsDefinitionKey='" + decisionRequirementsDefinitionKey + '\'' +
-      ", deploymentId='" + deploymentId + '\'' +
-      ", tenantId='" + tenantId + '\'' +
-      ", historyTimeToLive=" + historyTimeToLive +
-      '}';
+    return "DecisionDefinitionEntity{" + "id='" + id + '\'' + ", name='" + name + '\''
+        + ", category='" + category + '\'' + ", key='" + key + '\'' + ", version=" + version
+        + ", versionTag=" + versionTag + ", decisionRequirementsDefinitionId='"
+        + decisionRequirementsDefinitionId + '\'' + ", decisionRequirementsDefinitionKey='"
+        + decisionRequirementsDefinitionKey + '\'' + ", deploymentId='" + deploymentId + '\''
+        + ", tenantId='" + tenantId + '\'' + ", historyTimeToLive=" + historyTimeToLive + '}';
   }
 
 }

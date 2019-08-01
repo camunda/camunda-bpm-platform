@@ -16,9 +16,10 @@
  */
 package org.camunda.bpm.engine.exception.cmmn;
 
-
 /**
- * <p>This is exception is thrown when a specific case definition is not found.</p>
+ * <p>
+ * This is exception is thrown when a specific case definition is not found.
+ * </p>
  *
  * @author Roman Smirnov
  *

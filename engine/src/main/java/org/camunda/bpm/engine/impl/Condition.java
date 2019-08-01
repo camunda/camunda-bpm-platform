@@ -19,8 +19,6 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 
-
-
 /**
  * @author Tom Baeyens
  * @author Christopher Zell <christopher.zell@camunda.com>
@@ -28,10 +26,10 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 public interface Condition {
 
   /**
-   * Evaluates the condition and returns the result.
-   * The scope will be the same as the execution.
+   * Evaluates the condition and returns the result. The scope will be the same as the execution.
    *
-   * @param execution the execution which is used to evaluate the condition
+   * @param execution
+   *          the execution which is used to evaluate the condition
    * @return the result
    */
   boolean evaluate(DelegateExecution execution);
@@ -39,8 +37,10 @@ public interface Condition {
   /**
    * Evaluates the condition and returns the result.
    *
-   * @param scope the variable scope which can differ of the execution
-   * @param execution the execution which is used to evaluate the condition
+   * @param scope
+   *          the variable scope which can differ of the execution
+   * @param execution
+   *          the execution which is used to evaluate the condition
    * @return the result
    */
   boolean evaluate(VariableScope scope, DelegateExecution execution);
@@ -49,8 +49,10 @@ public interface Condition {
    * Tries to evaluate the condition. If the property which is used in the condition does not exist
    * false will be returned.
    *
-   * @param scope the variable scope which can differ of the execution
-   * @param execution the execution which is used to evaluate the condition
+   * @param scope
+   *          the variable scope which can differ of the execution
+   * @param execution
+   *          the execution which is used to evaluate the condition
    * @return the result
    */
   boolean tryEvaluate(VariableScope scope, DelegateExecution execution);

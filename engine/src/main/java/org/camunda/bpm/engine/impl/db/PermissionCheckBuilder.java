@@ -54,7 +54,8 @@ public class PermissionCheckBuilder {
     return this;
   }
 
-  public PermissionCheckBuilder atomicCheck(Resource resource, String queryParam, Permission permission) {
+  public PermissionCheckBuilder atomicCheck(Resource resource, String queryParam,
+      Permission permission) {
     if (!isPermissionDisabled(permission)) {
       PermissionCheck permCheck = new PermissionCheck();
       permCheck.setResource(resource);
@@ -66,7 +67,8 @@ public class PermissionCheckBuilder {
     return this;
   }
 
-  public PermissionCheckBuilder atomicCheckForResourceId(Resource resource, String resourceId, Permission permission) {
+  public PermissionCheckBuilder atomicCheckForResourceId(Resource resource, String resourceId,
+      Permission permission) {
     if (!isPermissionDisabled(permission)) {
       PermissionCheck permCheck = new PermissionCheck();
       permCheck.setResource(resource);
@@ -96,19 +98,21 @@ public class PermissionCheckBuilder {
 
     return permissionCheck;
   }
-  
+
   public List<PermissionCheck> getAtomicChecks() {
     return atomicChecks;
   }
 
   protected void validate() {
     if (!atomicChecks.isEmpty() && !compositeChecks.isEmpty()) {
-      throw new ProcessEngineException("Mixed authorization checks of atomic and composite permissions are not supported");
+      throw new ProcessEngineException(
+          "Mixed authorization checks of atomic and composite permissions are not supported");
     }
   }
 
   public boolean isPermissionDisabled(Permission permission) {
-    AuthorizationManager authorizationManager = Context.getCommandContext().getAuthorizationManager();
+    AuthorizationManager authorizationManager = Context.getCommandContext()
+        .getAuthorizationManager();
     return authorizationManager.isPermissionDisabled(permission);
   }
 }

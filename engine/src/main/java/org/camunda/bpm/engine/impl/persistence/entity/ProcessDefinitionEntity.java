@@ -42,12 +42,12 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements ProcessDefinition, ResourceDefinitionEntity<ProcessDefinitionEntity>, DbEntity, HasDbRevision {
+public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements ProcessDefinition,
+    ResourceDefinitionEntity<ProcessDefinitionEntity>, DbEntity, HasDbRevision {
 
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
@@ -113,7 +113,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected PvmExecutionImpl newProcessInstance() {
     ExecutionEntity newExecution = ExecutionEntity.createNewExecution();
 
-    if(tenantId != null) {
+    if (tenantId != null) {
       newExecution.setTenantId(tenantId);
     }
 
@@ -121,7 +121,8 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   }
 
   @Override
-  public ExecutionEntity createProcessInstance(String businessKey, String caseInstanceId, ActivityImpl initial) {
+  public ExecutionEntity createProcessInstance(String businessKey, String caseInstanceId,
+      ActivityImpl initial) {
     ensureNotSuspended();
 
     ExecutionEntity processInstance = (ExecutionEntity) createProcessInstanceForInitial(initial);
@@ -146,7 +147,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       processInstance.setCaseInstanceId(caseInstanceId);
     }
 
-    if(tenantId != null) {
+    if (tenantId != null) {
       processInstance.setTenantId(tenantId);
     }
 
@@ -166,22 +167,18 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   }
 
   public void deleteIdentityLink(String userId, String groupId) {
-    List<IdentityLinkEntity> identityLinks = Context
-      .getCommandContext()
-      .getIdentityLinkManager()
-      .findIdentityLinkByProcessDefinitionUserAndGroup(id, userId, groupId);
+    List<IdentityLinkEntity> identityLinks = Context.getCommandContext().getIdentityLinkManager()
+        .findIdentityLinkByProcessDefinitionUserAndGroup(id, userId, groupId);
 
-    for (IdentityLinkEntity identityLink: identityLinks) {
+    for (IdentityLinkEntity identityLink : identityLinks) {
       identityLink.delete();
     }
   }
 
   public List<IdentityLinkEntity> getIdentityLinks() {
     if (!isIdentityLinksInitialized) {
-      definitionIdentityLinkEntities = Context
-        .getCommandContext()
-        .getIdentityLinkManager()
-        .findIdentityLinksByProcessDefinitionId(id);
+      definitionIdentityLinkEntities = Context.getCommandContext().getIdentityLinkManager()
+          .findIdentityLinksByProcessDefinitionId(id);
       isIdentityLinksInitialized = true;
     }
 
@@ -190,23 +187,26 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   @Override
   public String toString() {
-    return "ProcessDefinitionEntity["+id+"]";
+    return "ProcessDefinitionEntity[" + id + "]";
   }
 
   /**
    * Updates all modifiable fields from another process definition entity.
+   * 
    * @param updatingProcessDefinition
    */
   @Override
   public void updateModifiableFieldsFromEntity(ProcessDefinitionEntity updatingProcessDefinition) {
-    if (this.key.equals(updatingProcessDefinition.key) && this.deploymentId.equals(updatingProcessDefinition.deploymentId)) {
-      // TODO: add a guard once the mismatch between revisions in deployment cache and database has been resolved
+    if (this.key.equals(updatingProcessDefinition.key)
+        && this.deploymentId.equals(updatingProcessDefinition.deploymentId)) {
+      // TODO: add a guard once the mismatch between revisions in deployment cache and database has
+      // been resolved
       this.revision = updatingProcessDefinition.revision;
       this.suspensionState = updatingProcessDefinition.suspensionState;
       this.historyTimeToLive = updatingProcessDefinition.historyTimeToLive;
-    }
-    else {
-      LOG.logUpdateUnrelatedProcessDefinitionEntity(this.key, updatingProcessDefinition.key, this.deploymentId, updatingProcessDefinition.deploymentId);
+    } else {
+      LOG.logUpdateUnrelatedProcessDefinitionEntity(this.key, updatingProcessDefinition.key,
+          this.deploymentId, updatingProcessDefinition.deploymentId);
     }
   }
 
@@ -240,12 +240,15 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     DeploymentCache deploymentCache = configuration.getDeploymentCache();
 
-    ProcessDefinitionEntity processDefinition = deploymentCache.findProcessDefinitionFromCache(processDefinitionId);
+    ProcessDefinitionEntity processDefinition = deploymentCache
+        .findProcessDefinitionFromCache(processDefinitionId);
 
     if (processDefinition == null) {
       CommandContext commandContext = Context.getCommandContext();
-      ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
-      processDefinition = processDefinitionManager.findLatestProcessDefinitionById(processDefinitionId);
+      ProcessDefinitionManager processDefinitionManager = commandContext
+          .getProcessDefinitionManager();
+      processDefinition = processDefinitionManager
+          .findLatestProcessDefinitionById(processDefinitionId);
 
       if (processDefinition != null) {
         processDefinition = deploymentCache.resolveProcessDefinition(processDefinition);
@@ -272,9 +275,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   protected void ensurePreviousProcessDefinitionIdInitialized() {
     if (previousProcessDefinitionId == null && !firstVersion) {
-      previousProcessDefinitionId = Context
-          .getCommandContext()
-          .getProcessDefinitionManager()
+      previousProcessDefinitionId = Context.getCommandContext().getProcessDefinitionManager()
           .findPreviousProcessDefinitionId(key, version, tenantId);
 
       if (previousProcessDefinitionId == null) {
@@ -404,12 +405,13 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   public int getRevision() {
     return revision;
   }
+
   public void setRevision(int revision) {
     this.revision = revision;
   }
 
   public int getRevisionNext() {
-    return revision+1;
+    return revision + 1;
   }
 
   public int getSuspensionState() {

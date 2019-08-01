@@ -26,7 +26,9 @@ public interface ResourceDefinition {
   /** unique identifier */
   String getId();
 
-  /** category name which is derived from the targetNamespace attribute in the definitions element */
+  /**
+   * category name which is derived from the targetNamespace attribute in the definitions element
+   */
   String getCategory();
 
   /** label used for display purposes */
@@ -38,7 +40,10 @@ public interface ResourceDefinition {
   /** version of this definition */
   int getVersion();
 
-  /** name of {@link RepositoryService#getResourceAsStream(String, String) the resource} of this definition */
+  /**
+   * name of {@link RepositoryService#getResourceAsStream(String, String) the resource} of this
+   * definition
+   */
   String getResourceName();
 
   /** The deployment in which this definition is contained. */
@@ -48,8 +53,8 @@ public interface ResourceDefinition {
   String getDiagramResourceName();
 
   /**
-   * The id of the tenant this definition belongs to. Can be <code>null</code>
-   * if the definition belongs to no single tenant.
+   * The id of the tenant this definition belongs to. Can be <code>null</code> if the definition
+   * belongs to no single tenant.
    */
   String getTenantId();
 

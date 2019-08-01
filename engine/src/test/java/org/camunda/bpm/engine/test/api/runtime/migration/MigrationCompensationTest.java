@@ -59,198 +59,200 @@ public class MigrationCompensationTest {
   @Test
   public void testCannotMigrateActivityInstanceForCompensationThrowingEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
     testHelper.completeTask("userTask2");
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("compensationEvent", "compensationEvent")
-      .mapActivities("compensationHandler", "compensationHandler")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("compensationEvent", "compensationEvent")
+        .mapActivities("compensationHandler", "compensationHandler").build();
 
     // when
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
       assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasActivityInstanceFailures("compensationEvent",
-          "The type of the source activity is not supported for activity instance migration"
-        );
+          .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .hasActivityInstanceFailures("compensationEvent",
+              "The type of the source activity is not supported for activity instance migration");
     }
   }
 
   @Test
   public void testCannotMigrateActivityInstanceForCancelEndEvent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.TRANSACTION_COMPENSATION_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.TRANSACTION_COMPENSATION_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.TRANSACTION_COMPENSATION_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.TRANSACTION_COMPENSATION_MODEL);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask");
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("transactionEndEvent", "transactionEndEvent")
-      .mapActivities("compensationHandler", "compensationHandler")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("transactionEndEvent", "transactionEndEvent")
+        .mapActivities("compensationHandler", "compensationHandler").build();
 
     // when
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
       assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasActivityInstanceFailures("transactionEndEvent",
-          "The type of the source activity is not supported for activity instance migration"
-        );
+          .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .hasActivityInstanceFailures("transactionEndEvent",
+              "The type of the source activity is not supported for activity instance migration");
     }
   }
 
   @Test
   public void testCannotMigrateActiveCompensationWithoutInstructionForThrowingEventCase1() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
     testHelper.completeTask("userTask2");
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("compensationHandler", "compensationHandler")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("compensationHandler", "compensationHandler").build();
 
     // when
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
       assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasActivityInstanceFailures("compensationEvent",
-          "There is no migration instruction for this instance's activity",
-          "The type of the source activity is not supported for activity instance migration"
-        );
+          .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .hasActivityInstanceFailures("compensationEvent",
+              "There is no migration instruction for this instance's activity",
+              "The type of the source activity is not supported for activity instance migration");
     }
   }
 
   @Test
   public void testCannotMigrateActiveCompensationWithoutInstructionForThrowingEventCase2() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_END_EVENT_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_END_EVENT_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_END_EVENT_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_END_EVENT_MODEL);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
     testHelper.completeTask("userTask2");
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("compensationHandler", "compensationHandler")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("compensationHandler", "compensationHandler").build();
 
     // when
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
       assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasActivityInstanceFailures("compensationEvent",
-          "There is no migration instruction for this instance's activity",
-          "The type of the source activity is not supported for activity instance migration"
-        );
+          .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .hasActivityInstanceFailures("compensationEvent",
+              "There is no migration instruction for this instance's activity",
+              "The type of the source activity is not supported for activity instance migration");
     }
   }
 
   @Test
   public void testCannotMigrateWithoutMappingCompensationBoundaryEvents() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask2", "userTask2").build();
 
     // when
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
       assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasActivityInstanceFailures(
-            sourceProcessDefinition.getId(),
-            "Cannot migrate subscription for compensation handler 'compensationHandler'. "
-            + "There is no migration instruction for the compensation boundary event");
-      }
+          .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .hasActivityInstanceFailures(sourceProcessDefinition.getId(),
+              "Cannot migrate subscription for compensation handler 'compensationHandler'. "
+                  + "There is no migration instruction for the compensation boundary event");
+    }
   }
 
   @Test
   public void testCannotRemoveCompensationEventSubscriptions() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask2", "userTask2").build();
 
     // when
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
       assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasActivityInstanceFailures(
-            sourceProcessDefinition.getId(),
-            "Cannot migrate subscription for compensation handler 'compensationHandler'. "
-            + "There is no migration instruction for the compensation boundary event");
+          .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .hasActivityInstanceFailures(sourceProcessDefinition.getId(),
+              "Cannot migrate subscription for compensation handler 'compensationHandler'. "
+                  + "There is no migration instruction for the compensation boundary event");
     }
   }
 
   @Test
   public void testCanRemoveCompensationBoundaryWithoutEventSubscriptions() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -266,17 +268,18 @@ public class MigrationCompensationTest {
   @Test
   public void testCannotTriggerAddedCompensationForCompletedInstances() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -291,13 +294,14 @@ public class MigrationCompensationTest {
   @Test
   public void testCanTriggerAddedCompensationForActiveInstances() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask", "userTask1")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask1").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -314,15 +318,18 @@ public class MigrationCompensationTest {
   @Test
   public void testCanMigrateWithCompensationSubscriptionsInMigratingScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask2", "userTask2")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
@@ -341,15 +348,18 @@ public class MigrationCompensationTest {
   @Test
   public void testCanMigrateWithCompensationSubscriptionsInMigratingScopeAssertActivityInstance() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask2", "userTask2")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // a migrated process instance
@@ -359,27 +369,29 @@ public class MigrationCompensationTest {
     testHelper.completeTask("userTask2");
 
     // then the activity instance tree is correct
-    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
+    ActivityInstance activityInstance = rule.getRuntimeService()
+        .getActivityInstance(processInstance.getId());
 
-    assertThat(activityInstance).hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("compensationEvent")
-        .activity("compensationHandler")
-      .done());
+    assertThat(activityInstance)
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .activity("compensationEvent").activity("compensationHandler").done());
   }
 
   @Test
   public void testCanMigrateWithCompensationSubscriptionsInMigratingScopeAssertExecutionTree() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask2", "userTask2")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
@@ -387,34 +399,37 @@ public class MigrationCompensationTest {
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree("userTask2").scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree("userTask2").scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).done());
   }
 
   @Test
   public void testCanMigrateWithCompensationSubscriptionsInMigratingScopeChangeIds() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(CompensationModels.ONE_COMPENSATION_TASK_MODEL)
-        .changeElementId("userTask1", "newUserTask1")
-        .changeElementId("compensationBoundary", "newCompensationBoundary")
-        .changeElementId("compensationHandler", "newCompensationHandler"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.ONE_COMPENSATION_TASK_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(CompensationModels.ONE_COMPENSATION_TASK_MODEL)
+            .changeElementId("userTask1", "newUserTask1")
+            .changeElementId("compensationBoundary", "newCompensationBoundary")
+            .changeElementId("compensationHandler", "newCompensationHandler"));
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask2", "userTask2")
-        .mapActivities("compensationBoundary", "newCompensationBoundary")
-        .build();
+        .mapActivities("compensationBoundary", "newCompensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    testHelper.assertEventSubscriptionMigrated("compensationHandler", "newCompensationHandler", null);
+    testHelper.assertEventSubscriptionMigrated("compensationHandler", "newCompensationHandler",
+        null);
 
     // and the compensation can be triggered and completed
     testHelper.completeTask("userTask2");
@@ -426,16 +441,18 @@ public class MigrationCompensationTest {
   @Test
   public void testCanMigrateWithCompensationEventScopeExecution() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("subProcess", "subProcess")
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask2", "userTask2")
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
@@ -455,16 +472,18 @@ public class MigrationCompensationTest {
   @Test
   public void testCanMigrateWithCompensationEventScopeExecutionAssertActivityInstance() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("subProcess", "subProcess")
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask2", "userTask2")
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
@@ -472,65 +491,64 @@ public class MigrationCompensationTest {
     testHelper.completeTask("userTask2");
 
     // then
-    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
+    ActivityInstance activityInstance = rule.getRuntimeService()
+        .getActivityInstance(processInstance.getId());
 
     assertThat(activityInstance).hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("compensationEvent")
-        .beginScope("subProcess")
-          .activity("compensationHandler")
-      .done());
+        describeActivityInstanceTree(targetProcessDefinition.getId()).activity("compensationEvent")
+            .beginScope("subProcess").activity("compensationHandler").done());
   }
 
   @Test
   public void testCanMigrateWithCompensationEventScopeExecutionAssertExecutionTree() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("subProcess", "subProcess")
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask2", "userTask2")
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
-    Execution eventScopeExecution = rule.getRuntimeService()
-      .createExecutionQuery()
-      .activityId("subProcess")
-      .singleResult();
+    Execution eventScopeExecution = rule.getRuntimeService().createExecutionQuery()
+        .activityId("subProcess").singleResult();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree("userTask2").scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("subProcess").scope().eventScope().id(eventScopeExecution.getId())
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree("userTask2").scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("subProcess")
+            .scope().eventScope().id(eventScopeExecution.getId()).done());
   }
 
   @Test
   public void testCanMigrateWithCompensationEventScopeExecutionChangeIds() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL)
-        .changeElementId("subProcess", "newSubProcess")
-        .changeElementId("userTask1", "newUserTask1")
-        .changeElementId("compensationBoundary", "newCompensationBoundary")
-        .changeElementId("compensationHandler", "newCompensationHandler"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL)
+            .changeElementId("subProcess", "newSubProcess")
+            .changeElementId("userTask1", "newUserTask1")
+            .changeElementId("compensationBoundary", "newCompensationBoundary")
+            .changeElementId("compensationHandler", "newCompensationHandler"));
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("subProcess", "newSubProcess")
-        .mapActivities("compensationBoundary", "newCompensationBoundary")
-        .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask2", "userTask2").mapActivities("subProcess", "newSubProcess")
+        .mapActivities("compensationBoundary", "newCompensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
@@ -538,7 +556,8 @@ public class MigrationCompensationTest {
 
     // then
     testHelper.assertEventSubscriptionMigrated("subProcess", "newSubProcess", null);
-    testHelper.assertEventSubscriptionMigrated("compensationHandler", "newCompensationHandler", null);
+    testHelper.assertEventSubscriptionMigrated("compensationHandler", "newCompensationHandler",
+        null);
 
     // and the compensation can be triggered and completed
     testHelper.completeTask("userTask2");
@@ -550,20 +569,22 @@ public class MigrationCompensationTest {
   @Test
   public void testCanMigrateWithCompensationEventScopeExecutionChangeIdsAssertActivityInstance() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL)
-        .changeElementId("subProcess", "newSubProcess")
-        .changeElementId("userTask1", "newUserTask1")
-        .changeElementId("compensationBoundary", "newCompensationBoundary")
-        .changeElementId("compensationHandler", "newCompensationHandler"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL)
+            .changeElementId("subProcess", "newSubProcess")
+            .changeElementId("userTask1", "newUserTask1")
+            .changeElementId("compensationBoundary", "newCompensationBoundary")
+            .changeElementId("compensationHandler", "newCompensationHandler"));
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("subProcess", "newSubProcess")
-        .mapActivities("compensationBoundary", "newCompensationBoundary")
-        .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask2", "userTask2").mapActivities("subProcess", "newSubProcess")
+        .mapActivities("compensationBoundary", "newCompensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
@@ -571,71 +592,68 @@ public class MigrationCompensationTest {
     testHelper.completeTask("userTask2");
 
     // then
-    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
+    ActivityInstance activityInstance = rule.getRuntimeService()
+        .getActivityInstance(processInstance.getId());
 
     assertThat(activityInstance).hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("compensationEvent")
-        .beginScope("newSubProcess")
-          .activity("newCompensationHandler")
-      .done());
+        describeActivityInstanceTree(targetProcessDefinition.getId()).activity("compensationEvent")
+            .beginScope("newSubProcess").activity("newCompensationHandler").done());
   }
 
   @Test
   public void testCanMigrateWithCompensationEventScopeExecutionChangeIdsAssertExecutionTree() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL)
-        .changeElementId("subProcess", "newSubProcess")
-        .changeElementId("userTask1", "newUserTask1")
-        .changeElementId("compensationBoundary", "newCompensationBoundary")
-        .changeElementId("compensationHandler", "newCompensationHandler"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL)
+            .changeElementId("subProcess", "newSubProcess")
+            .changeElementId("userTask1", "newUserTask1")
+            .changeElementId("compensationBoundary", "newCompensationBoundary")
+            .changeElementId("compensationHandler", "newCompensationHandler"));
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("subProcess", "newSubProcess")
-        .mapActivities("compensationBoundary", "newCompensationBoundary")
-        .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask2", "userTask2").mapActivities("subProcess", "newSubProcess")
+        .mapActivities("compensationBoundary", "newCompensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
-    Execution eventScopeExecution = rule.getRuntimeService()
-      .createExecutionQuery()
-      .activityId("subProcess")
-      .singleResult();
+    Execution eventScopeExecution = rule.getRuntimeService().createExecutionQuery()
+        .activityId("subProcess").singleResult();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree("userTask2").scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("newSubProcess").scope().eventScope().id(eventScopeExecution.getId())
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree("userTask2").scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("newSubProcess")
+            .scope().eventScope().id(eventScopeExecution.getId()).done());
 
   }
 
   @Test
   public void testCanMigrateEventScopeVariables() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("subProcess", "subProcess")
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask2", "userTask2")
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    Execution subProcessExecution = rule.getRuntimeService()
-        .createExecutionQuery()
-        .activityId("userTask1")
-        .singleResult();
+    Execution subProcessExecution = rule.getRuntimeService().createExecutionQuery()
+        .activityId("userTask1").singleResult();
     rule.getRuntimeService().setVariableLocal(subProcessExecution.getId(), "foo", "bar");
 
     testHelper.completeTask("userTask1");
@@ -657,17 +675,19 @@ public class MigrationCompensationTest {
   @Test
   public void testCanMigrateWithEventSubProcessHandler() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("subProcess", "subProcess")
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask2", "userTask2").mapActivities("subProcess", "subProcess")
         .mapActivities("eventSubProcessStart", "eventSubProcessStart")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     testHelper.completeTask("userTask1");
 
@@ -688,17 +708,19 @@ public class MigrationCompensationTest {
   @Test
   public void testCanMigrateWithEventSubProcessHandlerAssertActivityInstance() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("subProcess", "subProcess")
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask2", "userTask2").mapActivities("subProcess", "subProcess")
         .mapActivities("eventSubProcessStart", "eventSubProcessStart")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     testHelper.completeTask("userTask1");
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -707,67 +729,67 @@ public class MigrationCompensationTest {
     testHelper.completeTask("userTask2");
 
     // then
-    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
+    ActivityInstance activityInstance = rule.getRuntimeService()
+        .getActivityInstance(processInstance.getId());
 
-    assertThat(activityInstance).hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("compensationEvent")
-        .beginScope("subProcess")
-          .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-      .done());
+    assertThat(activityInstance)
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .activity("compensationEvent").beginScope("subProcess").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
   }
 
   @Test
   public void testCanMigrateWithEventSubProcessHandlerAssertExecutionTree() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("subProcess", "subProcess")
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask2", "userTask2").mapActivities("subProcess", "subProcess")
         .mapActivities("eventSubProcessStart", "eventSubProcessStart")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     testHelper.completeTask("userTask1");
 
-    Execution eventScopeExecution = rule.getRuntimeService()
-      .createExecutionQuery()
-      .activityId("subProcess")
-      .singleResult();
+    Execution eventScopeExecution = rule.getRuntimeService().createExecutionQuery()
+        .activityId("subProcess").singleResult();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree("userTask2").scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("subProcess").scope().eventScope().id(eventScopeExecution.getId())
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree("userTask2").scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("subProcess")
+            .scope().eventScope().id(eventScopeExecution.getId()).done());
 
   }
 
   @Test
   public void testCanMigrateWithEventSubProcessHandlerChangeIds() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL)
-        .changeElementId("eventSubProcess", "newEventSubProcess"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL)
+            .changeElementId("eventSubProcess", "newEventSubProcess"));
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask2", "userTask2")
         .mapActivities("compensationBoundary", "compensationBoundary")
         .mapActivities("subProcess", "subProcess")
-        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
-        .build();
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     testHelper.completeTask("userTask1");
 
@@ -788,31 +810,33 @@ public class MigrationCompensationTest {
   @Test
   public void testCanMigrateSiblingEventScopeExecutions() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask2", "userTask2")
-        .mapActivities("subProcess", "outerSubProcess")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask2", "userTask2").mapActivities("subProcess", "outerSubProcess")
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // starting a second instances of the sub process
     rule.getRuntimeService().createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("subProcess")
-      .execute();
+        .startBeforeActivity("subProcess").execute();
 
-    List<Execution> subProcessExecutions = rule.getRuntimeService().createExecutionQuery().activityId("userTask1").list();
+    List<Execution> subProcessExecutions = rule.getRuntimeService().createExecutionQuery()
+        .activityId("userTask1").list();
     for (Execution subProcessExecution : subProcessExecutions) {
       // set the same variable to a distinct value
-      rule.getRuntimeService().setVariableLocal(subProcessExecution.getId(), "var", subProcessExecution.getId());
+      rule.getRuntimeService().setVariableLocal(subProcessExecution.getId(), "var",
+          subProcessExecution.getId());
     }
 
     testHelper.completeAnyTask("userTask1");
     testHelper.completeAnyTask("userTask1");
-
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -820,10 +844,8 @@ public class MigrationCompensationTest {
     // then the variable snapshots during compensation are not shared
     testHelper.completeAnyTask("userTask2");
 
-    List<Task> compensationTasks = rule.getTaskService()
-        .createTaskQuery()
-        .taskDefinitionKey("compensationHandler")
-        .list();
+    List<Task> compensationTasks = rule.getTaskService().createTaskQuery()
+        .taskDefinitionKey("compensationHandler").list();
     Assert.assertEquals(2, compensationTasks.size());
 
     Object value1 = rule.getTaskService().getVariable(compensationTasks.get(0).getId(), "var");
@@ -834,31 +856,31 @@ public class MigrationCompensationTest {
   @Test
   public void testCannotMigrateWithoutCompensationStartEventCase1() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask2", "userTask2")
-      .mapActivities("compensationBoundary", "compensationBoundary")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask2", "userTask2")
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
     // when
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
       assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasActivityInstanceFailures(sourceProcessDefinition.getId(),
-            "Cannot migrate subscription for compensation handler 'eventSubProcess'. "
-            + "There is no migration instruction for the compensation start event");
+          .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .hasActivityInstanceFailures(sourceProcessDefinition.getId(),
+              "Cannot migrate subscription for compensation handler 'eventSubProcess'. "
+                  + "There is no migration instruction for the compensation start event");
     }
   }
 
@@ -871,51 +893,48 @@ public class MigrationCompensationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask2", "userTask2").build();
 
     // when
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
       assertThat(e.getValidationReport())
-        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .hasActivityInstanceFailures(sourceProcessDefinition.getId(),
-            "Cannot migrate subscription for compensation handler 'eventSubProcess'. "
-            + "There is no migration instruction for the compensation start event");
+          .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .hasActivityInstanceFailures(sourceProcessDefinition.getId(),
+              "Cannot migrate subscription for compensation handler 'eventSubProcess'. "
+                  + "There is no migration instruction for the compensation start event");
     }
   }
 
   @Test
   public void testEventScopeHierarchyPreservation() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.DOUBLE_SUBPROCESS_MODEL);
 
     try {
       // when
       rule.getRuntimeService()
-        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("outerSubProcess", "innerSubProcess")
-        .mapActivities("innerSubProcess", "outerSubProcess")
-        .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities("outerSubProcess", "innerSubProcess")
+          .mapActivities("innerSubProcess", "outerSubProcess").build();
       Assert.fail("exception expected");
     } catch (MigrationPlanValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-      .hasInstructionFailures("innerSubProcess",
-        "The closest mapped ancestor 'outerSubProcess' is mapped to scope 'innerSubProcess' "
-        + "which is not an ancestor of target scope 'outerSubProcess'"
-      );
+      assertThat(e.getValidationReport()).hasInstructionFailures("innerSubProcess",
+          "The closest mapped ancestor 'outerSubProcess' is mapped to scope 'innerSubProcess' "
+              + "which is not an ancestor of target scope 'outerSubProcess'");
     }
 
   }
@@ -923,52 +942,46 @@ public class MigrationCompensationTest {
   @Test
   public void testCompensationBoundaryHierarchyPreservation() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL)
-        .addSubProcessTo(ProcessModels.PROCESS_KEY)
-          .id("addedSubProcess")
-          .embeddedSubProcess()
-          .startEvent()
-          .endEvent()
-        .done());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL)
+            .addSubProcessTo(ProcessModels.PROCESS_KEY).id("addedSubProcess").embeddedSubProcess()
+            .startEvent().endEvent().done());
 
     try {
       // when
       rule.getRuntimeService()
-        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("subProcess", "addedSubProcess")
-        .mapActivities("compensationBoundary", "compensationBoundary")
-        .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities("subProcess", "addedSubProcess")
+          .mapActivities("compensationBoundary", "compensationBoundary").build();
       Assert.fail("exception expected");
     } catch (MigrationPlanValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-      .hasInstructionFailures("compensationBoundary",
-        "The closest mapped ancestor 'subProcess' is mapped to scope 'addedSubProcess' "
-        + "which is not an ancestor of target scope 'compensationBoundary'"
-      );
+      assertThat(e.getValidationReport()).hasInstructionFailures("compensationBoundary",
+          "The closest mapped ancestor 'subProcess' is mapped to scope 'addedSubProcess' "
+              + "which is not an ancestor of target scope 'compensationBoundary'");
     }
   }
 
   @Test
   public void testCannotMapCompensateStartEventWithoutMappingEventScopeCase1() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_EVENT_SUBPROCESS_MODEL);
 
     try {
       // when
       rule.getRuntimeService()
-        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
-        .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities("eventSubProcessStart", "eventSubProcessStart").build();
       Assert.fail("exception expected");
     } catch (MigrationPlanValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-        .hasInstructionFailures("eventSubProcessStart",
-          "The source activity's event scope (subProcess) must be mapped to the target activity's event scope (subProcess)"
-        );
+      assertThat(e.getValidationReport()).hasInstructionFailures("eventSubProcessStart",
+          "The source activity's event scope (subProcess) must be mapped to the target activity's event scope (subProcess)");
     }
   }
 
@@ -984,16 +997,13 @@ public class MigrationCompensationTest {
     try {
       // when
       rule.getRuntimeService()
-        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("eventSubProcessStart", "eventSubProcessStart")
-        .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities("eventSubProcessStart", "eventSubProcessStart").build();
       Assert.fail("exception expected");
     } catch (MigrationPlanValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-        .hasInstructionFailures("eventSubProcessStart",
-          "The source activity's event scope (subProcess) must be mapped to the target activity's event scope (subProcess)"
-      );
+      assertThat(e.getValidationReport()).hasInstructionFailures("eventSubProcessStart",
+          "The source activity's event scope (subProcess) must be mapped to the target activity's event scope (subProcess)");
     }
   }
 }

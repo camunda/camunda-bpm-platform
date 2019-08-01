@@ -48,64 +48,35 @@ public class RetryCmdDeployment {
   }
 
   public static BpmnModelInstance prepareSignalEventProcess() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-          .intermediateThrowEvent(FAILING_EVENT)
-            .camundaAsyncBefore(true)
-            .camundaFailedJobRetryTimeCycle(SCHEDULE)
-            .signal(MESSAGE)
-          .serviceTask()
-            .camundaClass(FailingDelegate.class.getName())
-        .endEvent()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .intermediateThrowEvent(FAILING_EVENT).camundaAsyncBefore(true)
+        .camundaFailedJobRetryTimeCycle(SCHEDULE).signal(MESSAGE).serviceTask()
+        .camundaClass(FailingDelegate.class.getName()).endEvent().done();
     return modelInstance;
   }
 
   public static BpmnModelInstance prepareMessageEventProcess() {
-    return Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-          .intermediateThrowEvent(FAILING_EVENT)
-            .camundaAsyncBefore(true)
-              .camundaFailedJobRetryTimeCycle(SCHEDULE)
-              .message(MESSAGE)
-            .serviceTask()
-              .camundaClass(FailingDelegate.class.getName())
-        .done();
+    return Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .intermediateThrowEvent(FAILING_EVENT).camundaAsyncBefore(true)
+        .camundaFailedJobRetryTimeCycle(SCHEDULE).message(MESSAGE).serviceTask()
+        .camundaClass(FailingDelegate.class.getName()).done();
   }
 
   public static BpmnModelInstance prepareEscalationEventProcess() {
-    return Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-          .intermediateThrowEvent(FAILING_EVENT)
-            .camundaAsyncBefore(true)
-            .camundaFailedJobRetryTimeCycle(SCHEDULE)
-            .escalation(MESSAGE)
-          .serviceTask()
-            .camundaClass(FailingDelegate.class.getName())
-        .endEvent()
-        .done();
+    return Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .intermediateThrowEvent(FAILING_EVENT).camundaAsyncBefore(true)
+        .camundaFailedJobRetryTimeCycle(SCHEDULE).escalation(MESSAGE).serviceTask()
+        .camundaClass(FailingDelegate.class.getName()).endEvent().done();
   }
-
 
   public static BpmnModelInstance prepareCompensationEventProcess() {
-    return Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-          .subProcess("subProcess")
-            .embeddedSubProcess()
-              .startEvent()
-              .endEvent()
-          .subProcessDone()
-          .intermediateThrowEvent(FAILING_EVENT)
-            .camundaAsyncBefore(true)
-            .camundaFailedJobRetryTimeCycle(SCHEDULE)
-            .compensateEventDefinition()
-            .compensateEventDefinitionDone()
-          .serviceTask()
-          .camundaClass(FailingDelegate.class.getName())
-        .endEvent()
-        .done();
+    return Bpmn.createExecutableProcess(PROCESS_ID).startEvent().subProcess("subProcess")
+        .embeddedSubProcess().startEvent().endEvent().subProcessDone()
+        .intermediateThrowEvent(FAILING_EVENT).camundaAsyncBefore(true)
+        .camundaFailedJobRetryTimeCycle(SCHEDULE).compensateEventDefinition()
+        .compensateEventDefinitionDone().serviceTask().camundaClass(FailingDelegate.class.getName())
+        .endEvent().done();
   }
-
 
   public RetryCmdDeployment withEventProcess(BpmnModelInstance... bpmnModelInstances) {
     this.bpmnModelInstances = bpmnModelInstances;
@@ -115,7 +86,7 @@ public class RetryCmdDeployment {
   public static Collection<RetryCmdDeployment[]> asParameters(RetryCmdDeployment... deployments) {
     List<RetryCmdDeployment[]> deploymentList = new ArrayList<RetryCmdDeployment[]>();
     for (RetryCmdDeployment deployment : deployments) {
-      deploymentList.add(new RetryCmdDeployment[]{ deployment });
+      deploymentList.add(new RetryCmdDeployment[] { deployment });
     }
 
     return deploymentList;

@@ -35,23 +35,30 @@ public class BPMNParseListenerTest extends ResourceProcessEngineTestCase {
   @Deployment
   public void testAlterProcessDefinitionKeyWhenDeploying() throws Exception {
     // Check if process-definition has different key
-    assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").count());
-    assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess-modified").count());
+    assertEquals(0, repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("oneTaskProcess").count());
+    assertEquals(1, repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("oneTaskProcess-modified").count());
   }
 
   @Deployment
   public void testAlterActivityBehaviors() throws Exception {
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithIntermediateThrowEvent-modified");
-    ProcessDefinitionImpl processDefinition = ((ProcessInstanceWithVariablesImpl) processInstance).getExecutionEntity().getProcessDefinition();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("oneTaskWithIntermediateThrowEvent-modified");
+    ProcessDefinitionImpl processDefinition = ((ProcessInstanceWithVariablesImpl) processInstance)
+        .getExecutionEntity().getProcessDefinition();
 
     ActivityImpl cancelThrowEvent = processDefinition.findActivity("CancelthrowEvent");
-    assertTrue(cancelThrowEvent.getActivityBehavior() instanceof TestBPMNParseListener.TestCompensationEventActivityBehavior);
+    assertTrue(cancelThrowEvent
+        .getActivityBehavior() instanceof TestBPMNParseListener.TestCompensationEventActivityBehavior);
 
     ActivityImpl startEvent = processDefinition.findActivity("theStart");
-    assertTrue(startEvent.getActivityBehavior() instanceof TestBPMNParseListener.TestNoneStartEventActivityBehavior);
+    assertTrue(startEvent
+        .getActivityBehavior() instanceof TestBPMNParseListener.TestNoneStartEventActivityBehavior);
 
     ActivityImpl endEvent = processDefinition.findActivity("theEnd");
-    assertTrue(endEvent.getActivityBehavior() instanceof TestBPMNParseListener.TestNoneEndEventActivityBehavior);
+    assertTrue(endEvent
+        .getActivityBehavior() instanceof TestBPMNParseListener.TestNoneEndEventActivityBehavior);
   }
 }

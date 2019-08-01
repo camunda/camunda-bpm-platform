@@ -40,7 +40,8 @@ public class UuidGeneratorTest {
   public void testMultithreaded() throws InterruptedException {
     final List<Thread> threads = new ArrayList<Thread>();
 
-    final TimeBasedGenerator timeBasedGenerator = Generators.timeBasedGenerator(EthernetAddress.fromInterface());
+    final TimeBasedGenerator timeBasedGenerator = Generators
+        .timeBasedGenerator(EthernetAddress.fromInterface());
     final ConcurrentSkipListSet<String> generatedIds = new ConcurrentSkipListSet<String>();
     final ConcurrentSkipListSet<String> duplicatedIds = new ConcurrentSkipListSet<String>();
 

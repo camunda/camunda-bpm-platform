@@ -56,7 +56,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected IdentityService identityService;
@@ -124,7 +124,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
     InputStream inputStream = repositoryService.getDecisionDiagram(decisionDefinitionId);
 
     // inputStream is always null because there is no decision diagram at the moment
-    // what should be deployed as a diagram resource for DMN? 
+    // what should be deployed as a diagram resource for DMN?
     assertThat(inputStream, nullValue());
   }
 
@@ -136,7 +136,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
     InputStream inputStream = repositoryService.getDecisionDiagram(decisionDefinitionId);
 
     // inputStream is always null because there is no decision diagram at the moment
-    // what should be deployed as a diagram resource for DMN? 
+    // what should be deployed as a diagram resource for DMN?
     assertThat(inputStream, nullValue());
   }
 

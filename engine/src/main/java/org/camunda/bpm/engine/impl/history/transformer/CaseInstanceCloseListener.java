@@ -34,8 +34,7 @@ public class CaseInstanceCloseListener extends HistoryCaseExecutionListener {
     ensureHistoryLevelInitialized();
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_INSTANCE_CLOSE, caseExecution)) {
       return eventProducer.createCaseInstanceCloseEvt(caseExecution);
-    }
-    else {
+    } else {
       return null;
     }
   }

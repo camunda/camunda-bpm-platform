@@ -37,7 +37,7 @@ public class MetricsCmmnTransformListener extends AbstractCmmnTransformListener 
   public static MetricsCaseExecutionListener listener = new MetricsCaseExecutionListener();
 
   protected void addListeners(CmmnActivity activity) {
-    if(activity != null) {
+    if (activity != null) {
       activity.addBuiltInListener(CaseExecutionListener.START, listener);
       activity.addBuiltInListener(CaseExecutionListener.MANUAL_START, listener);
       activity.addBuiltInListener(CaseExecutionListener.OCCUR, listener);
@@ -48,7 +48,8 @@ public class MetricsCmmnTransformListener extends AbstractCmmnTransformListener 
     addListeners(activity);
   }
 
-  public void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity activity) {
+  public void transformProcessTask(PlanItem planItem, ProcessTask processTask,
+      CmmnActivity activity) {
     addListeners(activity);
   }
 
@@ -56,7 +57,8 @@ public class MetricsCmmnTransformListener extends AbstractCmmnTransformListener 
     addListeners(activity);
   }
 
-  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity activity) {
+  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask,
+      CmmnActivity activity) {
     addListeners(activity);
   }
 

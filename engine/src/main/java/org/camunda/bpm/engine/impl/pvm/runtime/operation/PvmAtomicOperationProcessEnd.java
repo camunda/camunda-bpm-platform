@@ -64,11 +64,13 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
         throw e;
       } catch (Exception e) {
         LOG.exceptionWhileCompletingSupProcess(execution, e);
-        throw new ProcessEngineException("Error while completing sub process of execution " + execution, e);
+        throw new ProcessEngineException(
+            "Error while completing sub process of execution " + execution, e);
       }
     } else if (superCaseExecution != null) {
       CmmnActivity activity = superCaseExecution.getActivity();
-      transferVariablesBehavior = (TransferVariablesActivityBehavior) activity.getActivityBehavior();
+      transferVariablesBehavior = (TransferVariablesActivityBehavior) activity
+          .getActivityBehavior();
       try {
         transferVariablesBehavior.transferVariables(execution, superCaseExecution);
       } catch (RuntimeException e) {
@@ -76,7 +78,8 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
         throw e;
       } catch (Exception e) {
         LOG.exceptionWhileCompletingSupProcess(execution, e);
-        throw new ProcessEngineException("Error while completing sub process of execution " + execution, e);
+        throw new ProcessEngineException(
+            "Error while completing sub process of execution " + execution, e);
       }
     }
 
@@ -93,7 +96,8 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
         throw e;
       } catch (Exception e) {
         LOG.exceptionWhileCompletingSupProcess(execution, e);
-        throw new ProcessEngineException("Error while completing sub process of execution " + execution, e);
+        throw new ProcessEngineException(
+            "Error while completing sub process of execution " + execution, e);
       }
     } else if (superCaseExecution != null) {
       superCaseExecution.complete();

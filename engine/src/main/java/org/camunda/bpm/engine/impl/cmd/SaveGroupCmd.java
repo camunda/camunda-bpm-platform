@@ -26,26 +26,25 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 
-
 /**
  * @author Joram Barrez
  */
-public class SaveGroupCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
-  
+public class SaveGroupCmd extends AbstractWritableIdentityServiceCmd<Void>
+    implements Command<Void>, Serializable {
+
   private static final long serialVersionUID = 1L;
   protected GroupEntity group;
-  
+
   public SaveGroupCmd(GroupEntity group) {
     this.group = group;
   }
-  
+
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("group", group);
     ensureWhitelistedResourceId(commandContext, "Group", group.getId());
 
-    IdentityOperationResult operationResult = commandContext
-      .getWritableIdentityProvider()
-      .saveGroup(group);
+    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider()
+        .saveGroup(group);
 
     commandContext.getOperationLogManager().logGroupOperation(operationResult, group.getId());
 

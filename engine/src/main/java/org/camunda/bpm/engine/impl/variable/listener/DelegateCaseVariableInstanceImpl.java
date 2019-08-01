@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -116,10 +117,9 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
   }
 
   public String getTypeName() {
-    if(value != null) {
+    if (value != null) {
       return value.getType().getName();
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -129,10 +129,9 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
   }
 
   public Object getValue() {
-    if(value != null) {
+    if (value != null) {
       return value.getValue();
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -149,7 +148,8 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
     return Context.getProcessEngineConfiguration().getProcessEngine();
   }
 
-  public static DelegateCaseVariableInstanceImpl fromVariableInstance(VariableInstance variableInstance) {
+  public static DelegateCaseVariableInstanceImpl fromVariableInstance(
+      VariableInstance variableInstance) {
     DelegateCaseVariableInstanceImpl delegateInstance = new DelegateCaseVariableInstanceImpl();
     delegateInstance.variableId = variableInstance.getId();
     delegateInstance.processInstanceId = variableInstance.getProcessInstanceId();

@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 /**
  * Fluent builder to update the suspension state of process instances.
  */
-public interface UpdateProcessInstanceSuspensionStateSelectBuilder extends UpdateProcessInstancesRequest{
+public interface UpdateProcessInstanceSuspensionStateSelectBuilder
+    extends UpdateProcessInstancesRequest {
 
   /**
    * Selects the process instance with the given id.
@@ -49,6 +50,7 @@ public interface UpdateProcessInstanceSuspensionStateSelectBuilder extends Updat
    *          key of the process definition
    * @return the builder
    */
-  UpdateProcessInstanceSuspensionStateTenantBuilder byProcessDefinitionKey(String processDefinitionKey);
+  UpdateProcessInstanceSuspensionStateTenantBuilder byProcessDefinitionKey(
+      String processDefinitionKey);
 
 }

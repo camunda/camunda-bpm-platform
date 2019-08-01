@@ -30,7 +30,7 @@ import org.slf4j.Logger;
  */
 public class ParallelGateway implements ActivityBehavior {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   public void execute(ActivityExecution execution) {
     PvmActivity activity = execution.getActivity();
@@ -44,12 +44,14 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     int nbrOfExecutionsToJoin = execution.getActivity().getIncomingTransitions().size();
     int nbrOfExecutionsJoined = joinedExecutions.size();
 
-    if (nbrOfExecutionsJoined==nbrOfExecutionsToJoin) {
-      LOG.debug("parallel gateway '"+activity.getId()+"' activates: "+nbrOfExecutionsJoined+" of "+nbrOfExecutionsToJoin+" joined");
+    if (nbrOfExecutionsJoined == nbrOfExecutionsToJoin) {
+      LOG.debug("parallel gateway '" + activity.getId() + "' activates: " + nbrOfExecutionsJoined
+          + " of " + nbrOfExecutionsToJoin + " joined");
       execution.leaveActivityViaTransitions(outgoingTransitions, joinedExecutions);
 
     } else {
-      LOG.debug("parallel gateway '"+activity.getId()+"' does not activate: "+nbrOfExecutionsJoined+" of "+nbrOfExecutionsToJoin+" joined");
+      LOG.debug("parallel gateway '" + activity.getId() + "' does not activate: "
+          + nbrOfExecutionsJoined + " of " + nbrOfExecutionsToJoin + " joined");
     }
   }
 }

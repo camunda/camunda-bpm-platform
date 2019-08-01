@@ -47,12 +47,14 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
   }
 
   public TypedValueSerializer<?> getSerializerByName(String serializerName) {
-     return serializerMap.get(serializerName);
+    return serializerMap.get(serializerName);
   }
 
-  public TypedValueSerializer<?> findSerializerForValue(TypedValue value, VariableSerializerFactory fallBackSerializerFactory) {
+  public TypedValueSerializer<?> findSerializerForValue(TypedValue value,
+      VariableSerializerFactory fallBackSerializerFactory) {
 
-    String defaultSerializationFormat = Context.getProcessEngineConfiguration().getDefaultSerializationFormat();
+    String defaultSerializationFormat = Context.getProcessEngineConfiguration()
+        .getDefaultSerializationFormat();
 
     List<TypedValueSerializer<?>> matchedSerializers = new ArrayList<TypedValueSerializer<?>>();
 
@@ -62,22 +64,23 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
     }
 
     for (TypedValueSerializer<?> serializer : serializerList) {
-      if(type == null || serializer.getType().equals(type)) {
+      if (type == null || serializer.getType().equals(type)) {
 
         // if type is null => ask handler whether it can handle the value
         // OR if types match, this handler can handle values of this type
-        //    => BUT we still need to ask as the handler may not be able to handle ALL values of this type.
+        // => BUT we still need to ask as the handler may not be able to handle ALL values of this
+        // type.
 
-        if(serializer.canHandle(value)) {
+        if (serializer.canHandle(value)) {
           matchedSerializers.add(serializer);
-          if(serializer.getType().isPrimitiveValueType()) {
+          if (serializer.getType().isPrimitiveValueType()) {
             break;
           }
         }
       }
     }
 
-    if(matchedSerializers.size() == 0) {
+    if (matchedSerializers.size() == 0) {
       if (fallBackSerializerFactory != null) {
         TypedValueSerializer<?> serializer = fallBackSerializerFactory.getSerializer(value);
         if (serializer != null) {
@@ -85,21 +88,21 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
         }
       }
 
-      throw new ProcessEngineException("Cannot find serializer for value '"+value+"'.");
-    }
-    else if(matchedSerializers.size() == 1) {
+      throw new ProcessEngineException("Cannot find serializer for value '" + value + "'.");
+    } else if (matchedSerializers.size() == 1) {
       return matchedSerializers.get(0);
-    }
-    else {
+    } else {
       // ambiguous match, use default serializer
-      if(defaultSerializationFormat != null) {
+      if (defaultSerializationFormat != null) {
         for (TypedValueSerializer<?> typedValueSerializer : matchedSerializers) {
-          if(defaultSerializationFormat.equals(typedValueSerializer.getSerializationDataformat())) {
+          if (defaultSerializationFormat
+              .equals(typedValueSerializer.getSerializationDataformat())) {
             return typedValueSerializer;
           }
         }
       }
-      // no default serialization dataformat defined or default dataformat cannot serialize this value => use first serializer
+      // no default serialization dataformat defined or default dataformat cannot serialize this
+      // value => use first serializer
       return matchedSerializers.get(0);
     }
 
@@ -134,7 +137,7 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
 
   public int getSerializerIndexByName(String serializerName) {
     TypedValueSerializer<?> serializer = serializerMap.get(serializerName);
-    if(serializer != null) {
+    if (serializer != null) {
       return getSerializerIndex(serializer);
     } else {
       return -1;
@@ -167,7 +170,6 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
         copy.addSerializer(otherSerializer);
       }
     }
-
 
     return copy;
   }

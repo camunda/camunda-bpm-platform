@@ -52,7 +52,8 @@ public class CompensationUtil {
   /**
    * we create a separate execution for each compensation handler invocation.
    */
-  public static void throwCompensationEvent(List<EventSubscriptionEntity> eventSubscriptions, ActivityExecution execution, boolean async) {
+  public static void throwCompensationEvent(List<EventSubscriptionEntity> eventSubscriptions,
+      ActivityExecution execution, boolean async) {
 
     // first spawn the compensating executions
     for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
@@ -91,17 +92,17 @@ public class CompensationUtil {
   /**
    * creates an event scope for the given execution:
    *
-   * create a new event scope execution under the parent of the given execution
-   * and move all event subscriptions to that execution.
+   * create a new event scope execution under the parent of the given execution and move all event
+   * subscriptions to that execution.
    *
-   * this allows us to "remember" the event subscriptions after finishing a
-   * scope
+   * this allows us to "remember" the event subscriptions after finishing a scope
    */
   public static void createEventScopeExecution(ExecutionEntity execution) {
 
     // parent execution is a subprocess or a miBody
     ActivityImpl activity = execution.getActivity();
-    ExecutionEntity scopeExecution = (ExecutionEntity) execution.findExecutionForFlowScope(activity.getFlowScope());
+    ExecutionEntity scopeExecution = (ExecutionEntity) execution
+        .findExecutionForFlowScope(activity.getFlowScope());
 
     List<EventSubscriptionEntity> eventSubscriptions = execution.getCompensateEventSubscriptions();
 
@@ -124,11 +125,8 @@ public class CompensationUtil {
 
       // set event subscriptions to the event scope execution:
       for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
-        EventSubscriptionEntity newSubscription =
-                EventSubscriptionEntity.createAndInsert(
-                        eventScopeExecution,
-                        EventType.COMPENSATE,
-                        eventSubscriptionEntity.getActivity());
+        EventSubscriptionEntity newSubscription = EventSubscriptionEntity.createAndInsert(
+            eventScopeExecution, EventType.COMPENSATE, eventSubscriptionEntity.getActivity());
         newSubscription.setConfiguration(eventSubscriptionEntity.getConfiguration());
         // use the original date
         newSubscription.setCreated(eventSubscriptionEntity.getCreated());
@@ -142,11 +140,7 @@ public class CompensationUtil {
 
       ActivityImpl compensationHandler = getEventScopeCompensationHandler(execution);
       EventSubscriptionEntity eventSubscription = EventSubscriptionEntity
-              .createAndInsert(
-                scopeExecution,
-                EventType.COMPENSATE,
-                compensationHandler
-              );
+          .createAndInsert(scopeExecution, EventType.COMPENSATE, compensationHandler);
       eventSubscription.setConfiguration(eventScopeExecution.getId());
 
     }
@@ -155,12 +149,14 @@ public class CompensationUtil {
   protected static boolean hasCompensationEventSubprocess(ActivityImpl activity) {
     ActivityImpl compensationHandler = activity.findCompensationHandler();
 
-    return compensationHandler != null && compensationHandler.isSubProcessScope() && compensationHandler.isTriggeredByEvent();
+    return compensationHandler != null && compensationHandler.isSubProcessScope()
+        && compensationHandler.isTriggeredByEvent();
   }
 
   /**
-   * In the context when an event scope execution is created (i.e. a scope such as a subprocess has completed),
-   * this method returns the compensation handler activity that is going to be executed when by the event scope execution.
+   * In the context when an event scope execution is created (i.e. a scope such as a subprocess has
+   * completed), this method returns the compensation handler activity that is going to be executed
+   * when by the event scope execution.
    *
    * This method is not relevant when the scope has a boundary compensation handler.
    */
@@ -181,9 +177,11 @@ public class CompensationUtil {
   /**
    * Collect all compensate event subscriptions for scope of given execution.
    */
-  public static List<EventSubscriptionEntity> collectCompensateEventSubscriptionsForScope(ActivityExecution execution) {
+  public static List<EventSubscriptionEntity> collectCompensateEventSubscriptionsForScope(
+      ActivityExecution execution) {
 
-    final Map<ScopeImpl, PvmExecutionImpl> scopeExecutionMapping = execution.createActivityExecutionMapping();
+    final Map<ScopeImpl, PvmExecutionImpl> scopeExecutionMapping = execution
+        .createActivityExecutionMapping();
     ScopeImpl activity = (ScopeImpl) execution.getActivity();
 
     // <LEGACY>: different flow scopes may have the same scope execution =>
@@ -197,24 +195,28 @@ public class CompensationUtil {
       }
     };
 
-    new FlowScopeWalker(activity).addPostVisitor(eventSubscriptionCollector).walkUntil(new ReferenceWalker.WalkCondition<ScopeImpl>() {
-      @Override
-      public boolean isFulfilled(ScopeImpl element) {
-        Boolean consumesCompensationProperty = (Boolean) element.getProperty(BpmnParse.PROPERTYNAME_CONSUMES_COMPENSATION);
-        return consumesCompensationProperty == null || consumesCompensationProperty == Boolean.TRUE;
-      }
-    });
+    new FlowScopeWalker(activity).addPostVisitor(eventSubscriptionCollector)
+        .walkUntil(new ReferenceWalker.WalkCondition<ScopeImpl>() {
+          @Override
+          public boolean isFulfilled(ScopeImpl element) {
+            Boolean consumesCompensationProperty = (Boolean) element
+                .getProperty(BpmnParse.PROPERTYNAME_CONSUMES_COMPENSATION);
+            return consumesCompensationProperty == null
+                || consumesCompensationProperty == Boolean.TRUE;
+          }
+        });
 
     return new ArrayList<EventSubscriptionEntity>(subscriptions);
   }
 
   /**
-   * Collect all compensate event subscriptions for activity on the scope of
-   * given execution.
+   * Collect all compensate event subscriptions for activity on the scope of given execution.
    */
-  public static List<EventSubscriptionEntity> collectCompensateEventSubscriptionsForActivity(ActivityExecution execution, String activityRef) {
+  public static List<EventSubscriptionEntity> collectCompensateEventSubscriptionsForActivity(
+      ActivityExecution execution, String activityRef) {
 
-    final List<EventSubscriptionEntity> eventSubscriptions = collectCompensateEventSubscriptionsForScope(execution);
+    final List<EventSubscriptionEntity> eventSubscriptions = collectCompensateEventSubscriptionsForScope(
+        execution);
     final String subscriptionActivityId = getSubscriptionActivityId(execution, activityRef);
 
     List<EventSubscriptionEntity> eventSubscriptionsForActivity = new ArrayList<EventSubscriptionEntity>();
@@ -226,18 +228,19 @@ public class CompensationUtil {
     return eventSubscriptionsForActivity;
   }
 
-  public static ExecutionEntity getCompensatingExecution(EventSubscriptionEntity eventSubscription) {
+  public static ExecutionEntity getCompensatingExecution(
+      EventSubscriptionEntity eventSubscription) {
     String configuration = eventSubscription.getConfiguration();
     if (configuration != null) {
       return Context.getCommandContext().getExecutionManager().findExecutionById(configuration);
-    }
-    else {
+    } else {
       return null;
     }
   }
 
   private static String getSubscriptionActivityId(ActivityExecution execution, String activityRef) {
-    ActivityImpl activityToCompensate = ((ExecutionEntity) execution).getProcessDefinition().findActivity(activityRef);
+    ActivityImpl activityToCompensate = ((ExecutionEntity) execution).getProcessDefinition()
+        .findActivity(activityRef);
 
     if (activityToCompensate.isMultiInstance()) {
 

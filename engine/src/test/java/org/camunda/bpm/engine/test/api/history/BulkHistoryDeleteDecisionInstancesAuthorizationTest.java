@@ -78,25 +78,17 @@ public class BulkHistoryDeleteDecisionInstancesAuthorizationTest {
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-        scenario()
-            .failsDueToRequired(
-                grant(Resources.DECISION_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)
-            )
-                ,
+        scenario().failsDueToRequired(
+            grant(Resources.DECISION_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)),
         scenario()
             .withAuthorizations(
-                grant(Resources.DECISION_DEFINITION, "someId", "demo", Permissions.DELETE_HISTORY)
-            )
+                grant(Resources.DECISION_DEFINITION, "someId", "demo", Permissions.DELETE_HISTORY))
             .failsDueToRequired(
-                grant(Resources.DECISION_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)
-            )
-        ,
+                grant(Resources.DECISION_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)),
         scenario()
             .withAuthorizations(
-                grant(Resources.DECISION_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)
-            )
-            .succeeds()
-    );
+                grant(Resources.DECISION_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY))
+            .succeeds());
   }
 
   @After
@@ -105,23 +97,20 @@ public class BulkHistoryDeleteDecisionInstancesAuthorizationTest {
   }
 
   @Test
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn" })
   public void testCleanupHistory() {
-    //given
+    // given
     final List<String> ids = prepareHistoricDecisions();
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("demo")
-        .start();
+    authRule.init(scenario).withUser("demo").start();
 
     historyService.deleteHistoricDecisionInstancesBulk(ids);
 
-    //then
+    // then
     if (authRule.assertScenario(scenario)) {
-      assertEquals(0, historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION).count());
+      assertEquals(0, historyService.createHistoricDecisionInstanceQuery()
+          .decisionDefinitionKey(DECISION).count());
     }
 
   }
@@ -130,7 +119,8 @@ public class BulkHistoryDeleteDecisionInstancesAuthorizationTest {
     for (int i = 0; i < 5; i++) {
       decisionService.evaluateDecisionByKey(DECISION).variables(createVariables()).evaluate();
     }
-    final List<HistoricDecisionInstance> decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+    final List<HistoricDecisionInstance> decisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().list();
     final List<String> decisionInstanceIds = new ArrayList<String>();
     for (HistoricDecisionInstance decisionInstance : decisionInstances) {
       decisionInstanceIds.add(decisionInstance.getId());

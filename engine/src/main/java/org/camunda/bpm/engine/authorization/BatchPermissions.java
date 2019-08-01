@@ -17,27 +17,27 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * The set of built-in {@link Permission Permissions} for {@link Resources#BATCH Batch operations} in Camunda BPM.
+ * The set of built-in {@link Permission Permissions} for {@link Resources#BATCH Batch operations}
+ * in Camunda BPM.
  *
  * @author Yana Vasileva
  *
  */
 public enum BatchPermissions implements Permission {
 
-  /** The none permission means 'no action', 'doing nothing'.
-   * It does not mean that no permissions are granted. */
+  /**
+   * The none permission means 'no action', 'doing nothing'. It does not mean that no permissions
+   * are granted.
+   */
   NONE("NONE", 0),
 
   /**
-   * Indicates that  all interactions are permitted.
-   * If ALL is revoked it means that the user is not permitted
-   * to do everything, which means that at least one permission
-   * is revoked. This does not implicate that all individual
-   * permissions are revoked.
+   * Indicates that all interactions are permitted. If ALL is revoked it means that the user is not
+   * permitted to do everything, which means that at least one permission is revoked. This does not
+   * implicate that all individual permissions are revoked.
    *
-   * Example: If the UPDATE permission is revoke also the ALL
-   * permission is revoked, because the user is not authorized
-   * to execute all actions anymore.
+   * Example: If the UPDATE permission is revoke also the ALL permission is revoked, because the
+   * user is not authorized to execute all actions anymore.
    */
   ALL("ALL", Integer.MAX_VALUE),
 
@@ -71,10 +71,12 @@ public enum BatchPermissions implements Permission {
   CREATE_BATCH_RESTART_PROCESS_INSTANCES("CREATE_BATCH_RESTART_PROCESS_INSTANCES", 128),
 
   /** Indicates that CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES interactions are permitted */
-  CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES("CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES", 256),
+  CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES("CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES",
+      256),
 
   /** Indicates that CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES interactions are permitted. */
-  CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES("CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES", 512),
+  CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES("CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES",
+      512),
 
   /** Indicates that CREATE_BATCH_DELETE_DECISION_INSTANCES interactions are permitted */
   CREATE_BATCH_DELETE_DECISION_INSTANCES("CREATE_BATCH_DELETE_DECISION_INSTANCES", 1024),
@@ -86,7 +88,8 @@ public enum BatchPermissions implements Permission {
   CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES("CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES", 16384),
 
   /** Indicates that CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND interactions are permitted */
-  CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND("CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND", 32768),
+  CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND("CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND",
+      32768),
 
   /** Indicates that CREATE_BATCH_SET_REMOVAL_TIME interactions are permitted */
   CREATE_BATCH_SET_REMOVAL_TIME("CREATE_BATCH_SET_REMOVAL_TIME", 65536);

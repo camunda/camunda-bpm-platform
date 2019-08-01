@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -50,18 +49,17 @@ public class EnumFormType extends SimpleFormFieldType {
 
   public TypedValue convertValue(TypedValue propertyValue) {
     Object value = propertyValue.getValue();
-    if(value == null || String.class.isInstance(value)) {
+    if (value == null || String.class.isInstance(value)) {
       validateValue(value);
       return Variables.stringValue((String) value, propertyValue.isTransient());
-    }
-    else {
-      throw new ProcessEngineException("Value '"+value+"' is not of type String.");
+    } else {
+      throw new ProcessEngineException("Value '" + value + "' is not of type String.");
     }
   }
 
   protected void validateValue(Object value) {
-    if(value != null) {
-      if(values != null && !values.containsKey(value)) {
+    if (value != null) {
+      if (values != null && !values.containsKey(value)) {
         throw new ProcessEngineException("Invalid value for enum form property: " + value);
       }
     }
@@ -81,8 +79,8 @@ public class EnumFormType extends SimpleFormFieldType {
 
   @Override
   public String convertModelValueToFormValue(Object modelValue) {
-    if(modelValue != null) {
-      if(!(modelValue instanceof String)) {
+    if (modelValue != null) {
+      if (!(modelValue instanceof String)) {
         throw new ProcessEngineException("Model value should be a String");
       }
       validateValue(modelValue);

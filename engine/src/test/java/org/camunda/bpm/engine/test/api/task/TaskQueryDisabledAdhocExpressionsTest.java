@@ -31,8 +31,9 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
 
   protected static final String EXPECTED_ADHOC_QUERY_FAILURE_MESSAGE = "Expressions are forbidden in adhoc queries. "
       + "This behavior can be toggled in the process engine configuration";
-  public static final String STATE_MANIPULATING_EXPRESSION =
-      "${''.getClass().forName('" + TaskQueryDisabledAdhocExpressionsTest.class.getName() + "').getField('MUTABLE_FIELD').setLong(null, 42)}";
+  public static final String STATE_MANIPULATING_EXPRESSION = "${''.getClass().forName('"
+      + TaskQueryDisabledAdhocExpressionsTest.class.getName()
+      + "').getField('MUTABLE_FIELD').setLong(null, 42)}";
 
   public static long MUTABLE_FIELD = 0;
 
@@ -46,21 +47,36 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
   }
 
   public void testAdhocExpressionsFail() {
-    executeAndValidateFailingQuery(taskService.createTaskQuery().dueAfterExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().dueBeforeExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().dueDateExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().followUpAfterExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().followUpBeforeExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().followUpBeforeOrNotExistentExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().followUpDateExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().taskAssigneeExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().taskAssigneeLikeExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().taskCandidateGroupExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().taskCandidateGroupInExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().taskCandidateUserExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().taskCreatedAfterExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().taskCreatedBeforeExpression(STATE_MANIPULATING_EXPRESSION));
-    executeAndValidateFailingQuery(taskService.createTaskQuery().taskOwnerExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().dueAfterExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().dueBeforeExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().dueDateExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().followUpAfterExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().followUpBeforeExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(taskService.createTaskQuery()
+        .followUpBeforeOrNotExistentExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().followUpDateExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().taskAssigneeExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().taskAssigneeLikeExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().taskCandidateGroupExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(taskService.createTaskQuery()
+        .taskCandidateGroupInExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().taskCandidateUserExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().taskCreatedAfterExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().taskCreatedBeforeExpression(STATE_MANIPULATING_EXPRESSION));
+    executeAndValidateFailingQuery(
+        taskService.createTaskQuery().taskOwnerExpression(STATE_MANIPULATING_EXPRESSION));
   }
 
   public void testExtendStoredFilterByExpression() {
@@ -76,7 +92,8 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
     assertEquals(0, filterService.list(filter.getId()).size());
 
     // but it is not possible to executed the filter with an extended query that uses expressions
-    extendFilterAndValidateFailingQuery(filter, taskService.createTaskQuery().dueAfterExpression(STATE_MANIPULATING_EXPRESSION));
+    extendFilterAndValidateFailingQuery(filter,
+        taskService.createTaskQuery().dueAfterExpression(STATE_MANIPULATING_EXPRESSION));
 
     // cleanup
     filterService.deleteFilter(filter.getId());
@@ -94,8 +111,10 @@ public class TaskQueryDisabledAdhocExpressionsTest extends PluggableProcessEngin
     assertEquals(0, filterService.list(filter.getId()).size());
 
     // and it is possible to extend the filter query when not using an expression
-    assertEquals(new Long(0), filterService.count(filter.getId(), taskService.createTaskQuery().dueAfter(new Date())));
-    assertEquals(0, filterService.list(filter.getId(), taskService.createTaskQuery().dueAfter(new Date())).size());
+    assertEquals(new Long(0),
+        filterService.count(filter.getId(), taskService.createTaskQuery().dueAfter(new Date())));
+    assertEquals(0, filterService
+        .list(filter.getId(), taskService.createTaskQuery().dueAfter(new Date())).size());
 
     // cleanup
     filterService.deleteFilter(filter.getId());

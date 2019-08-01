@@ -53,9 +53,9 @@ public class CompareUtilTest {
   @Test
   public void testIsNotContainedIn() {
     String element = "test";
-    String [] values = {"test", "test1", "test2"};
-    String [] values2 = {"test1", "test2"};
-    String [] nullValues = null;
+    String[] values = { "test", "test1", "test2" };
+    String[] values2 = { "test1", "test2" };
+    String[] nullValues = null;
     List<String> nullList = null;
 
     assertThat(CompareUtil.elementIsNotContainedInArray(element, values), is(false));
@@ -74,9 +74,9 @@ public class CompareUtilTest {
   @Test
   public void testIsContainedIn() {
     String element = "test";
-    String [] values = {"test", "test1", "test2"};
-    String [] values2 = {"test1", "test2"};
-    String [] nullValues = null;
+    String[] values = { "test", "test1", "test2" };
+    String[] values2 = { "test1", "test2" };
+    String[] nullValues = null;
     List<String> nullList = null;
 
     assertThat(CompareUtil.elementIsContainedInArray(element, values), is(true));

@@ -27,38 +27,17 @@ public class MessageReceiveModels {
   public static final String MESSAGE_NAME = "Message";
 
   public static final BpmnModelInstance ONE_RECEIVE_TASK_PROCESS = ProcessModels.newModel()
-    .startEvent()
-    .receiveTask("receiveTask")
-      .message(MESSAGE_NAME)
-    .userTask("userTask")
-    .endEvent()
-    .done();
-
-  public static final BpmnModelInstance SUBPROCESS_RECEIVE_TASK_PROCESS = ProcessModels.newModel()
-      .startEvent()
-      .subProcess()
-      .embeddedSubProcess()
-        .startEvent()
-        .receiveTask("receiveTask")
-          .message(MESSAGE_NAME)
-        .userTask("userTask")
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
+      .startEvent().receiveTask("receiveTask").message(MESSAGE_NAME).userTask("userTask").endEvent()
       .done();
 
+  public static final BpmnModelInstance SUBPROCESS_RECEIVE_TASK_PROCESS = ProcessModels.newModel()
+      .startEvent().subProcess().embeddedSubProcess().startEvent().receiveTask("receiveTask")
+      .message(MESSAGE_NAME).userTask("userTask").endEvent().subProcessDone().endEvent().done();
+
   public static final BpmnModelInstance ONE_MESSAGE_CATCH_PROCESS = ProcessModels.newModel()
-    .startEvent()
-    .intermediateCatchEvent("messageCatch")
-      .message(MESSAGE_NAME)
-    .userTask("userTask")
-    .endEvent()
-    .done();
+      .startEvent().intermediateCatchEvent("messageCatch").message(MESSAGE_NAME)
+      .userTask("userTask").endEvent().done();
 
   public static final BpmnModelInstance MESSAGE_START_PROCESS = ProcessModels.newModel()
-    .startEvent("startEvent")
-      .message(MESSAGE_NAME)
-    .userTask("userTask")
-    .endEvent()
-    .done();
+      .startEvent("startEvent").message(MESSAGE_NAME).userTask("userTask").endEvent().done();
 }

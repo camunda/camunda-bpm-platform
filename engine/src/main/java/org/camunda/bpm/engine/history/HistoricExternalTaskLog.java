@@ -22,12 +22,14 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import java.util.Date;
 
 /**
- * <p>The {@link HistoricExternalTaskLog} is used to have a log containing
- * information about {@link ExternalTask task} execution. The log provides
- * details about the last lifecycle state of a {@link ExternalTask task}:</p>
+ * <p>
+ * The {@link HistoricExternalTaskLog} is used to have a log containing information about
+ * {@link ExternalTask task} execution. The log provides details about the last lifecycle state of a
+ * {@link ExternalTask task}:
+ * </p>
  *
- * An instance of {@link HistoricExternalTaskLog} represents the latest historic
- * state in the lifecycle of a {@link ExternalTask task}.
+ * An instance of {@link HistoricExternalTaskLog} represents the latest historic state in the
+ * lifecycle of a {@link ExternalTask task}.
  *
  * @since 7.7
  */
@@ -55,7 +57,8 @@ public interface HistoricExternalTaskLog {
   Integer getRetries();
 
   /**
-   * Returns the priority of the associated external task when <code>this</code> log entry was created.
+   * Returns the priority of the associated external task when <code>this</code> log entry was
+   * created.
    */
   long getPriority();
 
@@ -72,8 +75,8 @@ public interface HistoricExternalTaskLog {
   /**
    * Returns the message of the error that occurred by executing the associated external task.
    *
-   * To get the full error details,
-   * use {@link HistoryService#getHistoricExternalTaskLogErrorDetails(String)}
+   * To get the full error details, use
+   * {@link HistoryService#getHistoricExternalTaskLogErrorDetails(String)}
    */
   String getErrorMessage();
 
@@ -93,8 +96,8 @@ public interface HistoricExternalTaskLog {
   String getExecutionId();
 
   /**
-   * Returns the specific root process instance id of the process instance
-   * on which the associated external task was created.
+   * Returns the specific root process instance id of the process instance on which the associated
+   * external task was created.
    */
   String getRootProcessInstanceId();
 
@@ -120,26 +123,26 @@ public interface HistoricExternalTaskLog {
   String getTenantId();
 
   /**
-   * Returns <code>true</code> when <code>this</code> log represents
-   * the creation of the associated external task.
+   * Returns <code>true</code> when <code>this</code> log represents the creation of the associated
+   * external task.
    */
   boolean isCreationLog();
 
   /**
-   * Returns <code>true</code> when <code>this</code> log represents
-   * the failed execution of the associated external task.
+   * Returns <code>true</code> when <code>this</code> log represents the failed execution of the
+   * associated external task.
    */
   boolean isFailureLog();
 
   /**
-   * Returns <code>true</code> when <code>this</code> log represents
-   * the successful execution of the associated external task.
+   * Returns <code>true</code> when <code>this</code> log represents the successful execution of the
+   * associated external task.
    */
   boolean isSuccessLog();
 
   /**
-   * Returns <code>true</code> when <code>this</code> log represents
-   * the deletion of the associated external task.
+   * Returns <code>true</code> when <code>this</code> log represents the deletion of the associated
+   * external task.
    */
   boolean isDeletionLog();
 

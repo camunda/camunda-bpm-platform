@@ -24,8 +24,9 @@ import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-
-public class NativeHistoricProcessInstanceQueryImpl extends AbstractNativeQuery<NativeHistoricProcessInstanceQuery, HistoricProcessInstance> implements NativeHistoricProcessInstanceQuery {
+public class NativeHistoricProcessInstanceQueryImpl
+    extends AbstractNativeQuery<NativeHistoricProcessInstanceQuery, HistoricProcessInstance>
+    implements NativeHistoricProcessInstanceQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,19 +38,17 @@ public class NativeHistoricProcessInstanceQueryImpl extends AbstractNativeQuery<
     super(commandExecutor);
   }
 
+  // results ////////////////////////////////////////////////////////////////
 
- //results ////////////////////////////////////////////////////////////////
-  
-  public List<HistoricProcessInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return commandContext
-      .getHistoricProcessInstanceManager()
-      .findHistoricProcessInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+  public List<HistoricProcessInstance> executeList(CommandContext commandContext,
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return commandContext.getHistoricProcessInstanceManager()
+        .findHistoricProcessInstancesByNativeQuery(parameterMap, firstResult, maxResults);
   }
-  
+
   public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext
-      .getHistoricProcessInstanceManager()
-      .findHistoricProcessInstanceCountByNativeQuery(parameterMap);
+    return commandContext.getHistoricProcessInstanceManager()
+        .findHistoricProcessInstanceCountByNativeQuery(parameterMap);
   }
 
 }

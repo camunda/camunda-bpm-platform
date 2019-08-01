@@ -51,10 +51,11 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
 
   protected String rawJobHandlerConfiguration;
 
-  public TimerDeclarationImpl(Expression expression, TimerDeclarationType type, String jobHandlerType) {
+  public TimerDeclarationImpl(Expression expression, TimerDeclarationType type,
+      String jobHandlerType) {
     super(jobHandlerType);
     this.description = expression;
-    this.type= type;
+    this.type = type;
   }
 
   public boolean isInterruptingTimer() {
@@ -98,7 +99,8 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
   protected void initializeConfiguration(ExecutionEntity context, TimerEntity job) {
     String dueDateString = resolveAndSetDuedate(context, job, false);
 
-    if (type == TimerDeclarationType.CYCLE && jobHandlerType != TimerCatchIntermediateEventJobHandler.TYPE) {
+    if (type == TimerDeclarationType.CYCLE
+        && jobHandlerType != TimerCatchIntermediateEventJobHandler.TYPE) {
 
       // See ACT-1427: A boundary timer with a cancelActivity='true', doesn't need to repeat itself
       if (!isInterruptingTimer) {
@@ -108,14 +110,14 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     }
   }
 
-  public String resolveAndSetDuedate(ExecutionEntity context, TimerEntity job, boolean creationDateBased) {
-    BusinessCalendar businessCalendar = Context
-        .getProcessEngineConfiguration()
-        .getBusinessCalendarManager()
-        .getBusinessCalendar(type.calendarName);
+  public String resolveAndSetDuedate(ExecutionEntity context, TimerEntity job,
+      boolean creationDateBased) {
+    BusinessCalendar businessCalendar = Context.getProcessEngineConfiguration()
+        .getBusinessCalendarManager().getBusinessCalendar(type.calendarName);
 
-    if (description==null) {
-      throw new ProcessEngineException("Timer '"+context.getActivityId()+"' was not configured with a valid duration/time");
+    if (description == null) {
+      throw new ProcessEngineException(
+          "Timer '" + context.getActivityId() + "' was not configured with a valid duration/time");
     }
 
     String dueDateString = null;
@@ -124,25 +126,25 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     // ACT-1415: timer-declaration on start-event may contain expressions NOT
     // evaluating variables but other context, evaluating should happen nevertheless
     VariableScope scopeForExpression = context;
-    if(scopeForExpression == null) {
+    if (scopeForExpression == null) {
       scopeForExpression = StartProcessVariableScope.getSharedInstance();
     }
 
     Object dueDateValue = description.getValue(scopeForExpression);
     if (dueDateValue instanceof String) {
-      dueDateString = (String)dueDateValue;
-    }
-    else if (dueDateValue instanceof Date) {
-      duedate = (Date)dueDateValue;
-    }
-    else {
-      throw new ProcessEngineException("Timer '"+context.getActivityId()+"' was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
+      dueDateString = (String) dueDateValue;
+    } else if (dueDateValue instanceof Date) {
+      duedate = (Date) dueDateValue;
+    } else {
+      throw new ProcessEngineException("Timer '" + context.getActivityId()
+          + "' was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
     }
 
-    if (duedate==null) {
+    if (duedate == null) {
       if (creationDateBased) {
         if (job.getCreateTime() == null) {
-          throw new ProcessEngineException("Timer '"+context.getActivityId()+"' has no creation time and cannot be recalculated based on creation date. Either recalculate on your own or trigger recalculation with creationDateBased set to false.");
+          throw new ProcessEngineException("Timer '" + context.getActivityId()
+              + "' has no creation time and cannot be recalculated based on creation date. Either recalculate on your own or trigger recalculation with creationDateBased set to false.");
         }
         duedate = businessCalendar.resolveDuedate(dueDateString, job.getCreateTime());
       } else {
@@ -159,9 +161,9 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
   }
 
   protected String prepareRepeat(String dueDate) {
-    if (dueDate.startsWith("R") && dueDate.split("/").length==2) {
+    if (dueDate.startsWith("R") && dueDate.split("/").length == 2) {
       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-      return dueDate.replace("/","/"+sdf.format(ClockUtil.getCurrentTime())+"/");
+      return dueDate.replace("/", "/" + sdf.format(ClockUtil.getCurrentTime()) + "/");
     }
     return dueDate;
   }
@@ -188,10 +190,7 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
   }
 
   protected void scheduleTimer(TimerEntity timer) {
-    Context
-      .getCommandContext()
-      .getJobManager()
-      .schedule(timer);
+    Context.getCommandContext().getJobManager().schedule(timer);
   }
 
   protected ExecutionEntity resolveExecution(ExecutionEntity context) {
@@ -208,11 +207,11 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
       return Collections.emptyMap();
     }
 
-    Map<String, TimerDeclarationImpl> result = scope.getProperties().get(BpmnProperties.TIMER_DECLARATIONS);
+    Map<String, TimerDeclarationImpl> result = scope.getProperties()
+        .get(BpmnProperties.TIMER_DECLARATIONS);
     if (result != null) {
       return result;
-    }
-    else {
+    } else {
       return Collections.emptyMap();
     }
   }

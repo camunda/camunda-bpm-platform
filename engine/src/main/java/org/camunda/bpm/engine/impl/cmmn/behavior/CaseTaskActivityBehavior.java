@@ -33,7 +33,8 @@ public class CaseTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavior 
 
   protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
-  protected void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey) {
+  protected void triggerCallableElement(CmmnActivityExecution execution,
+      Map<String, Object> variables, String businessKey) {
     CmmnCaseDefinition definition = getCaseDefinitionToCall(execution, getCallableElement());
     CmmnCaseInstance caseInstance = execution.createSubCaseInstance(definition, businessKey);
     caseInstance.create(variables);

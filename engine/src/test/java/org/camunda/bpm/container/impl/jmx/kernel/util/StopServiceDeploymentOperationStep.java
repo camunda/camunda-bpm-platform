@@ -29,7 +29,7 @@ public class StopServiceDeploymentOperationStep extends DeploymentOperationStep 
   }
 
   public String getName() {
-    return "stop "+serviceName;
+    return "stop " + serviceName;
   }
 
   public void performOperationStep(DeploymentOperation operationContext) {

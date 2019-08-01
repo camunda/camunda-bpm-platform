@@ -40,17 +40,14 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Daniel Meyer
  * @author Falko Menge
  */
-public class ExecutionImpl extends PvmExecutionImpl implements
-        Serializable,
-        ActivityExecution,
-        PvmProcessInstance {
+public class ExecutionImpl extends PvmExecutionImpl
+    implements Serializable, ActivityExecution, PvmProcessInstance {
 
   private static final long serialVersionUID = 1L;
 
@@ -58,8 +55,10 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   // current position /////////////////////////////////////////////////////////
 
-  /** the process instance.  this is the root of the execution tree.
-   * the processInstance of a process instance is a self reference. */
+  /**
+   * the process instance. this is the root of the execution tree. the processInstance of a process
+   * instance is a self reference.
+   */
   protected ExecutionImpl processInstance;
 
   /** the parent execution */
@@ -71,13 +70,18 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   /** super execution, not-null if this execution is part of a subprocess */
   protected ExecutionImpl superExecution;
 
-  /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
+  /**
+   * reference to a subprocessinstance, not-null if currently subprocess is started from this
+   * execution
+   */
   protected ExecutionImpl subProcessInstance;
 
   /** super case execution, not-null if this execution is part of a case execution */
   protected CaseExecutionImpl superCaseExecution;
 
-  /** reference to a subcaseinstance, not-null if currently subcase is started from this execution */
+  /**
+   * reference to a subcaseinstance, not-null if currently subcase is started from this execution
+   */
   protected CaseExecutionImpl subCaseInstance;
 
   // variables/////////////////////////////////////////////////////////////////
@@ -89,7 +93,10 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   public ExecutionImpl() {
   }
 
-  /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
+  /**
+   * creates a new execution. properties processDefinition, processInstance and activity will be
+   * initialized.
+   */
   public ExecutionImpl createExecution(boolean initializeExecutionStartContext) {
     // create the new child execution
     ExecutionImpl createdExecution = newExecution();
@@ -121,7 +128,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     return createdExecution;
   }
 
-  /** instantiates a new execution.  can be overridden by subclasses */
+  /** instantiates a new execution. can be overridden by subclasses */
   protected ExecutionImpl newExecution() {
     return new ExecutionImpl();
   }
@@ -153,7 +160,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   /** ensures initialization and returns the non-null executions list */
   public List<ExecutionImpl> getExecutions() {
-    if(executions == null) {
+    if (executions == null) {
       executions = new ArrayList<ExecutionImpl>();
     }
     return executions;
@@ -202,8 +209,10 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     return createSubCaseInstance(caseDefinition, null);
   }
 
-  public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
-    CaseExecutionImpl caseInstance = (CaseExecutionImpl) caseDefinition.createCaseInstance(businessKey);
+  public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition,
+      String businessKey) {
+    CaseExecutionImpl caseInstance = (CaseExecutionImpl) caseDefinition
+        .createCaseInstance(businessKey);
 
     // manage bidirectional super-process-sub-case-instances relation
     subCaseInstance.setSuperExecution(this);
@@ -229,7 +238,6 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
     super.start(variables);
   }
-
 
   /** ensures initialization and returns the process instance. */
   public ExecutionImpl getProcessInstance() {
@@ -264,8 +272,8 @@ public class ExecutionImpl extends PvmExecutionImpl implements
    */
   protected String generateActivityInstanceId(String activityId) {
     int nextId = idGenerator.incrementAndGet();
-    String compositeId = activityId+":"+nextId;
-    if(compositeId.length()>64) {
+    String compositeId = activityId + ":" + nextId;
+    if (compositeId.length() > 64) {
       return String.valueOf(nextId);
     } else {
       return compositeId;
@@ -276,9 +284,10 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   public String toString() {
     if (isProcessInstanceExecution()) {
-      return "ProcessInstance["+getToStringIdentity()+"]";
+      return "ProcessInstance[" + getToStringIdentity() + "]";
     } else {
-      return (isEventScope? "EventScope":"")+(isConcurrent? "Concurrent" : "")+(isScope() ? "Scope" : "")+"Execution["+getToStringIdentity()+"]";
+      return (isEventScope ? "EventScope" : "") + (isConcurrent ? "Concurrent" : "")
+          + (isScope() ? "Scope" : "") + "Execution[" + getToStringIdentity() + "]";
     }
   }
 
@@ -325,19 +334,23 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   }
 
   public FlowElement getBpmnModelElementInstance() {
-    throw new UnsupportedOperationException(BpmnModelExecutionContext.class.getName() +" is unsupported in transient ExecutionImpl");
+    throw new UnsupportedOperationException(
+        BpmnModelExecutionContext.class.getName() + " is unsupported in transient ExecutionImpl");
   }
 
   public BpmnModelInstance getBpmnModelInstance() {
-    throw new UnsupportedOperationException(BpmnModelExecutionContext.class.getName() +" is unsupported in transient ExecutionImpl");
+    throw new UnsupportedOperationException(
+        BpmnModelExecutionContext.class.getName() + " is unsupported in transient ExecutionImpl");
   }
 
   public ProcessEngineServices getProcessEngineServices() {
-    throw new UnsupportedOperationException(ProcessEngineServicesAware.class.getName() +" is unsupported in transient ExecutionImpl");
+    throw new UnsupportedOperationException(
+        ProcessEngineServicesAware.class.getName() + " is unsupported in transient ExecutionImpl");
   }
 
   public ProcessEngine getProcessEngine() {
-    throw new UnsupportedOperationException(ProcessEngineServicesAware.class.getName() +" is unsupported in transient ExecutionImpl");
+    throw new UnsupportedOperationException(
+        ProcessEngineServicesAware.class.getName() + " is unsupported in transient ExecutionImpl");
   }
 
   public void forceUpdate() {
@@ -348,7 +361,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     // do nothing
   }
 
-  protected void removeVariablesLocalInternal(){
+  protected void removeVariablesLocalInternal() {
     // do nothing
   }
 

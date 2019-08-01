@@ -55,55 +55,49 @@ public class ExecutionEntityTest {
 
   @Test
   public void testRestoreProcessInstance() {
-    //given parent execution
+    // given parent execution
     List<ExecutionEntity> entities = new ArrayList<ExecutionEntity>();
     ExecutionEntity parent = new ExecutionEntity();
     parent.setId("parent");
     entities.add(parent);
-    //when restore process instance is called
+    // when restore process instance is called
     parent.restoreProcessInstance(entities, null, null, null, null, null, null);
-    //then no problem should occure
+    // then no problem should occure
 
-    //when child is added and restore is called again
+    // when child is added and restore is called again
     ExecutionEntity entity = new ExecutionEntity();
     entity.setId("child");
     entity.setParentId(parent.getId());
     entities.add(entity);
 
     parent.restoreProcessInstance(entities, null, null, null, null, null, null);
-    //then again no problem should occure
+    // then again no problem should occure
 
-    //when parent is deleted from the list
+    // when parent is deleted from the list
     entities.remove(parent);
 
-    //then exception is thrown because child reference to parent which does not exist anymore
+    // then exception is thrown because child reference to parent which does not exist anymore
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot resolve parent with id 'parent' of execution 'child', perhaps it was deleted in the meantime");
+    thrown.expectMessage(
+        "Cannot resolve parent with id 'parent' of execution 'child', perhaps it was deleted in the meantime");
     parent.restoreProcessInstance(entities, null, null, null, null, null, null);
   }
 
   @Test
   public void testRemoveExecutionSequence() {
     // given
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("singleTaskProcess")
-      .startEvent()
-      .userTask("taskWithLocalVariables")
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("singleTaskProcess").startEvent()
+        .userTask("taskWithLocalVariables")
         .camundaExecutionListenerClass("start", TestLocalVariableExecutionListener.class)
-        .camundaTaskListenerClass("delete", TestLocalVariableTaskListener.class)
-        .boundaryEvent()
-          .signal("interruptSignal")
-        .endEvent()
-      .moveToActivity("taskWithLocalVariables")
-      .endEvent()
-      .done();
+        .camundaTaskListenerClass("delete", TestLocalVariableTaskListener.class).boundaryEvent()
+        .signal("interruptSignal").endEvent().moveToActivity("taskWithLocalVariables").endEvent()
+        .done();
 
     testRule.deploy(modelInstance);
     ProcessInstance pi = processEngineRule.getRuntimeService()
-      .startProcessInstanceByKey("singleTaskProcess");
-    Execution execution = processEngineRule.getRuntimeService()
-      .createExecutionQuery()
-      .variableValueEquals("localVar", "localVarVal")
-      .singleResult();
+        .startProcessInstanceByKey("singleTaskProcess");
+    Execution execution = processEngineRule.getRuntimeService().createExecutionQuery()
+        .variableValueEquals("localVar", "localVarVal").singleResult();
 
     // when
     assertNotNull(execution);
@@ -122,7 +116,7 @@ public class ExecutionEntityTest {
     }
   }
 
-  public static class TestLocalVariableTaskListener implements TaskListener{
+  public static class TestLocalVariableTaskListener implements TaskListener {
 
     @Override
     public void notify(DelegateTask delegateTask) {

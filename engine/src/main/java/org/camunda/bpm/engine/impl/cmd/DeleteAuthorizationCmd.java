@@ -43,13 +43,14 @@ public class DeleteAuthorizationCmd implements Command<Void> {
     final AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
 
     AuthorizationEntity authorization = (AuthorizationEntity) new AuthorizationQueryImpl()
-      .authorizationId(authorizationId)
-      .singleResult();
+        .authorizationId(authorizationId).singleResult();
 
-    ensureNotNull("Authorization for Id '" + authorizationId + "' does not exist", "authorization", authorization);
+    ensureNotNull("Authorization for Id '" + authorizationId + "' does not exist", "authorization",
+        authorization);
 
     authorizationManager.delete(authorization);
-    commandContext.getOperationLogManager().logAuthorizationOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, authorization, null);
+    commandContext.getOperationLogManager().logAuthorizationOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE, authorization, null);
 
     return null;
   }

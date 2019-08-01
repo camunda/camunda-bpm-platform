@@ -40,17 +40,21 @@ public class TaskPriorityExtensionsTest extends PluggableProcessEngineTestCase {
     variables.put("taskPriority", priority);
 
     // Start process-instance, passing priority that should be used as task priority
-    final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskPriorityExtension", variables);
+    final ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("taskPriorityExtension", variables);
 
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertEquals(priority, task.getPriority());
   }
 
   @Deployment
   public void testPriorityExtensionString() throws Exception {
-    final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskPriorityExtensionString");
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    final ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("taskPriorityExtensionString");
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     assertEquals(42, task.getPriority());
   }
 }

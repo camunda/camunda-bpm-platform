@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer

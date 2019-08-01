@@ -33,7 +33,8 @@ public class LogAndUpdateVariableListener implements CaseVariableListener {
   public void notify(DelegateCaseVariableInstance variableInstance) throws Exception {
     invocations.add(variableInstance);
 
-    if ("variable".equals(variableInstance.getName()) && "value1".equals(variableInstance.getValue())) {
+    if ("variable".equals(variableInstance.getName())
+        && "value1".equals(variableInstance.getValue())) {
       variableInstance.getSourceExecution().setVariable("variable", "value2");
     }
   }
@@ -45,7 +46,5 @@ public class LogAndUpdateVariableListener implements CaseVariableListener {
   public static void reset() {
     invocations = new ArrayList<DelegateCaseVariableInstance>();
   }
-
-
 
 }

@@ -23,45 +23,49 @@ import org.camunda.bpm.engine.runtime.ProcessElementInstance;
  *
  */
 public class ProcessElementInstanceImpl implements ProcessElementInstance {
-  
+
   protected String id;
   protected String parentActivityInstanceId;
   protected String processInstanceId;
   protected String processDefinitionId;
-  
+
   public String getId() {
     return id;
   }
+
   public void setId(String id) {
     this.id = id;
   }
+
   public String getParentActivityInstanceId() {
     return parentActivityInstanceId;
   }
+
   public void setParentActivityInstanceId(String parentActivityInstanceId) {
     this.parentActivityInstanceId = parentActivityInstanceId;
   }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", parentActivityInstanceId=" + parentActivityInstanceId
-           + ", processInstanceId=" + processInstanceId
-           + ", processDefinitionId=" + processDefinitionId
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", parentActivityInstanceId="
+        + parentActivityInstanceId + ", processInstanceId=" + processInstanceId
+        + ", processDefinitionId=" + processDefinitionId + "]";
   }
 
 }

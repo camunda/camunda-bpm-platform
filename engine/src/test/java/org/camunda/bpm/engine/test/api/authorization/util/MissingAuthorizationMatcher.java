@@ -41,9 +41,10 @@ public class MissingAuthorizationMatcher extends TypeSafeDiagnosingMatcher<Missi
     this.missing = authorization;
   }
 
-  public static Collection<Matcher<? super MissingAuthorization>> asMatchers(List<MissingAuthorization> missingAuthorizations) {
-    Collection<Matcher<? super MissingAuthorization>> matchers =
-        new ArrayList<Matcher<? super MissingAuthorization>>(missingAuthorizations.size());
+  public static Collection<Matcher<? super MissingAuthorization>> asMatchers(
+      List<MissingAuthorization> missingAuthorizations) {
+    Collection<Matcher<? super MissingAuthorization>> matchers = new ArrayList<Matcher<? super MissingAuthorization>>(
+        missingAuthorizations.size());
     for (MissingAuthorization authorization : missingAuthorizations) {
       matchers.add(new MissingAuthorizationMatcher(authorization));
     }
@@ -73,7 +74,8 @@ public class MissingAuthorizationMatcher extends TypeSafeDiagnosingMatcher<Missi
     return new MissingAuthorization(permissionName, resourceName, resourceId);
   }
 
-  public static List<MissingAuthorization> asMissingAuthorizations(List<Authorization> authorizations) {
+  public static List<MissingAuthorization> asMissingAuthorizations(
+      List<Authorization> authorizations) {
     List<MissingAuthorization> missingAuthorizations = new ArrayList<MissingAuthorization>();
     for (Authorization authorization : authorizations) {
       missingAuthorizations.add(asMissingAuthorization(authorization));
@@ -84,11 +86,12 @@ public class MissingAuthorizationMatcher extends TypeSafeDiagnosingMatcher<Missi
   @Override
   protected boolean matchesSafely(MissingAuthorization item, Description mismatchDescription) {
     if (StringUtils.equals(missing.getResourceId(), item.getResourceId())
-        && StringUtils.equals(missing.getResourceType(), item.getResourceType())
-        && StringUtils.equals(missing.getViolatedPermissionName(), item.getViolatedPermissionName())) {
+        && StringUtils.equals(missing.getResourceType(), item.getResourceType()) && StringUtils
+            .equals(missing.getViolatedPermissionName(), item.getViolatedPermissionName())) {
       return true;
     }
-    mismatchDescription.appendText("expected missing authorization: ").appendValue(missing).appendValue(" received: ").appendValue(item);
+    mismatchDescription.appendText("expected missing authorization: ").appendValue(missing)
+        .appendValue(" received: ").appendValue(item);
     return false;
   }
 

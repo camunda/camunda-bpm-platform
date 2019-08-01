@@ -22,7 +22,8 @@ import static org.camunda.bpm.engine.delegate.CaseExecutionListener.PARENT_TERMI
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionParentTerminate extends AbstractAtomicOperationCaseExecutionTerminate {
+public class AtomicOperationCaseExecutionParentTerminate
+    extends AbstractAtomicOperationCaseExecutionTerminate {
 
   public String getCanonicalName() {
     return "case-execution-parent-terminate";

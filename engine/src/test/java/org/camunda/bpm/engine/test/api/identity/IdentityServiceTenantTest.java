@@ -85,7 +85,8 @@ public class IdentityServiceTenantTest {
       for (Tenant deleteTenant : processEngine.getIdentityService().createTenantQuery().list()) {
         processEngine.getIdentityService().deleteTenant(deleteTenant.getId());
       }
-      for (Authorization authorization : processEngine.getAuthorizationService().createAuthorizationQuery().list()) {
+      for (Authorization authorization : processEngine.getAuthorizationService()
+          .createAuthorizationQuery().list()) {
         processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
       }
 
@@ -171,9 +172,9 @@ public class IdentityServiceTenantTest {
 
   @Test
   public void testCustomCreateTenantWhitelistPattern() {
-    processEngine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
-      .buildProcessEngine();
+    processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(
+        "org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
+        .buildProcessEngine();
     processEngine.getProcessEngineConfiguration().setTenantResourceWhitelistPattern("[a-zA-Z]+");
 
     String invalidId = "john's tenant";
@@ -188,9 +189,9 @@ public class IdentityServiceTenantTest {
 
   @Test
   public void testCustomTenantWhitelistPattern() {
-    processEngine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
-      .buildProcessEngine();
+    processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(
+        "org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
+        .buildProcessEngine();
     processEngine.getProcessEngineConfiguration().setTenantResourceWhitelistPattern("[a-zA-Z]+");
 
     String validId = "johnsTenant";
@@ -245,9 +246,9 @@ public class IdentityServiceTenantTest {
 
   @Test
   public void createTenantWithGenericResourceId() {
-    processEngine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
-      .buildProcessEngine();
+    processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(
+        "org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
+        .buildProcessEngine();
 
     Tenant tenant = processEngine.getIdentityService().newTenant("*");
 

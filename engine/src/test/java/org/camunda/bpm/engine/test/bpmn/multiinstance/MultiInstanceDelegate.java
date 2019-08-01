@@ -19,15 +19,14 @@ package org.camunda.bpm.engine.test.bpmn.multiinstance;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Joram Barrez
  */
 public class MultiInstanceDelegate implements JavaDelegate {
-  
+
   public void execute(DelegateExecution execution) throws Exception {
     Integer result = (Integer) execution.getVariable("result");
-    
+
     Integer item = (Integer) execution.getVariable("item");
     if (item != null) {
       result = result * item;

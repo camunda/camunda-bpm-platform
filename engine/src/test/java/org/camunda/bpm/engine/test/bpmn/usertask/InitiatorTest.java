@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.bpmn.usertask;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -33,7 +32,7 @@ public class InitiatorTest extends PluggableProcessEngineTestCase {
     } finally {
       identityService.setAuthenticatedUserId(null);
     }
-    
+
     assertEquals(1, taskService.createTaskQuery().taskAssignee("bono").count());
   }
 }

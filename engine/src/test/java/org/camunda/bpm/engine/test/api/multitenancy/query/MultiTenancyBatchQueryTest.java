@@ -71,15 +71,18 @@ public class MultiTenancyBatchQueryTest {
 
   @Before
   public void initServices() {
-    managementService= engineRule.getManagementService();
+    managementService = engineRule.getManagementService();
     identityService = engineRule.getIdentityService();
   }
 
   @Before
   public void deployProcesses() {
-    ProcessDefinition sharedDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sharedDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO,
+        ProcessModels.ONE_TASK_PROCESS);
 
     sharedBatch = batchHelper.migrateProcessInstanceAsync(sharedDefinition, sharedDefinition);
     tenant1Batch = batchHelper.migrateProcessInstanceAsync(tenant1Definition, tenant1Definition);
@@ -188,7 +191,8 @@ public class MultiTenancyBatchQueryTest {
   @Test
   public void testBatchQueryFilterByTenant() {
     // when
-    Batch returnedBatch = managementService.createBatchQuery().tenantIdIn(TENANT_ONE).singleResult();
+    Batch returnedBatch = managementService.createBatchQuery().tenantIdIn(TENANT_ONE)
+        .singleResult();
 
     // then
     Assert.assertNotNull(returnedBatch);
@@ -199,10 +203,7 @@ public class MultiTenancyBatchQueryTest {
   public void testBatchQueryFilterByTenants() {
     // when
     List<Batch> returnedBatches = managementService.createBatchQuery()
-      .tenantIdIn(TENANT_ONE, TENANT_TWO)
-      .orderByTenantId()
-      .asc()
-      .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc().list();
 
     // then
     Assert.assertEquals(2, returnedBatches.size());
@@ -227,8 +228,7 @@ public class MultiTenancyBatchQueryTest {
     try {
       managementService.createBatchQuery().tenantIdIn(tenantIds);
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       // happy path
     }
   }
@@ -236,12 +236,11 @@ public class MultiTenancyBatchQueryTest {
   @Test
   public void testBatchQueryFailOnNullTenantIdCase2() {
 
-    String[] tenantIds = new String[]{ null };
+    String[] tenantIds = new String[] { null };
     try {
       managementService.createBatchQuery().tenantIdIn(tenantIds);
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       // happy path
     }
   }
@@ -250,7 +249,8 @@ public class MultiTenancyBatchQueryTest {
   public void testOrderByTenantIdAsc() {
 
     // when
-    List<Batch> orderedBatches = managementService.createBatchQuery().orderByTenantId().asc().list();
+    List<Batch> orderedBatches = managementService.createBatchQuery().orderByTenantId().asc()
+        .list();
 
     // then
     verifySorting(orderedBatches, batchByTenantId());
@@ -260,7 +260,8 @@ public class MultiTenancyBatchQueryTest {
   public void testOrderByTenantIdDesc() {
 
     // when
-    List<Batch> orderedBatches = managementService.createBatchQuery().orderByTenantId().desc().list();
+    List<Batch> orderedBatches = managementService.createBatchQuery().orderByTenantId().desc()
+        .list();
 
     // then
     verifySorting(orderedBatches, inverted(batchByTenantId()));
@@ -269,7 +270,8 @@ public class MultiTenancyBatchQueryTest {
   @Test
   public void testBatchStatisticsQueryFilterByTenant() {
     // when
-    BatchStatistics returnedBatch = managementService.createBatchStatisticsQuery().tenantIdIn(TENANT_ONE).singleResult();
+    BatchStatistics returnedBatch = managementService.createBatchStatisticsQuery()
+        .tenantIdIn(TENANT_ONE).singleResult();
 
     // then
     Assert.assertNotNull(returnedBatch);
@@ -280,10 +282,7 @@ public class MultiTenancyBatchQueryTest {
   public void testBatchStatisticsQueryFilterByTenants() {
     // when
     List<BatchStatistics> returnedBatches = managementService.createBatchStatisticsQuery()
-      .tenantIdIn(TENANT_ONE, TENANT_TWO)
-      .orderByTenantId()
-      .asc()
-      .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc().list();
 
     // then
     Assert.assertEquals(2, returnedBatches.size());
@@ -294,7 +293,8 @@ public class MultiTenancyBatchQueryTest {
   @Test
   public void testBatchStatisticsQueryFilterWithoutTenantId() {
     // when
-    BatchStatistics returnedBatch = managementService.createBatchStatisticsQuery().withoutTenantId().singleResult();
+    BatchStatistics returnedBatch = managementService.createBatchStatisticsQuery().withoutTenantId()
+        .singleResult();
 
     // then
     Assert.assertNotNull(returnedBatch);
@@ -308,8 +308,7 @@ public class MultiTenancyBatchQueryTest {
     try {
       managementService.createBatchStatisticsQuery().tenantIdIn(tenantIds);
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       // happy path
     }
   }
@@ -317,12 +316,11 @@ public class MultiTenancyBatchQueryTest {
   @Test
   public void testBatchStatisticsQueryFailOnNullTenantIdCase2() {
 
-    String[] tenantIds = new String[]{ null };
+    String[] tenantIds = new String[] { null };
     try {
       managementService.createBatchStatisticsQuery().tenantIdIn(tenantIds);
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       // happy path
     }
   }
@@ -330,7 +328,8 @@ public class MultiTenancyBatchQueryTest {
   @Test
   public void testBatchStatisticsQueryOrderByTenantIdAsc() {
     // when
-    List<BatchStatistics> orderedBatches = managementService.createBatchStatisticsQuery().orderByTenantId().asc().list();
+    List<BatchStatistics> orderedBatches = managementService.createBatchStatisticsQuery()
+        .orderByTenantId().asc().list();
 
     // then
     verifySorting(orderedBatches, batchStatisticsByTenantId());
@@ -339,7 +338,8 @@ public class MultiTenancyBatchQueryTest {
   @Test
   public void testBatchStatisticsQueryOrderByTenantIdDesc() {
     // when
-    List<BatchStatistics> orderedBatches = managementService.createBatchStatisticsQuery().orderByTenantId().desc().list();
+    List<BatchStatistics> orderedBatches = managementService.createBatchStatisticsQuery()
+        .orderByTenantId().desc().list();
 
     // then
     verifySorting(orderedBatches, inverted(batchStatisticsByTenantId()));

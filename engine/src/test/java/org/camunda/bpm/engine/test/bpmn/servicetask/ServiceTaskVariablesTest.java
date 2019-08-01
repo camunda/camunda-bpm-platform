@@ -23,21 +23,20 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  *
  * @author Daniel Meyer
  */
 public class ServiceTaskVariablesTest extends PluggableProcessEngineTestCase {
-  
+
   static boolean isNullInDelegate2;
   static boolean isNullInDelegate3;
-  
+
   public static class Variable implements Serializable {
     private static final long serialVersionUID = 1L;
-    public String value;    
+    public String value;
   }
-  
+
   public static class Delegate1 implements JavaDelegate {
 
     public void execute(DelegateExecution execution) throws Exception {
@@ -45,63 +44,62 @@ public class ServiceTaskVariablesTest extends PluggableProcessEngineTestCase {
       execution.setVariable("variable", v);
       v.value = "delegate1";
     }
-    
+
   }
-  
+
   public static class Delegate2 implements JavaDelegate {
 
     public void execute(DelegateExecution execution) throws Exception {
       Variable v = (Variable) execution.getVariable("variable");
       synchronized (ServiceTaskVariablesTest.class) {
         // we expect this to be 'true'
-        isNullInDelegate2 = (v.value != null && v.value.equals("delegate1"));         
+        isNullInDelegate2 = (v.value != null && v.value.equals("delegate1"));
       }
-      v.value = "delegate2";      
+      v.value = "delegate2";
     }
-    
+
   }
-  
+
   public static class Delegate3 implements JavaDelegate {
 
     public void execute(DelegateExecution execution) throws Exception {
       Variable v = (Variable) execution.getVariable("variable");
       synchronized (ServiceTaskVariablesTest.class) {
         // we expect this to be 'true' as well
-        isNullInDelegate3 = (v.value != null && v.value.equals("delegate2"));  
+        isNullInDelegate3 = (v.value != null && v.value.equals("delegate2"));
       }
     }
-    
+
   }
-  
+
   @Deployment
   public void testSerializedVariablesBothAsync() {
-    
+
     // in this test, there is an async cont. both before the second and the
     // third service task in the sequence
-    
+
     runtimeService.startProcessInstanceByKey("process");
     waitForJobExecutorToProcessAllJobs(10000);
-    
+
     synchronized (ServiceTaskVariablesTest.class) {
       assertTrue(isNullInDelegate2);
-      assertTrue(isNullInDelegate3); 
+      assertTrue(isNullInDelegate3);
     }
   }
 
   @Deployment
   public void testSerializedVariablesThirdAsync() {
-    
+
     // in this test, only the third service task is async
-        
+
     runtimeService.startProcessInstanceByKey("process");
     waitForJobExecutorToProcessAllJobs(10000);
-    
+
     synchronized (ServiceTaskVariablesTest.class) {
-      assertTrue(isNullInDelegate2); 
-      assertTrue(isNullInDelegate3); 
+      assertTrue(isNullInDelegate2);
+      assertTrue(isNullInDelegate3);
     }
-    
+
   }
 
 }
-

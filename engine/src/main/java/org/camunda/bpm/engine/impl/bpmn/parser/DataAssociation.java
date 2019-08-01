@@ -59,7 +59,6 @@ public class DataAssociation {
     return target;
   }
 
-
   public Expression getSourceExpression() {
     return sourceExpression;
   }

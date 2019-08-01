@@ -50,15 +50,16 @@ import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
- * Stub of the common parts of a Job. You will normally work with a subclass of
- * JobEntity, such as {@link TimerEntity} or {@link MessageEntity}.
+ * Stub of the common parts of a Job. You will normally work with a subclass of JobEntity, such as
+ * {@link TimerEntity} or {@link MessageEntity}.
  *
  * @author Tom Baeyens
  * @author Nick Burch
  * @author Dave Syer
  * @author Frederik Heremans
  */
-public abstract class JobEntity extends AcquirableJobEntity implements Serializable, Job, DbEntity, HasDbRevision, HasDbReferences {
+public abstract class JobEntity extends AcquirableJobEntity
+    implements Serializable, Job, DbEntity, HasDbRevision, HasDbReferences {
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -105,7 +106,9 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
   public void execute(CommandContext commandContext) {
     if (executionId != null) {
       ExecutionEntity execution = getExecution();
-      ensureNotNull("Cannot find execution with id '" + executionId + "' referenced from job '" + this + "'", "execution", execution);
+      ensureNotNull(
+          "Cannot find execution with id '" + executionId + "' referenced from job '" + this + "'",
+          "execution", execution);
     }
 
     // initialize activity id
@@ -117,7 +120,8 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     preExecute(commandContext);
     JobHandler jobHandler = getJobHandler();
     JobHandlerConfiguration configuration = getJobHandlerConfiguration();
-    ensureNotNull("Cannot find job handler '" + jobHandlerType + "' from job '" + this + "'", "jobHandler", jobHandler);
+    ensureNotNull("Cannot find job handler '" + jobHandlerType + "' from job '" + this + "'",
+        "jobHandler", jobHandler);
     jobHandler.execute(configuration, execution, commandContext, tenantId);
     postExecute(commandContext);
   }
@@ -148,9 +152,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
       this.deploymentId = processDefinition.getDeploymentId();
     }
 
-    commandContext
-      .getJobManager()
-      .insertJob(this);
+    commandContext.getJobManager().insertJob(this);
   }
 
   public void delete() {
@@ -199,7 +201,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     persistentState.put("jobHandlerConfiguration", jobHandlerConfiguration);
     persistentState.put("priority", priority);
     persistentState.put("tenantId", tenantId);
-    if(exceptionByteArrayId != null) {
+    if (exceptionByteArrayId != null) {
       persistentState.put("exceptionByteArrayId", exceptionByteArrayId);
     }
     return persistentState;
@@ -211,8 +213,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
       executionId = execution.getId();
       processInstanceId = execution.getProcessInstanceId();
       this.execution.addJob(this);
-    }
-    else {
+    } else {
       this.execution.removeJob(this);
       this.execution = execution;
       processInstanceId = null;
@@ -252,10 +253,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   protected void ensureExecutionInitialized() {
     if (execution == null && executionId != null) {
-      execution = Context
-          .getCommandContext()
-          .getExecutionManager()
-          .findExecutionById(executionId);
+      execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
     }
   }
 
@@ -279,7 +277,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
     // If the retries will be set to 0, an
     // incident has to be created.
-    if(retries == 0 && this.retries > 0) {
+    if (retries == 0 && this.retries > 0) {
       createFailedJobIncident();
     }
     this.retries = retries;
@@ -291,25 +289,21 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
   }
 
   protected void createFailedJobIncident() {
-    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
 
-    if (processEngineConfiguration
-        .isCreateIncidentOnFailedJobEnabled()) {
+    if (processEngineConfiguration.isCreateIncidentOnFailedJobEnabled()) {
 
       String incidentHandlerType = Incident.FAILED_JOB_HANDLER_TYPE;
 
       // make sure job has an ID set:
-      if(id == null) {
-        id = processEngineConfiguration
-            .getIdGenerator()
-            .getNextId();
+      if (id == null) {
+        id = processEngineConfiguration.getIdGenerator().getNextId();
 
       } else {
         // check whether there exists already an incident
         // for this job
-        List<Incident> failedJobIncidents = Context
-            .getCommandContext()
-            .getIncidentManager()
+        List<Incident> failedJobIncidents = Context.getCommandContext().getIncidentManager()
             .findIncidentByConfigurationAndIncidentType(id, incidentHandlerType);
 
         if (!failedJobIncidents.isEmpty()) {
@@ -321,16 +315,14 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
       IncidentContext incidentContext = createIncidentContext();
       incidentContext.setActivityId(getActivityId());
 
-      processEngineConfiguration
-        .getIncidentHandler(incidentHandlerType)
-        .handleIncident(incidentContext, exceptionMessage);
+      processEngineConfiguration.getIncidentHandler(incidentHandlerType)
+          .handleIncident(incidentContext, exceptionMessage);
 
     }
   }
 
   protected void removeFailedJobIncident(boolean incidentResolved) {
-    IncidentHandler handler = Context
-        .getProcessEngineConfiguration()
+    IncidentHandler handler = Context.getProcessEngineConfiguration()
         .getIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
 
     IncidentContext incidentContext = createIncidentContext();
@@ -394,12 +386,11 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
     ByteArrayEntity byteArray = getExceptionByteArray();
 
-    if(byteArray == null) {
+    if (byteArray == null) {
       byteArray = createJobExceptionByteArray(exceptionBytes, ResourceTypes.RUNTIME);
       exceptionByteArrayId = byteArray.getId();
       exceptionByteArray = byteArray;
-    }
-    else {
+    } else {
       byteArray.setBytes(exceptionBytes);
     }
   }
@@ -456,17 +447,14 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     this.jobDefinition = jobDefinition;
     if (jobDefinition != null) {
       jobDefinitionId = jobDefinition.getId();
-    }
-    else {
+    } else {
       jobDefinitionId = null;
     }
   }
 
   protected void ensureJobDefinitionInitialized() {
     if (jobDefinition == null && jobDefinitionId != null) {
-      jobDefinition = Context
-          .getCommandContext()
-          .getJobDefinitionManager()
+      jobDefinition = Context.getCommandContext().getJobDefinitionManager()
           .findById(jobDefinitionId);
     }
   }
@@ -486,10 +474,8 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   protected void ensureExceptionByteArrayInitialized() {
     if (exceptionByteArray == null && exceptionByteArrayId != null) {
-      exceptionByteArray = Context
-        .getCommandContext()
-        .getDbEntityManager()
-        .selectById(ByteArrayEntity.class, exceptionByteArrayId);
+      exceptionByteArray = Context.getCommandContext().getDbEntityManager()
+          .selectById(ByteArrayEntity.class, exceptionByteArrayId);
     }
   }
 
@@ -553,8 +539,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
       JobDefinition jobDefinition = getJobDefinition();
       if (jobDefinition != null) {
         activityId = jobDefinition.getActivityId();
-      }
-      else {
+      } else {
         ExecutionEntity execution = getExecution();
         if (execution != null) {
           activityId = execution.getActivityId();
@@ -612,25 +597,14 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", revision=" + revision
-           + ", duedate=" + duedate
-           + ", lockOwner=" + lockOwner
-           + ", lockExpirationTime=" + lockExpirationTime
-           + ", executionId=" + executionId
-           + ", processInstanceId=" + processInstanceId
-           + ", isExclusive=" + isExclusive
-           + ", isExclusive=" + isExclusive
-           + ", jobDefinitionId=" + jobDefinitionId
-           + ", jobHandlerType=" + jobHandlerType
-           + ", jobHandlerConfiguration=" + jobHandlerConfiguration
-           + ", exceptionByteArray=" + exceptionByteArray
-           + ", exceptionByteArrayId=" + exceptionByteArrayId
-           + ", exceptionMessage=" + exceptionMessage
-           + ", deploymentId=" + deploymentId
-           + ", priority=" + priority
-           + ", tenantId=" + tenantId
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", revision=" + revision + ", duedate="
+        + duedate + ", lockOwner=" + lockOwner + ", lockExpirationTime=" + lockExpirationTime
+        + ", executionId=" + executionId + ", processInstanceId=" + processInstanceId
+        + ", isExclusive=" + isExclusive + ", isExclusive=" + isExclusive + ", jobDefinitionId="
+        + jobDefinitionId + ", jobHandlerType=" + jobHandlerType + ", jobHandlerConfiguration="
+        + jobHandlerConfiguration + ", exceptionByteArray=" + exceptionByteArray
+        + ", exceptionByteArrayId=" + exceptionByteArrayId + ", exceptionMessage="
+        + exceptionMessage + ", deploymentId=" + deploymentId + ", priority=" + priority
+        + ", tenantId=" + tenantId + "]";
   }
 }

@@ -45,10 +45,12 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   @Deprecated
   public static final Namespace FOX_ENGINE_NS = new Namespace("http://www.camunda.com/fox");
 
-  public static final PropertyKey<FailedJobRetryConfiguration> FAILED_JOB_CONFIGURATION = new PropertyKey<FailedJobRetryConfiguration>("FAILED_JOB_CONFIGURATION");
+  public static final PropertyKey<FailedJobRetryConfiguration> FAILED_JOB_CONFIGURATION = new PropertyKey<FailedJobRetryConfiguration>(
+      "FAILED_JOB_CONFIGURATION");
 
   @Override
-  public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
+  public void parseStartEvent(Element startEventElement, ScopeImpl scope,
+      ActivityImpl startEventActivity) {
     String type = startEventActivity.getProperties().get(BpmnProperties.TYPE);
     if (type != null && type.equals(START_TIMER_EVENT) || isAsync(startEventActivity)) {
       this.setFailedJobRetryTimeCycleValue(startEventElement, startEventActivity);
@@ -56,7 +58,8 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
-  public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl nestedActivity) {
+  public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement,
+      ActivityImpl nestedActivity) {
     String type = nestedActivity.getProperties().get(BpmnProperties.TYPE);
     if ((type != null && type.equals(BOUNDARY_TIMER)) || isAsync(nestedActivity)) {
       setFailedJobRetryTimeCycleValue(boundaryEventElement, nestedActivity);
@@ -64,7 +67,8 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
-  public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope,
+      ActivityImpl activity) {
     String type = activity.getProperties().get(BpmnProperties.TYPE);
     if (type != null) {
       this.setFailedJobRetryTimeCycleValue(intermediateEventElement, activity);
@@ -72,7 +76,8 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
-  public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope,
+      ActivityImpl activity) {
     String type = activity.getProperties().get(BpmnProperties.TYPE);
     if (type != null && type.equals(INTERMEDIATE_TIMER) || isAsync(activity)) {
       this.setFailedJobRetryTimeCycleValue(intermediateEventElement, activity);
@@ -85,22 +90,26 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
-  public void parseExclusiveGateway(Element exclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseExclusiveGateway(Element exclusiveGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     parseActivity(exclusiveGwElement, activity);
   }
 
   @Override
-  public void parseInclusiveGateway(Element exclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseInclusiveGateway(Element exclusiveGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     parseActivity(exclusiveGwElement, activity);
   }
 
   @Override
-  public void parseEventBasedGateway(Element exclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseEventBasedGateway(Element exclusiveGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     parseActivity(exclusiveGwElement, activity);
   }
 
   @Override
-  public void parseParallelGateway(Element exclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseParallelGateway(Element exclusiveGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     parseActivity(exclusiveGwElement, activity);
   }
 
@@ -115,7 +124,8 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
-  public void parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope,
+      ActivityImpl activity) {
     parseActivity(businessRuleTaskElement, activity);
   }
 
@@ -130,7 +140,8 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   }
 
   @Override
-  public void parseCallActivity(Element callActivityElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseCallActivity(Element callActivityElement, ScopeImpl scope,
+      ActivityImpl activity) {
     parseActivity(callActivityElement, activity);
   }
 
@@ -169,7 +180,8 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
       }
       // the extension for inner activity is set on the multiInstanceLoopCharacteristics element
       if (isAsync(activity)) {
-        Element multiInstanceLoopCharacteristics = element.element(MULTI_INSTANCE_LOOP_CHARACTERISTICS);
+        Element multiInstanceLoopCharacteristics = element
+            .element(MULTI_INSTANCE_LOOP_CHARACTERISTICS);
         setFailedJobRetryTimeCycleValue(multiInstanceLoopCharacteristics, activity);
       }
 
@@ -183,10 +195,12 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
 
     Element extensionElements = element.element(EXTENSION_ELEMENTS);
     if (extensionElements != null) {
-      Element failedJobRetryTimeCycleElement = extensionElements.elementNS(FOX_ENGINE_NS, FAILED_JOB_RETRY_TIME_CYCLE);
+      Element failedJobRetryTimeCycleElement = extensionElements.elementNS(FOX_ENGINE_NS,
+          FAILED_JOB_RETRY_TIME_CYCLE);
       if (failedJobRetryTimeCycleElement == null) {
         // try to get it from the activiti namespace
-        failedJobRetryTimeCycleElement = extensionElements.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, FAILED_JOB_RETRY_TIME_CYCLE);
+        failedJobRetryTimeCycleElement = extensionElements
+            .elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, FAILED_JOB_RETRY_TIME_CYCLE);
       }
 
       if (failedJobRetryTimeCycleElement != null) {
@@ -194,12 +208,15 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
       }
     }
 
-    if (failedJobRetryTimeCycleConfiguration == null || failedJobRetryTimeCycleConfiguration.isEmpty()) {
-      failedJobRetryTimeCycleConfiguration = Context.getProcessEngineConfiguration().getFailedJobRetryTimeCycle();
+    if (failedJobRetryTimeCycleConfiguration == null
+        || failedJobRetryTimeCycleConfiguration.isEmpty()) {
+      failedJobRetryTimeCycleConfiguration = Context.getProcessEngineConfiguration()
+          .getFailedJobRetryTimeCycle();
     }
 
     if (failedJobRetryTimeCycleConfiguration != null) {
-      FailedJobRetryConfiguration configuration = ParseUtil.parseRetryIntervals(failedJobRetryTimeCycleConfiguration);
+      FailedJobRetryConfiguration configuration = ParseUtil
+          .parseRetryIntervals(failedJobRetryTimeCycleConfiguration);
       activity.getProperties().set(FAILED_JOB_CONFIGURATION, configuration);
     }
   }

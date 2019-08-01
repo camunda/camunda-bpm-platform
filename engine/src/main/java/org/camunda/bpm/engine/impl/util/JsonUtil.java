@@ -67,7 +67,8 @@ public final class JsonUtil {
     }
   }
 
-  public static <T> void addField(JsonObject jsonObject, String name, JsonObjectConverter<T> converter, T value) {
+  public static <T> void addField(JsonObject jsonObject, String name,
+      JsonObjectConverter<T> converter, T value) {
     if (jsonObject != null && name != null && converter != null && value != null) {
       jsonObject.add(name, converter.toJsonObject(value));
     }
@@ -91,7 +92,8 @@ public final class JsonUtil {
     }
   }
 
-  public static <T> void addElement(JsonArray jsonObject, JsonObjectConverter<T> converter, T value) {
+  public static <T> void addElement(JsonArray jsonObject, JsonObjectConverter<T> converter,
+      T value) {
     if (jsonObject != null && converter != null && value != null) {
       JsonObject jsonElement = converter.toJsonObject(value);
 
@@ -101,7 +103,8 @@ public final class JsonUtil {
     }
   }
 
-  public static <T> void addListField(JsonObject jsonObject, String name, JsonObjectConverter<T> converter, List<T> list) {
+  public static <T> void addListField(JsonObject jsonObject, String name,
+      JsonObjectConverter<T> converter, List<T> list) {
     if (jsonObject != null && name != null && converter != null && list != null) {
       JsonArray arrayNode = createArray();
 
@@ -176,7 +179,8 @@ public final class JsonUtil {
     }
   }
 
-  public static void addDefaultField(JsonObject jsonObject, String name, boolean defaultValue, Boolean value) {
+  public static void addDefaultField(JsonObject jsonObject, String name, boolean defaultValue,
+      Boolean value) {
     if (jsonObject != null && name != null && value != null && !value.equals(defaultValue)) {
       addField(jsonObject, name, value);
     }
@@ -564,17 +568,20 @@ public final class JsonUtil {
     try {
       return Integer.parseInt(numberString);
 
-    } catch (NumberFormatException ignored) { }
+    } catch (NumberFormatException ignored) {
+    }
 
     try {
       return Long.parseLong(numberString);
 
-    } catch (NumberFormatException ignored) { }
+    } catch (NumberFormatException ignored) {
+    }
 
     try {
       return Double.parseDouble(numberString);
 
-    } catch (NumberFormatException ignored) { }
+    } catch (NumberFormatException ignored) {
+    }
 
     return null;
   }
@@ -721,36 +728,35 @@ public final class JsonUtil {
   }
 
   public static Gson createGsonMapper() {
-    return new GsonBuilder()
-      .serializeNulls()
-      .registerTypeAdapter(Map.class, new JsonDeserializer<Map<String,Object>>() {
-        public Map<String, Object> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+    return new GsonBuilder().serializeNulls()
+        .registerTypeAdapter(Map.class, new JsonDeserializer<Map<String, Object>>() {
+          public Map<String, Object> deserialize(JsonElement json, Type typeOfT,
+              JsonDeserializationContext context) {
 
-          Map<String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
 
-          for (Map.Entry<String, JsonElement> entry : getObject(json).entrySet()) {
-            if (entry != null) {
-              String key = entry.getKey();
-              JsonElement jsonElement = entry.getValue();
+            for (Map.Entry<String, JsonElement> entry : getObject(json).entrySet()) {
+              if (entry != null) {
+                String key = entry.getKey();
+                JsonElement jsonElement = entry.getValue();
 
-              if (jsonElement != null && jsonElement.isJsonNull()) {
-                map.put(key, null);
+                if (jsonElement != null && jsonElement.isJsonNull()) {
+                  map.put(key, null);
 
-              } else if (jsonElement != null && jsonElement.isJsonPrimitive()) {
+                } else if (jsonElement != null && jsonElement.isJsonPrimitive()) {
 
-                Object rawValue = asPrimitiveObject((JsonPrimitive) jsonElement);
-                if (rawValue != null) {
-                  map.put(key, rawValue);
+                  Object rawValue = asPrimitiveObject((JsonPrimitive) jsonElement);
+                  if (rawValue != null) {
+                    map.put(key, rawValue);
 
+                  }
                 }
               }
             }
-          }
 
-          return map;
-        }
-      })
-      .create();
+            return map;
+          }
+        }).create();
   }
 
 }

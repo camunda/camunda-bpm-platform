@@ -32,7 +32,8 @@ import org.junit.Test;
  * @author Ronny Bräunlich
  *
  */
-public class ServiceTaskDelegateExpressionActivityBehaviorTest extends PluggableProcessEngineTestCase {
+public class ServiceTaskDelegateExpressionActivityBehaviorTest
+    extends PluggableProcessEngineTestCase {
 
   @Deployment
   @Test
@@ -42,7 +43,8 @@ public class ServiceTaskDelegateExpressionActivityBehaviorTest extends Pluggable
     processEngineConfiguration.setBeans(beans);
 
     try {
-      runtimeService.startProcessInstanceByKey("process", Collections.<String, Object> singletonMap("count", 0));
+      runtimeService.startProcessInstanceByKey("process",
+          Collections.<String, Object> singletonMap("count", 0));
       fail();
     } // since the NVE extends the ProcessEngineException we have to handle it
       // separately

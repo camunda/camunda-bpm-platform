@@ -63,31 +63,35 @@ public class CreateMigrationPlanAuthorizationTest {
 
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.READ)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.READ))
-        .failsDueToRequired(
-          grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.READ)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.READ))
-        .failsDueToRequired(
-            grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.READ)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.READ),
-          grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.READ))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.READ))
-        .succeeds()
-      );
+    return AuthorizationTestRule
+        .asParameters(
+            scenario().withoutAuthorizations()
+                .failsDueToRequired(grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey",
+                    "userId", Permissions.READ)),
+            scenario()
+                .withAuthorizations(grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey",
+                    "userId", Permissions.READ))
+                .failsDueToRequired(
+                    grant(
+                        Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId",
+                        Permissions.READ)),
+            scenario()
+                .withAuthorizations(grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey",
+                    "userId", Permissions.READ))
+                .failsDueToRequired(
+                    grant(
+                        Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId",
+                        Permissions.READ)),
+            scenario().withAuthorizations(
+                grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId",
+                    Permissions.READ),
+                grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId",
+                    Permissions.READ))
+                .succeeds(),
+            scenario()
+                .withAuthorizations(
+                    grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.READ))
+                .succeeds());
   }
 
   @Before
@@ -105,22 +109,20 @@ public class CreateMigrationPlanAuthorizationTest {
   public void testCreate() {
 
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
-        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("sourceDefinitionKey", sourceDefinition.getKey())
-      .bindResource("targetDefinitionKey", targetDefinition.getKey())
-      .start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("sourceDefinitionKey", sourceDefinition.getKey())
+        .bindResource("targetDefinitionKey", targetDefinition.getKey()).start();
 
     MigrationPlan migrationPlan = engineRule.getRuntimeService()
-      .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
     // then
     if (authRule.assertScenario(scenario)) {

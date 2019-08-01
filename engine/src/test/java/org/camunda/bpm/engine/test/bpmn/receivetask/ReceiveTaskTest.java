@@ -37,18 +37,17 @@ import org.camunda.bpm.engine.test.Deployment;
 public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
 
   private List<EventSubscription> getEventSubscriptionList() {
-    return runtimeService.createEventSubscriptionQuery()
-        .eventType(EventType.MESSAGE.name()).list();
+    return runtimeService.createEventSubscriptionQuery().eventType(EventType.MESSAGE.name()).list();
   }
 
   private List<EventSubscription> getEventSubscriptionList(String activityId) {
-    return runtimeService.createEventSubscriptionQuery()
-        .eventType(EventType.MESSAGE.name()).activityId(activityId).list();
+    return runtimeService.createEventSubscriptionQuery().eventType(EventType.MESSAGE.name())
+        .activityId(activityId).list();
   }
 
   private String getExecutionId(String processInstanceId, String activityId) {
-    return runtimeService.createExecutionQuery()
-        .processInstanceId(processInstanceId).activityId(activityId).singleResult().getId();
+    return runtimeService.createExecutionQuery().processInstanceId(processInstanceId)
+        .activityId(activityId).singleResult().getId();
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/receivetask/ReceiveTaskTest.simpleReceiveTask.bpmn20.xml")
@@ -57,7 +56,8 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     // given: a process instance waiting in the receive task
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
-    // expect: there is no message event subscription created for a receive task without a message reference
+    // expect: there is no message event subscription created for a receive task without a message
+    // reference
     assertEquals(0, getEventSubscriptionList().size());
 
     // then: we can signal the waiting receive task
@@ -132,10 +132,12 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
   public void testSupportsCorrelateMessageByBusinessKeyOnSingleReceiveTask() {
 
     // given: a process instance with business key 23 waiting in the receive task
-    ProcessInstance processInstance23 = runtimeService.startProcessInstanceByKey("testProcess", "23");
+    ProcessInstance processInstance23 = runtimeService.startProcessInstanceByKey("testProcess",
+        "23");
 
     // given: a 2nd process instance with business key 42 waiting in the receive task
-    ProcessInstance processInstance42 = runtimeService.startProcessInstanceByKey("testProcess", "42");
+    ProcessInstance processInstance42 = runtimeService.startProcessInstanceByKey("testProcess",
+        "42");
 
     // expect: there is two message event subscriptions for the tasks
     List<EventSubscription> subscriptionList = getEventSubscriptionList();
@@ -151,7 +153,8 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance23.getId());
 
     // expect: other process instance is still running
-    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance42.getId()).count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance42.getId()).count());
 
     // then: we can correlate the event subscription to the other process instance
     runtimeService.correlateMessage("newInvoiceMessage", "42");
@@ -306,8 +309,10 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(2, subscriptions.size());
 
     // then: we can trigger both event subscriptions
-    runtimeService.messageEventReceived(subscriptions.get(0).getEventName(), subscriptions.get(0).getExecutionId());
-    runtimeService.messageEventReceived(subscriptions.get(1).getEventName(), subscriptions.get(1).getExecutionId());
+    runtimeService.messageEventReceived(subscriptions.get(0).getEventName(),
+        subscriptions.get(0).getExecutionId());
+    runtimeService.messageEventReceived(subscriptions.get(1).getEventName(),
+        subscriptions.get(1).getExecutionId());
 
     // expect: both event subscriptions are removed
     assertEquals(0, getEventSubscriptionList().size());
@@ -346,16 +351,20 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(2, subscriptions.size());
 
     // then: we can trigger the first event subscription
-    runtimeService.messageEventReceived(subscriptions.get(0).getEventName(), subscriptions.get(0).getExecutionId());
+    runtimeService.messageEventReceived(subscriptions.get(0).getEventName(),
+        subscriptions.get(0).getExecutionId());
 
-    // expect: after completing the first receive task there is one event subscription for compensation
+    // expect: after completing the first receive task there is one event subscription for
+    // compensation
     assertEquals(1, runtimeService.createEventSubscriptionQuery()
         .eventType(EventType.COMPENSATE.name()).count());
 
     // then: we can trigger the second event subscription
-    runtimeService.messageEventReceived(subscriptions.get(1).getEventName(), subscriptions.get(1).getExecutionId());
+    runtimeService.messageEventReceived(subscriptions.get(1).getEventName(),
+        subscriptions.get(1).getExecutionId());
 
-    // expect: there are three event subscriptions for compensation (two subscriptions for tasks and one for miBody)
+    // expect: there are three event subscriptions for compensation (two subscriptions for tasks and
+    // one for miBody)
     assertEquals(3, runtimeService.createEventSubscriptionQuery()
         .eventType(EventType.COMPENSATE.name()).count());
 
@@ -381,8 +390,10 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(2, subscriptions.size());
 
     // then: we can trigger both receive task event subscriptions
-    runtimeService.messageEventReceived(subscriptions.get(0).getEventName(), subscriptions.get(0).getExecutionId());
-    runtimeService.messageEventReceived(subscriptions.get(1).getEventName(), subscriptions.get(1).getExecutionId());
+    runtimeService.messageEventReceived(subscriptions.get(0).getEventName(),
+        subscriptions.get(0).getExecutionId());
+    runtimeService.messageEventReceived(subscriptions.get(1).getEventName(),
+        subscriptions.get(1).getExecutionId());
 
     // expect: all subscriptions are removed (boundary subscription is removed too)
     assertEquals(0, getEventSubscriptionList().size());
@@ -447,8 +458,10 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(2, subscriptions.size());
 
     // then: we can trigger both receive task event subscriptions
-    runtimeService.messageEventReceived(subscriptions.get(0).getEventName(), subscriptions.get(0).getExecutionId());
-    runtimeService.messageEventReceived(subscriptions.get(1).getEventName(), subscriptions.get(1).getExecutionId());
+    runtimeService.messageEventReceived(subscriptions.get(0).getEventName(),
+        subscriptions.get(0).getExecutionId());
+    runtimeService.messageEventReceived(subscriptions.get(1).getEventName(),
+        subscriptions.get(1).getExecutionId());
 
     // expect: subscriptions are removed
     assertEquals(0, getEventSubscriptionList().size());
@@ -468,8 +481,10 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(2, subscriptions.size());
 
     // then: we can trigger both receive task event subscriptions
-    runtimeService.messageEventReceived(subscriptions.get(0).getEventName(), subscriptions.get(0).getExecutionId());
-    runtimeService.messageEventReceived(subscriptions.get(1).getEventName(), subscriptions.get(1).getExecutionId());
+    runtimeService.messageEventReceived(subscriptions.get(0).getEventName(),
+        subscriptions.get(0).getExecutionId());
+    runtimeService.messageEventReceived(subscriptions.get(1).getEventName(),
+        subscriptions.get(1).getExecutionId());
 
     // expect: subscriptions are removed
     assertEquals(0, getEventSubscriptionList().size());
@@ -502,10 +517,8 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testWaitStateBehavior() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
-    Execution execution = runtimeService.createExecutionQuery()
-      .processInstanceId(pi.getId())
-      .activityId("waitState")
-      .singleResult();
+    Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId())
+        .activityId("waitState").singleResult();
     assertNotNull(execution);
 
     runtimeService.signal(execution.getId());

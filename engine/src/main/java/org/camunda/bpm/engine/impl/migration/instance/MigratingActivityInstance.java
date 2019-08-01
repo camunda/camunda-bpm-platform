@@ -70,9 +70,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
    * Creates a migrating activity instances
    */
   public MigratingActivityInstance(ActivityInstance activityInstance,
-      MigrationInstruction migrationInstruction,
-      ScopeImpl sourceScope,
-      ScopeImpl targetScope,
+      MigrationInstruction migrationInstruction, ScopeImpl sourceScope, ScopeImpl targetScope,
       ExecutionEntity scopeExecution) {
 
     this.activityInstance = activityInstance;
@@ -84,7 +82,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     this.instanceBehavior = determineBehavior(sourceScope);
 
     if (activityInstance.getChildActivityInstances().length == 0
-      && activityInstance.getChildTransitionInstances().length == 0) {
+        && activityInstance.getChildTransitionInstances().length == 0) {
       // active state is only relevant for child activity instances;
       // for all other instances, their respective executions are always inactive
       activeState = representativeExecution.isActive();
@@ -102,20 +100,20 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     this.instanceBehavior = determineBehavior(targetScope);
   }
 
-
   protected MigratingActivityInstanceBehavior determineBehavior(ScopeImpl scope) {
     if (scope.isScope()) {
       return new MigratingScopeActivityInstanceBehavior();
-    }
-    else {
+    } else {
       return new MigratingNonScopeActivityInstanceBehavior();
     }
   }
 
   public void detachChildren() {
-    Set<MigratingActivityInstance> childrenCopy = new HashSet<MigratingActivityInstance>(childActivityInstances);
+    Set<MigratingActivityInstance> childrenCopy = new HashSet<MigratingActivityInstance>(
+        childActivityInstances);
     // First detach all dependent entities, only then detach the activity instances.
-    // This is because detaching activity instances may trigger execution tree compaction which in turn
+    // This is because detaching activity instances may trigger execution tree compaction which in
+    // turn
     // may overwrite certain dependent entities (e.g. variables)
     for (MigratingActivityInstance child : childrenCopy) {
       child.detachDependentInstances();
@@ -125,17 +123,20 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
       child.detachState();
     }
 
-    Set<MigratingTransitionInstance> transitionChildrenCopy = new HashSet<MigratingTransitionInstance>(childTransitionInstances);
+    Set<MigratingTransitionInstance> transitionChildrenCopy = new HashSet<MigratingTransitionInstance>(
+        childTransitionInstances);
     for (MigratingTransitionInstance child : transitionChildrenCopy) {
       child.detachState();
     }
 
-    Set<MigratingEventScopeInstance> compensationChildrenCopy = new HashSet<MigratingEventScopeInstance>(childCompensationInstances);
+    Set<MigratingEventScopeInstance> compensationChildrenCopy = new HashSet<MigratingEventScopeInstance>(
+        childCompensationInstances);
     for (MigratingEventScopeInstance child : compensationChildrenCopy) {
       child.detachState();
     }
 
-    Set<MigratingCompensationEventSubscriptionInstance> compensationSubscriptionsChildrenCopy = new HashSet<MigratingCompensationEventSubscriptionInstance>(childCompensationSubscriptionInstances);
+    Set<MigratingCompensationEventSubscriptionInstance> compensationSubscriptionsChildrenCopy = new HashSet<MigratingCompensationEventSubscriptionInstance>(
+        childCompensationSubscriptionInstances);
     for (MigratingCompensationEventSubscriptionInstance child : compensationSubscriptionsChildrenCopy) {
       child.detachState();
     }
@@ -230,11 +231,9 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
   public void addChild(MigratingScopeInstance migratingActivityInstance) {
     if (migratingActivityInstance instanceof MigratingActivityInstance) {
       addChild((MigratingActivityInstance) migratingActivityInstance);
-    }
-    else if (migratingActivityInstance instanceof MigratingEventScopeInstance) {
+    } else if (migratingActivityInstance instanceof MigratingEventScopeInstance) {
       addChild((MigratingEventScopeInstance) migratingActivityInstance);
-    }
-    else {
+    } else {
       throw MIGRATION_LOGGER.cannotHandleChild(this, migratingActivityInstance);
     }
   }
@@ -243,11 +242,9 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
   public void removeChild(MigratingScopeInstance child) {
     if (child instanceof MigratingActivityInstance) {
       removeChild((MigratingActivityInstance) child);
-    }
-    else if (child instanceof MigratingEventScopeInstance) {
+    } else if (child instanceof MigratingEventScopeInstance) {
       removeChild((MigratingEventScopeInstance) child);
-    }
-    else {
+    } else {
       throw MIGRATION_LOGGER.cannotHandleChild(this, child);
     }
   }
@@ -266,7 +263,8 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
   }
 
   @Override
-  public void removeChild(MigratingCompensationEventSubscriptionInstance migratingEventSubscription) {
+  public void removeChild(
+      MigratingCompensationEventSubscriptionInstance migratingEventSubscription) {
     this.childCompensationSubscriptionInstances.remove(migratingEventSubscription);
   }
 
@@ -277,8 +275,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
   public String getActivityInstanceId() {
     if (activityInstance != null) {
       return activityInstance.getId();
-    }
-    else {
+    } else {
       // - this branch is only executed for emerging activity instances
       // - emerging activity instances are never leaf activities
       // - therefore it is fine to always look up the activity instance id on the parent
@@ -346,8 +343,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
   protected void migrateHistory(DelegateExecution execution) {
     if (activityInstance.getId().equals(activityInstance.getProcessInstanceId())) {
       migrateProcessInstanceHistory(execution);
-    }
-    else {
+    } else {
       migrateActivityInstanceHistory(execution);
     }
   }
@@ -401,7 +397,6 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     }
   }
 
-
   protected interface MigratingActivityInstanceBehavior {
 
     boolean isDetached();
@@ -421,7 +416,8 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     void destroyAttachableExecution(ExecutionEntity execution);
   }
 
-  protected class MigratingNonScopeActivityInstanceBehavior implements MigratingActivityInstanceBehavior {
+  protected class MigratingNonScopeActivityInstanceBehavior
+      implements MigratingActivityInstanceBehavior {
 
     @Override
     public boolean isDetached() {
@@ -492,8 +488,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     public ExecutionEntity resolveRepresentativeExecution() {
       if (representativeExecution.getReplacedBy() != null) {
         return representativeExecution.resolveReplacedBy();
-      }
-      else {
+      } else {
         return representativeExecution;
       }
     }
@@ -514,13 +509,14 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     }
   }
 
-  protected class MigratingScopeActivityInstanceBehavior implements MigratingActivityInstanceBehavior {
+  protected class MigratingScopeActivityInstanceBehavior
+      implements MigratingActivityInstanceBehavior {
 
     @Override
     public boolean isDetached() {
       ExecutionEntity representativeExecution = resolveRepresentativeExecution();
       return representativeExecution != representativeExecution.getProcessInstance()
-        && representativeExecution.getParent() == null;
+          && representativeExecution.getParent() == null;
     }
 
     @Override
@@ -573,7 +569,8 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
       }
 
       if (sourceScope.getActivityBehavior() instanceof MigrationObserverBehavior) {
-        ((MigrationObserverBehavior) sourceScope.getActivityBehavior()).migrateScope(currentScopeExecution);
+        ((MigrationObserverBehavior) sourceScope.getActivityBehavior())
+            .migrateScope(currentScopeExecution);
       }
 
       migrateHistory(currentScopeExecution);
@@ -639,11 +636,12 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
       ExecutionEntity attachableExecution = scopeExecution;
 
       if (currentScope.getActivityBehavior() instanceof ModificationObserverBehavior) {
-        ModificationObserverBehavior behavior = (ModificationObserverBehavior) currentScope.getActivityBehavior();
+        ModificationObserverBehavior behavior = (ModificationObserverBehavior) currentScope
+            .getActivityBehavior();
         attachableExecution = (ExecutionEntity) behavior.createInnerInstance(scopeExecution);
-      }
-      else {
-        if (!scopeExecution.getNonEventScopeExecutions().isEmpty() || scopeExecution.getActivity() != null) {
+      } else {
+        if (!scopeExecution.getNonEventScopeExecutions().isEmpty()
+            || scopeExecution.getActivity() != null) {
           attachableExecution = (ExecutionEntity) scopeExecution.createConcurrentExecution();
           attachableExecution.setActive(false);
           scopeExecution.forceUpdate();
@@ -657,10 +655,10 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     public void destroyAttachableExecution(ExecutionEntity execution) {
 
       if (currentScope.getActivityBehavior() instanceof ModificationObserverBehavior) {
-        ModificationObserverBehavior behavior = (ModificationObserverBehavior) currentScope.getActivityBehavior();
+        ModificationObserverBehavior behavior = (ModificationObserverBehavior) currentScope
+            .getActivityBehavior();
         behavior.destroyInnerInstance(execution);
-      }
-      else {
+      } else {
         if (execution.isConcurrent()) {
           execution.remove();
           execution.getParent().tryPruneLastConcurrentChild();
@@ -670,5 +668,3 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
     }
   }
 }
-
-

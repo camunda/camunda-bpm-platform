@@ -42,73 +42,72 @@ import static org.junit.Assert.assertNotNull;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @RunWith(Parameterized.class)
-public class TriggerConditionalEventFromDelegationCodeTest extends AbstractConditionalEventTestCase {
+public class TriggerConditionalEventFromDelegationCodeTest
+    extends AbstractConditionalEventTestCase {
 
   private interface ConditionalEventProcessSpecifier {
     Class getDelegateClass();
+
     int getExpectedInterruptingCount();
+
     int getExpectedNonInterruptingCount();
+
     String getCondition();
   }
 
-
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][]{
-      {new ConditionalEventProcessSpecifier() {
-        @Override
-        public Class getDelegateClass() {
-          return SetVariableDelegate.class;
-        }
-
-        @Override
-        public int getExpectedInterruptingCount() {
-          return 1;
-        }
-
-        @Override
-        public int getExpectedNonInterruptingCount() {
-          return 1;
-        }
-
-        @Override
-        public String getCondition() {
-          return CONDITION_EXPR;
-        }
-
-        @Override
-        public String toString() {
-          return "SetSingleVariableInDelegate";
-        }
+    return Arrays.asList(new Object[][] { { new ConditionalEventProcessSpecifier() {
+      @Override
+      public Class getDelegateClass() {
+        return SetVariableDelegate.class;
       }
-      }, {
-      new ConditionalEventProcessSpecifier() {
-        @Override
-        public Class getDelegateClass() {
-          return SetMultipleSameVariableDelegate.class;
-        }
 
-        @Override
-        public int getExpectedInterruptingCount() {
-          return 1;
-        }
+      @Override
+      public int getExpectedInterruptingCount() {
+        return 1;
+      }
 
-        @Override
-        public int getExpectedNonInterruptingCount() {
-          return 3;
-        }
+      @Override
+      public int getExpectedNonInterruptingCount() {
+        return 1;
+      }
 
+      @Override
+      public String getCondition() {
+        return CONDITION_EXPR;
+      }
 
-        @Override
-        public String getCondition() {
-          return "${variable2 == 1}";
-        }
+      @Override
+      public String toString() {
+        return "SetSingleVariableInDelegate";
+      }
+    } }, { new ConditionalEventProcessSpecifier() {
+      @Override
+      public Class getDelegateClass() {
+        return SetMultipleSameVariableDelegate.class;
+      }
 
-        @Override
-        public String toString() {
-          return "SetMultipleVariableInDelegate";
-        }
-      }}});
+      @Override
+      public int getExpectedInterruptingCount() {
+        return 1;
+      }
+
+      @Override
+      public int getExpectedNonInterruptingCount() {
+        return 3;
+      }
+
+      @Override
+      public String getCondition() {
+        return "${variable2 == 1}";
+      }
+
+      @Override
+      public String toString() {
+        return "SetMultipleVariableInDelegate";
+      }
+    } } });
   }
 
   @Parameterized.Parameter
@@ -117,201 +116,199 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
   @Test
   public void testSetVariableInStartListener() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .userTask(TASK_WITH_CONDITION_ID)
-      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, specifier.getDelegateClass().getName())
-      .endEvent()
-      .done();
-    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), true);
+        .startEvent().userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION)
+        .userTask(TASK_WITH_CONDITION_ID)
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START,
+            specifier.getDelegateClass().getName())
+        .endEvent().done();
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        specifier.getCondition(), true);
 
     // given
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    ProcessInstance procInst = runtimeService
+        .startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
     Task task = taskQuery.singleResult();
     assertNotNull(task);
     assertEquals(TASK_BEFORE_CONDITION, task.getName());
 
-    //when task is completed
+    // when task is completed
     taskService.complete(task.getId());
 
-    //then start listener sets variable
-    //conditional event is triggered
+    // then start listener sets variable
+    // conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.getExpectedInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
+    assertEquals(specifier.getExpectedInterruptingCount(),
+        taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }
 
   @Test
   public void testNonInterruptingSetVariableInStartListener() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .userTask(TASK_WITH_CONDITION_ID)
-      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, specifier.getDelegateClass().getName())
-      .name(TASK_WITH_CONDITION)
-      .endEvent()
-      .done();
-    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), false);
+        .startEvent().userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION)
+        .userTask(TASK_WITH_CONDITION_ID)
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START,
+            specifier.getDelegateClass().getName())
+        .name(TASK_WITH_CONDITION).endEvent().done();
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        specifier.getCondition(), false);
 
     // given
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    ProcessInstance procInst = runtimeService
+        .startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
 
-    //when task is completed
+    // when task is completed
     taskService.complete(taskQuery.singleResult().getId());
 
-    //then start listener sets variable
-    //non interrupting boundary event is triggered
+    // then start listener sets variable
+    // non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(1 + specifier.getExpectedNonInterruptingCount(), tasksAfterVariableIsSet.size());
-    assertEquals(specifier.getExpectedNonInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
+    assertEquals(specifier.getExpectedNonInterruptingCount(),
+        taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }
 
   @Test
   public void testSetVariableInTakeListener() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .sequenceFlowId(FLOW_ID)
-      .userTask(TASK_WITH_CONDITION_ID)
-      .endEvent()
-      .done();
+        .startEvent().userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION)
+        .sequenceFlowId(FLOW_ID).userTask(TASK_WITH_CONDITION_ID).endEvent().done();
     CamundaExecutionListener listener = modelInstance.newInstance(CamundaExecutionListener.class);
     listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
     listener.setCamundaClass(specifier.getDelegateClass().getName());
-    modelInstance.<SequenceFlow>getModelElementById(FLOW_ID).builder().addExtensionElement(listener);
-    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), true);
+    modelInstance.<SequenceFlow> getModelElementById(FLOW_ID).builder()
+        .addExtensionElement(listener);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        specifier.getCondition(), true);
 
     // given
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    ProcessInstance procInst = runtimeService
+        .startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
     Task task = taskQuery.singleResult();
     assertNotNull(task);
     assertEquals(TASK_BEFORE_CONDITION, task.getName());
 
-    //when task is completed
+    // when task is completed
     taskService.complete(task.getId());
 
-    //then take listener sets variable
-    //conditional event is triggered
+    // then take listener sets variable
+    // conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.getExpectedInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
+    assertEquals(specifier.getExpectedInterruptingCount(),
+        taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }
 
   @Test
   public void testNonInterruptingSetVariableInTakeListener() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .sequenceFlowId(FLOW_ID)
-      .userTask(TASK_WITH_CONDITION_ID)
-      .endEvent()
-      .done();
+        .startEvent().userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION)
+        .sequenceFlowId(FLOW_ID).userTask(TASK_WITH_CONDITION_ID).endEvent().done();
     CamundaExecutionListener listener = modelInstance.newInstance(CamundaExecutionListener.class);
     listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
     listener.setCamundaClass(specifier.getDelegateClass().getName());
-    modelInstance.<SequenceFlow>getModelElementById(FLOW_ID).builder().addExtensionElement(listener);
-    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), false);
+    modelInstance.<SequenceFlow> getModelElementById(FLOW_ID).builder()
+        .addExtensionElement(listener);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        specifier.getCondition(), false);
 
     // given
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    ProcessInstance procInst = runtimeService
+        .startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
     Task task = taskQuery.singleResult();
     assertNotNull(task);
     assertEquals(TASK_BEFORE_CONDITION, task.getName());
 
-    //when task is completed
+    // when task is completed
     taskService.complete(task.getId());
 
-    //then take listener sets variable
-    //non interrupting boundary event is triggered
+    // then take listener sets variable
+    // non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(1 + specifier.getExpectedNonInterruptingCount(), tasksAfterVariableIsSet.size());
-    assertEquals(specifier.getExpectedNonInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
+    assertEquals(specifier.getExpectedNonInterruptingCount(),
+        taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }
 
   @Test
   public void testSetVariableInTakeListenerWithAsyncBefore() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .sequenceFlowId(FLOW_ID)
-      .userTask(TASK_WITH_CONDITION_ID).camundaAsyncBefore()
-      .endEvent()
-      .done();
+        .startEvent().userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION)
+        .sequenceFlowId(FLOW_ID).userTask(TASK_WITH_CONDITION_ID).camundaAsyncBefore().endEvent()
+        .done();
     CamundaExecutionListener listener = modelInstance.newInstance(CamundaExecutionListener.class);
     listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
     listener.setCamundaClass(specifier.getDelegateClass().getName());
-    modelInstance.<SequenceFlow>getModelElementById(FLOW_ID).builder().addExtensionElement(listener);
-    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), true);
+    modelInstance.<SequenceFlow> getModelElementById(FLOW_ID).builder()
+        .addExtensionElement(listener);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        specifier.getCondition(), true);
 
     // given
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    ProcessInstance procInst = runtimeService
+        .startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
     Task task = taskQuery.singleResult();
     assertNotNull(task);
     assertEquals(TASK_BEFORE_CONDITION, task.getName());
 
-    //when task is completed
+    // when task is completed
     taskService.complete(task.getId());
 
-    //then take listener sets variable
-    //conditional event is triggered
+    // then take listener sets variable
+    // conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.getExpectedInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
+    assertEquals(specifier.getExpectedInterruptingCount(),
+        taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }
 
   @Test
   public void testNonInterruptingSetVariableInTakeListenerWithAsyncBefore() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .sequenceFlowId(FLOW_ID)
-      .userTask(TASK_WITH_CONDITION_ID).camundaAsyncBefore()
-      .endEvent()
-      .done();
+        .startEvent().userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION)
+        .sequenceFlowId(FLOW_ID).userTask(TASK_WITH_CONDITION_ID).camundaAsyncBefore().endEvent()
+        .done();
     CamundaExecutionListener listener = modelInstance.newInstance(CamundaExecutionListener.class);
     listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
     listener.setCamundaClass(specifier.getDelegateClass().getName());
-    modelInstance.<SequenceFlow>getModelElementById(FLOW_ID).builder().addExtensionElement(listener);
-    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), false);
+    modelInstance.<SequenceFlow> getModelElementById(FLOW_ID).builder()
+        .addExtensionElement(listener);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        specifier.getCondition(), false);
 
     // given
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    ProcessInstance procInst = runtimeService
+        .startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
 
-    //when task is completed
+    // when task is completed
     taskService.complete(taskQuery.singleResult().getId());
 
-    //then take listener sets variable
-    //non interrupting boundary event is triggered
-    assertEquals(specifier.getExpectedNonInterruptingCount(),  taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
+    // then take listener sets variable
+    // non interrupting boundary event is triggered
+    assertEquals(specifier.getExpectedNonInterruptingCount(),
+        taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
 
-    //and job was created
+    // and job was created
     Job job = engine.getManagementService().createJobQuery().singleResult();
     assertNotNull(job);
 
-
-    //when job is executed task is created
+    // when job is executed task is created
     engine.getManagementService().executeJob(job.getId());
-    //when all tasks are completed
+    // when all tasks are completed
     assertEquals(specifier.getExpectedNonInterruptingCount() + 1, taskQuery.count());
     for (Task task : taskQuery.list()) {
       taskService.complete(task.getId());
     }
 
-    //then no task exist and process instance is ended
+    // then no task exist and process instance is ended
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(0, tasksAfterVariableIsSet.size());
     assertNull(runtimeService.createProcessInstanceQuery().singleResult());
@@ -320,80 +317,80 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
   @Test
   public void testSetVariableInEndListener() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, specifier.getDelegateClass().getName())
-      .userTask(TASK_WITH_CONDITION_ID)
-      .endEvent()
-      .done();
-    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), true);
+        .startEvent().userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION)
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END,
+            specifier.getDelegateClass().getName())
+        .userTask(TASK_WITH_CONDITION_ID).endEvent().done();
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        specifier.getCondition(), true);
 
     // given
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    ProcessInstance procInst = runtimeService
+        .startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
     Task task = taskQuery.singleResult();
 
-    //when task is completed
+    // when task is completed
     taskService.complete(task.getId());
 
-    //then end listener sets variable
-    //conditional event is triggered
+    // then end listener sets variable
+    // conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.getExpectedInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
+    assertEquals(specifier.getExpectedInterruptingCount(),
+        taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }
 
   @Test
   public void testNonInterruptingSetVariableInEndListener() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, specifier.getDelegateClass().getName())
-      .userTask(TASK_WITH_CONDITION_ID)
-      .name(TASK_WITH_CONDITION)
-      .endEvent()
-      .done();
-    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), false);
+        .startEvent().userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION)
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END,
+            specifier.getDelegateClass().getName())
+        .userTask(TASK_WITH_CONDITION_ID).name(TASK_WITH_CONDITION).endEvent().done();
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        specifier.getCondition(), false);
 
     // given
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    ProcessInstance procInst = runtimeService
+        .startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
 
-    //when task is completed
+    // when task is completed
     taskService.complete(taskQuery.singleResult().getId());
 
-    //then end listener sets variable
-    //non interrupting event is triggered
+    // then end listener sets variable
+    // non interrupting event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(1 + specifier.getExpectedNonInterruptingCount(), tasksAfterVariableIsSet.size());
-    assertEquals(specifier.getExpectedNonInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
+    assertEquals(specifier.getExpectedNonInterruptingCount(),
+        taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }
 
   @Test
   public void testSetVariableInStartAndEndListener() {
-    //given process with start and end listener on user task
+    // given process with start and end listener on user task
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, specifier.getDelegateClass().getName())
-      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, specifier.getDelegateClass().getName())
-      .userTask(TASK_WITH_CONDITION_ID)
-      .endEvent()
-      .done();
-    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), true);
+        .startEvent().userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION)
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START,
+            specifier.getDelegateClass().getName())
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END,
+            specifier.getDelegateClass().getName())
+        .userTask(TASK_WITH_CONDITION_ID).endEvent().done();
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        specifier.getCondition(), true);
 
-    //when process is started
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    // when process is started
+    ProcessInstance procInst = runtimeService
+        .startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
-    //then start listener sets variable and
-    //execution stays in task after conditional event in event sub process
+    // then start listener sets variable and
+    // execution stays in task after conditional event in event sub process
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
     Task task = taskQuery.singleResult();
     assertEquals(TASK_AFTER_CONDITION, task.getName());
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.getExpectedInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
+    assertEquals(specifier.getExpectedInterruptingCount(),
+        taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }
 }

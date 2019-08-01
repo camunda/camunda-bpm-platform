@@ -34,22 +34,24 @@ public class SetExternalTaskRetriesCmd extends ExternalTaskCmd {
   protected int retries;
   protected boolean writeUserOperationLog;
 
-  public SetExternalTaskRetriesCmd(String externalTaskId, int retries, boolean writeUserOperationLog) {
+  public SetExternalTaskRetriesCmd(String externalTaskId, int retries,
+      boolean writeUserOperationLog) {
     super(externalTaskId);
     this.retries = retries;
     this.writeUserOperationLog = writeUserOperationLog;
   }
-  
+
   @Override
   protected void validateInput() {
-    EnsureUtil.ensureGreaterThanOrEqual(BadUserRequestException.class, "The number of retries cannot be negative", "retries", retries, 0);
+    EnsureUtil.ensureGreaterThanOrEqual(BadUserRequestException.class,
+        "The number of retries cannot be negative", "retries", retries, 0);
   }
 
   @Override
   protected void execute(ExternalTaskEntity externalTask) {
     externalTask.setRetriesAndManageIncidents(retries);
   }
-  
+
   @Override
   protected String getUserOperationLogOperationType() {
     if (writeUserOperationLog) {
@@ -57,11 +59,13 @@ public class SetExternalTaskRetriesCmd extends ExternalTaskCmd {
     }
     return super.getUserOperationLogOperationType();
   }
-  
+
   @Override
-  protected List<PropertyChange> getUserOperationLogPropertyChanges(ExternalTaskEntity externalTask) {
+  protected List<PropertyChange> getUserOperationLogPropertyChanges(
+      ExternalTaskEntity externalTask) {
     if (writeUserOperationLog) {
-      return Collections.singletonList(new PropertyChange("retries", externalTask.getRetries(), retries));
+      return Collections
+          .singletonList(new PropertyChange("retries", externalTask.getRetries(), retries));
     }
     return super.getUserOperationLogPropertyChanges(externalTask);
   }

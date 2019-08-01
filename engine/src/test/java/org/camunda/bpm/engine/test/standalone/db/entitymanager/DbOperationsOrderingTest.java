@@ -61,7 +61,6 @@ public class DbOperationsOrderingTest {
   VariableInstanceEntity variable3 = null;
   VariableInstanceEntity variable4 = null;
 
-
   @Before
   public void setup() {
     TestIdGenerator idGenerator = new TestIdGenerator();
@@ -127,7 +126,6 @@ public class DbOperationsOrderingTest {
     assertHappensAfter(execution2, execution3, flush);
 
   }
-
 
   @Test
   public void testInsertReferenceOrderingAndIdOrdering() {
@@ -217,21 +215,25 @@ public class DbOperationsOrderingTest {
     assertHappensBefore(execution1, execution2, deleteOperations);
   }
 
-  protected void assertHappensAfter(DbEntity entity1, DbEntity entity2, List<DbOperation> operations) {
+  protected void assertHappensAfter(DbEntity entity1, DbEntity entity2,
+      List<DbOperation> operations) {
     int idx1 = indexOfEntity(entity1, operations);
     int idx2 = indexOfEntity(entity2, operations);
-    assertTrue("operation for " + entity1 + " should be executed after operation for " + entity2, idx1 > idx2);
+    assertTrue("operation for " + entity1 + " should be executed after operation for " + entity2,
+        idx1 > idx2);
   }
 
-  protected void assertHappensBefore(DbEntity entity1, DbEntity entity2, List<DbOperation> operations) {
+  protected void assertHappensBefore(DbEntity entity1, DbEntity entity2,
+      List<DbOperation> operations) {
     int idx1 = indexOfEntity(entity1, operations);
     int idx2 = indexOfEntity(entity2, operations);
-    assertTrue("operation for " + entity1 + " should be executed before operation for " + entity2, idx1 < idx2);
+    assertTrue("operation for " + entity1 + " should be executed before operation for " + entity2,
+        idx1 < idx2);
   }
 
   protected int indexOfEntity(DbEntity entity, List<DbOperation> operations) {
     for (int i = 0; i < operations.size(); i++) {
-      if(entity == ((DbEntityOperation) operations.get(i)).getEntity()) {
+      if (entity == ((DbEntityOperation) operations.get(i)).getEntity()) {
         return i;
       }
     }
@@ -262,6 +264,5 @@ public class DbOperationsOrderingTest {
       super.flushEntityCache();
     }
   }
-
 
 }

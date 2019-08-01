@@ -36,17 +36,21 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.BatchUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
-public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdateProcessInstancesSuspendStateCmd<Batch> {
+public class UpdateProcessInstancesSuspendStateBatchCmd
+    extends AbstractUpdateProcessInstancesSuspendStateCmd<Batch> {
 
-  public UpdateProcessInstancesSuspendStateBatchCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStateBuilderImpl builder, boolean suspending) {
+  public UpdateProcessInstancesSuspendStateBatchCmd(CommandExecutor commandExecutor,
+      UpdateProcessInstancesSuspensionStateBuilderImpl builder, boolean suspending) {
     super(commandExecutor, builder, suspending);
   }
 
   public Batch execute(CommandContext commandContext) {
     Collection<String> processInstanceIds = collectProcessInstanceIds();
 
-    EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "No process instance ids given", "process Instance Ids", processInstanceIds);
-    EnsureUtil.ensureNotContainsNull(BadUserRequestException.class, "Cannot be null.", "Process Instance ids", processInstanceIds);
+    EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "No process instance ids given",
+        "process Instance Ids", processInstanceIds);
+    EnsureUtil.ensureNotContainsNull(BadUserRequestException.class, "Cannot be null.",
+        "Process Instance ids", processInstanceIds);
     checkAuthorizations(commandContext);
     writeUserOperationLog(commandContext, processInstanceIds.size(), true);
     BatchEntity batch = createBatch(commandContext, processInstanceIds);
@@ -61,17 +65,21 @@ public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdatePr
     return batch;
   }
 
-  protected BatchEntity createBatch(CommandContext commandContext, Collection<String> processInstanceIds) {
+  protected BatchEntity createBatch(CommandContext commandContext,
+      Collection<String> processInstanceIds) {
 
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext
+        .getProcessEngineConfiguration();
     BatchJobHandler batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
-    BatchConfiguration configuration = getAbstractIdsBatchConfiguration(new ArrayList<String>(processInstanceIds));
+    BatchConfiguration configuration = getAbstractIdsBatchConfiguration(
+        new ArrayList<String>(processInstanceIds));
 
     BatchEntity batch = new BatchEntity();
 
     batch.setType(batchJobHandler.getType());
-    batch.setTotalJobs(BatchUtil.calculateBatchSize(processEngineConfiguration, (UpdateProcessInstancesSuspendStateBatchConfiguration) configuration));
+    batch.setTotalJobs(BatchUtil.calculateBatchSize(processEngineConfiguration,
+        (UpdateProcessInstancesSuspendStateBatchConfiguration) configuration));
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
@@ -84,13 +92,16 @@ public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdatePr
     return new UpdateProcessInstancesSuspendStateBatchConfiguration(processInstanceIds, suspending);
   }
 
-  protected BatchJobHandler<UpdateProcessInstancesSuspendStateBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  protected BatchJobHandler<UpdateProcessInstancesSuspendStateBatchConfiguration> getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     Map<String, BatchJobHandler<?>> batchHandlers = processEngineConfiguration.getBatchHandlers();
-    return (BatchJobHandler<UpdateProcessInstancesSuspendStateBatchConfiguration>) batchHandlers.get(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE);
+    return (BatchJobHandler<UpdateProcessInstancesSuspendStateBatchConfiguration>) batchHandlers
+        .get(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE);
   }
 
   protected void checkAuthorizations(CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND);
     }
   }

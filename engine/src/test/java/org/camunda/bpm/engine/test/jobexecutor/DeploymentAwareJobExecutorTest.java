@@ -78,9 +78,8 @@ public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCa
 
     Job executableJob = managementService.createJobQuery().singleResult();
 
-    String otherDeploymentId =
-        deployAndInstantiateWithNewEngineConfiguration(
-            "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcessVersion2.bpmn20.xml");
+    String otherDeploymentId = deployAndInstantiateWithNewEngineConfiguration(
+        "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcessVersion2.bpmn20.xml");
 
     // assert that two jobs have been created, one for each deployment
     List<Job> jobs = managementService.createJobQuery().list();
@@ -104,9 +103,8 @@ public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCa
   public void testExplicitDeploymentRegistration() {
     runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
 
-    String otherDeploymentId =
-        deployAndInstantiateWithNewEngineConfiguration(
-            "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcessVersion2.bpmn20.xml");
+    String otherDeploymentId = deployAndInstantiateWithNewEngineConfiguration(
+        "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcessVersion2.bpmn20.xml");
 
     processEngine.getManagementService().registerDeploymentForJobExecutor(otherDeploymentId);
 
@@ -125,10 +123,12 @@ public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCa
     String nonExistingDeploymentId = "some non-existing id";
 
     try {
-      processEngine.getManagementService().registerDeploymentForJobExecutor(nonExistingDeploymentId);
+      processEngine.getManagementService()
+          .registerDeploymentForJobExecutor(nonExistingDeploymentId);
       Assert.fail("Registering a non-existing deployment should not succeed");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Deployment " + nonExistingDeploymentId + " does not exist", e.getMessage());
+      assertTextPresent("Deployment " + nonExistingDeploymentId + " does not exist",
+          e.getMessage());
       // happy path
     }
   }
@@ -184,20 +184,19 @@ public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCa
   }
 
   private AcquiredJobs getExecutableJobs(JobExecutor jobExecutor) {
-    return processEngineConfiguration.getCommandExecutorTxRequired().execute(new AcquireJobsCmd(jobExecutor));
+    return processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new AcquireJobsCmd(jobExecutor));
   }
 
   private String deployAndInstantiateWithNewEngineConfiguration(String resource) {
     // 1. create another process engine
     try {
       otherProcessEngine = ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("camunda.cfg.xml")
-        .buildProcessEngine();
+          .createProcessEngineConfigurationFromResource("camunda.cfg.xml").buildProcessEngine();
     } catch (RuntimeException ex) {
       if (ex.getCause() != null && ex.getCause() instanceof FileNotFoundException) {
         otherProcessEngine = ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
-          .buildProcessEngine();
+            .createProcessEngineConfigurationFromResource("activiti.cfg.xml").buildProcessEngine();
       } else {
         throw ex;
       }
@@ -206,25 +205,23 @@ public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCa
     // 2. deploy again
     RepositoryService otherRepositoryService = otherProcessEngine.getRepositoryService();
 
-    String deploymentId = otherRepositoryService.createDeployment()
-      .addClasspathResource(resource)
-      .deploy().getId();
+    String deploymentId = otherRepositoryService.createDeployment().addClasspathResource(resource)
+        .deploy().getId();
 
     // 3. start instance (i.e. create job)
-    ProcessDefinition newDefinition = otherRepositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
+    ProcessDefinition newDefinition = otherRepositoryService.createProcessDefinitionQuery()
+        .deploymentId(deploymentId).singleResult();
     otherProcessEngine.getRuntimeService().startProcessInstanceById(newDefinition.getId());
 
     return deploymentId;
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/jobexecutor/processWithTimerCatch.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/processWithTimerCatch.bpmn20.xml")
   public void testIntermediateTimerEvent() {
-
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
     Set<String> registeredDeployments = processEngineConfiguration.getRegisteredDeployments();
-
 
     Job existingJob = managementService.createJobQuery().singleResult();
 
@@ -242,14 +239,14 @@ public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCa
     assertEquals(0, acquirableJobs.size());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/jobexecutor/processWithTimerStart.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/processWithTimerStart.bpmn20.xml")
   public void testTimerStartEvent() {
 
     Set<String> registeredDeployments = processEngineConfiguration.getRegisteredDeployments();
 
     Job existingJob = managementService.createJobQuery().singleResult();
 
-    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis()+1000));
+    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis() + 1000));
 
     List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();
 
@@ -264,15 +261,14 @@ public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCa
   }
 
   protected List<AcquirableJobEntity> findAcquirableJobs() {
-    return processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<List<AcquirableJobEntity>>() {
+    return processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new Command<List<AcquirableJobEntity>>() {
 
-      @Override
-      public List<AcquirableJobEntity> execute(CommandContext commandContext) {
-        return commandContext
-          .getJobManager()
-          .findNextJobsToExecute(new Page(0, 100));
-      }
-    });
+          @Override
+          public List<AcquirableJobEntity> execute(CommandContext commandContext) {
+            return commandContext.getJobManager().findNextJobsToExecute(new Page(0, 100));
+          }
+        });
   }
 
 }

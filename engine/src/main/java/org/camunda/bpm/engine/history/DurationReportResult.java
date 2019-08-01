@@ -17,9 +17,13 @@
 package org.camunda.bpm.engine.history;
 
 /**
- * <p>Represents a report result about duration of completed instances for a given period.</p>
+ * <p>
+ * Represents a report result about duration of completed instances for a given period.
+ * </p>
  *
- * <p>The result must be interpreted in conjunction with the executed report.</p>
+ * <p>
+ * The result must be interpreted in conjunction with the executed report.
+ * </p>
  *
  * @author Roman Smirnov
  *
@@ -27,20 +31,26 @@ package org.camunda.bpm.engine.history;
 public interface DurationReportResult extends ReportResult {
 
   /**
-   * <p>Returns the smallest duration of all completed instances,
-   * which have been started in the given period.</p>
+   * <p>
+   * Returns the smallest duration of all completed instances, which have been started in the given
+   * period.
+   * </p>
    */
   long getMinimum();
 
   /**
-   * <p>Returns the greatest duration of all completed instances,
-   * which have been started in the given period.</p>
+   * <p>
+   * Returns the greatest duration of all completed instances, which have been started in the given
+   * period.
+   * </p>
    */
   long getMaximum();
 
   /**
-   * <p>Returns the average duration of all completed instances,
-   * which have been started in the given period.</p>
+   * <p>
+   * Returns the average duration of all completed instances, which have been started in the given
+   * period.
+   * </p>
    */
   long getAverage();
 

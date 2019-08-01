@@ -24,5 +24,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 public interface BpmnEventTrigger {
   void trigger(ProcessEngineTestRule rule);
+
   BpmnModelInstance getProcessModel();
 }

@@ -42,16 +42,16 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 /**
-*
-* @author Deivarayan Azhagappan
-*
-*/
+ *
+ * @author Deivarayan Azhagappan
+ *
+ */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class MultiTenancyHistoricIdentityLinkLogQueryTest {
-  
+
   private static final String GROUP_1 = "Group1";
   private static final String USER_1 = "User1";
-  
+
   private static String PROCESS_DEFINITION_KEY = "oneTaskProcess";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -80,89 +80,76 @@ public class MultiTenancyHistoricIdentityLinkLogQueryTest {
     runtimeService = engineRule.getRuntimeService();
 
     // create sample identity link
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-    .startEvent()
-    .userTask("task").camundaCandidateUsers(A_USER_ID)
-    .endEvent()
-    .done();
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .userTask("task").camundaCandidateUsers(A_USER_ID).endEvent().done();
 
     // deploy tenants
     testRule.deployForTenant(TENANT_1, oneTaskProcess);
     testRule.deployForTenant(TENANT_2, oneTaskProcess);
-    testRule.deployForTenant(TENANT_3, oneTaskProcess);  
+    testRule.deployForTenant(TENANT_3, oneTaskProcess);
   }
 
   @Test
   public void addandDeleteHistoricIdentityLinkForSingleTenant() {
 
     startProcessInstanceForTenant(TENANT_1);
-    
+
     HistoricIdentityLinkLog historicIdentityLink = historyService
-        .createHistoricIdentityLinkLogQuery()
-        .singleResult();
-    
+        .createHistoricIdentityLinkLogQuery().singleResult();
+
     taskService.deleteCandidateUser(historicIdentityLink.getTaskId(), A_USER_ID);
-    
+
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.tenantIdIn(TENANT_1).count(), 2);
-    
+
   }
 
   @Test
   public void historicIdentityLinkForMultipleTenant() {
     startProcessInstanceForTenant(TENANT_1);
-    
+
     // Query test
     HistoricIdentityLinkLog historicIdentityLink = historyService
-        .createHistoricIdentityLinkLogQuery()
-        .singleResult();
-    
+        .createHistoricIdentityLinkLogQuery().singleResult();
+
     assertEquals(historicIdentityLink.getTenantId(), TENANT_1);
-    
+
     // start process instance for another tenant
     startProcessInstanceForTenant(TENANT_2);
-    
+
     // Query test
     List<HistoricIdentityLinkLog> historicIdentityLinks = historyService
-    .createHistoricIdentityLinkLogQuery()
-    .list();
+        .createHistoricIdentityLinkLogQuery().list();
 
     assertEquals(historicIdentityLinks.size(), 2);
 
     HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.tenantIdIn(TENANT_1).count(), 1);
-    
+
     query = historyService.createHistoricIdentityLinkLogQuery();
     assertEquals(query.tenantIdIn(TENANT_2).count(), 1);
   }
-  
+
   @Test
   public void addAndRemoveHistoricIdentityLinksForProcessDefinitionWithTenantId() throws Exception {
     String resourceName = "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml";
     testRule.deployForTenant(TENANT_1, resourceName);
     testRule.deployForTenant(TENANT_2, resourceName);
 
-    ProcessDefinition processDefinition1 = repositoryService
-      .createProcessDefinitionQuery()
-      .processDefinitionKey(PROCESS_DEFINITION_KEY)
-      .list()
-      .get(0);
-    ProcessDefinition processDefinition2 = repositoryService
-      .createProcessDefinitionQuery()
-      .processDefinitionKey(PROCESS_DEFINITION_KEY)
-      .list()
-      .get(1);
+    ProcessDefinition processDefinition1 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY).list().get(0);
+    ProcessDefinition processDefinition2 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY).list().get(1);
 
     assertNotNull(processDefinition1);
     assertNotNull(processDefinition2);
 
-    testTenantsByProcessDefinition(processDefinition1.getId());   
+    testTenantsByProcessDefinition(processDefinition1.getId());
     testTenantsByProcessDefinition(processDefinition2.getId());
-    
+
     List<HistoricIdentityLinkLog> historicIdentityLinks = historyService
-        .createHistoricIdentityLinkLogQuery()
-        .list();
-    
+        .createHistoricIdentityLinkLogQuery().list();
+
     assertEquals(historicIdentityLinks.size(), 8);
 
     // Query test
@@ -174,11 +161,11 @@ public class MultiTenancyHistoricIdentityLinkLogQueryTest {
 
   @SuppressWarnings("deprecation")
   public void testTenantsByProcessDefinition(String processDefinitionId) {
-    
+
     repositoryService.addCandidateStarterGroup(processDefinitionId, GROUP_1);
-    
+
     repositoryService.addCandidateStarterUser(processDefinitionId, USER_1);
-    
+
     repositoryService.deleteCandidateStarterGroup(processDefinitionId, GROUP_1);
 
     repositoryService.deleteCandidateStarterUser(processDefinitionId, USER_1);
@@ -192,11 +179,8 @@ public class MultiTenancyHistoricIdentityLinkLogQueryTest {
     testRule.deployForTenant(TENANT_1, resourceName);
     testRule.deployForTenant(TENANT_2, resourceName);
 
-    ProcessDefinition processDefinition1 = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey(PROCESS_DEFINITION_KEY)
-        .list()
-        .get(0);
+    ProcessDefinition processDefinition1 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY).list().get(0);
 
     assertNotNull(processDefinition1);
 
@@ -206,12 +190,9 @@ public class MultiTenancyHistoricIdentityLinkLogQueryTest {
     // Add candidate user for process definition 2
     repositoryService.addCandidateStarterUser(processDefinition1.getId(), USER_1);
 
-    ProcessDefinition processDefinition2 = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey(PROCESS_DEFINITION_KEY)
-        .list()
-        .get(1);
-    
+    ProcessDefinition processDefinition2 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY).list().get(1);
+
     assertNotNull(processDefinition2);
 
     // Add candidate group with process definition 2
@@ -221,16 +202,18 @@ public class MultiTenancyHistoricIdentityLinkLogQueryTest {
     repositoryService.addCandidateStarterUser(processDefinition2.getId(), USER_1);
 
     // Identity link test
-    List<IdentityLink> identityLinks = repositoryService.getIdentityLinksForProcessDefinition(processDefinition1.getId());
-    assertEquals(identityLinks.size(),2);
+    List<IdentityLink> identityLinks = repositoryService
+        .getIdentityLinksForProcessDefinition(processDefinition1.getId());
+    assertEquals(identityLinks.size(), 2);
     assertEquals(identityLinks.get(0).getTenantId(), TENANT_1);
     assertEquals(identityLinks.get(1).getTenantId(), TENANT_1);
 
-    identityLinks = repositoryService.getIdentityLinksForProcessDefinition(processDefinition2.getId());
-    assertEquals(identityLinks.size(),2);
+    identityLinks = repositoryService
+        .getIdentityLinksForProcessDefinition(processDefinition2.getId());
+    assertEquals(identityLinks.size(), 2);
     assertEquals(identityLinks.get(0).getTenantId(), TENANT_2);
     assertEquals(identityLinks.get(1).getTenantId(), TENANT_2);
-    
+
   }
 
   @Test
@@ -252,7 +235,6 @@ public class MultiTenancyHistoricIdentityLinkLogQueryTest {
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {
     return runtimeService.createProcessInstanceByKey("testProcess")
-        .processDefinitionTenantId(tenant)
-        .execute();
+        .processDefinitionTenantId(tenant).execute();
   }
 }

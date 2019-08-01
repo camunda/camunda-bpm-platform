@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
-
 /**
  * Gives access to a deployed decision diagram, e.g., a PNG image, through a stream of bytes.
  */
@@ -39,19 +38,19 @@ public class GetDeploymentDecisionDiagramCmd implements Command<InputStream>, Se
   }
 
   public InputStream execute(final CommandContext commandContext) {
-    DecisionDefinition decisionDefinition = new GetDeploymentDecisionDefinitionCmd(decisionDefinitionId).execute(commandContext);
+    DecisionDefinition decisionDefinition = new GetDeploymentDecisionDefinitionCmd(
+        decisionDefinitionId).execute(commandContext);
 
     final String deploymentId = decisionDefinition.getDeploymentId();
     final String resourceName = decisionDefinition.getDiagramResourceName();
 
-    if (resourceName != null ) {
+    if (resourceName != null) {
       return commandContext.runWithoutAuthorization(new Callable<InputStream>() {
         public InputStream call() throws Exception {
           return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
         }
       });
-    }
-    else {
+    } else {
       return null;
     }
   }

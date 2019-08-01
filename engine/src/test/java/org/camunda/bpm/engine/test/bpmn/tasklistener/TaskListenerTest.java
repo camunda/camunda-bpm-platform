@@ -54,7 +54,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-
 /**
  * @author Joram Barrez
  */
@@ -87,7 +86,8 @@ public class TaskListenerTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
   public void testTaskCreateListener() {
     runtimeService.startProcessInstanceByKey("taskListenerProcess");
     Task task = taskService.createTaskQuery().singleResult();
@@ -96,10 +96,12 @@ public class TaskListenerTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
   public void testTaskCompleteListener() {
     TaskDeleteListener.clear();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("taskListenerProcess");
     assertEquals(null, runtimeService.getVariable(processInstance.getId(), "greeting"));
     assertEquals(null, runtimeService.getVariable(processInstance.getId(), "expressionValue"));
 
@@ -112,15 +114,18 @@ public class TaskListenerTest {
     assertNull(TaskDeleteListener.lastTaskDefinitionKey);
     assertNull(TaskDeleteListener.lastDeleteReason);
 
-    assertEquals("Hello from The Process", runtimeService.getVariable(processInstance.getId(), "greeting"));
+    assertEquals("Hello from The Process",
+        runtimeService.getVariable(processInstance.getId(), "greeting"));
     assertEquals("Act", runtimeService.getVariable(processInstance.getId(), "shortName"));
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
   public void testTaskDeleteListenerByProcessDeletion() {
     TaskDeleteListener.clear();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("taskListenerProcess");
 
     assertEquals(0, TaskDeleteListener.eventCounter);
     assertNull(TaskDeleteListener.lastTaskDefinitionKey);
@@ -128,7 +133,8 @@ public class TaskListenerTest {
 
     // delete process instance to delete task
     Task task = taskService.createTaskQuery().singleResult();
-    runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "test delete task listener");
+    runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(),
+        "test delete task listener");
 
     assertEquals(1, TaskDeleteListener.eventCounter);
     assertEquals(task.getTaskDefinitionKey(), TaskDeleteListener.lastTaskDefinitionKey);
@@ -136,7 +142,8 @@ public class TaskListenerTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
   public void testTaskDeleteListenerByBoundaryEvent() {
     TaskDeleteListener.clear();
     runtimeService.startProcessInstanceByKey("taskListenerProcess");
@@ -155,16 +162,19 @@ public class TaskListenerTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml" })
   public void testTaskListenerWithExpression() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("taskListenerProcess");
     assertEquals(null, runtimeService.getVariable(processInstance.getId(), "greeting2"));
 
     // Completing first task will change the description
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
 
-    assertEquals("Write meeting notes", runtimeService.getVariable(processInstance.getId(), "greeting2"));
+    assertEquals("Write meeting notes",
+        runtimeService.getVariable(processInstance.getId(), "greeting2"));
   }
 
   @Test
@@ -189,7 +199,8 @@ public class TaskListenerTest {
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
-      HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().variableName("delete").singleResult();
+      HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
+          .variableName("delete").singleResult();
       assertNotNull(variable);
       assertTrue((Boolean) variable.getValue());
     }
@@ -197,9 +208,8 @@ public class TaskListenerTest {
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.testScriptResourceListener.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/tasklistener/taskListener.groovy"
-  })
+      "org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.testScriptResourceListener.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/tasklistener/taskListener.groovy" })
   public void testScriptResourceListener() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -220,12 +230,12 @@ public class TaskListenerTest {
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     if (processEngineConfiguration.getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
-      HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().variableName("delete").singleResult();
+      HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
+          .variableName("delete").singleResult();
       assertNotNull(variable);
       assertTrue((Boolean) variable.getValue());
     }
   }
-
 
   public static class TaskCreateListener implements TaskListener {
     public void notify(DelegateTask delegateTask) {
@@ -236,13 +246,10 @@ public class TaskListenerTest {
   @Test
   public void testCompleteTaskInCreateTaskListener() {
     // given process with user task and task create listener
-    BpmnModelInstance modelInstance =
-      Bpmn.createExecutableProcess("startToEnd")
-        .startEvent()
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("startToEnd").startEvent()
         .userTask()
         .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, TaskCreateListener.class.getName())
-        .name("userTask")
-        .endEvent().done();
+        .name("userTask").endEvent().done();
 
     testRule.deploy(modelInstance);
 
@@ -256,15 +263,12 @@ public class TaskListenerTest {
   @Test
   public void testCompleteTaskInCreateTaskListenerWithIdentityLinks() {
     // given process with user task, identity links and task create listener
-    BpmnModelInstance modelInstance =
-      Bpmn.createExecutableProcess("startToEnd")
-        .startEvent()
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("startToEnd").startEvent()
         .userTask()
         .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, TaskCreateListener.class.getName())
-        .name("userTask")
-        .camundaCandidateUsers(Arrays.asList(new String[]{"users1", "user2"}))
-        .camundaCandidateGroups(Arrays.asList(new String[]{"group1", "group2"}))
-        .endEvent().done();
+        .name("userTask").camundaCandidateUsers(Arrays.asList(new String[] { "users1", "user2" }))
+        .camundaCandidateGroups(Arrays.asList(new String[] { "group1", "group2" })).endEvent()
+        .done();
 
     testRule.deploy(modelInstance);
 
@@ -280,20 +284,15 @@ public class TaskListenerTest {
     // given
     RecorderTaskListener.clear();
 
-    BpmnModelInstance callActivityProcess = Bpmn.createExecutableProcess("calling")
-        .startEvent()
-        .callActivity()
-          .calledElement("called")
-        .endEvent()
-        .done();
+    BpmnModelInstance callActivityProcess = Bpmn.createExecutableProcess("calling").startEvent()
+        .callActivity().calledElement("called").endEvent().done();
 
-    BpmnModelInstance calledProcess = Bpmn.createExecutableProcess("called")
-        .startEvent()
-        .userTask()
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, RecorderTaskListener.class.getName())
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, RecorderTaskListener.class.getName())
-        .endEvent()
-        .done();
+    BpmnModelInstance calledProcess = Bpmn.createExecutableProcess("called").startEvent().userTask()
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE,
+            RecorderTaskListener.class.getName())
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE,
+            RecorderTaskListener.class.getName())
+        .endEvent().done();
 
     testRule.deploy(callActivityProcess, calledProcess);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calling");
@@ -315,20 +314,13 @@ public class TaskListenerTest {
     // given
     VariablesCollectingListener.reset();
 
-    BpmnModelInstance callActivityProcess = Bpmn.createExecutableProcess("calling")
-        .startEvent()
-        .callActivity()
-          .camundaIn("foo", "foo")
-          .calledElement("called")
-        .endEvent()
-        .done();
+    BpmnModelInstance callActivityProcess = Bpmn.createExecutableProcess("calling").startEvent()
+        .callActivity().camundaIn("foo", "foo").calledElement("called").endEvent().done();
 
-    BpmnModelInstance calledProcess = Bpmn.createExecutableProcess("called")
-        .startEvent()
-        .userTask()
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, VariablesCollectingListener.class.getName())
-        .endEvent()
-        .done();
+    BpmnModelInstance calledProcess = Bpmn.createExecutableProcess("called").startEvent().userTask()
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE,
+            VariablesCollectingListener.class.getName())
+        .endEvent().done();
 
     testRule.deploy(callActivityProcess, calledProcess);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calling",
@@ -346,19 +338,13 @@ public class TaskListenerTest {
 
   @Test
   public void testCompleteTaskOnCreateListenerWithFollowingCallActivity() {
-    final BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subProc")
-        .startEvent()
-        .userTask("calledTask")
-        .endEvent()
-        .done();
+    final BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subProc").startEvent()
+        .userTask("calledTask").endEvent().done();
 
-    final BpmnModelInstance instance = Bpmn.createExecutableProcess("mainProc")
-        .startEvent()
+    final BpmnModelInstance instance = Bpmn.createExecutableProcess("mainProc").startEvent()
         .userTask("mainTask")
         .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, CreateTaskListener.class.getName())
-        .callActivity().calledElement("subProc")
-        .endEvent()
-        .done();
+        .callActivity().calledElement("subProc").endEvent().done();
 
     testRule.deploy(subProcess);
     testRule.deploy(instance);
@@ -373,12 +359,9 @@ public class TaskListenerTest {
   public void testAssignmentTaskListenerWhenSavingTask() {
     AssignmentTaskListener.reset();
 
-    final BpmnModelInstance process = Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("task")
-          .camundaTaskListenerClass("assignment", AssignmentTaskListener.class)
-        .endEvent()
-        .done();
+    final BpmnModelInstance process = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("task").camundaTaskListenerClass("assignment", AssignmentTaskListener.class)
+        .endEvent().done();
 
     testRule.deploy(process);
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
@@ -397,7 +380,8 @@ public class TaskListenerTest {
   @Test
   public void testThrowErrorOnCreateAndCatchOnUserTask() {
     // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(TaskListener.EVENTNAME_CREATE);
+    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(
+        TaskListener.EVENTNAME_CREATE);
 
     testRule.deploy(model);
 
@@ -411,7 +395,8 @@ public class TaskListenerTest {
   @Test
   public void testThrowErrorOnAssignmentAndCatchOnUserTask() {
     // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(TaskListener.EVENTNAME_ASSIGNMENT);
+    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(
+        TaskListener.EVENTNAME_ASSIGNMENT);
 
     testRule.deploy(model);
     runtimeService.startProcessInstanceByKey("process");
@@ -430,7 +415,8 @@ public class TaskListenerTest {
   @Test
   public void testThrowErrorOnCompleteAndCatchOnUserTask() {
     // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(TaskListener.EVENTNAME_COMPLETE);
+    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(
+        TaskListener.EVENTNAME_COMPLETE);
 
     testRule.deploy(model);
     runtimeService.startProcessInstanceByKey("process");
@@ -448,7 +434,8 @@ public class TaskListenerTest {
   @Test
   public void testThrowErrorOnCreateAndCatchOnSubprocess() {
     // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnSubprocess(TaskListener.EVENTNAME_CREATE);
+    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnSubprocess(
+        TaskListener.EVENTNAME_CREATE);
 
     testRule.deploy(model);
 
@@ -462,7 +449,8 @@ public class TaskListenerTest {
   @Test
   public void testThrowErrorOnAssignmentAndCatchOnSubprocess() {
     // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnSubprocess(TaskListener.EVENTNAME_ASSIGNMENT);
+    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnSubprocess(
+        TaskListener.EVENTNAME_ASSIGNMENT);
 
     testRule.deploy(model);
     runtimeService.startProcessInstanceByKey("process");
@@ -481,7 +469,8 @@ public class TaskListenerTest {
   @Test
   public void testThrowErrorOnCompleteAndCatchOnSubprocess() {
     // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnSubprocess(TaskListener.EVENTNAME_COMPLETE);
+    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnSubprocess(
+        TaskListener.EVENTNAME_COMPLETE);
 
     testRule.deploy(model);
     runtimeService.startProcessInstanceByKey("process");
@@ -499,7 +488,8 @@ public class TaskListenerTest {
   @Test
   public void testThrowErrorOnCreateAndCatchOnEventSubprocess() {
     // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnEventSubprocess(TaskListener.EVENTNAME_CREATE);
+    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnEventSubprocess(
+        TaskListener.EVENTNAME_CREATE);
     System.out.println(Bpmn.convertToString(model));
     testRule.deploy(model);
 
@@ -513,7 +503,8 @@ public class TaskListenerTest {
   @Test
   public void testThrowErrorOnAssignmentAndCatchOnEventSubprocess() {
     // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnEventSubprocess(TaskListener.EVENTNAME_ASSIGNMENT);
+    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnEventSubprocess(
+        TaskListener.EVENTNAME_ASSIGNMENT);
 
     testRule.deploy(model);
     runtimeService.startProcessInstanceByKey("process");
@@ -532,7 +523,8 @@ public class TaskListenerTest {
   @Test
   public void testThrowErrorOnCompleteAndCatchOnEventSubprocess() {
     // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnEventSubprocess(TaskListener.EVENTNAME_COMPLETE);
+    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnEventSubprocess(
+        TaskListener.EVENTNAME_COMPLETE);
 
     testRule.deploy(model);
     runtimeService.startProcessInstanceByKey("process");
@@ -563,18 +555,13 @@ public class TaskListenerTest {
   public void testThrowErrorOnAssignmentExpressionListenerAndCatchOnUserTask() {
     // given
     processEngineConfiguration.getBeans().put("myListener", new ThrowBPMNErrorListener());
-    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
-        .startEvent()
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process").startEvent()
         .userTask("mainTask")
-          .camundaTaskListenerExpression(TaskListener.EVENTNAME_ASSIGNMENT, "${myListener.notify(task)}")
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
-        .boundaryEvent("throw")
-        .error(ERROR_CODE)
-        .userTask("afterCatch")
-        .moveToActivity("mainTask")
-        .userTask("afterThrow")
-        .endEvent()
-        .done();
+        .camundaTaskListenerExpression(TaskListener.EVENTNAME_ASSIGNMENT,
+            "${myListener.notify(task)}")
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
+        .boundaryEvent("throw").error(ERROR_CODE).userTask("afterCatch").moveToActivity("mainTask")
+        .userTask("afterThrow").endEvent().done();
     testRule.deploy(model);
     runtimeService.startProcessInstanceByKey("process");
 
@@ -592,7 +579,8 @@ public class TaskListenerTest {
   @Test
   public void testThrowErrorOnDeleteAndCatchOnUserTaskShouldNotTriggerPropagation() {
     // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(TaskListener.EVENTNAME_DELETE);
+    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(
+        TaskListener.EVENTNAME_DELETE);
 
     DeploymentWithDefinitions deployment = testRule.deploy(model);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -615,14 +603,12 @@ public class TaskListenerTest {
   public void testThrowUncaughtErrorOnCompleteAndCatchOnUserTask() {
     // given
     processEngineConfiguration.setEnableExceptionsAfterUnhandledBpmnError(true);
-    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
-        .startEvent()
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process").startEvent()
         .userTask("mainTask")
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_COMPLETE, ThrowBPMNErrorListener.class.getName())
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
-        .userTask("afterThrow")
-        .endEvent()
-        .done();
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_COMPLETE,
+            ThrowBPMNErrorListener.class.getName())
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
+        .userTask("afterThrow").endEvent().done();
 
     testRule.deploy(model);
     runtimeService.startProcessInstanceByKey("process");
@@ -636,7 +622,8 @@ public class TaskListenerTest {
     } catch (ProcessEngineException e) {
       // then
       assertTrue(e.getMessage().contains("There was an exception while invoking the TaskListener"));
-      assertTrue(e.getMessage().contains("Execution with id 'mainTask' throws an error event with errorCode '208', but no error handler was defined."));
+      assertTrue(e.getMessage().contains(
+          "Execution with id 'mainTask' throws an error event with errorCode '208', but no error handler was defined."));
     }
 
     // then
@@ -659,53 +646,32 @@ public class TaskListenerTest {
   }
 
   protected BpmnModelInstance createModelThrowErrorInListenerAndCatchOnUserTask(String eventName) {
-    return Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("mainTask")
-          .camundaTaskListenerClass(eventName, ThrowBPMNErrorListener.class.getName())
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
-        .boundaryEvent("throw")
-        .error(ERROR_CODE)
-        .userTask("afterCatch")
-        .moveToActivity("mainTask")
-        .userTask("afterThrow")
-        .endEvent()
-        .done();
+    return Bpmn.createExecutableProcess("process").startEvent().userTask("mainTask")
+        .camundaTaskListenerClass(eventName, ThrowBPMNErrorListener.class.getName())
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
+        .boundaryEvent("throw").error(ERROR_CODE).userTask("afterCatch").moveToActivity("mainTask")
+        .userTask("afterThrow").endEvent().done();
   }
 
-  protected BpmnModelInstance createModelThrowErrorInListenerAndCatchOnSubprocess(String eventName) {
-    return Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .subProcess("sub")
-          .embeddedSubProcess()
-          .startEvent("inSub")
-          .userTask("mainTask")
-            .camundaTaskListenerClass(eventName, ThrowBPMNErrorListener.class.getName())
-            .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
-          .userTask("afterThrow")
-          .endEvent()
-        .moveToActivity("sub")
-        .boundaryEvent("throw")
-        .error(ERROR_CODE)
-        .userTask("afterCatch")
-        .endEvent()
-        .done();
+  protected BpmnModelInstance createModelThrowErrorInListenerAndCatchOnSubprocess(
+      String eventName) {
+    return Bpmn.createExecutableProcess("process").startEvent().subProcess("sub")
+        .embeddedSubProcess().startEvent("inSub").userTask("mainTask")
+        .camundaTaskListenerClass(eventName, ThrowBPMNErrorListener.class.getName())
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
+        .userTask("afterThrow").endEvent().moveToActivity("sub").boundaryEvent("throw")
+        .error(ERROR_CODE).userTask("afterCatch").endEvent().done();
   }
 
-  protected BpmnModelInstance createModelThrowErrorInListenerAndCatchOnEventSubprocess(String eventName) {
+  protected BpmnModelInstance createModelThrowErrorInListenerAndCatchOnEventSubprocess(
+      String eventName) {
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
-    BpmnModelInstance model = processBuilder
-        .startEvent()
-        .userTask("mainTask")
-          .camundaTaskListenerClass(eventName, ThrowBPMNErrorListener.class.getName())
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
-        .userTask("afterThrow")
-        .endEvent()
-        .done();
-    processBuilder.eventSubProcess()
-       .startEvent("errorEvent").error(ERROR_CODE)
-         .userTask("afterCatch")
-       .endEvent();
+    BpmnModelInstance model = processBuilder.startEvent().userTask("mainTask")
+        .camundaTaskListenerClass(eventName, ThrowBPMNErrorListener.class.getName())
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
+        .userTask("afterThrow").endEvent().done();
+    processBuilder.eventSubProcess().startEvent("errorEvent").error(ERROR_CODE)
+        .userTask("afterCatch").endEvent();
     return model;
   }
 
@@ -730,9 +696,9 @@ public class TaskListenerTest {
 
   public static class CreateTaskListener implements TaskListener {
 
-      public void notify(DelegateTask delegateTask) {
-          delegateTask.getProcessEngineServices().getTaskService().complete(delegateTask.getId());
-      }
+    public void notify(DelegateTask delegateTask) {
+      delegateTask.getProcessEngineServices().getTaskService().complete(delegateTask.getId());
+    }
   }
 
   public static class AssignmentTaskListener implements TaskListener {

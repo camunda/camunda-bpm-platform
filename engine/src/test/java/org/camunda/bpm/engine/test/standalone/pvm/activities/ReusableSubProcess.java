@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -43,7 +42,8 @@ public class ReusableSubProcess implements SubProcessActivityBehavior {
     subProcessInstance.start();
   }
 
-  public void passOutputVariables(ActivityExecution targetExecution, VariableScope calledElementInstance) {
+  public void passOutputVariables(ActivityExecution targetExecution,
+      VariableScope calledElementInstance) {
   }
 
   public void completed(ActivityExecution execution) throws Exception {

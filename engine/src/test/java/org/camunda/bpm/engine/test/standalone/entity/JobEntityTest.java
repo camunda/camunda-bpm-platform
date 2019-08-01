@@ -32,11 +32,10 @@ import org.camunda.bpm.engine.test.Deployment;
 public class JobEntityTest extends PluggableProcessEngineTestCase {
 
   /**
-   * Note: This does not test a message with 4-byte Unicode supplementary
-   * characters for two reasons:
-   * - MySQL 5.1 does not support 4-byte supplementary characters (support from 5.5.3 onwards)
-   * - {@link String#length()} counts these characters twice (since they are represented by two
-   * chars), so essentially the cutoff would be half the actual cutoff for such a string
+   * Note: This does not test a message with 4-byte Unicode supplementary characters for two
+   * reasons: - MySQL 5.1 does not support 4-byte supplementary characters (support from 5.5.3
+   * onwards) - {@link String#length()} counts these characters twice (since they are represented by
+   * two chars), so essentially the cutoff would be half the actual cutoff for such a string
    */
   public void testInsertJobWithExceptionMessage() {
     String fittingThreeByteMessage = repeatCharacter("\u9faf", StringUtil.DB_MAX_STRING_LENGTH);
@@ -55,7 +54,8 @@ public class JobEntityTest extends PluggableProcessEngineTestCase {
 
     String message = repeatCharacter("a", StringUtil.DB_MAX_STRING_LENGTH * 2);
     threeByteJobEntity.setExceptionMessage(message);
-    assertEquals(StringUtil.DB_MAX_STRING_LENGTH, threeByteJobEntity.getExceptionMessage().length());
+    assertEquals(StringUtil.DB_MAX_STRING_LENGTH,
+        threeByteJobEntity.getExceptionMessage().length());
   }
 
   protected void insertJob(final JobEntity jobEntity) {
@@ -90,13 +90,13 @@ public class JobEntityTest extends PluggableProcessEngineTestCase {
     return sb.toString();
   }
 
-  
-   @Deployment
+  @Deployment
   public void testLongProcessDefinitionKey() {
     String key = "myrealrealrealrealrealrealrealrealrealrealreallongprocessdefinitionkeyawesome";
     String processInstanceId = runtimeService.startProcessInstanceByKey(key).getId();
 
-    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
+    Job job = managementService.createJobQuery().processInstanceId(processInstanceId)
+        .singleResult();
 
     assertEquals(key, job.getProcessDefinitionKey());
   }

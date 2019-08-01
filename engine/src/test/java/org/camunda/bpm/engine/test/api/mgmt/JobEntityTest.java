@@ -91,11 +91,8 @@ public class JobEntityTest {
   @Test
   public void shouldCheckCreateTimeOnMessage() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
-        .camundaAsyncBefore()
-      .endEvent()
-      .done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().camundaAsyncBefore()
+        .endEvent().done());
 
     runtimeService.startProcessInstanceByKey("process");
 
@@ -113,11 +110,8 @@ public class JobEntityTest {
   @Test
   public void shouldCheckCreateTimeOnTimer() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
-        .timerWithDuration("PT5S")
-      .endEvent()
-      .done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().timerWithDuration("PT5S")
+        .endEvent().done());
 
     runtimeService.startProcessInstanceByKey("process");
 
@@ -148,20 +142,20 @@ public class JobEntityTest {
     jobIds.add(everLivingJob.getId());
   }
 
-  // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // helper
+  // ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   protected void cleanupJobLog() {
     engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
-          for (String jobId : jobIds) {
-            commandContext.getHistoricJobLogManager()
-              .deleteHistoricJobLogByJobId(jobId);
-          }
+        .execute(new Command<Void>() {
+          public Void execute(CommandContext commandContext) {
+            for (String jobId : jobIds) {
+              commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+            }
 
-          return null;
-        }
-      });
+            return null;
+          }
+        });
   }
 
 }

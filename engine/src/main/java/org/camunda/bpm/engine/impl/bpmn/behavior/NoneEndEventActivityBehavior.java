@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-
 /**
  * @author Joram Barrez
  */

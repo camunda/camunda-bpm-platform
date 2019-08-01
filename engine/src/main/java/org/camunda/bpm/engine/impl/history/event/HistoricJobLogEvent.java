@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.impl.history.event;
+
 import java.util.Date;
 
 import org.camunda.bpm.engine.history.JobState;
@@ -104,10 +105,12 @@ public class HistoricJobLogEvent extends HistoryEvent {
   }
 
   public void setJobExceptionMessage(String jobExceptionMessage) {
-    // note: it is not a clean way to truncate where the history event is produced, since truncation is only
-    //   relevant for relational history databases that follow our schema restrictions;
-    //   a similar problem exists in JobEntity#setExceptionMessage where truncation may not be required for custom
-    //   persistence implementations
+    // note: it is not a clean way to truncate where the history event is produced, since truncation
+    // is only
+    // relevant for relational history databases that follow our schema restrictions;
+    // a similar problem exists in JobEntity#setExceptionMessage where truncation may not be
+    // required for custom
+    // persistence implementations
     this.jobExceptionMessage = StringUtil.trimToMaximumLengthAllowed(jobExceptionMessage);
   }
 
@@ -126,10 +129,8 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected ByteArrayEntity getExceptionByteArray() {
     if (exceptionByteArrayId != null) {
-      return Context
-        .getCommandContext()
-        .getDbEntityManager()
-        .selectById(ByteArrayEntity.class, exceptionByteArrayId);
+      return Context.getCommandContext().getDbEntityManager().selectById(ByteArrayEntity.class,
+          exceptionByteArrayId);
     }
 
     return null;

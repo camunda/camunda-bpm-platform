@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
-
 /**
  * @author Tom Baeyens
  * @author Saeid Mirzaei
@@ -35,12 +34,15 @@ public class IdentityLinkManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(String processDefinitionId) {
-    return getDbEntityManager().selectList("selectIdentityLinksByProcessDefinition", processDefinitionId);
+  public List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(
+      String processDefinitionId) {
+    return getDbEntityManager().selectList("selectIdentityLinksByProcessDefinition",
+        processDefinitionId);
   }
 
   @SuppressWarnings("unchecked")
-  public List<IdentityLinkEntity> findIdentityLinkByTaskUserGroupAndType(String taskId, String userId, String groupId, String type) {
+  public List<IdentityLinkEntity> findIdentityLinkByTaskUserGroupAndType(String taskId,
+      String userId, String groupId, String type) {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("taskId", taskId);
     parameters.put("userId", userId);
@@ -50,16 +52,19 @@ public class IdentityLinkManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<IdentityLinkEntity> findIdentityLinkByProcessDefinitionUserAndGroup(String processDefinitionId, String userId, String groupId) {
+  public List<IdentityLinkEntity> findIdentityLinkByProcessDefinitionUserAndGroup(
+      String processDefinitionId, String userId, String groupId) {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("userId", userId);
     parameters.put("groupId", groupId);
-    return getDbEntityManager().selectList("selectIdentityLinkByProcessDefinitionUserAndGroup", parameters);
+    return getDbEntityManager().selectList("selectIdentityLinkByProcessDefinitionUserAndGroup",
+        parameters);
   }
 
   public void deleteIdentityLinksByProcDef(String processDefId) {
-    getDbEntityManager().delete(IdentityLinkEntity.class, "deleteIdentityLinkByProcDef", processDefId);
+    getDbEntityManager().delete(IdentityLinkEntity.class, "deleteIdentityLinkByProcDef",
+        processDefId);
   }
 
 }

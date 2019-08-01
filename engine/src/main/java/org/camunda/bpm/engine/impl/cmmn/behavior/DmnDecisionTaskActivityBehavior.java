@@ -33,7 +33,8 @@ public class DmnDecisionTaskActivityBehavior extends DecisionTaskActivityBehavio
   @Override
   protected void performStart(CmmnActivityExecution execution) {
     try {
-      evaluateDecision((AbstractVariableScope) execution, callableElement, resultVariable, decisionResultMapper);
+      evaluateDecision((AbstractVariableScope) execution, callableElement, resultVariable,
+          decisionResultMapper);
 
       if (execution.isActive()) {
         execution.complete();

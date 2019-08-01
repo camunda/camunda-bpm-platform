@@ -57,10 +57,11 @@ public class FormFieldHandler {
     formField.setId(id);
 
     // set label (evaluate expression)
-    VariableScope variableScope = executionEntity != null ? executionEntity : StartProcessVariableScope.getSharedInstance();
+    VariableScope variableScope = executionEntity != null ? executionEntity
+        : StartProcessVariableScope.getSharedInstance();
     if (label != null) {
       Object labelValueObject = label.getValue(variableScope);
-      if(labelValueObject != null) {
+      if (labelValueObject != null) {
         formField.setLabel(labelValueObject.toString());
       }
     }
@@ -72,10 +73,10 @@ public class FormFieldHandler {
 
     // set default value (evaluate expression)
     Object defaultValue = null;
-    if(defaultValueExpression != null) {
+    if (defaultValueExpression != null) {
       defaultValue = defaultValueExpression.getValue(variableScope);
 
-      if(defaultValue != null) {
+      if (defaultValue != null) {
         formField.setDefaultValue(type.convertFormValueToModelValue(defaultValue));
       } else {
         formField.setDefaultValue(null);
@@ -84,7 +85,7 @@ public class FormFieldHandler {
 
     // value
     TypedValue value = variableScope.getVariableTyped(id);
-    if(value != null) {
+    if (value != null) {
       final TypedValue formValue;
       try {
         formValue = type.convertToFormValue(value);
@@ -92,9 +93,9 @@ public class FormFieldHandler {
         throw new FormFieldValidationException(id, "failed to convert '" + id + "'", exception);
       }
       formField.setValue(formValue);
-    }
-    else {
-      // first, need to convert to model value since the default value may be a String Constant specified in the model xml.
+    } else {
+      // first, need to convert to model value since the default value may be a String Constant
+      // specified in the model xml.
       TypedValue typedDefaultValue = type.convertToModelValue(Variables.untypedValue(defaultValue));
       // now convert to form value
       formField.setValue(type.convertToFormValue(typedDefaultValue));
@@ -104,10 +105,11 @@ public class FormFieldHandler {
     formField.setProperties(properties);
 
     // validation
-    List<FormFieldValidationConstraint> validationConstraints = formField.getValidationConstraints();
+    List<FormFieldValidationConstraint> validationConstraints = formField
+        .getValidationConstraints();
     for (FormFieldValidationConstraintHandler validationHandler : validationHandlers) {
       // do not add custom validators
-      if(!"validator".equals(validationHandler.name)) {
+      if (!"validator".equals(validationHandler.name)) {
         validationConstraints.add(validationHandler.createValidationConstraint(executionEntity));
       }
     }
@@ -124,7 +126,7 @@ public class FormFieldHandler {
     // perform validation
     for (FormFieldValidationConstraintHandler validationHandler : validationHandlers) {
       Object value = null;
-      if(submittedValue != null) {
+      if (submittedValue != null) {
         value = submittedValue.getValue();
       }
       validationHandler.validate(value, allValues, this, variableScope);
@@ -135,18 +137,17 @@ public class FormFieldHandler {
     if (submittedValue != null) {
       if (type != null) {
         modelValue = type.convertToModelValue(submittedValue);
-      }
-      else {
+      } else {
         modelValue = submittedValue;
       }
-    }
-    else if (defaultValueExpression != null) {
-      final TypedValue expressionValue = Variables.untypedValue(defaultValueExpression.getValue(variableScope));
+    } else if (defaultValueExpression != null) {
+      final TypedValue expressionValue = Variables
+          .untypedValue(defaultValueExpression.getValue(variableScope));
       if (type != null) {
-        // first, need to convert to model value since the default value may be a String Constant specified in the model xml.
+        // first, need to convert to model value since the default value may be a String Constant
+        // specified in the model xml.
         modelValue = type.convertToModelValue(Variables.untypedValue(expressionValue));
-      }
-      else if (expressionValue != null) {
+      } else if (expressionValue != null) {
         modelValue = Variables.stringValue(expressionValue.getValue().toString());
       }
     }

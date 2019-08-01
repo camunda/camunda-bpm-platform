@@ -30,7 +30,8 @@ public class DecisionResultTestListener implements CaseExecutionListener {
 
   @Override
   public void notify(DelegateCaseExecution execution) throws Exception {
-    decisionResult = (DmnDecisionResult) execution.getVariable(DecisionEvaluationUtil.DECISION_RESULT_VARIABLE);
+    decisionResult = (DmnDecisionResult) execution
+        .getVariable(DecisionEvaluationUtil.DECISION_RESULT_VARIABLE);
   }
 
   public static DmnDecisionResult getDecisionResult() {

@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.history;
 
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
@@ -50,8 +49,9 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
 
     DeploymentBuilder deploymentbuilder = repositoryService.createDeployment();
     BpmnModelInstance defaultModel = createDefaultExternalTaskModel().build();
-    BpmnModelInstance modifiedModel = createDefaultExternalTaskModel().processKey(ANOTHER_PROCESS_KEY).build();
-    deploymentId = deployment(deploymentbuilder, defaultModel , modifiedModel);
+    BpmnModelInstance modifiedModel = createDefaultExternalTaskModel()
+        .processKey(ANOTHER_PROCESS_KEY).build();
+    deploymentId = deployment(deploymentbuilder, defaultModel, modifiedModel);
 
     super.setUp();
   }
@@ -61,7 +61,6 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     super.tearDown();
     deleteDeployment(deploymentId);
   }
-
 
   public void testSimpleQueryWithoutAuthorization() {
     // given
@@ -153,17 +152,14 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     startThreeProcessInstancesDeleteOneAndCompleteTwoWithFailure();
 
     disableAuthorization();
-    String failedHistoricExternalTaskLogId = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .list()
-      .get(0)
-      .getId();
+    String failedHistoricExternalTaskLogId = historyService.createHistoricExternalTaskLogQuery()
+        .failureLog().list().get(0).getId();
     enableAuthorization();
 
     try {
       // when
-      String stacktrace = historyService.getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
+      String stacktrace = historyService
+          .getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
       fail("Exception expected: It should not be possible to retrieve the error details");
     } catch (AuthorizationException e) {
       // then
@@ -181,15 +177,12 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     startThreeProcessInstancesDeleteOneAndCompleteTwoWithFailure();
     createGrantAuthorization(PROCESS_DEFINITION, DEFAULT_PROCESS_KEY, userId, READ_HISTORY);
 
-    String failedHistoricExternalTaskLogId = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .list()
-      .get(0)
-      .getId();
+    String failedHistoricExternalTaskLogId = historyService.createHistoricExternalTaskLogQuery()
+        .failureLog().list().get(0).getId();
 
     // when
-    String stacktrace = historyService.getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
+    String stacktrace = historyService
+        .getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
 
     // then
     assertNotNull(stacktrace);
@@ -202,15 +195,12 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     startThreeProcessInstancesDeleteOneAndCompleteTwoWithFailure();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
 
-    String failedHistoricExternalTaskLogId = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .list()
-      .get(0)
-      .getId();
+    String failedHistoricExternalTaskLogId = historyService.createHistoricExternalTaskLogQuery()
+        .failureLog().list().get(0).getId();
 
     // when
-    String stacktrace = historyService.getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
+    String stacktrace = historyService
+        .getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
 
     // then
     assertNotNull(stacktrace);
@@ -231,18 +221,16 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
   }
 
   protected void completeExternalTaskWithFailure(ProcessInstance pi) {
-    ExternalTask task = externalTaskService
-      .createExternalTaskQuery()
-      .processInstanceId(pi.getId())
-      .singleResult();
+    ExternalTask task = externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
     completeExternalTaskWithFailure(task.getId());
   }
 
   protected void completeExternalTaskWithFailure(String externalTaskId) {
     List<LockedExternalTask> list = externalTaskService.fetchAndLock(5, WORKER_ID, false)
-      .topic(DEFAULT_TOPIC, LOCK_DURATION)
-      .execute();
-    externalTaskService.handleFailure(externalTaskId, WORKER_ID, "This is an error!", ERROR_DETAILS, 1, 0L);
+        .topic(DEFAULT_TOPIC, LOCK_DURATION).execute();
+    externalTaskService.handleFailure(externalTaskId, WORKER_ID, "This is an error!", ERROR_DETAILS,
+        1, 0L);
     externalTaskService.complete(externalTaskId, WORKER_ID);
     // unlock the remaining tasks
     for (LockedExternalTask lockedExternalTask : list) {

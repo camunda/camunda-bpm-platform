@@ -36,7 +36,7 @@ public class TaskCandidateTest extends PluggableProcessEngineTestCase {
 
   public void setUp() throws Exception {
     super.setUp();
-    
+
     Group accountants = identityService.newGroup("accountancy");
     identityService.saveGroup(accountants);
     Group managers = identityService.newGroup("management");
@@ -61,7 +61,7 @@ public class TaskCandidateTest extends PluggableProcessEngineTestCase {
     identityService.deleteGroup("sales");
     identityService.deleteGroup("accountancy");
     identityService.deleteGroup("management");
-    
+
     super.tearDown();
   }
 
@@ -69,13 +69,11 @@ public class TaskCandidateTest extends PluggableProcessEngineTestCase {
   public void testSingleCandidateGroup() {
 
     // Deploy and start process
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("singleCandidateGroup");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("singleCandidateGroup");
 
     // Task should not yet be assigned to kermit
-    List<Task> tasks = taskService
-      .createTaskQuery()
-      .taskAssignee(KERMIT)
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().taskAssignee(KERMIT).list();
     assertTrue(tasks.isEmpty());
 
     // The task should be visible in the candidate task list
@@ -92,10 +90,7 @@ public class TaskCandidateTest extends PluggableProcessEngineTestCase {
     assertTrue(tasks.isEmpty());
 
     // The task will be visible on the personal task list
-    tasks = taskService
-      .createTaskQuery()
-      .taskAssignee(KERMIT)
-      .list();
+    tasks = taskService.createTaskQuery().taskAssignee(KERMIT).list();
     assertEquals(1, tasks.size());
     task = tasks.get(0);
     assertEquals("Pay out expenses", task.getName());
@@ -110,20 +105,15 @@ public class TaskCandidateTest extends PluggableProcessEngineTestCase {
   public void testMultipleCandidateGroups() {
 
     // Deploy and start process
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multipleCandidatesGroup");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("multipleCandidatesGroup");
 
     // Task should not yet be assigned to anyone
-    List<Task> tasks = taskService
-      .createTaskQuery()
-      .taskAssignee(KERMIT)
-      .list();
-    
+    List<Task> tasks = taskService.createTaskQuery().taskAssignee(KERMIT).list();
+
     assertTrue(tasks.isEmpty());
-    tasks = taskService
-      .createTaskQuery()
-      .taskAssignee(GONZO)
-      .list();
-    
+    tasks = taskService.createTaskQuery().taskAssignee(GONZO).list();
+
     assertTrue(tasks.isEmpty());
 
     // The task should be visible in the candidate task list of Gonzo and Kermit
@@ -146,10 +136,7 @@ public class TaskCandidateTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().taskCandidateGroup("management").count());
 
     // The task will be visible on the personal task list of Gonzo
-    assertEquals(1, taskService
-      .createTaskQuery()
-      .taskAssignee(GONZO)
-      .count());
+    assertEquals(1, taskService.createTaskQuery().taskAssignee(GONZO).count());
 
     // But not on the personal task list of (for example) Kermit
     assertEquals(0, taskService.createTaskQuery().taskAssignee(KERMIT).count());

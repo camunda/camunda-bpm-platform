@@ -17,22 +17,21 @@
 package org.camunda.bpm.engine.management;
 
 /**
- * Represents a statistic which the aggregate number of incidents to
- * the corresponding incident type. 
+ * Represents a statistic which the aggregate number of incidents to the corresponding incident
+ * type.
  * 
  * @author roman.smirnov
  *
  */
 public interface IncidentStatistics {
-  
+
   /**
    * Returns the type of the incidents.
    */
   String getIncidentType();
-  
+
   /**
-   * Returns the number of incidents to the corresponding
-   * incidentType.
+   * Returns the number of incidents to the corresponding incidentType.
    */
   int getIncidentCount();
 

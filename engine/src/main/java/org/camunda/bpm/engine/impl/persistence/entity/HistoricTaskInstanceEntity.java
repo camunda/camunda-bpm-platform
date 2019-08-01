@@ -19,12 +19,12 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 
-
 /**
  * @author Tom Baeyens
  */
-public class HistoricTaskInstanceEntity extends HistoricTaskInstanceEventEntity implements HistoricTaskInstance {
+public class HistoricTaskInstanceEntity extends HistoricTaskInstanceEventEntity
+    implements HistoricTaskInstance {
 
   private static final long serialVersionUID = 1L;
-  
+
 }

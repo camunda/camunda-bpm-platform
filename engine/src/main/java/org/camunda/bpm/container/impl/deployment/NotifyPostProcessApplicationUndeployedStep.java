@@ -39,14 +39,15 @@ public class NotifyPostProcessApplicationUndeployedStep extends DeploymentOperat
   @Override
   public void performOperationStep(DeploymentOperation operationContext) {
 
-    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
+    final AbstractProcessApplication processApplication = operationContext
+        .getAttachment(Attachments.PROCESS_APPLICATION);
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final JmxManagedBpmPlatformPlugins plugins =
-        serviceContainer.getService(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_PLATFORM_PLUGINS);
+    final JmxManagedBpmPlatformPlugins plugins = serviceContainer.getService(
+        ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_PLATFORM_PLUGINS);
 
     if (plugins != null) {
-      for (BpmPlatformPlugin  plugin : plugins.getValue().getPlugins()) {
+      for (BpmPlatformPlugin plugin : plugins.getValue().getPlugins()) {
         plugin.postProcessApplicationUndeploy(processApplication);
       }
     }

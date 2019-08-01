@@ -37,10 +37,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 /**
  * {@link Deployer} responsible to parse DMN 1.1 XML files and create the proper
  * {@link DecisionDefinitionEntity}s. Since it uses the result of the
- * {@link DecisionRequirementsDefinitionDeployer} to avoid duplicated parsing, the DecisionRequirementsDefinitionDeployer must
- * process the deployment before this cacheDeployer.
+ * {@link DecisionRequirementsDefinitionDeployer} to avoid duplicated parsing, the
+ * DecisionRequirementsDefinitionDeployer must process the deployment before this cacheDeployer.
  */
-public class DecisionDefinitionDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEntity> {
+public class DecisionDefinitionDeployer
+    extends AbstractDefinitionDeployer<DecisionDefinitionEntity> {
 
   protected static final DecisionLogger LOG = ProcessEngineLogger.DECISION_LOGGER;
 
@@ -54,11 +55,13 @@ public class DecisionDefinitionDeployer extends AbstractDefinitionDeployer<Decis
   }
 
   @Override
-  protected List<DecisionDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
+  protected List<DecisionDefinitionEntity> transformDefinitions(DeploymentEntity deployment,
+      ResourceEntity resource, Properties properties) {
     List<DecisionDefinitionEntity> decisions = new ArrayList<DecisionDefinitionEntity>();
 
     // get the decisions from the deployed drd instead of parse the DMN again
-    DecisionRequirementsDefinitionEntity deployedDrd = findDeployedDrdForResource(deployment, resource.getName());
+    DecisionRequirementsDefinitionEntity deployedDrd = findDeployedDrdForResource(deployment,
+        resource.getName());
 
     if (deployedDrd == null) {
       throw LOG.exceptionNoDrdForResource(resource.getName());
@@ -68,7 +71,8 @@ public class DecisionDefinitionDeployer extends AbstractDefinitionDeployer<Decis
     for (DmnDecision decisionOfDrd : decisionsOfDrd) {
 
       DecisionDefinitionEntity decisionEntity = (DecisionDefinitionEntity) decisionOfDrd;
-      if (DecisionRequirementsDefinitionDeployer.isDecisionRequirementsDefinitionPersistable(deployedDrd)) {
+      if (DecisionRequirementsDefinitionDeployer
+          .isDecisionRequirementsDefinitionPersistable(deployedDrd)) {
         decisionEntity.setDecisionRequirementsDefinitionId(deployedDrd.getId());
         decisionEntity.setDecisionRequirementsDefinitionKey(deployedDrd.getKey());
       }
@@ -76,15 +80,18 @@ public class DecisionDefinitionDeployer extends AbstractDefinitionDeployer<Decis
       decisions.add(decisionEntity);
     }
 
-    if (!DecisionRequirementsDefinitionDeployer.isDecisionRequirementsDefinitionPersistable(deployedDrd)) {
+    if (!DecisionRequirementsDefinitionDeployer
+        .isDecisionRequirementsDefinitionPersistable(deployedDrd)) {
       deployment.removeArtifact(deployedDrd);
     }
 
     return decisions;
   }
 
-  protected DecisionRequirementsDefinitionEntity findDeployedDrdForResource(DeploymentEntity deployment, String resourceName) {
-    List<DecisionRequirementsDefinitionEntity> deployedDrds = deployment.getDeployedArtifacts(DecisionRequirementsDefinitionEntity.class);
+  protected DecisionRequirementsDefinitionEntity findDeployedDrdForResource(
+      DeploymentEntity deployment, String resourceName) {
+    List<DecisionRequirementsDefinitionEntity> deployedDrds = deployment
+        .getDeployedArtifacts(DecisionRequirementsDefinitionEntity.class);
     if (deployedDrds != null) {
 
       for (DecisionRequirementsDefinitionEntity deployedDrd : deployedDrds) {
@@ -97,13 +104,17 @@ public class DecisionDefinitionDeployer extends AbstractDefinitionDeployer<Decis
   }
 
   @Override
-  protected DecisionDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
-    return getDecisionDefinitionManager().findDecisionDefinitionByDeploymentAndKey(deploymentId, definitionKey);
+  protected DecisionDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId,
+      String definitionKey) {
+    return getDecisionDefinitionManager().findDecisionDefinitionByDeploymentAndKey(deploymentId,
+        definitionKey);
   }
 
   @Override
-  protected DecisionDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
-    return getDecisionDefinitionManager().findLatestDecisionDefinitionByKeyAndTenantId(definitionKey, tenantId);
+  protected DecisionDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey,
+      String tenantId) {
+    return getDecisionDefinitionManager()
+        .findLatestDecisionDefinitionByKeyAndTenantId(definitionKey, tenantId);
   }
 
   @Override
@@ -112,17 +123,20 @@ public class DecisionDefinitionDeployer extends AbstractDefinitionDeployer<Decis
   }
 
   @Override
-  protected void addDefinitionToDeploymentCache(DeploymentCache deploymentCache, DecisionDefinitionEntity definition) {
+  protected void addDefinitionToDeploymentCache(DeploymentCache deploymentCache,
+      DecisionDefinitionEntity definition) {
     deploymentCache.addDecisionDefinition(definition);
   }
 
-  // context ///////////////////////////////////////////////////////////////////////////////////////////
+  // context
+  // ///////////////////////////////////////////////////////////////////////////////////////////
 
   protected DecisionDefinitionManager getDecisionDefinitionManager() {
     return getCommandContext().getDecisionDefinitionManager();
   }
 
-  // getters/setters ///////////////////////////////////////////////////////////////////////////////////
+  // getters/setters
+  // ///////////////////////////////////////////////////////////////////////////////////
 
   public DmnTransformer getTransformer() {
     return transformer;

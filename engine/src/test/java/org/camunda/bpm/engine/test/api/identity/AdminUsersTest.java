@@ -47,7 +47,8 @@ public class AdminUsersTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   @Rule
   public final ExpectedException thrown = ExpectedException.none();

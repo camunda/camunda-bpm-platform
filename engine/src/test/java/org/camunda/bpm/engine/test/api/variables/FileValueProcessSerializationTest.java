@@ -44,16 +44,20 @@ public class FileValueProcessSerializationTest extends PluggableProcessEngineTes
 
   @Test
   public void testSerializeFileVariable() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done();
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask().endEvent().done();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addModelInstance("process.bpmn", modelInstance).deploy();
     VariableMap variables = Variables.createVariables();
     String filename = "test.txt";
     String type = "text/plain";
-    FileValue fileValue = Variables.fileValue(filename).file("ABC".getBytes()).encoding("UTF-8").mimeType(type).create();
+    FileValue fileValue = Variables.fileValue(filename).file("ABC".getBytes()).encoding("UTF-8")
+        .mimeType(type).create();
     variables.put("file", fileValue);
     runtimeService.startProcessInstanceByKey("process", variables);
     Task task = taskService.createTaskQuery().singleResult();
-    VariableInstance result = runtimeService.createVariableInstanceQuery().processInstanceIdIn(task.getProcessInstanceId()).singleResult();
+    VariableInstance result = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(task.getProcessInstanceId()).singleResult();
     FileValue value = (FileValue) result.getTypedValue();
 
     assertThat(value.getFilename(), is(filename));
@@ -72,7 +76,8 @@ public class FileValueProcessSerializationTest extends PluggableProcessEngineTes
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSerializeNullMimeType() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Variables.createVariables().putValue("fileVar", Variables.fileValue("test.txt").file("ABC".getBytes()).encoding("UTF-8").create()));
+        Variables.createVariables().putValue("fileVar",
+            Variables.fileValue("test.txt").file("ABC".getBytes()).encoding("UTF-8").create()));
 
     FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
     assertNull(fileVar.getMimeType());
@@ -82,7 +87,8 @@ public class FileValueProcessSerializationTest extends PluggableProcessEngineTes
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSerializeNullMimeTypeAndNullEncoding() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Variables.createVariables().putValue("fileVar", Variables.fileValue("test.txt").file("ABC".getBytes()).create()));
+        Variables.createVariables().putValue("fileVar",
+            Variables.fileValue("test.txt").file("ABC".getBytes()).create()));
 
     FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
     assertNull(fileVar.getMimeType());
@@ -93,7 +99,8 @@ public class FileValueProcessSerializationTest extends PluggableProcessEngineTes
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSerializeNullEncoding() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Variables.createVariables().putValue("fileVar", Variables.fileValue("test.txt").mimeType("some mimetype").file("ABC".getBytes()).create()));
+        Variables.createVariables().putValue("fileVar", Variables.fileValue("test.txt")
+            .mimeType("some mimetype").file("ABC".getBytes()).create()));
 
     FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
     assertNull(fileVar.getEncoding());
@@ -108,7 +115,7 @@ public class FileValueProcessSerializationTest extends PluggableProcessEngineTes
     FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
     assertNull(fileVar.getMimeType());
   }
-  
+
   @Test
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSerializeEmptyFileName() {

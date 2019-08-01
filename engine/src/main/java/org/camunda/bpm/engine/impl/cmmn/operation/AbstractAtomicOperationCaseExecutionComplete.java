@@ -34,7 +34,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Roman Smirnov
  *
  */
-public abstract class AbstractAtomicOperationCaseExecutionComplete extends AbstractCmmnEventAtomicOperation {
+public abstract class AbstractAtomicOperationCaseExecutionComplete
+    extends AbstractCmmnEventAtomicOperation {
 
   protected static final CmmnOperationLogger LOG = ProcessEngineLogger.CMMN_OPERATION_LOGGER;
 
@@ -60,12 +61,14 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
       PvmExecutionImpl superExecution = execution.getSuperExecution();
 
       if (superCaseExecution != null) {
-        TransferVariablesActivityBehavior behavior = (TransferVariablesActivityBehavior) getActivityBehavior(superCaseExecution);
+        TransferVariablesActivityBehavior behavior = (TransferVariablesActivityBehavior) getActivityBehavior(
+            superCaseExecution);
         behavior.transferVariables(execution, superCaseExecution);
         superCaseExecution.complete();
 
       } else if (superExecution != null) {
-        SubProcessActivityBehavior behavior = (SubProcessActivityBehavior) getActivityBehavior(superExecution);
+        SubProcessActivityBehavior behavior = (SubProcessActivityBehavior) getActivityBehavior(
+            superExecution);
 
         try {
           behavior.passOutputVariables(superExecution, execution);

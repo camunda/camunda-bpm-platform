@@ -27,31 +27,29 @@ public interface UpdateExternalTaskRetriesBuilder extends UpdateExternalTaskRetr
   /**
    * Sets the retries for external tasks.
    *
-   * If the new value is 0, a new incident with a <code>null</code> message is created.
-   * If the old value is 0 and the new value is greater than 0, an existing incident
-   * is resolved.
+   * If the new value is 0, a new incident with a <code>null</code> message is created. If the old
+   * value is 0 and the new value is greater than 0, an existing incident is resolved.
    *
    * @param retries
    *
    * @throws org.camunda.bpm.engine.BadUserRequestException
-   *           If no external tasks are found
-   *           If a external task id is set to null
+   *           If no external tasks are found If a external task id is set to null
    *
-   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
-   *   <ul>
-   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
-   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
-   *   </ul>
+   * @throws AuthorizationException
+   *           thrown if the current user does not possess any of the following permissions:
+   *           <ul>
+   *           <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *           <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void set(int retries);
 
   /**
-   * Sets the retries for external tasks asynchronously as batch. The returned batch
-   * can be used to track the progress.
+   * Sets the retries for external tasks asynchronously as batch. The returned batch can be used to
+   * track the progress.
    *
-   * If the new value is 0, a new incident with a <code>null</code> message is created.
-   * If the old value is 0 and the new value is greater than 0, an existing incident
-   * is resolved.
+   * If the new value is 0, a new incident with a <code>null</code> message is created. If the old
+   * value is 0 and the new value is greater than 0, an existing incident is resolved.
    *
    * @param retries
    *
@@ -60,7 +58,8 @@ public interface UpdateExternalTaskRetriesBuilder extends UpdateExternalTaskRetr
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE} or
-   *           {@link BatchPermissions#CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES} permission on {@link Resources#BATCH}.
+   *           {@link BatchPermissions#CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES} permission on
+   *           {@link Resources#BATCH}.
    */
   Batch setAsync(int retries);
 

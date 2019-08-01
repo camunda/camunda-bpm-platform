@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.identity.PasswordPolicyRule;
  * @author Miklas Boskamp
  */
 public class DefaultPasswordPolicyImpl implements PasswordPolicy {
-  
+
   protected static final String PLACEHOLDER_PREFIX = "PASSWORD_POLICY_";
 
   // password length

@@ -56,7 +56,8 @@ public abstract class AbstractJobExecutorAcquireJobsTest {
 
   @Before
   public void saveProcessEngineConfiguration() {
-    configuration = (ProcessEngineConfigurationImpl) rule.getProcessEngine().getProcessEngineConfiguration();
+    configuration = (ProcessEngineConfigurationImpl) rule.getProcessEngine()
+        .getProcessEngineConfiguration();
     jobExecutorAcquireByDueDate = configuration.isJobExecutorAcquireByDueDate();
     jobExecutorAcquireByPriority = configuration.isJobExecutorAcquireByPriority();
     jobExecutorPreferTimerJobs = configuration.isJobExecutorPreferTimerJobs();
@@ -82,22 +83,19 @@ public abstract class AbstractJobExecutorAcquireJobsTest {
   }
 
   protected List<AcquirableJobEntity> findAcquirableJobs() {
-    return configuration.getCommandExecutorTxRequired().execute(new Command<List<AcquirableJobEntity>>() {
+    return configuration.getCommandExecutorTxRequired()
+        .execute(new Command<List<AcquirableJobEntity>>() {
 
-      @Override
-      public List<AcquirableJobEntity> execute(CommandContext commandContext) {
-        return commandContext
-          .getJobManager()
-          .findNextJobsToExecute(new Page(0, 100));
-      }
-    });
+          @Override
+          public List<AcquirableJobEntity> execute(CommandContext commandContext) {
+            return commandContext.getJobManager().findNextJobsToExecute(new Page(0, 100));
+          }
+        });
   }
 
   protected String startProcess(String processDefinitionKey, String activity) {
-    return runtimeService
-      .createProcessInstanceByKey(processDefinitionKey)
-      .startBeforeActivity(activity)
-      .execute().getId();
+    return runtimeService.createProcessInstanceByKey(processDefinitionKey)
+        .startBeforeActivity(activity).execute().getId();
   }
 
   protected void startProcess(String processDefinitionKey, String activity, int times) {

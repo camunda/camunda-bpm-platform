@@ -37,21 +37,25 @@ import org.junit.rules.RuleChain;
 public class DeploymentAwareJobExecutorForOracleTest {
 
   protected ProcessEngineBootstrapRule deploymentAwareBootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setJobExecutorDeploymentAware(true);
       return configuration;
     }
   };
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(deploymentAwareBootstrapRule);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(
+      deploymentAwareBootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(deploymentAwareBootstrapRule).around(engineRule).around(testRule);
-  
+  public RuleChain ruleChain = RuleChain.outerRule(deploymentAwareBootstrapRule).around(engineRule)
+      .around(testRule);
+
   @Test
   public void testFindAcquirableJobsWhen0InstancesDeployed() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume
+        .assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
 
     // then
     findAcquirableJobs();
@@ -60,7 +64,8 @@ public class DeploymentAwareJobExecutorForOracleTest {
   @Test
   public void testFindAcquirableJobsWhen1InstanceDeployed() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume
+        .assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
     // when
     testRule.deploy(ProcessModels.ONE_TASK_PROCESS);
     // then
@@ -70,9 +75,10 @@ public class DeploymentAwareJobExecutorForOracleTest {
   @Test
   public void testFindAcquirableJobsWhen1000InstancesDeployed() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume
+        .assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
     // when
-    for (int i=0; i<1000; i++) {
+    for (int i = 0; i < 1000; i++) {
       testRule.deploy(ProcessModels.ONE_TASK_PROCESS);
     }
     // then
@@ -82,9 +88,10 @@ public class DeploymentAwareJobExecutorForOracleTest {
   @Test
   public void testFindAcquirableJobsWhen1001InstancesDeployed() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume
+        .assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
     // when
-    for (int i=0; i<1001; i++) {
+    for (int i = 0; i < 1001; i++) {
       testRule.deploy(ProcessModels.ONE_TASK_PROCESS);
     }
     // then
@@ -94,9 +101,10 @@ public class DeploymentAwareJobExecutorForOracleTest {
   @Test
   public void testFindAcquirableJobsWhen2000InstancesDeployed() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume
+        .assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
     // when
-    for (int i=0; i<2000; i++) {
+    for (int i = 0; i < 2000; i++) {
       testRule.deploy(ProcessModels.ONE_TASK_PROCESS);
     }
     // then
@@ -104,14 +112,13 @@ public class DeploymentAwareJobExecutorForOracleTest {
   }
 
   protected List<AcquirableJobEntity> findAcquirableJobs() {
-    return engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<List<AcquirableJobEntity>>() {
+    return engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new Command<List<AcquirableJobEntity>>() {
 
-      @Override
-      public List<AcquirableJobEntity> execute(CommandContext commandContext) {
-        return commandContext
-          .getJobManager()
-          .findNextJobsToExecute(new Page(0, 100));
-      }
-    });
+          @Override
+          public List<AcquirableJobEntity> execute(CommandContext commandContext) {
+            return commandContext.getJobManager().findNextJobsToExecute(new Page(0, 100));
+          }
+        });
   }
 }

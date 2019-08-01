@@ -45,7 +45,8 @@ public class StagePlanItemExecutionListenerHandlerTest extends CmmnElementHandle
 
   protected AbstractExecutionListenerSpec testSpecification;
 
-  public StagePlanItemExecutionListenerHandlerTest(AbstractExecutionListenerSpec testSpecification) {
+  public StagePlanItemExecutionListenerHandlerTest(
+      AbstractExecutionListenerSpec testSpecification) {
     this.testSpecification = testSpecification;
   }
 

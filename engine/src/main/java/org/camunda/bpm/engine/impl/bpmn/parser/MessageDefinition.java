@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
-
 import org.camunda.bpm.engine.impl.el.Expression;
 
 /**
@@ -28,7 +27,7 @@ public class MessageDefinition {
 
   protected String id;
   protected Expression name;
-  
+
   public MessageDefinition(String id, Expression name) {
     this.id = id;
     this.name = name;

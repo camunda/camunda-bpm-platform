@@ -76,15 +76,14 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
   public void testExecutionInPAContextByName() throws Exception {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
-    ProcessApplicationReference contextPA = ProcessApplicationContext.withProcessApplicationContext(
-        new Callable<ProcessApplicationReference>() {
+    ProcessApplicationReference contextPA = ProcessApplicationContext
+        .withProcessApplicationContext(new Callable<ProcessApplicationReference>() {
 
           @Override
           public ProcessApplicationReference call() throws Exception {
             return getCurrentContextApplication();
           }
-        },
-        pa.getName());
+        }, pa.getName());
 
     Assert.assertEquals(contextPA.getProcessApplication(), pa);
 
@@ -108,15 +107,14 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
   public void testExecutionInPAContextByReference() throws Exception {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
-    ProcessApplicationReference contextPA = ProcessApplicationContext.withProcessApplicationContext(
-        new Callable<ProcessApplicationReference>() {
+    ProcessApplicationReference contextPA = ProcessApplicationContext
+        .withProcessApplicationContext(new Callable<ProcessApplicationReference>() {
 
           @Override
           public ProcessApplicationReference call() throws Exception {
             return getCurrentContextApplication();
           }
-        },
-        pa.getReference());
+        }, pa.getReference());
 
     Assert.assertEquals(contextPA.getProcessApplication(), pa);
 
@@ -140,15 +138,14 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
   public void testExecutionInPAContextbyRawPA() throws Exception {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
-    ProcessApplicationReference contextPA = ProcessApplicationContext.withProcessApplicationContext(
-        new Callable<ProcessApplicationReference>() {
+    ProcessApplicationReference contextPA = ProcessApplicationContext
+        .withProcessApplicationContext(new Callable<ProcessApplicationReference>() {
 
           @Override
           public ProcessApplicationReference call() throws Exception {
             return getCurrentContextApplication();
           }
-        },
-        pa);
+        }, pa);
 
     Assert.assertEquals(contextPA.getProcessApplication(), pa);
 
@@ -167,7 +164,9 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
         fail("should not succeed");
 
       } catch (ProcessEngineException e) {
-        assertTextPresent("A process application with name '" + nonExistingName + "' is not registered", e.getMessage());
+        assertTextPresent(
+            "A process application with name '" + nonExistingName + "' is not registered",
+            e.getMessage());
       }
 
     } finally {
@@ -191,7 +190,9 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
       fail("should not succeed");
 
     } catch (ProcessEngineException e) {
-      assertTextPresent("A process application with name '" + nonExistingName + "' is not registered", e.getMessage());
+      assertTextPresent(
+          "A process application with name '" + nonExistingName + "' is not registered",
+          e.getMessage());
     }
 
   }
@@ -201,12 +202,14 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     // given a process application which extends the default one
     // - using a spy for verify the invocations
     TestApplicationWithoutEngine processApplication = spy(pa);
-    ProcessApplicationReference processApplicationReference = mock(ProcessApplicationReference.class);
+    ProcessApplicationReference processApplicationReference = mock(
+        ProcessApplicationReference.class);
     when(processApplicationReference.getProcessApplication()).thenReturn(processApplication);
 
     // when execute with context
     InvocationContext invocationContext = new InvocationContext(mock(BaseDelegateExecution.class));
-    Context.executeWithinProcessApplication(mock(Callable.class), processApplicationReference, invocationContext);
+    Context.executeWithinProcessApplication(mock(Callable.class), processApplicationReference,
+        invocationContext);
 
     // then the execute method should be invoked with context
     verify(processApplication).execute(any(Callable.class), eq(invocationContext));
@@ -215,14 +218,16 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
   }
 
   protected ProcessApplicationReference getCurrentContextApplication() {
-    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
-    return engineConfiguration.getCommandExecutorTxRequired().execute(new Command<ProcessApplicationReference>() {
+    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+        .getProcessEngineConfiguration();
+    return engineConfiguration.getCommandExecutorTxRequired()
+        .execute(new Command<ProcessApplicationReference>() {
 
-      @Override
-      public ProcessApplicationReference execute(CommandContext commandContext) {
-        return Context.getCurrentProcessApplication();
-      }
-    });
+          @Override
+          public ProcessApplicationReference execute(CommandContext commandContext) {
+            return Context.getCurrentProcessApplication();
+          }
+        });
   }
 
 }

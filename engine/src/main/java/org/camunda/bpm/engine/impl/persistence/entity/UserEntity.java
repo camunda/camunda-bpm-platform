@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 
 import static org.camunda.bpm.engine.impl.util.EncryptionUtil.saltPassword;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -66,36 +65,45 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
   }
 
   public int getRevisionNext() {
-    return revision+1;
+    return revision + 1;
   }
 
   public String getId() {
     return id;
   }
+
   public void setId(String id) {
     this.id = id;
   }
+
   public String getFirstName() {
     return firstName;
   }
+
   public void setFirstName(String firstName) {
     this.firstName = firstName;
   }
+
   public String getLastName() {
     return lastName;
   }
+
   public void setLastName(String lastName) {
     this.lastName = lastName;
   }
+
   public String getEmail() {
     return email;
   }
+
   public void setEmail(String email) {
     this.email = email;
   }
+
   public String getPassword() {
     return password;
   }
+
   public void setPassword(String password) {
     this.newPassword = password;
   }
@@ -103,6 +111,7 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
   public String getSalt() {
     return this.salt;
   }
+
   public void setSalt(String salt) {
     this.salt = salt;
   }
@@ -117,6 +126,7 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
   public int getRevision() {
     return revision;
   }
+
   public void setRevision(int revision) {
     this.revision = revision;
   }
@@ -149,38 +159,25 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
       return null;
     } else {
       String saltedPassword = saltPassword(password, salt);
-      return Context.getProcessEngineConfiguration()
-        .getPasswordManager()
-        .encrypt(saltedPassword);
+      return Context.getProcessEngineConfiguration().getPasswordManager().encrypt(saltedPassword);
     }
   }
 
   protected String generateSalt() {
-    return Context.getProcessEngineConfiguration()
-      .getSaltGenerator()
-      .generateSalt();
+    return Context.getProcessEngineConfiguration().getSaltGenerator().generateSalt();
   }
-  
 
   public boolean checkPasswordAgainstPolicy() {
-    PasswordPolicyResult result = Context.getProcessEngineConfiguration()
-      .getIdentityService()
-      .checkPasswordAgainstPolicy(newPassword);
+    PasswordPolicyResult result = Context.getProcessEngineConfiguration().getIdentityService()
+        .checkPasswordAgainstPolicy(newPassword);
 
     return result.isValid();
   }
 
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", revision=" + revision
-           + ", firstName=" + firstName
-           + ", lastName=" + lastName
-           + ", email=" + email
-           + ", password=" + password
-           + ", salt=" + salt
-           + ", lockExpirationTime=" + lockExpirationTime
-           + ", attempts=" + attempts
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", revision=" + revision + ", firstName="
+        + firstName + ", lastName=" + lastName + ", email=" + email + ", password=" + password
+        + ", salt=" + salt + ", lockExpirationTime=" + lockExpirationTime + ", attempts=" + attempts
+        + "]";
   }
 }

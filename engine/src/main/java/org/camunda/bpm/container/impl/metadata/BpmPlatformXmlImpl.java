@@ -23,7 +23,9 @@ import org.camunda.bpm.container.impl.metadata.spi.JobExecutorXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
- * <p>Implementation of the BpmPlatformXml SPI</p>
+ * <p>
+ * Implementation of the BpmPlatformXml SPI
+ * </p>
  * 
  * @author Daniel Meyer
  * 
@@ -33,7 +35,7 @@ public class BpmPlatformXmlImpl implements BpmPlatformXml {
   protected JobExecutorXml jobExecutor;
 
   protected List<ProcessEngineXml> processEngines;
-  
+
   public BpmPlatformXmlImpl(JobExecutorXml jobExecutor, List<ProcessEngineXml> processEngines) {
     this.jobExecutor = jobExecutor;
     this.processEngines = processEngines;

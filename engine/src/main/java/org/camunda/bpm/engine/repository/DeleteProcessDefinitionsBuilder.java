@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 
 /**
- * Fluent builder to delete process definitions by a process definition key or process definition ids.
+ * Fluent builder to delete process definitions by a process definition key or process definition
+ * ids.
  *
  * @author Tassilo Weidner
  */
@@ -38,8 +39,8 @@ public interface DeleteProcessDefinitionsBuilder {
 
   /**
    * Only the built-in {@link ExecutionListener}s are notified with the
-   * {@link ExecutionListener#EVENTNAME_END} event.
-   * Is only applied in conjunction with the cascade method.
+   * {@link ExecutionListener#EVENTNAME_END} event. Is only applied in conjunction with the cascade
+   * method.
    *
    * @return the builder
    */
@@ -58,11 +59,14 @@ public interface DeleteProcessDefinitionsBuilder {
    * @throws ProcessEngineException
    *           If no such processDefinition can be found.
    * @throws AuthorizationException
-   *           <ul><li>if the user has no {@link Permissions#UPDATE} permission on
+   *           <ul>
+   *           <li>if the user has no {@link Permissions#UPDATE} permission on
    *           {@link Resources#PROCESS_DEFINITION}</li>
-   *           <li>if {@link #cascade()} is applied and the user has
-   *           no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or
-   *           no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li></ul>
+   *           <li>if {@link #cascade()} is applied and the user has no {@link Permissions#UPDATE}
+   *           permission on {@link Resources#PROCESS_INSTANCE} or no
+   *           {@link Permissions#UPDATE_INSTANCE} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.</li>
+   *           </ul>
    */
   void delete();
 

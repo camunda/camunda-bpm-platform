@@ -29,8 +29,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 /**
- * Gives access to a deployed case diagram, e.g., a PNG image, through a stream
- * of bytes.
+ * Gives access to a deployed case diagram, e.g., a PNG image, through a stream of bytes.
  *
  * @author Simon Zambrovski
  */
@@ -42,19 +41,19 @@ public class GetDeploymentCaseDiagramCmd implements Command<InputStream>, Serial
 
   public GetDeploymentCaseDiagramCmd(String caseDefinitionId) {
     if (caseDefinitionId == null || caseDefinitionId.length() < 1) {
-      throw new ProcessEngineException("The case definition id is mandatory, but '" + caseDefinitionId + "' has been provided.");
+      throw new ProcessEngineException(
+          "The case definition id is mandatory, but '" + caseDefinitionId + "' has been provided.");
     }
     this.caseDefinitionId = caseDefinitionId;
   }
 
   @Override
   public InputStream execute(final CommandContext commandContext) {
-    CaseDefinitionEntity caseDefinition = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .findDeployedCaseDefinitionById(caseDefinitionId);
+    CaseDefinitionEntity caseDefinition = Context.getProcessEngineConfiguration()
+        .getDeploymentCache().findDeployedCaseDefinitionById(caseDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadCaseDefinition(caseDefinition);
     }
 

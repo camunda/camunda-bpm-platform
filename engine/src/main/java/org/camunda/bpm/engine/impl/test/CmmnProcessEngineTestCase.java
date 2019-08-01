@@ -29,9 +29,9 @@ import org.camunda.bpm.engine.variable.VariableMap;
 /**
  * Base class for CMMN test cases with helper methods.
  *
- * These also includes state transition methods which are currently
- * not implemented as parted of the public API, i.e. {@link CaseService}.
- * These methods should be removed after they are available through public API.
+ * These also includes state transition methods which are currently not implemented as parted of the
+ * public API, i.e. {@link CaseService}. These methods should be removed after they are available
+ * through public API.
  *
  * @author Sebastian Menski
  */
@@ -43,10 +43,8 @@ public class CmmnProcessEngineTestCase extends PluggableProcessEngineTestCase {
   }
 
   protected CaseInstance createCaseInstance(String businessKey) {
-    String caseDefinitionKey = repositoryService.
-      createCaseDefinitionQuery()
-      .singleResult()
-      .getKey();
+    String caseDefinitionKey = repositoryService.createCaseDefinitionQuery().singleResult()
+        .getKey();
 
     return createCaseInstanceByKey(caseDefinitionKey, businessKey);
   }
@@ -63,28 +61,20 @@ public class CmmnProcessEngineTestCase extends PluggableProcessEngineTestCase {
     return createCaseInstanceByKey(caseDefinitionKey, null, variables);
   }
 
-  protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey, VariableMap variables) {
-    return caseService
-      .withCaseDefinitionByKey(caseDefinitionKey)
-      .businessKey(businessKey)
-      .setVariables(variables)
-      .create();
+  protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey,
+      VariableMap variables) {
+    return caseService.withCaseDefinitionByKey(caseDefinitionKey).businessKey(businessKey)
+        .setVariables(variables).create();
   }
 
   // queries
 
   protected CaseExecution queryCaseExecutionByActivityId(String activityId) {
-    return caseService
-      .createCaseExecutionQuery()
-      .activityId(activityId)
-      .singleResult();
+    return caseService.createCaseExecutionQuery().activityId(activityId).singleResult();
   }
 
   protected CaseExecution queryCaseExecutionById(String caseExecutionId) {
-    return caseService
-      .createCaseExecutionQuery()
-      .caseExecutionId(caseExecutionId)
-      .singleResult();
+    return caseService.createCaseExecutionQuery().caseExecutionId(caseExecutionId).singleResult();
   }
 
   protected CaseSentryPartQueryImpl createCaseSentryPartQuery() {
@@ -95,34 +85,23 @@ public class CmmnProcessEngineTestCase extends PluggableProcessEngineTestCase {
   // transition methods
 
   protected void close(final String caseExecutionId) {
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .close();
+    caseService.withCaseExecution(caseExecutionId).close();
   }
 
   protected void complete(final String caseExecutionId) {
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .complete();
+    caseService.withCaseExecution(caseExecutionId).complete();
   }
 
   protected CaseInstance create(final String caseDefinitionId) {
-    return caseService
-      .withCaseDefinition(caseDefinitionId)
-      .create();
+    return caseService.withCaseDefinition(caseDefinitionId).create();
   }
 
   protected CaseInstance create(final String caseDefinitionId, final String businessKey) {
-    return caseService
-      .withCaseDefinition(caseDefinitionId)
-      .businessKey(businessKey)
-      .create();
+    return caseService.withCaseDefinition(caseDefinitionId).businessKey(businessKey).create();
   }
 
   protected void disable(final String caseExecutionId) {
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .disable();
+    caseService.withCaseExecution(caseExecutionId).disable();
   }
 
   protected void exit(final String caseExecutionId) {
@@ -134,9 +113,7 @@ public class CmmnProcessEngineTestCase extends PluggableProcessEngineTestCase {
   }
 
   protected void manualStart(final String caseExecutionId) {
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .manualStart();
+    caseService.withCaseExecution(caseExecutionId).manualStart();
   }
 
   protected void occur(final String caseExecutionId) {
@@ -181,9 +158,7 @@ public class CmmnProcessEngineTestCase extends PluggableProcessEngineTestCase {
   }
 
   protected void reenable(final String caseExecutionId) {
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .reenable();
+    caseService.withCaseExecution(caseExecutionId).reenable();
   }
 
   protected void resume(final String caseExecutionId) {
@@ -211,18 +186,14 @@ public class CmmnProcessEngineTestCase extends PluggableProcessEngineTestCase {
   }
 
   protected void executeHelperCaseCommand(HelperCaseCommand command) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(command);
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(command);
   }
 
   protected abstract class HelperCaseCommand implements Command<Void> {
 
     protected CmmnExecution getExecution(String caseExecutionId) {
-      return (CmmnExecution) caseService
-        .createCaseExecutionQuery()
-        .caseExecutionId(caseExecutionId)
-        .singleResult();
+      return (CmmnExecution) caseService.createCaseExecutionQuery().caseExecutionId(caseExecutionId)
+          .singleResult();
     }
 
     public Void execute(CommandContext commandContext) {

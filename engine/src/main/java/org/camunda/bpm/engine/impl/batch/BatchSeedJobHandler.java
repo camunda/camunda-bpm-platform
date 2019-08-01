@@ -26,12 +26,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
- * The batch seed job handler is responsible to
- * create all jobs to be executed by the batch.
+ * The batch seed job handler is responsible to create all jobs to be executed by the batch.
  *
- * If all jobs are created a seed monitor job is
- * created to oversee the completion of the batch
- * (see {@link BatchMonitorJobHandler}).
+ * If all jobs are created a seed monitor job is created to oversee the completion of the batch (see
+ * {@link BatchMonitorJobHandler}).
  */
 public class BatchSeedJobHandler implements JobHandler<BatchSeedJobConfiguration> {
 
@@ -41,23 +39,21 @@ public class BatchSeedJobHandler implements JobHandler<BatchSeedJobConfiguration
     return TYPE;
   }
 
-  public void execute(BatchSeedJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(BatchSeedJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
 
     String batchId = configuration.getBatchId();
     BatchEntity batch = commandContext.getBatchManager().findBatchById(batchId);
     ensureNotNull("Batch with id '" + batchId + "' cannot be found", "batch", batch);
 
-    BatchJobHandler<?> batchJobHandler = commandContext
-        .getProcessEngineConfiguration()
-        .getBatchHandlers()
-        .get(batch.getType());
+    BatchJobHandler<?> batchJobHandler = commandContext.getProcessEngineConfiguration()
+        .getBatchHandlers().get(batch.getType());
 
     boolean done = batchJobHandler.createJobs(batch);
 
     if (!done) {
       batch.createSeedJob();
-    }
-    else {
+    } else {
       // create monitor job initially without due date to
       // enable rapid completion of simple batches
       batch.createMonitorJob(false);

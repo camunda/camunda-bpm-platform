@@ -45,7 +45,8 @@ public class ProcessTaskPlanItemExecutionListenerHandlerTest extends CmmnElement
 
   protected AbstractExecutionListenerSpec testSpecification;
 
-  public ProcessTaskPlanItemExecutionListenerHandlerTest(AbstractExecutionListenerSpec testSpecification) {
+  public ProcessTaskPlanItemExecutionListenerHandlerTest(
+      AbstractExecutionListenerSpec testSpecification) {
     this.testSpecification = testSpecification;
   }
 

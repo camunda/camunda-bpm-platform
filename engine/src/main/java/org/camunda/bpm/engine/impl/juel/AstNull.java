@@ -17,20 +17,19 @@ package org.camunda.bpm.engine.impl.juel;
 
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 
-
 public final class AstNull extends AstLiteral {
-	@Override 
-	public Object eval(Bindings bindings, ELContext context) {
-		return null;
-	}
+  @Override
+  public Object eval(Bindings bindings, ELContext context) {
+    return null;
+  }
 
-	@Override
-	public String toString() {
-		return "null";
-	}
+  @Override
+  public String toString() {
+    return "null";
+  }
 
-	@Override 
-	public void appendStructure(StringBuilder b, Bindings bindings) {
-		b.append("null");
-	}
+  @Override
+  public void appendStructure(StringBuilder b, Bindings bindings) {
+    b.append("null");
+  }
 }

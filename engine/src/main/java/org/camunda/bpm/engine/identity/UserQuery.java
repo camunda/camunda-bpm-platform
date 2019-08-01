@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.identity;
 
 import org.camunda.bpm.engine.query.Query;
 
-
 /**
  * Allows programmatic querying of {@link User}
  *
@@ -35,24 +34,27 @@ public interface UserQuery extends Query<UserQuery, User> {
   /** Only select {@link User}s with the given firstName. */
   UserQuery userFirstName(String firstName);
 
-  /** Only select {@link User}s where the first name matches the given parameter.
-   * The syntax is that of SQL, eg. %activivi%.
+  /**
+   * Only select {@link User}s where the first name matches the given parameter. The syntax is that
+   * of SQL, eg. %activivi%.
    */
   UserQuery userFirstNameLike(String firstNameLike);
 
   /** Only select {@link User}s with the given lastName. */
   UserQuery userLastName(String lastName);
 
-  /** Only select {@link User}s where the last name matches the given parameter.
-   * The syntax is that of SQL, eg. %activivi%.
+  /**
+   * Only select {@link User}s where the last name matches the given parameter. The syntax is that
+   * of SQL, eg. %activivi%.
    */
   UserQuery userLastNameLike(String lastNameLike);
 
   /** Only those {@link User}s with the given email addres. */
   UserQuery userEmail(String email);
 
-  /** Only select {@link User}s where the email matches the given parameter.
-   * The syntax is that of SQL, eg. %activivi%.
+  /**
+   * Only select {@link User}s where the email matches the given parameter. The syntax is that of
+   * SQL, eg. %activivi%.
    */
   UserQuery userEmailLike(String emailLike);
 
@@ -65,7 +67,7 @@ public interface UserQuery extends Query<UserQuery, User> {
   /** Only select {@link User}s that belongs to the given tenant. */
   UserQuery memberOfTenant(String tenantId);
 
-  //sorting ////////////////////////////////////////////////////////
+  // sorting ////////////////////////////////////////////////////////
 
   /** Order by user id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   UserQuery orderByUserId();
@@ -76,7 +78,7 @@ public interface UserQuery extends Query<UserQuery, User> {
   /** Order by user last name (needs to be followed by {@link #asc()} or {@link #desc()}). */
   UserQuery orderByUserLastName();
 
-  /** Order by user email  (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /** Order by user email (needs to be followed by {@link #asc()} or {@link #desc()}). */
   UserQuery orderByUserEmail();
 
 }

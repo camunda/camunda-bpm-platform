@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.cfg;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Tom Baeyens
  */

@@ -33,7 +33,8 @@ import org.joda.time.Period;
  */
 public class TaskFollowUpDateExtensionsTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/usertask/TaskFollowUpDateExtensionsTest.testUserTaskFollowUpDate.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/usertask/TaskFollowUpDateExtensionsTest.testUserTaskFollowUpDate.bpmn20.xml" })
   public void testUserTaskFollowUpDateExtension() throws Exception {
 
     Date date = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse("01-01-2015 12:10:00");
@@ -41,38 +42,46 @@ public class TaskFollowUpDateExtensionsTest extends PluggableProcessEngineTestCa
     variables.put("dateVariable", date);
 
     // Start process-instance, passing date that should be used as followUpDate
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        variables);
 
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull(task.getFollowUpDate());
     assertEquals(date, task.getFollowUpDate());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/usertask/TaskFollowUpDateExtensionsTest.testUserTaskFollowUpDate.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/usertask/TaskFollowUpDateExtensionsTest.testUserTaskFollowUpDate.bpmn20.xml" })
   public void testUserTaskFollowUpDateStringExtension() throws Exception {
 
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("dateVariable", "2015-01-01T12:10:00");
 
     // Start process-instance, passing date that should be used as followUpDate
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        variables);
 
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull(task.getFollowUpDate());
     Date date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse("01-01-2015 12:10:00");
     assertEquals(date, task.getFollowUpDate());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/usertask/TaskFollowUpDateExtensionsTest.testUserTaskFollowUpDate.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/usertask/TaskFollowUpDateExtensionsTest.testUserTaskFollowUpDate.bpmn20.xml" })
   public void testUserTaskRelativeFollowUpDate() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("dateVariable", "P2DT2H30M");
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        variables);
 
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     Date followUpDate = task.getFollowUpDate();
     assertNotNull(followUpDate);

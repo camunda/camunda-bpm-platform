@@ -17,7 +17,9 @@
 package org.camunda.bpm.container.impl.tomcat.deployment;
 
 /**
- * <p>Set of constant keys to be used in apache tomcat deployment operations</p>
+ * <p>
+ * Set of constant keys to be used in apache tomcat deployment operations
+ * </p>
  * 
  * @author Daniel Meyer
  *

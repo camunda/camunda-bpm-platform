@@ -32,7 +32,8 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
  * @author Roman Smirnov
  *
  */
-public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, HasDbRevision, HasDbReferences {
+public class CaseSentryPartEntity extends CmmnSentryPart
+    implements DbEntity, HasDbRevision, HasDbReferences {
 
   private static final long serialVersionUID = 1L;
 
@@ -183,9 +184,7 @@ public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, Ha
   // helper ////////////////////////////////////////////////////////////////////
 
   protected CaseExecutionEntity findCaseExecutionById(String caseExecutionId) {
-    return Context
-        .getCommandContext()
-        .getCaseExecutionManager()
+    return Context.getCommandContext().getCaseExecutionManager()
         .findCaseExecutionById(caseExecutionId);
   }
 

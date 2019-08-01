@@ -30,30 +30,25 @@ public interface MigratingInstance {
   void detachState();
 
   /**
-   * Restore this instance's state as a subordinate to the given activity instance
-   * (e.g. in the execution tree).
-   * Restoration should restore the state that was detached
-   * before.
+   * Restore this instance's state as a subordinate to the given activity instance (e.g. in the
+   * execution tree). Restoration should restore the state that was detached before.
    */
   void attachState(MigratingScopeInstance targetActivityInstance);
 
   /**
-   * Restore this instance's state as a subordinate to the given transition instance
-   * (e.g. in the execution tree).
-   * Restoration should restore the state that was detached
-   * before.
+   * Restore this instance's state as a subordinate to the given transition instance (e.g. in the
+   * execution tree). Restoration should restore the state that was detached before.
    */
   void attachState(MigratingTransitionInstance targetTransitionInstance);
 
   /**
-   * Migrate state from the source process definition
-   * to the target process definition.
+   * Migrate state from the source process definition to the target process definition.
    */
   void migrateState();
 
   /**
-   * Migrate instances that are aggregated by this instance
-   * (e.g. an activity instance aggregates task instances).
+   * Migrate instances that are aggregated by this instance (e.g. an activity instance aggregates
+   * task instances).
    */
   void migrateDependentEntities();
 

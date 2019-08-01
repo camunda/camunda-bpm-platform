@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.authorization;
 
-
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
@@ -90,7 +89,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().includeDeleted().list();
+        List<HistoricVariableInstance> variables = historyService
+            .createHistoricVariableInstanceQuery().includeDeleted().list();
         for (HistoricVariableInstance variable : variables) {
           commandContext.getDbEntityManager().delete((HistoricVariableInstanceEntity) variable);
         }
@@ -207,7 +207,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(DEMO_ASSIGNEE_PROCESS_KEY);
 
     disableAuthorization();
-    String taskId = taskService.createTaskQuery().processDefinitionKey(PROCESS_KEY).listPage(0, 1).get(0).getId();
+    String taskId = taskService.createTaskQuery().processDefinitionKey(PROCESS_KEY).listPage(0, 1)
+        .get(0).getId();
     enableAuthorization();
 
     createGrantAuthorization(TASK, taskId, userId, READ);
@@ -331,7 +332,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'Task'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'Task'",
+          e.getMessage());
     }
   }
 
@@ -359,7 +362,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'Task'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'Task'",
+          e.getMessage());
     }
   }
 
@@ -421,7 +426,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
 
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN'",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -604,7 +611,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a task.");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have 'DELETE' permission on resource 'myTask' of type 'Task'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'DELETE' permission on resource 'myTask' of type 'Task'",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -643,7 +652,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete tasks.");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have 'DELETE' permission on resource 'myTask1' of type 'Task'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'DELETE' permission on resource 'myTask1' of type 'Task'",
+          e.getMessage());
     }
 
     deleteTask(firstTaskId, true);
@@ -665,7 +676,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete tasks.");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have 'DELETE' permission on resource 'myTask2' of type 'Task'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'DELETE' permission on resource 'myTask2' of type 'Task'",
+          e.getMessage());
     }
 
     deleteTask(firstTaskId, true);
@@ -706,7 +719,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to set an assignee");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -913,7 +928,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to set an owner");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -1137,7 +1154,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to add a candidate user");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -1232,7 +1251,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to add an user identity link");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
   }
 
@@ -1451,7 +1472,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to add a candidate group");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -1800,7 +1823,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to add an user identity link");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -1842,7 +1867,6 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // when
     taskService.addUserIdentityLink(taskId, "demo", IdentityLinkType.CANDIDATE);
-
 
     disableAuthorization();
     List<IdentityLink> linksForTask = taskService.getIdentityLinksForTask(taskId);
@@ -2096,7 +2120,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to add a group identity link");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -2292,7 +2318,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a candidate user");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -2541,7 +2569,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a candidate group");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -2790,7 +2820,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete an user identity link");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -3060,7 +3092,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delete a group identity link");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -3227,7 +3261,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to get identity links");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have 'READ' permission on resource 'myTask' of type 'Task'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have 'READ' permission on resource 'myTask' of type 'Task'",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -3369,7 +3405,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to claim the task.");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions:", e.getMessage());
+      assertTextPresent("The user with id 'test' does not have one of the following permissions:",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -3425,7 +3462,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to complete a task");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_WORK",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -3517,7 +3556,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to complete a task");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_WORK",
+          e.getMessage());
     }
 
   }
@@ -3601,7 +3642,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to complete a task");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_WORK",
+          e.getMessage());
     }
 
   }
@@ -3651,7 +3694,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to complete a task");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_WORK",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -3837,7 +3882,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to delegate a task");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -4061,7 +4108,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to resolve a task");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_WORK",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -4214,7 +4263,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to set a priority");
     } catch (AuthorizationException e) {
       // then
-      assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN'", e.getMessage());
+      assertTextPresent(
+          "The user with id 'test' does not have one of the following permissions: 'TASK_ASSIGN'",
+          e.getMessage());
     }
 
     deleteTask(taskId, true);
@@ -4668,9 +4719,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .resourceId(taskId)
+    Authorization authorization = authorizationService.createAuthorizationQuery().resourceId(taskId)
         .singleResult();
     enableAuthorization();
     assertNotNull(authorization);
@@ -4680,9 +4729,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    authorization = authorizationService
-        .createAuthorizationQuery()
-        .resourceId(taskId)
+    authorization = authorizationService.createAuthorizationQuery().resourceId(taskId)
         .singleResult();
     enableAuthorization();
 
@@ -4700,9 +4747,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
 
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .resourceId(taskId)
+    Authorization authorization = authorizationService.createAuthorizationQuery().resourceId(taskId)
         .singleResult();
     enableAuthorization();
     assertNotNull(authorization);
@@ -4712,16 +4757,15 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    authorization = authorizationService
-        .createAuthorizationQuery()
-        .resourceId(taskId)
+    authorization = authorizationService.createAuthorizationQuery().resourceId(taskId)
         .singleResult();
     enableAuthorization();
 
     assertNull(authorization);
   }
 
-  // set assignee -> an authorization is available (standalone task) /////////////////////////////////////////
+  // set assignee -> an authorization is available (standalone task)
+  // /////////////////////////////////////////
 
   public void testStandaloneTaskSetAssigneeCreateNewAuthorization() {
     // given
@@ -4735,9 +4779,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -4763,9 +4805,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -4793,9 +4833,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     // authorization for demo is still available
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -4846,9 +4884,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -4875,9 +4911,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -4890,7 +4924,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  // set assignee -> an authorization is available (process task) /////////////////////////////////////////
+  // set assignee -> an authorization is available (process task)
+  // /////////////////////////////////////////
 
   public void testProcessTaskSetAssigneeCreateNewAuthorization() {
     // given
@@ -4904,9 +4939,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -4930,9 +4963,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -4958,9 +4989,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     // authorization for demo is still available
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -4996,7 +5025,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskAssignee() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, DEMO_ASSIGNEE_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, DEMO_ASSIGNEE_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
@@ -5006,9 +5036,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // an authorization for demo has been created
     String taskId = selectSingleTask().getId();
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5031,7 +5059,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     identityService.setAuthentication(userId, Arrays.asList(groupId));
   }
 
-  // set assignee -> should not create an authorization (case task) /////////////////////////////////////////
+  // set assignee -> should not create an authorization (case task)
+  // /////////////////////////////////////////
 
   public void testCaseTaskSetAssigneeNoAuthorization() {
     // given
@@ -5044,16 +5073,15 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
     assertNull(authorization);
   }
 
-  // set owner -> an authorization is available (standalone task) /////////////////////////////////////////
+  // set owner -> an authorization is available (standalone task)
+  // /////////////////////////////////////////
 
   public void testStandaloneTaskSetOwnerCreateNewAuthorization() {
     // given
@@ -5067,9 +5095,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5095,9 +5121,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5147,9 +5171,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5177,9 +5199,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5192,7 +5212,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
-  // set owner -> an authorization is available (process task) /////////////////////////////////////////
+  // set owner -> an authorization is available (process task)
+  // /////////////////////////////////////////
 
   public void testProcessTaskSetOwnerCreateNewAuthorization() {
     // given
@@ -5206,9 +5227,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5232,9 +5251,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5268,7 +5285,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     identityService.setAuthentication(userId, Arrays.asList(groupId));
   }
 
-  // set owner -> should not create an authorization  (case task) /////////////////////////////////
+  // set owner -> should not create an authorization (case task) /////////////////////////////////
 
   public void testCaseTaskSetOwnerNoAuthorization() {
     // given
@@ -5281,9 +5298,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5303,9 +5318,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5331,9 +5344,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5409,9 +5420,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5435,9 +5444,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5473,7 +5480,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskCandidateUsers() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, CANDIDATE_USERS_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, CANDIDATE_USERS_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
@@ -5483,9 +5491,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // an authorization for demo has been created
     String taskId = selectSingleTask().getId();
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5497,11 +5503,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // an authorization for test has been created
     disableAuthorization();
-    authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("test")
-        .resourceId(taskId)
-        .singleResult();
+    authorization = authorizationService.createAuthorizationQuery().userIdIn("test")
+        .resourceId(taskId).singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5529,7 +5532,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(taskId, task.getId());
   }
 
-  // add candidate user -> should not create an authorization  (case task) /////////////////////////////////
+  // add candidate user -> should not create an authorization (case task)
+  // /////////////////////////////////
 
   public void testCaseTaskAddCandidateUserNoAuthorization() {
     // given
@@ -5542,9 +5546,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .userIdIn("demo")
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("demo")
         .singleResult();
     enableAuthorization();
 
@@ -5564,10 +5566,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .groupIdIn("management")
-        .singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .groupIdIn("management").singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5592,10 +5592,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .groupIdIn("management")
-        .singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .groupIdIn("management").singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5645,10 +5643,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .groupIdIn("management")
-        .singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .groupIdIn("management").singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5671,10 +5667,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .groupIdIn("management")
-        .singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .groupIdIn("management").singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5709,7 +5703,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskCandidateGroups() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, CANDIDATE_GROUPS_PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, CANDIDATE_GROUPS_PROCESS_KEY, userId,
+        CREATE_INSTANCE);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
@@ -5719,10 +5714,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // an authorization for management has been created
     String taskId = selectSingleTask().getId();
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .groupIdIn("management")
-        .singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .groupIdIn("management").singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5733,9 +5726,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // an authorization for accounting has been created
     disableAuthorization();
-    authorization = authorizationService
-        .createAuthorizationQuery()
-        .groupIdIn("accounting")
+    authorization = authorizationService.createAuthorizationQuery().groupIdIn("accounting")
         .singleResult();
     enableAuthorization();
 
@@ -5764,7 +5755,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(taskId, task.getId());
   }
 
-  // add candidate group -> should not create an authorization (case task) /////////////////////////////////
+  // add candidate group -> should not create an authorization (case task)
+  // /////////////////////////////////
 
   public void testCaseTaskAddCandidateGroupNoAuthorization() {
     // given
@@ -5777,10 +5769,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    Authorization authorization = authorizationService
-        .createAuthorizationQuery()
-        .groupIdIn("management")
-        .singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery()
+        .groupIdIn("management").singleResult();
     enableAuthorization();
 
     assertNull(authorization);
@@ -5962,7 +5952,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when
-    Map<String, Object> variables = taskService.getVariablesLocal(taskId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = taskService.getVariablesLocal(taskId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     assertNotNull(variables);
@@ -5980,7 +5971,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
 
     // when
-    VariableMap variables = taskService.getVariablesTyped(taskId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = taskService.getVariablesTyped(taskId, Arrays.asList(VARIABLE_NAME),
+        false);
 
     // then
     assertNotNull(variables);
@@ -6002,7 +5994,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when
-    Map<String, Object> variables = taskService.getVariablesLocalTyped(taskId, Arrays.asList(VARIABLE_NAME), false);
+    Map<String, Object> variables = taskService.getVariablesLocalTyped(taskId,
+        Arrays.asList(VARIABLE_NAME), false);
 
     // then
     assertNotNull(variables);
@@ -6283,7 +6276,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
   @Deployment
   public void testSetGenericResourceIdAssignee() {
-    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId,
+        CREATE_INSTANCE);
     createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, CREATE);
 
     try {
@@ -6319,8 +6313,10 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     try {
       // given
-      createGrantAuthorization(Resources.TASK, Authorization.ANY, userId, Permissions.CREATE, Permissions.DELETE, Permissions.READ);
-      processEngineConfiguration.setResourceAuthorizationProvider(new MyExtendedPermissionDefaultAuthorizationProvider());
+      createGrantAuthorization(Resources.TASK, Authorization.ANY, userId, Permissions.CREATE,
+          Permissions.DELETE, Permissions.READ);
+      processEngineConfiguration
+          .setResourceAuthorizationProvider(new MyExtendedPermissionDefaultAuthorizationProvider());
 
       // when
       Task newTask = taskService.newTask();
@@ -6329,61 +6325,70 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       taskService.saveTask(newTask);
 
       // then
-      Authorization auth = authorizationService.createAuthorizationQuery().userIdIn("Horst").singleResult();
+      Authorization auth = authorizationService.createAuthorizationQuery().userIdIn("Horst")
+          .singleResult();
       assertTrue(auth.isPermissionGranted(Permissions.DELETE));
 
       taskService.deleteTask(newTask.getId(), true);
 
     } finally {
-      processEngineConfiguration.setResourceAuthorizationProvider(new DefaultAuthorizationProvider());
+      processEngineConfiguration
+          .setResourceAuthorizationProvider(new DefaultAuthorizationProvider());
     }
-
 
   }
 
   @Deployment
   public void testAssignSameAssigneeAndOwnerToProcess() {
-    //given
-    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, Permissions.ALL);
-    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, Permissions.ALL);
+    // given
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId,
+        Permissions.ALL);
+    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId,
+        Permissions.ALL);
 
     // when
     runtimeService.startProcessInstanceByKey("process");
 
     // then
-    List<Authorization> auths = authorizationService.createAuthorizationQuery().userIdIn("horst").list();
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().userIdIn("horst")
+        .list();
     assertTrue(auths.size() == 1);
 
   }
 
   @Deployment
   public void testAssignSameUserToProcessTwice() {
-    //given
-    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, Permissions.ALL);
-    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, Permissions.ALL);
+    // given
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId,
+        Permissions.ALL);
+    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId,
+        Permissions.ALL);
 
     // when
     runtimeService.startProcessInstanceByKey("process");
 
     // then
-    List<Authorization> auths = authorizationService.createAuthorizationQuery().userIdIn("hans").list();
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().userIdIn("hans")
+        .list();
     assertTrue(auths.size() == 1);
   }
 
   @Deployment
   public void testAssignSameGroupToProcessTwice() {
-    //given
-    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, Permissions.ALL);
-    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, Permissions.ALL);
+    // given
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId,
+        Permissions.ALL);
+    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId,
+        Permissions.ALL);
 
     // when
     runtimeService.startProcessInstanceByKey("process");
 
     // then
-    List<Authorization> auths = authorizationService.createAuthorizationQuery().groupIdIn("abc").list();
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().groupIdIn("abc")
+        .list();
     assertTrue(auths.size() == 1);
   }
-
 
   // helper ////////////////////////////////////////////////////////////////////////////////
 
@@ -6488,7 +6493,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyVariableInstanceCountDisabledAuthorization(0);
 
     // when (3)
-    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(),
+        Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     verifyVariableInstanceCountDisabledAuthorization(0);
@@ -6502,13 +6508,15 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     verifyVariableInstanceCountDisabledAuthorization(1);
 
     // when (2)
-    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null,
+        Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     verifyVariableInstanceCountDisabledAuthorization(0);
 
     // when (3)
-    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(),
+        Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     verifyVariableInstanceCountDisabledAuthorization(0);

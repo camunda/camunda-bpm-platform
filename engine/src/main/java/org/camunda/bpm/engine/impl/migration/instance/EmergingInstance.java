@@ -19,15 +19,15 @@ package org.camunda.bpm.engine.impl.migration.instance;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
- * Represents a instance which will be created by a migration, i.e.
- * new event subscriptions or jobs.
+ * Represents a instance which will be created by a migration, i.e. new event subscriptions or jobs.
  */
 public interface EmergingInstance {
 
   /**
    * Creates this instance and attachs it to the given execution.
    *
-   * @param scopeExecution the execution to attach the new instance
+   * @param scopeExecution
+   *          the execution to attach the new instance
    */
   void create(ExecutionEntity scopeExecution);
 

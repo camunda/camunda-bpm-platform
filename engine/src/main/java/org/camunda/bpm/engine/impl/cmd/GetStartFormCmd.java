@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -44,17 +43,22 @@ public class GetStartFormCmd implements Command<StartFormData>, Serializable {
   }
 
   public StartFormData execute(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-    ensureNotNull("No process definition found for id '" + processDefinitionId + "'", "processDefinition", processDefinition);
+    ProcessDefinitionEntity processDefinition = deploymentCache
+        .findDeployedProcessDefinitionById(processDefinitionId);
+    ensureNotNull("No process definition found for id '" + processDefinitionId + "'",
+        "processDefinition", processDefinition);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessDefinition(processDefinition);
     }
 
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
-    ensureNotNull("No startFormHandler defined in process '" + processDefinitionId + "'", "startFormHandler", startFormHandler);
+    ensureNotNull("No startFormHandler defined in process '" + processDefinitionId + "'",
+        "startFormHandler", startFormHandler);
 
     return startFormHandler.createStartFormData(processDefinition);
   }

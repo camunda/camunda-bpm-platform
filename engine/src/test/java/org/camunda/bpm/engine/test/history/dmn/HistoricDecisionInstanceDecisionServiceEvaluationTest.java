@@ -62,14 +62,12 @@ public class HistoricDecisionInstanceDecisionServiceEvaluationTest {
 
   @Parameters
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {
-      { DECISION_PROCESS_WITH_DECISION_SERVICE, "task" },
-      { DECISION_PROCESS_WITH_START_LISTENER, "task" },
-      { DECISION_PROCESS_WITH_END_LISTENER, "task" },
-      { DECISION_PROCESS_INSIDE_EXPRESSION, "task" },
-      { DECISION_PROCESS_INSIDE_DELEGATE_EXPRESSION, "task" },
-      { DECISION_PROCESS_WITH_TAKE_LISTENER, "start" }
-    });
+    return Arrays.asList(new Object[][] { { DECISION_PROCESS_WITH_DECISION_SERVICE, "task" },
+        { DECISION_PROCESS_WITH_START_LISTENER, "task" },
+        { DECISION_PROCESS_WITH_END_LISTENER, "task" },
+        { DECISION_PROCESS_INSIDE_EXPRESSION, "task" },
+        { DECISION_PROCESS_INSIDE_DELEGATE_EXPRESSION, "task" },
+        { DECISION_PROCESS_WITH_TAKE_LISTENER, "start" } });
   }
 
   @Parameter(0)
@@ -101,21 +99,24 @@ public class HistoricDecisionInstanceDecisionServiceEvaluationTest {
   public void evaluateDecisionWithDecisionService() {
 
     runtimeService.startProcessInstanceByKey("testProcess", Variables.createVariables()
-        .putValue("input1", null)
-        .putValue("myBean", new DecisionServiceDelegate()));
+        .putValue("input1", null).putValue("myBean", new DecisionServiceDelegate()));
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstance.getProcessDefinitionId()).singleResult();
-    String decisionDefinitionId = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(DECISION_DEFINITION_KEY).singleResult().getId();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionId(processInstance.getProcessDefinitionId()).singleResult();
+    String decisionDefinitionId = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY).singleResult().getId();
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().singleResult();
 
     assertThat(historicDecisionInstance, is(notNullValue()));
     assertThat(historicDecisionInstance.getDecisionDefinitionId(), is(decisionDefinitionId));
     assertThat(historicDecisionInstance.getDecisionDefinitionKey(), is(DECISION_DEFINITION_KEY));
     assertThat(historicDecisionInstance.getDecisionDefinitionName(), is("sample decision"));
 
-    // references to process instance should be set since the decision is evaluated while executing a process instance
+    // references to process instance should be set since the decision is evaluated while executing
+    // a process instance
     assertThat(historicDecisionInstance.getProcessDefinitionKey(), is(processDefinition.getKey()));
     assertThat(historicDecisionInstance.getProcessDefinitionId(), is(processDefinition.getId()));
     assertThat(historicDecisionInstance.getProcessInstanceId(), is(processInstance.getId()));

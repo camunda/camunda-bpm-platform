@@ -65,7 +65,8 @@ public class LogUtil {
 
         String redirectCommons = LogManager.getLogManager().getProperty("redirect.commons.logging");
         if ((redirectCommons != null) && (!redirectCommons.equalsIgnoreCase("false"))) {
-          System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
+          System.setProperty("org.apache.commons.logging.Log",
+              "org.apache.commons.logging.impl.Jdk14Logger");
         }
       }
     } catch (Exception e) {
@@ -125,11 +126,11 @@ public class LogUtil {
 
     protected static String getThreadIndent(int threadId) {
       Integer threadIdInteger = Integer.valueOf(threadId);
-      if (threadLogMode==ThreadLogMode.NONE) {
+      if (threadLogMode == ThreadLogMode.NONE) {
         return "";
       }
-      if (threadLogMode==ThreadLogMode.PRINT_ID) {
-        return ""+threadId;
+      if (threadLogMode == ThreadLogMode.PRINT_ID) {
+        return "" + threadId;
       }
       String threadIndent = threadIndents.get(threadIdInteger);
       if (threadIndent == null) {

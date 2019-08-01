@@ -48,7 +48,8 @@ public abstract class AbstractModificationCmd<T> implements Command<T> {
       collectedProcessInstanceIds.addAll(processInstanceIds);
     }
 
-    final ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) builder.getProcessInstanceQuery();
+    final ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) builder
+        .getProcessInstanceQuery();
     if (processInstanceQuery != null) {
       collectedProcessInstanceIds.addAll(processInstanceQuery.listIds());
     }
@@ -57,29 +58,21 @@ public abstract class AbstractModificationCmd<T> implements Command<T> {
   }
 
   protected void writeUserOperationLog(CommandContext commandContext,
-      ProcessDefinition processDefinition,
-      int numInstances,
-      boolean async) {
+      ProcessDefinition processDefinition, int numInstances, boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
-    propertyChanges.add(new PropertyChange("nrOfInstances",
-        null,
-        numInstances));
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
 
-    commandContext.getOperationLogManager()
-      .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE,
-          null,
-          processDefinition.getId(),
-          processDefinition.getKey(),
-          propertyChanges);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, null,
+        processDefinition.getId(), processDefinition.getKey(), propertyChanges);
   }
 
-  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String processDefinitionId) {
+  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext,
+      String processDefinitionId) {
 
-    return commandContext
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
+    return commandContext.getProcessEngineConfiguration().getDeploymentCache()
         .findDeployedProcessDefinitionById(processDefinitionId);
   }
 

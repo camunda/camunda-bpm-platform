@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -49,32 +48,28 @@ public class SubTaskTest extends PluggableProcessEngineTestCase {
 
     String subTaskId = subTaskOne.getId();
     assertTrue(taskService.getSubTasks(subTaskId).isEmpty());
-    assertTrue(historyService
-            .createHistoricTaskInstanceQuery()
-            .taskParentTaskId(subTaskId)
-            .list()
-            .isEmpty());
+    assertTrue(historyService.createHistoricTaskInstanceQuery().taskParentTaskId(subTaskId).list()
+        .isEmpty());
 
     List<Task> subTasks = taskService.getSubTasks(gonzoTaskId);
     Set<String> subTaskNames = new HashSet<String>();
-    for (Task subTask: subTasks) {
+    for (Task subTask : subTasks) {
       subTaskNames.add(subTask.getName());
     }
 
-    if(processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT.getId()) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT
+        .getId()) {
       Set<String> expectedSubTaskNames = new HashSet<String>();
       expectedSubTaskNames.add("subtask one");
       expectedSubTaskNames.add("subtask two");
 
       assertEquals(expectedSubTaskNames, subTaskNames);
 
-      List<HistoricTaskInstance> historicSubTasks = historyService
-        .createHistoricTaskInstanceQuery()
-        .taskParentTaskId(gonzoTaskId)
-        .list();
+      List<HistoricTaskInstance> historicSubTasks = historyService.createHistoricTaskInstanceQuery()
+          .taskParentTaskId(gonzoTaskId).list();
 
       subTaskNames = new HashSet<String>();
-      for (HistoricTaskInstance historicSubTask: historicSubTasks) {
+      for (HistoricTaskInstance historicSubTask : historicSubTasks) {
         subTaskNames.add(historicSubTask.getName());
       }
 

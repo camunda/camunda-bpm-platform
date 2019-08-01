@@ -54,8 +54,7 @@ public class ProvidedProcessEngineRule extends ProcessEngineRule {
       } catch (Exception e) {
         throw new RuntimeException("Could not get process engine", e);
       }
-    }
-    else {
+    } else {
       super.initializeProcessEngine();
     }
   }

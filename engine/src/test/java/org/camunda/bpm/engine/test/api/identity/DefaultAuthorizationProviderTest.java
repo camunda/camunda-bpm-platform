@@ -27,7 +27,9 @@ import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
 /**
- * <p>Test authorizations provided by {@link DefaultAuthorizationProvider}</p>
+ * <p>
+ * Test authorizations provided by {@link DefaultAuthorizationProvider}
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -66,7 +68,8 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
 
   protected void tearDown() throws Exception {
     processEngineConfiguration.setAuthorizationEnabled(false);
-    List<Authorization> jonnysAuths = authorizationService.createAuthorizationQuery().userIdIn("jonny").list();
+    List<Authorization> jonnysAuths = authorizationService.createAuthorizationQuery()
+        .userIdIn("jonny").list();
     for (Authorization authorization : jonnysAuths) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
@@ -81,7 +84,8 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
     identityService.saveUser(identityService.newUser("jonny2"));
 
     // now there is an authorization for jonny2 which grants him ALL permissions on himself
-    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("jonny2").singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn("jonny2")
+        .singleResult();
     assertNotNull(authorization);
     assertEquals(AUTH_TYPE_GRANT, authorization.getAuthorizationType());
     assertEquals(USER.resourceType(), authorization.getResourceType());
@@ -103,7 +107,8 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
     identityService.saveGroup(identityService.newGroup("sales"));
 
     // now there is an authorization for sales which grants all members READ permissions
-    Authorization authorization = authorizationService.createAuthorizationQuery().groupIdIn("sales").singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery().groupIdIn("sales")
+        .singleResult();
     assertNotNull(authorization);
     assertEquals(AUTH_TYPE_GRANT, authorization.getAuthorizationType());
     assertEquals(GROUP.resourceType(), authorization.getResourceType());

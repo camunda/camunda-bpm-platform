@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.migration;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
- * Thrown if at least one migration instruction cannot be applied to the activity instance it matches. Contains
- * a object that contains the details for all validation errors.
+ * Thrown if at least one migration instruction cannot be applied to the activity instance it
+ * matches. Contains a object that contains the details for all validation errors.
  *
  * @author Thorben Lindhauer
  */
@@ -30,7 +30,8 @@ public class MigratingProcessInstanceValidationException extends ProcessEngineEx
 
   protected MigratingProcessInstanceValidationReport validationReport;
 
-  public MigratingProcessInstanceValidationException(String message, MigratingProcessInstanceValidationReport validationReport) {
+  public MigratingProcessInstanceValidationException(String message,
+      MigratingProcessInstanceValidationReport validationReport) {
     super(message);
     this.validationReport = validationReport;
   }

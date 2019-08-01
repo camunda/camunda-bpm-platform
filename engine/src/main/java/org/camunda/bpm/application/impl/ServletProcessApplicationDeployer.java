@@ -29,13 +29,16 @@ import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>This class is an implementation of {@link ServletContainerInitializer} and
- * is notified whenever a subclass of {@link ServletProcessApplication} annotated
- * with the {@link ProcessApplication} annotation is deployed. In such an event,
- * we automatically add the class as {@link ServletContextListener} to the
- * {@link ServletContext}.</p>
+ * <p>
+ * This class is an implementation of {@link ServletContainerInitializer} and is notified whenever a
+ * subclass of {@link ServletProcessApplication} annotated with the {@link ProcessApplication}
+ * annotation is deployed. In such an event, we automatically add the class as
+ * {@link ServletContextListener} to the {@link ServletContext}.
+ * </p>
  *
- * <p><strong>NOTE:</strong> Only works with Servlet 3.0 or better.</p>
+ * <p>
+ * <strong>NOTE:</strong> Only works with Servlet 3.0 or better.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -46,7 +49,7 @@ public class ServletProcessApplicationDeployer implements ServletContainerInitia
   private static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
 
   public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
-    if(c == null || c.isEmpty()) {
+    if (c == null || c.isEmpty()) {
       // skip deployments that do not carry a PA
       return;
 
@@ -63,27 +66,25 @@ public class ServletProcessApplicationDeployer implements ServletContainerInitia
       c.remove(ProcessApplication.class);
     }
 
-
     String contextPath = ctx.getContextPath();
-    if(c.size() > 1) {
+    if (c.size() > 1) {
       // a deployment must only contain a single PA
       throw LOG.multiplePasException(c, contextPath);
 
-    } else if(c.size() == 1) {
+    } else if (c.size() == 1) {
       Class<?> paClass = c.iterator().next();
 
       // validate whether it is a legal Process Application
-      if(!AbstractProcessApplication.class.isAssignableFrom(paClass)) {
+      if (!AbstractProcessApplication.class.isAssignableFrom(paClass)) {
         throw LOG.paWrongTypeException(paClass);
       }
 
       // add it as listener if it's a ServletProcessApplication
-      if(ServletProcessApplication.class.isAssignableFrom(paClass)) {
+      if (ServletProcessApplication.class.isAssignableFrom(paClass)) {
         LOG.detectedPa(paClass);
         ctx.addListener(paClass.getName());
       }
-    }
-    else {
+    } else {
       LOG.servletDeployerNoPaFound(contextPath);
     }
 

@@ -27,14 +27,14 @@ import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.DecisionRefExpression;
 import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 
-
 /**
  * @author Roman Smirnov
  *
  */
 public class DecisionTaskItemHandler extends CallingTaskItemHandler {
 
-  protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeActivity(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     super.initializeActivity(element, activity, context);
 
     initializeResultVariable(element, activity, context);
@@ -42,14 +42,16 @@ public class DecisionTaskItemHandler extends CallingTaskItemHandler {
     initializeDecisionTableResultMapper(element, activity, context);
   }
 
-  protected void initializeResultVariable(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeResultVariable(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     DecisionTask decisionTask = getDefinition(element);
     DmnDecisionTaskActivityBehavior behavior = getActivityBehavior(activity);
     String resultVariable = decisionTask.getCamundaResultVariable();
     behavior.setResultVariable(resultVariable);
   }
 
-  protected void initializeDecisionTableResultMapper(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeDecisionTableResultMapper(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     DecisionTask decisionTask = getDefinition(element);
     DmnDecisionTaskActivityBehavior behavior = getActivityBehavior(activity);
     String mapper = decisionTask.getCamundaMapDecisionResult();
@@ -69,7 +71,8 @@ public class DecisionTaskItemHandler extends CallingTaskItemHandler {
     return (DmnDecisionTaskActivityBehavior) activity.getActivityBehavior();
   }
 
-  protected String getDefinitionKey(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getDefinitionKey(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     DecisionTask definition = getDefinition(element);
     String decision = definition.getDecision();
 
@@ -83,21 +86,23 @@ public class DecisionTaskItemHandler extends CallingTaskItemHandler {
     return decision;
   }
 
-  protected String getBinding(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getBinding(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     DecisionTask definition = getDefinition(element);
     return definition.getCamundaDecisionBinding();
   }
 
-  protected String getVersion(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getVersion(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     DecisionTask definition = getDefinition(element);
     return definition.getCamundaDecisionVersion();
   }
 
-  protected String getTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getTenantId(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     DecisionTask definition = getDefinition(element);
     return definition.getCamundaDecisionTenantId();
   }
-
 
   protected DecisionTask getDefinition(CmmnElement element) {
     return (DecisionTask) super.getDefinition(element);

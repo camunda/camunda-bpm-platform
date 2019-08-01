@@ -27,7 +27,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
- * <p>Wrapper for a validation constraint</p>
+ * <p>
+ * Wrapper for a validation constraint
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -44,15 +46,22 @@ public class FormFieldValidationConstraintHandler {
 
   // submit /////////////////////////////////
 
-  public void validate(Object submittedValue, VariableMap submittedValues, FormFieldHandler formFieldHandler, VariableScope variableScope) {
+  public void validate(Object submittedValue, VariableMap submittedValues,
+      FormFieldHandler formFieldHandler, VariableScope variableScope) {
     try {
 
-      FormFieldValidatorContext context = new DefaultFormFieldValidatorContext(variableScope, config, submittedValues, formFieldHandler);
-      if(!validator.validate(submittedValue, context)) {
-        throw new FormFieldValidatorException(formFieldHandler.getId(), name, config, submittedValue, "Invalid value submitted for form field '"+formFieldHandler.getId()+"': validation of "+this+" failed.");
+      FormFieldValidatorContext context = new DefaultFormFieldValidatorContext(variableScope,
+          config, submittedValues, formFieldHandler);
+      if (!validator.validate(submittedValue, context)) {
+        throw new FormFieldValidatorException(formFieldHandler.getId(), name, config,
+            submittedValue, "Invalid value submitted for form field '" + formFieldHandler.getId()
+                + "': validation of " + this + " failed.");
       }
-    } catch(FormFieldValidationException e) {
-      throw new FormFieldValidatorException(formFieldHandler.getId(), name, config, submittedValue, "Invalid value submitted for form field '"+formFieldHandler.getId()+"': validation of "+this+" failed.", e);
+    } catch (FormFieldValidationException e) {
+      throw new FormFieldValidatorException(formFieldHandler.getId(), name, config, submittedValue,
+          "Invalid value submitted for form field '" + formFieldHandler.getId()
+              + "': validation of " + this + " failed.",
+          e);
     }
   }
 
@@ -83,7 +92,7 @@ public class FormFieldValidationConstraintHandler {
   }
 
   public String toString() {
-    return name + (config != null ? ("("+config+")") : "");
+    return name + (config != null ? ("(" + config + ")") : "");
   }
 
 }

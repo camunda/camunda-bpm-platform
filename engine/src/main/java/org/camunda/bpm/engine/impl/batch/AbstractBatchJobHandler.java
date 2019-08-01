@@ -31,11 +31,13 @@ import com.google.gson.JsonElement;
 import java.util.List;
 
 /**
- * Common methods for batch job handlers based on list of ids, providing serialization, configuration instantiation, etc.
+ * Common methods for batch job handlers based on list of ids, providing serialization,
+ * configuration instantiation, etc.
  *
  * @author Askar Akhmerov
  */
-public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> implements BatchJobHandler<T> {
+public abstract class AbstractBatchJobHandler<T extends BatchConfiguration>
+    implements BatchJobHandler<T> {
 
   public abstract JobDeclaration<BatchJobContext, MessageEntity> getJobDeclaration();
 
@@ -87,7 +89,6 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
     // do nothing as default
   }
 
-
   protected JobEntity createBatchJob(BatchEntity batch, ByteArrayEntity configuration) {
     BatchJobContext creationContext = new BatchJobContext(batch, configuration);
     return getJobDeclaration().createJobInstance(creationContext);
@@ -95,8 +96,7 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
 
   @Override
   public void deleteJobs(BatchEntity batch) {
-    List<JobEntity> jobs = Context.getCommandContext()
-        .getJobManager()
+    List<JobEntity> jobs = Context.getCommandContext().getJobManager()
         .findJobsByJobDefinitionId(batch.getBatchJobDefinitionId());
 
     for (JobEntity job : jobs) {
@@ -113,12 +113,12 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
   public void onDelete(BatchJobConfiguration configuration, JobEntity jobEntity) {
     String byteArrayId = configuration.getConfigurationByteArrayId();
     if (byteArrayId != null) {
-      Context.getCommandContext().getByteArrayManager()
-          .deleteByteArrayById(byteArrayId);
+      Context.getCommandContext().getByteArrayManager().deleteByteArrayById(byteArrayId);
     }
   }
 
-  protected ByteArrayEntity saveConfiguration(ByteArrayManager byteArrayManager, T jobConfiguration) {
+  protected ByteArrayEntity saveConfiguration(ByteArrayManager byteArrayManager,
+      T jobConfiguration) {
     ByteArrayEntity configurationEntity = new ByteArrayEntity();
     configurationEntity.setBytes(writeConfiguration(jobConfiguration));
     byteArrayManager.insert(configurationEntity);

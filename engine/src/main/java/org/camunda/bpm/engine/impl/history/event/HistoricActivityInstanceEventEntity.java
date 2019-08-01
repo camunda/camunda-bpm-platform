@@ -18,9 +18,10 @@ package org.camunda.bpm.engine.impl.history.event;
 
 import org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState;
 
-
 /**
- * <p>{@link HistoryEvent} implementation for events that happen in an activity.</p>
+ * <p>
+ * {@link HistoryEvent} implementation for events that happen in an activity.
+ * </p>
  *
  * @author Daniel Meyer
  * @author Marcel Wieczorek
@@ -58,7 +59,7 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
   protected String taskId;
   protected String taskAssignee;
 
-  /** id of the tenant which belongs to the activity instance  */
+  /** id of the tenant which belongs to the activity instance */
   protected String tenantId;
 
   // getters and setters //////////////////////////////////////////////////////
@@ -173,26 +174,15 @@ public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEv
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[activityId=" + activityId
-           + ", activityName=" + activityName
-           + ", activityType=" + activityType
-           + ", activityInstanceId=" + activityInstanceId
-           + ", activityInstanceState=" + activityInstanceState
-           + ", parentActivityInstanceId=" + parentActivityInstanceId
-           + ", calledProcessInstanceId=" + calledProcessInstanceId
-           + ", calledCaseInstanceId=" + calledCaseInstanceId
-           + ", taskId=" + taskId
-           + ", taskAssignee=" + taskAssignee
-           + ", durationInMillis=" + durationInMillis
-           + ", startTime=" + startTime
-           + ", endTime=" + endTime
-           + ", eventType=" + eventType
-           + ", executionId=" + executionId
-           + ", processDefinitionId=" + processDefinitionId
-           + ", rootProcessInstanceId=" + rootProcessInstanceId
-           + ", processInstanceId=" + processInstanceId
-           + ", tenantId=" + tenantId
-           + "]";
+    return this.getClass().getSimpleName() + "[activityId=" + activityId + ", activityName="
+        + activityName + ", activityType=" + activityType + ", activityInstanceId="
+        + activityInstanceId + ", activityInstanceState=" + activityInstanceState
+        + ", parentActivityInstanceId=" + parentActivityInstanceId + ", calledProcessInstanceId="
+        + calledProcessInstanceId + ", calledCaseInstanceId=" + calledCaseInstanceId + ", taskId="
+        + taskId + ", taskAssignee=" + taskAssignee + ", durationInMillis=" + durationInMillis
+        + ", startTime=" + startTime + ", endTime=" + endTime + ", eventType=" + eventType
+        + ", executionId=" + executionId + ", processDefinitionId=" + processDefinitionId
+        + ", rootProcessInstanceId=" + rootProcessInstanceId + ", processInstanceId="
+        + processInstanceId + ", tenantId=" + tenantId + "]";
   }
 }

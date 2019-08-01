@@ -34,33 +34,33 @@ public class SendMessageDelegate implements JavaDelegate {
       Map<String, Object> variablesFirstCall = new HashMap<String, Object>();
       variablesFirstCall.put("someVariable", "someValue1");
       runtimeService.createMessageCorrelation("waitForCorrelationKeyMessage")
-              .setVariables(variablesFirstCall)
-              .processInstanceVariableEquals("correlationKey", "someCorrelationKey")
-              .correlateAllWithResult();
+          .setVariables(variablesFirstCall)
+          .processInstanceVariableEquals("correlationKey", "someCorrelationKey")
+          .correlateAllWithResult();
 
       // 2. message
       Map<String, Object> variablesSecondCall = new HashMap<String, Object>();
       variablesSecondCall.put("someVariable", "someValue2");
       runtimeService.createMessageCorrelation("waitForCorrelationKeyMessage")
-              .setVariables(variablesSecondCall)
-              .processInstanceVariableEquals("correlationKey", "someCorrelationKey")
-              .correlateAllWithResult();
+          .setVariables(variablesSecondCall)
+          .processInstanceVariableEquals("correlationKey", "someCorrelationKey")
+          .correlateAllWithResult();
     } else {
       // 1. message
       Map<String, Object> variablesFirstCall = new HashMap<String, Object>();
       variablesFirstCall.put("someVariable", "someValue1");
       runtimeService.createMessageCorrelation("waitForCorrelationKeyMessage")
-              .setVariables(variablesFirstCall)
-              .processInstanceVariableEquals("correlationKey", "someCorrelationKey")
-              .correlateWithResult();
+          .setVariables(variablesFirstCall)
+          .processInstanceVariableEquals("correlationKey", "someCorrelationKey")
+          .correlateWithResult();
 
       // 2. message
       Map<String, Object> variablesSecondCall = new HashMap<String, Object>();
       variablesSecondCall.put("someVariable", "someValue2");
       runtimeService.createMessageCorrelation("waitForCorrelationKeyMessage")
-              .setVariables(variablesSecondCall)
-              .processInstanceVariableEquals("correlationKey", "someCorrelationKey")
-              .correlateWithResult();
+          .setVariables(variablesSecondCall)
+          .processInstanceVariableEquals("correlationKey", "someCorrelationKey")
+          .correlateWithResult();
     }
 
   }

@@ -28,8 +28,7 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 /**
- * Gives access to a deployed DMN model instance which can be accessed by the
- * DMN model API.
+ * Gives access to a deployed DMN model instance which can be accessed by the DMN model API.
  */
 public class GetDeploymentDmnModelInstanceCmd implements Command<DmnModelInstance> {
 
@@ -44,16 +43,20 @@ public class GetDeploymentDmnModelInstanceCmd implements Command<DmnModelInstanc
 
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
 
-    DecisionDefinitionEntity decisionDefinition = deploymentCache.findDeployedDecisionDefinitionById(decisionDefinitionId);
+    DecisionDefinitionEntity decisionDefinition = deploymentCache
+        .findDeployedDecisionDefinitionById(decisionDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadDecisionDefinition(decisionDefinition);
     }
 
-    DmnModelInstance modelInstance = deploymentCache.findDmnModelInstanceForDecisionDefinition(decisionDefinitionId);
+    DmnModelInstance modelInstance = deploymentCache
+        .findDmnModelInstanceForDecisionDefinition(decisionDefinitionId);
 
-    ensureNotNull(DmnModelInstanceNotFoundException.class, "No DMN model instance found for decision definition id " + decisionDefinitionId, "modelInstance",
-        modelInstance);
+    ensureNotNull(DmnModelInstanceNotFoundException.class,
+        "No DMN model instance found for decision definition id " + decisionDefinitionId,
+        "modelInstance", modelInstance);
     return modelInstance;
   }
 

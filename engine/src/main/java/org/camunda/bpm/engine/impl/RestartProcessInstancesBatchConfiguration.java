@@ -37,7 +37,8 @@ public class RestartProcessInstancesBatchConfiguration extends BatchConfiguratio
 
   public RestartProcessInstancesBatchConfiguration(List<String> processInstanceIds,
       List<AbstractProcessInstanceModificationCommand> instructions, String processDefinitionId,
-      boolean initialVariables, boolean skipCustomListeners, boolean skipIoMappings, boolean withoutBusinessKey) {
+      boolean initialVariables, boolean skipCustomListeners, boolean skipIoMappings,
+      boolean withoutBusinessKey) {
     super(processInstanceIds);
     this.instructions = instructions;
     this.processDefinitionId = processDefinitionId;

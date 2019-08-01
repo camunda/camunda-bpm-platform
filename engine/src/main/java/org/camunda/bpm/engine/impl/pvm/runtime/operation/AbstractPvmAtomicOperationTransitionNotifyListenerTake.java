@@ -22,14 +22,14 @@ import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
  *
  * @author Tom Baeyens
  * @author Daniel Meyer
  * @author Thorben Lindhauer
  */
-public abstract class AbstractPvmAtomicOperationTransitionNotifyListenerTake extends AbstractPvmEventAtomicOperation {
+public abstract class AbstractPvmAtomicOperationTransitionNotifyListenerTake
+    extends AbstractPvmEventAtomicOperation {
 
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
     PvmActivity destination = execution.getTransition().getDestination();
@@ -45,8 +45,8 @@ public abstract class AbstractPvmAtomicOperationTransitionNotifyListenerTake ext
       execution.performOperation(TRANSITION_INTERRUPT_FLOW_SCOPE);
       break;
     default:
-      throw new ProcessEngineException("Unsupported start behavior for activity '"+destination
-          +"' started from a sequence flow: "+destination.getActivityStartBehavior());
+      throw new ProcessEngineException("Unsupported start behavior for activity '" + destination
+          + "' started from a sequence flow: " + destination.getActivityStartBehavior());
     }
   }
 

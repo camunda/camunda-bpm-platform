@@ -27,19 +27,21 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
  * @author Thorben Lindhauer
  *
  */
-public class VariableInstanceHandler implements MigratingDependentInstanceParseHandler<MigratingProcessElementInstance, List<VariableInstanceEntity>> {
+public class VariableInstanceHandler implements
+    MigratingDependentInstanceParseHandler<MigratingProcessElementInstance, List<VariableInstanceEntity>> {
 
   @Override
-  public void handle(MigratingInstanceParseContext parseContext, MigratingProcessElementInstance owningInstance, List<VariableInstanceEntity> variables) {
+  public void handle(MigratingInstanceParseContext parseContext,
+      MigratingProcessElementInstance owningInstance, List<VariableInstanceEntity> variables) {
 
     ExecutionEntity representativeExecution = owningInstance.resolveRepresentativeExecution();
 
     for (VariableInstanceEntity variable : variables) {
       parseContext.consume(variable);
-      boolean isConcurrentLocalInParentScope =
-           (variable.getExecution() == representativeExecution.getParent() && variable.isConcurrentLocal())
-        || representativeExecution.isConcurrent();
-      owningInstance.addMigratingDependentInstance(new MigratingVariableInstance(variable, isConcurrentLocalInParentScope));
+      boolean isConcurrentLocalInParentScope = (variable.getExecution() == representativeExecution
+          .getParent() && variable.isConcurrentLocal()) || representativeExecution.isConcurrent();
+      owningInstance.addMigratingDependentInstance(
+          new MigratingVariableInstance(variable, isConcurrentLocalInParentScope));
     }
   }
 }

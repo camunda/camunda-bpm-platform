@@ -60,9 +60,12 @@ public class DefaultUserPermissionsForTaskTest extends AuthorizationTest {
     processEngine.getTaskService().setAssignee(taskId, userId2);
 
     // then
-    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
-    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.TASK_WORK, Resources.TASK, taskId));
-    assertEquals(false, authorizationService.isUserAuthorized(userId2, null,Permissions.UPDATE, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.READ,
+        Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.TASK_WORK,
+        Resources.TASK, taskId));
+    assertEquals(false, authorizationService.isUserAuthorized(userId2, null, Permissions.UPDATE,
+        Resources.TASK, taskId));
 
     deleteTask(taskId, true);
   }
@@ -80,8 +83,10 @@ public class DefaultUserPermissionsForTaskTest extends AuthorizationTest {
     processEngine.getTaskService().setAssignee(taskId, userId2);
 
     // then
-    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
-    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.UPDATE, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.READ,
+        Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.UPDATE,
+        Resources.TASK, taskId));
 
     deleteTask(taskId, true);
   }
@@ -99,9 +104,12 @@ public class DefaultUserPermissionsForTaskTest extends AuthorizationTest {
     processEngine.getTaskService().addCandidateUser(taskId, userId2);
 
     // then
-    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
-    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.TASK_WORK, Resources.TASK, taskId));
-    assertEquals(false, authorizationService.isUserAuthorized(userId2, null,Permissions.UPDATE, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.READ,
+        Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.TASK_WORK,
+        Resources.TASK, taskId));
+    assertEquals(false, authorizationService.isUserAuthorized(userId2, null, Permissions.UPDATE,
+        Resources.TASK, taskId));
 
     deleteTask(taskId, true);
   }
@@ -119,8 +127,10 @@ public class DefaultUserPermissionsForTaskTest extends AuthorizationTest {
     processEngine.getTaskService().addCandidateUser(taskId, userId2);
 
     // then
-    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
-    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.UPDATE, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.READ,
+        Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.UPDATE,
+        Resources.TASK, taskId));
 
     deleteTask(taskId, true);
   }
@@ -138,9 +148,12 @@ public class DefaultUserPermissionsForTaskTest extends AuthorizationTest {
     processEngine.getTaskService().setOwner(taskId, userId2);
 
     // then
-    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
-    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.TASK_WORK, Resources.TASK, taskId));
-    assertEquals(false, authorizationService.isUserAuthorized(userId2, null,Permissions.UPDATE, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.READ,
+        Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.TASK_WORK,
+        Resources.TASK, taskId));
+    assertEquals(false, authorizationService.isUserAuthorized(userId2, null, Permissions.UPDATE,
+        Resources.TASK, taskId));
 
     deleteTask(taskId, true);
   }
@@ -158,12 +171,13 @@ public class DefaultUserPermissionsForTaskTest extends AuthorizationTest {
     processEngine.getTaskService().setOwner(taskId, userId2);
 
     // then
-    assertEquals(true,authorizationService.isUserAuthorized(userId2, null, Permissions.READ, Resources.TASK, taskId));
-    assertEquals(true, authorizationService.isUserAuthorized(userId2, null,Permissions.UPDATE, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.READ,
+        Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, null, Permissions.UPDATE,
+        Resources.TASK, taskId));
 
     deleteTask(taskId, true);
   }
-
 
   public void testShouldGrantTaskWorkOnSetCandidateGroup() {
 
@@ -178,9 +192,12 @@ public class DefaultUserPermissionsForTaskTest extends AuthorizationTest {
     processEngine.getTaskService().addCandidateGroup(taskId, groupId);
 
     // then
-    assertEquals(true,authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId), Permissions.READ, Resources.TASK, taskId));
-    assertEquals(true, authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId),Permissions.TASK_WORK, Resources.TASK, taskId));
-    assertEquals(false, authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId),Permissions.UPDATE, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId),
+        Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId),
+        Permissions.TASK_WORK, Resources.TASK, taskId));
+    assertEquals(false, authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId),
+        Permissions.UPDATE, Resources.TASK, taskId));
 
     deleteTask(taskId, true);
   }
@@ -198,8 +215,10 @@ public class DefaultUserPermissionsForTaskTest extends AuthorizationTest {
     processEngine.getTaskService().addCandidateGroup(taskId, groupId);
 
     // then
-    assertEquals(true,authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId), Permissions.READ, Resources.TASK, taskId));
-    assertEquals(true, authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId),Permissions.UPDATE, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId),
+        Permissions.READ, Resources.TASK, taskId));
+    assertEquals(true, authorizationService.isUserAuthorized(userId2, Arrays.asList(groupId),
+        Permissions.UPDATE, Resources.TASK, taskId));
 
     deleteTask(taskId, true);
   }

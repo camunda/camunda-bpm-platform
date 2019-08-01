@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
-
 public class BatchJobDeclaration extends JobDeclaration<BatchJobContext, MessageEntity> {
 
   public BatchJobDeclaration(String jobHandlerType) {
@@ -52,8 +51,7 @@ public class BatchJobDeclaration extends JobDeclaration<BatchJobContext, Message
   }
 
   public ParameterValueProvider getJobPriorityProvider() {
-    long batchJobPriority = Context.getProcessEngineConfiguration()
-        .getBatchJobPriority();
+    long batchJobPriority = Context.getProcessEngineConfiguration().getBatchJobPriority();
     return new ConstantValueProvider(batchJobPriority);
   }
 

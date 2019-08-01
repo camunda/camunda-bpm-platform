@@ -38,7 +38,8 @@ public class UpdateCaseDefinitionHistoryTimeToLiveCmd implements Command<Void>, 
   protected String caseDefinitionId;
   protected Integer historyTimeToLive;
 
-  public UpdateCaseDefinitionHistoryTimeToLiveCmd(String caseDefinitionId, Integer historyTimeToLive) {
+  public UpdateCaseDefinitionHistoryTimeToLiveCmd(String caseDefinitionId,
+      Integer historyTimeToLive) {
     this.caseDefinitionId = caseDefinitionId;
     this.historyTimeToLive = historyTimeToLive;
   }
@@ -48,12 +49,15 @@ public class UpdateCaseDefinitionHistoryTimeToLiveCmd implements Command<Void>, 
     ensureNotNull(BadUserRequestException.class, "caseDefinitionId", caseDefinitionId);
 
     if (historyTimeToLive != null) {
-      ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive", historyTimeToLive, 0);
+      ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive",
+          historyTimeToLive, 0);
     }
 
-    CaseDefinitionEntity caseDefinitionEntity = commandContext.getCaseDefinitionManager().findLatestDefinitionById(caseDefinitionId);
+    CaseDefinitionEntity caseDefinitionEntity = commandContext.getCaseDefinitionManager()
+        .findLatestDefinitionById(caseDefinitionId);
 
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateCaseDefinition(caseDefinitionEntity);
     }
 
@@ -63,15 +67,16 @@ public class UpdateCaseDefinitionHistoryTimeToLiveCmd implements Command<Void>, 
     return null;
   }
 
-  protected void logUserOperation(CommandContext commandContext, CaseDefinitionEntity caseDefinitionEntity) {
+  protected void logUserOperation(CommandContext commandContext,
+      CaseDefinitionEntity caseDefinitionEntity) {
     List<PropertyChange> propertyChanges = new ArrayList<>();
-    propertyChanges.add(new PropertyChange("historyTimeToLive", caseDefinitionEntity.getHistoryTimeToLive(), historyTimeToLive));
-    propertyChanges.add(new PropertyChange("caseDefinitionKey", null, caseDefinitionEntity.getKey()));
+    propertyChanges.add(new PropertyChange("historyTimeToLive",
+        caseDefinitionEntity.getHistoryTimeToLive(), historyTimeToLive));
+    propertyChanges
+        .add(new PropertyChange("caseDefinitionKey", null, caseDefinitionEntity.getKey()));
 
-
-    commandContext.getOperationLogManager()
-      .logCaseDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE,
-        caseDefinitionId,
+    commandContext.getOperationLogManager().logCaseDefinitionOperation(
+        UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE, caseDefinitionId,
         propertyChanges);
   }
 }

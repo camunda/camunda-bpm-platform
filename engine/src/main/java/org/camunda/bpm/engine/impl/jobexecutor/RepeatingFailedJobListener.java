@@ -54,9 +54,7 @@ public class RepeatingFailedJobListener implements TransactionListener {
 
     public Void execute(CommandContext commandContext) {
 
-      TimerEntity failedJob = (TimerEntity) commandContext
-          .getJobManager()
-          .findJobById(jobId);
+      TimerEntity failedJob = (TimerEntity) commandContext.getJobManager().findJobById(jobId);
 
       Date newDueDate = failedJob.calculateRepeat();
 
@@ -64,7 +62,8 @@ public class RepeatingFailedJobListener implements TransactionListener {
         failedJob.createNewTimerJob(newDueDate);
 
         // update configuration of failed job
-        TimerJobConfiguration config = (TimerJobConfiguration) failedJob.getJobHandlerConfiguration();
+        TimerJobConfiguration config = (TimerJobConfiguration) failedJob
+            .getJobHandlerConfiguration();
         config.setFollowUpJobCreated(true);
         failedJob.setJobHandlerConfiguration(config);
       }

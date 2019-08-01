@@ -80,14 +80,9 @@ public class TaskReportResultEntity implements HistoricTaskInstanceReportResult 
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-    + "[" +
-      "count=" + count +
-      ", processDefinitionKey='" + processDefinitionKey + '\'' +
-      ", processDefinitionId='" + processDefinitionId + '\'' +
-      ", processDefinitionName='" + processDefinitionName + '\'' +
-      ", taskName='" + taskName + '\'' +
-      ", tenantId='" + tenantId + '\'' +
-      ']';
+    return this.getClass().getSimpleName() + "[" + "count=" + count + ", processDefinitionKey='"
+        + processDefinitionKey + '\'' + ", processDefinitionId='" + processDefinitionId + '\''
+        + ", processDefinitionName='" + processDefinitionName + '\'' + ", taskName='" + taskName
+        + '\'' + ", tenantId='" + tenantId + '\'' + ']';
   }
 }

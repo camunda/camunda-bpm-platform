@@ -76,7 +76,8 @@ public class TaskReadVariablePermissionAuthorizationTest {
     taskService = engineRule.getTaskService();
     runtimeService = engineRule.getRuntimeService();
 
-    enforceSpecificVariablePermission = processEngineConfiguration.isEnforceSpecificVariablePermission();
+    enforceSpecificVariablePermission = processEngineConfiguration
+        .isEnforceSpecificVariablePermission();
     processEngineConfiguration.setEnforceSpecificVariablePermission(true);
 
     User user = identityService.newUser(userId);
@@ -91,13 +92,16 @@ public class TaskReadVariablePermissionAuthorizationTest {
     for (User user : identityService.createUserQuery().list()) {
       identityService.deleteUser(user.getId());
     }
-    for (Authorization authorization : authorizationService.createAuthorizationQuery().userIdIn(DEMO).list()) {
+    for (Authorization authorization : authorizationService.createAuthorizationQuery()
+        .userIdIn(DEMO).list()) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
-    for (Authorization authorization : authorizationService.createAuthorizationQuery().groupIdIn(ACCOUNTING_GROUP).list()) {
+    for (Authorization authorization : authorizationService.createAuthorizationQuery()
+        .groupIdIn(ACCOUNTING_GROUP).list()) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
-    processEngineConfiguration.setEnforceSpecificVariablePermission(enforceSpecificVariablePermission);
+    processEngineConfiguration
+        .setEnforceSpecificVariablePermission(enforceSpecificVariablePermission);
   }
 
   // TaskService#saveTask() ///////////////////////////////////
@@ -326,20 +330,23 @@ public class TaskReadVariablePermissionAuthorizationTest {
 
   protected void verifyUserAuthorization(String userId) {
     authRule.disableAuthorization();
-    Authorization userAuthorization = authorizationService.createAuthorizationQuery().userIdIn(userId).singleResult();
+    Authorization userAuthorization = authorizationService.createAuthorizationQuery()
+        .userIdIn(userId).singleResult();
     assertNotNull(userAuthorization);
     verifyReadVariablePermission(userAuthorization);
   }
 
   protected void verifyGroupAuthorization(String groupId) {
     authRule.disableAuthorization();
-    Authorization groupAuthorization = authorizationService.createAuthorizationQuery().groupIdIn(groupId).singleResult();
+    Authorization groupAuthorization = authorizationService.createAuthorizationQuery()
+        .groupIdIn(groupId).singleResult();
     assertNotNull(groupAuthorization);
     verifyReadVariablePermission(groupAuthorization);
   }
 
   protected void verifyReadVariablePermission(Authorization groupAuthorization) {
-    Permission[] permissions = groupAuthorization.getPermissions(new Permission[] { TaskPermissions.READ_VARIABLE });
+    Permission[] permissions = groupAuthorization
+        .getPermissions(new Permission[] { TaskPermissions.READ_VARIABLE });
     assertNotNull(permissions);
     assertEquals(TaskPermissions.READ_VARIABLE, permissions[0]);
   }

@@ -25,8 +25,8 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import java.util.Date;
 
 /**
- * The provider is either invoked on root process instance start or end
- * based on the selected history removal time strategy.
+ * The provider is either invoked on root process instance start or end based on the selected
+ * history removal time strategy.
  *
  * @author Tassilo Weidner
  */
@@ -36,37 +36,43 @@ public interface HistoryRemovalTimeProvider {
    * Calculates the removal time of historic entities related to processes.
    *
    * START: the removal time is set for each historic entity separately on occurrence (creation).
-   *        {@link HistoricProcessInstanceEventEntity#getEndTime()} is {@code null}
+   * {@link HistoricProcessInstanceEventEntity#getEndTime()} is {@code null}
    *
-   * END:   the removal time is updated simultaneously for all historic entities which belong to
-   *        the root process instance when it ends.
-   *        {@link HistoricProcessInstanceEventEntity#getEndTime()} is not {@code null}
+   * END: the removal time is updated simultaneously for all historic entities which belong to the
+   * root process instance when it ends. {@link HistoricProcessInstanceEventEntity#getEndTime()} is
+   * not {@code null}
    *
-   * @param historicRootProcessInstance which is either in state running or ended
-   * @param processDefinition of the historic root process instance
+   * @param historicRootProcessInstance
+   *          which is either in state running or ended
+   * @param processDefinition
+   *          of the historic root process instance
    * @return the removal time for historic process instances
    */
-  Date calculateRemovalTime(HistoricProcessInstanceEventEntity historicRootProcessInstance, ProcessDefinition processDefinition);
+  Date calculateRemovalTime(HistoricProcessInstanceEventEntity historicRootProcessInstance,
+      ProcessDefinition processDefinition);
 
   /**
    * Calculates the removal time of historic entities related to decisions.
    *
    * @param historicRootDecisionInstance
-   * @param decisionDefinition of the historic root decision instance
+   * @param decisionDefinition
+   *          of the historic root decision instance
    * @return the removal time for historic decision instances
    */
-  Date calculateRemovalTime(HistoricDecisionInstanceEntity historicRootDecisionInstance, DecisionDefinition decisionDefinition);
+  Date calculateRemovalTime(HistoricDecisionInstanceEntity historicRootDecisionInstance,
+      DecisionDefinition decisionDefinition);
 
   /**
    * Calculates the removal time of historic batches.
    *
    * START: the removal time is set for the historic batch entity on start.
-   *        {@link HistoricBatchEntity#getEndTime()} is {@code null}
+   * {@link HistoricBatchEntity#getEndTime()} is {@code null}
    *
-   * END:   the removal time is set for the historic batch entity on end.
-   *        {@link HistoricBatchEntity#getEndTime()} is not {@code null}
+   * END: the removal time is set for the historic batch entity on end.
+   * {@link HistoricBatchEntity#getEndTime()} is not {@code null}
    *
-   * @param historicBatch which is either in state running or ended
+   * @param historicBatch
+   *          which is either in state running or ended
    * @return the removal time of historic entities
    */
   Date calculateRemovalTime(HistoricBatchEntity historicBatch);

@@ -81,9 +81,8 @@ public class HistoricExternalTaskLogQueryTest {
     ExternalTask task = startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .singleResult();
 
     // then
     assertNotNull(log);
@@ -97,10 +96,8 @@ public class HistoricExternalTaskLogQueryTest {
     String logId = retrieveFirstHistoricExternalTaskLog().getId();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .logId(logId)
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().logId(logId)
+        .singleResult();
 
     // then
     assertNotNull(log);
@@ -117,10 +114,7 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .logId(null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().logId(null).singleResult();
 
   }
 
@@ -131,10 +125,8 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .logId("foo")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().logId("foo")
+        .singleResult();
 
     // then
     assertNull(log);
@@ -147,10 +139,8 @@ public class HistoricExternalTaskLogQueryTest {
     String logExternalTaskId = retrieveFirstHistoricExternalTaskLog().getExternalTaskId();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .externalTaskId(logExternalTaskId)
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .externalTaskId(logExternalTaskId).singleResult();
 
     // then
     assertNotNull(log);
@@ -167,10 +157,7 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .externalTaskId(null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().externalTaskId(null).singleResult();
 
   }
 
@@ -181,10 +168,8 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .externalTaskId("foo")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .externalTaskId("foo").singleResult();
 
     // then
     assertNull(log);
@@ -199,10 +184,8 @@ public class HistoricExternalTaskLogQueryTest {
     ExternalTask task = startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .topicName(DEFAULT_TOPIC)
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .topicName(DEFAULT_TOPIC).singleResult();
 
     // then
     assertNotNull(log);
@@ -219,10 +202,7 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .topicName(null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().topicName(null).singleResult();
 
   }
 
@@ -233,10 +213,8 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .topicName("foo bar")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .topicName("foo bar").singleResult();
 
     // then
     assertNull(log);
@@ -251,10 +229,8 @@ public class HistoricExternalTaskLogQueryTest {
     completeExternalTaskWithWorker(taskToCheck.getId(), WORKER_ID);
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .workerId(WORKER_ID)
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .workerId(WORKER_ID).singleResult();
 
     // then
     assertNotNull(log);
@@ -272,10 +248,7 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .workerId(null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().workerId(null).singleResult();
 
   }
 
@@ -287,10 +260,8 @@ public class HistoricExternalTaskLogQueryTest {
     completeExternalTask(task.getId());
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .workerId("foo")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .workerId("foo").singleResult();
 
     // then
     assertNull(log);
@@ -305,10 +276,8 @@ public class HistoricExternalTaskLogQueryTest {
     reportExternalTaskFailure(taskList.get(1).getId(), errorMessage);
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .errorMessage(errorMessage)
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .errorMessage(errorMessage).singleResult();
 
     // then
     assertNotNull(log);
@@ -325,10 +294,7 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .errorMessage(null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().errorMessage(null).singleResult();
 
   }
 
@@ -339,10 +305,8 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .errorMessage("asdfasdf")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .errorMessage("asdfasdf").singleResult();
 
     // then
     assertNull(log);
@@ -355,10 +319,8 @@ public class HistoricExternalTaskLogQueryTest {
     ExternalTask task = startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .activityIdIn(DEFAULT_EXTERNAL_TASK_NAME)
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .activityIdIn(DEFAULT_EXTERNAL_TASK_NAME).singleResult();
 
     // then
     assertNotNull(log);
@@ -375,10 +337,8 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .activityIdIn((String[]) null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().activityIdIn((String[]) null)
+        .singleResult();
   }
 
   @Test
@@ -391,11 +351,9 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    String[] activityIdsContainNull = {"a", null, "b"};
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .activityIdIn(activityIdsContainNull)
-      .singleResult();
+    String[] activityIdsContainNull = { "a", null, "b" };
+    historyService.createHistoricExternalTaskLogQuery().activityIdIn(activityIdsContainNull)
+        .singleResult();
   }
 
   @Test
@@ -408,11 +366,9 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    String[] activityIdsContainEmptyString = {"a", "", "b"};
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .activityIdIn(activityIdsContainEmptyString)
-      .singleResult();
+    String[] activityIdsContainEmptyString = { "a", "", "b" };
+    historyService.createHistoricExternalTaskLogQuery().activityIdIn(activityIdsContainEmptyString)
+        .singleResult();
 
   }
 
@@ -423,10 +379,8 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .activityIdIn("foo")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .activityIdIn("foo").singleResult();
 
     // then
     assertNull(log);
@@ -438,15 +392,11 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcessGivenActivityId("dummyName");
     ExternalTask task = startExternalTaskProcess();
     String activityInstanceId = historyService.createHistoricActivityInstanceQuery()
-      .activityId(DEFAULT_EXTERNAL_TASK_NAME)
-      .singleResult()
-      .getId();
+        .activityId(DEFAULT_EXTERNAL_TASK_NAME).singleResult().getId();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .activityInstanceIdIn(activityInstanceId)
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .activityInstanceIdIn(activityInstanceId).singleResult();
 
     // then
     assertNotNull(log);
@@ -463,10 +413,8 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .activityInstanceIdIn((String[]) null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().activityInstanceIdIn((String[]) null)
+        .singleResult();
 
   }
 
@@ -480,11 +428,9 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    String[] activityIdsContainNull = {"a", null, "b"};
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .activityInstanceIdIn(activityIdsContainNull)
-      .singleResult();
+    String[] activityIdsContainNull = { "a", null, "b" };
+    historyService.createHistoricExternalTaskLogQuery().activityInstanceIdIn(activityIdsContainNull)
+        .singleResult();
 
   }
 
@@ -498,11 +444,9 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    String[] activityIdsContainEmptyString = {"a", "", "b"};
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .activityInstanceIdIn(activityIdsContainEmptyString)
-      .singleResult();
+    String[] activityIdsContainEmptyString = { "a", "", "b" };
+    historyService.createHistoricExternalTaskLogQuery()
+        .activityInstanceIdIn(activityIdsContainEmptyString).singleResult();
 
   }
 
@@ -513,10 +457,8 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .activityInstanceIdIn("foo")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .activityInstanceIdIn("foo").singleResult();
 
     // then
     assertNull(log);
@@ -529,10 +471,8 @@ public class HistoricExternalTaskLogQueryTest {
     HistoricExternalTaskLog taskLog = retrieveFirstHistoricExternalTaskLog();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .executionIdIn(taskLog.getExecutionId())
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .executionIdIn(taskLog.getExecutionId()).singleResult();
 
     // then
     assertNotNull(log);
@@ -549,10 +489,8 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .executionIdIn((String[]) null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().executionIdIn((String[]) null)
+        .singleResult();
 
   }
 
@@ -566,11 +504,9 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    String[] activityIdsContainNull = {"a", null, "b"};
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .executionIdIn(activityIdsContainNull)
-      .singleResult();
+    String[] activityIdsContainNull = { "a", null, "b" };
+    historyService.createHistoricExternalTaskLogQuery().executionIdIn(activityIdsContainNull)
+        .singleResult();
 
   }
 
@@ -584,11 +520,9 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    String[] activityIdsContainEmptyString = {"a", "", "b"};
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .executionIdIn(activityIdsContainEmptyString)
-      .singleResult();
+    String[] activityIdsContainEmptyString = { "a", "", "b" };
+    historyService.createHistoricExternalTaskLogQuery().executionIdIn(activityIdsContainEmptyString)
+        .singleResult();
 
   }
 
@@ -599,10 +533,8 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .executionIdIn("foo")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .executionIdIn("foo").singleResult();
 
     // then
     assertNull(log);
@@ -615,10 +547,8 @@ public class HistoricExternalTaskLogQueryTest {
     String processInstanceId = retrieveFirstHistoricExternalTaskLog().getProcessInstanceId();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .processInstanceId(processInstanceId)
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .processInstanceId(processInstanceId).singleResult();
 
     // then
     assertNotNull(log);
@@ -635,10 +565,7 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .processInstanceId(null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().processInstanceId(null).singleResult();
 
   }
 
@@ -649,10 +576,8 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .processInstanceId("foo")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .processInstanceId("foo").singleResult();
 
     // then
     assertNull(log);
@@ -665,10 +590,8 @@ public class HistoricExternalTaskLogQueryTest {
     String definitionId = retrieveFirstHistoricExternalTaskLog().getProcessDefinitionId();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .processDefinitionId(definitionId)
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .processDefinitionId(definitionId).singleResult();
 
     // then
     assertNotNull(log);
@@ -685,10 +608,7 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .processDefinitionId(null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().processDefinitionId(null).singleResult();
 
   }
 
@@ -699,10 +619,8 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .processDefinitionId("foo")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .processDefinitionId("foo").singleResult();
 
     // then
     assertNull(log);
@@ -715,10 +633,8 @@ public class HistoricExternalTaskLogQueryTest {
     ExternalTask task = startExternalTaskProcessGivenProcessDefinitionKey("Process");
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .processDefinitionKey(task.getProcessDefinitionKey())
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .processDefinitionKey(task.getProcessDefinitionKey()).singleResult();
 
     // then
     assertNotNull(log);
@@ -735,10 +651,7 @@ public class HistoricExternalTaskLogQueryTest {
     thrown.expect(NotValidException.class);
 
     // when
-    historyService
-      .createHistoricExternalTaskLogQuery()
-      .processDefinitionKey(null)
-      .singleResult();
+    historyService.createHistoricExternalTaskLogQuery().processDefinitionKey(null).singleResult();
 
   }
 
@@ -749,10 +662,8 @@ public class HistoricExternalTaskLogQueryTest {
     startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .processDefinitionKey("foo")
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery()
+        .processDefinitionKey("foo").singleResult();
 
     // then
     assertNull(log);
@@ -765,10 +676,8 @@ public class HistoricExternalTaskLogQueryTest {
     completeExternalTask(task.getId());
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .creationLog()
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().creationLog()
+        .singleResult();
 
     // then
     assertNotNull(log);
@@ -782,10 +691,8 @@ public class HistoricExternalTaskLogQueryTest {
     reportExternalTaskFailure(task.getId(), "Dummy error message!");
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().failureLog()
+        .singleResult();
 
     // then
     assertNotNull(log);
@@ -799,10 +706,8 @@ public class HistoricExternalTaskLogQueryTest {
     completeExternalTask(task.getId());
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .successLog()
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().successLog()
+        .singleResult();
 
     // then
     assertNotNull(log);
@@ -816,10 +721,8 @@ public class HistoricExternalTaskLogQueryTest {
     runtimeService.deleteProcessInstance(task.getProcessInstanceId(), null);
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .deletionLog()
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().deletionLog()
+        .singleResult();
 
     // then
     assertNotNull(log);
@@ -834,9 +737,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // when
     List<HistoricExternalTaskLog> externalTaskLogs = historyService
-      .createHistoricExternalTaskLogQuery()
-      .priorityLowerThanOrEquals(2L)
-      .list();
+        .createHistoricExternalTaskLogQuery().priorityLowerThanOrEquals(2L).list();
 
     // then
     assertThat(externalTaskLogs.size(), is(3));
@@ -854,9 +755,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // when
     List<HistoricExternalTaskLog> externalTaskLogs = historyService
-      .createHistoricExternalTaskLogQuery()
-      .priorityHigherThanOrEquals(2L)
-      .list();
+        .createHistoricExternalTaskLogQuery().priorityHigherThanOrEquals(2L).list();
 
     // then
     assertThat(externalTaskLogs.size(), is(3));
@@ -874,10 +773,8 @@ public class HistoricExternalTaskLogQueryTest {
 
     // when
     List<HistoricExternalTaskLog> externalTaskLogs = historyService
-      .createHistoricExternalTaskLogQuery()
-      .priorityLowerThanOrEquals(3L)
-      .priorityHigherThanOrEquals(1L)
-      .list();
+        .createHistoricExternalTaskLogQuery().priorityLowerThanOrEquals(3L)
+        .priorityHigherThanOrEquals(1L).list();
 
     // then
     assertThat(externalTaskLogs.size(), is(3));
@@ -895,23 +792,17 @@ public class HistoricExternalTaskLogQueryTest {
 
     // when
     List<HistoricExternalTaskLog> externalTaskLogs = historyService
-      .createHistoricExternalTaskLogQuery()
-      .priorityLowerThanOrEquals(1L)
-      .priorityHigherThanOrEquals(4L)
-      .list();
+        .createHistoricExternalTaskLogQuery().priorityLowerThanOrEquals(1L)
+        .priorityHigherThanOrEquals(4L).list();
 
     // then
     assertThat(externalTaskLogs.size(), is(0));
   }
 
-
   // helper methods
 
   protected HistoricExternalTaskLog retrieveFirstHistoricExternalTaskLog() {
-    return historyService
-      .createHistoricExternalTaskLogQuery()
-      .list()
-      .get(0);
+    return historyService.createHistoricExternalTaskLogQuery().list().get(0);
   }
 
   protected void completeExternalTaskWithWorker(String externalTaskId, String workerId) {
@@ -923,10 +814,10 @@ public class HistoricExternalTaskLogQueryTest {
     completeExternalTask(externalTaskId, DEFAULT_TOPIC, WORKER_ID, false);
   }
 
-  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority) {
+  protected void completeExternalTask(String externalTaskId, String topic, String workerId,
+      boolean usePriority) {
     List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
-      .topic(topic, LOCK_DURATION)
-      .execute();
+        .topic(topic, LOCK_DURATION).execute();
     externalTaskService.complete(externalTaskId, workerId);
     // unlock the remaining tasks
     for (LockedExternalTask lockedExternalTask : list) {
@@ -940,14 +831,14 @@ public class HistoricExternalTaskLogQueryTest {
     reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, errorMessage);
   }
 
-  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries, boolean usePriority, String errorMessage) {
+  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId,
+      Integer retries, boolean usePriority, String errorMessage) {
     List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
-      .topic(topic, LOCK_DURATION)
-      .execute();
+        .topic(topic, LOCK_DURATION).execute();
     externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, retries, 0L);
 
     for (LockedExternalTask lockedExternalTask : list) {
-        externalTaskService.unlock(lockedExternalTask.getId());
+      externalTaskService.unlock(lockedExternalTask.getId());
     }
   }
 
@@ -960,38 +851,53 @@ public class HistoricExternalTaskLogQueryTest {
   }
 
   protected ExternalTask startExternalTaskProcessGivenTopicName(String topicName) {
-    BpmnModelInstance processModelWithCustomTopic = createDefaultExternalTaskModel().topic(topicName).build();
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(processModelWithCustomTopic);
+    BpmnModelInstance processModelWithCustomTopic = createDefaultExternalTaskModel()
+        .topic(topicName).build();
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(processModelWithCustomTopic);
     ProcessInstance pi = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId()).singleResult();
+    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
   }
 
   protected ExternalTask startExternalTaskProcessGivenActivityId(String activityId) {
-    BpmnModelInstance processModelWithCustomActivityId = createDefaultExternalTaskModel().externalTaskName(activityId).build();
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(processModelWithCustomActivityId);
+    BpmnModelInstance processModelWithCustomActivityId = createDefaultExternalTaskModel()
+        .externalTaskName(activityId).build();
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(processModelWithCustomActivityId);
     ProcessInstance pi = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId()).singleResult();
+    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
   }
 
-  protected ExternalTask startExternalTaskProcessGivenProcessDefinitionKey(String processDefinitionKey) {
-    BpmnModelInstance processModelWithCustomKey = createDefaultExternalTaskModel().processKey(processDefinitionKey).build();
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(processModelWithCustomKey);
+  protected ExternalTask startExternalTaskProcessGivenProcessDefinitionKey(
+      String processDefinitionKey) {
+    BpmnModelInstance processModelWithCustomKey = createDefaultExternalTaskModel()
+        .processKey(processDefinitionKey).build();
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(processModelWithCustomKey);
     ProcessInstance pi = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId()).singleResult();
+    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
   }
 
   protected ExternalTask startExternalTaskProcessGivenPriority(int priority) {
-    BpmnModelInstance processModelWithCustomPriority = createDefaultExternalTaskModel().priority(priority).build();
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(processModelWithCustomPriority);
+    BpmnModelInstance processModelWithCustomPriority = createDefaultExternalTaskModel()
+        .priority(priority).build();
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(processModelWithCustomPriority);
     ProcessInstance pi = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId()).singleResult();
+    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
   }
 
   protected ExternalTask startExternalTaskProcess() {
     BpmnModelInstance oneExternalTaskProcess = createDefaultExternalTaskModel().build();
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(oneExternalTaskProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(oneExternalTaskProcess);
     ProcessInstance pi = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId()).singleResult();
+    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
   }
 
 }

@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.cfg;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
 
-
 /**
  * @author Nico Rehwaldt
  */

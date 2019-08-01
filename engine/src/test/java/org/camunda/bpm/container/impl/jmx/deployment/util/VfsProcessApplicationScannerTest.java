@@ -26,7 +26,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-
 /**
  * @author Clint Manning
  */
@@ -36,24 +35,27 @@ public class VfsProcessApplicationScannerTest {
   public void testScanProcessArchivePathForResources() throws MalformedURLException {
 
     // given: scanning the relative test resource root
-    URLClassLoader classLoader = new URLClassLoader(new URL[]{new URL("file:")});
+    URLClassLoader classLoader = new URLClassLoader(new URL[] { new URL("file:") });
     String processRootPath = "classpath:org/camunda/bpm/container/impl/jmx/deployment/process/";
-    Map<String, byte[]> scanResult = ProcessApplicationScanningUtil.findResources(classLoader, processRootPath, null);
+    Map<String, byte[]> scanResult = ProcessApplicationScanningUtil.findResources(classLoader,
+        processRootPath, null);
 
     // expect: finds only the BPMN process file and not treats the 'bpmn' folder
     assertEquals(1, scanResult.size());
     String processFileName = "VfsProcessScannerTest.bpmn20.xml";
     assertTrue("'" + processFileName + "'not found", contains(scanResult, processFileName));
-    assertFalse("'bpmn' folder in resource path found", contains(scanResult, "processResource.txt"));
+    assertFalse("'bpmn' folder in resource path found",
+        contains(scanResult, "processResource.txt"));
   }
 
   @Test
   public void testScanProcessArchivePathForCmmnResources() throws MalformedURLException {
 
     // given: scanning the relative test resource root
-    URLClassLoader classLoader = new URLClassLoader(new URL[]{new URL("file:")});
+    URLClassLoader classLoader = new URLClassLoader(new URL[] { new URL("file:") });
     String processRootPath = "classpath:org/camunda/bpm/container/impl/jmx/deployment/case/";
-    Map<String, byte[]> scanResult = ProcessApplicationScanningUtil.findResources(classLoader, processRootPath, null);
+    Map<String, byte[]> scanResult = ProcessApplicationScanningUtil.findResources(classLoader,
+        processRootPath, null);
 
     // expect: finds only the CMMN process file and not treats the 'cmmn' folder
     assertEquals(1, scanResult.size());
@@ -63,11 +65,13 @@ public class VfsProcessApplicationScannerTest {
   }
 
   @Test
-  public void testScanProcessArchivePathWithAdditionalResourceSuffixes() throws MalformedURLException {
-    URLClassLoader classLoader = new URLClassLoader(new URL[]{new URL("file:")});
+  public void testScanProcessArchivePathWithAdditionalResourceSuffixes()
+      throws MalformedURLException {
+    URLClassLoader classLoader = new URLClassLoader(new URL[] { new URL("file:") });
     String processRootPath = "classpath:org/camunda/bpm/container/impl/jmx/deployment/script/";
     String[] additionalResourceSuffixes = new String[] { "py", "groovy", "rb" };
-    Map<String, byte[]> scanResult = ProcessApplicationScanningUtil.findResources(classLoader, processRootPath, null, additionalResourceSuffixes);
+    Map<String, byte[]> scanResult = ProcessApplicationScanningUtil.findResources(classLoader,
+        processRootPath, null, additionalResourceSuffixes);
 
     assertEquals(4, scanResult.size());
     String processFileName = "VfsProcessScannerTest.bpmn20.xml";

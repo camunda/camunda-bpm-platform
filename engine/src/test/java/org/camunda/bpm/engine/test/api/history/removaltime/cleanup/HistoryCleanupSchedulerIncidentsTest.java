@@ -44,10 +44,11 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Tassilo Weidner
  */
-public class HistoryCleanupSchedulerIncidentsTest  extends AbstractHistoryCleanupSchedulerTest {
+public class HistoryCleanupSchedulerIncidentsTest extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configure(configuration, HistoryEventTypes.INCIDENT_CREATE);
     }
   };
@@ -56,7 +57,8 @@ public class HistoryCleanupSchedulerIncidentsTest  extends AbstractHistoryCleanu
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected TaskService taskService;
   protected RuntimeService runtimeService;
@@ -75,22 +77,17 @@ public class HistoryCleanupSchedulerIncidentsTest  extends AbstractHistoryCleanu
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .scriptTask()
-        .camundaAsyncBefore()
-        .scriptFormat("groovy")
-        .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
-      .scriptTask()
-        .camundaAsyncBefore()
-        .scriptFormat("groovy")
-        .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
-      .scriptTask()
-        .camundaAsyncBefore()
-        .scriptFormat("groovy")
-        .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
-      .userTask("userTask")
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().scriptTask().camundaAsyncBefore()
+      .scriptFormat("groovy")
+      .scriptText(
+          "if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
+      .scriptTask().camundaAsyncBefore().scriptFormat("groovy")
+      .scriptText(
+          "if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
+      .scriptTask().camundaAsyncBefore().scriptFormat("groovy")
+      .scriptText(
+          "if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
+      .userTask("userTask").endEvent().done();
 
   @Test
   public void shouldScheduleToNow() {
@@ -102,15 +99,14 @@ public class HistoryCleanupSchedulerIncidentsTest  extends AbstractHistoryCleanu
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
     for (int i = 0; i < 3; i++) {
-      String jobId = managementService.createJobQuery()
-        .singleResult()
-        .getId();
+      String jobId = managementService.createJobQuery().singleResult().getId();
 
       managementService.setJobRetries(jobId, 0);
 
       try {
         managementService.executeJob(jobId);
-      } catch (Exception ignored) { }
+      } catch (Exception ignored) {
+      }
     }
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -141,15 +137,14 @@ public class HistoryCleanupSchedulerIncidentsTest  extends AbstractHistoryCleanu
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
     for (int i = 0; i < 3; i++) {
-      String jobId = managementService.createJobQuery()
-        .singleResult()
-        .getId();
+      String jobId = managementService.createJobQuery().singleResult().getId();
 
       managementService.setJobRetries(jobId, 0);
 
       try {
         managementService.executeJob(jobId);
-      } catch (Exception ignored) { }
+      } catch (Exception ignored) {
+      }
     }
 
     String taskId = taskService.createTaskQuery().singleResult().getId();

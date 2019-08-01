@@ -43,7 +43,8 @@ public class DeleteUnmappedInstanceVisitor implements TreeVisitor<MigratingScope
 
     visitedInstances.add(currentInstance);
     if (!currentInstance.migrates()) {
-      Set<MigratingProcessElementInstance> children = new HashSet<MigratingProcessElementInstance>(currentInstance.getChildren());
+      Set<MigratingProcessElementInstance> children = new HashSet<MigratingProcessElementInstance>(
+          currentInstance.getChildren());
       MigratingScopeInstance parent = currentInstance.getParent();
 
       // 1. detach children
@@ -56,8 +57,7 @@ public class DeleteUnmappedInstanceVisitor implements TreeVisitor<MigratingScope
       for (MigratingProcessElementInstance child : children) {
         child.attachState(parent);
       }
-    }
-    else {
+    } else {
       currentInstance.removeUnmappedDependentInstances();
     }
   }

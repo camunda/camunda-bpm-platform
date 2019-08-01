@@ -20,8 +20,10 @@ import org.camunda.bpm.engine.impl.core.model.CoreActivity;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
- * <p>A {@link ModelElementHandler} handles an instance of a {@link ModelElementInstance modelElement}
- * to create a new {@link CoreActivity activity.}</p>
+ * <p>
+ * A {@link ModelElementHandler} handles an instance of a {@link ModelElementInstance modelElement}
+ * to create a new {@link CoreActivity activity.}
+ * </p>
  *
  * @author Roman Smirnov
  *
@@ -29,10 +31,14 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 public interface ModelElementHandler<T extends ModelElementInstance, V extends HandlerContext, E> {
 
   /**
-   * <p>This method handles a element to create a new element.</p>
+   * <p>
+   * This method handles a element to create a new element.
+   * </p>
    *
-   * @param element the {@link ModelElementInstance} to be handled.
-   * @param context the {@link HandlerContext} which holds necessary information.
+   * @param element
+   *          the {@link ModelElementInstance} to be handled.
+   * @param context
+   *          the {@link HandlerContext} which holds necessary information.
    *
    * @return a new element.
    */

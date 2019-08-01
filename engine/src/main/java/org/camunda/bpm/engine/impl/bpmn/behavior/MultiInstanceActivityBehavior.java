@@ -33,15 +33,15 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 
-
 /**
- * Abstract Multi Instance Behavior: used for both parallel and sequential
- * multi instance implementation.
+ * Abstract Multi Instance Behavior: used for both parallel and sequential multi instance
+ * implementation.
  *
  * @author Daniel Meyer
  * @author Thorben Lindhauer
  */
-public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivityBehavior implements CompositeActivityBehavior, ModificationObserverBehavior {
+public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivityBehavior
+    implements CompositeActivityBehavior, ModificationObserverBehavior {
 
   protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
@@ -64,16 +64,15 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
     int nrOfInstances = resolveNrOfInstances(execution);
     if (nrOfInstances == 0) {
       leave(execution);
-    }
-    else if (nrOfInstances < 0) {
+    } else if (nrOfInstances < 0) {
       throw LOG.invalidAmountException("instances", nrOfInstances);
-    }
-    else {
+    } else {
       createInstances(execution, nrOfInstances);
     }
   }
 
-  protected void performInstance(ActivityExecution execution, PvmActivity activity, int loopCounter) {
+  protected void performInstance(ActivityExecution execution, PvmActivity activity,
+      int loopCounter) {
     setLoopVariable(execution, LOOP_COUNTER, loopCounter);
     evaluateCollectionVariable(execution, loopCounter);
     execution.setEnded(false);
@@ -95,7 +94,8 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
     }
   }
 
-  protected abstract void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception;
+  protected abstract void createInstances(ActivityExecution execution, int nrOfInstances)
+      throws Exception;
 
   // Helpers //////////////////////////////////////////////////////////////////////
 
@@ -106,7 +106,8 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
     } else if (collectionExpression != null) {
       Object obj = collectionExpression.getValue(execution);
       if (!(obj instanceof Collection)) {
-        throw LOG.unresolvableExpressionException(collectionExpression.getExpressionText(), "Collection");
+        throw LOG.unresolvableExpressionException(collectionExpression.getExpressionText(),
+            "Collection");
       }
       nrOfInstances = ((Collection<?>) obj).size();
     } else if (collectionVariable != null) {
@@ -133,8 +134,7 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
   }
 
   protected boolean usesCollection() {
-    return collectionExpression != null
-              || collectionVariable != null;
+    return collectionExpression != null || collectionVariable != null;
   }
 
   protected int resolveLoopCardinality(ActivityExecution execution) {
@@ -145,15 +145,17 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
     } else if (value instanceof String) {
       return Integer.valueOf((String) value);
     } else {
-      throw LOG.expressionNotANumberException("loopCardinality", loopCardinalityExpression.getExpressionText());
+      throw LOG.expressionNotANumberException("loopCardinality",
+          loopCardinalityExpression.getExpressionText());
     }
   }
 
   protected boolean completionConditionSatisfied(ActivityExecution execution) {
     if (completionConditionExpression != null) {
       Object value = completionConditionExpression.getValue(execution);
-      if (! (value instanceof Boolean)) {
-        throw LOG.expressionNotBooleanException("completionCondition", completionConditionExpression.getExpressionText());
+      if (!(value instanceof Boolean)) {
+        throw LOG.expressionNotBooleanException("completionCondition",
+            completionConditionExpression.getExpressionText());
       }
       Boolean booleanValue = (Boolean) value;
 
@@ -185,7 +187,8 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
         return innerActivity;
       }
     }
-    throw new ProcessEngineException("inner activity of multi instance body activity '" + miBodyActivity.getId() + "' not found");
+    throw new ProcessEngineException("inner activity of multi instance body activity '"
+        + miBodyActivity.getId() + "' not found");
   }
 
   protected void setLoopVariable(ActivityExecution execution, String variableName, Object value) {
@@ -194,10 +197,10 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
 
   protected Integer getLoopVariable(ActivityExecution execution, String variableName) {
     IntegerValue value = execution.getVariableLocalTyped(variableName);
-    ensureNotNull("The variable \"" + variableName + "\" could not be found in execution with id " + execution.getId(), "value", value);
+    ensureNotNull("The variable \"" + variableName + "\" could not be found in execution with id "
+        + execution.getId(), "value", value);
     return value.getValue();
   }
-
 
   protected Integer getLocalLoopVariable(ActivityExecution execution, String variableName) {
     return (Integer) execution.getVariableLocal(variableName);

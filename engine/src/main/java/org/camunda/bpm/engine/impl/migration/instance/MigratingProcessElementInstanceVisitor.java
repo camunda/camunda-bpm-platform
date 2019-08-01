@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.impl.tree.TreeVisitor;
  * @author Thorben Lindhauer
  *
  */
-public abstract class MigratingProcessElementInstanceVisitor implements TreeVisitor<MigrationContext> {
+public abstract class MigratingProcessElementInstanceVisitor
+    implements TreeVisitor<MigrationContext> {
 
   @Override
   public void visit(MigrationContext obj) {
@@ -40,40 +41,44 @@ public abstract class MigratingProcessElementInstanceVisitor implements TreeVisi
 
   protected abstract boolean canMigrate(MigratingProcessElementInstance instance);
 
-  protected abstract void instantiateScopes(
-      MigratingScopeInstance ancestorScopeInstance,
-      MigratingScopeInstanceBranch executionBranch,
-      List<ScopeImpl> scopesToInstantiate);
+  protected abstract void instantiateScopes(MigratingScopeInstance ancestorScopeInstance,
+      MigratingScopeInstanceBranch executionBranch, List<ScopeImpl> scopesToInstantiate);
 
-  protected void migrateProcessElementInstance(MigratingProcessElementInstance migratingInstance, MigratingScopeInstanceBranch migratingInstanceBranch) {
+  protected void migrateProcessElementInstance(MigratingProcessElementInstance migratingInstance,
+      MigratingScopeInstanceBranch migratingInstanceBranch) {
     final MigratingScopeInstance parentMigratingInstance = migratingInstance.getParent();
 
     ScopeImpl sourceScope = migratingInstance.getSourceScope();
     ScopeImpl targetScope = migratingInstance.getTargetScope();
     ScopeImpl targetFlowScope = targetScope.getFlowScope();
-    ScopeImpl parentActivityInstanceTargetScope = parentMigratingInstance != null ? parentMigratingInstance.getTargetScope() : null;
+    ScopeImpl parentActivityInstanceTargetScope = parentMigratingInstance != null
+        ? parentMigratingInstance.getTargetScope()
+        : null;
 
-    if (sourceScope != sourceScope.getProcessDefinition() && targetFlowScope != parentActivityInstanceTargetScope) {
+    if (sourceScope != sourceScope.getProcessDefinition()
+        && targetFlowScope != parentActivityInstanceTargetScope) {
       // create intermediate scopes
 
       // 1. manipulate execution tree
 
       // determine the list of ancestor scopes (parent, grandparent, etc.) for which
-      //     no executions exist yet
-      List<ScopeImpl> nonExistingScopes = collectNonExistingFlowScopes(targetFlowScope, migratingInstanceBranch);
+      // no executions exist yet
+      List<ScopeImpl> nonExistingScopes = collectNonExistingFlowScopes(targetFlowScope,
+          migratingInstanceBranch);
 
       // get the closest ancestor scope that is instantiated already
-      ScopeImpl existingScope = nonExistingScopes.isEmpty() ?
-          targetFlowScope :
-          nonExistingScopes.get(0).getFlowScope();
+      ScopeImpl existingScope = nonExistingScopes.isEmpty() ? targetFlowScope
+          : nonExistingScopes.get(0).getFlowScope();
 
       // and its scope instance
-      MigratingScopeInstance ancestorScopeInstance = migratingInstanceBranch.getInstance(existingScope);
+      MigratingScopeInstance ancestorScopeInstance = migratingInstanceBranch
+          .getInstance(existingScope);
 
       // Instantiate the scopes as children of the scope execution
       instantiateScopes(ancestorScopeInstance, migratingInstanceBranch, nonExistingScopes);
 
-      MigratingScopeInstance targetFlowScopeInstance = migratingInstanceBranch.getInstance(targetFlowScope);
+      MigratingScopeInstance targetFlowScopeInstance = migratingInstanceBranch
+          .getInstance(targetFlowScope);
 
       // 2. detach instance
       // The order of steps 1 and 2 avoids intermediate execution tree compaction
@@ -92,11 +97,12 @@ public abstract class MigratingProcessElementInstanceVisitor implements TreeVisi
   }
 
   /**
-   * Returns a list of flow scopes from the given scope until a scope is reached that is already present in the given
-   * {@link MigratingScopeInstanceBranch} (exclusive). The order of the returned list is top-down, i.e. the highest scope
-   * is the first element of the list.
+   * Returns a list of flow scopes from the given scope until a scope is reached that is already
+   * present in the given {@link MigratingScopeInstanceBranch} (exclusive). The order of the
+   * returned list is top-down, i.e. the highest scope is the first element of the list.
    */
-  protected List<ScopeImpl> collectNonExistingFlowScopes(ScopeImpl scope, final MigratingScopeInstanceBranch migratingExecutionBranch) {
+  protected List<ScopeImpl> collectNonExistingFlowScopes(ScopeImpl scope,
+      final MigratingScopeInstanceBranch migratingExecutionBranch) {
     FlowScopeWalker walker = new FlowScopeWalker(scope);
     final List<ScopeImpl> result = new LinkedList<ScopeImpl>();
     walker.addPreVisitor(new TreeVisitor<ScopeImpl>() {

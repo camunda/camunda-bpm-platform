@@ -18,11 +18,10 @@ package org.camunda.bpm.engine.impl.json;
 
 import com.google.gson.JsonObject;
 
-
 /**
  * @author Tom Baeyens
  */
-public abstract class JsonObjectConverter <T> {
+public abstract class JsonObjectConverter<T> {
 
   public String toJson(T object) {
     return toJsonObject(object).toString();

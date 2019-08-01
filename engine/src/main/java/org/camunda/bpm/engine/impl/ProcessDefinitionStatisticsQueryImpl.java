@@ -24,9 +24,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 
-
-public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessDefinitionStatisticsQuery, ProcessDefinitionStatistics>
-  implements ProcessDefinitionStatisticsQuery {
+public class ProcessDefinitionStatisticsQueryImpl
+    extends AbstractQuery<ProcessDefinitionStatisticsQuery, ProcessDefinitionStatistics>
+    implements ProcessDefinitionStatisticsQuery {
 
   protected static final long serialVersionUID = 1L;
   protected boolean includeFailedJobs = false;
@@ -41,19 +41,14 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return
-      commandContext
-        .getStatisticsManager()
+    return commandContext.getStatisticsManager()
         .getStatisticsCountGroupedByProcessDefinitionVersion(this);
   }
 
   @Override
-  public List<ProcessDefinitionStatistics> executeList(CommandContext commandContext,
-      Page page) {
+  public List<ProcessDefinitionStatistics> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return
-      commandContext
-        .getStatisticsManager()
+    return commandContext.getStatisticsManager()
         .getStatisticsGroupedByProcessDefinitionVersion(this, page);
   }
 
@@ -83,13 +78,16 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
   protected void checkQueryOk() {
     super.checkQueryOk();
     if (includeIncidents && includeIncidentsForType != null) {
-      throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
+      throw new ProcessEngineException(
+          "Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
     }
     if (includeRootIncidents && includeIncidentsForType != null) {
-      throw new ProcessEngineException("Invalid query: It is not possible to use includeRootIncident() and includeIncidentForType() to execute one query.");
+      throw new ProcessEngineException(
+          "Invalid query: It is not possible to use includeRootIncident() and includeIncidentForType() to execute one query.");
     }
     if (includeIncidents && includeRootIncidents) {
-      throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeRootIncidents() to execute one query.");
+      throw new ProcessEngineException(
+          "Invalid query: It is not possible to use includeIncident() and includeRootIncidents() to execute one query.");
     }
   }
 

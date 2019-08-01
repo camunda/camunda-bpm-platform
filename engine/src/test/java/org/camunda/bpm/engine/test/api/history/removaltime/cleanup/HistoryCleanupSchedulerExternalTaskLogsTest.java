@@ -45,10 +45,12 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Tassilo Weidner
  */
-public class HistoryCleanupSchedulerExternalTaskLogsTest extends AbstractHistoryCleanupSchedulerTest {
+public class HistoryCleanupSchedulerExternalTaskLogsTest
+    extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configure(configuration, HistoryEventTypes.EXTERNAL_TASK_SUCCESS);
     }
   };
@@ -57,17 +59,16 @@ public class HistoryCleanupSchedulerExternalTaskLogsTest extends AbstractHistory
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected ExternalTaskService externalTaskService;
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .userTask("userTask").name("userTask")
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().userTask("userTask").name("userTask").endEvent()
+      .done();
 
   @Before
   public void init() {
@@ -84,14 +85,9 @@ public class HistoryCleanupSchedulerExternalTaskLogsTest extends AbstractHistory
   @Test
   public void shouldScheduleToNow() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .serviceTask().camundaExternalTask("anExternalTaskTopic")
-        .multiInstance()
-          .cardinality("5")
-        .multiInstanceDone()
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").camundaHistoryTimeToLive(5).startEvent()
+        .serviceTask().camundaExternalTask("anExternalTaskTopic").multiInstance().cardinality("5")
+        .multiInstanceDone().endEvent().done());
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -99,9 +95,7 @@ public class HistoryCleanupSchedulerExternalTaskLogsTest extends AbstractHistory
 
     for (int i = 0; i < 5; i++) {
       LockedExternalTask externalTask = externalTaskService.fetchAndLock(1, "aWorkerId")
-        .topic("anExternalTaskTopic", 2000)
-        .execute()
-        .get(0);
+          .topic("anExternalTaskTopic", 2000).execute().get(0);
 
       externalTaskService.complete(externalTask.getId(), "aWorkerId");
     }
@@ -124,14 +118,9 @@ public class HistoryCleanupSchedulerExternalTaskLogsTest extends AbstractHistory
   @Test
   public void shouldScheduleToLater() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .serviceTask().camundaExternalTask("anExternalTaskTopic")
-        .multiInstance()
-          .cardinality("5")
-        .multiInstanceDone()
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").camundaHistoryTimeToLive(5).startEvent()
+        .serviceTask().camundaExternalTask("anExternalTaskTopic").multiInstance().cardinality("5")
+        .multiInstanceDone().endEvent().done());
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -139,9 +128,7 @@ public class HistoryCleanupSchedulerExternalTaskLogsTest extends AbstractHistory
 
     for (int i = 0; i < 5; i++) {
       LockedExternalTask externalTask = externalTaskService.fetchAndLock(1, "aWorkerId")
-        .topic("anExternalTaskTopic", 2000)
-        .execute()
-        .get(0);
+          .topic("anExternalTaskTopic", 2000).execute().get(0);
 
       externalTaskService.complete(externalTask.getId(), "aWorkerId");
     }

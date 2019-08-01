@@ -22,8 +22,8 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
- * Keeps track of scope instances (activity instances; event scope instances) created in a branch
- * of the activity/event scope tree from the process instance downwards
+ * Keeps track of scope instances (activity instances; event scope instances) created in a branch of
+ * the activity/event scope tree from the process instance downwards
  *
  * @author Thorben Lindhauer
  */
@@ -34,8 +34,7 @@ public class MigratingScopeInstanceBranch {
     this(new HashMap<ScopeImpl, MigratingScopeInstance>());
   }
 
-  protected MigratingScopeInstanceBranch(
-      Map<ScopeImpl, MigratingScopeInstance> scopeInstances) {
+  protected MigratingScopeInstanceBranch(Map<ScopeImpl, MigratingScopeInstance> scopeInstances) {
     this.scopeInstances = scopeInstances;
   }
 

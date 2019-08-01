@@ -33,8 +33,7 @@ import org.camunda.bpm.container.impl.spi.ServiceTypes;
 
 /**
  * <p>
- * Deployment operation step responsible for deploying a thread pool for the
- * JobExecutor
+ * Deployment operation step responsible for deploying a thread pool for the JobExecutor
  * </p>
  *
  * @author Daniel Meyer
@@ -65,14 +64,17 @@ public class StartManagedThreadPoolStep extends DeploymentOperationStep {
     // initialize Queue & Executor services
     BlockingQueue<Runnable> threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
 
-    ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue);
+    ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize,
+        keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue);
     threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 
     // construct the service for the thread pool
-    JmxManagedThreadPool managedThreadPool = new JmxManagedThreadPool(threadPoolQueue, threadPoolExecutor);
+    JmxManagedThreadPool managedThreadPool = new JmxManagedThreadPool(threadPoolQueue,
+        threadPoolExecutor);
 
     // install the service into the container
-    serviceContainer.startService(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR, managedThreadPool);
+    serviceContainer.startService(ServiceTypes.BPM_PLATFORM,
+        RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR, managedThreadPool);
 
   }
 

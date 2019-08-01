@@ -70,13 +70,8 @@ public class ModificationUserOperationLogTest {
 
   @Before
   public void createBpmnModelInstance() {
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .userTask("user1")
-        .sequenceFlowId("seq")
-        .userTask("user2")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").userTask("user1")
+        .sequenceFlowId("seq").userTask("user2").endEvent("end").done();
   }
 
   @After
@@ -93,6 +88,7 @@ public class ModificationUserOperationLogTest {
   public void removeBatches() {
     helper.removeAllRunningAndHistoricBatches();
   }
+
   @Test
   public void testLogCreation() {
     // given
@@ -105,13 +101,11 @@ public class ModificationUserOperationLogTest {
 
     // then
     List<UserOperationLogEntry> opLogEntries = rule.getHistoryService()
-            .createUserOperationLogQuery()
-            .operationType(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE)
-            .list();
+        .createUserOperationLogQuery()
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE).list();
     Assert.assertEquals(2, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
-
 
     UserOperationLogEntry asyncEntry = entries.get("async");
     Assert.assertNotNull(asyncEntry);
@@ -143,12 +137,12 @@ public class ModificationUserOperationLogTest {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
 
     Batch batch = runtimeService.createModification(processDefinition.getId())
-      .startAfterActivity("user2")
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+        .startAfterActivity("user2").processInstanceIds(Arrays.asList(processInstance.getId()))
+        .executeAsync();
 
     helper.executeSeedJob(batch);
 
@@ -158,7 +152,8 @@ public class ModificationUserOperationLogTest {
     rule.getIdentityService().clearAuthentication();
 
     // then
-    Assert.assertEquals(0, rule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).count());
+    Assert.assertEquals(0, rule.getHistoryService().createUserOperationLogQuery()
+        .entityType(EntityTypes.PROCESS_INSTANCE).count());
   }
 
   @Test
@@ -166,12 +161,11 @@ public class ModificationUserOperationLogTest {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
 
-    runtimeService.createModification(processDefinition.getId())
-      .cancelAllForActivity("user1")
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    runtimeService.createModification(processDefinition.getId()).cancelAllForActivity("user1")
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
 
     // when
     testRule.waitForJobExecutorToProcessAllJobs(5000L);

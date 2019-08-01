@@ -38,11 +38,14 @@ import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_
 /**
  * @author Tassilo Weidner
  */
-public class BatchSetRemovalTimeJobHandler extends AbstractBatchJobHandler<SetRemovalTimeBatchConfiguration> {
+public class BatchSetRemovalTimeJobHandler
+    extends AbstractBatchJobHandler<SetRemovalTimeBatchConfiguration> {
 
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_BATCH_SET_REMOVAL_TIME);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(
+      Batch.TYPE_BATCH_SET_REMOVAL_TIME);
 
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
 
     String byteArrayId = configuration.getConfigurationByteArrayId();
     byte[] configurationByteArray = findByteArrayById(byteArrayId, commandContext).getBytes();
@@ -64,7 +67,8 @@ public class BatchSetRemovalTimeJobHandler extends AbstractBatchJobHandler<SetRe
     }
   }
 
-  protected Date getOrCalculateRemovalTime(SetRemovalTimeBatchConfiguration batchConfiguration, HistoricBatchEntity instance, CommandContext commandContext) {
+  protected Date getOrCalculateRemovalTime(SetRemovalTimeBatchConfiguration batchConfiguration,
+      HistoricBatchEntity instance, CommandContext commandContext) {
     if (batchConfiguration.hasRemovalTime()) {
       return batchConfiguration.getRemovalTime();
 
@@ -77,9 +81,9 @@ public class BatchSetRemovalTimeJobHandler extends AbstractBatchJobHandler<SetRe
     }
   }
 
-  protected void addRemovalTime(String instanceId, Date removalTime, CommandContext commandContext) {
-    commandContext.getHistoricBatchManager()
-      .addRemovalTimeById(instanceId, removalTime);
+  protected void addRemovalTime(String instanceId, Date removalTime,
+      CommandContext commandContext) {
+    commandContext.getHistoricBatchManager().addRemovalTimeById(instanceId, removalTime);
   }
 
   protected boolean hasBaseTime(HistoricBatchEntity instance, CommandContext commandContext) {
@@ -91,7 +95,8 @@ public class BatchSetRemovalTimeJobHandler extends AbstractBatchJobHandler<SetRe
   }
 
   protected boolean isStrategyStart(CommandContext commandContext) {
-    return HISTORY_REMOVAL_TIME_STRATEGY_START.equals(getHistoryRemovalTimeStrategy(commandContext));
+    return HISTORY_REMOVAL_TIME_STRATEGY_START
+        .equals(getHistoryRemovalTimeStrategy(commandContext));
   }
 
   protected boolean isStrategyEnd(CommandContext commandContext) {
@@ -99,8 +104,7 @@ public class BatchSetRemovalTimeJobHandler extends AbstractBatchJobHandler<SetRe
   }
 
   protected String getHistoryRemovalTimeStrategy(CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration()
-      .getHistoryRemovalTimeStrategy();
+    return commandContext.getProcessEngineConfiguration().getHistoryRemovalTimeStrategy();
   }
 
   protected boolean isDmnEnabled(CommandContext commandContext) {
@@ -108,29 +112,27 @@ public class BatchSetRemovalTimeJobHandler extends AbstractBatchJobHandler<SetRe
   }
 
   protected Date calculateRemovalTime(HistoricBatchEntity batch, CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration()
-      .getHistoryRemovalTimeProvider()
-      .calculateRemovalTime(batch);
+    return commandContext.getProcessEngineConfiguration().getHistoryRemovalTimeProvider()
+        .calculateRemovalTime(batch);
   }
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId, CommandContext commandContext) {
-    return commandContext.getDbEntityManager()
-      .selectById(ByteArrayEntity.class, byteArrayId);
+    return commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, byteArrayId);
   }
 
   protected HistoricBatchEntity findBatchById(String instanceId, CommandContext commandContext) {
-    return commandContext.getHistoricBatchManager()
-      .findHistoricBatchById(instanceId);
+    return commandContext.getHistoricBatchManager().findHistoricBatchById(instanceId);
   }
 
   public JobDeclaration<BatchJobContext, MessageEntity> getJobDeclaration() {
     return JOB_DECLARATION;
   }
 
-  protected SetRemovalTimeBatchConfiguration createJobConfiguration(SetRemovalTimeBatchConfiguration configuration, List<String> batchIds) {
+  protected SetRemovalTimeBatchConfiguration createJobConfiguration(
+      SetRemovalTimeBatchConfiguration configuration, List<String> batchIds) {
     return new SetRemovalTimeBatchConfiguration(batchIds)
-      .setRemovalTime(configuration.getRemovalTime())
-      .setHasRemovalTime(configuration.hasRemovalTime());
+        .setRemovalTime(configuration.getRemovalTime())
+        .setHasRemovalTime(configuration.hasRemovalTime());
   }
 
   protected JsonObjectConverter getJsonConverterInstance() {

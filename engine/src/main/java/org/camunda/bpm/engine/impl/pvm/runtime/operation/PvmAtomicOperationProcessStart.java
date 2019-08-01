@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.pvm.runtime.InstantiationStack;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -67,7 +66,8 @@ public class PvmAtomicOperationProcessStart extends AbstractPvmEventAtomicOperat
     }, new Callback<PvmExecutionImpl, Void>() {
       @Override
       public Void callback(PvmExecutionImpl execution) {
-        ProcessInstanceStartContext processInstanceStartContext = execution.getProcessInstanceStartContext();
+        ProcessInstanceStartContext processInstanceStartContext = execution
+            .getProcessInstanceStartContext();
         InstantiationStack instantiationStack = processInstanceStartContext.getInstantiationStack();
 
         if (instantiationStack.getActivities().isEmpty()) {

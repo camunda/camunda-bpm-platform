@@ -41,9 +41,7 @@ public class RemoveTaskVariablesCmd extends AbstractRemoveVariableCmd {
   protected TaskEntity getEntity() {
     ensureNotNull("taskId", entityId);
 
-    TaskEntity task = commandContext
-      .getTaskManager()
-      .findTaskById(entityId);
+    TaskEntity task = commandContext.getTaskManager().findTaskById(entityId);
 
     ensureNotNull("Cannot find task with id " + entityId, "task", task);
 
@@ -59,11 +57,13 @@ public class RemoveTaskVariablesCmd extends AbstractRemoveVariableCmd {
 
   protected void logVariableOperation(AbstractVariableScope scope) {
     TaskEntity task = (TaskEntity) scope;
-    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), null, task.getId(), PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), null,
+        task.getId(), PropertyChange.EMPTY_CHANGE);
   }
 
   protected void checkRemoveTaskVariables(TaskEntity task) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateTaskVariable(task);
     }
   }

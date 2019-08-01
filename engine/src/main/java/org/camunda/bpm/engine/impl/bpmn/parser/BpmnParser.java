@@ -23,13 +23,12 @@ import org.camunda.bpm.engine.impl.cfg.BpmnParseFactory;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.util.xml.Parser;
 
-
 /**
  * Parser for BPMN 2.0 process models.
  *
- * There is only one instance of this parser in the process engine.
- * This {@link Parser} creates {@link BpmnParse} instances that
- * can be used to actually parse the BPMN 2.0 XML process definitions.
+ * There is only one instance of this parser in the process engine. This {@link Parser} creates
+ * {@link BpmnParse} instances that can be used to actually parse the BPMN 2.0 XML process
+ * definitions.
  *
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -53,6 +52,7 @@ public class BpmnParser extends Parser {
 
   /**
    * The namespace of the Activiti custom BPMN extensions.
+   * 
    * @deprecated use {@link #CAMUNDA_BPMN_EXTENSIONS_NS}
    */
   @Deprecated
@@ -69,7 +69,8 @@ public class BpmnParser extends Parser {
   public static final String BPMN_DC_NS = "http://www.omg.org/spec/DD/20100524/DC";
 
   /**
-   * The namespace of the generic OMG DI elements (don't ask me why they didnt use the BPMN_DI_NS ...)
+   * The namespace of the generic OMG DI elements (don't ask me why they didnt use the BPMN_DI_NS
+   * ...)
    */
   public static final String OMG_DI_NS = "http://www.omg.org/spec/DD/20100524/DI";
 
@@ -89,8 +90,8 @@ public class BpmnParser extends Parser {
   }
 
   /**
-   * Creates a new {@link BpmnParse} instance that can be used
-   * to parse only one BPMN 2.0 process definition.
+   * Creates a new {@link BpmnParse} instance that can be used to parse only one BPMN 2.0 process
+   * definition.
    */
   public BpmnParse createParse() {
     return bpmnParseFactory.createBpmnParse(this);

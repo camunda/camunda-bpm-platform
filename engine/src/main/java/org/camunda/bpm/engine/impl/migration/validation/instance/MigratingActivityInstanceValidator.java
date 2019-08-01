@@ -21,6 +21,8 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 
 public interface MigratingActivityInstanceValidator {
 
-  void validate(MigratingActivityInstance migratingInstance, MigratingProcessInstance migratingProcessInstance, MigratingActivityInstanceValidationReportImpl instanceReport);
+  void validate(MigratingActivityInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
+      MigratingActivityInstanceValidationReportImpl instanceReport);
 
 }

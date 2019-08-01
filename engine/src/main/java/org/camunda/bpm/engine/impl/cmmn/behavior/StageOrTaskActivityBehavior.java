@@ -128,7 +128,8 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     }
 
     if (execution.isCompleted()) {
-      throw LOG.wrongCaseStateException("exit", id, "[available|enabled|disabled|active|failed|suspended]", "completed");
+      throw LOG.wrongCaseStateException("exit", id,
+          "[available|enabled|disabled|active|failed|suspended]", "completed");
     }
 
     performExit(execution);
@@ -151,8 +152,8 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     }
 
     if (execution.isCompleted() || execution.isTerminated()) {
-      throw LOG.wrongCaseStateException("parentSuspend", id, "suspend", "[available|enabled|disabled|active]",
-        execution.getCurrentState().toString());
+      throw LOG.wrongCaseStateException("parentSuspend", id, "suspend",
+          "[available|enabled|disabled|active]", execution.getCurrentState().toString());
     }
 
     performParentSuspension(execution);
@@ -181,7 +182,8 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     String id = execution.getId();
 
     if (!execution.isSuspended()) {
-      throw LOG.wrongCaseStateException("parentResume", id, "resume", "suspended", execution.getCurrentState().toString());
+      throw LOG.wrongCaseStateException("parentResume", id, "resume", "suspended",
+          execution.getCurrentState().toString());
     }
 
     CmmnActivityExecution parent = execution.getParent();

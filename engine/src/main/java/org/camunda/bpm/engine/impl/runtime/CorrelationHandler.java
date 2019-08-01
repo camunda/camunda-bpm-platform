@@ -28,39 +28,41 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 public interface CorrelationHandler {
 
   /**
-   * Correlate the given message to either a waiting execution or a process
-   * definition with a message start event.
+   * Correlate the given message to either a waiting execution or a process definition with a
+   * message start event.
    *
    * @param correlationSet
    *          any of its members may be <code>null</code>
    *
-   * @return the matched correlation target or <code>null</code> if the message
-   *         could not be correlated.
+   * @return the matched correlation target or <code>null</code> if the message could not be
+   *         correlated.
    */
-  public CorrelationHandlerResult correlateMessage(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
+  public CorrelationHandlerResult correlateMessage(CommandContext commandContext,
+      String messageName, CorrelationSet correlationSet);
 
   /**
-   * Correlate the given message to all waiting executions and all process
-   * definitions which have a message start event.
+   * Correlate the given message to all waiting executions and all process definitions which have a
+   * message start event.
    *
    * @param correlationSet
    *          any of its members may be <code>null</code>
    *
-   * @return all matched correlation targets or an empty List if the message
-   *         could not be correlated.
+   * @return all matched correlation targets or an empty List if the message could not be
+   *         correlated.
    */
-  public List<CorrelationHandlerResult> correlateMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
+  public List<CorrelationHandlerResult> correlateMessages(CommandContext commandContext,
+      String messageName, CorrelationSet correlationSet);
 
   /**
-   * Correlate the given message to process definitions with a message start
-   * event.
+   * Correlate the given message to process definitions with a message start event.
    *
    * @param correlationSet
    *          any of its members may be <code>null</code>
    *
-   * @return the matched correlation targets or an empty list if the message
-   *         could not be correlated.
+   * @return the matched correlation targets or an empty list if the message could not be
+   *         correlated.
    */
-  public List<CorrelationHandlerResult> correlateStartMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet);
+  public List<CorrelationHandlerResult> correlateStartMessages(CommandContext commandContext,
+      String messageName, CorrelationSet correlationSet);
 
 }

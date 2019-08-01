@@ -24,8 +24,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 public interface MetricsReporterIdProvider {
 
   /**
-   * Provides an id that identifies the metrics reported as part of the given engine's
-   * process execution. May return null.
+   * Provides an id that identifies the metrics reported as part of the given engine's process
+   * execution. May return null.
    */
   String provideId(ProcessEngine processEngine);
 }

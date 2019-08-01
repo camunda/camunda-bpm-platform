@@ -31,44 +31,34 @@ import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
  */
 public class DecisionLogger extends ProcessEngineLogger {
 
-  public ProcessEngineException decisionResultMappingException(DmnDecisionResult decisionResult, DecisionResultMapper resultMapper, DmnEngineException cause) {
-    return new ProcessEngineException(exceptionMessage(
-        "001",
-        "The decision result mapper '{}' failed to process '{}'",
-        resultMapper,
-        decisionResult
-      ), cause);
+  public ProcessEngineException decisionResultMappingException(DmnDecisionResult decisionResult,
+      DecisionResultMapper resultMapper, DmnEngineException cause) {
+    return new ProcessEngineException(exceptionMessage("001",
+        "The decision result mapper '{}' failed to process '{}'", resultMapper, decisionResult),
+        cause);
   }
 
-  public ProcessEngineException decisionResultCollectMappingException(Collection<String> outputNames, DmnDecisionResult decisionResult, DecisionResultMapper resultMapper) {
-    return new ProcessEngineException(exceptionMessage(
-        "002",
+  public ProcessEngineException decisionResultCollectMappingException(
+      Collection<String> outputNames, DmnDecisionResult decisionResult,
+      DecisionResultMapper resultMapper) {
+    return new ProcessEngineException(exceptionMessage("002",
         "The decision result mapper '{}' failed to process '{}'. The decision outputs should only contains values for one output name but found '{}'.",
-        resultMapper,
-        decisionResult,
-        outputNames
-      ));
+        resultMapper, decisionResult, outputNames));
   }
 
   public BadUserRequestException exceptionEvaluateDecisionDefinitionByIdAndTenantId() {
-    return new BadUserRequestException(exceptionMessage(
-        "003", "Cannot specify a tenant-id when evaluate a decision definition by decision definition id."));
+    return new BadUserRequestException(exceptionMessage("003",
+        "Cannot specify a tenant-id when evaluate a decision definition by decision definition id."));
   }
 
   public ProcessEngineException exceptionParseDmnResource(String resouceName, Exception cause) {
-    return new ProcessEngineException(exceptionMessage(
-        "004",
-        "Unable to transform DMN resource '{}'.",
-        resouceName
-        ), cause);
+    return new ProcessEngineException(
+        exceptionMessage("004", "Unable to transform DMN resource '{}'.", resouceName), cause);
   }
 
   public ProcessEngineException exceptionNoDrdForResource(String resourceName) {
-    return new ProcessEngineException(exceptionMessage(
-        "005",
-        "Found no decision requirements definition for DMN resource '{}'.",
-        resourceName
-      ));
+    return new ProcessEngineException(exceptionMessage("005",
+        "Found no decision requirements definition for DMN resource '{}'.", resourceName));
   }
 
 }

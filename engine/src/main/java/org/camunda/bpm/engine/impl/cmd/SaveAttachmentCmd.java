@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.task.Attachment;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -31,19 +30,18 @@ public class SaveAttachmentCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected Attachment attachment;
-  
+
   public SaveAttachmentCmd(Attachment attachment) {
     this.attachment = attachment;
   }
 
   public Object execute(CommandContext commandContext) {
-    AttachmentEntity updateAttachment = commandContext
-      .getDbEntityManager()
-      .selectById(AttachmentEntity.class, attachment.getId());
-    
+    AttachmentEntity updateAttachment = commandContext.getDbEntityManager()
+        .selectById(AttachmentEntity.class, attachment.getId());
+
     updateAttachment.setName(attachment.getName());
     updateAttachment.setDescription(attachment.getDescription());
-    
+
     return null;
   }
 }

@@ -49,20 +49,23 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
     JobEntity job = commandContext.getJobManager().findJobById(jobId);
     ensureNotNull("No job found with id '" + jobId + "'", "job", job);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateJob(job);
     }
     // We need to check if the job was locked, ie acquired by the job acquisition thread
     // This happens if the the job was already acquired, but not yet executed.
     // In that case, we can't allow to delete the job.
     if (job.getLockOwner() != null || job.getLockExpirationTime() != null) {
-      throw new ProcessEngineException("Cannot delete job when the job is being executed. Try again later.");
+      throw new ProcessEngineException(
+          "Cannot delete job when the job is being executed. Try again later.");
     }
 
-    commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, jobId, 
-        job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), 
-        job.getProcessDefinitionKey(), PropertyChange.EMPTY_CHANGE);
-    
+    commandContext.getOperationLogManager().logJobOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE, jobId, job.getJobDefinitionId(),
+        job.getProcessInstanceId(), job.getProcessDefinitionId(), job.getProcessDefinitionKey(),
+        PropertyChange.EMPTY_CHANGE);
+
     job.delete();
     return null;
   }

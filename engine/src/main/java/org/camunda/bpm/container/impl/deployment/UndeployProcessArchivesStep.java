@@ -31,7 +31,9 @@ import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
- * <p>Deployment operation responsible for undeploying all process archives.</p>
+ * <p>
+ * Deployment operation responsible for undeploying all process archives.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -45,19 +47,25 @@ public class UndeployProcessArchivesStep extends DeploymentOperationStep {
   public void performOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
-    final JmxManagedProcessApplication deployedProcessApplication = serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
+    final AbstractProcessApplication processApplication = operationContext
+        .getAttachment(Attachments.PROCESS_APPLICATION);
+    final JmxManagedProcessApplication deployedProcessApplication = serviceContainer
+        .getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
 
-    ensureNotNull("Cannot find process application with name " + processApplication.getName(), "deployedProcessApplication", deployedProcessApplication);
+    ensureNotNull("Cannot find process application with name " + processApplication.getName(),
+        "deployedProcessApplication", deployedProcessApplication);
 
-    Map<String, DeployedProcessArchive> deploymentMap = deployedProcessApplication.getProcessArchiveDeploymentMap();
+    Map<String, DeployedProcessArchive> deploymentMap = deployedProcessApplication
+        .getProcessArchiveDeploymentMap();
     if (deploymentMap != null) {
       List<ProcessesXml> processesXmls = deployedProcessApplication.getProcessesXmls();
       for (ProcessesXml processesXml : processesXmls) {
         for (ProcessArchiveXml parsedProcessArchive : processesXml.getProcessArchives()) {
-          DeployedProcessArchive deployedProcessArchive = deploymentMap.get(parsedProcessArchive.getName());
+          DeployedProcessArchive deployedProcessArchive = deploymentMap
+              .get(parsedProcessArchive.getName());
           if (deployedProcessArchive != null) {
-            operationContext.addStep(new UndeployProcessArchiveStep(deployedProcessApplication, parsedProcessArchive, deployedProcessArchive.getProcessEngineName()));
+            operationContext.addStep(new UndeployProcessArchiveStep(deployedProcessApplication,
+                parsedProcessArchive, deployedProcessArchive.getProcessEngineName()));
           }
         }
       }

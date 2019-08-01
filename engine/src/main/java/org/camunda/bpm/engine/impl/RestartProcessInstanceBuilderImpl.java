@@ -49,7 +49,8 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
   protected boolean skipIoMappings;
   protected boolean withoutBusinessKey;
 
-  public RestartProcessInstanceBuilderImpl(CommandExecutor commandExecutor, String processDefinitionId) {
+  public RestartProcessInstanceBuilderImpl(CommandExecutor commandExecutor,
+      String processDefinitionId) {
     ensureNotNull(NotValidException.class, "processDefinitionId", processDefinitionId);
     this.commandExecutor = commandExecutor;
     this.instructions = new ArrayList<AbstractProcessInstanceModificationCommand>();
@@ -83,7 +84,8 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
   }
 
   public void execute(boolean writeUserOperationLog) {
-    commandExecutor.execute(new RestartProcessInstancesCmd(commandExecutor, this, writeUserOperationLog));
+    commandExecutor
+        .execute(new RestartProcessInstancesCmd(commandExecutor, this, writeUserOperationLog));
   }
 
   public Batch executeAsync() {
@@ -105,7 +107,8 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
   }
 
   @Override
-  public RestartProcessInstanceBuilder historicProcessInstanceQuery(HistoricProcessInstanceQuery query) {
+  public RestartProcessInstanceBuilder historicProcessInstanceQuery(
+      HistoricProcessInstanceQuery query) {
     this.query = query;
     return this;
   }

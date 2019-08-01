@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
  * @author Roman Smirnov
  *
  */
-public class MySpecialCaseExecutionListener extends MyCaseExecutionListener implements CaseExecutionListener {
+public class MySpecialCaseExecutionListener extends MyCaseExecutionListener
+    implements CaseExecutionListener {
 
   private static final long serialVersionUID = 1L;
 

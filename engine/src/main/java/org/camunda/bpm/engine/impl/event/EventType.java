@@ -19,9 +19,9 @@ package org.camunda.bpm.engine.impl.event;
 /**
  * Defines the existing event types, on which the subscription can be done.
  *
- * Since the the event type for message and signal are historically lower case
- * the enum variant can't be used, so we have to reimplement an enum like class.
- * That is done so we can restrict the event types to only the defined ones.
+ * Since the the event type for message and signal are historically lower case the enum variant
+ * can't be used, so we have to reimplement an enum like class. That is done so we can restrict the
+ * event types to only the defined ones.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */

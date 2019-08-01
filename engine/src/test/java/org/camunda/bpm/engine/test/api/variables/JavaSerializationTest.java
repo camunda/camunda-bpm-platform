@@ -65,10 +65,12 @@ public class JavaSerializationTest {
 
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/variables/oneTaskProcess.bpmn20.xml";
 
-  protected static final String JAVA_DATA_FORMAT = Variables.SerializationDataFormats.JAVA.getName();
+  protected static final String JAVA_DATA_FORMAT = Variables.SerializationDataFormats.JAVA
+      .getName();
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
       return configuration;
     }
@@ -77,7 +79,8 @@ public class JavaSerializationTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -97,10 +100,12 @@ public class JavaSerializationTest {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     JavaSerializable javaSerializable = new JavaSerializable("foo");
-    runtimeService.setVariable(instance.getId(), "simpleBean", objectValue(javaSerializable).serializationDataFormat(JAVA_DATA_FORMAT).create());
+    runtimeService.setVariable(instance.getId(), "simpleBean",
+        objectValue(javaSerializable).serializationDataFormat(JAVA_DATA_FORMAT).create());
 
     // validate untyped value
-    JavaSerializable value = (JavaSerializable) runtimeService.getVariable(instance.getId(), "simpleBean");
+    JavaSerializable value = (JavaSerializable) runtimeService.getVariable(instance.getId(),
+        "simpleBean");
 
     assertEquals(javaSerializable, value);
 
@@ -119,16 +124,16 @@ public class JavaSerializationTest {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()),
+        engineRule.getProcessEngine());
 
     runtimeService.setVariable(instance.getId(), "simpleBean",
-        serializedObjectValue(serializedObject)
-        .serializationDataFormat(JAVA_DATA_FORMAT)
-        .objectTypeName(JavaSerializable.class.getName())
-        .create());
+        serializedObjectValue(serializedObject).serializationDataFormat(JAVA_DATA_FORMAT)
+            .objectTypeName(JavaSerializable.class.getName()).create());
 
     // validate untyped value
-    JavaSerializable value = (JavaSerializable) runtimeService.getVariable(instance.getId(), "simpleBean");
+    JavaSerializable value = (JavaSerializable) runtimeService.getVariable(instance.getId(),
+        "simpleBean");
     assertEquals(javaSerializable, value);
 
     // validate typed value
@@ -141,22 +146,23 @@ public class JavaSerializationTest {
   @Deployment
   public void testJavaObjectDeserializedInFirstCommand() throws Exception {
 
-    // this test makes sure that if a serialized value is set, it can be deserialized in the same command in which it is set.
+    // this test makes sure that if a serialized value is set, it can be deserialized in the same
+    // command in which it is set.
 
     // given
     // a serialized Java Object
     JavaSerializable javaSerializable = new JavaSerializable("foo");
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()),
+        engineRule.getProcessEngine());
 
     // if
     // I start a process instance in which a Java Delegate reads the value in its deserialized form
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", Variables.createVariables()
-      .putValue("varName", serializedObjectValue(serializedObject)
-        .serializationDataFormat(JAVA_DATA_FORMAT)
-        .objectTypeName(JavaSerializable.class.getName())
-        .create()));
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("varName",
+            serializedObjectValue(serializedObject).serializationDataFormat(JAVA_DATA_FORMAT)
+                .objectTypeName(JavaSerializable.class.getName()).create()));
 
     // then
     // it does not fail
@@ -166,7 +172,8 @@ public class JavaSerializationTest {
   @Deployment
   public void testJavaObjectNotDeserializedIfNotRequested() throws Exception {
 
-    // this test makes sure that if a serialized value is set, it is not automatically deserialized if deserialization is not requested
+    // this test makes sure that if a serialized value is set, it is not automatically deserialized
+    // if deserialization is not requested
 
     // given
     // a serialized Java Object
@@ -174,22 +181,23 @@ public class JavaSerializationTest {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
     byte[] serializedObjectBytes = baos.toByteArray();
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(serializedObjectBytes), engineRule.getProcessEngine());
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(serializedObjectBytes),
+        engineRule.getProcessEngine());
 
     thrown.expect(RuntimeException.class);
     thrown.expectMessage("Exception while deserializing object");
 
     // which cannot be deserialized
-    ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedObjectBytes));
+    ObjectInputStream objectInputStream = new ObjectInputStream(
+        new ByteArrayInputStream(serializedObjectBytes));
     objectInputStream.readObject();
 
     // if
     // I start a process instance in which a Java Delegate reads the value in its serialized form
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", Variables.createVariables()
-      .putValue("varName", serializedObjectValue(serializedObject)
-        .serializationDataFormat(JAVA_DATA_FORMAT)
-        .objectTypeName(JavaSerializable.class.getName())
-        .create()));
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValue("varName",
+            serializedObjectValue(serializedObject).serializationDataFormat(JAVA_DATA_FORMAT)
+                .objectTypeName(JavaSerializable.class.getName()).create()));
 
     // then
     // it does not fail
@@ -203,9 +211,7 @@ public class JavaSerializationTest {
 
     // set null value as "deserialized" object
     runtimeService.setVariable(instance.getId(), "nullObject",
-        objectValue(null)
-        .serializationDataFormat(JAVA_DATA_FORMAT)
-        .create());
+        objectValue(null).serializationDataFormat(JAVA_DATA_FORMAT).create());
 
     // get null value via untyped api
     assertNull(runtimeService.getVariable(instance.getId(), "nullObject"));
@@ -224,18 +230,21 @@ public class JavaSerializationTest {
 
     // set null value as "serialized" object
     runtimeService.setVariable(instance.getId(), "nullObject",
-        serializedObjectValue()
-        .serializationDataFormat(JAVA_DATA_FORMAT)
-        .create()); // Note: no object type name provided
+        serializedObjectValue().serializationDataFormat(JAVA_DATA_FORMAT).create()); // Note: no
+                                                                                     // object type
+                                                                                     // name
+                                                                                     // provided
 
     // get null value via untyped api
     assertNull(runtimeService.getVariable(instance.getId(), "nullObject"));
 
     // get null via typed api
-    ObjectValue deserializedTypedValue = runtimeService.getVariableTyped(instance.getId(), "nullObject");
+    ObjectValue deserializedTypedValue = runtimeService.getVariableTyped(instance.getId(),
+        "nullObject");
     assertObjectValueDeserializedNull(deserializedTypedValue);
 
-    ObjectValue serializedTypedValue = runtimeService.getVariableTyped(instance.getId(), "nullObject", false);
+    ObjectValue serializedTypedValue = runtimeService.getVariableTyped(instance.getId(),
+        "nullObject", false);
     assertObjectValueSerializedNull(serializedTypedValue);
   }
 
@@ -249,16 +258,20 @@ public class JavaSerializationTest {
 
     // set null value as "serialized" object
     runtimeService.setVariable(instance.getId(), "nullObject",
-        serializedObjectValue()
-        .serializationDataFormat(JAVA_DATA_FORMAT)
-        .objectTypeName(typeName) // This time an objectTypeName is provided
-        .create());
+        serializedObjectValue().serializationDataFormat(JAVA_DATA_FORMAT).objectTypeName(typeName) // This
+                                                                                                   // time
+                                                                                                   // an
+                                                                                                   // objectTypeName
+                                                                                                   // is
+                                                                                                   // provided
+            .create());
 
     // get null value via untyped api
     assertNull(runtimeService.getVariable(instance.getId(), "nullObject"));
 
     // get null via typed api
-    ObjectValue deserializedTypedValue = runtimeService.getVariableTyped(instance.getId(), "nullObject");
+    ObjectValue deserializedTypedValue = runtimeService.getVariableTyped(instance.getId(),
+        "nullObject");
     assertNotNull(deserializedTypedValue);
     assertTrue(deserializedTypedValue.isDeserialized());
     assertEquals(JAVA_DATA_FORMAT, deserializedTypedValue.getSerializationDataFormat());
@@ -267,7 +280,8 @@ public class JavaSerializationTest {
     assertNull(deserializedTypedValue.getObjectType());
     assertEquals(typeName, deserializedTypedValue.getObjectTypeName());
 
-    ObjectValue serializedTypedValue = runtimeService.getVariableTyped(instance.getId(), "nullObject", false);
+    ObjectValue serializedTypedValue = runtimeService.getVariableTyped(instance.getId(),
+        "nullObject", false);
     assertNotNull(serializedTypedValue);
     assertFalse(serializedTypedValue.isDeserialized());
     assertEquals(JAVA_DATA_FORMAT, serializedTypedValue.getSerializationDataFormat());
@@ -285,9 +299,7 @@ public class JavaSerializationTest {
     JavaSerializable javaSerializable = new JavaSerializable("foo");
 
     runtimeService.setVariable(instance.getId(), "varName",
-        objectValue(javaSerializable)
-        .serializationDataFormat(JAVA_DATA_FORMAT)
-        .create());
+        objectValue(javaSerializable).serializationDataFormat(JAVA_DATA_FORMAT).create());
 
     // get value via untyped api
     assertEquals(javaSerializable, runtimeService.getVariable(instance.getId(), "varName"));
@@ -311,9 +323,7 @@ public class JavaSerializationTest {
     JavaSerializable javaSerializable = new JavaSerializable("foo");
 
     runtimeService.setVariable(instance.getId(), "varName",
-        objectValue(javaSerializable)
-        .serializationDataFormat(JAVA_DATA_FORMAT)
-        .create());
+        objectValue(javaSerializable).serializationDataFormat(JAVA_DATA_FORMAT).create());
 
     // get value via untyped api
     assertEquals(javaSerializable, runtimeService.getVariable(instance.getId(), "varName"));
@@ -332,18 +342,16 @@ public class JavaSerializationTest {
     task.setName("gonzoTask");
     taskService.saveTask(task);
     String taskId = task.getId();
-    try{
+    try {
 
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       new ObjectOutputStream(baos).writeObject(new String("trumpet"));
-      String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
+      String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()),
+          engineRule.getProcessEngine());
 
       taskService.setVariable(taskId, "instrument",
-        Variables.serializedObjectValue(serializedObject)
-          .objectTypeName(String.class.getName())
-          .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
-          .setTransient(true)
-          );
+          Variables.serializedObjectValue(serializedObject).objectTypeName(String.class.getName())
+              .serializationDataFormat(Variables.SerializationDataFormats.JAVA).setTransient(true));
       assertEquals("trumpet", taskService.getVariable(taskId, "instrument"));
     } finally {
       taskService.deleteTask(taskId, true);
@@ -354,29 +362,21 @@ public class JavaSerializationTest {
   @Test
   public void testTransientObjectValue() throws IOException {
     // given
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
-        .startEvent()
-        .exclusiveGateway("gtw")
-          .sequenceFlowId("flow1")
-          .condition("cond", "${x.property == \"bar\"}")
-          .userTask("userTask1")
-          .endEvent()
-        .moveToLastGateway()
-          .sequenceFlowId("flow2")
-          .userTask("userTask2")
-          .endEvent()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo").startEvent()
+        .exclusiveGateway("gtw").sequenceFlowId("flow1")
+        .condition("cond", "${x.property == \"bar\"}").userTask("userTask1").endEvent()
+        .moveToLastGateway().sequenceFlowId("flow2").userTask("userTask2").endEvent().done();
 
     testRule.deploy(modelInstance);
 
     JavaSerializable bean = new JavaSerializable("bar");
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(bean);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()),
+        engineRule.getProcessEngine());
     ObjectValue javaValue = serializedObjectValue(serializedObject, true)
         .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
-        .objectTypeName(JavaSerializable.class.getName())
-        .create();
+        .objectTypeName(JavaSerializable.class.getName()).create();
     VariableMap variables = Variables.createVariables().putValueTyped("x", javaValue);
 
     // when

@@ -22,21 +22,20 @@ import org.camunda.bpm.engine.IdentityService;
 
 /**
  * <p>
- * Holds the result of an {@link IdentityService} operation including the
- * operation that was executed and optionally a resulting value.
+ * Holds the result of an {@link IdentityService} operation including the operation that was
+ * executed and optionally a resulting value.
  * </p>
  * 
  * <p>
- * This metadata can be used to distinguish between the different resulting
- * actions of a logical operation, e.g. if the 'save' operation lead to an
- * 'update' or an 'insert'.
+ * This metadata can be used to distinguish between the different resulting actions of a logical
+ * operation, e.g. if the 'save' operation lead to an 'update' or an 'insert'.
  * </p>
  * 
  * @author Tobias Metzke
  *
  */
 public class IdentityOperationResult {
-  
+
   public static final String OPERATION_CREATE = "create";
   public static final String OPERATION_UPDATE = "update";
   public static final String OPERATION_DELETE = "delete";
@@ -45,7 +44,7 @@ public class IdentityOperationResult {
 
   protected Serializable value;
   protected String operation;
-  
+
   public IdentityOperationResult(Serializable value, String operation) {
     this.value = value;
     this.operation = operation;

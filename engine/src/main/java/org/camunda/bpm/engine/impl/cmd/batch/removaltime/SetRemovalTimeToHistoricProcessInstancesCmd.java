@@ -49,7 +49,8 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBased
 
   protected SetRemovalTimeToHistoricProcessInstancesBuilderImpl builder;
 
-  public SetRemovalTimeToHistoricProcessInstancesCmd(SetRemovalTimeToHistoricProcessInstancesBuilderImpl builder) {
+  public SetRemovalTimeToHistoricProcessInstancesCmd(
+      SetRemovalTimeToHistoricProcessInstancesBuilderImpl builder) {
     this.builder = builder;
   }
 
@@ -76,12 +77,13 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBased
     }
 
     ensureNotNull(BadUserRequestException.class, "removalTime", builder.getMode());
-    ensureNotEmpty(BadUserRequestException.class, "historicProcessInstances", historicProcessInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "historicProcessInstances",
+        historicProcessInstanceIds);
 
     checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME);
 
-    writeUserOperationLog(commandContext, historicProcessInstanceIds.size(), builder.getMode(), builder.getRemovalTime(),
-      builder.isHierarchical(), true);
+    writeUserOperationLog(commandContext, historicProcessInstanceIds.size(), builder.getMode(),
+        builder.getRemovalTime(), builder.isHierarchical(), true);
 
     BatchEntity batch = createBatch(commandContext, new ArrayList<>(historicProcessInstanceIds));
 
@@ -96,10 +98,10 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBased
     return batch;
   }
 
-  protected List<String> findHistoricInstanceIds(List<String> instanceIds, CommandContext commandContext) {
-    List<HistoricProcessInstance> historicProcessInstances = createHistoricDecisionInstanceQuery(commandContext)
-      .processInstanceIds(new HashSet<>(instanceIds))
-      .list();
+  protected List<String> findHistoricInstanceIds(List<String> instanceIds,
+      CommandContext commandContext) {
+    List<HistoricProcessInstance> historicProcessInstances = createHistoricDecisionInstanceQuery(
+        commandContext).processInstanceIds(new HashSet<>(instanceIds)).list();
 
     List<String> ids = new ArrayList<>();
     for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
@@ -109,14 +111,14 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBased
     return ids;
   }
 
-  protected HistoricProcessInstanceQuery createHistoricDecisionInstanceQuery(CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration()
-      .getHistoryService()
-      .createHistoricProcessInstanceQuery();
+  protected HistoricProcessInstanceQuery createHistoricDecisionInstanceQuery(
+      CommandContext commandContext) {
+    return commandContext.getProcessEngineConfiguration().getHistoryService()
+        .createHistoricProcessInstanceQuery();
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext, int numInstances, Mode mode, Date removalTime,
-                                       boolean hierarchical, boolean async) {
+  protected void writeUserOperationLog(CommandContext commandContext, int numInstances, Mode mode,
+      Date removalTime, boolean hierarchical, boolean async) {
     List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("mode", null, mode));
     propertyChanges.add(new PropertyChange("removalTime", null, removalTime));
@@ -124,23 +126,23 @@ public class SetRemovalTimeToHistoricProcessInstancesCmd extends AbstractIDBased
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
 
-    commandContext.getOperationLogManager()
-      .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_REMOVAL_TIME, propertyChanges);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_SET_REMOVAL_TIME, propertyChanges);
   }
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids) {
-    return new SetRemovalTimeBatchConfiguration(ids)
-      .setHierarchical(builder.isHierarchical())
-      .setHasRemovalTime(hasRemovalTime(builder.getMode()))
-      .setRemovalTime(builder.getRemovalTime());
+    return new SetRemovalTimeBatchConfiguration(ids).setHierarchical(builder.isHierarchical())
+        .setHasRemovalTime(hasRemovalTime(builder.getMode()))
+        .setRemovalTime(builder.getRemovalTime());
   }
 
   protected boolean hasRemovalTime(Mode mode) {
-    return builder.getMode() == Mode.ABSOLUTE_REMOVAL_TIME ||
-      builder.getMode() == Mode.CLEARED_REMOVAL_TIME;
+    return builder.getMode() == Mode.ABSOLUTE_REMOVAL_TIME
+        || builder.getMode() == Mode.CLEARED_REMOVAL_TIME;
   }
 
-  protected BatchJobHandler getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  protected BatchJobHandler getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     return processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_PROCESS_SET_REMOVAL_TIME);
   }
 

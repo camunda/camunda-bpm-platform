@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.After;
 
 public class CycleBusinessCalendarTest extends PvmTestCase {
-  
+
   @After
   public void tearDown() {
     ClockUtil.reset();
@@ -58,7 +58,7 @@ public class CycleBusinessCalendarTest extends PvmTestCase {
 
     assertEquals(expectedDuedate, duedate);
   }
-  
+
   public void testSimpleCronWithStartDate() throws Exception {
     CycleBusinessCalendar businessCalendar = new CycleBusinessCalendar();
 

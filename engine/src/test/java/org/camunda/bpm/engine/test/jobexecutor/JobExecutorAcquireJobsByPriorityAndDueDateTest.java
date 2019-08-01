@@ -28,7 +28,8 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JobExecutorAcquireJobsByPriorityAndDueDateTest extends AbstractJobExecutorAcquireJobsTest {
+public class JobExecutorAcquireJobsByPriorityAndDueDateTest
+    extends AbstractJobExecutorAcquireJobsTest {
 
   @Before
   public void prepareProcessEngineConfiguration() {
@@ -44,10 +45,8 @@ public class JobExecutorAcquireJobsByPriorityAndDueDateTest extends AbstractJobE
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/jobexecutor/jobPrioProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/jobexecutor/timerJobPrioProcess.bpmn20.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/jobPrioProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/jobexecutor/timerJobPrioProcess.bpmn20.xml" })
   public void testAcquisitionByPriorityAndDueDate() {
     // job with priority 10
     String instance1 = startProcess("jobPrioProcess", "task1");

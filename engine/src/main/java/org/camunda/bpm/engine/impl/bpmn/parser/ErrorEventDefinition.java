@@ -39,12 +39,12 @@ public class ErrorEventDefinition implements Serializable {
 
   protected final String handlerActivityId;
   protected String errorCode;
-  protected Integer precedence =0;
+  protected Integer precedence = 0;
   protected String errorCodeVariable;
   protected String errorMessageVariable;
 
   public ErrorEventDefinition(String handlerActivityId) {
-    this.handlerActivityId=handlerActivityId;
+    this.handlerActivityId = handlerActivityId;
   }
 
   public String getErrorCode() {
@@ -74,24 +74,25 @@ public class ErrorEventDefinition implements Serializable {
 
   public boolean catchesException(Exception ex) {
 
-    if(this.errorCode == null) {
+    if (this.errorCode == null) {
       return false;
 
     } else {
 
       // unbox exception
-      while ((ex instanceof ProcessEngineException || ex instanceof ScriptException) && ex.getCause() != null) {
+      while ((ex instanceof ProcessEngineException || ex instanceof ScriptException)
+          && ex.getCause() != null) {
         ex = (Exception) ex.getCause();
       }
 
       // check exception hierarchy
       Class<?> exceptionClass = ex.getClass();
       do {
-        if(this.errorCode.equals(exceptionClass.getName())) {
+        if (this.errorCode.equals(exceptionClass.getName())) {
           return true;
         }
         exceptionClass = exceptionClass.getSuperclass();
-      } while(exceptionClass != null);
+      } while (exceptionClass != null);
 
       return false;
     }

@@ -26,7 +26,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Roman Smirnov
  *
  */
-public abstract class AbstractAtomicOperationCaseExecutionResume extends AbstractCmmnEventAtomicOperation {
+public abstract class AbstractAtomicOperationCaseExecutionResume
+    extends AbstractCmmnEventAtomicOperation {
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
     CmmnActivityBehavior behavior = getActivityBehavior(execution);
@@ -48,6 +49,5 @@ public abstract class AbstractAtomicOperationCaseExecutionResume extends Abstrac
   }
 
   protected abstract void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution);
-
 
 }

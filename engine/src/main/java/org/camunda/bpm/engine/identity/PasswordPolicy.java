@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.identity;
 import java.util.List;
 
 /**
- * Contains a list of {@link PasswordPolicyRule rules} that must be matched by
- * passwords for engine-managed users.
+ * Contains a list of {@link PasswordPolicyRule rules} that must be matched by passwords for
+ * engine-managed users.
  * 
  * @author Miklas Boskamp
  */
@@ -28,6 +28,7 @@ public interface PasswordPolicy {
 
   /**
    * A list of rules that must be matched by user passwords.
+   * 
    * @return the list
    */
   List<PasswordPolicyRule> getRules();

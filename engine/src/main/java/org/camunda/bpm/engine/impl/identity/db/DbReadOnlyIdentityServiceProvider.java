@@ -45,13 +45,16 @@ import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 
 /**
- * <p>Read only implementation of DB-backed identity service</p>
+ * <p>
+ * Read only implementation of DB-backed identity service
+ * </p>
  *
  * @author Daniel Meyer
  * @author nico.rehwaldt
  */
 @SuppressWarnings("unchecked")
-public class DbReadOnlyIdentityServiceProvider extends AbstractManager implements ReadOnlyIdentityProvider {
+public class DbReadOnlyIdentityServiceProvider extends AbstractManager
+    implements ReadOnlyIdentityProvider {
 
   // users /////////////////////////////////////////
 
@@ -61,15 +64,18 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   }
 
   public UserQuery createUserQuery() {
-    return new DbUserQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+    return new DbUserQueryImpl(
+        Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
   }
 
   public UserQueryImpl createUserQuery(CommandContext commandContext) {
     return new DbUserQueryImpl();
   }
 
-  @Override public NativeUserQuery createNativeUserQuery() {
-    return new NativeUserQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+  @Override
+  public NativeUserQuery createNativeUserQuery() {
+    return new NativeUserQueryImpl(
+        Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
   }
 
   public long findUserCountByQueryCriteria(DbUserQueryImpl query) {
@@ -82,8 +88,10 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
     return getDbEntityManager().selectList("selectUserByQueryCriteria", query);
   }
 
-  public List<User> findUserByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbEntityManager().selectListWithRawParameter("selectUserByNativeQuery", parameterMap, firstResult, maxResults);
+  public List<User> findUserByNativeQuery(Map<String, Object> parameterMap, int firstResult,
+      int maxResults) {
+    return getDbEntityManager().selectListWithRawParameter("selectUserByNativeQuery", parameterMap,
+        firstResult, maxResults);
   }
 
   public long findUserCountByNativeQuery(Map<String, Object> parameterMap) {
@@ -101,9 +109,8 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
 
   protected boolean matchPassword(String password, UserEntity user) {
     String saltedPassword = saltPassword(password, user.getSalt());
-    return Context.getProcessEngineConfiguration()
-      .getPasswordManager()
-      .check(saltedPassword, user.getPassword());
+    return Context.getProcessEngineConfiguration().getPasswordManager().check(saltedPassword,
+        user.getPassword());
   }
 
   // groups //////////////////////////////////////////
@@ -114,7 +121,8 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   }
 
   public GroupQuery createGroupQuery() {
-    return new DbGroupQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+    return new DbGroupQueryImpl(
+        Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
   }
 
   public GroupQuery createGroupQuery(CommandContext commandContext) {
@@ -131,7 +139,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
     return getDbEntityManager().selectList("selectGroupByQueryCriteria", query);
   }
 
-  //tenants //////////////////////////////////////////
+  // tenants //////////////////////////////////////////
 
   public TenantEntity findTenantById(String tenantId) {
     checkAuthorization(Permissions.READ, Resources.TENANT, tenantId);
@@ -139,7 +147,8 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   }
 
   public TenantQuery createTenantQuery() {
-    return new DbTenantQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+    return new DbTenantQueryImpl(
+        Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
   }
 
   public TenantQuery createTenantQuery(CommandContext commandContext) {
@@ -155,15 +164,15 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
     configureQuery(query, Resources.TENANT);
     return getDbEntityManager().selectList("selectTenantByQueryCriteria", query);
   }
-  
-  //memberships //////////////////////////////////////////
+
+  // memberships //////////////////////////////////////////
   protected boolean existsMembership(String userId, String groupId) {
     Map<String, String> key = new HashMap<>();
     key.put("userId", userId);
     key.put("groupId", groupId);
     return ((Long) getDbEntityManager().selectOne("selectMembershipCount", key)) > 0;
   }
-  
+
   protected boolean existsTenantMembership(String tenantId, String userId, String groupId) {
     Map<String, String> key = new HashMap<>();
     key.put("tenantId", tenantId);
@@ -176,20 +185,18 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
     return ((Long) getDbEntityManager().selectOne("selectTenantMembershipCount", key)) > 0;
   }
 
-  //authorizations ////////////////////////////////////////////////////
+  // authorizations ////////////////////////////////////////////////////
 
   @Override
-  protected void configureQuery(@SuppressWarnings("rawtypes") AbstractQuery query, Resource resource) {
-    Context.getCommandContext()
-      .getAuthorizationManager()
-      .configureQuery(query, resource);
+  protected void configureQuery(@SuppressWarnings("rawtypes") AbstractQuery query,
+      Resource resource) {
+    Context.getCommandContext().getAuthorizationManager().configureQuery(query, resource);
   }
 
   @Override
   protected void checkAuthorization(Permission permission, Resource resource, String resourceId) {
-    Context.getCommandContext()
-      .getAuthorizationManager()
-      .checkAuthorization(permission, resource, resourceId);
- }
+    Context.getCommandContext().getAuthorizationManager().checkAuthorization(permission, resource,
+        resourceId);
+  }
 
 }

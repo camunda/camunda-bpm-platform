@@ -21,7 +21,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
-
 /**
  * @author Tom Baeyens
  */

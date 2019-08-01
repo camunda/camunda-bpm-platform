@@ -28,26 +28,22 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.camunda.bpm.engine.query.QueryProperty;
 
-
 /**
  * @author Thorben Lindhauer
  *
  */
 public class JsonQueryOrderingPropertyConverter extends JsonObjectConverter<QueryOrderingProperty> {
 
+  protected static JsonQueryOrderingPropertyConverter INSTANCE = new JsonQueryOrderingPropertyConverter();
 
-  protected static JsonQueryOrderingPropertyConverter INSTANCE =
-      new JsonQueryOrderingPropertyConverter();
-
-  protected static JsonArrayConverter<List<QueryOrderingProperty>> ARRAY_CONVERTER =
-      new JsonArrayOfObjectsConverter<QueryOrderingProperty>(INSTANCE);
+  protected static JsonArrayConverter<List<QueryOrderingProperty>> ARRAY_CONVERTER = new JsonArrayOfObjectsConverter<QueryOrderingProperty>(
+      INSTANCE);
 
   public static final String RELATION = "relation";
   public static final String QUERY_PROPERTY = "queryProperty";
   public static final String QUERY_PROPERTY_FUNCTION = "queryPropertyFunction";
   public static final String DIRECTION = "direction";
   public static final String RELATION_CONDITIONS = "relationProperties";
-
 
   public JsonObject toJsonObject(QueryOrderingProperty property) {
     JsonObject jsonObject = JsonUtil.createObject();
@@ -67,7 +63,7 @@ public class JsonQueryOrderingPropertyConverter extends JsonObjectConverter<Quer
 
     if (property.hasRelationConditions()) {
       JsonArray relationConditionsJson = JsonQueryFilteringPropertyConverter.ARRAY_CONVERTER
-        .toJsonArray(property.getRelationConditions());
+          .toJsonArray(property.getRelationConditions());
       JsonUtil.addField(jsonObject, RELATION_CONDITIONS, relationConditionsJson);
     }
 
@@ -83,8 +79,7 @@ public class JsonQueryOrderingPropertyConverter extends JsonObjectConverter<Quer
     QueryOrderingProperty property = null;
     if (QueryOrderingProperty.RELATION_VARIABLE.equals(relation)) {
       property = new VariableOrderProperty();
-    }
-    else {
+    } else {
       property = new QueryOrderingProperty();
     }
 
@@ -107,8 +102,8 @@ public class JsonQueryOrderingPropertyConverter extends JsonObjectConverter<Quer
     }
 
     if (jsonObject.has(RELATION_CONDITIONS)) {
-      List<QueryEntityRelationCondition> relationConditions =
-          JsonQueryFilteringPropertyConverter.ARRAY_CONVERTER.toObject(JsonUtil.getArray(jsonObject, RELATION_CONDITIONS));
+      List<QueryEntityRelationCondition> relationConditions = JsonQueryFilteringPropertyConverter.ARRAY_CONVERTER
+          .toObject(JsonUtil.getArray(jsonObject, RELATION_CONDITIONS));
       property.setRelationConditions(relationConditions);
     }
 

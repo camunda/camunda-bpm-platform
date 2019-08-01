@@ -99,12 +99,16 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
   }
 
   public void setErrorMessage(String errorMessage) {
-    // note: it is not a clean way to truncate where the history event is produced, since truncation is only
-    //   relevant for relational history databases that follow our schema restrictions;
-    //   a similar problem exists in ExternalTaskEntity#setErrorMessage where truncation may not be required for custom
-    //   persistence implementations
-    if(errorMessage != null && errorMessage.length() > ExternalTaskEntity.MAX_EXCEPTION_MESSAGE_LENGTH) {
-      this.errorMessage = errorMessage.substring(0, ExternalTaskEntity.MAX_EXCEPTION_MESSAGE_LENGTH);
+    // note: it is not a clean way to truncate where the history event is produced, since truncation
+    // is only
+    // relevant for relational history databases that follow our schema restrictions;
+    // a similar problem exists in ExternalTaskEntity#setErrorMessage where truncation may not be
+    // required for custom
+    // persistence implementations
+    if (errorMessage != null
+        && errorMessage.length() > ExternalTaskEntity.MAX_EXCEPTION_MESSAGE_LENGTH) {
+      this.errorMessage = errorMessage.substring(0,
+          ExternalTaskEntity.MAX_EXCEPTION_MESSAGE_LENGTH);
     } else {
       this.errorMessage = errorMessage;
     }
@@ -127,7 +131,8 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
     EnsureUtil.ensureNotNull("exception", exception);
 
     byte[] exceptionBytes = toByteArray(exception);
-    ByteArrayEntity byteArray = createExceptionByteArray(EXCEPTION_NAME, exceptionBytes, ResourceTypes.HISTORY);
+    ByteArrayEntity byteArray = createExceptionByteArray(EXCEPTION_NAME, exceptionBytes,
+        ResourceTypes.HISTORY);
     byteArray.setRootProcessInstanceId(rootProcessInstanceId);
     byteArray.setRemovalTime(removalTime);
 
@@ -136,10 +141,8 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
 
   protected ByteArrayEntity getErrorByteArray() {
     if (errorDetailsByteArrayId != null) {
-      return Context
-          .getCommandContext()
-          .getDbEntityManager()
-          .selectById(ByteArrayEntity.class, errorDetailsByteArrayId);
+      return Context.getCommandContext().getDbEntityManager().selectById(ByteArrayEntity.class,
+          errorDetailsByteArrayId);
     }
     return null;
   }

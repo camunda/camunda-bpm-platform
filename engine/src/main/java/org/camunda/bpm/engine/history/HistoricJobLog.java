@@ -22,18 +22,18 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
- * <p>The {@link HistoricJobLog} is used to have a log containing
- * information about {@link Job job} execution. The log provides
- * details about the complete lifecycle of a {@link Job job}:</p>
+ * <p>
+ * The {@link HistoricJobLog} is used to have a log containing information about {@link Job job}
+ * execution. The log provides details about the complete lifecycle of a {@link Job job}:
+ * </p>
  * <ul>
- *   <li>job created</li>
- *   <li>job execution failed</li>
- *   <li>job execution successful</li>
- *   <li>job was deleted</li>
+ * <li>job created</li>
+ * <li>job execution failed</li>
+ * <li>job execution successful</li>
+ * <li>job was deleted</li>
  * </ul>
  *
- * An instance of {@link HistoricJobLog} represents a state in
- * the lifecycle of a {@link Job job}.
+ * An instance of {@link HistoricJobLog} represents a state in the lifecycle of a {@link Job job}.
  *
  * @author Roman Smirnov
  *
@@ -62,8 +62,8 @@ public interface HistoricJobLog {
   Date getJobDueDate();
 
   /**
-   * Returns the retries of the associated job before the associated job has
-   * been executed and when <code>this</code> log occurred.
+   * Returns the retries of the associated job before the associated job has been executed and when
+   * <code>this</code> log occurred.
    */
   int getJobRetries();
 
@@ -77,8 +77,8 @@ public interface HistoricJobLog {
   /**
    * Returns the message of the exception that occurred by executing the associated job.
    *
-   * To get the full exception stacktrace,
-   * use {@link HistoryService#getHistoricJobLogExceptionStacktrace(String)}
+   * To get the full exception stacktrace, use
+   * {@link HistoryService#getHistoricJobLogExceptionStacktrace(String)}
    */
   String getJobExceptionMessage();
 
@@ -108,8 +108,8 @@ public interface HistoricJobLog {
   String getExecutionId();
 
   /**
-   * Returns the specific root process instance id of the process instance
-   * on which the associated job was created.
+   * Returns the specific root process instance id of the process instance on which the associated
+   * job was created.
    */
   String getRootProcessInstanceId();
 
@@ -134,32 +134,32 @@ public interface HistoricJobLog {
   String getDeploymentId();
 
   /**
-   * Returns the id of the tenant this job log entry belongs to. Can be <code>null</code>
-   * if the job log entry belongs to no single tenant.
+   * Returns the id of the tenant this job log entry belongs to. Can be <code>null</code> if the job
+   * log entry belongs to no single tenant.
    */
   public String getTenantId();
 
   /**
-   * Returns <code>true</code> when <code>this</code> log represents
-   * the creation of the associated job.
+   * Returns <code>true</code> when <code>this</code> log represents the creation of the associated
+   * job.
    */
   boolean isCreationLog();
 
   /**
-   * Returns <code>true</code> when <code>this</code> log represents
-   * the failed execution of the associated job.
+   * Returns <code>true</code> when <code>this</code> log represents the failed execution of the
+   * associated job.
    */
   boolean isFailureLog();
 
   /**
-   * Returns <code>true</code> when <code>this</code> log represents
-   * the successful execution of the associated job.
+   * Returns <code>true</code> when <code>this</code> log represents the successful execution of the
+   * associated job.
    */
   boolean isSuccessLog();
 
   /**
-   * Returns <code>true</code> when <code>this</code> log represents
-   * the deletion of the associated job.
+   * Returns <code>true</code> when <code>this</code> log represents the deletion of the associated
+   * job.
    */
   boolean isDeletionLog();
 

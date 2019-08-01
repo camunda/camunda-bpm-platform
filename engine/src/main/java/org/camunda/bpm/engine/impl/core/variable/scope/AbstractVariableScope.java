@@ -48,7 +48,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  * @author Sebastian Menski
  *
  */
-public abstract class AbstractVariableScope implements Serializable, VariableScope, VariableEventDispatcher {
+public abstract class AbstractVariableScope
+    implements Serializable, VariableScope, VariableEventDispatcher {
 
   private static final long serialVersionUID = 1L;
 
@@ -56,7 +57,9 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   protected ELContext cachedElContext;
 
   protected abstract VariableStore<CoreVariableInstance> getVariableStore();
+
   protected abstract VariableInstanceFactory<CoreVariableInstance> getVariableInstanceFactory();
+
   protected abstract List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners();
 
   public abstract AbstractVariableScope getParentVariableScope();
@@ -64,13 +67,13 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   public void initializeVariableStore(Map<String, Object> variables) {
     for (String variableName : variables.keySet()) {
       TypedValue value = Variables.untypedValue(variables.get(variableName));
-      CoreVariableInstance variableValue = getVariableInstanceFactory().build(variableName, value, false);
+      CoreVariableInstance variableValue = getVariableInstanceFactory().build(variableName, value,
+          false);
       getVariableStore().addVariable(variableValue);
     }
   }
 
   // get variable map /////////////////////////////////////////
-
 
   public String getVariableScopeKey() {
     return "scope";
@@ -104,20 +107,21 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     return variables;
   }
 
-  public void collectVariables(VariableMapImpl resultVariables, Collection<String> variableNames, boolean isLocal, boolean deserializeValues) {
+  public void collectVariables(VariableMapImpl resultVariables, Collection<String> variableNames,
+      boolean isLocal, boolean deserializeValues) {
     boolean collectAll = (variableNames == null);
 
     List<CoreVariableInstance> localVariables = getVariableInstancesLocal(variableNames);
     for (CoreVariableInstance var : localVariables) {
-      if(!resultVariables.containsKey(var.getName())
-         && (collectAll || variableNames.contains(var.getName()))) {
+      if (!resultVariables.containsKey(var.getName())
+          && (collectAll || variableNames.contains(var.getName()))) {
         resultVariables.put(var.getName(), var.getTypedValue(deserializeValues));
       }
     }
-    if(!isLocal) {
+    if (!isLocal) {
       AbstractVariableScope parentScope = getParentVariableScope();
       // Do not propagate to parent if all variables in 'variableNames' are already collected!
-      if(parentScope != null && (collectAll || !resultVariables.keySet().equals(variableNames))) {
+      if (parentScope != null && (collectAll || !resultVariables.keySet().equals(variableNames))) {
         parentScope.collectVariables(resultVariables, variableNames, isLocal, deserializeValues);
       }
     }
@@ -138,11 +142,13 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   }
 
   public Object getVariableLocal(String variableName, boolean deserializeObjectValue) {
-    return getValueFromVariableInstance(deserializeObjectValue, getVariableInstanceLocal(variableName));
+    return getValueFromVariableInstance(deserializeObjectValue,
+        getVariableInstanceLocal(variableName));
   }
 
-  protected Object getValueFromVariableInstance(boolean deserializeObjectValue, CoreVariableInstance variableInstance) {
-    if(variableInstance != null) {
+  protected Object getValueFromVariableInstance(boolean deserializeObjectValue,
+      CoreVariableInstance variableInstance) {
+    if (variableInstance != null) {
       TypedValue typedValue = variableInstance.getTypedValue(deserializeObjectValue);
       if (typedValue != null) {
         return typedValue.getValue();
@@ -163,27 +169,29 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     return getVariableLocalTyped(variableName, true);
   }
 
-  public <T extends TypedValue> T getVariableLocalTyped(String variableName, boolean deserializeValue) {
-    return getTypedValueFromVariableInstance(deserializeValue, getVariableInstanceLocal(variableName));
+  public <T extends TypedValue> T getVariableLocalTyped(String variableName,
+      boolean deserializeValue) {
+    return getTypedValueFromVariableInstance(deserializeValue,
+        getVariableInstanceLocal(variableName));
   }
 
   @SuppressWarnings("unchecked")
-  private <T extends TypedValue> T getTypedValueFromVariableInstance(boolean deserializeValue, CoreVariableInstance variableInstance) {
-    if(variableInstance != null) {
+  private <T extends TypedValue> T getTypedValueFromVariableInstance(boolean deserializeValue,
+      CoreVariableInstance variableInstance) {
+    if (variableInstance != null) {
       return (T) variableInstance.getTypedValue(deserializeValue);
-    }
-    else {
+    } else {
       return null;
     }
   }
 
   public CoreVariableInstance getVariableInstance(String variableName) {
     CoreVariableInstance variableInstance = getVariableInstanceLocal(variableName);
-    if (variableInstance!=null) {
+    if (variableInstance != null) {
       return variableInstance;
     }
     AbstractVariableScope parentScope = getParentVariableScope();
-    if (parentScope!=null) {
+    if (parentScope != null) {
       return parentScope.getVariableInstance(variableName);
     }
     return null;
@@ -227,10 +235,10 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   protected Set<String> collectVariableNames(Set<String> variableNames) {
     AbstractVariableScope parentScope = getParentVariableScope();
-    if (parentScope!=null) {
+    if (parentScope != null) {
       variableNames.addAll(parentScope.collectVariableNames(variableNames));
     }
-    for (CoreVariableInstance variableInstance: getVariableStore().getVariables()) {
+    for (CoreVariableInstance variableInstance : getVariableStore().getVariables()) {
       variableNames.add(variableInstance.getName());
     }
     return variableNames;
@@ -245,13 +253,12 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   }
 
   public void setVariables(Map<String, ? extends Object> variables) {
-    if (variables!=null) {
+    if (variables != null) {
       for (String variableName : variables.keySet()) {
         Object value = null;
         if (variables instanceof VariableMap) {
           value = ((VariableMap) variables).getValueTyped(variableName);
-        }
-        else {
+        } else {
           value = variables.get(variableName);
         }
         setVariable(variableName, value);
@@ -260,13 +267,12 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   }
 
   public void setVariablesLocal(Map<String, ? extends Object> variables) {
-    if (variables!=null) {
+    if (variables != null) {
       for (String variableName : variables.keySet()) {
         Object value = null;
         if (variables instanceof VariableMap) {
           value = ((VariableMap) variables).getValueTyped(variableName);
-        }
-        else {
+        } else {
           value = variables.get(variableName);
         }
         setVariableLocal(variableName, value);
@@ -284,7 +290,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   public void removeVariablesLocal() {
     List<String> variableNames = new ArrayList<String>(getVariableNamesLocal());
-    for (String variableName: variableNames) {
+    for (String variableName : variableNames) {
       removeVariableLocal(variableName);
     }
   }
@@ -311,7 +317,8 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   }
 
-  protected void setVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityVariableScope) {
+  protected void setVariable(String variableName, TypedValue value,
+      AbstractVariableScope sourceActivityVariableScope) {
     if (hasVariableLocal(variableName)) {
       TypedValue previousTypeValue = getVariableInstanceLocal(variableName).getTypedValue(false);
 
@@ -328,8 +335,8 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       return;
     }
     AbstractVariableScope parentVariableScope = getParentVariableScope();
-    if (parentVariableScope!=null) {
-      if (sourceActivityVariableScope==null) {
+    if (parentVariableScope != null) {
+      if (sourceActivityVariableScope == null) {
         parentVariableScope.setVariable(variableName, value);
       } else {
         parentVariableScope.setVariable(variableName, value, sourceActivityVariableScope);
@@ -343,7 +350,8 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     }
   }
 
-  public void setVariableLocal(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
+  public void setVariableLocal(String variableName, TypedValue value,
+      AbstractVariableScope sourceActivityExecution) {
 
     checkJavaSerialization(variableName, value);
 
@@ -353,8 +361,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       CoreVariableInstance existingInstance = variableStore.getVariable(variableName);
       existingInstance.setValue(value);
       invokeVariableLifecycleListenersUpdate(existingInstance, sourceActivityExecution);
-    }
-    else if (variableStore.isRemoved(variableName)) {
+    } else if (variableStore.isRemoved(variableName)) {
 
       CoreVariableInstance existingInstance = variableStore.getRemovedVariable(variableName);
 
@@ -364,9 +371,9 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
       DbEntityManager dbEntityManager = Context.getCommandContext().getDbEntityManager();
       dbEntityManager.undoDelete((VariableInstanceEntity) existingInstance);
-    }
-    else {
-      CoreVariableInstance variableValue = getVariableInstanceFactory().build(variableName, value, false);
+    } else {
+      CoreVariableInstance variableValue = getVariableInstanceFactory().build(variableName, value,
+          false);
       getVariableStore().addVariable(variableValue);
       invokeVariableLifecycleListenersCreate(variableValue, sourceActivityExecution);
     }
@@ -374,12 +381,15 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   /**
    * Checks, if Java serialization will be used and if it is allowed to be used.
+   * 
    * @param variableName
    * @param value
    */
   protected void checkJavaSerialization(String variableName, TypedValue value) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if (value instanceof SerializableValue && !processEngineConfiguration.isJavaSerializationFormatEnabled()) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
+    if (value instanceof SerializableValue
+        && !processEngineConfiguration.isJavaSerializationFormatEnabled()) {
 
       SerializableValue serializableValue = (SerializableValue) value;
 
@@ -392,7 +402,8 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
         if (requestedDataFormat == null) {
           // check if Java serializer will be used
           final TypedValueSerializer serializerForValue = TypedValueField.getSerializers()
-              .findSerializerForValue(serializableValue, processEngineConfiguration.getFallbackSerializerFactory());
+              .findSerializerForValue(serializableValue,
+                  processEngineConfiguration.getFallbackSerializerFactory());
           if (serializerForValue != null) {
             requestedDataFormat = serializerForValue.getSerializationDataformat();
           }
@@ -405,33 +416,42 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     }
   }
 
-  protected void invokeVariableLifecycleListenersCreate(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope) {
-    invokeVariableLifecycleListenersCreate(variableInstance, sourceScope, getVariableInstanceLifecycleListeners());
+  protected void invokeVariableLifecycleListenersCreate(CoreVariableInstance variableInstance,
+      AbstractVariableScope sourceScope) {
+    invokeVariableLifecycleListenersCreate(variableInstance, sourceScope,
+        getVariableInstanceLifecycleListeners());
   }
 
-  protected void invokeVariableLifecycleListenersCreate(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope,
+  protected void invokeVariableLifecycleListenersCreate(CoreVariableInstance variableInstance,
+      AbstractVariableScope sourceScope,
       List<VariableInstanceLifecycleListener<CoreVariableInstance>> lifecycleListeners) {
     for (VariableInstanceLifecycleListener<CoreVariableInstance> lifecycleListener : lifecycleListeners) {
       lifecycleListener.onCreate(variableInstance, sourceScope);
     }
   }
 
-  protected void invokeVariableLifecycleListenersDelete(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope) {
-    invokeVariableLifecycleListenersDelete(variableInstance, sourceScope, getVariableInstanceLifecycleListeners());
+  protected void invokeVariableLifecycleListenersDelete(CoreVariableInstance variableInstance,
+      AbstractVariableScope sourceScope) {
+    invokeVariableLifecycleListenersDelete(variableInstance, sourceScope,
+        getVariableInstanceLifecycleListeners());
   }
 
-  protected void invokeVariableLifecycleListenersDelete(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope,
+  protected void invokeVariableLifecycleListenersDelete(CoreVariableInstance variableInstance,
+      AbstractVariableScope sourceScope,
       List<VariableInstanceLifecycleListener<CoreVariableInstance>> lifecycleListeners) {
     for (VariableInstanceLifecycleListener<CoreVariableInstance> lifecycleListener : lifecycleListeners) {
       lifecycleListener.onDelete(variableInstance, sourceScope);
     }
   }
 
-  protected void invokeVariableLifecycleListenersUpdate(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope) {
-    invokeVariableLifecycleListenersUpdate(variableInstance, sourceScope, getVariableInstanceLifecycleListeners());
+  protected void invokeVariableLifecycleListenersUpdate(CoreVariableInstance variableInstance,
+      AbstractVariableScope sourceScope) {
+    invokeVariableLifecycleListenersUpdate(variableInstance, sourceScope,
+        getVariableInstanceLifecycleListeners());
   }
 
-  protected void invokeVariableLifecycleListenersUpdate(CoreVariableInstance variableInstance, AbstractVariableScope sourceScope,
+  protected void invokeVariableLifecycleListenersUpdate(CoreVariableInstance variableInstance,
+      AbstractVariableScope sourceScope,
       List<VariableInstanceLifecycleListener<CoreVariableInstance>> lifecycleListeners) {
     for (VariableInstanceLifecycleListener<CoreVariableInstance> lifecycleListener : lifecycleListeners) {
       lifecycleListener.onUpdate(variableInstance, sourceScope);
@@ -445,22 +465,22 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   }
 
   /**
-   * Sets a variable in the local scope. In contrast to
-   * {@link #setVariableLocal(String, Object)}, the variable is transient that
-   * means it will not be stored in the data base. For example, a transient
-   * variable can be used for a result variable that is only available for
-   * output mapping.
+   * Sets a variable in the local scope. In contrast to {@link #setVariableLocal(String, Object)},
+   * the variable is transient that means it will not be stored in the data base. For example, a
+   * transient variable can be used for a result variable that is only available for output mapping.
    */
   public void setVariableLocalTransient(String variableName, Object value) {
     TypedValue typedValue = Variables.untypedValue(value, true);
 
     checkJavaSerialization(variableName, typedValue);
 
-    CoreVariableInstance coreVariableInstance = getVariableInstanceFactory().build(variableName, typedValue, true);
+    CoreVariableInstance coreVariableInstance = getVariableInstanceFactory().build(variableName,
+        typedValue, true);
     getVariableStore().addVariable(coreVariableInstance);
   }
 
-  public void setVariableLocalTransient(String variableName, Object value, AbstractVariableScope sourceActivityVariableScope) {
+  public void setVariableLocalTransient(String variableName, Object value,
+      AbstractVariableScope sourceActivityVariableScope) {
 
     VariableStore<CoreVariableInstance> variableStore = getVariableStore();
     if (variableStore.containsKey(variableName)) {
@@ -469,7 +489,8 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       invokeVariableLifecycleListenersUpdate(existingInstance, sourceActivityVariableScope);
     } else {
       setVariableLocalTransient(variableName, value);
-      invokeVariableLifecycleListenersCreate(variableStore.getVariable(variableName), sourceActivityVariableScope);
+      invokeVariableLifecycleListenersCreate(variableStore.getVariable(variableName),
+          sourceActivityVariableScope);
     }
   }
 
@@ -477,14 +498,15 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     removeVariable(variableName, getSourceActivityVariableScope());
   }
 
-  protected void removeVariable(String variableName, AbstractVariableScope sourceActivityExecution) {
+  protected void removeVariable(String variableName,
+      AbstractVariableScope sourceActivityExecution) {
     if (getVariableStore().containsKey(variableName)) {
       removeVariableLocal(variableName, sourceActivityExecution);
       return;
     }
     AbstractVariableScope parentVariableScope = getParentVariableScope();
-    if (parentVariableScope!=null) {
-      if (sourceActivityExecution==null) {
+    if (parentVariableScope != null) {
+      if (sourceActivityExecution == null) {
         parentVariableScope.removeVariable(variableName);
       } else {
         parentVariableScope.removeVariable(variableName, sourceActivityExecution);
@@ -500,7 +522,8 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     return this;
   }
 
-  protected void removeVariableLocal(String variableName, AbstractVariableScope sourceActivityExecution) {
+  protected void removeVariableLocal(String variableName,
+      AbstractVariableScope sourceActivityExecution) {
 
     if (getVariableStore().containsKey(variableName)) {
       CoreVariableInstance variableInstance = getVariableStore().getVariable(variableName);
@@ -514,6 +537,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   public ELContext getCachedElContext() {
     return cachedElContext;
   }
+
   public void setCachedElContext(ELContext cachedElContext) {
     this.cachedElContext = cachedElContext;
   }

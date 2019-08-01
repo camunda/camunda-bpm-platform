@@ -59,7 +59,8 @@ public class ExecuteJobsCmd implements Command<Void>, Serializable {
 
     final JobEntity job = commandContext.getDbEntityManager().selectById(JobEntity.class, jobId);
 
-    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     final IdentityService identityService = processEngineConfiguration.getIdentityService();
 
     final JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
@@ -68,7 +69,8 @@ public class ExecuteJobsCmd implements Command<Void>, Serializable {
       if (jobExecutorContext != null) {
         // CAM-1842
         // Job was acquired but does not exist anymore. This is not a problem.
-        // It usually means that the job has been deleted after it was acquired which can happen if the
+        // It usually means that the job has been deleted after it was acquired which can happen if
+        // the
         // the activity instance corresponding to the job is cancelled.
         LOG.debugAcquiredJobNotFound(jobId);
         return null;
@@ -81,13 +83,15 @@ public class ExecuteJobsCmd implements Command<Void>, Serializable {
     jobFailureCollector.setJob(job);
 
     if (jobExecutorContext == null) { // if null, then we are not called by the job executor
-      for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+          .getCommandCheckers()) {
         checker.checkUpdateJob(job);
       }
       // write a user operation log since we're not called by the job executor
-      commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_EXECUTE, 
-          jobId, job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), 
-          job.getProcessDefinitionKey(), PropertyChange.EMPTY_CHANGE);
+      commandContext.getOperationLogManager().logJobOperation(
+          UserOperationLogEntry.OPERATION_TYPE_EXECUTE, jobId, job.getJobDefinitionId(),
+          job.getProcessInstanceId(), job.getProcessDefinitionId(), job.getProcessDefinitionKey(),
+          PropertyChange.EMPTY_CHANGE);
     } else {
       jobExecutorContext.setCurrentJob(job);
 
@@ -108,8 +112,7 @@ public class ExecuteJobsCmd implements Command<Void>, Serializable {
 
       job.execute(commandContext);
 
-    }
-    finally {
+    } finally {
       if (jobExecutorContext != null) {
         jobExecutorContext.setCurrentJob(null);
         identityService.clearAuthentication();

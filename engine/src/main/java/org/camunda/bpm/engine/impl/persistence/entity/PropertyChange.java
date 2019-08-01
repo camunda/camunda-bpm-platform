@@ -78,11 +78,11 @@ public class PropertyChange {
   }
 
   protected String valueAsString(Object value) {
-    if(value == null) {
+    if (value == null) {
       return null;
 
-    } else if(value instanceof Date){
-      return String.valueOf(((Date)value).getTime());
+    } else if (value instanceof Date) {
+      return String.valueOf(((Date) value).getTime());
 
     } else {
       return value.toString();

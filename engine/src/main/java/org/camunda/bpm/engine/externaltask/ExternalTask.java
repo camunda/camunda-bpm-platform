@@ -21,9 +21,9 @@ import java.util.Date;
 import org.camunda.bpm.engine.ExternalTaskService;
 
 /**
- * Represents an instance of an external task that is created when
- * a service-task like activity (i.e. service task, send task, ...) with
- * attribute <code>camunda:type="external"</code> is executed.
+ * Represents an instance of an external task that is created when a service-task like activity
+ * (i.e. service task, send task, ...) with attribute <code>camunda:type="external"</code> is
+ * executed.
  *
  * @author Thorben Lindhauer
  */
@@ -80,32 +80,32 @@ public interface ExternalTask {
   String getProcessDefinitionKey();
 
   /**
-   * @return the number of retries left. The number of retries is provided by
-   *   a task client, therefore the initial value is <code>null</code>.
+   * @return the number of retries left. The number of retries is provided by a task client,
+   *         therefore the initial value is <code>null</code>.
    */
   Integer getRetries();
 
   /**
    * @return short error message submitted with the latest reported failure executing this task;
-   *   <code>null</code> if no failure was reported previously or if no error message
-   *   was submitted
+   *         <code>null</code> if no failure was reported previously or if no error message was
+   *         submitted
    *
    * @see ExternalTaskService#handleFailure(String, String,String, String, int, long)
    *
-   * To get the full error details,
-   * use {@link ExternalTaskService#getExternalTaskErrorDetails(String)}
+   *      To get the full error details, use
+   *      {@link ExternalTaskService#getExternalTaskErrorDetails(String)}
    */
   String getErrorMessage();
 
   /**
-   * @return true if the external task is suspended; a suspended external task
-   * cannot be completed, thereby preventing process continuation
+   * @return true if the external task is suspended; a suspended external task cannot be completed,
+   *         thereby preventing process continuation
    */
   boolean isSuspended();
 
   /**
-   * @return the id of the tenant the task belongs to. Can be <code>null</code>
-   * if the task belongs to no single tenant.
+   * @return the id of the tenant the task belongs to. Can be <code>null</code> if the task belongs
+   *         to no single tenant.
    */
   String getTenantId();
 
@@ -115,7 +115,6 @@ public interface ExternalTask {
    * @return the priority of the external task
    */
   long getPriority();
-
 
   /**
    * Returns the business key of the process instance the external task belongs to

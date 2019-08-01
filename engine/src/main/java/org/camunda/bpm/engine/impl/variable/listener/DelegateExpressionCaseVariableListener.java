@@ -36,7 +36,8 @@ public class DelegateExpressionCaseVariableListener implements CaseVariableListe
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;
 
-  public DelegateExpressionCaseVariableListener(Expression expression, List<FieldDeclaration> fieldDeclarations) {
+  public DelegateExpressionCaseVariableListener(Expression expression,
+      List<FieldDeclaration> fieldDeclarations) {
     this.expression = expression;
     this.fieldDeclarations = fieldDeclarations;
   }
@@ -47,19 +48,17 @@ public class DelegateExpressionCaseVariableListener implements CaseVariableListe
 
     if (delegate instanceof CaseVariableListener) {
       CaseVariableListener listenerInstance = (CaseVariableListener) delegate;
-      Context
-        .getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(new CaseVariableListenerInvocation(listenerInstance, variableInstance));
+      Context.getProcessEngineConfiguration().getDelegateInterceptor()
+          .handleInvocation(new CaseVariableListenerInvocation(listenerInstance, variableInstance));
     } else {
       throw new ProcessEngineException("Delegate expression " + expression
-              + " did not resolve to an implementation of " + CaseVariableListener.class);
+          + " did not resolve to an implementation of " + CaseVariableListener.class);
     }
   }
 
   /**
-   * returns the expression text for this execution listener. Comes in handy if you want to
-   * check which listeners you already have.
+   * returns the expression text for this execution listener. Comes in handy if you want to check
+   * which listeners you already have.
    */
   public String getExpressionText() {
     return expression.getExpressionText();

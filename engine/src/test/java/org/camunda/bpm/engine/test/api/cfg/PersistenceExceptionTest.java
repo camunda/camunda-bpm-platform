@@ -54,12 +54,14 @@ public class PersistenceExceptionTest {
 
   @Test
   public void testPersistenceExceptionContainsRealCause() {
-    Assume.assumeFalse(engineRule.getProcessEngineConfiguration().getDatabaseType().equals(DbSqlSessionFactory.MARIADB));
+    Assume.assumeFalse(engineRule.getProcessEngineConfiguration().getDatabaseType()
+        .equals(DbSqlSessionFactory.MARIADB));
     StringBuffer longString = new StringBuffer();
     for (int i = 0; i < 100; i++) {
       longString.append("tensymbols");
     }
-    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process1").startEvent().userTask(longString.toString()).endEvent().done();
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process1").startEvent()
+        .userTask(longString.toString()).endEvent().done();
     testRule.deploy(modelInstance);
     try {
       runtimeService.startProcessInstanceByKey("process1").getId();

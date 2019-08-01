@@ -82,10 +82,7 @@ public class BatchModificationHistoryTest {
 
   @Parameterized.Parameters(name = "Job DueDate is set: {0}")
   public static Collection<Object[]> scenarios() throws ParseException {
-    return Arrays.asList(new Object[][] {
-      { false, null },
-      { true, START_DATE }
-    });
+    return Arrays.asList(new Object[][] { { false, null }, { true, START_DATE } });
   }
 
   @Before
@@ -95,13 +92,8 @@ public class BatchModificationHistoryTest {
 
   @Before
   public void createBpmnModelInstance() {
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .userTask("user1")
-        .sequenceFlowId("seq")
-        .userTask("user2")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").userTask("user1")
+        .sequenceFlowId("seq").userTask("user2").endEvent("end").done();
   }
 
   @Before

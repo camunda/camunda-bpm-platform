@@ -50,8 +50,7 @@ public interface PlatformServiceContainer {
   <S> S getService(ServiceType type, String localName);
 
   /**
-   * get the service value for a specific service by name or null if no such
-   * Service exists.
+   * get the service value for a specific service by name or null if no such Service exists.
    *
    */
   <S> S getServiceValue(ServiceType type, String localName);
@@ -79,12 +78,11 @@ public interface PlatformServiceContainer {
   public interface ServiceType {
 
     /**
-     * Returns a wildcard name that allows to query the service container
-     * for all services of the type represented by this ServiceType.
+     * Returns a wildcard name that allows to query the service container for all services of the
+     * type represented by this ServiceType.
      */
     public String getTypeName();
 
   }
-
 
 }

@@ -85,7 +85,8 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
     this.jobExecutor = processEngineConfiguration.getJobExecutor();
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    commandExecutorSchemaOperations = processEngineConfiguration.getCommandExecutorSchemaOperations();
+    commandExecutorSchemaOperations = processEngineConfiguration
+        .getCommandExecutorSchemaOperations();
     this.sessionFactories = processEngineConfiguration.getSessionFactories();
     this.historyLevel = processEngineConfiguration.getHistoryLevel();
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
@@ -110,18 +111,20 @@ public class ProcessEngineImpl implements ProcessEngine {
       DbMetricsReporter dbMetricsReporter = processEngineConfiguration.getDbMetricsReporter();
       dbMetricsReporter.setReporterId(reporterId);
 
-      if(processEngineConfiguration.isDbMetricsReporterActivate()) {
+      if (processEngineConfiguration.isDbMetricsReporterActivate()) {
         dbMetricsReporter.start();
       }
     }
   }
 
   protected void executeSchemaOperations() {
-    commandExecutorSchemaOperations.execute(processEngineConfiguration.getSchemaOperationsCommand());
+    commandExecutorSchemaOperations
+        .execute(processEngineConfiguration.getSchemaOperationsCommand());
     commandExecutorSchemaOperations.execute(processEngineConfiguration.getHistoryLevelCommand());
 
     try {
-      commandExecutorSchemaOperations.execute(processEngineConfiguration.getProcessEngineBootstrapCommand());
+      commandExecutorSchemaOperations
+          .execute(processEngineConfiguration.getProcessEngineBootstrapCommand());
     } catch (OptimisticLockingException ole) {
       LOG.historyCleanupJobReconfigurationFailure(ole);
     }
@@ -132,7 +135,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 
     ProcessEngines.unregister(this);
 
-    if(processEngineConfiguration.isMetricsEnabled()) {
+    if (processEngineConfiguration.isMetricsEnabled()) {
       processEngineConfiguration.getDbMetricsReporter().stop();
     }
 

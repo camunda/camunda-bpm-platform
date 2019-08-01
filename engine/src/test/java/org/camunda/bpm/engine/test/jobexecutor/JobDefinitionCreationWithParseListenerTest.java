@@ -42,11 +42,10 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 /**
- * Represents a test class, which uses parse listeners
- * to create job definitions for async activities.
- * The parse listeners are called after the bpmn xml was parsed.
- * They set the activity asyncBefore property to true. In this case
- * there should created some job declarations for the async activity.
+ * Represents a test class, which uses parse listeners to create job definitions for async
+ * activities. The parse listeners are called after the bpmn xml was parsed. They set the activity
+ * asyncBefore property to true. In this case there should created some job declarations for the
+ * async activity.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
@@ -57,12 +56,14 @@ public class JobDefinitionCreationWithParseListenerTest {
    */
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       List<BpmnParseListener> listeners = new ArrayList<BpmnParseListener>();
-      listeners.add(new AbstractBpmnParseListener(){
+      listeners.add(new AbstractBpmnParseListener() {
 
         @Override
-        public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
+        public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope,
+            ActivityImpl activity) {
           activity.setAsyncBefore(true);
         }
       });
@@ -85,16 +86,18 @@ public class JobDefinitionCreationWithParseListenerTest {
 
   @Test
   public void testCreateJobDefinitionWithParseListener() {
-    //given
+    // given
     String modelFileName = "jobCreationWithinParseListener.bpmn20.xml";
-    InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
-    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
+    InputStream in = JobDefinitionCreationWithParseListenerTest.class
+        .getResourceAsStream(modelFileName);
+    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment()
+        .addInputStream(modelFileName, in);
 
-    //when the asyncBefore is set in the parse listener
+    // when the asyncBefore is set in the parse listener
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);
 
-    //then there exists a new job definition
+    // then there exists a new job definition
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     JobDefinition jobDef = query.singleResult();
     assertNotNull(jobDef);
@@ -102,19 +105,20 @@ public class JobDefinitionCreationWithParseListenerTest {
     assertEquals(jobDef.getActivityId(), "servicetask1");
   }
 
-
   @Test
   public void testCreateJobDefinitionWithParseListenerAndAsyncInXml() {
-    //given the asyncBefore is set in the xml
+    // given the asyncBefore is set in the xml
     String modelFileName = "jobAsyncBeforeCreationWithinParseListener.bpmn20.xml";
-    InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
-    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
+    InputStream in = JobDefinitionCreationWithParseListenerTest.class
+        .getResourceAsStream(modelFileName);
+    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment()
+        .addInputStream(modelFileName, in);
 
-    //when the asyncBefore is set in the parse listener
+    // when the asyncBefore is set in the parse listener
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);
 
-    //then there exists only one job definition
+    // then there exists only one job definition
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     JobDefinition jobDef = query.singleResult();
     assertNotNull(jobDef);

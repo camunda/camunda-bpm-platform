@@ -51,19 +51,19 @@ public class MocksTest {
 
   @Test
   public void testMethodsOfMocksAPI() {
-    //given
+    // given
     HashMap<String, Object> map = new HashMap<String, Object>();
 
     for (int i = 0; i < 5; i++) {
       map.put("key" + i, new Object());
     }
 
-    //when
+    // when
     for (String key : map.keySet()) {
       Mocks.register(key, map.get(key));
     }
 
-    //then
+    // then
     for (String key : map.keySet()) {
       assertEquals(map.get(key), Mocks.get(key));
     }
@@ -91,9 +91,9 @@ public class MocksTest {
     testMockAvailability();
   }
 
-  //helper ////////////////////////////////////////////////////////////
+  // helper ////////////////////////////////////////////////////////////
   private void testMockAvailability() {
-    //given
+    // given
     final String testStr = "testValue";
 
     Mocks.register("myMock", new Object() {
@@ -108,11 +108,11 @@ public class MocksTest {
 
     });
 
-    //when
+    // when
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("mocksTest");
     Mocks.reset();
 
-    //then
+    // then
     assertEquals(testStr, runtimeService.getVariable(pi.getId(), "testVar"));
   }
 

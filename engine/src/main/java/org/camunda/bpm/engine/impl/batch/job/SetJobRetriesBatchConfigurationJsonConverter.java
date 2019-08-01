@@ -26,7 +26,8 @@ import java.util.List;
 /**
  * @author Askar Akhmerov
  */
-public class SetJobRetriesBatchConfigurationJsonConverter extends JsonObjectConverter<SetRetriesBatchConfiguration> {
+public class SetJobRetriesBatchConfigurationJsonConverter
+    extends JsonObjectConverter<SetRetriesBatchConfiguration> {
   public static final SetJobRetriesBatchConfigurationJsonConverter INSTANCE = new SetJobRetriesBatchConfigurationJsonConverter();
 
   public static final String JOB_IDS = "jobIds";
@@ -41,10 +42,8 @@ public class SetJobRetriesBatchConfigurationJsonConverter extends JsonObjectConv
   }
 
   public SetRetriesBatchConfiguration toObject(JsonObject json) {
-    SetRetriesBatchConfiguration configuration = new SetRetriesBatchConfiguration(
-        readJobIds(json),
-        JsonUtil.getInt(json, RETRIES)
-    );
+    SetRetriesBatchConfiguration configuration = new SetRetriesBatchConfiguration(readJobIds(json),
+        JsonUtil.getInt(json, RETRIES));
 
     return configuration;
   }

@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.impl.cmd.ActivateProcessDefinitionCmd;
  * @author Joram Barrez
  * @author roman.smirnov
  */
-public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDefinitionSuspensionStateJobHandler {
+public class TimerActivateProcessDefinitionHandler
+    extends TimerChangeProcessDefinitionSuspensionStateJobHandler {
 
   public static final String TYPE = "activate-processdefinition";
 
@@ -32,7 +33,8 @@ public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDef
   }
 
   @Override
-  protected AbstractSetProcessDefinitionStateCmd getCommand(ProcessDefinitionSuspensionStateConfiguration configuration) {
+  protected AbstractSetProcessDefinitionStateCmd getCommand(
+      ProcessDefinitionSuspensionStateConfiguration configuration) {
     return new ActivateProcessDefinitionCmd(configuration.createBuilder());
   }
 }

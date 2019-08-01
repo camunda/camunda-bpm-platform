@@ -31,7 +31,8 @@ public class ProcessApplicationDeploymentImpl implements ProcessApplicationDeplo
   protected DeploymentWithDefinitions deployment;
   protected ProcessApplicationRegistration registration;
 
-  public ProcessApplicationDeploymentImpl(DeploymentWithDefinitions deployment, ProcessApplicationRegistration registration) {
+  public ProcessApplicationDeploymentImpl(DeploymentWithDefinitions deployment,
+      ProcessApplicationRegistration registration) {
     this.deployment = deployment;
     this.registration = registration;
   }

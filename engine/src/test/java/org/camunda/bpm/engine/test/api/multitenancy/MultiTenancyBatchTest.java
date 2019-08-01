@@ -78,8 +78,10 @@ public class MultiTenancyBatchTest {
   @Before
   public void deployProcesses() {
     sharedDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO, ProcessModels.ONE_TASK_PROCESS);
+    tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO,
+        ProcessModels.ONE_TASK_PROCESS);
   }
 
   @After
@@ -88,8 +90,7 @@ public class MultiTenancyBatchTest {
   }
 
   /**
-   * Source: no tenant id
-   * Target: no tenant id
+   * Source: no tenant id Target: no tenant id
    */
   @Test
   public void testBatchTenantIdCase1() {
@@ -101,8 +102,7 @@ public class MultiTenancyBatchTest {
   }
 
   /**
-   * Source: tenant 1
-   * Target: no tenant id
+   * Source: tenant 1 Target: no tenant id
    */
   @Test
   public void testBatchTenantIdCase2() {
@@ -114,8 +114,7 @@ public class MultiTenancyBatchTest {
   }
 
   /**
-   * Source: no tenant id
-   * Target: tenant 1
+   * Source: no tenant id Target: tenant 1
    */
   @Test
   public void testBatchTenantIdCase3() {
@@ -195,13 +194,11 @@ public class MultiTenancyBatchTest {
     try {
       managementService.deleteBatch(batch.getId(), true);
       Assert.fail("exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // then
       Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot delete batch '"
-        + batch.getId() + "' because it belongs to no authenticated tenant"));
-    }
-    finally {
+          + batch.getId() + "' because it belongs to no authenticated tenant"));
+    } finally {
       identityService.clearAuthentication();
     }
   }
@@ -231,13 +228,11 @@ public class MultiTenancyBatchTest {
     try {
       managementService.suspendBatchById(batch.getId());
       Assert.fail("exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // then
       Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot suspend batch '"
-      + batch.getId() +"' because it belongs to no authenticated tenant"));
-    }
-    finally {
+          + batch.getId() + "' because it belongs to no authenticated tenant"));
+    } finally {
       identityService.clearAuthentication();
     }
   }
@@ -269,13 +264,11 @@ public class MultiTenancyBatchTest {
     try {
       managementService.activateBatchById(batch.getId());
       Assert.fail("exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // then
       Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot activate batch '"
-      + batch.getId() + "' because it belongs to no authenticated tenant"));
-    }
-    finally {
+          + batch.getId() + "' because it belongs to no authenticated tenant"));
+    } finally {
       identityService.clearAuthentication();
     }
   }

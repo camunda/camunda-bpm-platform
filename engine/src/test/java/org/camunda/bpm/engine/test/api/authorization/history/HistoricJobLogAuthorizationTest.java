@@ -65,7 +65,8 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
+        commandContext.getHistoricJobLogManager()
+            .deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
         return null;
       }
     });
@@ -157,7 +158,8 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 5);
   }
 
-  // historic job log query (multiple process instance) ////////////////////////////////////////////////
+  // historic job log query (multiple process instance)
+  // ////////////////////////////////////////////////
 
   public void testQueryWithoutAuthorization() {
     // given
@@ -166,9 +168,11 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     disableAuthorization();
-    String jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY).singleResult().getId();
+    String jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY)
+        .singleResult().getId();
     managementService.executeJob(jobId);
-    jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY).singleResult().getId();
+    jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY)
+        .singleResult().getId();
     managementService.executeJob(jobId);
     enableAuthorization();
 
@@ -186,9 +190,11 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     disableAuthorization();
-    String jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY).singleResult().getId();
+    String jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY)
+        .singleResult().getId();
     managementService.executeJob(jobId);
-    jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY).singleResult().getId();
+    jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY)
+        .singleResult().getId();
     managementService.executeJob(jobId);
     enableAuthorization();
 
@@ -208,9 +214,11 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     disableAuthorization();
-    String jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY).singleResult().getId();
+    String jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY)
+        .singleResult().getId();
     managementService.executeJob(jobId);
-    jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY).singleResult().getId();
+    jobId = managementService.createJobQuery().processDefinitionKey(TIMER_START_PROCESS_KEY)
+        .singleResult().getId();
     managementService.executeJob(jobId);
     enableAuthorization();
 
@@ -275,7 +283,8 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 6);
 
     disableAuthorization();
-    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
+        .list();
     for (HistoricProcessInstance instance : instances) {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }
@@ -312,13 +321,15 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     disableAuthorization();
-    String jobLogId = historyService.createHistoricJobLogQuery().failureLog().listPage(0, 1).get(0).getId();
+    String jobLogId = historyService.createHistoricJobLogQuery().failureLog().listPage(0, 1).get(0)
+        .getId();
     enableAuthorization();
 
     try {
       // when
       historyService.getHistoricJobLogExceptionStacktrace(jobLogId);
-      fail("Exception expected: It should not be possible to get the historic job log exception stacktrace");
+      fail(
+          "Exception expected: It should not be possible to get the historic job log exception stacktrace");
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
@@ -334,7 +345,8 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     disableAuthorization();
-    String jobLogId = historyService.createHistoricJobLogQuery().failureLog().listPage(0, 1).get(0).getId();
+    String jobLogId = historyService.createHistoricJobLogQuery().failureLog().listPage(0, 1).get(0)
+        .getId();
     enableAuthorization();
 
     createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ_HISTORY);
@@ -351,7 +363,8 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     disableAuthorization();
-    String jobLogId = historyService.createHistoricJobLogQuery().failureLog().listPage(0, 1).get(0).getId();
+    String jobLogId = historyService.createHistoricJobLogQuery().failureLog().listPage(0, 1).get(0)
+        .getId();
     enableAuthorization();
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);

@@ -34,7 +34,7 @@ import org.slf4j.Logger;
  */
 public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   static ControllableThread activeThread;
 
@@ -60,26 +60,26 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
     public void run() {
       try {
-        processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new SetTaskVariablesCmd(taskId, Collections.singletonMap(variableName, variableValue), false)));
+        processEngineConfiguration.getCommandExecutorTxRequired()
+            .execute(new ControlledCommand(activeThread, new SetTaskVariablesCmd(taskId,
+                Collections.singletonMap(variableName, variableValue), false)));
 
       } catch (OptimisticLockingException e) {
         this.optimisticLockingException = e;
       } catch (Exception e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
-
 
   @Override
   protected void runTest() throws Throwable {
 
     String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
 
-    if (DbSqlSessionFactory.DB2.equals(databaseType) && "testConcurrentVariableCreate".equals(getName())) {
+    if (DbSqlSessionFactory.DB2.equals(databaseType)
+        && "testConcurrentVariableCreate".equals(getName())) {
       // skip test method - if database is DB2
     } else {
       // invoke the test method
@@ -89,10 +89,11 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   // Test is skipped when testing on DB2.
   // Please update the IF condition in #runTest, if the method name is changed.
-  @Deployment(resources="org/camunda/bpm/engine/test/concurrency/ConcurrentVariableUpdateTest.process.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/ConcurrentVariableUpdateTest.process.bpmn20.xml")
   public void testConcurrentVariableCreate() {
 
-    runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("varName1", "someValue"));
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Collections.<String, Object> singletonMap("varName1", "someValue"));
 
     String variableName = "varName";
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -116,7 +117,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     taskService.complete(taskId);
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/concurrency/ConcurrentVariableUpdateTest.process.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/ConcurrentVariableUpdateTest.process.bpmn20.xml")
   public void testConcurrentVariableUpdate() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -130,7 +131,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     thread1.startAndWaitUntilControlIsReturned();
 
     // this fails with an optimistic locking exception
-    SetTaskVariablesThread thread2 = new SetTaskVariablesThread(taskId, variableName, "someOtherString");
+    SetTaskVariablesThread thread2 = new SetTaskVariablesThread(taskId, variableName,
+        "someOtherString");
     thread2.startAndWaitUntilControlIsReturned();
 
     thread1.proceedAndWaitTillDone();
@@ -143,8 +145,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     taskService.complete(taskId);
   }
 
-
-  @Deployment(resources="org/camunda/bpm/engine/test/concurrency/ConcurrentVariableUpdateTest.process.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/ConcurrentVariableUpdateTest.process.bpmn20.xml")
   public void testConcurrentVariableUpdateTypeChange() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -158,7 +159,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     thread1.startAndWaitUntilControlIsReturned();
 
     // this fails with an optimistic locking exception
-    SetTaskVariablesThread thread2 = new SetTaskVariablesThread(taskId, variableName, "someOtherString");
+    SetTaskVariablesThread thread2 = new SetTaskVariablesThread(taskId, variableName,
+        "someOtherString");
     thread2.startAndWaitUntilControlIsReturned();
 
     thread1.proceedAndWaitTillDone();

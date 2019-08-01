@@ -25,7 +25,9 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 public class SameEventScopeInstructionValidator implements MigrationInstructionValidator {
 
-  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report) {
+  public void validate(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
+      MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
     if (isCompensationBoundaryEvent(sourceActivity)) {
       // this is not required for compensation boundary events since their
@@ -44,14 +46,16 @@ public class SameEventScopeInstructionValidator implements MigrationInstructionV
     }
 
     if (targetEventScope == null) {
-      report.addFailure("The source activity's event scope (" + sourceEventScope.getId() + ") must be mapped but the "
-          + "target activity has no event scope");
-    }
-    else {
-      ScopeImpl mappedSourceEventScope = findMappedEventScope(sourceEventScope, instruction, instructions);
-      if (mappedSourceEventScope == null || !mappedSourceEventScope.getId().equals(targetEventScope.getId())) {
+      report.addFailure("The source activity's event scope (" + sourceEventScope.getId()
+          + ") must be mapped but the " + "target activity has no event scope");
+    } else {
+      ScopeImpl mappedSourceEventScope = findMappedEventScope(sourceEventScope, instruction,
+          instructions);
+      if (mappedSourceEventScope == null
+          || !mappedSourceEventScope.getId().equals(targetEventScope.getId())) {
         report.addFailure("The source activity's event scope (" + sourceEventScope.getId() + ") "
-            + "must be mapped to the target activity's event scope (" + targetEventScope.getId() + ")");
+            + "must be mapped to the target activity's event scope (" + targetEventScope.getId()
+            + ")");
       }
     }
   }
@@ -61,13 +65,14 @@ public class SameEventScopeInstructionValidator implements MigrationInstructionV
     return ActivityTypes.BOUNDARY_COMPENSATION.equals(activityType);
   }
 
-  protected ScopeImpl findMappedEventScope(ScopeImpl sourceEventScope, ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions) {
+  protected ScopeImpl findMappedEventScope(ScopeImpl sourceEventScope,
+      ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions) {
     if (sourceEventScope != null) {
       if (sourceEventScope == sourceEventScope.getProcessDefinition()) {
         return instruction.getTargetActivity().getProcessDefinition();
-      }
-      else {
-        List<ValidatingMigrationInstruction> eventScopeInstructions = instructions.getInstructionsBySourceScope(sourceEventScope);
+      } else {
+        List<ValidatingMigrationInstruction> eventScopeInstructions = instructions
+            .getInstructionsBySourceScope(sourceEventScope);
         if (eventScopeInstructions.size() > 0) {
           return eventScopeInstructions.get(0).getTargetActivity();
         }

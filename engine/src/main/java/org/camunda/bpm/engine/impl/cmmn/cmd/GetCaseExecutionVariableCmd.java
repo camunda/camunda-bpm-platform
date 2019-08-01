@@ -48,13 +48,14 @@ public class GetCaseExecutionVariableCmd implements Command<Object>, Serializabl
     ensureNotNull("caseExecutionId", caseExecutionId);
     ensureNotNull("variableName", variableName);
 
-    CaseExecutionEntity caseExecution = commandContext
-      .getCaseExecutionManager()
-      .findCaseExecutionById(caseExecutionId);
+    CaseExecutionEntity caseExecution = commandContext.getCaseExecutionManager()
+        .findCaseExecutionById(caseExecutionId);
 
-    ensureNotNull(CaseExecutionNotFoundException.class, "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
+    ensureNotNull(CaseExecutionNotFoundException.class,
+        "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadCaseInstance(caseExecution);
     }
 

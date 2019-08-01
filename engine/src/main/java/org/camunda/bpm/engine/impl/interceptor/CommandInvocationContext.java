@@ -32,9 +32,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
 /**
- * In contrast to {@link CommandContext}, this context holds resources that are only valid
- * during execution of a single command (i.e. the current command or an exception that was thrown
- * during its execution).
+ * In contrast to {@link CommandContext}, this context holds resources that are only valid during
+ * execution of a single command (i.e. the current command or an exception that was thrown during
+ * its execution).
  *
  * @author Thorben Lindhauer
  */
@@ -43,7 +43,7 @@ public class CommandInvocationContext {
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected Throwable throwable;
-  protected Command< ? > command;
+  protected Command<?> command;
   protected boolean isExecuting = false;
   protected List<AtomicOperationInvocation> queuedInvocations = new ArrayList<AtomicOperationInvocation>();
   protected BpmnStackTrace bpmnStackTrace = new BpmnStackTrace();
@@ -63,8 +63,7 @@ public class CommandInvocationContext {
   public void trySetThrowable(Throwable t) {
     if (this.throwable == null) {
       this.throwable = t;
-    }
-    else {
+    } else {
       LOG.maskedExceptionInCommandContext(throwable);
     }
   }
@@ -77,8 +76,10 @@ public class CommandInvocationContext {
     performOperation(executionOperation, execution, true);
   }
 
-  public void performOperation(final AtomicOperation executionOperation, final ExecutionEntity execution, final boolean performAsync) {
-    AtomicOperationInvocation invocation = new AtomicOperationInvocation(executionOperation, execution, performAsync);
+  public void performOperation(final AtomicOperation executionOperation,
+      final ExecutionEntity execution, final boolean performAsync) {
+    AtomicOperationInvocation invocation = new AtomicOperationInvocation(executionOperation,
+        execution, performAsync);
     queuedInvocations.add(0, invocation);
     performNext();
   }
@@ -86,13 +87,14 @@ public class CommandInvocationContext {
   protected void performNext() {
     AtomicOperationInvocation nextInvocation = queuedInvocations.get(0);
 
-    if(nextInvocation.operation.isAsyncCapable() && isExecuting) {
+    if (nextInvocation.operation.isAsyncCapable() && isExecuting) {
       // will be picked up by while loop below
       return;
     }
 
-    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(nextInvocation.execution);
-    if(requiresContextSwitch(targetProcessApplication)) {
+    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(
+        nextInvocation.execution);
+    if (requiresContextSwitch(targetProcessApplication)) {
 
       Context.executeWithinProcessApplication(new Callable<Void>() {
         public Void call() throws Exception {
@@ -101,21 +103,18 @@ public class CommandInvocationContext {
         }
 
       }, targetProcessApplication, new InvocationContext(nextInvocation.execution));
-    }
-    else {
-      if(!nextInvocation.operation.isAsyncCapable()) {
+    } else {
+      if (!nextInvocation.operation.isAsyncCapable()) {
         // if operation is not async capable, perform right away.
         invokeNext();
-      }
-      else {
-        try  {
+      } else {
+        try {
           isExecuting = true;
-          while (! queuedInvocations.isEmpty()) {
+          while (!queuedInvocations.isEmpty()) {
             // assumption: all operations are executed within the same process application...
             invokeNext();
           }
-        }
-        finally {
+        } finally {
           isExecuting = false;
         }
       }
@@ -126,10 +125,10 @@ public class CommandInvocationContext {
     AtomicOperationInvocation invocation = queuedInvocations.remove(0);
     try {
       invocation.execute(bpmnStackTrace);
-    }
-    catch(RuntimeException e) {
+    } catch (RuntimeException e) {
       // log bpmn stacktrace
-      bpmnStackTrace.printStackTrace(Context.getProcessEngineConfiguration().isBpmnStacktraceVerbose());
+      bpmnStackTrace
+          .printStackTrace(Context.getProcessEngineConfiguration().isBpmnStacktraceVerbose());
       // rethrow
       throw e;
     }

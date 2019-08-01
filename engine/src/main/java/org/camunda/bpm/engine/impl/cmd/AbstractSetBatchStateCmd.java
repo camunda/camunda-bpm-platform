@@ -44,7 +44,8 @@ public abstract class AbstractSetBatchStateCmd implements Command<Void> {
     BatchManager batchManager = commandContext.getBatchManager();
 
     BatchEntity batch = batchManager.findBatchById(batchId);
-    ensureNotNull(BadUserRequestException.class, "Batch for id '" + batchId + "' cannot be found", "batch", batch);
+    ensureNotNull(BadUserRequestException.class, "Batch for id '" + batchId + "' cannot be found",
+        "batch", batch);
 
     checkAccess(commandContext, batch);
 
@@ -62,7 +63,8 @@ public abstract class AbstractSetBatchStateCmd implements Command<Void> {
   protected abstract SuspensionState getNewSuspensionState();
 
   protected void checkAccess(CommandContext commandContext, BatchEntity batch) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checkAccess(checker, batch);
     }
   }
@@ -73,21 +75,23 @@ public abstract class AbstractSetBatchStateCmd implements Command<Void> {
     createSetJobDefinitionStateCommand(jobDefinitionId).execute(commandContext);
   }
 
-  protected AbstractSetJobDefinitionStateCmd createSetJobDefinitionStateCommand(String jobDefinitionId) {
-    AbstractSetJobDefinitionStateCmd suspendJobDefinitionCmd = createSetJobDefinitionStateCommand(new UpdateJobDefinitionSuspensionStateBuilderImpl()
-      .byJobDefinitionId(jobDefinitionId)
-      .includeJobs(true)
-    );
+  protected AbstractSetJobDefinitionStateCmd createSetJobDefinitionStateCommand(
+      String jobDefinitionId) {
+    AbstractSetJobDefinitionStateCmd suspendJobDefinitionCmd = createSetJobDefinitionStateCommand(
+        new UpdateJobDefinitionSuspensionStateBuilderImpl().byJobDefinitionId(jobDefinitionId)
+            .includeJobs(true));
     suspendJobDefinitionCmd.disableLogUserOperation();
     return suspendJobDefinitionCmd;
   }
 
-  protected abstract AbstractSetJobDefinitionStateCmd createSetJobDefinitionStateCommand(UpdateJobDefinitionSuspensionStateBuilderImpl builder);
+  protected abstract AbstractSetJobDefinitionStateCmd createSetJobDefinitionStateCommand(
+      UpdateJobDefinitionSuspensionStateBuilderImpl builder);
 
   protected void logUserOperation(CommandContext commandContext) {
-    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
-    commandContext.getOperationLogManager()
-      .logBatchOperation(getUserOperationType(), batchId, propertyChange);
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null,
+        getNewSuspensionState().getName());
+    commandContext.getOperationLogManager().logBatchOperation(getUserOperationType(), batchId,
+        propertyChange);
   }
 
   protected abstract String getUserOperationType();

@@ -18,9 +18,9 @@ package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.query.QueryProperty;
 
-
 /**
- * Contains the possible properties which can be used in a {@link HistoricProcessInstanceQueryProperty}.
+ * Contains the possible properties which can be used in a
+ * {@link HistoricProcessInstanceQueryProperty}.
  *
  * @author Joram Barrez
  */

@@ -48,25 +48,28 @@ public class ProcessApplicationContextUtil {
       return null;
     }
 
-    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication((ProcessDefinitionEntity) execution.getProcessDefinition());
+    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication(
+        (ProcessDefinitionEntity) execution.getProcessDefinition());
 
     // logg application context switch details
-    if(LOG.isContextSwitchLoggable() && processApplicationForDeployment == null) {
+    if (LOG.isContextSwitchLoggable() && processApplicationForDeployment == null) {
       loggContextSwitchDetails(execution);
     }
 
     return processApplicationForDeployment;
   }
 
-  public static ProcessApplicationReference getTargetProcessApplication(CaseExecutionEntity execution) {
+  public static ProcessApplicationReference getTargetProcessApplication(
+      CaseExecutionEntity execution) {
     if (execution == null) {
       return null;
     }
 
-    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication((CaseDefinitionEntity) execution.getCaseDefinition());
+    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication(
+        (CaseDefinitionEntity) execution.getCaseDefinition());
 
     // logg application context switch details
-    if(LOG.isContextSwitchLoggable() && processApplicationForDeployment == null) {
+    if (LOG.isContextSwitchLoggable() && processApplicationForDeployment == null) {
       loggContextSwitchDetails(execution);
     }
 
@@ -76,17 +79,17 @@ public class ProcessApplicationContextUtil {
   public static ProcessApplicationReference getTargetProcessApplication(TaskEntity task) {
     if (task.getProcessDefinition() != null) {
       return getTargetProcessApplication(task.getProcessDefinition());
-    }
-    else if (task.getCaseDefinition() != null) {
+    } else if (task.getCaseDefinition() != null) {
       return getTargetProcessApplication(task.getCaseDefinition());
-    }
-    else {
+    } else {
       return null;
     }
   }
 
-  public static ProcessApplicationReference getTargetProcessApplication(ResourceDefinitionEntity definition) {
-    ProcessApplicationReference reference = getTargetProcessApplication(definition.getDeploymentId());
+  public static ProcessApplicationReference getTargetProcessApplication(
+      ResourceDefinitionEntity definition) {
+    ProcessApplicationReference reference = getTargetProcessApplication(
+        definition.getDeploymentId());
 
     if (reference == null && areProcessApplicationsRegistered()) {
       ResourceDefinitionEntity previous = definition.getPreviousDefinition();
@@ -99,8 +102,7 @@ public class ProcessApplicationContextUtil {
 
         if (reference == null) {
           previous = previous.getPreviousDefinition();
-        }
-        else {
+        } else {
           return reference;
         }
 
@@ -111,27 +113,34 @@ public class ProcessApplicationContextUtil {
   }
 
   public static ProcessApplicationReference getTargetProcessApplication(String deploymentId) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
+    ProcessApplicationManager processApplicationManager = processEngineConfiguration
+        .getProcessApplicationManager();
 
-    ProcessApplicationReference processApplicationForDeployment = processApplicationManager.getProcessApplicationForDeployment(deploymentId);
+    ProcessApplicationReference processApplicationForDeployment = processApplicationManager
+        .getProcessApplicationForDeployment(deploymentId);
 
     return processApplicationForDeployment;
   }
 
   public static boolean areProcessApplicationsRegistered() {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
+    ProcessApplicationManager processApplicationManager = processEngineConfiguration
+        .getProcessApplicationManager();
 
     return processApplicationManager.hasRegistrations();
   }
 
   private static void loggContextSwitchDetails(ExecutionEntity execution) {
 
-    final CoreExecutionContext<? extends CoreExecution> executionContext = Context.getCoreExecutionContext();
+    final CoreExecutionContext<? extends CoreExecution> executionContext = Context
+        .getCoreExecutionContext();
     // only log for first atomic op:
-    if(executionContext == null ||( executionContext.getExecution() != execution) ) {
-      ProcessApplicationManager processApplicationManager = Context.getProcessEngineConfiguration().getProcessApplicationManager();
+    if (executionContext == null || (executionContext.getExecution() != execution)) {
+      ProcessApplicationManager processApplicationManager = Context.getProcessEngineConfiguration()
+          .getProcessApplicationManager();
       LOG.debugNoTargetProcessApplicationFound(execution, processApplicationManager);
     }
 
@@ -139,42 +148,49 @@ public class ProcessApplicationContextUtil {
 
   private static void loggContextSwitchDetails(CaseExecutionEntity execution) {
 
-    final CoreExecutionContext<? extends CoreExecution> executionContext = Context.getCoreExecutionContext();
+    final CoreExecutionContext<? extends CoreExecution> executionContext = Context
+        .getCoreExecutionContext();
     // only log for first atomic op:
-    if(executionContext == null ||( executionContext.getExecution() != execution) ) {
-      ProcessApplicationManager processApplicationManager = Context.getProcessEngineConfiguration().getProcessApplicationManager();
-      LOG.debugNoTargetProcessApplicationFoundForCaseExecution(execution, processApplicationManager);
+    if (executionContext == null || (executionContext.getExecution() != execution)) {
+      ProcessApplicationManager processApplicationManager = Context.getProcessEngineConfiguration()
+          .getProcessApplicationManager();
+      LOG.debugNoTargetProcessApplicationFoundForCaseExecution(execution,
+          processApplicationManager);
     }
 
   }
 
-  public static boolean requiresContextSwitch(ProcessApplicationReference processApplicationReference) {
+  public static boolean requiresContextSwitch(
+      ProcessApplicationReference processApplicationReference) {
 
-    final ProcessApplicationReference currentProcessApplication = Context.getCurrentProcessApplication();
+    final ProcessApplicationReference currentProcessApplication = Context
+        .getCurrentProcessApplication();
 
-    if(processApplicationReference == null) {
+    if (processApplicationReference == null) {
       return false;
     }
 
-    if(currentProcessApplication == null) {
+    if (currentProcessApplication == null) {
       return true;
-    }
-    else {
-      if(!processApplicationReference.getName().equals(currentProcessApplication.getName())) {
+    } else {
+      if (!processApplicationReference.getName().equals(currentProcessApplication.getName())) {
         return true;
-      }
-      else {
-        // check whether the thread context has been manipulated since last context switch. This can happen as a result of
+      } else {
+        // check whether the thread context has been manipulated since last context switch. This can
+        // happen as a result of
         // an operation causing the container to switch to a different application.
-        // Example: JavaDelegate implementation (inside PA) invokes an EJB from different application which in turn interacts with the Process engine.
-        ClassLoader processApplicationClassLoader = ProcessApplicationClassloaderInterceptor.getProcessApplicationClassLoader();
+        // Example: JavaDelegate implementation (inside PA) invokes an EJB from different
+        // application which in turn interacts with the Process engine.
+        ClassLoader processApplicationClassLoader = ProcessApplicationClassloaderInterceptor
+            .getProcessApplicationClassLoader();
         ClassLoader currentClassloader = ClassLoaderUtil.getContextClassloader();
         return currentClassloader != processApplicationClassLoader;
       }
     }
   }
 
-  public static void doContextSwitch(final Runnable runnable, ProcessDefinitionEntity contextDefinition) {
+  public static void doContextSwitch(final Runnable runnable,
+      ProcessDefinitionEntity contextDefinition) {
     ProcessApplicationReference processApplication = getTargetProcessApplication(contextDefinition);
     if (requiresContextSwitch(processApplication)) {
       Context.executeWithinProcessApplication(new Callable<Void>() {
@@ -185,8 +201,7 @@ public class ProcessApplicationContextUtil {
           return null;
         }
       }, processApplication);
-    }
-    else {
+    } else {
       runnable.run();
     }
   }

@@ -43,10 +43,8 @@ public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProc
 
   @Override
   protected void setUp() {
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .endEvent()
-    .done();
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .endEvent().done();
 
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
@@ -56,39 +54,33 @@ public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProc
   }
 
   public void testQueryWithoutTenantId() {
-    HistoricVariableInstanceQuery query = historyService.
-        createHistoricVariableInstanceQuery();
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
-    HistoricVariableInstanceQuery query = historyService
-        .createHistoricVariableInstanceQuery()
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
     assertEquals(query.list().get(0).getValue(), TENANT_ONE_VAR);
 
-    query = historyService
-        .createHistoricVariableInstanceQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = historyService.createHistoricVariableInstanceQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
     assertEquals(query.list().get(0).getValue(), TENANT_TWO_VAR);
   }
 
   public void testQueryByTenantIds() {
-    HistoricVariableInstanceQuery query = historyService
-        .createHistoricVariableInstanceQuery()
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    HistoricVariableInstanceQuery query = historyService
-        .createHistoricVariableInstanceQuery()
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -96,8 +88,7 @@ public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProc
 
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricVariableInstanceQuery()
-        .tenantIdIn((String) null);
+      historyService.createHistoricVariableInstanceQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -105,10 +96,8 @@ public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProc
   }
 
   public void testQuerySortingAsc() {
-    List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
+    List<HistoricVariableInstance> historicVariableInstances = historyService
+        .createHistoricVariableInstanceQuery().orderByTenantId().asc().list();
 
     assertThat(historicVariableInstances.size(), is(2));
     assertThat(historicVariableInstances.get(0).getTenantId(), is(TENANT_ONE));
@@ -118,10 +107,8 @@ public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProc
   }
 
   public void testQuerySortingDesc() {
-    List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery()
-        .orderByTenantId()
-        .desc()
-        .list();
+    List<HistoricVariableInstance> historicVariableInstances = historyService
+        .createHistoricVariableInstanceQuery().orderByTenantId().desc().list();
 
     assertThat(historicVariableInstances.size(), is(2));
     assertThat(historicVariableInstances.get(0).getTenantId(), is(TENANT_TWO));
@@ -167,10 +154,8 @@ public class MultiTenancyHistoricVariableInstanceQueryTest extends PluggableProc
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant, String var) {
-    return runtimeService.createProcessInstanceByKey("testProcess")
-        .setVariable("myVar", var)
-        .processDefinitionTenantId(tenant)
-        .execute();
+    return runtimeService.createProcessInstanceByKey("testProcess").setVariable("myVar", var)
+        .processDefinitionTenantId(tenant).execute();
   }
 
 }

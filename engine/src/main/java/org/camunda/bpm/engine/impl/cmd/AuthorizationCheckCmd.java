@@ -28,7 +28,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 /**
- * <p>Command allowing to perform an authorization check</p>
+ * <p>
+ * Command allowing to perform an authorization check
+ * </p>
  * 
  * @author Daniel Meyer
  *
@@ -43,7 +45,8 @@ public class AuthorizationCheckCmd implements Command<Boolean> {
   protected Resource resource;
   protected String resourceId;
 
-  public AuthorizationCheckCmd(String userId, List<String> groupIds, Permission permission, Resource resource, String resourceId) {
+  public AuthorizationCheckCmd(String userId, List<String> groupIds, Permission permission,
+      Resource resource, String resourceId) {
     this.userId = userId;
     this.groupIds = groupIds;
     this.permission = permission;
@@ -60,9 +63,12 @@ public class AuthorizationCheckCmd implements Command<Boolean> {
     return authorizationManager.isAuthorized(userId, groupIds, permission, resource, resourceId);
   }
 
-  protected void validate(String userId, List<String> groupIds, Permission permission, Resource resource) {
-    ensureAtLeastOneNotNull("Authorization must have a 'userId' or/and a 'groupId'.", userId, groupIds);
-    ensureNotNull("Invalid permission for an authorization", "authorization.getResource()", permission);
+  protected void validate(String userId, List<String> groupIds, Permission permission,
+      Resource resource) {
+    ensureAtLeastOneNotNull("Authorization must have a 'userId' or/and a 'groupId'.", userId,
+        groupIds);
+    ensureNotNull("Invalid permission for an authorization", "authorization.getResource()",
+        permission);
     ensureNotNull("Invalid resource for an authorization", "authorization.getResource()", resource);
   }
 

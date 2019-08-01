@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.javax.el.MethodNotFoundException;
 import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
 
-
 /**
  * Expression implementation backed by a JUEL {@link ValueExpression}.
  *
@@ -41,7 +40,8 @@ public class JuelExpression implements Expression {
   protected ValueExpression valueExpression;
   protected ExpressionManager expressionManager;
 
-  public JuelExpression(ValueExpression valueExpression, ExpressionManager expressionManager, String expressionText) {
+  public JuelExpression(ValueExpression valueExpression, ExpressionManager expressionManager,
+      String expressionText) {
     this.valueExpression = valueExpression;
     this.expressionManager = expressionManager;
     this.expressionText = expressionText;
@@ -54,19 +54,24 @@ public class JuelExpression implements Expression {
   public Object getValue(VariableScope variableScope, BaseDelegateExecution contextExecution) {
     ELContext elContext = expressionManager.getElContext(variableScope);
     try {
-      ExpressionGetInvocation invocation = new ExpressionGetInvocation(valueExpression, elContext, contextExecution);
-      Context.getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(invocation);
+      ExpressionGetInvocation invocation = new ExpressionGetInvocation(valueExpression, elContext,
+          contextExecution);
+      Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
       return invocation.getInvocationResult();
     } catch (PropertyNotFoundException pnfe) {
-      throw new ProcessEngineException("Unknown property used in expression: " + expressionText+". Cause: "+pnfe.getMessage(), pnfe);
+      throw new ProcessEngineException("Unknown property used in expression: " + expressionText
+          + ". Cause: " + pnfe.getMessage(), pnfe);
     } catch (MethodNotFoundException mnfe) {
-      throw new ProcessEngineException("Unknown method used in expression: " + expressionText+". Cause: "+mnfe.getMessage(), mnfe);
-    } catch(ELException ele) {
-      throw new ProcessEngineException("Error while evaluating expression: " + expressionText+". Cause: "+ele.getMessage(), ele);
+      throw new ProcessEngineException(
+          "Unknown method used in expression: " + expressionText + ". Cause: " + mnfe.getMessage(),
+          mnfe);
+    } catch (ELException ele) {
+      throw new ProcessEngineException(
+          "Error while evaluating expression: " + expressionText + ". Cause: " + ele.getMessage(),
+          ele);
     } catch (Exception e) {
-      throw new ProcessEngineException("Error while evaluating expression: " + expressionText+". Cause: "+e.getMessage(), e);
+      throw new ProcessEngineException(
+          "Error while evaluating expression: " + expressionText + ". Cause: " + e.getMessage(), e);
     }
   }
 
@@ -74,21 +79,22 @@ public class JuelExpression implements Expression {
     setValue(value, variableScope, null);
   }
 
-  public void setValue(Object value, VariableScope variableScope, BaseDelegateExecution contextExecution) {
+  public void setValue(Object value, VariableScope variableScope,
+      BaseDelegateExecution contextExecution) {
     ELContext elContext = expressionManager.getElContext(variableScope);
     try {
-      ExpressionSetInvocation invocation = new ExpressionSetInvocation(valueExpression, elContext, value, contextExecution);
-      Context.getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(invocation);
+      ExpressionSetInvocation invocation = new ExpressionSetInvocation(valueExpression, elContext,
+          value, contextExecution);
+      Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
     } catch (Exception e) {
-      throw new ProcessEngineException("Error while evaluating expression: " + expressionText+". Cause: "+e.getMessage(), e);
+      throw new ProcessEngineException(
+          "Error while evaluating expression: " + expressionText + ". Cause: " + e.getMessage(), e);
     }
   }
 
   @Override
   public String toString() {
-    if(valueExpression != null) {
+    if (valueExpression != null) {
       return valueExpression.getExpressionString();
     }
     return super.toString();

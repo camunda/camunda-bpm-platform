@@ -34,11 +34,8 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
   protected Filter filter;
 
   public void setUp() {
-    filter = filterService.newTaskFilter()
-      .setName("name")
-      .setOwner("owner")
-      .setQuery(taskService.createTaskQuery())
-      .setProperties(new HashMap<String, Object>());
+    filter = filterService.newTaskFilter().setName("name").setOwner("owner")
+        .setQuery(taskService.createTaskQuery()).setProperties(new HashMap<String, Object>());
     assertNull(filter.getId());
     filterService.saveFilter(filter);
     assertNotNull(filter.getId());
@@ -64,24 +61,21 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
     try {
       filter.setName(null);
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
 
     try {
       filter.setName("");
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
 
     try {
       filter.setQuery((Query<?, ?>) null);
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
   }
@@ -100,9 +94,8 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
   }
 
   public void testExtendFilter() {
-    TaskQuery extendingQuery = taskService.createTaskQuery()
-      .taskName("newName")
-      .taskOwner("newOwner");
+    TaskQuery extendingQuery = taskService.createTaskQuery().taskName("newName")
+        .taskOwner("newOwner");
     Filter newFilter = filter.extend(extendingQuery);
     assertNull(newFilter.getId());
 
@@ -113,32 +106,23 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
 
   public void testQueryFilter() {
 
-    Filter filter2 = filterService.createTaskFilterQuery()
-      .filterId(filter.getId())
-      .filterName("name")
-      .filterOwner("owner")
-      .singleResult();
+    Filter filter2 = filterService.createTaskFilterQuery().filterId(filter.getId())
+        .filterName("name").filterOwner("owner").singleResult();
 
     compareFilter(filter, filter2);
 
-    filter2 = filterService.createTaskFilterQuery()
-      .filterNameLike("%m%")
-      .singleResult();
+    filter2 = filterService.createTaskFilterQuery().filterNameLike("%m%").singleResult();
 
     compareFilter(filter, filter2);
   }
 
   public void testQueryUnknownFilter() {
-    Filter unknownFilter = filterService.createTaskFilterQuery()
-      .filterId("unknown")
-      .singleResult();
+    Filter unknownFilter = filterService.createTaskFilterQuery().filterId("unknown").singleResult();
 
     assertNull(unknownFilter);
 
-    unknownFilter = filterService.createTaskFilterQuery()
-      .filterId(filter.getId())
-      .filterName("invalid")
-      .singleResult();
+    unknownFilter = filterService.createTaskFilterQuery().filterId(filter.getId())
+        .filterName("invalid").singleResult();
 
     assertNull(unknownFilter);
   }
@@ -158,8 +142,7 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
     try {
       filterService.deleteFilter(filter.getId());
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
   }
@@ -171,7 +154,8 @@ public class FilterServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(filter1.getResourceType(), filter2.getResourceType());
     assertEquals(filter1.getName(), filter2.getName());
     assertEquals(filter1.getOwner(), filter2.getOwner());
-    assertEquals(((FilterEntity) filter1).getQueryInternal(), ((FilterEntity) filter2).getQueryInternal());
+    assertEquals(((FilterEntity) filter1).getQueryInternal(),
+        ((FilterEntity) filter2).getQueryInternal());
     assertEquals(filter1.getProperties(), filter2.getProperties());
   }
 

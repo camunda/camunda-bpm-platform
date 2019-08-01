@@ -56,16 +56,19 @@ public class CompensationEventActivityBehavior extends FlowNodeActivityBehavior 
   protected List<EventSubscriptionEntity> collectEventSubscriptions(ActivityExecution execution) {
     final String activityRef = compensateEventDefinition.getActivityRef();
     if (activityRef != null) {
-      return CompensationUtil.collectCompensateEventSubscriptionsForActivity(execution, activityRef);
+      return CompensationUtil.collectCompensateEventSubscriptionsForActivity(execution,
+          activityRef);
     } else {
       return CompensationUtil.collectCompensateEventSubscriptionsForScope(execution);
     }
   }
 
   @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
     // join compensating executions -
-    // only wait for non-event-scope executions cause a compensation event subprocess consume the compensation event and
+    // only wait for non-event-scope executions cause a compensation event subprocess consume the
+    // compensation event and
     // do not have to compensate embedded subprocesses (which are still non-event-scope executions)
 
     if (((PvmExecutionImpl) execution).getNonEventScopeExecutions().isEmpty()) {

@@ -27,9 +27,9 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class AsyncCallActivityTest extends PluggableProcessEngineTestCase {
 
-
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/AsyncCallActivityTest.asyncStartEvent.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/async/AsyncCallActivityTest.testCallSubProcess.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/async/AsyncCallActivityTest.asyncStartEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/async/AsyncCallActivityTest.testCallSubProcess.bpmn20.xml" })
   public void testCallProcessWithAsyncOnStartEvent() {
 
     runtimeService.startProcessInstanceByKey("callAsyncSubProcess");

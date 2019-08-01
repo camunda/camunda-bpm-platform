@@ -30,23 +30,26 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.commons.utils.EnsureUtil;
 
 /**
- * <p>Describes and creates jobs for handling an event asynchronously.
- * These jobs are created in the context of an {@link EventSubscriptionEntity} and are of type {@link MessageEntity}.</p>
+ * <p>
+ * Describes and creates jobs for handling an event asynchronously. These jobs are created in the
+ * context of an {@link EventSubscriptionEntity} and are of type {@link MessageEntity}.
+ * </p>
  *
  * @author Thorben Lindhauer
  */
-public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscriptionEntity, MessageEntity> {
+public class EventSubscriptionJobDeclaration
+    extends JobDeclaration<EventSubscriptionEntity, MessageEntity> {
 
   private static final long serialVersionUID = 1L;
 
   protected EventSubscriptionDeclaration eventSubscriptionDeclaration;
 
-  public EventSubscriptionJobDeclaration(EventSubscriptionDeclaration eventSubscriptionDeclaration) {
+  public EventSubscriptionJobDeclaration(
+      EventSubscriptionDeclaration eventSubscriptionDeclaration) {
     super(ProcessEventJobHandler.TYPE);
     EnsureUtil.ensureNotNull("eventSubscriptionDeclaration", eventSubscriptionDeclaration);
     this.eventSubscriptionDeclaration = eventSubscriptionDeclaration;
   }
-
 
   protected MessageEntity newJobInstance(EventSubscriptionEntity eventSubscription) {
 
@@ -66,7 +69,7 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
 
     // TODO: support payload
     // if(payload != null) {
-    //   message.setEventPayload(payload);
+    // message.setEventPayload(payload);
     // }
 
     return message;
@@ -88,12 +91,14 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
     return context.getExecution();
   }
 
-  protected JobHandlerConfiguration resolveJobHandlerConfiguration(EventSubscriptionEntity context) {
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(
+      EventSubscriptionEntity context) {
     return new EventSubscriptionJobConfiguration(context.getId());
   }
 
   @SuppressWarnings("unchecked")
-  public static List<EventSubscriptionJobDeclaration> getDeclarationsForActivity(PvmActivity activity) {
+  public static List<EventSubscriptionJobDeclaration> getDeclarationsForActivity(
+      PvmActivity activity) {
     Object result = activity.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION);
     if (result != null) {
       return (List<EventSubscriptionJobDeclaration>) result;
@@ -105,8 +110,10 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
   /**
    * Assumes that an activity has at most one declaration of a certain eventType.
    */
-  public static EventSubscriptionJobDeclaration findDeclarationForSubscription(EventSubscriptionEntity eventSubscription) {
-    List<EventSubscriptionJobDeclaration> declarations = getDeclarationsForActivity(eventSubscription.getActivity());
+  public static EventSubscriptionJobDeclaration findDeclarationForSubscription(
+      EventSubscriptionEntity eventSubscription) {
+    List<EventSubscriptionJobDeclaration> declarations = getDeclarationsForActivity(
+        eventSubscription.getActivity());
 
     for (EventSubscriptionJobDeclaration declaration : declarations) {
       if (declaration.getEventType().equals(eventSubscription.getEventType())) {
@@ -116,6 +123,5 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
 
     return null;
   }
-
 
 }

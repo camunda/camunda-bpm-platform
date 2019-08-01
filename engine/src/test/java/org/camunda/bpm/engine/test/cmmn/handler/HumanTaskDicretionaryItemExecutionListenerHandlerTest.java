@@ -47,7 +47,8 @@ public class HumanTaskDicretionaryItemExecutionListenerHandlerTest extends CmmnE
 
   protected AbstractExecutionListenerSpec testSpecification;
 
-  public HumanTaskDicretionaryItemExecutionListenerHandlerTest(AbstractExecutionListenerSpec testSpecification) {
+  public HumanTaskDicretionaryItemExecutionListenerHandlerTest(
+      AbstractExecutionListenerSpec testSpecification) {
     this.testSpecification = testSpecification;
   }
 

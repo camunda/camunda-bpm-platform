@@ -30,11 +30,10 @@ public class AbstractSetJobRetriesCmd {
   protected static final String RETRIES = "retries";
 
   protected void setJobRetriesByJobId(String jobId, int retries, CommandContext commandContext) {
-    JobEntity job = commandContext
-        .getJobManager()
-        .findJobById(jobId);
+    JobEntity job = commandContext.getJobManager().findJobById(jobId);
     if (job != null) {
-      for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+          .getCommandCheckers()) {
         checker.checkUpdateRetriesJob(job);
       }
 

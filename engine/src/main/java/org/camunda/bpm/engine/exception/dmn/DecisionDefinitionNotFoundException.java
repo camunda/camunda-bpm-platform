@@ -16,9 +16,10 @@
  */
 package org.camunda.bpm.engine.exception.dmn;
 
-
 /**
- * <p>This exception is thrown when a specific decision definition is not found.</p>
+ * <p>
+ * This exception is thrown when a specific decision definition is not found.
+ * </p>
  */
 public class DecisionDefinitionNotFoundException extends DecisionException {
 

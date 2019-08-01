@@ -26,27 +26,29 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import java.io.Serializable;
 
-
 /**
  * @author Askar Akhmerov
  */
-public class SetJobRetriesCmd extends AbstractSetJobRetriesCmd implements Command<Void>, Serializable {
+public class SetJobRetriesCmd extends AbstractSetJobRetriesCmd
+    implements Command<Void>, Serializable {
 
   protected static final long serialVersionUID = 1L;
-
 
   protected final String jobId;
   protected final String jobDefinitionId;
   protected final int retries;
 
-
   public SetJobRetriesCmd(String jobId, String jobDefinitionId, int retries) {
-    if ((jobId == null || jobId.isEmpty()) && (jobDefinitionId == null || jobDefinitionId.isEmpty())) {
-      throw new ProcessEngineException("Either job definition id or job id has to be provided as parameter.");
+    if ((jobId == null || jobId.isEmpty())
+        && (jobDefinitionId == null || jobDefinitionId.isEmpty())) {
+      throw new ProcessEngineException(
+          "Either job definition id or job id has to be provided as parameter.");
     }
 
     if (retries < 0) {
-      throw new ProcessEngineException("The number of job retries must be a non-negative Integer, but '" + retries + "' has been provided.");
+      throw new ProcessEngineException(
+          "The number of job retries must be a non-negative Integer, but '" + retries
+              + "' has been provided.");
     }
 
     this.jobId = jobId;
@@ -70,19 +72,18 @@ public class SetJobRetriesCmd extends AbstractSetJobRetriesCmd implements Comman
 
     if (jobDefinition != null) {
       String processDefinitionId = jobDefinition.getProcessDefinitionId();
-      for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+          .getCommandCheckers()) {
         checker.checkUpdateRetriesProcessInstanceByProcessDefinitionId(processDefinitionId);
       }
     }
 
-    commandContext
-        .getJobManager()
-        .updateFailedJobRetriesByJobDefinitionId(jobDefinitionId, retries);
+    commandContext.getJobManager().updateFailedJobRetriesByJobDefinitionId(jobDefinitionId,
+        retries);
 
     PropertyChange propertyChange = new PropertyChange(RETRIES, null, retries);
-    commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), null, jobDefinitionId, null,
-        null, null, propertyChange);
+    commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), null,
+        jobDefinitionId, null, null, null, propertyChange);
   }
-
 
 }

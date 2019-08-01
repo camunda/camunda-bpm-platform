@@ -76,11 +76,13 @@ public class AuthorizationQueryAuthorizationsTest {
     processEngineConfiguration.setAuthorizationEnabled(true);
 
     // assume
-    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId").resourceType(Resources.PROCESS_DEFINITION).singleResult();
+    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId")
+        .resourceType(Resources.PROCESS_DEFINITION).singleResult();
     assertNotNull(authResult);
 
     // then
-    assertEquals(1, authorizationService.createAuthorizationQuery().hasPermission(Permissions.READ).count());
+    assertEquals(1,
+        authorizationService.createAuthorizationQuery().hasPermission(Permissions.READ).count());
   }
 
   @Test
@@ -96,11 +98,13 @@ public class AuthorizationQueryAuthorizationsTest {
     processEngineConfiguration.setAuthorizationEnabled(true);
 
     // assume
-    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId").resourceType(Resources.BATCH).singleResult();
+    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId")
+        .resourceType(Resources.BATCH).singleResult();
     assertNotNull(authResult);
 
     // then
-    assertEquals(0, authorizationService.createAuthorizationQuery().hasPermission(Permissions.CREATE_INSTANCE).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery()
+        .hasPermission(Permissions.CREATE_INSTANCE).count());
   }
 
   @Test
@@ -116,27 +120,28 @@ public class AuthorizationQueryAuthorizationsTest {
     processEngineConfiguration.setAuthorizationEnabled(true);
 
     // assume
-    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId").resourceType(Resources.APPLICATION).singleResult();
+    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId")
+        .resourceType(Resources.APPLICATION).singleResult();
     assertNotNull(authResult);
 
     // when
     Authorization accessResult = authorizationService.createAuthorizationQuery()
-        .hasPermission(Permissions.ACCESS)
-        .singleResult();
+        .hasPermission(Permissions.ACCESS).singleResult();
     List<Authorization> retryJobPDResult = authorizationService.createAuthorizationQuery()
-        .hasPermission(ProcessDefinitionPermissions.RETRY_JOB)
-        .list();
+        .hasPermission(ProcessDefinitionPermissions.RETRY_JOB).list();
     List<Authorization> retryJobPIResult = authorizationService.createAuthorizationQuery()
-        .hasPermission(ProcessInstancePermissions.RETRY_JOB)
-        .list();
+        .hasPermission(ProcessInstancePermissions.RETRY_JOB).list();
 
     // then
     assertNotNull(accessResult);
-    assertEquals(1, authorizationService.createAuthorizationQuery().hasPermission(Permissions.ACCESS).count());
+    assertEquals(1,
+        authorizationService.createAuthorizationQuery().hasPermission(Permissions.ACCESS).count());
     assertTrue(retryJobPDResult.isEmpty());
-    assertEquals(0, authorizationService.createAuthorizationQuery().hasPermission(ProcessDefinitionPermissions.RETRY_JOB).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery()
+        .hasPermission(ProcessDefinitionPermissions.RETRY_JOB).count());
     assertTrue(retryJobPIResult.isEmpty());
-    assertEquals(0, authorizationService.createAuthorizationQuery().hasPermission(ProcessInstancePermissions.RETRY_JOB).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery()
+        .hasPermission(ProcessInstancePermissions.RETRY_JOB).count());
   }
 
   @Test
@@ -152,14 +157,13 @@ public class AuthorizationQueryAuthorizationsTest {
     processEngineConfiguration.setAuthorizationEnabled(true);
 
     // assume
-    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId").resourceType(Resources.APPLICATION).singleResult();
+    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId")
+        .resourceType(Resources.APPLICATION).singleResult();
     assertNotNull(authResult);
 
     // then
-    assertEquals(0, authorizationService.createAuthorizationQuery()
-        .resourceType(Resources.BATCH)
-        .hasPermission(Permissions.ACCESS)
-        .count());
+    assertEquals(0, authorizationService.createAuthorizationQuery().resourceType(Resources.BATCH)
+        .hasPermission(Permissions.ACCESS).count());
   }
 
   @Test
@@ -176,24 +180,21 @@ public class AuthorizationQueryAuthorizationsTest {
     processEngineConfiguration.setAuthorizationEnabled(true);
 
     // assume
-    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId").resourceType(Resources.PROCESS_DEFINITION).singleResult();
+    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId")
+        .resourceType(Resources.PROCESS_DEFINITION).singleResult();
     assertNotNull(authResult);
-    assertEquals(1, authorizationService.createAuthorizationQuery()
-        .resourceType(Resources.PROCESS_DEFINITION)
-        .hasPermission(ProcessDefinitionPermissions.READ)
-        .hasPermission(ProcessDefinitionPermissions.RETRY_JOB)
-        .count());
-    assertEquals(1, authorizationService.createAuthorizationQuery()
-        .resourceType(Resources.PROCESS_DEFINITION)
-        .hasPermission(ProcessDefinitionPermissions.READ)
-        .count());
+    assertEquals(1,
+        authorizationService.createAuthorizationQuery().resourceType(Resources.PROCESS_DEFINITION)
+            .hasPermission(ProcessDefinitionPermissions.READ)
+            .hasPermission(ProcessDefinitionPermissions.RETRY_JOB).count());
+    assertEquals(1,
+        authorizationService.createAuthorizationQuery().resourceType(Resources.PROCESS_DEFINITION)
+            .hasPermission(ProcessDefinitionPermissions.READ).count());
 
     // then
-    assertEquals(0, authorizationService.createAuthorizationQuery()
-        .resourceType(Resources.PROCESS_DEFINITION)
-        .hasPermission(Permissions.READ)
-        .hasPermission(Permissions.ACCESS)
-        .count());
+    assertEquals(0,
+        authorizationService.createAuthorizationQuery().resourceType(Resources.PROCESS_DEFINITION)
+            .hasPermission(Permissions.READ).hasPermission(Permissions.ACCESS).count());
   }
 
   @Test
@@ -210,14 +211,13 @@ public class AuthorizationQueryAuthorizationsTest {
     processEngineConfiguration.setAuthorizationEnabled(true);
 
     // assume
-    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId").resourceType(Resources.PROCESS_DEFINITION).singleResult();
+    Authorization authResult = authorizationService.createAuthorizationQuery().userIdIn("userId")
+        .resourceType(Resources.PROCESS_DEFINITION).singleResult();
     assertNotNull(authResult);
 
     // then
-    assertEquals(0, authorizationService.createAuthorizationQuery()
-        .hasPermission(Permissions.READ)
-        .hasPermission(Permissions.ACCESS)
-        .count());
+    assertEquals(0, authorizationService.createAuthorizationQuery().hasPermission(Permissions.READ)
+        .hasPermission(Permissions.ACCESS).count());
   }
 
   protected void cleanupAfterTest() {

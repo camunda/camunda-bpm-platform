@@ -41,33 +41,20 @@ public class MultiTenancySignalReceiveTest {
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  protected static final BpmnModelInstance SIGNAL_START_PROCESS = Bpmn.createExecutableProcess("signalStart")
-      .startEvent()
-        .signal("signal")
-      .userTask()
-      .endEvent()
+  protected static final BpmnModelInstance SIGNAL_START_PROCESS = Bpmn
+      .createExecutableProcess("signalStart").startEvent().signal("signal").userTask().endEvent()
       .done();
 
-  protected static final BpmnModelInstance SIGNAL_CATCH_PROCESS = Bpmn.createExecutableProcess("signalCatch")
-      .startEvent()
-      .intermediateCatchEvent()
-        .signal("signal")
-      .userTask()
-      .endEvent()
-      .done();
+  protected static final BpmnModelInstance SIGNAL_CATCH_PROCESS = Bpmn
+      .createExecutableProcess("signalCatch").startEvent().intermediateCatchEvent().signal("signal")
+      .userTask().endEvent().done();
 
-  protected static final BpmnModelInstance SIGNAL_INTERMEDIATE_THROW_PROCESS = Bpmn.createExecutableProcess("signalThrow")
-      .startEvent()
-      .intermediateThrowEvent()
-        .signal("signal")
-      .endEvent()
-      .done();
+  protected static final BpmnModelInstance SIGNAL_INTERMEDIATE_THROW_PROCESS = Bpmn
+      .createExecutableProcess("signalThrow").startEvent().intermediateThrowEvent().signal("signal")
+      .endEvent().done();
 
-  protected static final BpmnModelInstance SIGNAL_END_THROW_PROCESS = Bpmn.createExecutableProcess("signalThrow")
-      .startEvent()
-      .endEvent()
-        .signal("signal")
-      .done();
+  protected static final BpmnModelInstance SIGNAL_END_THROW_PROCESS = Bpmn
+      .createExecutableProcess("signalThrow").startEvent().endEvent().signal("signal").done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
@@ -77,7 +64,7 @@ public class MultiTenancySignalReceiveTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void sendSignalToStartEventForNonTenant() {
@@ -129,8 +116,10 @@ public class MultiTenancySignalReceiveTest {
     testRule.deploy(SIGNAL_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_ONE, SIGNAL_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionWithoutTenantId().execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
 
     engineRule.getRuntimeService().createSignalEvent("signal").withoutTenantId().send();
 
@@ -144,8 +133,10 @@ public class MultiTenancySignalReceiveTest {
     testRule.deployForTenant(TENANT_ONE, SIGNAL_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_TWO, SIGNAL_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     engineRule.getRuntimeService().createSignalEvent("signal").tenantId(TENANT_ONE).send();
     engineRule.getRuntimeService().createSignalEvent("signal").tenantId(TENANT_TWO).send();
@@ -184,8 +175,10 @@ public class MultiTenancySignalReceiveTest {
     testRule.deploy(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionWithoutTenantId().execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
 
     engineRule.getRuntimeService().createSignalEvent("signal").withoutTenantId().send();
 
@@ -200,8 +193,10 @@ public class MultiTenancySignalReceiveTest {
     testRule.deployForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_TWO, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     engineRule.getRuntimeService().createSignalEvent("signal").tenantId(TENANT_ONE).send();
     engineRule.getRuntimeService().createSignalEvent("signal").tenantId(TENANT_TWO).send();
@@ -228,8 +223,10 @@ public class MultiTenancySignalReceiveTest {
     testRule.deployForTenant(TENANT_ONE, SIGNAL_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_TWO, SIGNAL_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     engineRule.getRuntimeService().createSignalEvent("signal").send();
 
@@ -258,18 +255,23 @@ public class MultiTenancySignalReceiveTest {
     thrown.expect(BadUserRequestException.class);
     thrown.expectMessage("Cannot specify a tenant-id when deliver a signal to a single execution.");
 
-    engineRule.getRuntimeService().createSignalEvent("signal").executionId("id").tenantId(TENANT_ONE).send();
+    engineRule.getRuntimeService().createSignalEvent("signal").executionId("id")
+        .tenantId(TENANT_ONE).send();
   }
 
   @Test
   public void throwIntermediateSignalForTenant() {
-    testRule.deployForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS, SIGNAL_INTERMEDIATE_THROW_PROCESS);
+    testRule.deployForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS,
+        SIGNAL_INTERMEDIATE_THROW_PROCESS);
     testRule.deployForTenant(TENANT_TWO, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
     testRule.deploy(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionWithoutTenantId().execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     engineRule.getRuntimeService().startProcessInstanceByKey("signalThrow");
 
@@ -284,8 +286,10 @@ public class MultiTenancySignalReceiveTest {
     testRule.deploy(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS, SIGNAL_INTERMEDIATE_THROW_PROCESS);
     testRule.deployForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionWithoutTenantId().execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
 
     engineRule.getRuntimeService().startProcessInstanceByKey("signalThrow");
 
@@ -296,13 +300,17 @@ public class MultiTenancySignalReceiveTest {
 
   @Test
   public void throwEndSignalForTenant() {
-    testRule.deployForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS, SIGNAL_END_THROW_PROCESS);
+    testRule.deployForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS,
+        SIGNAL_END_THROW_PROCESS);
     testRule.deployForTenant(TENANT_TWO, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
     testRule.deploy(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionWithoutTenantId().execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     engineRule.getRuntimeService().startProcessInstanceByKey("signalThrow");
 
@@ -317,8 +325,10 @@ public class MultiTenancySignalReceiveTest {
     testRule.deploy(SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS, SIGNAL_END_THROW_PROCESS);
     testRule.deployForTenant(TENANT_ONE, SIGNAL_START_PROCESS, SIGNAL_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionWithoutTenantId().execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionWithoutTenantId().execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("signalCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
 
     engineRule.getRuntimeService().startProcessInstanceByKey("signalThrow");
 

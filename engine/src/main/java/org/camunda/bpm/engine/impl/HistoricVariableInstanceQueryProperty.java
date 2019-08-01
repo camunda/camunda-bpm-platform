@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
 
-
 /**
  * Contains the possible properties which can be used in a {@link HistoricVariableInstanceQuery}.
  *

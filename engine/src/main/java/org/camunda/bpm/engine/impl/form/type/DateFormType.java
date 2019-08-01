@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -55,54 +54,54 @@ public class DateFormType extends AbstractFormFieldType {
 
   public TypedValue convertToModelValue(TypedValue propertyValue) {
     Object value = propertyValue.getValue();
-    if(value == null) {
+    if (value == null) {
       return Variables.dateValue(null, propertyValue.isTransient());
-    }
-    else if(value instanceof Date) {
+    } else if (value instanceof Date) {
       return Variables.dateValue((Date) value, propertyValue.isTransient());
-    }
-    else if(value instanceof String) {
+    } else if (value instanceof String) {
       String strValue = ((String) value).trim();
       if (strValue.isEmpty()) {
         return Variables.dateValue(null, propertyValue.isTransient());
       }
       try {
-        return Variables.dateValue((Date) dateFormat.parseObject(strValue), propertyValue.isTransient());
+        return Variables.dateValue((Date) dateFormat.parseObject(strValue),
+            propertyValue.isTransient());
       } catch (ParseException e) {
-        throw new ProcessEngineException("Could not parse value '"+value+"' as date using date format '"+datePattern+"'.");
+        throw new ProcessEngineException("Could not parse value '" + value
+            + "' as date using date format '" + datePattern + "'.");
       }
-    }
-    else {
-      throw new ProcessEngineException("Value '"+value+"' cannot be transformed into a Date.");
+    } else {
+      throw new ProcessEngineException("Value '" + value + "' cannot be transformed into a Date.");
     }
   }
 
   public TypedValue convertToFormValue(TypedValue modelValue) {
-    if(modelValue.getValue() == null) {
+    if (modelValue.getValue() == null) {
       return Variables.stringValue(null, modelValue.isTransient());
-    } else if(modelValue.getType() == ValueType.DATE) {
-      return Variables.stringValue(dateFormat.format(modelValue.getValue()), modelValue.isTransient());
-    }
-    else {
-      throw new ProcessEngineException("Expected value to be of type '"+ValueType.DATE+"' but got '"+modelValue.getType()+"'.");
+    } else if (modelValue.getType() == ValueType.DATE) {
+      return Variables.stringValue(dateFormat.format(modelValue.getValue()),
+          modelValue.isTransient());
+    } else {
+      throw new ProcessEngineException("Expected value to be of type '" + ValueType.DATE
+          + "' but got '" + modelValue.getType() + "'.");
     }
   }
 
   // deprecated //////////////////////////////////////////////////////////
 
   public Object convertFormValueToModelValue(Object propertyValue) {
-    if (propertyValue==null || "".equals(propertyValue)) {
+    if (propertyValue == null || "".equals(propertyValue)) {
       return null;
     }
     try {
       return dateFormat.parseObject(propertyValue.toString());
     } catch (ParseException e) {
-      throw new ProcessEngineException("invalid date value "+propertyValue);
+      throw new ProcessEngineException("invalid date value " + propertyValue);
     }
   }
 
   public String convertModelValueToFormValue(Object modelValue) {
-    if (modelValue==null) {
+    if (modelValue == null) {
       return null;
     }
     return dateFormat.format(modelValue);

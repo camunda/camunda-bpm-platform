@@ -35,10 +35,14 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
- * <p>Tests the deployment from two threads simultaneously.</p>
+ * <p>
+ * Tests the deployment from two threads simultaneously.
+ * </p>
  *
- * <p><b>Note:</b> the tests are not execute on H2 because it doesn't support the
- * exclusive lock on the deployment table.</p>
+ * <p>
+ * <b>Note:</b> the tests are not execute on H2 because it doesn't support the exclusive lock on the
+ * deployment table.
+ * </p>
  *
  * @author Daniel Meyer
  */
@@ -60,7 +64,7 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
   protected void runTest() throws Throwable {
     String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
 
-    if("h2".equals(databaseType)) {
+    if ("h2".equals(databaseType)) {
       // skip test method - if database is H2
     } else {
       // invoke the test method
@@ -73,28 +77,23 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
    */
   public void testDuplicateFiltering() throws InterruptedException {
 
-    deployOnTwoConcurrentThreads(
-        createDeploymentBuilder().enableDuplicateFiltering(false),
+    deployOnTwoConcurrentThreads(createDeploymentBuilder().enableDuplicateFiltering(false),
         createDeploymentBuilder().enableDuplicateFiltering(false));
 
-    // ensure that although both transactions were run concurrently, only one deployment was constructed.
+    // ensure that although both transactions were run concurrently, only one deployment was
+    // constructed.
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
     assertThat(deploymentQuery.count(), is(1L));
   }
 
   public void testVersioning() throws InterruptedException {
 
-    deployOnTwoConcurrentThreads(
-        createDeploymentBuilder(),
-        createDeploymentBuilder()
-        );
+    deployOnTwoConcurrentThreads(createDeploymentBuilder(), createDeploymentBuilder());
 
-    // ensure that although both transactions were run concurrently, the process definitions have different versions
-    List<ProcessDefinition> processDefinitions = repositoryService
-        .createProcessDefinitionQuery()
-        .orderByProcessDefinitionVersion()
-        .asc()
-        .list();
+    // ensure that although both transactions were run concurrently, the process definitions have
+    // different versions
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionVersion().asc().list();
 
     assertThat(processDefinitions.size(), is(2));
     assertThat(processDefinitions.get(0).getVersion(), is(1));
@@ -102,21 +101,24 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
   }
 
   protected DeploymentBuilder createDeploymentBuilder() {
-    return new DeploymentBuilderImpl(null)
-        .name("some-deployment-name")
-        .addString("foo.bpmn", processResource);
+    return new DeploymentBuilderImpl(null).name("some-deployment-name").addString("foo.bpmn",
+        processResource);
   }
 
-  protected void deployOnTwoConcurrentThreads(DeploymentBuilder deploymentOne, DeploymentBuilder deploymentTwo) throws InterruptedException {
-    assertThat("you can not use the same deployment builder for both deployments", deploymentOne, is(not(deploymentTwo)));
+  protected void deployOnTwoConcurrentThreads(DeploymentBuilder deploymentOne,
+      DeploymentBuilder deploymentTwo) throws InterruptedException {
+    assertThat("you can not use the same deployment builder for both deployments", deploymentOne,
+        is(not(deploymentTwo)));
 
     // STEP 1: bring two threads to a point where they have
     // 1) started a new transaction
     // 2) are ready to deploy
-    ThreadControl thread1 = executeControllableCommand(new ControllableDeployCommand(deploymentOne));
+    ThreadControl thread1 = executeControllableCommand(
+        new ControllableDeployCommand(deploymentOne));
     thread1.waitForSync();
 
-    ThreadControl thread2 = executeControllableCommand(new ControllableDeployCommand(deploymentTwo));
+    ThreadControl thread2 = executeControllableCommand(
+        new ControllableDeployCommand(deploymentTwo));
     thread2.waitForSync();
 
     // STEP 2: make Thread 1 proceed and wait until it has deployed but not yet committed
@@ -143,7 +145,7 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
   @Override
   protected void tearDown() throws Exception {
 
-    for(Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
   }
@@ -157,11 +159,11 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
     }
 
     public Void execute(CommandContext commandContext) {
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync(); // thread will block here until makeContinue() is called form main thread
 
       new DeployCmd((DeploymentBuilderImpl) deploymentBuilder).execute(commandContext);
 
-      monitor.sync();  // thread will block here until waitUntilDone() is called form main thread
+      monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
 
       return null;
     }

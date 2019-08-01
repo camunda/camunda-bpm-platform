@@ -27,8 +27,8 @@ import org.junit.Before;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-public class HistoricProcessInstanceQueryVariableIgnoreCaseTest
-    extends AbstractVariableIgnoreCaseTest<HistoricProcessInstanceQueryImpl, HistoricProcessInstance> {
+public class HistoricProcessInstanceQueryVariableIgnoreCaseTest extends
+    AbstractVariableIgnoreCaseTest<HistoricProcessInstanceQueryImpl, HistoricProcessInstance> {
 
   @Before
   public void init() {
@@ -38,11 +38,13 @@ public class HistoricProcessInstanceQueryVariableIgnoreCaseTest
 
   @Override
   protected HistoricProcessInstanceQueryImpl createQuery() {
-    return (HistoricProcessInstanceQueryImpl) engineRule.getHistoryService().createHistoricProcessInstanceQuery();
+    return (HistoricProcessInstanceQueryImpl) engineRule.getHistoryService()
+        .createHistoricProcessInstanceQuery();
   }
 
   @Override
-  protected void assertThatTwoInstancesAreEqual(HistoricProcessInstance one, HistoricProcessInstance two) {
+  protected void assertThatTwoInstancesAreEqual(HistoricProcessInstance one,
+      HistoricProcessInstance two) {
     assertThat(one.getId()).isEqualTo(two.getId());
   }
 }

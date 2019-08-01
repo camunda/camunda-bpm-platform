@@ -19,7 +19,8 @@ package org.camunda.bpm.engine.history;
 import java.util.Date;
 
 /**
- * Represents one execution of an activity and it's stored permanent for statistics, audit and other business intelligence purposes.
+ * Represents one execution of an activity and it's stored permanent for statistics, audit and other
+ * business intelligence purposes.
  *
  * @author Christian Stettler
  */
@@ -38,8 +39,8 @@ public interface HistoricActivityInstance {
   String getActivityName();
 
   /**
-   * The activity type of the activity.
-   * Typically the activity type correspond to the XML tag used in the BPMN 2.0 process definition file.
+   * The activity type of the activity. Typically the activity type correspond to the XML tag used
+   * in the BPMN 2.0 process definition file.
    *
    * All activity types are available in {@link org.camunda.bpm.engine.ActivityTypes}
    *
@@ -80,7 +81,7 @@ public interface HistoricActivityInstance {
   /** Time when the activity instance ended */
   Date getEndTime();
 
-  /** Difference between {@link #getEndTime()} and {@link #getStartTime()}.  */
+  /** Difference between {@link #getEndTime()} and {@link #getStartTime()}. */
   Long getDurationInMillis();
 
   /** Did this activity instance complete a BPMN 2.0 scope */
@@ -90,8 +91,8 @@ public interface HistoricActivityInstance {
   boolean isCanceled();
 
   /**
-   * The id of the tenant this historic activity instance belongs to. Can be <code>null</code>
-   * if the historic activity instance belongs to no single tenant.
+   * The id of the tenant this historic activity instance belongs to. Can be <code>null</code> if
+   * the historic activity instance belongs to no single tenant.
    */
   String getTenantId();
 

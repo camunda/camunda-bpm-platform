@@ -32,7 +32,8 @@ public class ErrorDeclarationForProcessInstanceFinder implements TreeVisitor<Pvm
   protected ErrorEventDefinition errorEventDefinition;
   protected PvmActivity currentActivity;
 
-  public ErrorDeclarationForProcessInstanceFinder(Exception exception, String errorCode, PvmActivity currentActivity) {
+  public ErrorDeclarationForProcessInstanceFinder(Exception exception, String errorCode,
+      PvmActivity currentActivity) {
     this.exception = exception;
     this.errorCode = errorCode;
     this.currentActivity = currentActivity;
@@ -40,11 +41,14 @@ public class ErrorDeclarationForProcessInstanceFinder implements TreeVisitor<Pvm
 
   @Override
   public void visit(PvmScope scope) {
-    List<ErrorEventDefinition> errorEventDefinitions = scope.getProperties().get(BpmnProperties.ERROR_EVENT_DEFINITIONS);
+    List<ErrorEventDefinition> errorEventDefinitions = scope.getProperties()
+        .get(BpmnProperties.ERROR_EVENT_DEFINITIONS);
     for (ErrorEventDefinition errorEventDefinition : errorEventDefinitions) {
-      PvmActivity activityHandler = scope.getProcessDefinition().findActivity(errorEventDefinition.getHandlerActivityId());
-      if ((!isReThrowingErrorEventSubprocess(activityHandler)) && ((exception != null && errorEventDefinition.catchesException(exception))
-        || (exception == null && errorEventDefinition.catchesError(errorCode)))) {
+      PvmActivity activityHandler = scope.getProcessDefinition()
+          .findActivity(errorEventDefinition.getHandlerActivityId());
+      if ((!isReThrowingErrorEventSubprocess(activityHandler))
+          && ((exception != null && errorEventDefinition.catchesException(exception))
+              || (exception == null && errorEventDefinition.catchesError(errorCode)))) {
 
         errorHandlerActivity = activityHandler;
         this.errorEventDefinition = errorEventDefinition;
@@ -54,8 +58,8 @@ public class ErrorDeclarationForProcessInstanceFinder implements TreeVisitor<Pvm
   }
 
   protected boolean isReThrowingErrorEventSubprocess(PvmActivity activityHandler) {
-    ScopeImpl activityHandlerScope = (ScopeImpl)activityHandler;
-    return activityHandlerScope.isAncestorFlowScopeOf((ScopeImpl)currentActivity);
+    ScopeImpl activityHandlerScope = (ScopeImpl) activityHandler;
+    return activityHandlerScope.isAncestorFlowScopeOf((ScopeImpl) currentActivity);
   }
 
   public PvmActivity getErrorHandlerActivity() {

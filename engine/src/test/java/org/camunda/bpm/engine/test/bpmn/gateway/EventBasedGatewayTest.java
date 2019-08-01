@@ -27,15 +27,14 @@ import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  * @author Daniel Meyer
  */
 public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources={
-          "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testCatchAlertAndTimer.bpmn20.xml",
-          "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.throwAlertSignal.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testCatchAlertAndTimer.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.throwAlertSignal.bpmn20.xml" })
   public void testCatchSignalCancelsTimer() {
 
     runtimeService.startProcessInstanceByKey("catchSignal");
@@ -50,9 +49,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     assertEquals(0, managementService.createJobQuery().count());
 
-    Task task = taskService.createTaskQuery()
-      .taskName("afterSignal")
-      .singleResult();
+    Task task = taskService.createTaskQuery().taskName("afterSignal").singleResult();
 
     assertNotNull(task);
 
@@ -60,9 +57,8 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={
-          "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testCatchAlertAndTimer.bpmn20.xml"
-          })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testCatchAlertAndTimer.bpmn20.xml" })
   public void testCatchTimerCancelsSignal() {
 
     runtimeService.startProcessInstanceByKey("catchSignal");
@@ -71,7 +67,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     assertEquals(1, managementService.createJobQuery().count());
 
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() +10000));
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 10000));
     try {
       // wait for timer to fire
       waitForJobExecutorToProcessAllJobs(10000);
@@ -80,14 +76,12 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
       assertEquals(1, runtimeService.createProcessInstanceQuery().count());
       assertEquals(0, managementService.createJobQuery().count());
 
-      Task task = taskService.createTaskQuery()
-        .taskName("afterTimer")
-        .singleResult();
+      Task task = taskService.createTaskQuery().taskName("afterTimer").singleResult();
 
       assertNotNull(task);
 
       taskService.complete(task.getId());
-    }finally{
+    } finally {
       ClockUtil.setCurrentTime(new Date());
     }
   }
@@ -98,7 +92,8 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("catchSignal");
 
     assertEquals(2, runtimeService.createEventSubscriptionQuery().count());
-    EventSubscriptionQuery messageEventSubscriptionQuery = runtimeService.createEventSubscriptionQuery().eventType("message");
+    EventSubscriptionQuery messageEventSubscriptionQuery = runtimeService
+        .createEventSubscriptionQuery().eventType("message");
     assertEquals(1, messageEventSubscriptionQuery.count());
     assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal").count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
@@ -106,29 +101,27 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
 
     // we can query for an execution with has both a signal AND message subscription
     Execution execution = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName("newInvoice")
-      .signalEventSubscriptionName("alert")
-      .singleResult();
+        .messageEventSubscriptionName("newInvoice").signalEventSubscriptionName("alert")
+        .singleResult();
     assertNotNull(execution);
 
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() +10000));
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 10000));
     try {
 
       EventSubscription messageEventSubscription = messageEventSubscriptionQuery.singleResult();
-      runtimeService.messageEventReceived(messageEventSubscription.getEventName(), messageEventSubscription.getExecutionId());
+      runtimeService.messageEventReceived(messageEventSubscription.getEventName(),
+          messageEventSubscription.getExecutionId());
 
       assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
       assertEquals(1, runtimeService.createProcessInstanceQuery().count());
       assertEquals(0, managementService.createJobQuery().count());
 
-      Task task = taskService.createTaskQuery()
-        .taskName("afterMessage")
-        .singleResult();
+      Task task = taskService.createTaskQuery().taskName("afterMessage").singleResult();
 
       assertNotNull(task);
 
       taskService.complete(task.getId());
-    }finally{
+    } finally {
       ClockUtil.setCurrentTime(new Date());
     }
   }
@@ -136,12 +129,13 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
   public void testConnectedToActitiy() {
 
     try {
-      repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testConnectedToActivity.bpmn20.xml")
-        .deploy();
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testConnectedToActivity.bpmn20.xml")
+          .deploy();
       fail("exception expected");
     } catch (Exception e) {
-      if(!e.getMessage().contains("Event based gateway can only be connected to elements of type intermediateCatchEvent")) {
+      if (!e.getMessage().contains(
+          "Event based gateway can only be connected to elements of type intermediateCatchEvent")) {
         fail("different exception expected");
       }
     }
@@ -151,12 +145,12 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
   public void testInvalidSequenceFlow() {
 
     try {
-      repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testEventInvalidSequenceFlow.bpmn20.xml")
-        .deploy();
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/gateway/EventBasedGatewayTest.testEventInvalidSequenceFlow.bpmn20.xml")
+          .deploy();
       fail("exception expected");
     } catch (Exception e) {
-      if(!e.getMessage().contains("Invalid incoming sequenceflow for intermediateCatchEvent")) {
+      if (!e.getMessage().contains("Invalid incoming sequenceflow for intermediateCatchEvent")) {
         fail("different exception expected");
       }
     }

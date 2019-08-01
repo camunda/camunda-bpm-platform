@@ -63,8 +63,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
   public void testFetchWithoutAuthorization() {
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(0, tasks.size());
@@ -76,8 +75,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(0, tasks.size());
@@ -89,8 +87,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(0, tasks.size());
@@ -102,8 +99,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(1, tasks.size());
@@ -116,8 +112,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(0, tasks.size());
@@ -129,8 +124,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(0, tasks.size());
@@ -138,12 +132,12 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
   public void testFetchWithReadAndUpdateInstanceOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, READ_INSTANCE, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, READ_INSTANCE,
+        UPDATE_INSTANCE);
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(1, tasks.size());
@@ -157,8 +151,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(1, tasks.size());
@@ -172,8 +165,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(1, tasks.size());
@@ -186,8 +178,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(2, tasks.size());
@@ -199,8 +190,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(2, tasks.size());
@@ -213,8 +203,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
+        .topic("externalTaskTopic", LOCK_TIME).execute();
 
     // then
     assertEquals(1, tasks.size());

@@ -40,11 +40,16 @@ public class BpmnExceptionHandler {
 
   /**
    * Decides how to propagate the exception properly, e.g. as bpmn error or "normal" error.
-   * @param execution the current execution
-   * @param ex the exception to propagate
-   * @throws Exception if no error handler could be found
+   * 
+   * @param execution
+   *          the current execution
+   * @param ex
+   *          the exception to propagate
+   * @throws Exception
+   *           if no error handler could be found
    */
-  public static void propagateException(ActivityExecution execution, Exception ex) throws Exception {
+  public static void propagateException(ActivityExecution execution, Exception ex)
+      throws Exception {
     BpmnError bpmnError = checkIfCauseOfExceptionIsBpmnError(ex);
     if (bpmnError != null) {
       propagateBpmnError(bpmnError, execution);
@@ -53,13 +58,12 @@ public class BpmnExceptionHandler {
     }
   }
 
-
-  protected static void propagateExceptionAsError(Exception exception, ActivityExecution execution) throws Exception {
+  protected static void propagateExceptionAsError(Exception exception, ActivityExecution execution)
+      throws Exception {
     if (isProcessEngineExceptionWithoutCause(exception) || isTransactionNotActive()) {
       throw exception;
-    }
-    else {
-      propagateError(null, exception.getMessage(),exception, execution);
+    } else {
+      propagateError(null, exception.getMessage(), exception, execution);
     }
   }
 
@@ -72,13 +76,12 @@ public class BpmnExceptionHandler {
   }
 
   /**
-   * Searches recursively through the exception to see if the exception itself
-   * or one of its causes is a {@link BpmnError}.
+   * Searches recursively through the exception to see if the exception itself or one of its causes
+   * is a {@link BpmnError}.
    *
    * @param e
    *          the exception to check
-   * @return the BpmnError that was the cause of this exception or null if no
-   *         BpmnError was found
+   * @return the BpmnError that was the cause of this exception or null if no BpmnError was found
    */
   protected static BpmnError checkIfCauseOfExceptionIsBpmnError(Throwable e) {
     if (e instanceof BpmnError) {
@@ -89,17 +92,20 @@ public class BpmnExceptionHandler {
     return checkIfCauseOfExceptionIsBpmnError(e.getCause());
   }
 
-
-  public static void propagateBpmnError(BpmnError error, ActivityExecution execution) throws Exception {
+  public static void propagateBpmnError(BpmnError error, ActivityExecution execution)
+      throws Exception {
     propagateError(error.getErrorCode(), error.getMessage(), null, execution);
   }
 
-  public static void propagateError(String errorCode, String errorMessage, Exception origException, ActivityExecution execution) throws Exception {
+  public static void propagateError(String errorCode, String errorMessage, Exception origException,
+      ActivityExecution execution) throws Exception {
 
     ActivityExecutionHierarchyWalker walker = new ActivityExecutionHierarchyWalker(execution);
 
-    final ErrorDeclarationForProcessInstanceFinder errorDeclarationFinder = new ErrorDeclarationForProcessInstanceFinder(origException, errorCode, execution.getActivity());
-    ActivityExecutionMappingCollector activityExecutionMappingCollector = new ActivityExecutionMappingCollector(execution);
+    final ErrorDeclarationForProcessInstanceFinder errorDeclarationFinder = new ErrorDeclarationForProcessInstanceFinder(
+        origException, errorCode, execution.getActivity());
+    ActivityExecutionMappingCollector activityExecutionMappingCollector = new ActivityExecutionMappingCollector(
+        execution);
 
     walker.addScopePreVisitor(errorDeclarationFinder);
     walker.addExecutionPreVisitor(activityExecutionMappingCollector);
@@ -116,7 +122,7 @@ public class BpmnExceptionHandler {
         }
       });
 
-    } catch(Exception e) {
+    } catch (Exception e) {
       LOG.errorPropagationException(execution.getActivityInstanceId(), e);
 
       // separate the exception handling to support a fail-safe error propagation
@@ -129,7 +135,8 @@ public class BpmnExceptionHandler {
     if (errorHandlingActivity == null) {
       if (origException == null) {
 
-        if (Context.getCommandContext().getProcessEngineConfiguration().isEnableExceptionsAfterUnhandledBpmnError()) {
+        if (Context.getCommandContext().getProcessEngineConfiguration()
+            .isEnableExceptionsAfterUnhandledBpmnError()) {
           throw LOG.missingBoundaryCatchEventError(execution.getActivity().getId(), errorCode);
         } else {
           LOG.missingBoundaryCatchEvent(execution.getActivity().getId(), errorCode);
@@ -139,21 +146,20 @@ public class BpmnExceptionHandler {
         // throw original exception
         throw origException;
       }
-    }
-    else {
+    } else {
 
       ErrorEventDefinition errorDefinition = errorDeclarationFinder.getErrorEventDefinition();
-      PvmExecutionImpl errorHandlingExecution = activityExecutionMappingCollector.getExecutionForScope(errorHandlingActivity.getEventScope());
+      PvmExecutionImpl errorHandlingExecution = activityExecutionMappingCollector
+          .getExecutionForScope(errorHandlingActivity.getEventScope());
 
-      if(errorDefinition.getErrorCodeVariable() != null) {
+      if (errorDefinition.getErrorCodeVariable() != null) {
         errorHandlingExecution.setVariable(errorDefinition.getErrorCodeVariable(), errorCode);
       }
-      if(errorDefinition.getErrorMessageVariable() != null) {
+      if (errorDefinition.getErrorMessageVariable() != null) {
         errorHandlingExecution.setVariable(errorDefinition.getErrorMessageVariable(), errorMessage);
       }
       errorHandlingExecution.executeActivity(errorHandlingActivity);
     }
   }
-
 
 }

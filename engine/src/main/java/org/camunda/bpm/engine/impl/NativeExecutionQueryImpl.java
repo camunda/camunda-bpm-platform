@@ -24,8 +24,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
 
-
-public class NativeExecutionQueryImpl extends AbstractNativeQuery<NativeExecutionQuery, Execution> implements NativeExecutionQuery {
+public class NativeExecutionQueryImpl extends AbstractNativeQuery<NativeExecutionQuery, Execution>
+    implements NativeExecutionQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,19 +37,16 @@ public class NativeExecutionQueryImpl extends AbstractNativeQuery<NativeExecutio
     super(commandExecutor);
   }
 
+  // results ////////////////////////////////////////////////////////////////
 
- //results ////////////////////////////////////////////////////////////////
-  
-  public List<Execution> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return commandContext
-      .getExecutionManager()
-      .findExecutionsByNativeQuery(parameterMap, firstResult, maxResults);
+  public List<Execution> executeList(CommandContext commandContext,
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return commandContext.getExecutionManager().findExecutionsByNativeQuery(parameterMap,
+        firstResult, maxResults);
   }
-  
+
   public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext
-      .getExecutionManager()
-      .findExecutionCountByNativeQuery(parameterMap);
+    return commandContext.getExecutionManager().findExecutionCountByNativeQuery(parameterMap);
   }
 
 }

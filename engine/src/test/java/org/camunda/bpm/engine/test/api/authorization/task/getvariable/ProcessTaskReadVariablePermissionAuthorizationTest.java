@@ -37,36 +37,28 @@ import org.junit.runners.Parameterized.Parameters;
  *
  */
 @RunWith(Parameterized.class)
-public class ProcessTaskReadVariablePermissionAuthorizationTest extends ProcessTaskAuthorizationTest {
+public class ProcessTaskReadVariablePermissionAuthorizationTest
+    extends ProcessTaskAuthorizationTest {
 
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(TASK, "taskId", userId, READ_VARIABLE),
-          grant(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "taskId", userId, READ_VARIABLE)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "*", userId, READ_VARIABLE)),
-      scenario()
-        .withAuthorizations(
-          grant(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE)),
-      scenario()
-        .withAuthorizations(
-          grant(PROCESS_DEFINITION, "*", userId, READ_TASK_VARIABLE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(TASK, "taskId", userId, READ_VARIABLE),
+            grant(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE)),
+        scenario().withAuthorizations(grant(TASK, "taskId", userId, READ_VARIABLE)),
+        scenario().withAuthorizations(grant(TASK, "*", userId, READ_VARIABLE)),
+        scenario()
+            .withAuthorizations(grant(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK_VARIABLE)),
+        scenario().withAuthorizations(grant(PROCESS_DEFINITION, "*", userId, READ_TASK_VARIABLE))
+            .succeeds());
   }
 
   @Before
   public void setUp() {
     super.setUp();
-    ensureSpecificVariablePermission = processEngineConfiguration.isEnforceSpecificVariablePermission();
+    ensureSpecificVariablePermission = processEngineConfiguration
+        .isEnforceSpecificVariablePermission();
     // prerequisite of the whole test suite
     processEngineConfiguration.setEnforceSpecificVariablePermission(true);
   }
@@ -74,7 +66,8 @@ public class ProcessTaskReadVariablePermissionAuthorizationTest extends ProcessT
   @After
   public void tearDown() {
     super.tearDown();
-    processEngineConfiguration.setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
+    processEngineConfiguration
+        .setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
 }

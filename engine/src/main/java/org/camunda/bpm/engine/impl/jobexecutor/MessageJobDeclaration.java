@@ -24,12 +24,15 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
 /**
- * <p>Declaration of a Message Job (Asynchronous continuation job)</p>
+ * <p>
+ * Declaration of a Message Job (Asynchronous continuation job)
+ * </p>
  *
  * @author Daniel Meyer
  *
  */
-public class MessageJobDeclaration extends JobDeclaration<AtomicOperationInvocation, MessageEntity> {
+public class MessageJobDeclaration
+    extends JobDeclaration<AtomicOperationInvocation, MessageEntity> {
 
   public static final String ASYNC_BEFORE = "async-before";
   public static final String ASYNC_AFTER = "async-after";
@@ -65,15 +68,16 @@ public class MessageJobDeclaration extends JobDeclaration<AtomicOperationInvocat
   }
 
   @Override
-  protected JobHandlerConfiguration resolveJobHandlerConfiguration(AtomicOperationInvocation context) {
+  protected JobHandlerConfiguration resolveJobHandlerConfiguration(
+      AtomicOperationInvocation context) {
     AsyncContinuationConfiguration configuration = new AsyncContinuationConfiguration();
 
     configuration.setAtomicOperation(context.getOperation().getCanonicalName());
 
     ExecutionEntity execution = context.getExecution();
     PvmActivity activity = execution.getActivity();
-    if(activity != null && activity.isAsyncAfter()) {
-      if(execution.getTransition() != null) {
+    if (activity != null && activity.isAsyncAfter()) {
+      if (execution.getTransition() != null) {
         // store id of selected transition in case this is async after.
         // id is not serialized with the execution -> we need to remember it as
         // job handler configuration.
@@ -83,5 +87,5 @@ public class MessageJobDeclaration extends JobDeclaration<AtomicOperationInvocat
 
     return configuration;
   }
-  
+
 }

@@ -32,143 +32,82 @@ import org.camunda.bpm.model.bpmn.instance.UserTask;
 public class CompensationModels {
 
   public static final BpmnModelInstance ONE_COMPENSATION_TASK_MODEL = ProcessModels.newModel()
-    .startEvent()
-    .userTask("userTask1")
-      .boundaryEvent("compensationBoundary")
-      .compensateEventDefinition()
-      .compensateEventDefinitionDone()
-    .moveToActivity("userTask1")
-    .userTask("userTask2")
-    .intermediateThrowEvent("compensationEvent")
-      .compensateEventDefinition()
-      .waitForCompletion(true)
-      .compensateEventDefinitionDone()
-    .endEvent()
-    .done();
+      .startEvent().userTask("userTask1").boundaryEvent("compensationBoundary")
+      .compensateEventDefinition().compensateEventDefinitionDone().moveToActivity("userTask1")
+      .userTask("userTask2").intermediateThrowEvent("compensationEvent").compensateEventDefinition()
+      .waitForCompletion(true).compensateEventDefinitionDone().endEvent().done();
   static {
-    addUserTaskCompensationHandler(ONE_COMPENSATION_TASK_MODEL, "compensationBoundary", "compensationHandler");
+    addUserTaskCompensationHandler(ONE_COMPENSATION_TASK_MODEL, "compensationBoundary",
+        "compensationHandler");
   }
 
-public static final BpmnModelInstance COMPENSATION_ONE_TASK_SUBPROCESS_MODEL =  ProcessModels.newModel()
-      .startEvent()
-      .subProcess("subProcess")
-        .embeddedSubProcess()
-        .startEvent()
-        .userTask("userTask1")
-          .boundaryEvent("compensationBoundary")
-          .compensateEventDefinition()
-          .compensateEventDefinitionDone()
-        .moveToActivity("userTask1")
-        .endEvent()
-      .subProcessDone()
-      .userTask("userTask2")
-      .intermediateThrowEvent("compensationEvent")
-        .compensateEventDefinition()
-        .waitForCompletion(true)
-        .compensateEventDefinitionDone()
-      .endEvent()
-      .done();
+  public static final BpmnModelInstance COMPENSATION_ONE_TASK_SUBPROCESS_MODEL = ProcessModels
+      .newModel().startEvent().subProcess("subProcess").embeddedSubProcess().startEvent()
+      .userTask("userTask1").boundaryEvent("compensationBoundary").compensateEventDefinition()
+      .compensateEventDefinitionDone().moveToActivity("userTask1").endEvent().subProcessDone()
+      .userTask("userTask2").intermediateThrowEvent("compensationEvent").compensateEventDefinition()
+      .waitForCompletion(true).compensateEventDefinitionDone().endEvent().done();
   static {
-    addUserTaskCompensationHandler(COMPENSATION_ONE_TASK_SUBPROCESS_MODEL, "compensationBoundary", "compensationHandler");
+    addUserTaskCompensationHandler(COMPENSATION_ONE_TASK_SUBPROCESS_MODEL, "compensationBoundary",
+        "compensationHandler");
   }
 
-  public static final BpmnModelInstance COMPENSATION_TWO_TASKS_SUBPROCESS_MODEL = ProcessModels.newModel()
-      .startEvent()
-      .subProcess("subProcess")
-        .embeddedSubProcess()
-        .startEvent()
-        .userTask("userTask1")
-          .boundaryEvent("compensationBoundary")
-          .compensateEventDefinition()
-          .compensateEventDefinitionDone()
-        .moveToActivity("userTask1")
-        .userTask("userTask2")
-        .endEvent("subProcessEnd")
-      .subProcessDone()
-      .intermediateThrowEvent("compensationEvent")
-        .compensateEventDefinition()
-        .waitForCompletion(true)
-        .compensateEventDefinitionDone()
-      .endEvent()
-      .done();
+  public static final BpmnModelInstance COMPENSATION_TWO_TASKS_SUBPROCESS_MODEL = ProcessModels
+      .newModel().startEvent().subProcess("subProcess").embeddedSubProcess().startEvent()
+      .userTask("userTask1").boundaryEvent("compensationBoundary").compensateEventDefinition()
+      .compensateEventDefinitionDone().moveToActivity("userTask1").userTask("userTask2")
+      .endEvent("subProcessEnd").subProcessDone().intermediateThrowEvent("compensationEvent")
+      .compensateEventDefinition().waitForCompletion(true).compensateEventDefinitionDone()
+      .endEvent().done();
 
   static {
-    addUserTaskCompensationHandler(COMPENSATION_TWO_TASKS_SUBPROCESS_MODEL, "compensationBoundary", "compensationHandler");
+    addUserTaskCompensationHandler(COMPENSATION_TWO_TASKS_SUBPROCESS_MODEL, "compensationBoundary",
+        "compensationHandler");
   }
 
   public static final BpmnModelInstance DOUBLE_SUBPROCESS_MODEL = ProcessModels.newModel()
-        .startEvent()
-        .subProcess("outerSubProcess")
-          .embeddedSubProcess()
-          .startEvent()
-          .subProcess("innerSubProcess")
-            .embeddedSubProcess()
-            .startEvent()
-            .userTask("userTask1")
-              .boundaryEvent("compensationBoundary")
-              .compensateEventDefinition()
-              .compensateEventDefinitionDone()
-            .moveToActivity("userTask1")
-            .endEvent()
-          .subProcessDone()
-          .endEvent()
-        .subProcessDone()
-        .userTask("userTask2")
-        .intermediateThrowEvent("compensationEvent")
-          .compensateEventDefinition()
-          .waitForCompletion(true)
-          .compensateEventDefinitionDone()
-        .endEvent()
-        .done();
+      .startEvent().subProcess("outerSubProcess").embeddedSubProcess().startEvent()
+      .subProcess("innerSubProcess").embeddedSubProcess().startEvent().userTask("userTask1")
+      .boundaryEvent("compensationBoundary").compensateEventDefinition()
+      .compensateEventDefinitionDone().moveToActivity("userTask1").endEvent().subProcessDone()
+      .endEvent().subProcessDone().userTask("userTask2").intermediateThrowEvent("compensationEvent")
+      .compensateEventDefinition().waitForCompletion(true).compensateEventDefinitionDone()
+      .endEvent().done();
   static {
-    CompensationModels.addUserTaskCompensationHandler(DOUBLE_SUBPROCESS_MODEL, "compensationBoundary", "compensationHandler");
+    CompensationModels.addUserTaskCompensationHandler(DOUBLE_SUBPROCESS_MODEL,
+        "compensationBoundary", "compensationHandler");
   }
 
   public static final BpmnModelInstance COMPENSATION_END_EVENT_MODEL = ProcessModels.newModel()
-      .startEvent()
-      .userTask("userTask1")
-        .boundaryEvent("compensationBoundary")
-        .compensateEventDefinition()
-        .compensateEventDefinitionDone()
-      .moveToActivity("userTask1")
-      .userTask("userTask2")
-      .endEvent("compensationEvent")
-        .compensateEventDefinition()
-        .waitForCompletion(true)
-      .done();
+      .startEvent().userTask("userTask1").boundaryEvent("compensationBoundary")
+      .compensateEventDefinition().compensateEventDefinitionDone().moveToActivity("userTask1")
+      .userTask("userTask2").endEvent("compensationEvent").compensateEventDefinition()
+      .waitForCompletion(true).done();
 
   static {
-    addUserTaskCompensationHandler(COMPENSATION_END_EVENT_MODEL, "compensationBoundary", "compensationHandler");
+    addUserTaskCompensationHandler(COMPENSATION_END_EVENT_MODEL, "compensationBoundary",
+        "compensationHandler");
   }
 
-  public static final BpmnModelInstance TRANSACTION_COMPENSATION_MODEL = modify(TransactionModels.CANCEL_BOUNDARY_EVENT)
-    .activityBuilder("userTask")
-      .boundaryEvent("compensationBoundary")
-      .compensateEventDefinition()
-      .compensateEventDefinitionDone()
-    .done();
+  public static final BpmnModelInstance TRANSACTION_COMPENSATION_MODEL = modify(
+      TransactionModels.CANCEL_BOUNDARY_EVENT).activityBuilder("userTask")
+          .boundaryEvent("compensationBoundary").compensateEventDefinition()
+          .compensateEventDefinitionDone().done();
   static {
-    addUserTaskCompensationHandler(TRANSACTION_COMPENSATION_MODEL, "compensationBoundary", "compensationHandler");
+    addUserTaskCompensationHandler(TRANSACTION_COMPENSATION_MODEL, "compensationBoundary",
+        "compensationHandler");
   }
 
-  public static final BpmnModelInstance COMPENSATION_EVENT_SUBPROCESS_MODEL = modify(COMPENSATION_ONE_TASK_SUBPROCESS_MODEL)
-    .addSubProcessTo("subProcess")
-      .id("eventSubProcess")
-      .triggerByEvent()
-      .embeddedSubProcess()
-      .startEvent("eventSubProcessStart")
-        .compensateEventDefinition()
-        .compensateEventDefinitionDone()
-      .userTask("eventSubProcessTask")
-      .intermediateThrowEvent("eventSubProcessCompensationEvent")
-        .compensateEventDefinition()
-        .waitForCompletion(true)
-        .compensateEventDefinitionDone()
-      .endEvent()
-      .endEvent()
-    .done();
+  public static final BpmnModelInstance COMPENSATION_EVENT_SUBPROCESS_MODEL = modify(
+      COMPENSATION_ONE_TASK_SUBPROCESS_MODEL).addSubProcessTo("subProcess").id("eventSubProcess")
+          .triggerByEvent().embeddedSubProcess().startEvent("eventSubProcessStart")
+          .compensateEventDefinition().compensateEventDefinitionDone()
+          .userTask("eventSubProcessTask")
+          .intermediateThrowEvent("eventSubProcessCompensationEvent").compensateEventDefinition()
+          .waitForCompletion(true).compensateEventDefinitionDone().endEvent().endEvent().done();
 
-  public static void addUserTaskCompensationHandler(BpmnModelInstance modelInstance, String boundaryEventId, String compensationHandlerId) {
+  public static void addUserTaskCompensationHandler(BpmnModelInstance modelInstance,
+      String boundaryEventId, String compensationHandlerId) {
 
     BoundaryEvent boundaryEvent = modelInstance.getModelElementById(boundaryEventId);
     BaseElement scope = (BaseElement) boundaryEvent.getParentElement();
@@ -185,6 +124,5 @@ public static final BpmnModelInstance COMPENSATION_ONE_TASK_SUBPROCESS_MODEL =  
     scope.addChildElement(association);
 
   }
-
 
 }

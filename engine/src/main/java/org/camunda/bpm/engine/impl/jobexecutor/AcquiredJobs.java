@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -77,7 +76,7 @@ public class AcquiredJobs {
       batch.remove(id);
 
       // remove batch if it is now empty
-      if(batch.isEmpty()) {
+      if (batch.isEmpty()) {
         batchIterator.remove();
       }
 

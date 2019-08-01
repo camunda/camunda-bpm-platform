@@ -20,8 +20,8 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.TaskService;
 
-
-/** User comments that form discussions around tasks.
+/**
+ * User comments that form discussions around tasks.
  *
  * @see {@link TaskService#getTaskComments(String)
  * @author Tom Baeyens
@@ -40,14 +40,20 @@ public interface Comment {
   /** reference to the task on which this comment was made */
   String getTaskId();
 
-  /** reference to the root process instance id of the process instance on which this comment was made */
+  /**
+   * reference to the root process instance id of the process instance on which this comment was
+   * made
+   */
   String getRootProcessInstanceId();
 
   /** reference to the process instance on which this comment was made */
   String getProcessInstanceId();
 
-  /** the full comment message the user had related to the task and/or process instance
-   * @see TaskService#getTaskComments(String) */
+  /**
+   * the full comment message the user had related to the task and/or process instance
+   * 
+   * @see TaskService#getTaskComments(String)
+   */
   String getFullMessage();
 
   /** The time the historic comment will be removed. */

@@ -24,17 +24,18 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
 
 import java.util.List;
 
-
 /**
  * @author Askar Akhmerov
  */
 public class HistoricDecisionInstanceStatisticsQueryImpl extends
-    AbstractQuery<HistoricDecisionInstanceStatisticsQuery, HistoricDecisionInstanceStatistics> implements HistoricDecisionInstanceStatisticsQuery {
+    AbstractQuery<HistoricDecisionInstanceStatisticsQuery, HistoricDecisionInstanceStatistics>
+    implements HistoricDecisionInstanceStatisticsQuery {
 
   protected final String decisionRequirementsDefinitionId;
   protected String decisionInstanceId;
 
-  public HistoricDecisionInstanceStatisticsQueryImpl(String decisionRequirementsDefinitionId, CommandExecutor commandExecutor) {
+  public HistoricDecisionInstanceStatisticsQueryImpl(String decisionRequirementsDefinitionId,
+      CommandExecutor commandExecutor) {
     super(commandExecutor);
     this.decisionRequirementsDefinitionId = decisionRequirementsDefinitionId;
   }
@@ -43,19 +44,18 @@ public class HistoricDecisionInstanceStatisticsQueryImpl extends
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
 
-    long count = commandContext
-        .getStatisticsManager()
+    long count = commandContext.getStatisticsManager()
         .getStatisticsCountGroupedByDecisionRequirementsDefinition(this);
 
     return count;
   }
 
   @Override
-  public List<HistoricDecisionInstanceStatistics> executeList(CommandContext commandContext, Page page) {
+  public List<HistoricDecisionInstanceStatistics> executeList(CommandContext commandContext,
+      Page page) {
     checkQueryOk();
 
-    List<HistoricDecisionInstanceStatistics> statisticsList = commandContext
-        .getStatisticsManager()
+    List<HistoricDecisionInstanceStatistics> statisticsList = commandContext.getStatisticsManager()
         .getStatisticsGroupedByDecisionRequirementsDefinition(this, page);
 
     return statisticsList;

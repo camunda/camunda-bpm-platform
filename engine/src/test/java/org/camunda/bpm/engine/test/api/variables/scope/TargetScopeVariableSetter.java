@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 public class TargetScopeVariableSetter implements JavaDelegate {
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    execution.setVariable("targetOrderId", execution.getVariableLocal("targetOrderId"),"SubProcess_1");
+    execution.setVariable("targetOrderId", execution.getVariableLocal("targetOrderId"),
+        "SubProcess_1");
   }
 }

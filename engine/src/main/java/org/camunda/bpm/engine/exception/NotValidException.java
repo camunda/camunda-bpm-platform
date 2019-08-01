@@ -19,7 +19,9 @@ package org.camunda.bpm.engine.exception;
 import org.camunda.bpm.engine.BadUserRequestException;
 
 /**
- * <p>This exception is thrown, if a given value is not valid.</p>
+ * <p>
+ * This exception is thrown, if a given value is not valid.
+ * </p>
  *
  * @author Roman Smirnov
  *

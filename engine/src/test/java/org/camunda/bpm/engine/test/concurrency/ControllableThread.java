@@ -19,13 +19,12 @@ package org.camunda.bpm.engine.test.concurrency;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.slf4j.Logger;
 
-
 /**
  * @author Tom Baeyens
  */
 public class ControllableThread extends Thread {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   public ControllableThread() {
     super();
@@ -40,11 +39,11 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   protected String generateName() {
     String className = getClass().getName();
     int dollarIndex = className.lastIndexOf('$');
-    return className.substring(dollarIndex+1);
+    return className.substring(dollarIndex + 1);
   }
 
   public synchronized void startAndWaitUntilControlIsReturned() {
-    LOG.debug("test thread will start "+getName()+" and wait till it returns control");
+    LOG.debug("test thread will start " + getName() + " and wait till it returns control");
     start();
     try {
       wait();
@@ -54,7 +53,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   }
 
   public synchronized void returnControlToTestThreadAndWait() {
-    LOG.debug(getName()+" will notify test thread and till test thread proceeds this thread");
+    LOG.debug(getName() + " will notify test thread and till test thread proceeds this thread");
     this.notify();
     try {
       this.wait();
@@ -69,7 +68,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   }
 
   public synchronized void proceedAndWaitTillDone() {
-    LOG.debug("test thread will notify "+getName()+" and wait until it completes");
+    LOG.debug("test thread will notify " + getName() + " and wait until it completes");
     notify();
     try {
       join();

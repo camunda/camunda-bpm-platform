@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Daniel Meyer
  *
  */
-public class PvmAtomicOperationActivityStartInterruptEventScope extends PvmAtomicOperationInterruptScope {
+public class PvmAtomicOperationActivityStartInterruptEventScope
+    extends PvmAtomicOperationInterruptScope {
 
   public String getCanonicalName() {
     return "activity-start-interrupt-scope";

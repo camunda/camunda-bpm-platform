@@ -27,8 +27,8 @@ import org.camunda.bpm.engine.impl.util.JsonUtil;
  */
 public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfiguration {
 
-  public final static int START_DELAY = 10;  //10 seconds
-  public final static int MAX_DELAY = 60*60;  //hour
+  public final static int START_DELAY = 10; // 10 seconds
+  public final static int MAX_DELAY = 60 * 60; // hour
 
   public static final String JOB_CONFIG_COUNT_EMPTY_RUNS = "countEmptyRuns";
   public static final String JOB_CONFIG_EXECUTE_AT_ONCE = "immediatelyDue";
@@ -36,12 +36,14 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
   public static final String JOB_CONFIG_MINUTE_TO = "minuteTo";
 
   /**
-   * Counts runs without data. Is used within batch window to calculate the delay between two job runs in case no data for cleanup was found.
+   * Counts runs without data. Is used within batch window to calculate the delay between two job
+   * runs in case no data for cleanup was found.
    */
   private int countEmptyRuns = 0;
 
   /**
-   * Indicated that the job was triggered manually and must be executed at once without waiting for batch window start time.
+   * Indicated that the job was triggered manually and must be executed at once without waiting for
+   * batch window start time.
    */
   private boolean immediatelyDue;
 
@@ -79,12 +81,16 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
   }
 
   /**
-   * The delay between two "empty" runs increases twice each time until it reaches {@link HistoryCleanupJobHandlerConfiguration#MAX_DELAY} value.
-   * @param date date to count delay from
+   * The delay between two "empty" runs increases twice each time until it reaches
+   * {@link HistoryCleanupJobHandlerConfiguration#MAX_DELAY} value.
+   * 
+   * @param date
+   *          date to count delay from
    * @return date with delay
    */
   public Date getNextRunWithDelay(Date date) {
-    Date result = addSeconds(date, Math.min((int)(Math.pow(2., (double)countEmptyRuns) * START_DELAY), MAX_DELAY));
+    Date result = addSeconds(date,
+        Math.min((int) (Math.pow(2., (double) countEmptyRuns) * START_DELAY), MAX_DELAY));
     return result;
   }
 
@@ -127,4 +133,3 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
     this.minuteTo = minuteTo;
   }
 }
-

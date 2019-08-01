@@ -46,7 +46,8 @@ import org.camunda.bpm.engine.query.Query;
 /**
  * @author Sebastian Menski
  */
-public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevision, HasDbReferences, DbEntityLifecycleAware {
+public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevision, HasDbReferences,
+    DbEntityLifecycleAware {
 
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
@@ -83,8 +84,10 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
   }
 
   public Filter setResourceType(String resourceType) {
-    ensureNotEmpty(NotValidException.class, "Filter resource type must not be null or empty", "resourceType", resourceType);
-    ensureNull(NotValidException.class, "Cannot overwrite filter resource type", "resourceType", this.resourceType);
+    ensureNotEmpty(NotValidException.class, "Filter resource type must not be null or empty",
+        "resourceType", resourceType);
+    ensureNull(NotValidException.class, "Cannot overwrite filter resource type", "resourceType",
+        this.resourceType);
 
     this.resourceType = resourceType;
     return this;
@@ -139,8 +142,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
     if (properties != null) {
       JsonObject json = JsonUtil.asObject(properties);
       return JsonUtil.asMap(json);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -158,8 +160,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
     if (properties != null) {
       JsonObject json = JsonUtil.asObject(properties);
       this.properties = JsonUtil.asMap(json);
-    }
-    else {
+    } else {
       this.properties = null;
     }
   }
@@ -181,7 +182,8 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
     ensureNotNull(NotValidException.class, "extendingQuery", extendingQuery);
 
     if (!extendingQuery.getClass().equals(query.getClass())) {
-      throw LOG.queryExtensionException(query.getClass().getName(), extendingQuery.getClass().getName());
+      throw LOG.queryExtensionException(query.getClass().getName(),
+          extendingQuery.getClass().getName());
     }
 
     FilterEntity copy = copyFilter();
@@ -195,8 +197,7 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
     JsonObjectConverter<T> converter = (JsonObjectConverter<T>) queryConverter.get(resourceType);
     if (converter != null) {
       return converter;
-    }
-    else {
+    } else {
       throw LOG.unsupportedResourceTypeException(resourceType);
     }
   }

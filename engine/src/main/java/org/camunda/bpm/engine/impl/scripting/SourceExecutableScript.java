@@ -59,8 +59,7 @@ public class SourceExecutableScript extends CompiledExecutableScript {
 
     if (getCompiledScript() != null) {
       return super.evaluate(engine, variableScope, bindings);
-    }
-    else {
+    } else {
       try {
         return evaluateScript(engine, bindings);
       } catch (ScriptException e) {
@@ -68,14 +67,17 @@ public class SourceExecutableScript extends CompiledExecutableScript {
           throw (BpmnError) e.getCause();
         }
         String activityIdMessage = getActivityIdExceptionMessage(variableScope);
-        throw new ScriptEvaluationException("Unable to evaluate script" + activityIdMessage + ":" + e.getMessage(), e);
+        throw new ScriptEvaluationException(
+            "Unable to evaluate script" + activityIdMessage + ":" + e.getMessage(), e);
       }
     }
   }
 
   protected void compileScript(ScriptEngine engine) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if (processEngineConfiguration.isEnableScriptEngineCaching() && processEngineConfiguration.isEnableScriptCompilation()) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
+    if (processEngineConfiguration.isEnableScriptEngineCaching()
+        && processEngineConfiguration.isEnableScriptCompilation()) {
 
       if (getCompiledScript() == null && shouldBeCompiled) {
         synchronized (this) {
@@ -90,15 +92,14 @@ public class SourceExecutableScript extends CompiledExecutableScript {
         }
       }
 
-    }
-    else {
+    } else {
       // if script compilation is disabled abort
       shouldBeCompiled = false;
     }
   }
 
   public CompiledScript compile(ScriptEngine scriptEngine, String language, String src) {
-    if(scriptEngine instanceof Compilable) {
+    if (scriptEngine instanceof Compilable) {
       Compilable compilingEngine = (Compilable) scriptEngine;
 
       try {

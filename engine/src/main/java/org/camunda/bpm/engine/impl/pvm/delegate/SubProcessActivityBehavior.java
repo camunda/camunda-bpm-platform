@@ -18,10 +18,9 @@ package org.camunda.bpm.engine.impl.pvm.delegate;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 
-
-
-/** behavior for activities that delegate to a complete separate execution of
- * a process definition.  In BPMN terminology this can be used to implement a reusable subprocess.
+/**
+ * behavior for activities that delegate to a complete separate execution of a process definition.
+ * In BPMN terminology this can be used to implement a reusable subprocess.
  *
  * @author Tom Baeyens
  */
@@ -31,14 +30,16 @@ public interface SubProcessActivityBehavior extends ActivityBehavior {
    * Pass the output variables from the process instance of the subprocess to the given execution.
    * This should be called before the process instance is destroyed.
    *
-   * @param targetExecution execution of the calling process instance to pass the variables to
-   * @param calledElementInstance instance of the called element that serves as the variable source
+   * @param targetExecution
+   *          execution of the calling process instance to pass the variables to
+   * @param calledElementInstance
+   *          instance of the called element that serves as the variable source
    */
   void passOutputVariables(ActivityExecution targetExecution, VariableScope calledElementInstance);
 
   /**
-   * Called after the process instance is destroyed for
-   * this activity to perform its outgoing control flow logic.
+   * Called after the process instance is destroyed for this activity to perform its outgoing
+   * control flow logic.
    *
    * @param execution
    * @throws java.lang.Exception

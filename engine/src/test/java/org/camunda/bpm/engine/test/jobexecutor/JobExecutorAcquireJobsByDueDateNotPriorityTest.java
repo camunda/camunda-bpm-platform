@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JobExecutorAcquireJobsByDueDateNotPriorityTest extends AbstractJobExecutorAcquireJobsTest {
+public class JobExecutorAcquireJobsByDueDateNotPriorityTest
+    extends AbstractJobExecutorAcquireJobsTest {
 
   @Before
   public void prepareProcessEngineConfiguration() {
@@ -64,7 +65,6 @@ public class JobExecutorAcquireJobsByDueDateNotPriorityTest extends AbstractJobE
     assertEquals(10, (int) findJobById(acquirableJobs.get(3).getId()).getPriority());
     assertEquals(instance4, acquirableJobs.get(3).getProcessInstanceId());
   }
-
 
   protected Job findJobById(String id) {
     return managementService.createJobQuery().jobId(id).singleResult();

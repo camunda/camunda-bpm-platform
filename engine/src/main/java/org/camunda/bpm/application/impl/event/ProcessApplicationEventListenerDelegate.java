@@ -32,17 +32,23 @@ import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
- * <p>{@link ExecutionListener} and {@link TaskListener} implementation delegating to
- * the {@link ExecutionListener} and {@link TaskListener} provided by a
- * {@link ProcessApplicationInterface ProcessApplication}.</p>
+ * <p>
+ * {@link ExecutionListener} and {@link TaskListener} implementation delegating to the
+ * {@link ExecutionListener} and {@link TaskListener} provided by a
+ * {@link ProcessApplicationInterface ProcessApplication}.
+ * </p>
  *
- * <p>If the process application does not provide an execution listener (ie.
- * {@link ProcessApplicationInterface#getExecutionListener()} returns null), the
- * request is silently ignored.</p>
+ * <p>
+ * If the process application does not provide an execution listener (ie.
+ * {@link ProcessApplicationInterface#getExecutionListener()} returns null), the request is silently
+ * ignored.
+ * </p>
  *
- * <p>If the process application does not provide a task listener (ie.
- * {@link ProcessApplicationInterface#getTaskListener()} returns null), the
- * request is silently ignored.</p>
+ * <p>
+ * If the process application does not provide a task listener (ie.
+ * {@link ProcessApplicationInterface#getTaskListener()} returns null), the request is silently
+ * ignored.
+ * </p>
  *
  *
  * @author Daniel Meyer
@@ -64,8 +70,8 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
     performNotification(execution, notification);
   }
 
-  public void notify(final DelegateTask delegateTask){
-    if(delegateTask.getExecution() == null) {
+  public void notify(final DelegateTask delegateTask) {
+    if (delegateTask.getExecution() == null) {
       LOG.taskNotRelatedToExecution(delegateTask);
     } else {
       final DelegateExecution execution = delegateTask.getExecution();
@@ -77,22 +83,26 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
       };
       try {
         performNotification(execution, notification);
-      } catch(Exception e) {
+      } catch (Exception e) {
         throw LOG.exceptionWhileNotifyingPaTaskListener(e);
       }
     }
   }
 
-  protected void performNotification(final DelegateExecution execution, Callable<Void> notification) throws Exception {
-    final ProcessApplicationReference processApp = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
+  protected void performNotification(final DelegateExecution execution, Callable<Void> notification)
+      throws Exception {
+    final ProcessApplicationReference processApp = ProcessApplicationContextUtil
+        .getTargetProcessApplication((ExecutionEntity) execution);
     if (processApp == null) {
       // ignore silently
       LOG.noTargetProcessApplicationForExecution(execution);
 
     } else {
       if (ProcessApplicationContextUtil.requiresContextSwitch(processApp)) {
-        // this should not be necessary since context switch is already performed by OperationContext and / or DelegateInterceptor
-        Context.executeWithinProcessApplication(notification, processApp, new InvocationContext(execution));
+        // this should not be necessary since context switch is already performed by
+        // OperationContext and / or DelegateInterceptor
+        Context.executeWithinProcessApplication(notification, processApp,
+            new InvocationContext(execution));
 
       } else {
         // context switch already performed
@@ -107,7 +117,7 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
     try {
       ProcessApplicationInterface processApplication = processApp.getProcessApplication();
       ExecutionListener executionListener = processApplication.getExecutionListener();
-      if(executionListener != null) {
+      if (executionListener != null) {
         executionListener.notify(execution);
 
       } else {
@@ -125,7 +135,7 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
     try {
       ProcessApplicationInterface processApplication = processApp.getProcessApplication();
       TaskListener taskListener = processApplication.getTaskListener();
-      if(taskListener != null) {
+      if (taskListener != null) {
         taskListener.notify(task);
 
       } else {

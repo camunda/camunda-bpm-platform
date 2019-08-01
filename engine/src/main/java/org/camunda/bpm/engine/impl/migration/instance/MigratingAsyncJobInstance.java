@@ -36,22 +36,22 @@ import org.camunda.bpm.engine.management.JobDefinition;
  */
 public class MigratingAsyncJobInstance extends MigratingJobInstance {
 
-  public MigratingAsyncJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity, ScopeImpl targetScope) {
+  public MigratingAsyncJobInstance(JobEntity jobEntity, JobDefinitionEntity jobDefinitionEntity,
+      ScopeImpl targetScope) {
     super(jobEntity, jobDefinitionEntity, targetScope);
   }
 
   @Override
   protected void migrateJobHandlerConfiguration() {
-    AsyncContinuationConfiguration configuration = (AsyncContinuationConfiguration) jobEntity.getJobHandlerConfiguration();
+    AsyncContinuationConfiguration configuration = (AsyncContinuationConfiguration) jobEntity
+        .getJobHandlerConfiguration();
 
     if (isAsyncAfter()) {
       updateAsyncAfterTargetConfiguration(configuration);
-    }
-    else {
+    } else {
       updateAsyncBeforeTargetConfiguration();
     }
   }
-
 
   public boolean isAsyncAfter() {
     JobDefinition jobDefinition = jobEntity.getJobDefinition();
@@ -65,26 +65,28 @@ public class MigratingAsyncJobInstance extends MigratingJobInstance {
   protected void updateAsyncBeforeTargetConfiguration() {
 
     AsyncContinuationConfiguration targetConfiguration = new AsyncContinuationConfiguration();
-    AsyncContinuationConfiguration currentConfiguration = (AsyncContinuationConfiguration) jobEntity.getJobHandlerConfiguration();
+    AsyncContinuationConfiguration currentConfiguration = (AsyncContinuationConfiguration) jobEntity
+        .getJobHandlerConfiguration();
 
-    if (PvmAtomicOperation.PROCESS_START.getCanonicalName().equals(currentConfiguration.getAtomicOperation())) {
+    if (PvmAtomicOperation.PROCESS_START.getCanonicalName()
+        .equals(currentConfiguration.getAtomicOperation())) {
       // process start always stays process start
       targetConfiguration.setAtomicOperation(PvmAtomicOperation.PROCESS_START.getCanonicalName());
-    }
-    else {
+    } else {
       if (((ActivityImpl) targetScope).getIncomingTransitions().isEmpty()) {
-        targetConfiguration.setAtomicOperation(PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE.getCanonicalName());
-      }
-      else {
-        targetConfiguration.setAtomicOperation(PvmAtomicOperation.TRANSITION_CREATE_SCOPE.getCanonicalName());
+        targetConfiguration
+            .setAtomicOperation(PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE.getCanonicalName());
+      } else {
+        targetConfiguration
+            .setAtomicOperation(PvmAtomicOperation.TRANSITION_CREATE_SCOPE.getCanonicalName());
       }
     }
-
 
     jobEntity.setJobHandlerConfiguration(targetConfiguration);
   }
 
-  protected void updateAsyncAfterTargetConfiguration(AsyncContinuationConfiguration currentConfiguration) {
+  protected void updateAsyncAfterTargetConfiguration(
+      AsyncContinuationConfiguration currentConfiguration) {
     ActivityImpl targetActivity = (ActivityImpl) targetScope;
     List<PvmTransition> outgoingTransitions = targetActivity.getOutgoingTransitions();
 
@@ -92,14 +94,13 @@ public class MigratingAsyncJobInstance extends MigratingJobInstance {
 
     if (outgoingTransitions.isEmpty()) {
       targetConfiguration.setAtomicOperation(PvmAtomicOperation.ACTIVITY_END.getCanonicalName());
-    }
-    else {
-      targetConfiguration.setAtomicOperation(PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE.getCanonicalName());
+    } else {
+      targetConfiguration.setAtomicOperation(
+          PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE.getCanonicalName());
 
       if (outgoingTransitions.size() == 1) {
         targetConfiguration.setTransitionId(outgoingTransitions.get(0).getId());
-      }
-      else {
+      } else {
         TransitionImpl matchingTargetTransition = null;
         String currentTransitionId = currentConfiguration.getTransitionId();
         if (currentTransitionId != null) {
@@ -108,8 +109,7 @@ public class MigratingAsyncJobInstance extends MigratingJobInstance {
 
         if (matchingTargetTransition != null) {
           targetConfiguration.setTransitionId(matchingTargetTransition.getId());
-        }
-        else {
+        } else {
           // should not happen since it is avoided by validation
           throw new ProcessEngineException("Cannot determine matching outgoing sequence flow");
         }

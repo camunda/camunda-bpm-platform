@@ -40,19 +40,15 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
   private ThreadControl thread2;
 
   /**
-   * In this test, we run two transactions concurrently.
-   * The transactions have the following behavior:
+   * In this test, we run two transactions concurrently. The transactions have the following
+   * behavior:
    *
-   * (1) INSERT row into a table
-   * (2) SELECT ALL rows from that table
+   * (1) INSERT row into a table (2) SELECT ALL rows from that table
    *
    * We execute it with two threads in the following interleaving:
    *
-   *      Thread 1             Thread 2
-   *      ========             ========
-   * ------INSERT---------------------------   |
-   * ---------------------------INSERT------   |
-   * ---------------------------SELECT------   v time
+   * Thread 1 Thread 2 ======== ======== ------INSERT--------------------------- |
+   * ---------------------------INSERT------ | ---------------------------SELECT------ v time
    * ------SELECT---------------------------
    *
    * Deadlocks may occur if readers are not properly isolated from writers.
@@ -73,7 +69,7 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
     // wait for Thread 2 to perform SELECT
     thread2.makeContinue();
 
-    // wait for Thread 1  to perform same SELECT => deadlock
+    // wait for Thread 1 to perform same SELECT => deadlock
     thread1.makeContinue();
 
     thread2.waitForSync();
@@ -90,7 +86,8 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
     }
 
     public Void execute(CommandContext commandContext) {
-      DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(Context.getProcessEngineConfiguration().getIdGenerator());
+      DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(
+          Context.getProcessEngineConfiguration().getIdGenerator());
       DbEntityManager newEntityManager = dbEntityManagerFactory.openSession();
 
       HistoricProcessInstanceEventEntity hpi = new HistoricProcessInstanceEventEntity();
@@ -124,18 +121,19 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
     // end interaction with Thread 1
     thread1.waitUntilDone();
 
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
 
-        public Void execute(CommandContext commandContext) {
-          List<HistoricProcessInstance> list = commandContext.getDbEntityManager().createHistoricProcessInstanceQuery().list();
-          for (HistoricProcessInstance historicProcessInstance : list) {
-            commandContext.getDbEntityManager().delete(HistoricProcessInstanceEventEntity.class, "deleteHistoricProcessInstance", historicProcessInstance.getId());
-          }
-          return null;
+      public Void execute(CommandContext commandContext) {
+        List<HistoricProcessInstance> list = commandContext.getDbEntityManager()
+            .createHistoricProcessInstanceQuery().list();
+        for (HistoricProcessInstance historicProcessInstance : list) {
+          commandContext.getDbEntityManager().delete(HistoricProcessInstanceEventEntity.class,
+              "deleteHistoricProcessInstance", historicProcessInstance.getId());
         }
+        return null;
+      }
 
-      });
+    });
   }
 
 }

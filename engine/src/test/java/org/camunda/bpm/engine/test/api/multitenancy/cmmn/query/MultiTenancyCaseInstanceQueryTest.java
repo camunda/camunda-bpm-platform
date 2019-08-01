@@ -47,54 +47,43 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
   }
 
   public void testQueryNoTenantIdSet() {
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery();
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
-        .tenantIdIn(TENANT_ONE);
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = caseService
-        .createCaseInstanceQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = caseService.createCaseInstanceQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO);
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().tenantIdIn(TENANT_ONE,
+        TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByInstancesWithoutTenantId() {
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
-        .withoutTenantId();
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().withoutTenantId();
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
-        .tenantIdIn("nonExisting");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
   }
 
   public void testFailQueryByTenantIdNull() {
     try {
-      caseService.createCaseInstanceQuery()
-        .tenantIdIn((String) null);
+      caseService.createCaseInstanceQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -104,10 +93,7 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
   public void testQuerySortingAsc() {
     // exclude case instances without tenant id because of database-specific ordering
     List<CaseInstance> caseInstances = caseService.createCaseInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc().list();
 
     assertThat(caseInstances.size(), is(2));
     assertThat(caseInstances.get(0).getTenantId(), is(TENANT_ONE));
@@ -117,10 +103,7 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
   public void testQuerySortingDesc() {
     // exclude case instances without tenant id because of database-specific ordering
     List<CaseInstance> caseInstances = caseService.createCaseInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .desc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().desc().list();
 
     assertThat(caseInstances.size(), is(2));
     assertThat(caseInstances.get(0).getTenantId(), is(TENANT_TWO));
@@ -167,7 +150,8 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
   protected void createCaseInstance(String tenantId) {
     String caseDefinitionId = null;
 
-    CaseDefinitionQuery caseDefinitionQuery = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneTaskCase");
+    CaseDefinitionQuery caseDefinitionQuery = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase");
     if (tenantId == null) {
       caseDefinitionId = caseDefinitionQuery.withoutTenantId().singleResult().getId();
     } else {

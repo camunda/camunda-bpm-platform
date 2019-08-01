@@ -30,23 +30,19 @@ import org.junit.Test;
  */
 public class ForceCloseMybatisConnectionPoolTest {
 
-
   @Test
   public void testForceCloseMybatisConnectionPoolTrue() {
 
     // given
     // that the process engine is configured with forceCloseMybatisConnectionPool = true
     ProcessEngineConfigurationImpl configurationImpl = new StandaloneInMemProcessEngineConfiguration()
-     .setJdbcUrl("jdbc:h2:mem:camunda-forceclose")
-     .setProcessEngineName("engine-forceclose")
-     .setForceCloseMybatisConnectionPool(true);
+        .setJdbcUrl("jdbc:h2:mem:camunda-forceclose").setProcessEngineName("engine-forceclose")
+        .setForceCloseMybatisConnectionPool(true);
 
-    ProcessEngine processEngine = configurationImpl
-     .buildProcessEngine();
+    ProcessEngine processEngine = configurationImpl.buildProcessEngine();
 
     PooledDataSource pooledDataSource = (PooledDataSource) configurationImpl.getDataSource();
     PoolState state = pooledDataSource.getPoolState();
-
 
     // then
     // if the process engine is closed
@@ -63,17 +59,14 @@ public class ForceCloseMybatisConnectionPoolTest {
     // given
     // that the process engine is configured with forceCloseMybatisConnectionPool = false
     ProcessEngineConfigurationImpl configurationImpl = new StandaloneInMemProcessEngineConfiguration()
-     .setJdbcUrl("jdbc:h2:mem:camunda-forceclose")
-     .setProcessEngineName("engine-forceclose")
-     .setForceCloseMybatisConnectionPool(false);
+        .setJdbcUrl("jdbc:h2:mem:camunda-forceclose").setProcessEngineName("engine-forceclose")
+        .setForceCloseMybatisConnectionPool(false);
 
-    ProcessEngine processEngine = configurationImpl
-     .buildProcessEngine();
+    ProcessEngine processEngine = configurationImpl.buildProcessEngine();
 
     PooledDataSource pooledDataSource = (PooledDataSource) configurationImpl.getDataSource();
     PoolState state = pooledDataSource.getPoolState();
     int idleConnections = state.getIdleConnectionCount();
-
 
     // then
     // if the process engine is closed

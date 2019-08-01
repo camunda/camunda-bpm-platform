@@ -33,7 +33,8 @@ public class PatchExecutionVariablesCmd extends AbstractPatchVariablesCmd {
 
   private static final long serialVersionUID = 1L;
 
-  public PatchExecutionVariablesCmd(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions, boolean isLocal) {
+  public PatchExecutionVariablesCmd(String executionId, Map<String, ? extends Object> modifications,
+      Collection<String> deletions, boolean isLocal) {
     super(executionId, modifications, deletions, isLocal);
   }
 
@@ -46,7 +47,7 @@ public class PatchExecutionVariablesCmd extends AbstractPatchVariablesCmd {
   }
 
   public void logVariableOperation(CommandContext commandContext) {
-    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), entityId, null,
-      PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), entityId,
+        null, PropertyChange.EMPTY_CHANGE);
   }
 }

@@ -34,16 +34,16 @@ import org.camunda.bpm.engine.task.TaskQuery;
  */
 public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngineTestCase {
 
-
-  protected static final String EXPECTED_STORED_QUERY_FAILURE_MESSAGE =
-      "Expressions are forbidden in stored queries. This behavior can be toggled in the process engine configuration";
-  public static final String STATE_MANIPULATING_EXPRESSION =
-      "${''.getClass().forName('" + TaskQueryDisabledStoredExpressionsTest.class.getName() + "').getField('MUTABLE_FIELD').setLong(null, 42)}";
+  protected static final String EXPECTED_STORED_QUERY_FAILURE_MESSAGE = "Expressions are forbidden in stored queries. This behavior can be toggled in the process engine configuration";
+  public static final String STATE_MANIPULATING_EXPRESSION = "${''.getClass().forName('"
+      + TaskQueryDisabledStoredExpressionsTest.class.getName()
+      + "').getField('MUTABLE_FIELD').setLong(null, 42)}";
 
   public static long MUTABLE_FIELD = 0;
 
   public TaskQueryDisabledStoredExpressionsTest() {
-    super("org/camunda/bpm/engine/test/api/task/task-query-disabled-stored-expressions-test.camunda.cfg.xml");
+    super(
+        "org/camunda/bpm/engine/test/api/task/task-query-disabled-stored-expressions-test.camunda.cfg.xml");
   }
 
   protected void setUp() throws Exception {
@@ -64,7 +64,8 @@ public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngin
   }
 
   public void testStoreFilterWithExpression() {
-    TaskQuery taskQuery = taskService.createTaskQuery().dueAfterExpression(STATE_MANIPULATING_EXPRESSION);
+    TaskQuery taskQuery = taskService.createTaskQuery()
+        .dueAfterExpression(STATE_MANIPULATING_EXPRESSION);
     Filter filter = filterService.newTaskFilter("filter");
     filter.setQuery(taskQuery);
 
@@ -99,20 +100,22 @@ public class TaskQueryDisabledStoredExpressionsTest extends ResourceProcessEngin
   }
 
   public void testCannotExecuteStoredFilter() {
-    final TaskQuery filterQuery = taskService.createTaskQuery().dueAfterExpression(STATE_MANIPULATING_EXPRESSION);
+    final TaskQuery filterQuery = taskService.createTaskQuery()
+        .dueAfterExpression(STATE_MANIPULATING_EXPRESSION);
 
     // store a filter bypassing validation
     // the API way of doing this would be by reconfiguring the engine
-    String filterId = processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<String>() {
+    String filterId = processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new Command<String>() {
 
-      public String execute(CommandContext commandContext) {
-        FilterEntity filter = new FilterEntity(EntityTypes.TASK);
-        filter.setQuery(filterQuery);
-        filter.setName("filter");
-        commandContext.getDbEntityManager().insert(filter);
-        return filter.getId();
-      }
-    });
+          public String execute(CommandContext commandContext) {
+            FilterEntity filter = new FilterEntity(EntityTypes.TASK);
+            filter.setQuery(filterQuery);
+            filter.setName("filter");
+            commandContext.getDbEntityManager().insert(filter);
+            return filter.getId();
+          }
+        });
 
     extendFilterAndValidateFailingQuery(filterId, null);
 

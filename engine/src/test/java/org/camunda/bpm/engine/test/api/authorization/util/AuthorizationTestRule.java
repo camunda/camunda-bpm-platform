@@ -48,9 +48,11 @@ public class AuthorizationTestRule extends AuthorizationTestBaseRule {
     start(scenario, null, new HashMap<String, String>());
   }
 
-  public void start(AuthorizationScenario scenario, String userId, Map<String, String> resourceBindings) {
+  public void start(AuthorizationScenario scenario, String userId,
+      Map<String, String> resourceBindings) {
     Assert.assertNull(interceptor.getLastException());
-    scenarioInstance = new AuthorizationScenarioInstance(scenario, engineRule.getAuthorizationService(), resourceBindings);
+    scenarioInstance = new AuthorizationScenarioInstance(scenario,
+        engineRule.getAuthorizationService(), resourceBindings);
     enableAuthorization(userId);
     interceptor.activate();
   }
@@ -58,7 +60,8 @@ public class AuthorizationTestRule extends AuthorizationTestBaseRule {
   /**
    * Assert the scenario conditions. If no exception or the expected one was thrown.
    *
-   * @param scenario the scenario to assert on
+   * @param scenario
+   *          the scenario to assert on
    * @return true if no exception was thrown, false otherwise
    */
   public boolean assertScenario(AuthorizationScenario scenario) {
@@ -84,8 +87,8 @@ public class AuthorizationTestRule extends AuthorizationTestBaseRule {
   }
 
   protected void starting(Description description) {
-    ProcessEngineConfigurationImpl engineConfiguration =
-        (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) engineRule
+        .getProcessEngine().getProcessEngineConfiguration();
 
     interceptor.reset();
     engineConfiguration.getCommandInterceptorsTxRequired().get(0).setNext(interceptor);
@@ -97,17 +100,18 @@ public class AuthorizationTestRule extends AuthorizationTestBaseRule {
   protected void finished(Description description) {
     super.finished(description);
 
-    ProcessEngineConfigurationImpl engineConfiguration =
-        (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) engineRule
+        .getProcessEngine().getProcessEngineConfiguration();
 
     engineConfiguration.getCommandInterceptorsTxRequired().get(0).setNext(interceptor.getNext());
     interceptor.setNext(null);
   }
 
-  public static Collection<AuthorizationScenario[]> asParameters(AuthorizationScenario... scenarios) {
+  public static Collection<AuthorizationScenario[]> asParameters(
+      AuthorizationScenario... scenarios) {
     List<AuthorizationScenario[]> scenarioList = new ArrayList<AuthorizationScenario[]>();
     for (AuthorizationScenario scenario : scenarios) {
-      scenarioList.add(new AuthorizationScenario[]{ scenario });
+      scenarioList.add(new AuthorizationScenario[] { scenario });
     }
 
     return scenarioList;

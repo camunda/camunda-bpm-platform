@@ -75,44 +75,44 @@ public class MigrateProcessInstanceSyncQueryTest {
   @Test
   public void testMigrateWithQuery() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
-        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
-    ProcessInstance instance1 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
-    ProcessInstance instance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance instance1 = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance instance2 = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
     grantAuthorization("user", Resources.PROCESS_INSTANCE, instance2.getId(), Permissions.READ);
     grantAuthorization("user", Resources.PROCESS_DEFINITION, "*", Permissions.MIGRATE_INSTANCE);
 
     MigrationPlan migrationPlan = engineRule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
 
     // when
     authRule.enableAuthorization("user");
-    engineRule.getRuntimeService().newMigration(migrationPlan)
-      .processInstanceQuery(query)
-      .execute();
+    engineRule.getRuntimeService().newMigration(migrationPlan).processInstanceQuery(query)
+        .execute();
 
     authRule.disableAuthorization();
 
-
     // then
-    ProcessInstance instance1AfterMigration = engineRule
-      .getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(instance1.getId())
-      .singleResult();
+    ProcessInstance instance1AfterMigration = engineRule.getRuntimeService()
+        .createProcessInstanceQuery().processInstanceId(instance1.getId()).singleResult();
 
     Assert.assertEquals(sourceDefinition.getId(), instance1AfterMigration.getProcessDefinitionId());
   }
 
-  protected void grantAuthorization(String userId, Resource resource, String resourceId, Permission permission) {
-    Authorization authorization = engineRule.getAuthorizationService().createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+  protected void grantAuthorization(String userId, Resource resource, String resourceId,
+      Permission permission) {
+    Authorization authorization = engineRule.getAuthorizationService()
+        .createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
     authorization.setResource(resource);
     authorization.setResourceId(resourceId);
     authorization.addPermission(permission);

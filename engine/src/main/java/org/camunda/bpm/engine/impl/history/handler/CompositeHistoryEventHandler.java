@@ -44,8 +44,7 @@ public class CompositeHistoryEventHandler implements HistoryEventHandler {
   }
 
   /**
-   * Constructor that takes a varargs parameter {@link HistoryEventHandler} that
-   * consume the event.
+   * Constructor that takes a varargs parameter {@link HistoryEventHandler} that consume the event.
    * 
    * @param historyEventHandlers
    *          the list of {@link HistoryEventHandler} that consume the event.
@@ -55,8 +54,7 @@ public class CompositeHistoryEventHandler implements HistoryEventHandler {
   }
 
   /**
-   * Constructor that takes a list of {@link HistoryEventHandler} that consume
-   * the event.
+   * Constructor that takes a list of {@link HistoryEventHandler} that consume the event.
    * 
    * @param historyEventHandlers
    *          the list of {@link HistoryEventHandler} that consume the event.
@@ -70,7 +68,8 @@ public class CompositeHistoryEventHandler implements HistoryEventHandler {
    * 
    * @param historyEventHandlers
    */
-  private void initializeHistoryEventHandlers(final List<HistoryEventHandler> historyEventHandlers) {
+  private void initializeHistoryEventHandlers(
+      final List<HistoryEventHandler> historyEventHandlers) {
     EnsureUtil.ensureNotNull("History event handler", historyEventHandlers);
     for (HistoryEventHandler historyEventHandler : historyEventHandlers) {
       EnsureUtil.ensureNotNull("History event handler", historyEventHandler);
@@ -79,8 +78,8 @@ public class CompositeHistoryEventHandler implements HistoryEventHandler {
   }
 
   /**
-   * Adds the {@link HistoryEventHandler} to the list of
-   * {@link HistoryEventHandler} that consume the event.
+   * Adds the {@link HistoryEventHandler} to the list of {@link HistoryEventHandler} that consume
+   * the event.
    * 
    * @param historyEventHandler
    *          the {@link HistoryEventHandler} that consume the event.

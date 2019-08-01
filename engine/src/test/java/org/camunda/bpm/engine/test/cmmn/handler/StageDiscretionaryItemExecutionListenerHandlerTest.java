@@ -47,7 +47,8 @@ public class StageDiscretionaryItemExecutionListenerHandlerTest extends CmmnElem
 
   protected AbstractExecutionListenerSpec testSpecification;
 
-  public StageDiscretionaryItemExecutionListenerHandlerTest(AbstractExecutionListenerSpec testSpecification) {
+  public StageDiscretionaryItemExecutionListenerHandlerTest(
+      AbstractExecutionListenerSpec testSpecification) {
     this.testSpecification = testSpecification;
   }
 

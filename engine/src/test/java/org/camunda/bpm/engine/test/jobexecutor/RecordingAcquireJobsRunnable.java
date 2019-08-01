@@ -50,8 +50,10 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
   }
 
   @Override
-  protected AcquiredJobs acquireJobs(JobAcquisitionContext context, JobAcquisitionStrategy configuration, ProcessEngineImpl currentProcessEngine) {
-    acquisitionEvents.add(new RecordedAcquisitionEvent(System.currentTimeMillis(), configuration.getNumJobsToAcquire(currentProcessEngine.getName())));
+  protected AcquiredJobs acquireJobs(JobAcquisitionContext context,
+      JobAcquisitionStrategy configuration, ProcessEngineImpl currentProcessEngine) {
+    acquisitionEvents.add(new RecordedAcquisitionEvent(System.currentTimeMillis(),
+        configuration.getNumJobsToAcquire(currentProcessEngine.getName())));
     return super.acquireJobs(context, configuration, currentProcessEngine);
   }
 
@@ -63,11 +65,13 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
     return acquisitionEvents;
   }
 
-  protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext, JobAcquisitionStrategy acquisitionStrategy) {
+  protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext,
+      JobAcquisitionStrategy acquisitionStrategy) {
     super.configureNextAcquisitionCycle(acquisitionContext, acquisitionStrategy);
 
     long timeBetweenCurrentAndNextAcquisition = acquisitionStrategy.getWaitTime();
-    waitEvents.add(new RecordedWaitEvent(System.currentTimeMillis(), timeBetweenCurrentAndNextAcquisition));
+    waitEvents.add(
+        new RecordedWaitEvent(System.currentTimeMillis(), timeBetweenCurrentAndNextAcquisition));
   }
 
   public static class RecordedWaitEvent {
@@ -83,6 +87,7 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
     public long getTimestamp() {
       return timestamp;
     }
+
     public long getTimeBetweenAcquisitions() {
       return timeBetweenAcquisitions;
     }

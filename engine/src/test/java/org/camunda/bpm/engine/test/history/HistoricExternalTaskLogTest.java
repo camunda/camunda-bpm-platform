@@ -73,7 +73,8 @@ public class HistoricExternalTaskLogTest {
 
   @After
   public void tearDown() {
-    List<ExternalTask> list = externalTaskService.createExternalTaskQuery().workerId(WORKER_ID).list();
+    List<ExternalTask> list = externalTaskService.createExternalTaskQuery().workerId(WORKER_ID)
+        .list();
     for (ExternalTask externalTask : list) {
       externalTaskService.unlock(externalTask.getId());
     }
@@ -86,10 +87,8 @@ public class HistoricExternalTaskLogTest {
     ExternalTask task = startExternalTaskProcess();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .creationLog()
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().creationLog()
+        .singleResult();
 
     // then
     assertHistoricLogPropertiesAreProperlySet(task, log);
@@ -107,10 +106,8 @@ public class HistoricExternalTaskLogTest {
     task = externalTaskService.createExternalTaskQuery().singleResult();
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().failureLog()
+        .singleResult();
 
     // then
     assertHistoricLogPropertiesAreProperlySet(task, log);
@@ -127,10 +124,8 @@ public class HistoricExternalTaskLogTest {
     completeExternalTask(task.getId());
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .successLog()
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().successLog()
+        .singleResult();
 
     // then
     assertHistoricLogPropertiesAreProperlySet(task, log);
@@ -147,10 +142,8 @@ public class HistoricExternalTaskLogTest {
     runtimeService.deleteProcessInstance(task.getProcessInstanceId(), "Dummy reason for deletion!");
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .deletionLog()
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().deletionLog()
+        .singleResult();
 
     // then
     assertHistoricLogPropertiesAreProperlySet(task, log);
@@ -168,10 +161,8 @@ public class HistoricExternalTaskLogTest {
     completeExternalTask(task.getId());
 
     // when
-    HistoricExternalTaskLog log = historyService
-      .createHistoricExternalTaskLogQuery()
-      .successLog()
-      .singleResult();
+    HistoricExternalTaskLog log = historyService.createHistoricExternalTaskLogQuery().successLog()
+        .singleResult();
 
     // then
     assertEquals(WORKER_ID, log.getWorkerId());
@@ -186,14 +177,12 @@ public class HistoricExternalTaskLogTest {
     reportExternalTaskFailure(task.getId());
 
     // when
-    String failedHistoricExternalTaskLogId = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .singleResult()
-      .getId();
+    String failedHistoricExternalTaskLogId = historyService.createHistoricExternalTaskLogQuery()
+        .failureLog().singleResult().getId();
 
     // then
-    String stacktrace = historyService.getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
+    String stacktrace = historyService
+        .getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
     assertNotNull(stacktrace);
     assertEquals(ERROR_DETAILS, stacktrace);
   }
@@ -209,12 +198,8 @@ public class HistoricExternalTaskLogTest {
     reportExternalTaskFailure(task.getId(), ERROR_MESSAGE, secondErrorDetails);
 
     // when
-    List<HistoricExternalTaskLog> list = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .orderByTimestamp()
-      .asc()
-      .list();
+    List<HistoricExternalTaskLog> list = historyService.createHistoricExternalTaskLogQuery()
+        .failureLog().orderByTimestamp().asc().list();
 
     String firstFailedLogId = list.get(0).getId();
     String secondFailedLogId = list.get(1).getId();
@@ -227,7 +212,6 @@ public class HistoricExternalTaskLogTest {
     assertEquals(firstErrorDetails, stacktrace1);
     assertEquals(secondErrorDetails, stacktrace2);
   }
-
 
   @Test
   public void testGetExceptionStacktraceForNonexistentExternalTaskId() {
@@ -259,13 +243,12 @@ public class HistoricExternalTaskLogTest {
     reportExternalTaskFailure(task.getId(), exceptionMessage, ERROR_DETAILS);
 
     // when
-    HistoricExternalTaskLog failedLog = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .singleResult();
+    HistoricExternalTaskLog failedLog = historyService.createHistoricExternalTaskLogQuery()
+        .failureLog().singleResult();
 
     String errorMessage = failedLog.getErrorMessage();
-    String expectedErrorMessage = exceptionMessage.substring(0, ExternalTaskEntity.MAX_EXCEPTION_MESSAGE_LENGTH);
+    String expectedErrorMessage = exceptionMessage.substring(0,
+        ExternalTaskEntity.MAX_EXCEPTION_MESSAGE_LENGTH);
 
     // then
     assertNotNull(failedLog);
@@ -304,7 +287,8 @@ public class HistoricExternalTaskLogTest {
     assertTrue(log.isDeletionLog());
   }
 
-  protected void assertHistoricLogPropertiesAreProperlySet(ExternalTask task, HistoricExternalTaskLog log) {
+  protected void assertHistoricLogPropertiesAreProperlySet(ExternalTask task,
+      HistoricExternalTaskLog log) {
     assertNotNull(log);
     assertNotNull(log.getId());
     assertNotNull(log.getTimestamp());
@@ -322,9 +306,8 @@ public class HistoricExternalTaskLogTest {
   }
 
   protected void completeExternalTask(String externalTaskId) {
-    externalTaskService.fetchAndLock(100, WORKER_ID, false)
-      .topic(DEFAULT_TOPIC, LOCK_DURATION)
-      .execute();
+    externalTaskService.fetchAndLock(100, WORKER_ID, false).topic(DEFAULT_TOPIC, LOCK_DURATION)
+        .execute();
     externalTaskService.complete(externalTaskId, WORKER_ID);
   }
 
@@ -332,18 +315,20 @@ public class HistoricExternalTaskLogTest {
     reportExternalTaskFailure(externalTaskId, ERROR_MESSAGE, ERROR_DETAILS);
   }
 
-  protected void reportExternalTaskFailure(String externalTaskId, String errorMessage, String errorDetails) {
-    externalTaskService.fetchAndLock(100, WORKER_ID, false)
-      .topic(DEFAULT_TOPIC, LOCK_DURATION)
-      .execute();
+  protected void reportExternalTaskFailure(String externalTaskId, String errorMessage,
+      String errorDetails) {
+    externalTaskService.fetchAndLock(100, WORKER_ID, false).topic(DEFAULT_TOPIC, LOCK_DURATION)
+        .execute();
     externalTaskService.handleFailure(externalTaskId, WORKER_ID, errorMessage, errorDetails, 1, 0L);
   }
 
   protected ExternalTask startExternalTaskProcess() {
     BpmnModelInstance oneExternalTaskProcess = createDefaultExternalTaskModel().build();
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(oneExternalTaskProcess);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(oneExternalTaskProcess);
     ProcessInstance pi = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId()).singleResult();
+    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
   }
 
   protected String createStringOfLength(int count) {

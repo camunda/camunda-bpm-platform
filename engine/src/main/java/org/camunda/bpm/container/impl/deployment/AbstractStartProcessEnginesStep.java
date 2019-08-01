@@ -23,12 +23,15 @@ import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 
 /**
- * <p>Deployment operation step that is responsible for starting all process
- * engines declared in a {@link List} of {@link ProcessEngineXml} files.</p>
+ * <p>
+ * Deployment operation step that is responsible for starting all process engines declared in a
+ * {@link List} of {@link ProcessEngineXml} files.
+ * </p>
  *
- * <p>This step does not start the process engines directly but rather creates
- * individual {@link StartProcessEngineStep} instances that each start a process
- * engine.</p>
+ * <p>
+ * This step does not start the process engines directly but rather creates individual
+ * {@link StartProcessEngineStep} instances that each start a process engine.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -50,10 +53,12 @@ public abstract class AbstractStartProcessEnginesStep extends DeploymentOperatio
 
   }
 
-  protected StartProcessEngineStep createStartProcessEngineStep(ProcessEngineXml parsedProcessEngine) {
+  protected StartProcessEngineStep createStartProcessEngineStep(
+      ProcessEngineXml parsedProcessEngine) {
     return new StartProcessEngineStep(parsedProcessEngine);
   }
 
-  protected abstract List<ProcessEngineXml> getProcessEnginesXmls(DeploymentOperation operationContext);
+  protected abstract List<ProcessEngineXml> getProcessEnginesXmls(
+      DeploymentOperation operationContext);
 
 }

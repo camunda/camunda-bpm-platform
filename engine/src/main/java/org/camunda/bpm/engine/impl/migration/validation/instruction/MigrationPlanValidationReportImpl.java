@@ -50,13 +50,12 @@ public class MigrationPlanValidationReportImpl implements MigrationPlanValidatio
 
   public void writeTo(StringBuilder sb) {
     sb.append("Migration plan for process definition '")
-      .append(migrationPlan.getSourceProcessDefinitionId())
-      .append("' to '")
-      .append(migrationPlan.getTargetProcessDefinitionId())
-      .append("' is not valid:\n");
+        .append(migrationPlan.getSourceProcessDefinitionId()).append("' to '")
+        .append(migrationPlan.getTargetProcessDefinitionId()).append("' is not valid:\n");
 
     for (MigrationInstructionValidationReport instructionReport : instructionReports) {
-      sb.append("\t Migration instruction ").append(instructionReport.getMigrationInstruction()).append(" is not valid:\n");
+      sb.append("\t Migration instruction ").append(instructionReport.getMigrationInstruction())
+          .append(" is not valid:\n");
       for (String failure : instructionReport.getFailures()) {
         sb.append("\t\t").append(failure).append("\n");
       }

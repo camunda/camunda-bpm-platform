@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActivityBehavior implements ConditionalEventBehavior {
+public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActivityBehavior
+    implements ConditionalEventBehavior {
 
   protected final ConditionalEventDefinition conditionalEvent;
 
@@ -43,7 +44,8 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
   }
 
   @Override
-  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableEvent variableEvent) {
+  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription,
+      final VariableEvent variableEvent) {
     final PvmExecutionImpl execution = eventSubscription.getExecution();
 
     if (execution != null && !execution.isEnded() && execution.isScope()

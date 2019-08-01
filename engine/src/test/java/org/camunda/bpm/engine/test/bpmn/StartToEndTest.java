@@ -31,5 +31,5 @@ public class StartToEndTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
     assertTrue(processInstance.isEnded());
   }
-  
+
 }

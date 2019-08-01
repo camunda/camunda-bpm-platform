@@ -124,7 +124,6 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, managementService.createJobQuery().count());
   }
 
-
   @Deployment
   public void testAsyncParallelMultiInstanceWithServiceTask() {
     NUM_INVOCATIONS = 0;
@@ -195,7 +194,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // now there should be one job for each service task wrapped in the multi-instance body:
     assertEquals(5, managementService.createJobQuery().count());
     // execute all jobs - one for asyncBefore and another for asyncAfter:
-    executeAvailableJobs(5+5);
+    executeAvailableJobs(5 + 5);
 
     // the service was invoked
     assertEquals(5, NUM_INVOCATIONS);
@@ -214,8 +213,9 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
     // now there should be one job for the multi-instance body:
     assertEquals(1, managementService.createJobQuery().count());
-    // execute all jobs - one for multi-instance body and one for each service task wrapped in the multi-instance body:
-    executeAvailableJobs(1+5);
+    // execute all jobs - one for multi-instance body and one for each service task wrapped in the
+    // multi-instance body:
+    executeAvailableJobs(1 + 5);
 
     // the service was invoked
     assertEquals(5, NUM_INVOCATIONS);
@@ -223,7 +223,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, managementService.createJobQuery().count());
   }
 
-  protected void assertTransitionInstances(String processInstanceId, String activityId, int numInstances) {
+  protected void assertTransitionInstances(String processInstanceId, String activityId,
+      int numInstances) {
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
 
     assertEquals(numInstances, tree.getTransitionInstances(activityId).length);
@@ -240,7 +241,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
     // now there should be one job for the multi-instance body:
     assertEquals(1, managementService.createJobQuery().count());
-    assertTransitionInstances(processInstance.getId(), "service" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, 1);
+    assertTransitionInstances(processInstance.getId(),
+        "service" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, 1);
 
     // when the mi body before job is executed
     Job job = managementService.createJobQuery().singleResult();
@@ -271,7 +273,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // then there is one mi body after job
     job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertTransitionInstances(processInstance.getId(), "service" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, 1);
+    assertTransitionInstances(processInstance.getId(),
+        "service" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, 1);
 
     // when executing this job, the process ends
     managementService.executeJob(job.getId());
@@ -289,15 +292,10 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // then they are represented in the activity instance tree by transition instances
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    assertThat(tree).hasStructure(
-        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-          .beginScope("service#multiInstanceBody")
-            .transition("service")
-            .transition("service")
-            .transition("service")
-            .transition("service")
-            .transition("service")
-        .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("service#multiInstanceBody").transition("service").transition("service")
+            .transition("service").transition("service").transition("service").done());
   }
 
   @Deployment
@@ -307,7 +305,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // now there should be one job in the database, and it is a message
     assertEquals(1, managementService.createJobQuery().count());
     Job job = managementService.createJobQuery().singleResult();
-    if(!(job instanceof MessageEntity)) {
+    if (!(job instanceof MessageEntity)) {
       fail("the job must be a message");
     }
 
@@ -341,11 +339,12 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     assertNotNull(execution);
     assertEquals("service", runtimeService.getActiveActivityIds(execution.getId()).get(0));
 
-    // there are two jobs, the message and the timer (the message will not be retried anymore, max retires is reached.)
+    // there are two jobs, the message and the timer (the message will not be retried anymore, max
+    // retires is reached.)
     assertEquals(2, managementService.createJobQuery().count());
 
     // now the timer triggers:
-    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis()+10000));
+    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis() + 10000));
     executeAvailableJobs();
 
     // and we are done:
@@ -384,10 +383,9 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
 
-    assertThat(activityInstance).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .transition("subProcess")
-      .done());
+    assertThat(activityInstance)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .transition("subProcess").done());
 
     executeAvailableJobs();
 
@@ -430,8 +428,9 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     runtimeService.signal(eid);
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testAsyncCallActivity.bpmn20.xml",
-          "org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testAsyncServiceNoListeners.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testAsyncCallActivity.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testAsyncServiceNoListeners.bpmn20.xml" })
   public void testAsyncCallActivity() {
     // start process
     runtimeService.startProcessInstanceByKey("asyncCallactivity");
@@ -497,7 +496,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testAsyncIntermediateCatchEvent() {
     // start PI
-    String pid = runtimeService.startProcessInstanceByKey("asyncIntermediateCatchEvent").getProcessInstanceId();
+    String pid = runtimeService.startProcessInstanceByKey("asyncIntermediateCatchEvent")
+        .getProcessInstanceId();
 
     // now there is 1 job in the database:
     assertEquals(1, managementService.createJobQuery().count());
@@ -524,7 +524,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testAsyncIntermediateThrowEvent() {
     // start PI
-    String pid = runtimeService.startProcessInstanceByKey("asyncIntermediateThrowEvent").getProcessInstanceId();
+    String pid = runtimeService.startProcessInstanceByKey("asyncIntermediateThrowEvent")
+        .getProcessInstanceId();
 
     // now there is 1 job in the database:
     assertEquals(1, managementService.createJobQuery().count());
@@ -553,7 +554,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     variables.put("flow", false);
 
     // start PI
-    String pid = runtimeService.startProcessInstanceByKey("asyncExclusiveGateway", variables).getProcessInstanceId();
+    String pid = runtimeService.startProcessInstanceByKey("asyncExclusiveGateway", variables)
+        .getProcessInstanceId();
 
     // now there is 1 job in the database:
     assertEquals(1, managementService.createJobQuery().count());
@@ -578,7 +580,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testAsyncInclusiveGateway() {
     // start PI
-    String pid = runtimeService.startProcessInstanceByKey("asyncInclusiveGateway").getProcessInstanceId();
+    String pid = runtimeService.startProcessInstanceByKey("asyncInclusiveGateway")
+        .getProcessInstanceId();
 
     // now there is 1 job in the database:
     assertEquals(1, managementService.createJobQuery().count());
@@ -598,7 +601,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(2, list.size());
 
     // complete these tasks and finish the process instance
-    for(Task task: list) {
+    for (Task task : list) {
       taskService.complete(task.getId());
     }
   }
@@ -606,7 +609,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testAsyncEventGateway() {
     // start PI
-    String pid = runtimeService.startProcessInstanceByKey("asyncEventGateway").getProcessInstanceId();
+    String pid = runtimeService.startProcessInstanceByKey("asyncEventGateway")
+        .getProcessInstanceId();
 
     // now there is a job in the database
     assertEquals(1, managementService.createJobQuery().count());
@@ -675,7 +679,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
     assertEquals(2, recordedEvents.size());
     assertEquals("subProcess", recordedEvents.get(0).getActivityId());
-    assertNull(recordedEvents.get(1).getActivityId()); // process instance end event has no activity id
+    assertNull(recordedEvents.get(1).getActivityId()); // process instance end event has no activity
+                                                       // id
 
     RecorderExecutionListener.clear();
   }
@@ -694,7 +699,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
     // then the output mapping has not been executed because the
     // activity was not active yet
-    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT.getId()) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT
+        .getId()) {
       assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
     }
 
@@ -706,20 +712,24 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testDeleteInScopeShouldNotInvokeOutputMapping() {
     // given
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncOutputMappingSubProcess");
+    ProcessInstance instance = runtimeService
+        .startProcessInstanceByKey("asyncOutputMappingSubProcess");
     assertEquals(1, managementService.createJobQuery().count());
 
     // when
     runtimeService.deleteProcessInstance(instance.getId(), "");
 
     // then
-    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT.getId()) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT
+        .getId()) {
       // the output mapping of the task has not been executed because the
       // activity was not active yet
-      assertEquals(0, historyService.createHistoricVariableInstanceQuery().variableName("taskOutputMappingExecuted").count());
+      assertEquals(0, historyService.createHistoricVariableInstanceQuery()
+          .variableName("taskOutputMappingExecuted").count());
 
       // but the containing sub process output mapping was executed
-      assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("subProcessOutputMappingExecuted").count());
+      assertEquals(1, historyService.createHistoricVariableInstanceQuery()
+          .variableName("subProcessOutputMappingExecuted").count());
     }
   }
 
@@ -730,14 +740,16 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
       // given a deployment that contains a process called "process" with an async task "task"
       org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService
           .createDeployment()
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testDeployAndRemoveAsyncActivity.v1.bpmn20.xml")
+          .addClasspathResource(
+              "org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testDeployAndRemoveAsyncActivity.v1.bpmn20.xml")
           .deploy();
       deployments.add(deployment1.getId());
 
       // when redeploying the process where that task is not contained anymore
       org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService
           .createDeployment()
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testDeployAndRemoveAsyncActivity.v2.bpmn20.xml")
+          .addClasspathResource(
+              "org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testDeployAndRemoveAsyncActivity.v2.bpmn20.xml")
           .deploy();
       deployments.add(deployment2.getId());
 
@@ -756,12 +768,14 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/async/processWithGatewayAndTwoEndEvents.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/async/processWithGatewayAndTwoEndEvents.bpmn20.xml" })
   public void testGatewayWithTwoEndEventsLastJobReAssignedToParentExe() {
     String processKey = repositoryService.createProcessDefinitionQuery().singleResult().getKey();
     String processInstanceId = runtimeService.startProcessInstanceByKey(processKey).getId();
 
-    List<Job> jobList = managementService.createJobQuery().processInstanceId(processInstanceId).list();
+    List<Job> jobList = managementService.createJobQuery().processInstanceId(processInstanceId)
+        .list();
 
     // There should be two jobs
     assertNotNull(jobList);
@@ -786,12 +800,14 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(0, jobList.size());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/async/processGatewayAndTwoEndEventsPlusTimer.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/async/processGatewayAndTwoEndEventsPlusTimer.bpmn20.xml" })
   public void testGatewayWithTwoEndEventsLastTimerReAssignedToParentExe() {
     String processKey = repositoryService.createProcessDefinitionQuery().singleResult().getKey();
     String processInstanceId = runtimeService.startProcessInstanceByKey(processKey).getId();
 
-    List<Job> jobList = managementService.createJobQuery().processInstanceId(processInstanceId).list();
+    List<Job> jobList = managementService.createJobQuery().processInstanceId(processInstanceId)
+        .list();
 
     // There should be two jobs
     assertNotNull(jobList);
@@ -824,7 +840,8 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     String key = "myrealrealrealrealrealrealrealrealrealrealreallongprocessdefinitionkeyawesome";
     String processInstanceId = runtimeService.startProcessInstanceByKey(key).getId();
 
-    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
+    Job job = managementService.createJobQuery().processInstanceId(processInstanceId)
+        .singleResult();
 
     assertEquals(key, job.getProcessDefinitionKey());
   }

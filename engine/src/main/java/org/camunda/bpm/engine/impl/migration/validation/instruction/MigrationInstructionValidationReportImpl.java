@@ -22,7 +22,8 @@ import java.util.List;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationInstructionValidationReport;
 
-public class MigrationInstructionValidationReportImpl implements MigrationInstructionValidationReport {
+public class MigrationInstructionValidationReportImpl
+    implements MigrationInstructionValidationReport {
 
   protected MigrationInstruction migrationInstruction;
 
@@ -49,10 +50,8 @@ public class MigrationInstructionValidationReportImpl implements MigrationInstru
   }
 
   public String toString() {
-    return "MigrationInstructionValidationReportImpl{" +
-      "migrationInstruction=" + migrationInstruction +
-      ", failures=" + failures +
-      '}';
+    return "MigrationInstructionValidationReportImpl{" + "migrationInstruction="
+        + migrationInstruction + ", failures=" + failures + '}';
   }
 
 }

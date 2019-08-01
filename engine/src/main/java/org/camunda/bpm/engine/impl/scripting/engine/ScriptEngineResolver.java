@@ -39,18 +39,20 @@ public class ScriptEngineResolver {
   }
 
   public void addScriptEngineFactory(ScriptEngineFactory scriptEngineFactory) {
-    scriptEngineManager.registerEngineName(scriptEngineFactory.getEngineName(), scriptEngineFactory);
+    scriptEngineManager.registerEngineName(scriptEngineFactory.getEngineName(),
+        scriptEngineFactory);
   }
 
   public ScriptEngineManager getScriptEngineManager() {
     return scriptEngineManager;
   }
 
-
   /**
-   * Returns a cached script engine or creates a new script engine if no such engine is currently cached.
+   * Returns a cached script engine or creates a new script engine if no such engine is currently
+   * cached.
    *
-   * @param language the language (such as 'groovy' for the script engine)
+   * @param language
+   *          the language (such as 'groovy' for the script engine)
    * @return the cached engine or null if no script engine can be created for the given language
    */
   public ScriptEngine getScriptEngine(String language, boolean resolveFromCache) {
@@ -60,16 +62,16 @@ public class ScriptEngineResolver {
     if (resolveFromCache) {
       scriptEngine = cachedEngines.get(language);
 
-      if(scriptEngine == null) {
+      if (scriptEngine == null) {
         scriptEngine = scriptEngineManager.getEngineByName(language);
 
-        if(scriptEngine != null) {
+        if (scriptEngine != null) {
 
-          if(ScriptingEngines.GROOVY_SCRIPTING_LANGUAGE.equals(language)) {
+          if (ScriptingEngines.GROOVY_SCRIPTING_LANGUAGE.equals(language)) {
             configureGroovyScriptEngine(scriptEngine);
           }
 
-          if(isCachable(scriptEngine)) {
+          if (isCachable(scriptEngine)) {
             cachedEngines.put(language, scriptEngine);
           }
 
@@ -87,7 +89,8 @@ public class ScriptEngineResolver {
   /**
    * Allows checking whether the script engine can be cached.
    *
-   * @param scriptEngine the script engine to check.
+   * @param scriptEngine
+   *          the script engine to check.
    * @return true if the script engine may be cached.
    */
   protected boolean isCachable(ScriptEngine scriptEngine) {
@@ -98,13 +101,15 @@ public class ScriptEngineResolver {
 
   /**
    * Allows providing custom configuration for the groovy script engine.
-   * @param scriptEngine the groovy script engine to configure.
+   * 
+   * @param scriptEngine
+   *          the groovy script engine to configure.
    */
   protected void configureGroovyScriptEngine(ScriptEngine scriptEngine) {
 
     // make sure Groovy compiled scripts only hold weak references to java methods
-    scriptEngine.getContext().setAttribute("#jsr223.groovy.engine.keep.globals", "weak", ScriptContext.ENGINE_SCOPE);
+    scriptEngine.getContext().setAttribute("#jsr223.groovy.engine.keep.globals", "weak",
+        ScriptContext.ENGINE_SCOPE);
   }
-
 
 }

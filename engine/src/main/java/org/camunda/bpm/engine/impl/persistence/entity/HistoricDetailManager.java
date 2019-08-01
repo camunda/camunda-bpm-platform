@@ -40,7 +40,8 @@ public class HistoricDetailManager extends AbstractHistoricManager {
     deleteHistoricDetails(parameters);
   }
 
-  public void deleteHistoricDetailsByTaskProcessInstanceIds(List<String> historicProcessInstanceIds) {
+  public void deleteHistoricDetailsByTaskProcessInstanceIds(
+      List<String> historicProcessInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("taskProcessInstanceIds", historicProcessInstanceIds);
     deleteHistoricDetails(parameters);
@@ -57,7 +58,7 @@ public class HistoricDetailManager extends AbstractHistoricManager {
     parameters.put("taskCaseInstanceIds", historicCaseInstanceIds);
     deleteHistoricDetails(parameters);
   }
-  
+
   public void deleteHistoricDetailsByVariableInstanceId(String historicVariableInstanceId) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("variableInstanceId", historicVariableInstanceId);
@@ -65,20 +66,25 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   }
 
   public void deleteHistoricDetails(Map<String, Object> parameters) {
-    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDetailByteArraysByIds", parameters);
-    getDbEntityManager().deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByIds", parameters);
+    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class,
+        "deleteHistoricDetailByteArraysByIds", parameters);
+    getDbEntityManager().deletePreserveOrder(HistoricDetailEventEntity.class,
+        "deleteHistoricDetailsByIds", parameters);
   }
 
-
-  public long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
+  public long findHistoricDetailCountByQueryCriteria(
+      HistoricDetailQueryImpl historicVariableUpdateQuery) {
     configureQuery(historicVariableUpdateQuery);
-    return (Long) getDbEntityManager().selectOne("selectHistoricDetailCountByQueryCriteria", historicVariableUpdateQuery);
+    return (Long) getDbEntityManager().selectOne("selectHistoricDetailCountByQueryCriteria",
+        historicVariableUpdateQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery, Page page) {
+  public List<HistoricDetail> findHistoricDetailsByQueryCriteria(
+      HistoricDetailQueryImpl historicVariableUpdateQuery, Page page) {
     configureQuery(historicVariableUpdateQuery);
-    return getDbEntityManager().selectList("selectHistoricDetailsByQueryCriteria", historicVariableUpdateQuery, page);
+    return getDbEntityManager().selectList("selectHistoricDetailsByQueryCriteria",
+        historicVariableUpdateQuery, page);
   }
 
   public void deleteHistoricDetailsByTaskId(String taskId) {
@@ -90,8 +96,9 @@ public class HistoricDetailManager extends AbstractHistoricManager {
         ((HistoricDetailEventEntity) historicDetail).delete();
       }
 
-      //delete entries in Cache
-      List<HistoricDetailEventEntity> cachedHistoricDetails = getDbEntityManager().getCachedEntitiesByType(HistoricDetailEventEntity.class);
+      // delete entries in Cache
+      List<HistoricDetailEventEntity> cachedHistoricDetails = getDbEntityManager()
+          .getCachedEntitiesByType(HistoricDetailEventEntity.class);
       for (HistoricDetailEventEntity historicDetail : cachedHistoricDetails) {
         // make sure we only delete the right ones (as we cannot make a proper query in the cache)
         if (taskId.equals(historicDetail.getTaskId())) {
@@ -111,25 +118,28 @@ public class HistoricDetailManager extends AbstractHistoricManager {
     getTenantManager().configureQuery(query);
   }
 
-  public void addRemovalTimeToDetailsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToDetailsByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricDetailEventEntity.class, "updateHistoricDetailsByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricDetailEventEntity.class,
+        "updateHistoricDetailsByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToDetailsByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public void addRemovalTimeToDetailsByProcessInstanceId(String processInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricDetailEventEntity.class, "updateHistoricDetailsByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricDetailEventEntity.class,
+        "updateHistoricDetailsByProcessInstanceId", parameters);
   }
 
-  public DbOperation deleteHistoricDetailsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteHistoricDetailsByRemovalTime(Date removalTime, int minuteFrom,
+      int minuteTo, int batchSize) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -138,8 +148,8 @@ public class HistoricDetailManager extends AbstractHistoricManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByRemovalTime",
+    return getDbEntityManager().deletePreserveOrder(HistoricDetailEventEntity.class,
+        "deleteHistoricDetailsByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 

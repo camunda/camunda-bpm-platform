@@ -40,84 +40,63 @@ import java.util.List;
 public class OptimizeService extends ServiceImpl {
 
   public List<HistoricActivityInstance> getCompletedHistoricActivityInstances(Date finishedAfter,
-                                                                              Date finishedAt,
-                                                                              int maxResults) {
-    return commandExecutor.execute(
-      new OptimizeCompletedHistoricActivityInstanceQueryCmd(finishedAfter, finishedAt, maxResults)
-    );
+      Date finishedAt, int maxResults) {
+    return commandExecutor.execute(new OptimizeCompletedHistoricActivityInstanceQueryCmd(
+        finishedAfter, finishedAt, maxResults));
   }
 
   public List<HistoricActivityInstance> getRunningHistoricActivityInstances(Date startedAfter,
-                                                                            Date startedAt,
-                                                                            int maxResults) {
+      Date startedAt, int maxResults) {
     return commandExecutor.execute(
-      new OptimizeRunningHistoricActivityInstanceQueryCmd(startedAfter, startedAt, maxResults)
-    );
+        new OptimizeRunningHistoricActivityInstanceQueryCmd(startedAfter, startedAt, maxResults));
   }
 
   public List<HistoricTaskInstance> getCompletedHistoricTaskInstances(Date finishedAfter,
-                                                                      Date finishedAt,
-                                                                      int maxResults) {
+      Date finishedAt, int maxResults) {
     return commandExecutor.execute(
-      new OptimizeCompletedHistoricTaskInstanceQueryCmd(finishedAfter, finishedAt, maxResults)
-    );
+        new OptimizeCompletedHistoricTaskInstanceQueryCmd(finishedAfter, finishedAt, maxResults));
   }
 
   public List<HistoricTaskInstance> getRunningHistoricTaskInstances(Date startedAfter,
-                                                                    Date startedAt,
-                                                                    int maxResults) {
+      Date startedAt, int maxResults) {
     return commandExecutor.execute(
-      new OptimizeRunningHistoricTaskInstanceQueryCmd(startedAfter, startedAt, maxResults)
-    );
+        new OptimizeRunningHistoricTaskInstanceQueryCmd(startedAfter, startedAt, maxResults));
   }
 
   public List<UserOperationLogEntry> getHistoricUserOperationLogs(Date occurredAfter,
-                                                                  Date occurredAt,
-                                                                  int maxResults) {
+      Date occurredAt, int maxResults) {
     return commandExecutor.execute(
-      new OptimizeHistoricUserOperationsLogQueryCmd(occurredAfter, occurredAt, maxResults)
-    );
+        new OptimizeHistoricUserOperationsLogQueryCmd(occurredAfter, occurredAt, maxResults));
   }
 
   public List<OptimizeHistoricIdentityLinkLogEntity> getHistoricIdentityLinkLogs(Date occurredAfter,
-                                                                                 Date occurredAt,
-                                                                                 int maxResults) {
+      Date occurredAt, int maxResults) {
     return commandExecutor.execute(
-      new OptimizeHistoricIdentityLinkLogQueryCmd(occurredAfter, occurredAt, maxResults)
-    );
+        new OptimizeHistoricIdentityLinkLogQueryCmd(occurredAfter, occurredAt, maxResults));
   }
 
   public List<HistoricProcessInstance> getCompletedHistoricProcessInstances(Date finishedAfter,
-                                                                            Date finishedAt,
-                                                                            int maxResults) {
-    return commandExecutor.execute(
-      new OptimizeCompletedHistoricProcessInstanceQueryCmd(finishedAfter, finishedAt, maxResults)
-    );
+      Date finishedAt, int maxResults) {
+    return commandExecutor.execute(new OptimizeCompletedHistoricProcessInstanceQueryCmd(
+        finishedAfter, finishedAt, maxResults));
   }
 
   public List<HistoricProcessInstance> getRunningHistoricProcessInstances(Date startedAfter,
-                                                                          Date startedAt,
-                                                                          int maxResults) {
+      Date startedAt, int maxResults) {
     return commandExecutor.execute(
-      new OptimizeRunningHistoricProcessInstanceQueryCmd(startedAfter, startedAt, maxResults)
-    );
+        new OptimizeRunningHistoricProcessInstanceQueryCmd(startedAfter, startedAt, maxResults));
   }
 
   public List<HistoricVariableUpdate> getHistoricVariableUpdates(Date occurredAfter,
-                                                                 Date occurredAt,
-                                                                 int maxResults) {
-    return commandExecutor.execute(
-      new OptimizeHistoricVariableUpdateQueryCmd(occurredAfter, occurredAt, maxResults)
-    );
+      Date occurredAt, int maxResults) {
+    return commandExecutor
+        .execute(new OptimizeHistoricVariableUpdateQueryCmd(occurredAfter, occurredAt, maxResults));
   }
 
   public List<HistoricDecisionInstance> getHistoricDecisionInstances(Date evaluatedAfter,
-                                                                     Date evaluatedAt,
-                                                                     int maxResults) {
+      Date evaluatedAt, int maxResults) {
     return commandExecutor.execute(
-      new OptimizeHistoricDecisionInstanceQueryCmd(evaluatedAfter, evaluatedAt, maxResults)
-    );
+        new OptimizeHistoricDecisionInstanceQueryCmd(evaluatedAfter, evaluatedAt, maxResults));
   }
-
 
 }

@@ -57,7 +57,7 @@ public class MetricsDisabledTest extends ResourceProcessEngineTestCase {
       // I cannot invoke
       managementService.reportDbMetricsNow();
       fail("Exception expected");
-    } catch(ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertTextPresent("Metrics reporting is disabled", e.getMessage());
     }
   }

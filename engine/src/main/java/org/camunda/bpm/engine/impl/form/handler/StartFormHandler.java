@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.form.handler;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
-
 /**
  * @author Tom Baeyens
  */

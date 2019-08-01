@@ -56,6 +56,7 @@ public interface UpdateExternalTaskRetriesSelectBuilder {
   /**
    * Selects a list of external tasks with the given historic process instance query.
    */
-  UpdateExternalTaskRetriesBuilder historicProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery);
+  UpdateExternalTaskRetriesBuilder historicProcessInstanceQuery(
+      HistoricProcessInstanceQuery historicProcessInstanceQuery);
 
 }

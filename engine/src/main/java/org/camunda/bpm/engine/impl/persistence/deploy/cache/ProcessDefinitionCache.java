@@ -27,8 +27,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public class ProcessDefinitionCache extends ResourceDefinitionCache<ProcessDefinitionEntity> {
 
-
-  public ProcessDefinitionCache(CacheFactory factory, int cacheCapacity, CacheDeployer cacheDeployer) {
+  public ProcessDefinitionCache(CacheFactory factory, int cacheCapacity,
+      CacheDeployer cacheDeployer) {
     super(factory, cacheCapacity, cacheDeployer);
   }
 
@@ -44,39 +44,53 @@ public class ProcessDefinitionCache extends ResourceDefinitionCache<ProcessDefin
 
   @Override
   protected void checkDefinitionFound(String definitionId, ProcessDefinitionEntity definition) {
-    ensureNotNull("no deployed process definition found with id '" + definitionId + "'", "processDefinition", definition);
+    ensureNotNull("no deployed process definition found with id '" + definitionId + "'",
+        "processDefinition", definition);
   }
 
   @Override
-  protected void checkInvalidDefinitionByKey(String definitionKey, ProcessDefinitionEntity definition) {
-    ensureNotNull("no processes deployed with key '" + definitionKey + "'", "processDefinition", definition);
-  }
-
-  @Override
-  protected void checkInvalidDefinitionByKeyAndTenantId(String definitionKey, String tenantId, ProcessDefinitionEntity definition) {
-    ensureNotNull("no processes deployed with key '" + definitionKey + "' and tenant-id '" + tenantId + "'", "processDefinition", definition);
-  }
-
-  @Override
-  protected void checkInvalidDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId, ProcessDefinitionEntity definition) {
-    ensureNotNull("no processes deployed with key = '" + definitionKey + "', version = '" + definitionVersion
-        + "' and tenant-id = '" + tenantId + "'", "processDefinition", definition);
-  }
-
-  @Override
-  protected void checkInvalidDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId,
+  protected void checkInvalidDefinitionByKey(String definitionKey,
       ProcessDefinitionEntity definition) {
-    ensureNotNull("no processes deployed with key = '" + definitionKey + "', versionTag = '" + definitionVersionTag
-        + "' and tenant-id = '" + tenantId + "'", "processDefinition", definition);
+    ensureNotNull("no processes deployed with key '" + definitionKey + "'", "processDefinition",
+        definition);
   }
 
   @Override
-  protected void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey, ProcessDefinitionEntity definition) {
-    ensureNotNull("no processes deployed with key = '" + definitionKey + "' in deployment = '" + deploymentId + "'", "processDefinition", definition);
+  protected void checkInvalidDefinitionByKeyAndTenantId(String definitionKey, String tenantId,
+      ProcessDefinitionEntity definition) {
+    ensureNotNull(
+        "no processes deployed with key '" + definitionKey + "' and tenant-id '" + tenantId + "'",
+        "processDefinition", definition);
   }
 
   @Override
-  protected void checkInvalidDefinitionWasCached(String deploymentId, String definitionId, ProcessDefinitionEntity definition) {
-    ensureNotNull("deployment '" + deploymentId + "' didn't put process definition '" + definitionId + "' in the cache", "cachedProcessDefinition", definition);
+  protected void checkInvalidDefinitionByKeyVersionAndTenantId(String definitionKey,
+      Integer definitionVersion, String tenantId, ProcessDefinitionEntity definition) {
+    ensureNotNull("no processes deployed with key = '" + definitionKey + "', version = '"
+        + definitionVersion + "' and tenant-id = '" + tenantId + "'", "processDefinition",
+        definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionByKeyVersionTagAndTenantId(String definitionKey,
+      String definitionVersionTag, String tenantId, ProcessDefinitionEntity definition) {
+    ensureNotNull(
+        "no processes deployed with key = '" + definitionKey + "', versionTag = '"
+            + definitionVersionTag + "' and tenant-id = '" + tenantId + "'",
+        "processDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey,
+      ProcessDefinitionEntity definition) {
+    ensureNotNull("no processes deployed with key = '" + definitionKey + "' in deployment = '"
+        + deploymentId + "'", "processDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionWasCached(String deploymentId, String definitionId,
+      ProcessDefinitionEntity definition) {
+    ensureNotNull("deployment '" + deploymentId + "' didn't put process definition '" + definitionId
+        + "' in the cache", "cachedProcessDefinition", definition);
   }
 }

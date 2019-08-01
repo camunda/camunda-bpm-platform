@@ -60,7 +60,8 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase
     assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
-    verifyOrder(order, "theStart", "theService", "fork", "theService1", "theEnd1", "theService2", "theEnd2");
+    verifyOrder(order, "theStart", "theService", "fork", "theService1", "theEnd1", "theService2",
+        "theEnd2");
   }
 
   @Deployment
@@ -139,7 +140,8 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase
     assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
-    verifyOrder(order, "theStart", "theService", "fork", "theService1", "theEnd1", "theService2", "theService3", "theEnd2");
+    verifyOrder(order, "theStart", "theService", "fork", "theService1", "theEnd1", "theService2",
+        "theService3", "theEnd2");
 
   }
 
@@ -183,7 +185,7 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase
 
     ActivitySequenceCounterMap theService3Element = order.get(5);
     assertEquals("theService3", theService3Element.getActivityId());
-    assertTrue(theService3Element.getSequenceCounter() > theService2Element.getSequenceCounter() );
+    assertTrue(theService3Element.getSequenceCounter() > theService2Element.getSequenceCounter());
 
     // when (2)
     String jobId = jobQuery.activityId("theEnd1").singleResult().getId();
@@ -273,7 +275,8 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase
     assertProcessEnded(processInstanceId);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testForkReplaceBy.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/standalone/entity/ExecutionSequenceCounterTest.testForkReplaceBy.bpmn20.xml" })
   public void testForkReplaceByAnotherExecutionOrder() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -594,7 +597,8 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase
     assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
-    verifyOrder(order, "theStart", "theService1", "subProcess", "innerStart", "innerService", "innerEnd", "theService2", "theEnd");
+    verifyOrder(order, "theStart", "theService1", "subProcess", "innerStart", "innerService",
+        "innerEnd", "theService2", "theEnd");
   }
 
   @Deployment
@@ -660,7 +664,8 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase
     assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
-    verifyOrder(order, "theStart", "theService1", "theService2", "theService2", "theService3", "theEnd");
+    verifyOrder(order, "theStart", "theService1", "theService2", "theService2", "theService3",
+        "theEnd");
   }
 
   @Deployment
@@ -712,7 +717,8 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase
     assertProcessEnded(processInstanceId);
 
     List<ActivitySequenceCounterMap> order = ExecutionOrderListener.getActivityExecutionOrder();
-    verifyOrder(order, "theStart", "theService1", "join", "theScript", "fork", "join", "theScript", "fork", "theService2", "theEnd");
+    verifyOrder(order, "theStart", "theService1", "join", "theScript", "fork", "join", "theScript",
+        "fork", "theService2", "theEnd");
   }
 
   @Deployment
@@ -733,7 +739,8 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase
     assertProcessEnded(processInstanceId);
 
     order = ExecutionOrderListener.getActivityExecutionOrder();
-    verifyOrder(order, "theStart", "theService1", "theTask", "messageBoundary", "theServiceAfterMessage", "theEnd2");
+    verifyOrder(order, "theStart", "theService1", "theTask", "messageBoundary",
+        "theServiceAfterMessage", "theEnd2");
   }
 
   @Deployment
@@ -762,16 +769,19 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase
 
     ActivitySequenceCounterMap messageBoundaryElement = order.get(3);
     assertEquals("messageBoundary", messageBoundaryElement.getActivityId());
-    assertTrue(messageBoundaryElement.getSequenceCounter() > theService1Element.getSequenceCounter());
+    assertTrue(
+        messageBoundaryElement.getSequenceCounter() > theService1Element.getSequenceCounter());
     assertFalse(messageBoundaryElement.getSequenceCounter() > theTaskElement.getSequenceCounter());
 
     ActivitySequenceCounterMap theServiceAfterMessageElement = order.get(4);
     assertEquals("theServiceAfterMessage", theServiceAfterMessageElement.getActivityId());
-    assertTrue(theServiceAfterMessageElement.getSequenceCounter() > messageBoundaryElement.getSequenceCounter());
+    assertTrue(theServiceAfterMessageElement.getSequenceCounter() > messageBoundaryElement
+        .getSequenceCounter());
 
     ActivitySequenceCounterMap theEnd2Element = order.get(5);
     assertEquals("theEnd2", theEnd2Element.getActivityId());
-    assertTrue(theEnd2Element.getSequenceCounter() > theServiceAfterMessageElement.getSequenceCounter());
+    assertTrue(
+        theEnd2Element.getSequenceCounter() > theServiceAfterMessageElement.getSequenceCounter());
 
     // when (3)
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -788,7 +798,8 @@ public class ExecutionSequenceCounterTest extends PluggableProcessEngineTestCase
     assertTrue(theEnd1Element.getSequenceCounter() > theEnd2Element.getSequenceCounter());
   }
 
-  protected void verifyOrder(List<ActivitySequenceCounterMap> actualOrder, String... expectedOrder) {
+  protected void verifyOrder(List<ActivitySequenceCounterMap> actualOrder,
+      String... expectedOrder) {
     assertEquals(expectedOrder.length, actualOrder.size());
 
     long lastActualSequenceCounter = 0;

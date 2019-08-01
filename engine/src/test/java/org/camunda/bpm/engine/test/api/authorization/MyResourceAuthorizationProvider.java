@@ -158,7 +158,8 @@ public class MyResourceAuthorizationProvider implements ResourceAuthorizationPro
     return null;
   }
 
-  public AuthorizationEntity[] newDecisionRequirementsDefinition(DecisionRequirementsDefinition decisionRequirementsDefinition) {
+  public AuthorizationEntity[] newDecisionRequirementsDefinition(
+      DecisionRequirementsDefinition decisionRequirementsDefinition) {
     return null;
   }
 

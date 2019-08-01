@@ -47,26 +47,34 @@ public class ResolveIncidentCmd implements Command<Void> {
   public Void execute(CommandContext commandContext) {
     final Incident incident = commandContext.getIncidentManager().findIncidentById(incidentId);
 
-    EnsureUtil.ensureNotNull(NotFoundException.class, "Cannot find an incident with id '" + incidentId + "'",
-        "incident", incident);
+    EnsureUtil.ensureNotNull(NotFoundException.class,
+        "Cannot find an incident with id '" + incidentId + "'", "incident", incident);
 
-    if (incident.getIncidentType().equals("failedJob") || incident.getIncidentType().equals("failedExternalTask")) {
-      throw new BadUserRequestException("Cannot resolve an incident of type " + incident.getIncidentType());
+    if (incident.getIncidentType().equals("failedJob")
+        || incident.getIncidentType().equals("failedExternalTask")) {
+      throw new BadUserRequestException(
+          "Cannot resolve an incident of type " + incident.getIncidentType());
     }
 
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "", "executionId", incident.getExecutionId());
-    ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(incident.getExecutionId());
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "", "executionId",
+        incident.getExecutionId());
+    ExecutionEntity execution = commandContext.getExecutionManager()
+        .findExecutionById(incident.getExecutionId());
 
     EnsureUtil.ensureNotNull(BadUserRequestException.class,
-        "Cannot find an execution for an incident with id '" + incidentId + "'", "execution", execution);
+        "Cannot find an execution for an incident with id '" + incidentId + "'", "execution",
+        execution);
 
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateProcessInstance(execution);
     }
 
-    commandContext.getOperationLogManager().logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_RESOLVE, execution.getProcessInstanceId(), 
-        execution.getProcessDefinitionId(), null, Collections.singletonList(new PropertyChange("incidentId", null, incidentId)));
-    
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_RESOLVE, execution.getProcessInstanceId(),
+        execution.getProcessDefinitionId(), null,
+        Collections.singletonList(new PropertyChange("incidentId", null, incidentId)));
+
     execution.resolveIncident(incidentId);
     return null;
   }

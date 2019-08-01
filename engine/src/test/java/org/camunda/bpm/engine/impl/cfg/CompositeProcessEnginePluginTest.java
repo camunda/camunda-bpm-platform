@@ -33,7 +33,8 @@ public class CompositeProcessEnginePluginTest {
   private static final ProcessEnginePlugin PLUGIN_B = processEnginePlugin("PluginB");
   private static final InOrder ORDER = inOrder(PLUGIN_A, PLUGIN_B);
 
-  private static final ProcessEngineConfigurationImpl CONFIGURATION = mock(ProcessEngineConfigurationImpl.class);
+  private static final ProcessEngineConfigurationImpl CONFIGURATION = mock(
+      ProcessEngineConfigurationImpl.class);
   private static final ProcessEngine ENGINE = mock(ProcessEngine.class);
   private InOrder inOrder;
 
@@ -87,7 +88,8 @@ public class CompositeProcessEnginePluginTest {
 
   @Test
   public void verifyToString() throws Exception {
-    assertThat(new CompositeProcessEnginePlugin(PLUGIN_A, PLUGIN_B).toString(), is("CompositeProcessEnginePlugin[PluginA, PluginB]"));
+    assertThat(new CompositeProcessEnginePlugin(PLUGIN_A, PLUGIN_B).toString(),
+        is("CompositeProcessEnginePlugin[PluginA, PluginB]"));
   }
 
   private static ProcessEnginePlugin processEnginePlugin(final String name) {

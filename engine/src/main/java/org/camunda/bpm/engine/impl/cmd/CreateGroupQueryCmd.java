@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -31,9 +30,7 @@ public class CreateGroupQueryCmd implements Command<GroupQuery>, Serializable {
   private static final long serialVersionUID = 1L;
 
   public GroupQuery execute(CommandContext commandContext) {
-    return commandContext
-      .getReadOnlyIdentityProvider()
-      .createGroupQuery();
+    return commandContext.getReadOnlyIdentityProvider().createGroupQuery();
   }
 
 }

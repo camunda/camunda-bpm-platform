@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  * @author Joram Barrez
  */
@@ -67,8 +66,10 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
     assertNotNull(task.getTaskDefinitionKey());
     assertNotNull(task.getCreateTime());
 
-    // the next test verifies that if an execution creates a task, that no events are created during creation of the task.
-    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    // the next test verifies that if an execution creates a task, that no events are created during
+    // creation of the task.
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       assertEquals(0, taskService.getTaskEvents(task.getId()).size());
     }
   }
@@ -76,14 +77,15 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testQuerySortingWithParameter() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).list().size());
+    assertEquals(1,
+        taskService.createTaskQuery().processInstanceId(processInstance.getId()).list().size());
   }
 
   @Deployment
   public void testCompleteAfterParallelGateway() throws InterruptedException {
-	  // related to http://jira.codehaus.org/browse/ACT-1054
+    // related to http://jira.codehaus.org/browse/ACT-1054
 
-	  // start the process
+    // start the process
     runtimeService.startProcessInstanceByKey("ForkProcess");
     List<Task> taskList = taskService.createTaskQuery().list();
     assertNotNull(taskList);
@@ -91,11 +93,12 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
 
     // make sure user task exists
     Task task = taskService.createTaskQuery().taskDefinitionKey("SimpleUser").singleResult();
-  	assertNotNull(task);
+    assertNotNull(task);
 
-  	// attempt to complete the task and get PersistenceException pointing to "referential integrity constraint violation"
-  	taskService.complete(task.getId());
-	}
+    // attempt to complete the task and get PersistenceException pointing to "referential integrity
+    // constraint violation"
+    taskService.complete(task.getId());
+  }
 
   @Deployment
   public void testComplexScenarioWithSubprocessesAndParallelGateways() {
@@ -118,10 +121,7 @@ public class UserTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("Write monthly financial report", task.getName());
 
     taskService.claim(task.getId(), "fozzie");
-    tasks = taskService
-      .createTaskQuery()
-      .taskAssignee("fozzie")
-      .list();
+    tasks = taskService.createTaskQuery().taskAssignee("fozzie").list();
 
     assertEquals(1, tasks.size());
     taskService.complete(task.getId());

@@ -53,47 +53,37 @@ public class MultiTenancyCaseExecutionQueryTest extends PluggableProcessEngineTe
   }
 
   public void testQueryByTenantId() {
-    CaseExecutionQuery query = caseService
-        .createCaseExecutionQuery()
-        .tenantIdIn(TENANT_ONE);
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery().tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(2L));
 
-    query = caseService
-        .createCaseExecutionQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = caseService.createCaseExecutionQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantIds() {
-    CaseExecutionQuery query = caseService
-        .createCaseExecutionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO);
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery().tenantIdIn(TENANT_ONE,
+        TENANT_TWO);
 
     assertThat(query.count(), is(4L));
   }
 
   public void testQueryByExecutionsWithoutTenantId() {
-    CaseExecutionQuery query = caseService
-        .createCaseExecutionQuery()
-        .withoutTenantId();
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery().withoutTenantId();
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    CaseExecutionQuery query = caseService
-        .createCaseExecutionQuery()
-        .tenantIdIn("nonExisting");
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery().tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
   }
 
   public void testFailQueryByTenantIdNull() {
     try {
-      caseService.createCaseExecutionQuery()
-        .tenantIdIn((String) null);
+      caseService.createCaseExecutionQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -103,10 +93,7 @@ public class MultiTenancyCaseExecutionQueryTest extends PluggableProcessEngineTe
   public void testQuerySortingAsc() {
     // exclude case executions without tenant id because of database-specific ordering
     List<CaseExecution> caseExecutions = caseService.createCaseExecutionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc().list();
 
     assertThat(caseExecutions.size(), is(4));
     assertThat(caseExecutions.get(0).getTenantId(), is(TENANT_ONE));
@@ -118,10 +105,7 @@ public class MultiTenancyCaseExecutionQueryTest extends PluggableProcessEngineTe
   public void testQuerySortingDesc() {
     // exclude case executions without tenant id because of database-specific ordering
     List<CaseExecution> caseExecutions = caseService.createCaseExecutionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .desc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().desc().list();
 
     assertThat(caseExecutions.size(), is(4));
     assertThat(caseExecutions.get(0).getTenantId(), is(TENANT_TWO));
@@ -170,7 +154,8 @@ public class MultiTenancyCaseExecutionQueryTest extends PluggableProcessEngineTe
   protected void createCaseInstance(String tenantId) {
     String caseDefinitionId = null;
 
-    CaseDefinitionQuery caseDefinitionQuery = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneTaskCase");
+    CaseDefinitionQuery caseDefinitionQuery = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase");
     if (tenantId == null) {
       caseDefinitionId = caseDefinitionQuery.withoutTenantId().singleResult().getId();
     } else {

@@ -40,17 +40,19 @@ public class VariableInTransactionTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       @Override
       public Void execute(CommandContext commandContext) {
-        //create a variable
-        VariableInstanceEntity variable = VariableInstanceEntity.createAndInsert("aVariable", Variables.byteArrayValue(new byte[0]));
+        // create a variable
+        VariableInstanceEntity variable = VariableInstanceEntity.createAndInsert("aVariable",
+            Variables.byteArrayValue(new byte[0]));
         String byteArrayId = variable.getByteArrayValueId();
 
-        //delete the variable
+        // delete the variable
         variable.delete();
 
-        //check if the variable is deleted transient
-        //-> no insert and delete stmt will be flushed
+        // check if the variable is deleted transient
+        // -> no insert and delete stmt will be flushed
         DbEntityManager dbEntityManager = commandContext.getDbEntityManager();
-        CachedDbEntity cachedEntity = dbEntityManager.getDbEntityCache().getCachedEntity(ByteArrayEntity.class, byteArrayId);
+        CachedDbEntity cachedEntity = dbEntityManager.getDbEntityCache()
+            .getCachedEntity(ByteArrayEntity.class, byteArrayId);
 
         DbEntityState entityState = cachedEntity.getEntityState();
         assertEquals(DbEntityState.DELETED_TRANSIENT, entityState);

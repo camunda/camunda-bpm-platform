@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.query.QueryProperty;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -41,7 +40,8 @@ public interface HistoricTaskInstanceQueryProperty {
   public static final QueryProperty TASK_PRIORITY = new QueryPropertyImpl("PRIORITY_");
   public static final QueryProperty TASK_DUE_DATE = new QueryPropertyImpl("DUE_DATE_");
   public static final QueryProperty TASK_FOLLOW_UP_DATE = new QueryPropertyImpl("FOLLOW_UP_DATE_");
-  public static final QueryProperty CASE_DEFINITION_ID = new QueryPropertyImpl("CASE_DEFINITION_ID_");
+  public static final QueryProperty CASE_DEFINITION_ID = new QueryPropertyImpl(
+      "CASE_DEFINITION_ID_");
   public static final QueryProperty CASE_INSTANCE_ID = new QueryPropertyImpl("CASE_INSTANCE_ID_");
   public static final QueryProperty CASE_EXECUTION_ID = new QueryPropertyImpl("CASE_EXECUTION_ID_");
   public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");

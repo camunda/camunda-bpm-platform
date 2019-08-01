@@ -28,9 +28,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
-public class UpdateProcessInstancesSuspendStateJobHandler extends AbstractBatchJobHandler<UpdateProcessInstancesSuspendStateBatchConfiguration> {
+public class UpdateProcessInstancesSuspendStateJobHandler
+    extends AbstractBatchJobHandler<UpdateProcessInstancesSuspendStateBatchConfiguration> {
 
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(
+      Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE);
 
   @Override
   public String getType() {
@@ -47,30 +49,35 @@ public class UpdateProcessInstancesSuspendStateJobHandler extends AbstractBatchJ
   }
 
   @Override
-  protected UpdateProcessInstancesSuspendStateBatchConfiguration createJobConfiguration(UpdateProcessInstancesSuspendStateBatchConfiguration configuration, List<String> processIdsForJob) {
-    return new UpdateProcessInstancesSuspendStateBatchConfiguration(processIdsForJob, configuration.getSuspended());
+  protected UpdateProcessInstancesSuspendStateBatchConfiguration createJobConfiguration(
+      UpdateProcessInstancesSuspendStateBatchConfiguration configuration,
+      List<String> processIdsForJob) {
+    return new UpdateProcessInstancesSuspendStateBatchConfiguration(processIdsForJob,
+        configuration.getSuspended());
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-      .getDbEntityManager()
-      .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
+  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
+    ByteArrayEntity configurationEntity = commandContext.getDbEntityManager()
+        .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    UpdateProcessInstancesSuspendStateBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    UpdateProcessInstancesSuspendStateBatchConfiguration batchConfiguration = readConfiguration(
+        configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
+    boolean initialLegacyRestrictions = commandContext
+        .isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();
     commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
     try {
-      if(batchConfiguration.getSuspended()) {
-        commandContext.getProcessEngineConfiguration()
-          .getRuntimeService()
-          .updateProcessInstanceSuspensionState().byProcessInstanceIds(batchConfiguration.getIds()).suspend();
+      if (batchConfiguration.getSuspended()) {
+        commandContext.getProcessEngineConfiguration().getRuntimeService()
+            .updateProcessInstanceSuspensionState()
+            .byProcessInstanceIds(batchConfiguration.getIds()).suspend();
       } else {
-         commandContext.getProcessEngineConfiguration()
-           .getRuntimeService()
-           .updateProcessInstanceSuspensionState().byProcessInstanceIds(batchConfiguration.getIds()).activate();
+        commandContext.getProcessEngineConfiguration().getRuntimeService()
+            .updateProcessInstanceSuspensionState()
+            .byProcessInstanceIds(batchConfiguration.getIds()).activate();
       }
     } finally {
       commandContext.enableUserOperationLog();

@@ -88,9 +88,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByTimestamp()
-      .asc();
+    query.orderByTimestamp().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskByTimestamp());
@@ -105,9 +103,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByTimestamp()
-      .desc();
+    query.orderByTimestamp().desc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskByTimestamp()));
@@ -122,9 +118,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByExternalTaskId()
-      .asc();
+    query.orderByExternalTaskId().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByExternalTaskId());
@@ -139,9 +133,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByExternalTaskId()
-      .desc();
+    query.orderByExternalTaskId().desc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByExternalTaskId()));
@@ -157,10 +149,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .failureLog()
-      .orderByRetries()
-      .asc();
+    query.failureLog().orderByRetries().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByRetries());
@@ -176,10 +165,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .failureLog()
-      .orderByRetries()
-      .desc();
+    query.failureLog().orderByRetries().desc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByRetries()));
@@ -194,9 +180,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByPriority()
-      .asc();
+    query.orderByPriority().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByPriority());
@@ -211,9 +195,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByPriority()
-      .desc();
+    query.orderByPriority().desc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByPriority()));
@@ -228,9 +210,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByTopicName()
-      .asc();
+    query.orderByTopicName().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByTopicName());
@@ -245,9 +225,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByTopicName()
-      .desc();
+    query.orderByTopicName().desc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByTopicName()));
@@ -263,10 +241,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .successLog()
-      .orderByWorkerId()
-      .asc();
+    query.successLog().orderByWorkerId().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByWorkerId());
@@ -282,10 +257,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .successLog()
-      .orderByWorkerId()
-      .desc();
+    query.successLog().orderByWorkerId().desc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByWorkerId()));
@@ -300,9 +272,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByActivityId()
-      .asc();
+    query.orderByActivityId().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByActivityId());
@@ -317,9 +287,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByActivityId()
-      .desc();
+    query.orderByActivityId().desc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByActivityId()));
@@ -334,9 +302,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByActivityInstanceId()
-      .asc();
+    query.orderByActivityInstanceId().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByActivityInstanceId());
@@ -351,12 +317,11 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByActivityInstanceId()
-      .desc();
+    query.orderByActivityInstanceId().desc();
 
     // then
-    verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByActivityInstanceId()));
+    verifyQueryWithOrdering(query, taskCount,
+        inverted(historicExternalTaskLogByActivityInstanceId()));
   }
 
   @Test
@@ -368,14 +333,11 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByExecutionId()
-      .asc();
+    query.orderByExecutionId().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByExecutionId());
   }
-
 
   @Test
   public void testQuerySortingByExecutionIdDsc() {
@@ -386,9 +348,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByExecutionId()
-      .desc();
+    query.orderByExecutionId().desc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByExecutionId()));
@@ -403,14 +363,11 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByProcessInstanceId()
-      .asc();
+    query.orderByProcessInstanceId().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByProcessInstanceId());
   }
-
 
   @Test
   public void testQuerySortingByProcessInstanceIdDsc() {
@@ -421,12 +378,11 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByProcessInstanceId()
-      .desc();
+    query.orderByProcessInstanceId().desc();
 
     // then
-    verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByProcessInstanceId()));
+    verifyQueryWithOrdering(query, taskCount,
+        inverted(historicExternalTaskLogByProcessInstanceId()));
   }
 
   @Test
@@ -438,14 +394,11 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByProcessDefinitionId()
-      .asc();
+    query.orderByProcessDefinitionId().asc();
 
     // then
     verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByProcessDefinitionId());
   }
-
 
   @Test
   public void testQuerySortingByProcessDefinitionIdDsc() {
@@ -456,12 +409,11 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByProcessDefinitionId()
-      .desc();
+    query.orderByProcessDefinitionId().desc();
 
     // then
-    verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByProcessDefinitionId()));
+    verifyQueryWithOrdering(query, taskCount,
+        inverted(historicExternalTaskLogByProcessDefinitionId()));
   }
 
   @Test
@@ -473,14 +425,12 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByProcessDefinitionKey()
-      .asc();
+    query.orderByProcessDefinitionKey().asc();
 
     // then
-    verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByProcessDefinitionKey(engineRule.getProcessEngine()));
+    verifyQueryWithOrdering(query, taskCount,
+        historicExternalTaskLogByProcessDefinitionKey(engineRule.getProcessEngine()));
   }
-
 
   @Test
   public void testQuerySortingByProcessDefinitionKeyDsc() {
@@ -491,18 +441,17 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
-    query
-      .orderByProcessDefinitionKey()
-      .desc();
+    query.orderByProcessDefinitionKey().desc();
 
     // then
-    verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByProcessDefinitionKey(engineRule.getProcessEngine())));
+    verifyQueryWithOrdering(query, taskCount,
+        inverted(historicExternalTaskLogByProcessDefinitionKey(engineRule.getProcessEngine())));
   }
 
   // helper ------------------------------------
 
   protected void completeExternalTasksWithWorkers(List<ExternalTask> taskLIst) {
-    for (Integer i=0; i<taskLIst.size(); i++) {
+    for (Integer i = 0; i < taskLIst.size(); i++) {
       completeExternalTaskWithWorker(taskLIst.get(i).getId(), i.toString());
     }
   }
@@ -512,10 +461,10 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
   }
 
-  protected void completeExternalTask(String externalTaskId, String topic, String workerId, boolean usePriority) {
+  protected void completeExternalTask(String externalTaskId, String topic, String workerId,
+      boolean usePriority) {
     List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
-      .topic(topic, LOCK_DURATION)
-      .execute();
+        .topic(topic, LOCK_DURATION).execute();
     externalTaskService.complete(externalTaskId, workerId);
     // unlock the remaining tasks
     for (LockedExternalTask lockedExternalTask : list) {
@@ -526,15 +475,16 @@ public class HistoricExternalTaskLogQuerySortingTest {
   }
 
   protected void reportExternalTaskFailure(List<ExternalTask> taskLIst) {
-    for (Integer i=0; i<taskLIst.size(); i++) {
-      reportExternalTaskFailure(taskLIst.get(i).getId(), DEFAULT_TOPIC, WORKER_ID, i+1, false, "foo");
+    for (Integer i = 0; i < taskLIst.size(); i++) {
+      reportExternalTaskFailure(taskLIst.get(i).getId(), DEFAULT_TOPIC, WORKER_ID, i + 1, false,
+          "foo");
     }
   }
 
-  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries, boolean usePriority, String errorMessage) {
+  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId,
+      Integer retries, boolean usePriority, String errorMessage) {
     List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
-      .topic(topic, LOCK_DURATION)
-      .execute();
+        .topic(topic, LOCK_DURATION).execute();
     externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, retries, 0L);
 
     for (LockedExternalTask lockedExternalTask : list) {
@@ -570,40 +520,55 @@ public class HistoricExternalTaskLogQuerySortingTest {
   protected List<ExternalTask> startProcessesByProcessDefinitionKey(int count) {
     List<ExternalTask> list = new LinkedList<ExternalTask>();
     for (Integer ithTopic = 0; ithTopic < count; ithTopic++) {
-      list.add(startExternalTaskProcessGivenProcessDefinitionKey("ProcessKey" + ithTopic.toString()));
+      list.add(
+          startExternalTaskProcessGivenProcessDefinitionKey("ProcessKey" + ithTopic.toString()));
     }
     return list;
   }
 
   protected ExternalTask startExternalTaskProcessGivenTopicName(String topicName) {
-    BpmnModelInstance processModelWithCustomTopic = createDefaultExternalTaskModel().topic(topicName).build();
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(processModelWithCustomTopic);
+    BpmnModelInstance processModelWithCustomTopic = createDefaultExternalTaskModel()
+        .topic(topicName).build();
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(processModelWithCustomTopic);
     ProcessInstance pi = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId()).singleResult();
+    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
   }
 
   protected ExternalTask startExternalTaskProcessGivenActivityId(String activityId) {
-    BpmnModelInstance processModelWithCustomActivityId = createDefaultExternalTaskModel().externalTaskName(activityId).build();
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(processModelWithCustomActivityId);
+    BpmnModelInstance processModelWithCustomActivityId = createDefaultExternalTaskModel()
+        .externalTaskName(activityId).build();
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(processModelWithCustomActivityId);
     ProcessInstance pi = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId()).singleResult();
+    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
   }
 
-  protected ExternalTask startExternalTaskProcessGivenProcessDefinitionKey(String processDefinitionKey) {
-    BpmnModelInstance processModelWithCustomKey = createDefaultExternalTaskModel().processKey(processDefinitionKey).build();
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(processModelWithCustomKey);
+  protected ExternalTask startExternalTaskProcessGivenProcessDefinitionKey(
+      String processDefinitionKey) {
+    BpmnModelInstance processModelWithCustomKey = createDefaultExternalTaskModel()
+        .processKey(processDefinitionKey).build();
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(processModelWithCustomKey);
     ProcessInstance pi = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId()).singleResult();
+    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
   }
 
   protected ExternalTask startExternalTaskProcessGivenPriority(int priority) {
-    BpmnModelInstance processModelWithCustomPriority = createDefaultExternalTaskModel().priority(priority).build();
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(processModelWithCustomPriority);
+    BpmnModelInstance processModelWithCustomPriority = createDefaultExternalTaskModel()
+        .priority(priority).build();
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(processModelWithCustomPriority);
     ProcessInstance pi = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
-    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId()).singleResult();
+    return externalTaskService.createExternalTaskQuery().processInstanceId(pi.getId())
+        .singleResult();
   }
 
-  protected void verifyQueryWithOrdering(HistoricExternalTaskLogQuery query, int countExpected, NullTolerantComparator<HistoricExternalTaskLog> expectedOrdering) {
+  protected void verifyQueryWithOrdering(HistoricExternalTaskLogQuery query, int countExpected,
+      NullTolerantComparator<HistoricExternalTaskLog> expectedOrdering) {
     assertThat(countExpected, is(query.list().size()));
     assertThat((long) countExpected, is(query.count()));
     TestOrderingUtil.verifySorting(query.list(), expectedOrdering);

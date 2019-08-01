@@ -59,15 +59,21 @@ public class DeleteProcessDefinitionsByIdsCmd implements Command<Void>, Serializ
   protected boolean writeUserOperationLog;
   protected boolean skipIoMappings;
 
-  public DeleteProcessDefinitionsByIdsCmd(List<String> processDefinitionIds, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
+  public DeleteProcessDefinitionsByIdsCmd(List<String> processDefinitionIds, boolean cascade,
+      boolean skipCustomListeners, boolean skipIoMappings) {
     this(processDefinitionIds, cascade, cascade, skipCustomListeners, skipIoMappings, true);
   }
 
-  public DeleteProcessDefinitionsByIdsCmd(List<String> processDefinitionIds, boolean cascadeToHistory, boolean cascadeToInstances, boolean skipCustomListeners, boolean writeUserOperationLog) {
-    this(processDefinitionIds, cascadeToHistory, cascadeToInstances, skipCustomListeners, false, writeUserOperationLog);
+  public DeleteProcessDefinitionsByIdsCmd(List<String> processDefinitionIds,
+      boolean cascadeToHistory, boolean cascadeToInstances, boolean skipCustomListeners,
+      boolean writeUserOperationLog) {
+    this(processDefinitionIds, cascadeToHistory, cascadeToInstances, skipCustomListeners, false,
+        writeUserOperationLog);
   }
 
-  public DeleteProcessDefinitionsByIdsCmd(List<String> processDefinitionIds, boolean cascadeToHistory, boolean cascadeToInstances, boolean skipCustomListeners, boolean skipIoMappings, boolean writeUserOperationLog) {
+  public DeleteProcessDefinitionsByIdsCmd(List<String> processDefinitionIds,
+      boolean cascadeToHistory, boolean cascadeToInstances, boolean skipCustomListeners,
+      boolean skipIoMappings, boolean writeUserOperationLog) {
     this.processDefinitionIds = new HashSet<String>(processDefinitionIds);
     this.cascadeToHistory = cascadeToHistory;
     this.cascadeToInstances = cascadeToInstances;
@@ -86,9 +92,11 @@ public class DeleteProcessDefinitionsByIdsCmd implements Command<Void>, Serializ
       processDefinitions = new ArrayList<ProcessDefinition>();
       processDefinitions.add(processDefinition);
     } else {
-      ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
+      ProcessDefinitionManager processDefinitionManager = commandContext
+          .getProcessDefinitionManager();
       processDefinitions = processDefinitionManager.findDefinitionsByIds(processDefinitionIds);
-      ensureNotEmpty(NotFoundException.class, "No process definition found", "processDefinitions", processDefinitions);
+      ensureNotEmpty(NotFoundException.class, "No process definition found", "processDefinitions",
+          processDefinitions);
     }
 
     Set<ProcessDefinitionGroup> groups = groupByKeyAndTenant(processDefinitions);
@@ -107,13 +115,17 @@ public class DeleteProcessDefinitionsByIdsCmd implements Command<Void>, Serializ
   protected ProcessDefinition getSingleProcessDefinition(CommandContext commandContext) {
     String processDefinitionId = processDefinitionIds.iterator().next();
     ensureNotNull("processDefinitionId", processDefinitionId);
-    ProcessDefinition processDefinition = commandContext.getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
-    ensureNotNull(NotFoundException.class, "No process definition found with id '" + processDefinitionId + "'", "processDefinition", processDefinition);
+    ProcessDefinition processDefinition = commandContext.getProcessDefinitionManager()
+        .findLatestProcessDefinitionById(processDefinitionId);
+    ensureNotNull(NotFoundException.class,
+        "No process definition found with id '" + processDefinitionId + "'", "processDefinition",
+        processDefinition);
 
     return processDefinition;
   }
 
-  protected Set<ProcessDefinitionGroup> groupByKeyAndTenant(List<ProcessDefinition> processDefinitions) {
+  protected Set<ProcessDefinitionGroup> groupByKeyAndTenant(
+      List<ProcessDefinition> processDefinitions) {
     Set<ProcessDefinitionGroup> groups = new HashSet<ProcessDefinitionGroup>();
     Map<ProcessDefinitionGroup, List<ProcessDefinitionEntity>> map = new HashMap<ProcessDefinitionGroup, List<ProcessDefinitionEntity>>();
 
@@ -127,8 +139,7 @@ public class DeleteProcessDefinitionsByIdsCmd implements Command<Void>, Serializ
       List<ProcessDefinitionEntity> definitions = group.processDefinitions;
       if (map.containsKey(group)) {
         definitions = map.get(group);
-      }
-      else {
+      } else {
         groups.add(group);
         map.put(group, definitions);
       }
@@ -148,10 +159,13 @@ public class DeleteProcessDefinitionsByIdsCmd implements Command<Void>, Serializ
     if (isLatestProcessDefinition(firstProcessDefinition)) {
       for (ProcessDefinitionEntity processDefinition : processDefinitions) {
         String previousProcessDefinitionId = processDefinition.getPreviousProcessDefinitionId();
-        if (previousProcessDefinitionId != null && !this.processDefinitionIds.contains(previousProcessDefinitionId)) {
+        if (previousProcessDefinitionId != null
+            && !this.processDefinitionIds.contains(previousProcessDefinitionId)) {
           CommandContext commandContext = Context.getCommandContext();
-          ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
-          newLatestProcessDefinition = processDefinitionManager.findLatestDefinitionById(previousProcessDefinitionId);
+          ProcessDefinitionManager processDefinitionManager = commandContext
+              .getProcessDefinitionManager();
+          newLatestProcessDefinition = processDefinitionManager
+              .findLatestDefinitionById(previousProcessDefinitionId);
           break;
         }
       }
@@ -161,15 +175,18 @@ public class DeleteProcessDefinitionsByIdsCmd implements Command<Void>, Serializ
   }
 
   protected boolean isLatestProcessDefinition(ProcessDefinitionEntity processDefinition) {
-    ProcessDefinitionManager processDefinitionManager = Context.getCommandContext().getProcessDefinitionManager();
+    ProcessDefinitionManager processDefinitionManager = Context.getCommandContext()
+        .getProcessDefinitionManager();
     String key = processDefinition.getKey();
     String tenantId = processDefinition.getTenantId();
-    ProcessDefinitionEntity latestProcessDefinition = processDefinitionManager.findLatestDefinitionByKeyAndTenantId(key, tenantId);
+    ProcessDefinitionEntity latestProcessDefinition = processDefinitionManager
+        .findLatestDefinitionByKeyAndTenantId(key, tenantId);
     return processDefinition.getId().equals(latestProcessDefinition.getId());
   }
 
   protected void checkAuthorization(ProcessDefinitionGroup group) {
-    List<CommandChecker> commandCheckers = Context.getCommandContext().getProcessEngineConfiguration().getCommandCheckers();
+    List<CommandChecker> commandCheckers = Context.getCommandContext()
+        .getProcessEngineConfiguration().getCommandCheckers();
     List<ProcessDefinitionEntity> processDefinitions = group.processDefinitions;
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
       for (CommandChecker commandChecker : commandCheckers) {
@@ -190,17 +207,20 @@ public class DeleteProcessDefinitionsByIdsCmd implements Command<Void>, Serializ
       String processDefinitionId = processDefinition.getId();
 
       if (writeUserOperationLog) {
-        userOperationLogManager.logProcessDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processDefinitionId, processDefinition.getKey(),
-            new PropertyChange("cascade", false, cascadeToHistory));
+        userOperationLogManager.logProcessDefinitionOperation(
+            UserOperationLogEntry.OPERATION_TYPE_DELETE, processDefinitionId,
+            processDefinition.getKey(), new PropertyChange("cascade", false, cascadeToHistory));
       }
 
-      definitionManager.deleteProcessDefinition(processDefinition, processDefinitionId, cascadeToHistory, cascadeToInstances, skipCustomListeners, skipIoMappings);
+      definitionManager.deleteProcessDefinition(processDefinition, processDefinitionId,
+          cascadeToHistory, cascadeToInstances, skipCustomListeners, skipIoMappings);
     }
 
     if (newLatestProcessDefinition != null) {
       ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
       DeploymentCache deploymentCache = configuration.getDeploymentCache();
-      newLatestProcessDefinition = deploymentCache.resolveProcessDefinition(newLatestProcessDefinition);
+      newLatestProcessDefinition = deploymentCache
+          .resolveProcessDefinition(newLatestProcessDefinition);
 
       List<Deployer> deployers = configuration.getDeployers();
       for (Deployer deployer : deployers) {

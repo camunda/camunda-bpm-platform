@@ -31,10 +31,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 
 /**
- * Provides the keys used by {@link DbEntityCache} for organizing the different {@link DbEntity} types.
- * Especially for polymorphic types, it is important that they are accessible in the cache under one
- * common key such that querying the cache with a superclass or with a subclass both return the cached
- * entities.
+ * Provides the keys used by {@link DbEntityCache} for organizing the different {@link DbEntity}
+ * types. Especially for polymorphic types, it is important that they are accessible in the cache
+ * under one common key such that querying the cache with a superclass or with a subclass both
+ * return the cached entities.
  *
  * @author Thorben Lindhauer
  */
@@ -68,10 +68,14 @@ public class DbEntityCacheKeyMapping {
     mapping.registerEntityCacheKey(TimerEntity.class, AcquirableJobEntity.class);
 
     // subclasses of HistoricDetailEventEntity
-    mapping.registerEntityCacheKey(HistoricFormPropertyEntity.class, HistoricDetailEventEntity.class);
-    mapping.registerEntityCacheKey(HistoricFormPropertyEventEntity.class, HistoricDetailEventEntity.class);
-    mapping.registerEntityCacheKey(HistoricVariableUpdateEventEntity.class, HistoricDetailEventEntity.class);
-    mapping.registerEntityCacheKey(HistoricDetailVariableInstanceUpdateEntity.class, HistoricDetailEventEntity.class);
+    mapping.registerEntityCacheKey(HistoricFormPropertyEntity.class,
+        HistoricDetailEventEntity.class);
+    mapping.registerEntityCacheKey(HistoricFormPropertyEventEntity.class,
+        HistoricDetailEventEntity.class);
+    mapping.registerEntityCacheKey(HistoricVariableUpdateEventEntity.class,
+        HistoricDetailEventEntity.class);
+    mapping.registerEntityCacheKey(HistoricDetailVariableInstanceUpdateEntity.class,
+        HistoricDetailEventEntity.class);
 
     return mapping;
   }

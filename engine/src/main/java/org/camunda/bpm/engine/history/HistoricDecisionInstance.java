@@ -48,19 +48,29 @@ public interface HistoricDecisionInstance {
   /** Time when the historic decision instance is to be removed. */
   Date getRemovalTime();
 
-  /** The corresponding key of the process definition in case the decision was evaluated inside a process. */
+  /**
+   * The corresponding key of the process definition in case the decision was evaluated inside a
+   * process.
+   */
   String getProcessDefinitionKey();
 
-  /** The corresponding id of the process definition in case the decision was evaluated inside a process. */
+  /**
+   * The corresponding id of the process definition in case the decision was evaluated inside a
+   * process.
+   */
   String getProcessDefinitionId();
 
   /** The corresponding process instance in case the decision was evaluated inside a process. */
   String getProcessInstanceId();
 
-  /** The corresponding key of the case definition in case the decision was evaluated inside a case. */
+  /**
+   * The corresponding key of the case definition in case the decision was evaluated inside a case.
+   */
   String getCaseDefinitionKey();
 
-  /** The corresponding id of the case definition in case the decision was evaluated inside a case. */
+  /**
+   * The corresponding id of the case definition in case the decision was evaluated inside a case.
+   */
   String getCaseDefinitionId();
 
   /** The corresponding case instance in case the decision was evaluated inside a case. */
@@ -69,28 +79,35 @@ public interface HistoricDecisionInstance {
   /** The corresponding activity in case the decision was evaluated inside a process or a case. */
   String getActivityId();
 
-  /** The corresponding activity instance in case the decision was evaluated inside a process or a case. */
+  /**
+   * The corresponding activity instance in case the decision was evaluated inside a process or a
+   * case.
+   */
   String getActivityInstanceId();
 
   /**
-   * The user ID in case the decision was evaluated by an authenticated user using the decision service
-   * outside of an execution context.
+   * The user ID in case the decision was evaluated by an authenticated user using the decision
+   * service outside of an execution context.
    */
   String getUserId();
 
   /**
-   * The input values of the evaluated decision. The fetching of the input values must be enabled on the query.
+   * The input values of the evaluated decision. The fetching of the input values must be enabled on
+   * the query.
    *
-   * @throws ProcessEngineException if the input values are not fetched.
+   * @throws ProcessEngineException
+   *           if the input values are not fetched.
    *
    * @see HistoricDecisionInstanceQuery#includeInputs()
    */
   List<HistoricDecisionInputInstance> getInputs();
 
   /**
-   * The output values of the evaluated decision. The fetching of the output values must be enabled on the query.
+   * The output values of the evaluated decision. The fetching of the output values must be enabled
+   * on the query.
    *
-   * @throws ProcessEngineException if the output values are not fetched.
+   * @throws ProcessEngineException
+   *           if the output values are not fetched.
    *
    * @see HistoricDecisionInstanceQuery#includeOutputs()
    */
@@ -100,32 +117,32 @@ public interface HistoricDecisionInstance {
   Double getCollectResultValue();
 
   /**
-   * The unique identifier of the historic decision instance of the evaluated root decision.
-   * Can be <code>null</code> if this instance is the root decision instance of the evaluation.
+   * The unique identifier of the historic decision instance of the evaluated root decision. Can be
+   * <code>null</code> if this instance is the root decision instance of the evaluation.
    */
   String getRootDecisionInstanceId();
 
   /**
-   * The unique identifier of the root historic process instance of the evaluated root decision
-   * in case the decision was evaluated inside a process, otherwise <code>null</code>.
+   * The unique identifier of the root historic process instance of the evaluated root decision in
+   * case the decision was evaluated inside a process, otherwise <code>null</code>.
    */
   String getRootProcessInstanceId();
 
   /**
-   * The id of the related decision requirements definition. Can be
-   * <code>null</code> if the decision has no relations to other decisions.
+   * The id of the related decision requirements definition. Can be <code>null</code> if the
+   * decision has no relations to other decisions.
    */
   String getDecisionRequirementsDefinitionId();
 
   /**
-   * The key of the related decision requirements definition. Can be
-   * <code>null</code> if the decision has no relations to other decisions.
+   * The key of the related decision requirements definition. Can be <code>null</code> if the
+   * decision has no relations to other decisions.
    */
   String getDecisionRequirementsDefinitionKey();
 
   /**
-   * The id of the tenant this historic decision instance belongs to. Can be <code>null</code>
-   * if the historic decision instance belongs to no single tenant.
+   * The id of the tenant this historic decision instance belongs to. Can be <code>null</code> if
+   * the historic decision instance belongs to no single tenant.
    */
   String getTenantId();
 }

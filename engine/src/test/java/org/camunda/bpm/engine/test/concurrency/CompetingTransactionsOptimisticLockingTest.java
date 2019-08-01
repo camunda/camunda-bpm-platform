@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * @author Nikola Koevski
  */
-public class CompetingTransactionsOptimisticLockingTest extends PluggableProcessEngineTestCase{
+public class CompetingTransactionsOptimisticLockingTest extends PluggableProcessEngineTestCase {
 
   private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   static ControllableThread activeThread;
@@ -55,9 +55,8 @@ public class CompetingTransactionsOptimisticLockingTest extends PluggableProcess
     @Override
     public void run() {
       try {
-        processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new CompleteTaskCmd(taskId, null)));
+        processEngineConfiguration.getCommandExecutorTxRequired()
+            .execute(new ControlledCommand(activeThread, new CompleteTaskCmd(taskId, null)));
 
       } catch (ProcessEngineException e) {
         this.exception = e;
@@ -86,8 +85,10 @@ public class CompetingTransactionsOptimisticLockingTest extends PluggableProcess
 
     assertEquals(2, tasks.size());
 
-    Task firstTask = "task1-1".equals(tasks.get(0).getTaskDefinitionKey()) ? tasks.get(0) : tasks.get(1);
-    Task secondTask = "task2-1".equals(tasks.get(0).getTaskDefinitionKey()) ? tasks.get(0) : tasks.get(1);
+    Task firstTask = "task1-1".equals(tasks.get(0).getTaskDefinitionKey()) ? tasks.get(0)
+        : tasks.get(1);
+    Task secondTask = "task2-1".equals(tasks.get(0).getTaskDefinitionKey()) ? tasks.get(0)
+        : tasks.get(1);
 
     TransactionThread thread1 = new TransactionThread(firstTask.getId());
     thread1.startAndWaitUntilControlIsReturned();

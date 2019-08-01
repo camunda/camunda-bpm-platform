@@ -63,10 +63,9 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
   protected final Date END_DATE = new Date(1363608000000L);
 
   public void initEngineConfiguration(ProcessEngineConfigurationImpl engineConfiguration) {
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
-      .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
-      .initHistoryRemovalTime();
+    engineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
+        .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
+        .initHistoryRemovalTime();
 
     engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
 
@@ -90,10 +89,8 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
   @AfterClass
   public static void tearDownAfterAll() {
     if (engineConfiguration != null) {
-      engineConfiguration
-        .setHistoryRemovalTimeProvider(null)
-        .setHistoryRemovalTimeStrategy(null)
-        .initHistoryRemovalTime();
+      engineConfiguration.setHistoryRemovalTimeProvider(null).setHistoryRemovalTimeStrategy(null)
+          .initHistoryRemovalTime();
 
       engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
 
@@ -110,7 +107,7 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
   // helper /////////////////////////////////////////////////////////////////
 
   protected List<HistoryLevel> setCustomHistoryLevel(HistoryEventTypes eventType) {
-    ((CustomHistoryLevelRemovalTime)customHistoryLevel).setEventTypes(eventType);
+    ((CustomHistoryLevelRemovalTime) customHistoryLevel).setEventTypes(eventType);
 
     return Collections.singletonList(customHistoryLevel);
   }
@@ -138,36 +135,35 @@ public abstract class AbstractHistoryCleanupSchedulerTest {
   }
 
   protected void clearJob(final String jobId) {
-    engineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
-        public Object execute(CommandContext commandContext) {
-          JobEntity job = commandContext.getJobManager().findJobById(jobId);
-          if (job != null) {
-            commandContext.getJobManager().delete(job);
-          }
-          return null;
+    engineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        JobEntity job = commandContext.getJobManager().findJobById(jobId);
+        if (job != null) {
+          commandContext.getJobManager().delete(job);
         }
-      });
+        return null;
+      }
+    });
   }
 
   protected void clearMeterLog() {
-    engineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
-        public Object execute(CommandContext commandContext) {
-          commandContext.getMeterLogManager().deleteAll();
+    engineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        commandContext.getMeterLogManager().deleteAll();
 
-          return null;
-        }
-      });
+        return null;
+      }
+    });
   }
 
   protected List<HistoryLevel> setCustomHistoryLevel(HistoryEventTypes... eventType) {
-    ((CustomHistoryLevelRemovalTime)customHistoryLevel).setEventTypes(eventType);
+    ((CustomHistoryLevelRemovalTime) customHistoryLevel).setEventTypes(eventType);
 
     return Collections.singletonList(customHistoryLevel);
   }
 
-  public ProcessEngineConfiguration configure(ProcessEngineConfigurationImpl configuration, HistoryEventTypes... historyEventTypes) {
+  public ProcessEngineConfiguration configure(ProcessEngineConfigurationImpl configuration,
+      HistoryEventTypes... historyEventTypes) {
     configuration.setJdbcUrl("jdbc:h2:mem:" + thisClass.getSimpleName());
     configuration.setCustomHistoryLevels(setCustomHistoryLevel(historyEventTypes));
     configuration.setHistory(customHistoryLevel.getName());

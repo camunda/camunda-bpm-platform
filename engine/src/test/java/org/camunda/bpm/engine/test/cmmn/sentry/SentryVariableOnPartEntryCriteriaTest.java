@@ -28,9 +28,10 @@ import org.camunda.bpm.engine.test.Deployment;
 public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
   // Basic tests - create, update, delete variable
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSimpleVariableOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSimpleVariableOnPart.cmmn" })
   public void testVariableCreate() {
-    
+
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("HumanTask_1");
@@ -41,9 +42,10 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     assertTrue(firstHumanTask.isEnabled());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSimpleVariableOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSimpleVariableOnPart.cmmn" })
   public void testUnknownVariableCreate() {
-    
+
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     caseService.setVariable(caseInstanceId, "unknown", "aVariable");
@@ -51,24 +53,26 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     assertFalse(firstHumanTask.isEnabled());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testVariableUpdate.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testVariableUpdate.cmmn" })
   public void testVariableUpdate() {
-    
+
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     caseService.setVariable(caseInstanceId, "variable_1", "aVariable");
     CaseExecution firstHumanTask = queryCaseExecutionByActivityId("HumanTask_1");
     // HumanTask not enabled on variable create
     assertFalse(firstHumanTask.isEnabled());
-    
+
     caseService.setVariable(caseInstanceId, "variable_1", "bVariable");
     firstHumanTask = queryCaseExecutionByActivityId("HumanTask_1");
     assertTrue(firstHumanTask.isEnabled());
-  }  
+  }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testVariableDelete.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testVariableDelete.cmmn" })
   public void testVariableDelete() {
-    
+
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     caseService.removeVariable(caseInstanceId, "variable_1");
@@ -79,29 +83,30 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     caseService.setVariable(caseInstanceId, "variable_1", "aVariable");
     firstHumanTask = queryCaseExecutionByActivityId("HumanTask_1");
     assertFalse(firstHumanTask.isEnabled());
-    
+
     caseService.removeVariable(caseInstanceId, "variable_1");
     firstHumanTask = queryCaseExecutionByActivityId("HumanTask_1");
     assertTrue(firstHumanTask.isEnabled());
   }
 
   // different variable name and variable event test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testDifferentVariableName.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testDifferentVariableName.cmmn" })
   public void testDifferentVariableName() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
-    
+
     CaseExecution firstHumanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     CaseExecution firstHumanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
-    
+
     assertFalse(firstHumanTask1.isEnabled());
     assertFalse(firstHumanTask2.isEnabled());
 
     caseService.setVariable(caseInstanceId, "variable_1", "aVariable");
     firstHumanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     assertTrue(firstHumanTask1.isEnabled());
-    
+
     firstHumanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
-    // variable_2 is not set 
+    // variable_2 is not set
     assertFalse(firstHumanTask2.isEnabled());
 
     caseService.setVariable(caseInstanceId, "variable_2", "aVariable");
@@ -109,22 +114,23 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     assertTrue(firstHumanTask2.isEnabled());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testDifferentVariableEvents.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testDifferentVariableEvents.cmmn" })
   public void testDifferentVariableEventsButSameName() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
-    
+
     CaseExecution firstHumanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     CaseExecution firstHumanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
-    
+
     assertFalse(firstHumanTask1.isEnabled());
     assertFalse(firstHumanTask2.isEnabled());
 
     caseService.setVariable(caseInstanceId, "variable_1", "aVariable");
     firstHumanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     assertTrue(firstHumanTask1.isEnabled());
-    
+
     firstHumanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
-    // variable_1 is not updated 
+    // variable_1 is not updated
     assertFalse(firstHumanTask2.isEnabled());
 
     caseService.setVariable(caseInstanceId, "variable_1", "bVariable");
@@ -133,9 +139,10 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   // Multiple variableOnParts test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testMoreVariableOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testMoreVariableOnPart.cmmn" })
   public void testMultipleVariableOnParts() {
-    
+
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     caseService.setVariable(caseInstanceId, "variable_1", "aVariable");
@@ -153,9 +160,10 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     assertTrue(firstHumanTask.isEnabled());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testMultipleSentryMultipleVariableOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testMultipleSentryMultipleVariableOnPart.cmmn" })
   public void testMultipleSentryMultipleVariableOnParts() {
-    
+
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
     caseService.setVariable(caseInstanceId, "value", 99);
@@ -167,7 +175,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
     manualStart(firstHumanTask.getId());
     complete(firstHumanTask.getId());
-    
+
     secondHumanTask = queryCaseExecutionByActivityId("HumanTask_2");
     // Sentry1 would not be satisfied as the value has to be > 100
     // But, Sentry 2 would be satisfied and enables HumanTask2
@@ -176,11 +184,12 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   // IfPart, OnPart and VariableOnPart combination test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testOnPartIfPartAndVariableOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testOnPartIfPartAndVariableOnPart.cmmn" })
   public void testOnPartIfPartAndVariableOnPart() {
-    
+
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
-    
+
     String firstHumanTaskId = queryCaseExecutionByActivityId("HumanTask_1").getId();
 
     complete(firstHumanTaskId);
@@ -197,22 +206,22 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     caseService.setVariable(caseInstanceId, "variable_1", "aVariable");
     secondHumanTask = queryCaseExecutionByActivityId("HumanTask_2");
     assertTrue(secondHumanTask.isEnabled());
-    
+
   }
 
-  
   // Variable scope tests
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSimpleVariableScope.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSimpleVariableScope.cmmn" })
   public void testVariableCreateScope() {
-    
+
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
-    
+
     String firstHumanTaskId = queryCaseExecutionByActivityId("HumanTask_1").getId();
-    
+
     manualStart(firstHumanTaskId);
-    
+
     caseService.setVariableLocal(firstHumanTaskId, "variable_1", "aVariable");
-    
+
     CaseExecution secondHumanTask = queryCaseExecutionByActivityId("HumanTask_2");
     // Sentry would not be triggered as the scope of the sentry and humanTask1 is different
     assertFalse(secondHumanTask.isEnabled());
@@ -227,25 +236,28 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     assertTrue(secondHumanTask.isEnabled());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testStageScope.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testStageScope.cmmn" })
   public void testStageScope() {
-    
+
     caseService.createCaseInstanceByKey("Case_1");
 
     CaseExecution caseModelHumanTask = queryCaseExecutionByActivityId("CaseModel_HumanTask");
     assertFalse(caseModelHumanTask.isEnabled());
 
     String stageExecutionId = queryCaseExecutionByActivityId("Stage_1").getId();
-    // set the variable in the scope of stage such that sentry in the scope of case model does not gets evaluated.
+    // set the variable in the scope of stage such that sentry in the scope of case model does not
+    // gets evaluated.
     caseService.setVariableLocal(stageExecutionId, "variable_1", "aVariable");
-    
+
     CaseExecution stageHumanTask = queryCaseExecutionByActivityId("Stage_HumanTask");
     caseModelHumanTask = queryCaseExecutionByActivityId("CaseModel_HumanTask");
     assertFalse(caseModelHumanTask.isEnabled());
     assertTrue(stageHumanTask.isEnabled());
 
     caseService.removeVariable(stageExecutionId, "variable_1");
-    // set the variable in the scope of case model that would trigger the sentry outside the scope of the stage
+    // set the variable in the scope of case model that would trigger the sentry outside the scope
+    // of the stage
     caseService.setVariable(stageHumanTask.getId(), "variable_1", "aVariable");
 
     stageHumanTask = queryCaseExecutionByActivityId("Stage_HumanTask");
@@ -254,7 +266,8 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     assertTrue(stageHumanTask.isEnabled());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testStagesScope.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testStagesScope.cmmn" })
   public void testStagesScope() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -270,15 +283,17 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     assertTrue(humanTask3.isEnabled());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testStagesScope.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testStagesScope.cmmn" })
   public void testStageLocalScope() {
     caseService.createCaseInstanceByKey("Case_1").getId();
 
     String stageExecution1_Id = queryCaseExecutionByActivityId("Stage_1").getId();
-    
+
     String stageExecution2_Id = queryCaseExecutionByActivityId("Stage_2").getId();
 
-    // variable set to stage 1 scope, so that sentries in stage 2 and in case model should not be triggered
+    // variable set to stage 1 scope, so that sentries in stage 2 and in case model should not be
+    // triggered
     caseService.setVariableLocal(stageExecution1_Id, "variable_1", "aVariable");
 
     CaseExecution humanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
@@ -290,7 +305,8 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     CaseExecution humanTask3 = queryCaseExecutionByActivityId("HumanTask_3");
     assertFalse(humanTask3.isEnabled());
 
-    // variable set to stage 2 scope, so that sentries in the scope of case model should not be triggered
+    // variable set to stage 2 scope, so that sentries in the scope of case model should not be
+    // triggered
     caseService.setVariableLocal(stageExecution2_Id, "variable_1", "aVariable");
     humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
     assertTrue(humanTask2.isEnabled());
@@ -299,10 +315,11 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     assertFalse(humanTask3.isEnabled());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testMultipleOnPartsInStage.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testMultipleOnPartsInStage.cmmn" })
   public void testMultipleOnPartsInStages() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
-    
+
     caseService.setVariable(caseInstanceId, "variable_1", 101);
 
     CaseExecution humanTask3 = queryCaseExecutionByActivityId("HumanTask_3");
@@ -315,12 +332,13 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     CaseExecution humanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     manualStart(humanTask1.getId());
     complete(humanTask1.getId());
-    
+
     humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
     assertTrue(humanTask2.isEnabled());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.sentryEvaluationBeforeCreation.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.sentryEvaluationBeforeCreation.cmmn" })
   public void testShouldnotEvaluateSentryBeforeSentryCreation() {
     caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -330,11 +348,12 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     CaseExecution humanTask = queryCaseExecutionByActivityId("HumanTask_1");
     assertNull(humanTask);
 
-    // set the variable in the scope of stage - should not trigger sentry inside the stage as the sentry is not yet created.
+    // set the variable in the scope of stage - should not trigger sentry inside the stage as the
+    // sentry is not yet created.
     caseService.setVariableLocal(stageExecution.getId(), "variable_1", "aVariable");
 
     manualStart(stageExecution.getId());
-    
+
     humanTask = queryCaseExecutionByActivityId("HumanTask_1");
     // variable event occurred before sentry creation
     assertTrue(humanTask.isAvailable());
@@ -347,8 +366,10 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
   }
 
   // Evaluation of not affected sentries test
-  // i.e: Evaluation of a sentry's ifPart condition even if there are no evaluation of variableOnParts defined in the sentry
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSentryShouldNotBeEvaluatedAfterStageComplete.cmmn"})
+  // i.e: Evaluation of a sentry's ifPart condition even if there are no evaluation of
+  // variableOnParts defined in the sentry
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSentryShouldNotBeEvaluatedAfterStageComplete.cmmn" })
   public void testEvaluationOfNotAffectedSentries() {
     caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -368,7 +389,8 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testNotAffectedSentriesInMultipleStageScopes.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testNotAffectedSentriesInMultipleStageScopes.cmmn" })
   public void testNotAffectedSentriesInMultipleStageScopes() {
     caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -391,10 +413,11 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
     humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
     assertTrue(humanTask2.isEnabled());
-    
+
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableNameInDifferentScopes.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableNameInDifferentScopes.cmmn" })
   public void testSameVariableNameInDifferentScopes() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -402,13 +425,13 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
     // inner stage
     String stageExecution2_Id = queryCaseExecutionByActivityId("Stage_2").getId();
-    
+
     // set the same variable 'value' in the scope of case model
     caseService.setVariable(caseInstanceId, "value", 102);
 
     // set the variable 'value' in the scope of stage 1
     caseService.setVariableLocal(stageExecution1_Id, "value", 99);
-    
+
     CaseExecution humanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     assertTrue(humanTask1.isAvailable());
     CaseExecution humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
@@ -423,13 +446,15 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
     assertFalse(humanTask2.isEnabled());
 
-    // update the variable 'value' in the stage 2/stage 1 scope to evaluate the sentry inside stage 2
+    // update the variable 'value' in the stage 2/stage 1 scope to evaluate the sentry inside stage
+    // 2
     caseService.setVariable(stageExecution2_Id, "value", 103);
     humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
     assertTrue(humanTask2.isEnabled());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableNameInDifferentScopes.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableNameInDifferentScopes.cmmn" })
   public void testNestedScopes() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -437,7 +462,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
     // set the variable 'value' in the scope of the case model
     caseService.setVariable(stageExecution1_Id, "value", 99);
-    
+
     CaseExecution humanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     assertTrue(humanTask1.isAvailable());
     CaseExecution humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
@@ -454,7 +479,8 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableNameInDifferentScopes.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableNameInDifferentScopes.cmmn" })
   public void testNestedScopesWithNullVariableValue() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -465,7 +491,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
     // set the variable 'value' in the scope of the stage 1 with null value
     caseService.setVariableLocal(stageExecution1_Id, "value", null);
-    
+
     CaseExecution humanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     assertTrue(humanTask1.isAvailable());
     CaseExecution humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
@@ -478,12 +504,14 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     humanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     assertTrue(humanTask1.isEnabled());
     humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
-    // Sentry attached to HumanTask 2 is not evaluated because a variable 'value' exists in stage 2 even if the value is null 
+    // Sentry attached to HumanTask 2 is not evaluated because a variable 'value' exists in stage 2
+    // even if the value is null
     assertFalse(humanTask2.isEnabled());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testDifferentVariableNameInDifferentScope.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testDifferentVariableNameInDifferentScope.cmmn" })
   public void testNestedScopesOfDifferentVariableNames() {
     String caseInstanceId = caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -491,7 +519,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
 
     // inner stage
     String stageExecution2_Id = queryCaseExecutionByActivityId("Stage_2").getId();
-    
+
     // set the variable 'value_1' in the scope of the case model
     caseService.setVariable(caseInstanceId, "value_1", 99);
     // set the variable 'value_1' in the scope of the stage 1
@@ -507,7 +535,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     // update the variable 'value_1' in the case model scope and stage scope
     caseService.setVariable(caseInstanceId, "value_1", 102);
     caseService.setVariableLocal(stageExecution1_Id, "value_1", 102);
-    
+
     // then sentry of HumanTask 1 gets evaluated and sentry of HumanTask 2 does not gets evaluated.
     humanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     assertTrue(humanTask1.isEnabled());
@@ -519,8 +547,9 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     assertTrue(humanTask2.isEnabled());
 
   }
-  
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableOnPartAsEntryAndExitCriteria.cmmn"})
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/variableonpart/SentryVariableOnPartEntryCriteriaTest.testSameVariableOnPartAsEntryAndExitCriteria.cmmn" })
   public void testSameVariableOnPartAsEntryAndExitCriteria() {
     caseService.createCaseInstanceByKey("Case_1").getId();
 
@@ -532,7 +561,7 @@ public class SentryVariableOnPartEntryCriteriaTest extends CmmnProcessEngineTest
     // exit criteria not satisfied due to the variable 'value' must be greater than 100
     assertTrue(humanTask.isEnabled());
     manualStart(humanTask.getId());
-    
+
     caseService.setVariable(stageExecution.getId(), "value", 101);
     stageExecution = queryCaseExecutionByActivityId("Stage_1");
     assertNull(stageExecution);

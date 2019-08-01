@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-public class DeleteTenantCmd extends AbstractWritableIdentityServiceCmd<Void>  implements Command<Void>, Serializable  {
+public class DeleteTenantCmd extends AbstractWritableIdentityServiceCmd<Void>
+    implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -38,9 +39,8 @@ public class DeleteTenantCmd extends AbstractWritableIdentityServiceCmd<Void>  i
 
   @Override
   protected Void executeCmd(CommandContext commandContext) {
-    IdentityOperationResult operationResult = commandContext
-      .getWritableIdentityProvider()
-      .deleteTenant(tenantId);
+    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider()
+        .deleteTenant(tenantId);
 
     commandContext.getOperationLogManager().logTenantOperation(operationResult, tenantId);
 

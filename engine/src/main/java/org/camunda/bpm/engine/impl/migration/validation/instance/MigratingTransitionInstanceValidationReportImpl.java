@@ -23,14 +23,16 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingTransitionInstanc
 import org.camunda.bpm.engine.migration.MigratingTransitionInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
-public class MigratingTransitionInstanceValidationReportImpl implements MigratingTransitionInstanceValidationReport {
+public class MigratingTransitionInstanceValidationReportImpl
+    implements MigratingTransitionInstanceValidationReport {
 
   protected String transitionInstanceId;
   protected String sourceScopeId;
   protected MigrationInstruction migrationInstruction;
   protected List<String> failures = new ArrayList<String>();
 
-  public MigratingTransitionInstanceValidationReportImpl(MigratingTransitionInstance migratingTransitionInstance) {
+  public MigratingTransitionInstanceValidationReportImpl(
+      MigratingTransitionInstance migratingTransitionInstance) {
     this.transitionInstanceId = migratingTransitionInstance.getTransitionInstance().getId();
     this.sourceScopeId = migratingTransitionInstance.getSourceScope().getId();
     this.migrationInstruction = migratingTransitionInstance.getMigrationInstruction();

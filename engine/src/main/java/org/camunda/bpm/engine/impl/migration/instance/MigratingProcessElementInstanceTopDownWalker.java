@@ -23,13 +23,13 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementIns
 import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
 
 /**
- * Walks the hierarchy of {@link MigratingProcessElementInstance}s in a top-down-fashion.
- * Maintains a context of the current instance and the {@link MigratingScopeInstanceBranch}
- * that it is in.
+ * Walks the hierarchy of {@link MigratingProcessElementInstance}s in a top-down-fashion. Maintains
+ * a context of the current instance and the {@link MigratingScopeInstanceBranch} that it is in.
  *
  * @author Thorben Lindhauer
  */
-public class MigratingProcessElementInstanceTopDownWalker extends ReferenceWalker<MigrationContext> {
+public class MigratingProcessElementInstanceTopDownWalker
+    extends ReferenceWalker<MigrationContext> {
 
   public MigratingProcessElementInstanceTopDownWalker(MigratingActivityInstance activityInstance) {
     super(new MigrationContext(activityInstance, new MigratingScopeInstanceBranch()));
@@ -51,7 +51,8 @@ public class MigratingProcessElementInstanceTopDownWalker extends ReferenceWalke
       // By changing the way how the branches are created here, it should be possible
       // to implement other strategies, e.g. "once-per-child" semantics
       MigratingScopeInstanceBranch childrenScopeBranch = currentElement.scopeInstanceBranch.copy();
-      MigratingScopeInstanceBranch childrenCompensationScopeBranch = currentElement.scopeInstanceBranch.copy();
+      MigratingScopeInstanceBranch childrenCompensationScopeBranch = currentElement.scopeInstanceBranch
+          .copy();
 
       MigratingScopeInstance scopeInstance = (MigratingScopeInstance) currentElement.processElementInstance;
 
@@ -65,15 +66,12 @@ public class MigratingProcessElementInstanceTopDownWalker extends ReferenceWalke
         // e.g. when adding a sub process, we want to create a new activity instance as well
         // as a new event scope instance for that sub process
         if (child instanceof MigratingEventScopeInstance
-          || child instanceof MigratingCompensationEventSubscriptionInstance) {
+            || child instanceof MigratingCompensationEventSubscriptionInstance) {
           instanceBranch = childrenCompensationScopeBranch;
-        }
-        else {
+        } else {
           instanceBranch = childrenScopeBranch;
         }
-        nextElements.add(new MigrationContext(
-            child,
-            instanceBranch));
+        nextElements.add(new MigrationContext(child, instanceBranch));
       }
     }
 
@@ -84,7 +82,8 @@ public class MigratingProcessElementInstanceTopDownWalker extends ReferenceWalke
     protected MigratingProcessElementInstance processElementInstance;
     protected MigratingScopeInstanceBranch scopeInstanceBranch;
 
-    public MigrationContext(MigratingProcessElementInstance processElementInstance, MigratingScopeInstanceBranch scopeInstanceBranch) {
+    public MigrationContext(MigratingProcessElementInstance processElementInstance,
+        MigratingScopeInstanceBranch scopeInstanceBranch) {
       this.processElementInstance = processElementInstance;
       this.scopeInstanceBranch = scopeInstanceBranch;
     }

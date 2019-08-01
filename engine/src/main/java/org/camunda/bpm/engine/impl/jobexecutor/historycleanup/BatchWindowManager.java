@@ -30,6 +30,7 @@ public interface BatchWindowManager {
 
   /**
    * When true, then for each date, it's possible to determine next batch window.
+   * 
    * @param configuration
    * @return
    */

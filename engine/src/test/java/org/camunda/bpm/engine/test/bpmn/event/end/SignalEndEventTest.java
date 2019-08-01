@@ -31,7 +31,8 @@ public class SignalEndEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testCatchSignalEndEventInEmbeddedSubprocess() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchSignalEndEventInEmbeddedSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("catchSignalEndEventInEmbeddedSubprocess");
     assertNotNull(processInstance);
 
     // After process start, usertask in subprocess should exist
@@ -48,21 +49,23 @@ public class SignalEndEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.catchSignalEndEvent.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.processWithSignalEndEvent.bpmn20.xml"
-    })
+      "org/camunda/bpm/engine/test/bpmn/event/end/SignalEndEventTest.processWithSignalEndEvent.bpmn20.xml" })
   public void testCatchSignalEndEventInCallActivity() throws Exception {
     // first, start process to wait of the signal event
-    ProcessInstance processInstanceCatchEvent = runtimeService.startProcessInstanceByKey("catchSignalEndEvent");
+    ProcessInstance processInstanceCatchEvent = runtimeService
+        .startProcessInstanceByKey("catchSignalEndEvent");
     assertNotNull(processInstanceCatchEvent);
 
     // now we have a subscription for the signal event:
     assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
-    assertEquals("alert", runtimeService.createEventSubscriptionQuery().singleResult().getEventName());
+    assertEquals("alert",
+        runtimeService.createEventSubscriptionQuery().singleResult().getEventName());
 
     // start process which throw the signal end event
-    ProcessInstance processInstanceEndEvent = runtimeService.startProcessInstanceByKey("processWithSignalEndEvent");
+    ProcessInstance processInstanceEndEvent = runtimeService
+        .startProcessInstanceByKey("processWithSignalEndEvent");
     assertNotNull(processInstanceEndEvent);
     assertProcessEnded(processInstanceEndEvent.getId());
 
@@ -77,13 +80,15 @@ public class SignalEndEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstanceCatchEvent.getId());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/signal/testPropagateOutputVariablesWhileThrowSignal.bpmn20.xml",
-                            "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEndEventTest.parent.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/signal/testPropagateOutputVariablesWhileThrowSignal.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEndEventTest.parent.bpmn20.xml" })
   public void testPropagateOutputVariablesWhileThrowSignal() {
     // given
-    Map<String,Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
-    String processInstanceId = runtimeService.startProcessInstanceByKey("SignalParentProcess", variables).getId();
+    String processInstanceId = runtimeService
+        .startProcessInstanceByKey("SignalParentProcess", variables).getId();
 
     // when
     String id = taskService.createTaskQuery().taskName("ut2").singleResult().getId();
@@ -93,13 +98,15 @@ public class SignalEndEventTest extends PluggableProcessEngineTestCase {
     checkOutput(processInstanceId);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/signal/testPropagateOutputVariablesWhileThrowSignal2.bpmn20.xml",
-                            "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEndEventTest.parent.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/signal/testPropagateOutputVariablesWhileThrowSignal2.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEndEventTest.parent.bpmn20.xml" })
   public void testPropagateOutputVariablesWhileThrowSignal2() {
     // given
-    Map<String,Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
-    String processInstanceId = runtimeService.startProcessInstanceByKey("SignalParentProcess", variables).getId();
+    String processInstanceId = runtimeService
+        .startProcessInstanceByKey("SignalParentProcess", variables).getId();
 
     // when
     String id = taskService.createTaskQuery().taskName("inside subprocess").singleResult().getId();

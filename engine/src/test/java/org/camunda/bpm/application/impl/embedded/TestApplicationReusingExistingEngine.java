@@ -23,10 +23,8 @@ import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
  * @author Daniel Meyer
  *
  */
-@ProcessApplication(
-    name="test-app",
-    deploymentDescriptors={"org/camunda/bpm/application/impl/embedded/deployment-reusing-existing-engine.xml"}
-)
+@ProcessApplication(name = "test-app", deploymentDescriptors = {
+    "org/camunda/bpm/application/impl/embedded/deployment-reusing-existing-engine.xml" })
 public class TestApplicationReusingExistingEngine extends EmbeddedProcessApplication {
 
 }

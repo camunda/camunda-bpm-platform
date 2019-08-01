@@ -25,7 +25,8 @@ import org.camunda.bpm.engine.query.Query;
  *
  * @author Philipp Ossler
  */
-public interface HistoricDecisionInstanceQuery extends Query<HistoricDecisionInstanceQuery, HistoricDecisionInstance> {
+public interface HistoricDecisionInstanceQuery
+    extends Query<HistoricDecisionInstanceQuery, HistoricDecisionInstance> {
 
   /** Only select historic decision instances with the given decision instance id. */
   HistoricDecisionInstanceQuery decisionInstanceId(String decisionInstanceId);
@@ -49,40 +50,57 @@ public interface HistoricDecisionInstanceQuery extends Query<HistoricDecisionIns
   HistoricDecisionInstanceQuery decisionDefinitionName(String decisionDefinitionName);
 
   /**
-   * Only select historic decision instances with the given name of the decision definition using LIKE construct.
+   * Only select historic decision instances with the given name of the decision definition using
+   * LIKE construct.
    */
   HistoricDecisionInstanceQuery decisionDefinitionNameLike(String decisionDefinitionNameLike);
 
-  /** Only select historic decision instances that are evaluated inside a process
-   * with the given process definition key. */
+  /**
+   * Only select historic decision instances that are evaluated inside a process with the given
+   * process definition key.
+   */
   HistoricDecisionInstanceQuery processDefinitionKey(String processDefinitionKey);
 
-  /** Only select historic decision instances that are evaluated inside a process
-   * with the given process definition id. */
+  /**
+   * Only select historic decision instances that are evaluated inside a process with the given
+   * process definition id.
+   */
   HistoricDecisionInstanceQuery processDefinitionId(String processDefinitionId);
 
-  /** Only select historic decision instances that are evaluated inside a process
-   * with the given process instance id. */
+  /**
+   * Only select historic decision instances that are evaluated inside a process with the given
+   * process instance id.
+   */
   HistoricDecisionInstanceQuery processInstanceId(String processInstanceId);
 
-  /** Only select historic decision instances that are evaluated inside a case
-   * with the given case definition key. */
+  /**
+   * Only select historic decision instances that are evaluated inside a case with the given case
+   * definition key.
+   */
   HistoricDecisionInstanceQuery caseDefinitionKey(String caseDefinitionKey);
 
-  /** Only select historic decision instances that are evaluated inside a case
-   * with the given case definition id. */
+  /**
+   * Only select historic decision instances that are evaluated inside a case with the given case
+   * definition id.
+   */
   HistoricDecisionInstanceQuery caseDefinitionId(String caseDefinitionId);
 
-  /** Only select historic decision instances that are evaluated inside a case
-   * with the given case instance id. */
+  /**
+   * Only select historic decision instances that are evaluated inside a case with the given case
+   * instance id.
+   */
   HistoricDecisionInstanceQuery caseInstanceId(String caseInstanceId);
 
-  /** Only select historic decision instances that are evaluated inside a process or a case
-   * which have one of the activity ids. */
+  /**
+   * Only select historic decision instances that are evaluated inside a process or a case which
+   * have one of the activity ids.
+   */
   HistoricDecisionInstanceQuery activityIdIn(String... activityIds);
 
-  /** Only select historic decision instances that are evaluated inside a process or a case
-   * which have one of the activity instance ids. */
+  /**
+   * Only select historic decision instances that are evaluated inside a process or a case which
+   * have one of the activity instance ids.
+   */
   HistoricDecisionInstanceQuery activityInstanceIdIn(String... activityInstanceIds);
 
   /** Only select historic decision instances that were evaluated before the given date. */
@@ -91,9 +109,12 @@ public interface HistoricDecisionInstanceQuery extends Query<HistoricDecisionIns
   /** Only select historic decision instances that were evaluated after the given date. */
   HistoricDecisionInstanceQuery evaluatedAfter(Date date);
 
-  /** Only select historic decision instances that were evaluated by the user with the given user ID.
-   * <p> The user ID is saved for decisions which are evaluated by a authenticated user without a process or
-   * case instance */
+  /**
+   * Only select historic decision instances that were evaluated by the user with the given user ID.
+   * <p>
+   * The user ID is saved for decisions which are evaluated by a authenticated user without a
+   * process or case instance
+   */
   HistoricDecisionInstanceQuery userId(String userId);
 
   /** Enable fetching {@link HistoricDecisionInputInstance} of evaluated decision. */
@@ -102,42 +123,58 @@ public interface HistoricDecisionInstanceQuery extends Query<HistoricDecisionIns
   /** Enable fetching {@link HistoricDecisionOutputInstance} of evaluated decision. */
   HistoricDecisionInstanceQuery includeOutputs();
 
-  /** Disable fetching of byte array input and output values. By default, the query will fetch the value of a byte array.
-   * By calling this method you can prevent the values of (potentially large) blob data chunks to be fetched. */
+  /**
+   * Disable fetching of byte array input and output values. By default, the query will fetch the
+   * value of a byte array. By calling this method you can prevent the values of (potentially large)
+   * blob data chunks to be fetched.
+   */
   HistoricDecisionInstanceQuery disableBinaryFetching();
 
-  /** Disable deserialization of input and output values that are custom objects. By default, the query
-   * will attempt to deserialize the value of these variables. By calling this method you can
-   * prevent such attempts in environments where their classes are not available.
-   * Independent of this setting, variable serialized values are accessible. */
+  /**
+   * Disable deserialization of input and output values that are custom objects. By default, the
+   * query will attempt to deserialize the value of these variables. By calling this method you can
+   * prevent such attempts in environments where their classes are not available. Independent of
+   * this setting, variable serialized values are accessible.
+   */
   HistoricDecisionInstanceQuery disableCustomObjectDeserialization();
 
   /**
-   * Only select historic decision instances with a given root historic decision
-   * instance id. This also includes the historic decision instance with the
-   * given id.
+   * Only select historic decision instances with a given root historic decision instance id. This
+   * also includes the historic decision instance with the given id.
    */
   HistoricDecisionInstanceQuery rootDecisionInstanceId(String decisionInstanceId);
 
-  /** Only select historic decision instances that are the root decision instance of an evaluation. */
+  /**
+   * Only select historic decision instances that are the root decision instance of an evaluation.
+   */
   HistoricDecisionInstanceQuery rootDecisionInstancesOnly();
 
-  /** Only select historic decision instances that belongs to a decision requirements definition with the given id. */
-  HistoricDecisionInstanceQuery decisionRequirementsDefinitionId(String decisionRequirementsDefinitionId);
+  /**
+   * Only select historic decision instances that belongs to a decision requirements definition with
+   * the given id.
+   */
+  HistoricDecisionInstanceQuery decisionRequirementsDefinitionId(
+      String decisionRequirementsDefinitionId);
 
-  /** Only select historic decision instances that belongs to a decision requirements definition with the given key. */
-  HistoricDecisionInstanceQuery decisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey);
+  /**
+   * Only select historic decision instances that belongs to a decision requirements definition with
+   * the given key.
+   */
+  HistoricDecisionInstanceQuery decisionRequirementsDefinitionKey(
+      String decisionRequirementsDefinitionKey);
 
   /** Only select historic decision instances with one of the given tenant ids. */
   HistoricDecisionInstanceQuery tenantIdIn(String... tenantIds);
 
-  /** Order by the time when the decisions was evaluated
-   * (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the time when the decisions was evaluated (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   HistoricDecisionInstanceQuery orderByEvaluationTime();
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of historic decision instances without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of historic decision instances without tenant id is database-specific.
    */
   HistoricDecisionInstanceQuery orderByTenantId();
 

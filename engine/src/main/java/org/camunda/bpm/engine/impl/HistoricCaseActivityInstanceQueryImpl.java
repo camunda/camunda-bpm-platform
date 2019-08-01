@@ -39,7 +39,9 @@ import org.camunda.bpm.engine.impl.util.CompareUtil;
 /**
  * @author Sebastian Menski
  */
-public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<HistoricCaseActivityInstanceQuery, HistoricCaseActivityInstance> implements HistoricCaseActivityInstanceQuery {
+public class HistoricCaseActivityInstanceQueryImpl
+    extends AbstractQuery<HistoricCaseActivityInstanceQuery, HistoricCaseActivityInstance>
+    implements HistoricCaseActivityInstanceQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -68,16 +70,14 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getHistoricCaseActivityInstanceManager()
-      .findHistoricCaseActivityInstanceCountByQueryCriteria(this);
+    return commandContext.getHistoricCaseActivityInstanceManager()
+        .findHistoricCaseActivityInstanceCountByQueryCriteria(this);
   }
 
   public List<HistoricCaseActivityInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getHistoricCaseActivityInstanceManager()
-      .findHistoricCaseActivityInstancesByQueryCriteria(this, page);
+    return commandContext.getHistoricCaseActivityInstanceManager()
+        .findHistoricCaseActivityInstancesByQueryCriteria(this, page);
   }
 
   public HistoricCaseActivityInstanceQuery caseActivityInstanceId(String caseActivityInstanceId) {
@@ -85,8 +85,10 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     return caseActivityInstanceIdIn(caseActivityInstanceId);
   }
 
-  public HistoricCaseActivityInstanceQuery caseActivityInstanceIdIn(String... caseActivityInstanceIds) {
-    ensureNotNull(NotValidException.class, "caseActivityInstanceIds", (Object[]) caseActivityInstanceIds);
+  public HistoricCaseActivityInstanceQuery caseActivityInstanceIdIn(
+      String... caseActivityInstanceIds) {
+    ensureNotNull(NotValidException.class, "caseActivityInstanceIds",
+        (Object[]) caseActivityInstanceIds);
     this.caseActivityInstanceIds = caseActivityInstanceIds;
     return this;
   }
@@ -171,43 +173,57 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   }
 
   public HistoricCaseActivityInstanceQuery available() {
-    ensureNull(NotValidException.class, "Already querying for case activity instance state '" + caseActivityInstanceState + "'", "caseActivityState", caseActivityInstanceState);
+    ensureNull(NotValidException.class,
+        "Already querying for case activity instance state '" + caseActivityInstanceState + "'",
+        "caseActivityState", caseActivityInstanceState);
     this.caseActivityInstanceState = AVAILABLE.getStateCode();
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery enabled() {
-    ensureNull(NotValidException.class, "Already querying for case activity instance state '" + caseActivityInstanceState + "'", "caseActivityState", caseActivityInstanceState);
+    ensureNull(NotValidException.class,
+        "Already querying for case activity instance state '" + caseActivityInstanceState + "'",
+        "caseActivityState", caseActivityInstanceState);
     this.caseActivityInstanceState = ENABLED.getStateCode();
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery disabled() {
-    ensureNull(NotValidException.class, "Already querying for case activity instance state '" + caseActivityInstanceState + "'", "caseActivityState", caseActivityInstanceState);
+    ensureNull(NotValidException.class,
+        "Already querying for case activity instance state '" + caseActivityInstanceState + "'",
+        "caseActivityState", caseActivityInstanceState);
     this.caseActivityInstanceState = DISABLED.getStateCode();
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery active() {
-    ensureNull(NotValidException.class, "Already querying for case activity instance state '" + caseActivityInstanceState + "'", "caseActivityState", caseActivityInstanceState);
+    ensureNull(NotValidException.class,
+        "Already querying for case activity instance state '" + caseActivityInstanceState + "'",
+        "caseActivityState", caseActivityInstanceState);
     this.caseActivityInstanceState = ACTIVE.getStateCode();
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery suspended() {
-    ensureNull(NotValidException.class, "Already querying for case activity instance state '" + caseActivityInstanceState + "'", "caseActivityState", caseActivityInstanceState);
+    ensureNull(NotValidException.class,
+        "Already querying for case activity instance state '" + caseActivityInstanceState + "'",
+        "caseActivityState", caseActivityInstanceState);
     this.caseActivityInstanceState = SUSPENDED.getStateCode();
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery completed() {
-    ensureNull(NotValidException.class, "Already querying for case activity instance state '" + caseActivityInstanceState + "'", "caseActivityState", caseActivityInstanceState);
+    ensureNull(NotValidException.class,
+        "Already querying for case activity instance state '" + caseActivityInstanceState + "'",
+        "caseActivityState", caseActivityInstanceState);
     this.caseActivityInstanceState = COMPLETED.getStateCode();
     return this;
   }
 
   public HistoricCaseActivityInstanceQuery terminated() {
-    ensureNull(NotValidException.class, "Already querying for case activity instance state '" + caseActivityInstanceState + "'", "caseActivityState", caseActivityInstanceState);
+    ensureNull(NotValidException.class,
+        "Already querying for case activity instance state '" + caseActivityInstanceState + "'",
+        "caseActivityState", caseActivityInstanceState);
     this.caseActivityInstanceState = TERMINATED.getStateCode();
     return this;
   }
@@ -221,8 +237,8 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions()
-      || CompareUtil.areNotInAscendingOrder(createdAfter, createdBefore)
-      || CompareUtil.areNotInAscendingOrder(endedAfter, endedBefore);
+        || CompareUtil.areNotInAscendingOrder(createdAfter, createdBefore)
+        || CompareUtil.areNotInAscendingOrder(endedAfter, endedBefore);
   }
 
   // ordering

@@ -37,12 +37,10 @@ public class TimerEventFactory implements BpmnEventFactory {
   public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
 
   @Override
-  public MigratingBpmnEventTrigger addBoundaryEvent(ProcessEngine engine, BpmnModelInstance modelInstance, String activityId, String boundaryEventId) {
-    ModifiableBpmnModelInstance.wrap(modelInstance)
-        .activityBuilder(activityId)
-        .boundaryEvent(boundaryEventId)
-          .timerWithDate(TIMER_DATE)
-        .done();
+  public MigratingBpmnEventTrigger addBoundaryEvent(ProcessEngine engine,
+      BpmnModelInstance modelInstance, String activityId, String boundaryEventId) {
+    ModifiableBpmnModelInstance.wrap(modelInstance).activityBuilder(activityId)
+        .boundaryEvent(boundaryEventId).timerWithDate(TIMER_DATE).done();
 
     TimerEventTrigger trigger = new TimerEventTrigger();
     trigger.engine = engine;
@@ -53,15 +51,11 @@ public class TimerEventFactory implements BpmnEventFactory {
   }
 
   @Override
-  public MigratingBpmnEventTrigger addEventSubProcess(ProcessEngine engine, BpmnModelInstance modelInstance, String parentId, String subProcessId, String startEventId) {
-    ModifiableBpmnModelInstance.wrap(modelInstance)
-      .addSubProcessTo(parentId)
-      .id(subProcessId)
-      .triggerByEvent()
-      .embeddedSubProcess()
-        .startEvent(startEventId).timerWithDuration("PT10M")
-      .subProcessDone()
-      .done();
+  public MigratingBpmnEventTrigger addEventSubProcess(ProcessEngine engine,
+      BpmnModelInstance modelInstance, String parentId, String subProcessId, String startEventId) {
+    ModifiableBpmnModelInstance.wrap(modelInstance).addSubProcessTo(parentId).id(subProcessId)
+        .triggerByEvent().embeddedSubProcess().startEvent(startEventId).timerWithDuration("PT10M")
+        .subProcessDone().done();
 
     TimerEventTrigger trigger = new TimerEventTrigger();
     trigger.engine = engine;
@@ -70,7 +64,6 @@ public class TimerEventFactory implements BpmnEventFactory {
 
     return trigger;
   }
-
 
   protected static class TimerEventTrigger implements MigratingBpmnEventTrigger {
 
@@ -81,17 +74,20 @@ public class TimerEventFactory implements BpmnEventFactory {
     @Override
     public void trigger(String processInstanceId) {
       ManagementService managementService = engine.getManagementService();
-      Job timerJob = managementService.createJobQuery().processInstanceId(processInstanceId).activityId(activityId).singleResult();
+      Job timerJob = managementService.createJobQuery().processInstanceId(processInstanceId)
+          .activityId(activityId).singleResult();
 
       if (timerJob == null) {
-        throw new ProcessEngineException("No job for this event found in context of process instance " + processInstanceId);
+        throw new ProcessEngineException(
+            "No job for this event found in context of process instance " + processInstanceId);
       }
 
       managementService.executeJob(timerJob.getId());
     }
 
     @Override
-    public void assertEventTriggerMigrated(MigrationTestRule migrationContext, String targetActivityId) {
+    public void assertEventTriggerMigrated(MigrationTestRule migrationContext,
+        String targetActivityId) {
       migrationContext.assertJobMigrated(activityId, targetActivityId, handlerType);
     }
 

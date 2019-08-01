@@ -56,107 +56,102 @@ public class HistoryCleanupStrategyConfigurationTest {
   public void init() {
     engineConfiguration = engineRule.getProcessEngineConfiguration();
 
-    engineConfiguration
-      .setHistoryCleanupStrategy(null)
-      .setHistoryRemovalTimeStrategy(null)
-      .initHistoryCleanup();
+    engineConfiguration.setHistoryCleanupStrategy(null).setHistoryRemovalTimeStrategy(null)
+        .initHistoryCleanup();
   }
 
   @AfterClass
   public static void tearDown() {
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(null)
-      .initHistoryRemovalTime();
-    engineConfiguration
-      .setHistoryCleanupStrategy(null)
-      .initHistoryCleanup();
+    engineConfiguration.setHistoryRemovalTimeStrategy(null).initHistoryRemovalTime();
+    engineConfiguration.setHistoryCleanupStrategy(null).initHistoryCleanup();
   }
 
   @Test
   public void shouldAutomaticallyConfigure() {
     // given
 
-    engineConfiguration
-      .setHistoryCleanupStrategy(null);
+    engineConfiguration.setHistoryCleanupStrategy(null);
 
     // when
     engineConfiguration.initHistoryCleanup();
 
     // then
-    assertThat(engineConfiguration.getHistoryCleanupStrategy(), is(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED));
+    assertThat(engineConfiguration.getHistoryCleanupStrategy(),
+        is(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED));
   }
 
   @Test
   public void shouldConfigureToRemovalTimeBased() {
     // given
 
-    engineConfiguration
-      .setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
+    engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
 
     // when
     engineConfiguration.initHistoryCleanup();
 
     // then
-    assertThat(engineConfiguration.getHistoryCleanupStrategy(), is(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED));
+    assertThat(engineConfiguration.getHistoryCleanupStrategy(),
+        is(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED));
   }
 
   @Test
   public void shouldConfigureToRemovalTimeBasedWithRemovalTimeStrategyToEnd() {
     // given
 
-    engineConfiguration
-      .setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED)
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END);
+    engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED)
+        .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END);
 
     // when
     engineConfiguration.initHistoryCleanup();
 
     // then
-    assertThat(engineConfiguration.getHistoryCleanupStrategy(), is(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED));
-    assertThat(engineConfiguration.getHistoryRemovalTimeStrategy(), is(HISTORY_REMOVAL_TIME_STRATEGY_END));
+    assertThat(engineConfiguration.getHistoryCleanupStrategy(),
+        is(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED));
+    assertThat(engineConfiguration.getHistoryRemovalTimeStrategy(),
+        is(HISTORY_REMOVAL_TIME_STRATEGY_END));
   }
 
   @Test
   public void shouldConfigureToRemovalTimeBasedWithRemovalTimeStrategyToStart() {
     // given
 
-    engineConfiguration
-      .setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED)
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START);
+    engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED)
+        .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START);
 
     // when
     engineConfiguration.initHistoryCleanup();
 
     // then
-    assertThat(engineConfiguration.getHistoryCleanupStrategy(), is(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED));
-    assertThat(engineConfiguration.getHistoryRemovalTimeStrategy(), is(HISTORY_REMOVAL_TIME_STRATEGY_START));
+    assertThat(engineConfiguration.getHistoryCleanupStrategy(),
+        is(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED));
+    assertThat(engineConfiguration.getHistoryRemovalTimeStrategy(),
+        is(HISTORY_REMOVAL_TIME_STRATEGY_START));
   }
-
 
   @Test
   public void shouldConfigureToEndTimeBased() {
     // given
 
-    engineConfiguration
-      .setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
+    engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
 
     // when
     engineConfiguration.initHistoryCleanup();
 
     // then
-    assertThat(engineConfiguration.getHistoryCleanupStrategy(), is(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED));
+    assertThat(engineConfiguration.getHistoryCleanupStrategy(),
+        is(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED));
   }
 
   @Test
   public void shouldConfigureWithNotExistentStrategy() {
     // given
 
-    engineConfiguration
-      .setHistoryCleanupStrategy("nonExistentStrategy");
+    engineConfiguration.setHistoryCleanupStrategy("nonExistentStrategy");
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("history cleanup strategy must be either set to 'removalTimeBased' or 'endTimeBased'.");
+    thrown.expectMessage(
+        "history cleanup strategy must be either set to 'removalTimeBased' or 'endTimeBased'.");
 
     // when
     engineConfiguration.initHistoryCleanup();
@@ -166,13 +161,13 @@ public class HistoryCleanupStrategyConfigurationTest {
   public void shouldConfigureToRemovalTimeBasedWithRemovalTimeStrategyToNone() {
     // given
 
-    engineConfiguration
-      .setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED)
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE);
+    engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED)
+        .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE);
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("history removal time strategy cannot be set to 'none' in conjunction with 'removalTimeBased' history cleanup strategy.");
+    thrown.expectMessage(
+        "history removal time strategy cannot be set to 'none' in conjunction with 'removalTimeBased' history cleanup strategy.");
 
     // when
     engineConfiguration.initHistoryCleanup();

@@ -24,8 +24,10 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 
 /**
- * <p>JobExecutor implementation that delegates the execution of jobs
- * to the {@link RuntimeContainerDelegate RuntimeContainer}</p>
+ * <p>
+ * JobExecutor implementation that delegates the execution of jobs to the
+ * {@link RuntimeContainerDelegate RuntimeContainer}
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -37,7 +39,7 @@ public class RuntimeContainerJobExecutor extends JobExecutor {
     final RuntimeContainerDelegate runtimeContainerDelegate = getRuntimeContainerDelegate();
 
     // schedule job acquisition
-    if(!runtimeContainerDelegate.getExecutorService().schedule(acquireJobsRunnable, true)) {
+    if (!runtimeContainerDelegate.getExecutorService().schedule(acquireJobsRunnable, true)) {
       throw new ProcessEngineException("Could not schedule AcquireJobsRunnable for execution.");
     }
 
@@ -55,7 +57,7 @@ public class RuntimeContainerJobExecutor extends JobExecutor {
     Runnable executeJobsRunnable = getExecuteJobsRunnable(jobIds, processEngine);
 
     // delegate job execution to runtime container
-    if(!executorService.schedule(executeJobsRunnable, false)) {
+    if (!executorService.schedule(executeJobsRunnable, false)) {
 
       logRejectedExecution(processEngine, jobIds.size());
       rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);

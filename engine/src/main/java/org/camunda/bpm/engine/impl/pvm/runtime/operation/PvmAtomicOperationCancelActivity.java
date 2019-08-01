@@ -42,19 +42,25 @@ public abstract class PvmAtomicOperationCancelActivity implements PvmAtomicOpera
 
     PvmExecutionImpl propagatingExecution = null;
 
-    if(LegacyBehavior.isConcurrentScope(execution)) {
+    if (LegacyBehavior.isConcurrentScope(execution)) {
       // this is legacy behavior
-      LegacyBehavior.cancelConcurrentScope(execution, (PvmActivity) cancellingActivity.getEventScope());
+      LegacyBehavior.cancelConcurrentScope(execution,
+          (PvmActivity) cancellingActivity.getEventScope());
       propagatingExecution = execution;
-    }
-    else {
-      // Unlike PvmAtomicOperationTransitionDestroyScope this needs to use delete() (instead of destroy() and remove()).
-      // The reason is that PvmAtomicOperationTransitionDestroyScope is executed when a scope (or non scope) is left using
-      // a sequence flow. In that case the execution will have completed all the work inside the current activity
-      // and will have no more child executions. In PvmAtomicOperationCancelScope the scope is cancelled due to
-      // a boundary event firing. In that case the execution has not completed all the work in the current scope / activity
-      // and it is necessary to delete the complete hierarchy of executions below and including the execution itself.
-      execution.deleteCascade("Cancel scope activity "+cancellingActivity+" executed.");
+    } else {
+      // Unlike PvmAtomicOperationTransitionDestroyScope this needs to use delete() (instead of
+      // destroy() and remove()).
+      // The reason is that PvmAtomicOperationTransitionDestroyScope is executed when a scope (or
+      // non scope) is left using
+      // a sequence flow. In that case the execution will have completed all the work inside the
+      // current activity
+      // and will have no more child executions. In PvmAtomicOperationCancelScope the scope is
+      // cancelled due to
+      // a boundary event firing. In that case the execution has not completed all the work in the
+      // current scope / activity
+      // and it is necessary to delete the complete hierarchy of executions below and including the
+      // execution itself.
+      execution.deleteCascade("Cancel scope activity " + cancellingActivity + " executed.");
       propagatingExecution = execution.getParent();
     }
 

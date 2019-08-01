@@ -19,11 +19,10 @@ package org.camunda.bpm.engine.impl.cfg;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * Implementations may not assume that this is executed by the same thread as the command itself.
- * Especially thread locals such as those available in {@link Context} should not be accessed
- * in an implementation of this interface. See CAM-3684 for details.
+ * Especially thread locals such as those available in {@link Context} should not be accessed in an
+ * implementation of this interface. See CAM-3684 for details.
  *
  * @author Tom Baeyens
  */

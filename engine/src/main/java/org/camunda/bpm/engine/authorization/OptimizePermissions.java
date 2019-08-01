@@ -17,26 +17,25 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * The set of built-in {@link Permission Permissions} for
- * {@link Resources#OPTIMIZE Optimize resource} in Camunda BPM.
+ * The set of built-in {@link Permission Permissions} for {@link Resources#OPTIMIZE Optimize
+ * resource} in Camunda BPM.
  *
  */
 public enum OptimizePermissions implements Permission {
 
   /**
-   * The none permission means 'no action', 'doing nothing'. It does not mean
-   * that no permissions are granted.
+   * The none permission means 'no action', 'doing nothing'. It does not mean that no permissions
+   * are granted.
    */
   NONE("NONE", 0),
 
   /**
-   * Indicates that all interactions are permitted. If ALL is revoked it means
-   * that the user is not permitted to do everything, which means that at least
-   * one permission is revoked. This does not implicate that all individual
-   * permissions are revoked.
+   * Indicates that all interactions are permitted. If ALL is revoked it means that the user is not
+   * permitted to do everything, which means that at least one permission is revoked. This does not
+   * implicate that all individual permissions are revoked.
    *
-   * Example: If the EDIT permission is revoke also the ALL permission is
-   * revoked, because the user is not authorized to execute all actions anymore.
+   * Example: If the EDIT permission is revoke also the ALL permission is revoked, because the user
+   * is not authorized to execute all actions anymore.
    */
   ALL("ALL", Integer.MAX_VALUE),
 

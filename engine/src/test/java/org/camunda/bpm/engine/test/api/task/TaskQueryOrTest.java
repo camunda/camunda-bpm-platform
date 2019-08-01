@@ -75,12 +75,12 @@ public class TaskQueryOrTest {
 
   @After
   public void tearDown() {
-    for (org.camunda.bpm.engine.repository.Deployment deployment:
-      repositoryService.createDeploymentQuery().list()) {
+    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService
+        .createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
-    for (Task task: taskService.createTaskQuery().list()) {
+    for (Task task : taskService.createTaskQuery().list()) {
       taskService.deleteTask(task.getId(), true);
     }
   }
@@ -90,10 +90,7 @@ public class TaskQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set endOr() before or()");
 
-    taskService.createTaskQuery()
-      .or()
-      .endOr()
-      .endOr();
+    taskService.createTaskQuery().or().endOr().endOr();
   }
 
   @Test
@@ -101,13 +98,7 @@ public class TaskQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set or() within 'or' query");
 
-    taskService.createTaskQuery()
-      .or()
-        .or()
-        .endOr()
-      .endOr()
-      .or()
-      .endOr();
+    taskService.createTaskQuery().or().or().endOr().endOr().or().endOr();
   }
 
   @Test
@@ -115,21 +106,16 @@ public class TaskQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set withCandidateGroups() within 'or' query");
 
-    taskService.createTaskQuery()
-      .or()
-        .withCandidateGroups()
-      .endOr();
+    taskService.createTaskQuery().or().withCandidateGroups().endOr();
   }
 
   @Test
   public void shouldThrowExceptionByWithoutCandidateGroupsApplied() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set withoutCandidateGroups() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set withoutCandidateGroups() within 'or' query");
 
-    taskService.createTaskQuery()
-      .or()
-        .withoutCandidateGroups()
-      .endOr();
+    taskService.createTaskQuery().or().withoutCandidateGroups().endOr();
   }
 
   @Test
@@ -137,32 +123,25 @@ public class TaskQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set withCandidateUsers() within 'or' query");
 
-    taskService.createTaskQuery()
-      .or()
-        .withCandidateUsers()
-      .endOr();
+    taskService.createTaskQuery().or().withCandidateUsers().endOr();
   }
 
   @Test
   public void shouldThrowExceptionByWithoutCandidateUsersApplied() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set withoutCandidateUsers() within 'or' query");
+    thrown
+        .expectMessage("Invalid query usage: cannot set withoutCandidateUsers() within 'or' query");
 
-    taskService.createTaskQuery()
-      .or()
-        .withoutCandidateUsers()
-      .endOr();
+    taskService.createTaskQuery().or().withoutCandidateUsers().endOr();
   }
 
   @Test
   public void shouldThrowExceptionByOrderingApplied() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByCaseExecutionId() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByCaseExecutionId() within 'or' query");
 
-    taskService.createTaskQuery()
-      .or()
-        .orderByCaseExecutionId()
-      .endOr();
+    taskService.createTaskQuery().or().orderByCaseExecutionId().endOr();
   }
 
   @Test
@@ -170,10 +149,7 @@ public class TaskQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set initializeFormKeys() within 'or' query");
 
-    taskService.createTaskQuery()
-      .or()
-        .initializeFormKeys()
-      .endOr();
+    taskService.createTaskQuery().or().initializeFormKeys().endOr();
   }
 
   @Test
@@ -188,12 +164,8 @@ public class TaskQueryOrTest {
     taskService.addCandidateGroup(task2.getId(), "aCandidateGroup");
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .taskCandidateUser("aCandidateUser")
-      .or()
-        .taskCandidateGroup("aCandidateGroup")
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("aCandidateUser").or()
+        .taskCandidateGroup("aCandidateGroup").endOr().list();
 
     // then
     assertEquals(0, tasks.size());
@@ -206,10 +178,7 @@ public class TaskQueryOrTest {
     taskService.saveTask(taskService.newTask());
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().endOr().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -227,12 +196,8 @@ public class TaskQueryOrTest {
     taskService.addCandidateGroup(task2.getId(), "Controlling");
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .taskCandidateUser("John Doe")
-        .taskCandidateGroup("Controlling")
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().taskCandidateUser("John Doe")
+        .taskCandidateGroup("Controlling").endOr().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -251,13 +216,8 @@ public class TaskQueryOrTest {
     taskService.addCandidateGroup(task2.getId(), "Controlling");
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .taskCandidateUser("John Doe")
-        .taskCandidateGroup("Controlling")
-        .includeAssignedTasks()
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().taskCandidateUser("John Doe")
+        .taskCandidateGroup("Controlling").includeAssignedTasks().endOr().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -275,12 +235,8 @@ public class TaskQueryOrTest {
     taskService.addCandidateUser(task2.getId(), "John Doe");
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .taskCandidateUser("John Doe")
-        .taskAssignee("John Doe")
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().taskCandidateUser("John Doe")
+        .taskAssignee("John Doe").endOr().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -302,12 +258,8 @@ public class TaskQueryOrTest {
     taskService.addCandidateGroup(task3.getId(), "Sales");
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .taskCandidateUser("John Doe")
-        .taskCandidateGroupIn(Arrays.asList("Controlling", "Sales"))
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().taskCandidateUser("John Doe")
+        .taskCandidateGroupIn(Arrays.asList("Controlling", "Sales")).endOr().list();
 
     // then
     assertEquals(3, tasks.size());
@@ -329,12 +281,8 @@ public class TaskQueryOrTest {
     taskService.addCandidateGroup(task3.getId(), "Sales");
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .taskCandidateGroup("Accounting")
-        .taskCandidateGroupIn(Arrays.asList("Controlling", "Sales"))
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().taskCandidateGroup("Accounting")
+        .taskCandidateGroupIn(Arrays.asList("Controlling", "Sales")).endOr().list();
 
     // then
     assertEquals(3, tasks.size());
@@ -352,12 +300,8 @@ public class TaskQueryOrTest {
     taskService.saveTask(task2);
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().taskName("aTaskName")
+        .taskDescription("aTaskDescription").endOr().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -386,15 +330,9 @@ public class TaskQueryOrTest {
     taskService.saveTask(task5);
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-        .taskId(task3.getId())
-        .taskPriority(5)
-        .taskOwner("aTaskOwner")
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().taskName("aTaskName")
+        .taskDescription("aTaskDescription").taskId(task3.getId()).taskPriority(5)
+        .taskOwner("aTaskOwner").endOr().list();
 
     // then
     assertEquals(5, tasks.size());
@@ -435,16 +373,9 @@ public class TaskQueryOrTest {
     taskService.saveTask(task5);
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-        .taskId(task3.getId())
-      .endOr()
-      .taskOwner("aTaskOwner")
-      .taskPriority(4)
-      .taskAssignee("aTaskAssignee")
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().taskName("aTaskName")
+        .taskDescription("aTaskDescription").taskId(task3.getId()).endOr().taskOwner("aTaskOwner")
+        .taskPriority(4).taskAssignee("aTaskAssignee").list();
 
     // then
     assertEquals(3, tasks.size());
@@ -492,27 +423,12 @@ public class TaskQueryOrTest {
     taskService.saveTask(task6);
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-      .endOr()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-        .taskAssignee("aTaskAssignee")
-      .endOr()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-        .taskOwner("aTaskOwner")
-        .taskAssignee("aTaskAssignee")
-      .endOr()
-      .or()
-        .taskAssignee("aTaskAssignee")
-        .taskPriority(4)
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().taskName("aTaskName")
+        .taskDescription("aTaskDescription").endOr().or().taskName("aTaskName")
+        .taskDescription("aTaskDescription").taskAssignee("aTaskAssignee").endOr().or()
+        .taskName("aTaskName").taskDescription("aTaskDescription").taskOwner("aTaskOwner")
+        .taskAssignee("aTaskAssignee").endOr().or().taskAssignee("aTaskAssignee").taskPriority(4)
+        .endOr().list();
 
     // then
     assertEquals(3, tasks.size());
@@ -534,13 +450,8 @@ public class TaskQueryOrTest {
     taskService.addCandidateGroup(task3.getId(), "Sales");
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .taskCandidateGroup("Accounting")
-        .taskCandidateGroup("Controlling")
-        .taskCandidateGroup("Sales")
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().taskCandidateGroup("Accounting")
+        .taskCandidateGroup("Controlling").taskCandidateGroup("Sales").endOr().list();
 
     // then
     assertEquals(1, tasks.size());
@@ -551,18 +462,15 @@ public class TaskQueryOrTest {
     // given
     Task task1 = taskService.newTask();
     taskService.saveTask(task1);
-    taskService.setVariable(task1.getId(),"aLongValue", 789L);
+    taskService.setVariable(task1.getId(), "aLongValue", 789L);
 
     Task task2 = taskService.newTask();
     taskService.saveTask(task2);
-    taskService.setVariable(task2.getId(),"anEvenLongerValue", 1000L);
+    taskService.setVariable(task2.getId(), "anEvenLongerValue", 1000L);
 
     // when
-    TaskQuery query = taskService.createTaskQuery()
-      .or()
-        .taskVariableValueEquals("aLongValue", 789L)
-        .taskVariableValueGreaterThan("anEvenLongerValue", 999L)
-      .endOr();
+    TaskQuery query = taskService.createTaskQuery().or().taskVariableValueEquals("aLongValue", 789L)
+        .taskVariableValueGreaterThan("anEvenLongerValue", 999L).endOr();
 
     // then
     assertEquals(2, query.count());
@@ -572,43 +480,27 @@ public class TaskQueryOrTest {
   public void shouldInitializeFormKeys() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-          .camundaFormKey("aFormKey")
-      .endEvent()
-      .done();
+        .startEvent().userTask().camundaFormKey("aFormKey").endEvent().done();
 
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", aProcessDefinition).deploy();
 
     ProcessInstance processInstance1 = runtimeService
-      .startProcessInstanceByKey("aProcessDefinition");
+        .startProcessInstanceByKey("aProcessDefinition");
 
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
-        .userTask()
-          .camundaFormKey("anotherFormKey")
-      .endEvent()
-      .done();
+    BpmnModelInstance anotherProcessDefinition = Bpmn
+        .createExecutableProcess("anotherProcessDefinition").startEvent().userTask()
+        .camundaFormKey("anotherFormKey").endEvent().done();
 
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", anotherProcessDefinition)
-      .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", anotherProcessDefinition)
+        .deploy();
 
     ProcessInstance processInstance2 = runtimeService
-      .startProcessInstanceByKey("anotherProcessDefinition");
+        .startProcessInstanceByKey("anotherProcessDefinition");
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
+    List<Task> tasks = taskService.createTaskQuery().or()
         .processDefinitionId(processInstance1.getProcessDefinitionId())
-        .processInstanceId(processInstance2.getId())
-      .endOr()
-      .initializeFormKeys()
-      .list();
+        .processInstanceId(processInstance2.getId()).endOr().initializeFormKeys().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -620,39 +512,24 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksWithProcessDefinitionNameOrProcessDefinitionKey() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .name("process1")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .name("process1").startEvent().userTask().endEvent().done();
 
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", aProcessDefinition).deploy();
 
     runtimeService.startProcessInstanceByKey("aProcessDefinition");
 
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+    BpmnModelInstance anotherProcessDefinition = Bpmn
+        .createExecutableProcess("anotherProcessDefinition").startEvent().userTask().endEvent()
+        .done();
 
-     repositoryService
-       .createDeployment()
-       .addModelInstance("foo.bpmn", anotherProcessDefinition)
-       .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", anotherProcessDefinition)
+        .deploy();
 
     runtimeService.startProcessInstanceByKey("anotherProcessDefinition");
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .processDefinitionName("process1")
-        .processDefinitionKey("anotherProcessDefinition")
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().processDefinitionName("process1")
+        .processDefinitionKey("anotherProcessDefinition").endOr().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -662,40 +539,24 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksWithProcessInstanceBusinessKeyOrProcessInstanceBusinessKeyLike() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .startEvent().userTask().endEvent().done();
 
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", aProcessDefinition).deploy();
 
-    runtimeService
-      .startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
+    runtimeService.startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
 
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+    BpmnModelInstance anotherProcessDefinition = Bpmn
+        .createExecutableProcess("anotherProcessDefinition").startEvent().userTask().endEvent()
+        .done();
 
-     repositoryService
-       .createDeployment()
-       .addModelInstance("foo.bpmn", anotherProcessDefinition)
-       .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", anotherProcessDefinition)
+        .deploy();
 
-    runtimeService
-      .startProcessInstanceByKey("anotherProcessDefinition", "anotherBusinessKey");
+    runtimeService.startProcessInstanceByKey("anotherProcessDefinition", "anotherBusinessKey");
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .processInstanceBusinessKey("aBusinessKey")
-        .processInstanceBusinessKeyLike("anotherBusinessKey")
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().processInstanceBusinessKey("aBusinessKey")
+        .processInstanceBusinessKeyLike("anotherBusinessKey").endOr().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -705,52 +566,38 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksWithProcessInstanceBusinessKeyOrProcessInstanceBusinessKeyLikeAndAssignee() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .startEvent().userTask().endEvent().done();
 
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", aProcessDefinition).deploy();
 
-    ProcessInstance processInstance = runtimeService
-      .startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("aProcessDefinition",
+        "aBusinessKey");
 
-    runtimeService
-    .startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
+    runtimeService.startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
 
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+    BpmnModelInstance anotherProcessDefinition = Bpmn
+        .createExecutableProcess("anotherProcessDefinition").startEvent().userTask().endEvent()
+        .done();
 
-     repositoryService
-       .createDeployment()
-       .addModelInstance("foo.bpmn", anotherProcessDefinition)
-       .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", anotherProcessDefinition)
+        .deploy();
 
     ProcessInstance processInstanceAnotherDefinition = runtimeService
-      .startProcessInstanceByKey("anotherProcessDefinition", "anotherBusinessKey");
+        .startProcessInstanceByKey("anotherProcessDefinition", "anotherBusinessKey");
 
     // set the assignee for one task of each process definition
     String assignee = "testUser4";
-    String taskId = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId();
+    String taskId = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult().getId();
     taskService.setAssignee(taskId, assignee);
 
-    taskId = taskService.createTaskQuery().processInstanceId(processInstanceAnotherDefinition.getId()).singleResult().getId();
+    taskId = taskService.createTaskQuery()
+        .processInstanceId(processInstanceAnotherDefinition.getId()).singleResult().getId();
     taskService.setAssignee(taskId, assignee);
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .processInstanceBusinessKey("aBusinessKey")
-        .processInstanceBusinessKeyLike("anotherBusinessKey")
-      .endOr()
-      .taskAssignee(assignee)
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().processInstanceBusinessKey("aBusinessKey")
+        .processInstanceBusinessKeyLike("anotherBusinessKey").endOr().taskAssignee(assignee).list();
 
     // then
     assertEquals(2, tasks.size());
@@ -760,32 +607,20 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksWithProcessInstanceBusinessKeyOrProcessInstanceBusinessKeyLikeOrStandaloneAssignee() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .startEvent().userTask().endEvent().done();
 
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", aProcessDefinition).deploy();
 
-    runtimeService
-      .startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
-    
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+    runtimeService.startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
 
-     repositoryService
-       .createDeployment()
-       .addModelInstance("foo.bpmn", anotherProcessDefinition)
-       .deploy();
+    BpmnModelInstance anotherProcessDefinition = Bpmn
+        .createExecutableProcess("anotherProcessDefinition").startEvent().userTask().endEvent()
+        .done();
 
-    runtimeService
-      .startProcessInstanceByKey("anotherProcessDefinition", "anotherBusinessKey");
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", anotherProcessDefinition)
+        .deploy();
+
+    runtimeService.startProcessInstanceByKey("anotherProcessDefinition", "anotherBusinessKey");
 
     // create a standalone task with assignee
     String assignee = "testUser4";
@@ -794,123 +629,78 @@ public class TaskQueryOrTest {
     taskService.saveTask(newTask);
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .processInstanceBusinessKey("aBusinessKey")
-        .processInstanceBusinessKeyLike("anotherBusinessKey")
-        .taskAssignee(assignee)
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().processInstanceBusinessKey("aBusinessKey")
+        .processInstanceBusinessKeyLike("anotherBusinessKey").taskAssignee(assignee).endOr().list();
 
     // then
     assertEquals(3, tasks.size());
   }
 
   @Test
-  @Deployment(resources={
-    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
-    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn" })
   public void shouldReturnTasksWithCaseDefinitionKeyCaseDefinitionName() {
     // given
-    String caseDefinitionId1 = repositoryService
-      .createCaseDefinitionQuery()
-      .caseDefinitionKey("oneTaskCase")
-      .singleResult()
-      .getId();
+    String caseDefinitionId1 = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase").singleResult().getId();
 
-    caseService
-      .withCaseDefinition(caseDefinitionId1)
-      .create();
+    caseService.withCaseDefinition(caseDefinitionId1).create();
 
-    String caseDefinitionId2 = repositoryService
-      .createCaseDefinitionQuery()
-      .caseDefinitionKey("oneTaskCase2")
-      .singleResult()
-      .getId();
+    String caseDefinitionId2 = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase2").singleResult().getId();
 
-    caseService
-      .withCaseDefinition(caseDefinitionId2)
-      .create();
+    caseService.withCaseDefinition(caseDefinitionId2).create();
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .caseDefinitionKey("oneTaskCase")
-        .caseDefinitionName("One")
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().caseDefinitionKey("oneTaskCase")
+        .caseDefinitionName("One").endOr().list();
 
     // then
     assertEquals(2, tasks.size());
   }
 
   @Test
-  @Deployment(resources={
-    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
-    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn" })
   public void shouldReturnTasksWithCaseInstanceBusinessKeyOrCaseInstanceBusinessKeyLike() {
     // given
-    String caseDefinitionId1 = repositoryService
-      .createCaseDefinitionQuery()
-      .caseDefinitionKey("oneTaskCase")
-      .singleResult()
-      .getId();
+    String caseDefinitionId1 = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase").singleResult().getId();
 
-    CaseInstance caseInstance1 = caseService
-      .withCaseDefinition(caseDefinitionId1)
-      .businessKey("aBusinessKey")
-      .create();
+    CaseInstance caseInstance1 = caseService.withCaseDefinition(caseDefinitionId1)
+        .businessKey("aBusinessKey").create();
 
-    String caseDefinitionId2 = repositoryService
-      .createCaseDefinitionQuery()
-      .caseDefinitionKey("oneTaskCase2")
-      .singleResult()
-      .getId();
+    String caseDefinitionId2 = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase2").singleResult().getId();
 
-    CaseInstance caseInstance2 = caseService
-      .withCaseDefinition(caseDefinitionId2)
-      .businessKey("anotherBusinessKey")
-      .create();
+    CaseInstance caseInstance2 = caseService.withCaseDefinition(caseDefinitionId2)
+        .businessKey("anotherBusinessKey").create();
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
+    List<Task> tasks = taskService.createTaskQuery().or()
         .caseInstanceBusinessKey(caseInstance1.getBusinessKey())
-        .caseInstanceBusinessKeyLike(caseInstance2.getBusinessKey())
-      .endOr()
-      .list();
+        .caseInstanceBusinessKeyLike(caseInstance2.getBusinessKey()).endOr().list();
 
     // then
     assertEquals(2, tasks.size());
   }
 
   @Test
-  @Deployment(resources={
-    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
-    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn" })
   public void shouldReturnTasksWithCaseInstanceBusinessKeyOrCaseInstanceBusinessKeyLikeOrStandaloneAssignee() {
     // given
-    String caseDefinitionId1 = repositoryService
-      .createCaseDefinitionQuery()
-      .caseDefinitionKey("oneTaskCase")
-      .singleResult()
-      .getId();
+    String caseDefinitionId1 = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase").singleResult().getId();
 
-    CaseInstance caseInstance1 = caseService
-      .withCaseDefinition(caseDefinitionId1)
-      .businessKey("aBusinessKey")
-      .create();
+    CaseInstance caseInstance1 = caseService.withCaseDefinition(caseDefinitionId1)
+        .businessKey("aBusinessKey").create();
 
-    String caseDefinitionId2 = repositoryService
-      .createCaseDefinitionQuery()
-      .caseDefinitionKey("oneTaskCase2")
-      .singleResult()
-      .getId();
+    String caseDefinitionId2 = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase2").singleResult().getId();
 
-    CaseInstance caseInstance2 = caseService
-      .withCaseDefinition(caseDefinitionId2)
-      .businessKey("anotherBusinessKey")
-      .create();
+    CaseInstance caseInstance2 = caseService.withCaseDefinition(caseDefinitionId2)
+        .businessKey("anotherBusinessKey").create();
 
     // create a standalone task with assignee
     String assignee = "testUser4";
@@ -919,54 +709,35 @@ public class TaskQueryOrTest {
     taskService.saveTask(newTask);
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
+    List<Task> tasks = taskService.createTaskQuery().or()
         .caseInstanceBusinessKey(caseInstance1.getBusinessKey())
-        .caseInstanceBusinessKeyLike(caseInstance2.getBusinessKey())
-        .taskAssignee(assignee)
-      .endOr()
-      .list();
+        .caseInstanceBusinessKeyLike(caseInstance2.getBusinessKey()).taskAssignee(assignee).endOr()
+        .list();
 
     // then
     assertEquals(3, tasks.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void shouldReturnTasksWithCaseInstanceBusinessKeyOrProcessInstanceBusinessKey() {
     String businessKey = "aBusinessKey";
 
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .startEvent().userTask().endEvent().done();
 
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", aProcessDefinition).deploy();
 
     runtimeService.startProcessInstanceByKey("aProcessDefinition", businessKey);
 
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .caseDefinitionKey("oneTaskCase")
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase").singleResult().getId();
 
-    caseService
-      .withCaseDefinition(caseDefinitionId)
-      .businessKey(businessKey)
-      .create();
+    caseService.withCaseDefinition(caseDefinitionId).businessKey(businessKey).create();
 
     TaskQuery query = taskService.createTaskQuery();
 
-    query
-      .or()
-        .caseInstanceBusinessKey(businessKey)
-        .processInstanceBusinessKey(businessKey)
-      .endOr();
+    query.or().caseInstanceBusinessKey(businessKey).processInstanceBusinessKey(businessKey).endOr();
 
     assertEquals(2, query.list().size());
   }
@@ -975,32 +746,22 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksWithActivityInstanceIdInOrTaskId() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .startEvent().userTask().endEvent().done();
 
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", aProcessDefinition).deploy();
 
     ProcessInstance processInstance1 = runtimeService
-      .startProcessInstanceByKey("aProcessDefinition");
+        .startProcessInstanceByKey("aProcessDefinition");
 
     String activityInstanceId = runtimeService.getActivityInstance(processInstance1.getId())
-      .getChildActivityInstances()[0].getId();
+        .getChildActivityInstances()[0].getId();
 
     Task task2 = taskService.newTask();
     taskService.saveTask(task2);
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .or()
-        .activityInstanceIdIn(activityInstanceId)
-        .taskId(task2.getId())
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().or().activityInstanceIdIn(activityInstanceId)
+        .taskId(task2.getId()).endOr().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -1009,19 +770,13 @@ public class TaskQueryOrTest {
   @Test
   public void shouldReturnTasksByExtendingQuery_OrInExtendingQuery() {
     // given
-    TaskQuery extendedQuery = taskService.createTaskQuery()
-      .taskCandidateGroup("sales");
+    TaskQuery extendedQuery = taskService.createTaskQuery().taskCandidateGroup("sales");
 
-    TaskQuery extendingQuery = taskService.createTaskQuery()
-      .or()
-        .taskName("aTaskName")
-      .endOr()
-      .or()
-        .taskNameLike("anotherTaskName")
-      .endOr();
+    TaskQuery extendingQuery = taskService.createTaskQuery().or().taskName("aTaskName").endOr().or()
+        .taskNameLike("anotherTaskName").endOr();
 
     // when
-    TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
+    TaskQueryImpl result = (TaskQueryImpl) ((TaskQueryImpl) extendedQuery).extend(extendingQuery);
 
     // then
     assertEquals("sales", result.getCandidateGroup());
@@ -1032,19 +787,13 @@ public class TaskQueryOrTest {
   @Test
   public void shouldReturnTasksByExtendingQuery_OrInExtendedQuery() {
     // given
-    TaskQuery extendedQuery = taskService.createTaskQuery()
-      .or()
-        .taskName("aTaskName")
-      .endOr()
-      .or()
-        .taskNameLike("anotherTaskName")
-      .endOr();
+    TaskQuery extendedQuery = taskService.createTaskQuery().or().taskName("aTaskName").endOr().or()
+        .taskNameLike("anotherTaskName").endOr();
 
-    TaskQuery extendingQuery = taskService.createTaskQuery()
-      .taskCandidateGroup("aCandidateGroup");
+    TaskQuery extendingQuery = taskService.createTaskQuery().taskCandidateGroup("aCandidateGroup");
 
     // when
-    TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
+    TaskQueryImpl result = (TaskQueryImpl) ((TaskQueryImpl) extendedQuery).extend(extendingQuery);
 
     // then
     assertEquals("aTaskName", result.getQueries().get(1).getName());
@@ -1055,24 +804,15 @@ public class TaskQueryOrTest {
   @Test
   public void shouldReturnTasksByExtendingQuery_OrInBothExtendedAndExtendingQuery() {
     // given
-    TaskQuery extendedQuery = taskService.createTaskQuery()
-      .or()
-        .taskName("aTaskName")
-      .endOr()
-      .or()
-        .taskNameLike("anotherTaskName")
-      .endOr();
+    TaskQuery extendedQuery = taskService.createTaskQuery().or().taskName("aTaskName").endOr().or()
+        .taskNameLike("anotherTaskName").endOr();
 
-    TaskQuery extendingQuery = taskService.createTaskQuery()
-      .or()
-        .taskCandidateGroup("aCandidateGroup")
-      .endOr()
-      .or()
-        .taskCandidateUser("aCandidateUser")
-      .endOr();
+    TaskQuery extendingQuery = taskService.createTaskQuery().or()
+        .taskCandidateGroup("aCandidateGroup").endOr().or().taskCandidateUser("aCandidateUser")
+        .endOr();
 
     // when
-    TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
+    TaskQueryImpl result = (TaskQueryImpl) ((TaskQueryImpl) extendedQuery).extend(extendingQuery);
 
     // then
     assertEquals("aTaskName", result.getQueries().get(1).getName());
@@ -1085,131 +825,72 @@ public class TaskQueryOrTest {
   public void shouldTestDueDateCombinations() throws ParseException {
     HashMap<String, Date> dates = createFollowUpAndDueDateTasks();
 
-    assertEquals(2, taskService.createTaskQuery()
-      .or()
-        .dueDate(dates.get("date"))
-        .dueBefore(dates.get("oneHourAgo"))
-      .endOr()
-      .count());
+    assertEquals(2, taskService.createTaskQuery().or().dueDate(dates.get("date"))
+        .dueBefore(dates.get("oneHourAgo")).endOr().count());
 
-    assertEquals(2, taskService.createTaskQuery()
-      .or()
-        .dueDate(dates.get("date"))
-        .dueAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(2, taskService.createTaskQuery().or().dueDate(dates.get("date"))
+        .dueAfter(dates.get("oneHourLater")).endOr().count());
 
-    assertEquals(2, taskService.createTaskQuery()
-      .or()
-        .dueBefore(dates.get("oneHourAgo"))
-        .dueAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(2, taskService.createTaskQuery().or().dueBefore(dates.get("oneHourAgo"))
+        .dueAfter(dates.get("oneHourLater")).endOr().count());
 
-    assertEquals(3, taskService.createTaskQuery()
-      .or()
-        .dueBefore(dates.get("oneHourLater"))
-        .dueAfter(dates.get("oneHourAgo"))
-      .endOr()
-      .count());
+    assertEquals(3, taskService.createTaskQuery().or().dueBefore(dates.get("oneHourLater"))
+        .dueAfter(dates.get("oneHourAgo")).endOr().count());
 
-    assertEquals(3, taskService.createTaskQuery()
-      .or()
-        .dueDate(dates.get("date"))
-        .dueBefore(dates.get("oneHourAgo"))
-        .dueAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(3, taskService.createTaskQuery().or().dueDate(dates.get("date"))
+        .dueBefore(dates.get("oneHourAgo")).dueAfter(dates.get("oneHourLater")).endOr().count());
   }
 
   @Test
   public void shouldTestFollowUpDateCombinations() throws ParseException {
     HashMap<String, Date> dates = createFollowUpAndDueDateTasks();
 
-    assertEquals(2, taskService.createTaskQuery()
-      .or()
-        .followUpDate(dates.get("date"))
-        .followUpBefore(dates.get("oneHourAgo"))
-      .endOr()
-      .count());
+    assertEquals(2, taskService.createTaskQuery().or().followUpDate(dates.get("date"))
+        .followUpBefore(dates.get("oneHourAgo")).endOr().count());
 
-    assertEquals(2, taskService.createTaskQuery()
-      .or()
-        .followUpDate(dates.get("date"))
-        .followUpAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(2, taskService.createTaskQuery().or().followUpDate(dates.get("date"))
+        .followUpAfter(dates.get("oneHourLater")).endOr().count());
 
-    assertEquals(2, taskService.createTaskQuery()
-      .or()
-        .followUpBefore(dates.get("oneHourAgo"))
-        .followUpAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(2, taskService.createTaskQuery().or().followUpBefore(dates.get("oneHourAgo"))
+        .followUpAfter(dates.get("oneHourLater")).endOr().count());
 
-    assertEquals(3, taskService.createTaskQuery()
-      .or()
-        .followUpBefore(dates.get("oneHourLater"))
-        .followUpAfter(dates.get("oneHourAgo"))
-      .endOr()
-      .count());
+    assertEquals(3, taskService.createTaskQuery().or().followUpBefore(dates.get("oneHourLater"))
+        .followUpAfter(dates.get("oneHourAgo")).endOr().count());
 
-    assertEquals(3, taskService.createTaskQuery()
-      .or()
-        .followUpDate(dates.get("date"))
-        .followUpBefore(dates.get("oneHourAgo"))
-        .followUpAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(3,
+        taskService.createTaskQuery().or().followUpDate(dates.get("date"))
+            .followUpBefore(dates.get("oneHourAgo")).followUpAfter(dates.get("oneHourLater"))
+            .endOr().count());
 
     // followUp before or null
     taskService.saveTask(taskService.newTask());
 
     assertEquals(4, taskService.createTaskQuery().count());
 
-    assertEquals(3, taskService.createTaskQuery()
-      .or()
-        .followUpDate(dates.get("date"))
-        .followUpBeforeOrNotExistent(dates.get("oneHourAgo"))
-      .endOr()
-      .count());
+    assertEquals(3, taskService.createTaskQuery().or().followUpDate(dates.get("date"))
+        .followUpBeforeOrNotExistent(dates.get("oneHourAgo")).endOr().count());
 
-    assertEquals(3, taskService.createTaskQuery()
-      .or()
-        .followUpBeforeOrNotExistent(dates.get("oneHourAgo"))
-        .followUpAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(3,
+        taskService.createTaskQuery().or().followUpBeforeOrNotExistent(dates.get("oneHourAgo"))
+            .followUpAfter(dates.get("oneHourLater")).endOr().count());
 
-    assertEquals(4, taskService.createTaskQuery()
-      .or()
-        .followUpBeforeOrNotExistent(dates.get("oneHourLater"))
-        .followUpAfter(dates.get("oneHourAgo"))
-      .endOr()
-      .count());
+    assertEquals(4,
+        taskService.createTaskQuery().or().followUpBeforeOrNotExistent(dates.get("oneHourLater"))
+            .followUpAfter(dates.get("oneHourAgo")).endOr().count());
 
-    assertEquals(4, taskService.createTaskQuery()
-      .or()
-        .followUpDate(dates.get("date"))
-        .followUpBeforeOrNotExistent(dates.get("oneHourAgo"))
-        .followUpAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(4,
+        taskService.createTaskQuery().or().followUpDate(dates.get("date"))
+            .followUpBeforeOrNotExistent(dates.get("oneHourAgo"))
+            .followUpAfter(dates.get("oneHourLater")).endOr().count());
   }
 
   @Test
   public void shouldReturnTasksByVariableAndActiveProcesses() throws Exception {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("oneTaskProcess")
-        .startEvent()
-          .userTask("testQuerySuspensionStateTask")
-        .endEvent()
-        .done();
+        .startEvent().userTask("testQuerySuspensionStateTask").endEvent().done();
 
-      repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", aProcessDefinition)
-        .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", aProcessDefinition).deploy();
 
     // start two process instance and leave them active
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -1218,21 +899,25 @@ public class TaskQueryOrTest {
     // start one process instance and suspend it
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("foo", 0);
-    ProcessInstance suspendedProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    ProcessInstance suspendedProcessInstance = runtimeService
+        .startProcessInstanceByKey("oneTaskProcess", variables);
     runtimeService.suspendProcessInstanceById(suspendedProcessInstance.getProcessInstanceId());
 
     // assume
-    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("testQuerySuspensionStateTask").active().count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("testQuerySuspensionStateTask").suspended().count());
+    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("testQuerySuspensionStateTask")
+        .active().count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("testQuerySuspensionStateTask")
+        .suspended().count());
 
     // then
-    assertEquals(3, taskService.createTaskQuery().or().active().processVariableValueEquals("foo", 0).endOr().list().size());
+    assertEquals(3, taskService.createTaskQuery().or().active().processVariableValueEquals("foo", 0)
+        .endOr().list().size());
   }
 
   protected HashMap<String, Date> createFollowUpAndDueDateTasks() throws ParseException {
     final Date date = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("27/07/2017 01:12:13"),
-      oneHourAgo = new Date(date.getTime() - 60 * 60 * 1000),
-      oneHourLater = new Date(date.getTime() + 60 * 60 * 1000);
+        oneHourAgo = new Date(date.getTime() - 60 * 60 * 1000),
+        oneHourLater = new Date(date.getTime() + 60 * 60 * 1000);
 
     Task taskDueBefore = taskService.newTask();
     taskDueBefore.setFollowUpDate(new Date(oneHourAgo.getTime() - 1000));
@@ -1251,11 +936,13 @@ public class TaskQueryOrTest {
 
     assertEquals(3, taskService.createTaskQuery().count());
 
-    return new HashMap<String, Date>() {{
-      put("date", date);
-      put("oneHourAgo", oneHourAgo);
-      put("oneHourLater", oneHourLater);
-    }};
+    return new HashMap<String, Date>() {
+      {
+        put("date", date);
+        put("oneHourAgo", oneHourAgo);
+        put("oneHourLater", oneHourLater);
+      }
+    };
   }
 
 }

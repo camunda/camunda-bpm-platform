@@ -28,15 +28,19 @@ import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
- * <p>Interface to the component responsible for performing
- * background work ({@link Job Jobs}).</p>
+ * <p>
+ * Interface to the component responsible for performing background work ({@link Job Jobs}).
+ * </p>
  *
- * <p>The {@link JobExecutor} is capable of dispatching to multiple process engines,
- * ie. multiple process engines can share a single Thread Pool for performing Background
- * Work. </p>
+ * <p>
+ * The {@link JobExecutor} is capable of dispatching to multiple process engines, ie. multiple
+ * process engines can share a single Thread Pool for performing Background Work.
+ * </p>
  *
- * <p>In clustered situations, you can have multiple Job Executors running against the
- * same queue + pending job list.</p>
+ * <p>
+ * In clustered situations, you can have multiple Job Executors running against the same queue +
+ * pending job list.
+ * </p>
  *
  * @author Daniel Meyer
  */
@@ -44,7 +48,7 @@ public abstract class JobExecutor {
 
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
-  protected String name = "JobExecutor["+getClass().getName()+"]";
+  protected String name = "JobExecutor[" + getClass().getName() + "]";
   protected List<ProcessEngineImpl> processEngines = new CopyOnWriteArrayList<ProcessEngineImpl>();
   protected AcquireJobsCommandFactory acquireJobsCmdFactory;
   protected AcquireJobsRunnable acquireJobsRunnable;
@@ -66,8 +70,8 @@ public abstract class JobExecutor {
   protected long maxBackoff = 0;
 
   /**
-   * The number of job acquisition cycles without locking failures
-   * until the backoff level is reduced.
+   * The number of job acquisition cycles without locking failures until the backoff level is
+   * reduced.
    */
   protected int backoffDecreaseThreshold = 100;
 
@@ -106,7 +110,7 @@ public abstract class JobExecutor {
   }
 
   public void jobWasAdded() {
-    if(isActive) {
+    if (isActive) {
       acquireJobsRunnable.jobWasAdded();
     }
   }
@@ -115,7 +119,7 @@ public abstract class JobExecutor {
     processEngines.add(processEngine);
 
     // when we register the first process engine, start the jobexecutor
-    if(processEngines.size() == 1 && isAutoActivate) {
+    if (processEngines.size() == 1 && isAutoActivate) {
       start();
     }
   }
@@ -124,55 +128,54 @@ public abstract class JobExecutor {
     processEngines.remove(processEngine);
 
     // if we unregister the last process engine, auto-shutdown the jobexecutor
-    if(processEngines.isEmpty() && isActive) {
+    if (processEngines.isEmpty() && isActive) {
       shutdown();
     }
   }
 
   protected abstract void startExecutingJobs();
+
   protected abstract void stopExecutingJobs();
+
   public abstract void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine);
 
   /**
    * Deprecated: use {@link #executeJobs(List, ProcessEngineImpl)} instead
+   * 
    * @param jobIds
    */
   @Deprecated
   public void executeJobs(List<String> jobIds) {
-    if(!processEngines.isEmpty()) {
+    if (!processEngines.isEmpty()) {
       executeJobs(jobIds, processEngines.get(0));
     }
   }
 
   public void logAcquisitionAttempt(ProcessEngineImpl engine) {
     if (engine.getProcessEngineConfiguration().isMetricsEnabled()) {
-      engine.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_ACQUISITION_ATTEMPT);
+      engine.getProcessEngineConfiguration().getMetricsRegistry()
+          .markOccurrence(Metrics.JOB_ACQUISITION_ATTEMPT);
     }
   }
 
   public void logAcquiredJobs(ProcessEngineImpl engine, int numJobs) {
     if (engine != null && engine.getProcessEngineConfiguration().isMetricsEnabled()) {
-      engine.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_ACQUIRED_SUCCESS, numJobs);
+      engine.getProcessEngineConfiguration().getMetricsRegistry()
+          .markOccurrence(Metrics.JOB_ACQUIRED_SUCCESS, numJobs);
     }
   }
 
   public void logAcquisitionFailureJobs(ProcessEngineImpl engine, int numJobs) {
     if (engine != null && engine.getProcessEngineConfiguration().isMetricsEnabled()) {
-      engine.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_ACQUIRED_FAILURE, numJobs);
+      engine.getProcessEngineConfiguration().getMetricsRegistry()
+          .markOccurrence(Metrics.JOB_ACQUIRED_FAILURE, numJobs);
     }
   }
 
   public void logRejectedExecution(ProcessEngineImpl engine, int numJobs) {
     if (engine != null && engine.getProcessEngineConfiguration().isMetricsEnabled()) {
-      engine.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_EXECUTION_REJECTED, numJobs);
+      engine.getProcessEngineConfiguration().getMetricsRegistry()
+          .markOccurrence(Metrics.JOB_EXECUTION_REJECTED, numJobs);
     }
   }
 
@@ -183,9 +186,8 @@ public abstract class JobExecutor {
   }
 
   /**
-   * Must return an iterator of registered process engines
-   * that is independent of concurrent modifications
-   * to the underlying data structure of engines.
+   * Must return an iterator of registered process engines that is independent of concurrent
+   * modifications to the underlying data structure of engines.
    */
   public Iterator<ProcessEngineImpl> engineIterator() {
     // a CopyOnWriteArrayList's iterator is safe in the presence
@@ -202,7 +204,7 @@ public abstract class JobExecutor {
    */
   @Deprecated
   public CommandExecutor getCommandExecutor() {
-    if(processEngines.isEmpty()) {
+    if (processEngines.isEmpty()) {
       return null;
     } else {
       return processEngines.get(0).getProcessEngineConfiguration().getCommandExecutorTxRequired();
@@ -211,6 +213,7 @@ public abstract class JobExecutor {
 
   /**
    * Deprecated: use {@link #registerProcessEngine(ProcessEngineImpl)} instead
+   * 
    * @param commandExecutorTxRequired
    */
   @Deprecated
@@ -331,21 +334,20 @@ public abstract class JobExecutor {
   }
 
   protected void startJobAcquisitionThread() {
-		if (jobAcquisitionThread == null) {
-			jobAcquisitionThread = new Thread(acquireJobsRunnable, getName());
-			jobAcquisitionThread.start();
-		}
-	}
+    if (jobAcquisitionThread == null) {
+      jobAcquisitionThread = new Thread(acquireJobsRunnable, getName());
+      jobAcquisitionThread.start();
+    }
+  }
 
-	protected void stopJobAcquisitionThread() {
-		try {
-			jobAcquisitionThread.join();
-		}
-		catch (InterruptedException e) {
-		  LOG.interruptedWhileShuttingDownjobExecutor(e);
-		}
-		jobAcquisitionThread = null;
-	}
+  protected void stopJobAcquisitionThread() {
+    try {
+      jobAcquisitionThread.join();
+    } catch (InterruptedException e) {
+      LOG.interruptedWhileShuttingDownjobExecutor(e);
+    }
+    jobAcquisitionThread = null;
+  }
 
   public AcquireJobsRunnable getAcquireJobsRunnable() {
     return acquireJobsRunnable;

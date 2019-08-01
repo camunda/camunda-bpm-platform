@@ -42,7 +42,8 @@ public class DmnBusinessRuleTaskActivityBehavior extends AbstractBpmnActivityBeh
   protected final String resultVariable;
   protected final DecisionResultMapper decisionResultMapper;
 
-  public DmnBusinessRuleTaskActivityBehavior(BaseCallableElement callableElement, String resultVariableName, DecisionResultMapper decisionResultMapper) {
+  public DmnBusinessRuleTaskActivityBehavior(BaseCallableElement callableElement,
+      String resultVariableName, DecisionResultMapper decisionResultMapper) {
     this.callableElement = callableElement;
     this.resultVariable = resultVariableName;
     this.decisionResultMapper = decisionResultMapper;
@@ -53,7 +54,8 @@ public class DmnBusinessRuleTaskActivityBehavior extends AbstractBpmnActivityBeh
     executeWithErrorPropagation(execution, new Callable<Void>() {
 
       public Void call() throws Exception {
-        evaluateDecision((AbstractVariableScope) execution, callableElement, resultVariable, decisionResultMapper);
+        evaluateDecision((AbstractVariableScope) execution, callableElement, resultVariable,
+            decisionResultMapper);
         leave(execution);
         return null;
       }

@@ -133,7 +133,8 @@ public class TopicFetchInstruction implements Serializable {
   }
 
   public void addFilterVariable(String name, Object value) {
-    QueryVariableValue variableValue = new QueryVariableValue(name, value, QueryOperator.EQUALS, true);
+    QueryVariableValue variableValue = new QueryVariableValue(name, value, QueryOperator.EQUALS,
+        true);
     this.filterVariables.add(variableValue);
   }
 
@@ -155,10 +156,9 @@ public class TopicFetchInstruction implements Serializable {
 
   public void ensureVariablesInitialized() {
     if (!filterVariables.isEmpty()) {
-      VariableSerializers variableSerializers = Context
-          .getProcessEngineConfiguration()
+      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration()
           .getVariableSerializers();
-      for(QueryVariableValue queryVariableValue : filterVariables) {
+      for (QueryVariableValue queryVariableValue : filterVariables) {
         queryVariableValue.initialize(variableSerializers);
       }
     }

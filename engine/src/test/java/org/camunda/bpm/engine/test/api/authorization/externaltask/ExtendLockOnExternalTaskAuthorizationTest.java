@@ -32,7 +32,8 @@ public class ExtendLockOnExternalTaskAuthorizationTest extends HandleExternalTas
 
   @Override
   public void assertExternalTaskResults() {
-    ExternalTask taskWithExtendedLock = engineRule.getExternalTaskService().createExternalTaskQuery().locked().singleResult();
+    ExternalTask taskWithExtendedLock = engineRule.getExternalTaskService()
+        .createExternalTaskQuery().locked().singleResult();
     Assert.assertNotNull(taskWithExtendedLock);
   }
 }

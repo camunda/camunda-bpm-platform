@@ -46,7 +46,8 @@ import static org.junit.Assert.assertThat;
 public class HistoryCleanupSchedulerCommentsTest extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configure(configuration);
     }
   };
@@ -55,7 +56,8 @@ public class HistoryCleanupSchedulerCommentsTest extends AbstractHistoryCleanupS
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -74,10 +76,8 @@ public class HistoryCleanupSchedulerCommentsTest extends AbstractHistoryCleanupS
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .userTask("userTask").name("userTask")
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().userTask("userTask").name("userTask").endEvent()
+      .done();
 
   @Test
   public void shouldScheduleToNow() {
@@ -86,10 +86,8 @@ public class HistoryCleanupSchedulerCommentsTest extends AbstractHistoryCleanupS
 
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -122,10 +120,8 @@ public class HistoryCleanupSchedulerCommentsTest extends AbstractHistoryCleanupS
 
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     ClockUtil.setCurrentTime(END_DATE);
 

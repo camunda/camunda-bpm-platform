@@ -22,9 +22,11 @@ package org.camunda.bpm.engine.impl.db;
  * @author Joram Barrez
  */
 public interface HasDbRevision {
-  
+
   void setRevision(int revision);
+
   int getRevision();
+
   int getRevisionNext();
 
 }

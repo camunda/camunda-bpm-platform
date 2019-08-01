@@ -28,13 +28,13 @@ import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Ingo Richtsmeier
  */
-public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployment> implements DeploymentQuery, Serializable {
+public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployment>
+    implements DeploymentQuery, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String deploymentId;
@@ -106,16 +106,17 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   }
 
   public DeploymentQuery includeDeploymentsWithoutTenantId() {
-    this.includeDeploymentsWithoutTenantId  = true;
+    this.includeDeploymentsWithoutTenantId = true;
     return this;
   }
 
   @Override
   protected boolean hasExcludingConditions() {
-    return super.hasExcludingConditions() || CompareUtil.areNotInAscendingOrder(deploymentAfter, deploymentBefore);
+    return super.hasExcludingConditions()
+        || CompareUtil.areNotInAscendingOrder(deploymentAfter, deploymentBefore);
   }
 
-  //sorting ////////////////////////////////////////////////////////
+  // sorting ////////////////////////////////////////////////////////
 
   public DeploymentQuery orderByDeploymentId() {
     return orderBy(DeploymentQueryProperty.DEPLOYMENT_ID);
@@ -137,25 +138,21 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     return orderBy(DeploymentQueryProperty.TENANT_ID);
   }
 
-  //results ////////////////////////////////////////////////////////
+  // results ////////////////////////////////////////////////////////
 
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getDeploymentManager()
-      .findDeploymentCountByQueryCriteria(this);
+    return commandContext.getDeploymentManager().findDeploymentCountByQueryCriteria(this);
   }
 
   @Override
   public List<Deployment> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getDeploymentManager()
-      .findDeploymentsByQueryCriteria(this, page);
+    return commandContext.getDeploymentManager().findDeploymentsByQueryCriteria(this, page);
   }
 
-  //getters ////////////////////////////////////////////////////////
+  // getters ////////////////////////////////////////////////////////
 
   public String getDeploymentId() {
     return deploymentId;

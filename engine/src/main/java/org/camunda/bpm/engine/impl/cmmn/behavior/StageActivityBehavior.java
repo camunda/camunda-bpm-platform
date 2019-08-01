@@ -34,7 +34,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
  * @author Roman Smirnov
  *
  */
-public class StageActivityBehavior extends StageOrTaskActivityBehavior implements CmmnCompositeActivityBehavior {
+public class StageActivityBehavior extends StageOrTaskActivityBehavior
+    implements CmmnCompositeActivityBehavior {
 
   protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
@@ -48,7 +49,6 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       List<CmmnExecution> children = execution.createChildExecutions(childActivities);
       execution.createSentryParts();
       execution.triggerChildExecutionsLifecycle(children);
-
 
       if (execution.isActive()) {
         execution.fireIfOnlySentryParts();
@@ -130,7 +130,8 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
     return canComplete(execution, throwException, autoComplete);
   }
 
-  protected boolean canComplete(CmmnActivityExecution execution, boolean throwException, boolean autoComplete) {
+  protected boolean canComplete(CmmnActivityExecution execution, boolean throwException,
+      boolean autoComplete) {
     String id = execution.getId();
 
     List<? extends CmmnExecution> children = execution.getCaseExecutions();
@@ -146,7 +147,8 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       if (child.isNew() || child.isActive()) {
 
         if (throwException) {
-          throw LOG.remainingChildException("complete", id, child.getId(), CaseExecutionState.ACTIVE);
+          throw LOG.remainingChildException("complete", id, child.getId(),
+              CaseExecutionState.ACTIVE);
         }
 
         return false;
@@ -158,10 +160,12 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       // available in the case execution tree.
 
       for (CmmnExecution child : children) {
-        if (child.isRequired() && !child.isDisabled() && !child.isCompleted() && !child.isTerminated()) {
+        if (child.isRequired() && !child.isDisabled() && !child.isCompleted()
+            && !child.isTerminated()) {
 
           if (throwException) {
-            throw LOG.remainingChildException("complete", id, child.getId(), child.getCurrentState());
+            throw LOG.remainingChildException("complete", id, child.getId(),
+                child.getCurrentState());
           }
 
           return false;
@@ -175,7 +179,8 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         if (!child.isDisabled() && !child.isCompleted() && !child.isTerminated()) {
 
           if (throwException) {
-            throw LOG.wrongChildStateException("complete", id, child.getId(), "[available|enabled|suspended]");
+            throw LOG.wrongChildStateException("complete", id, child.getId(),
+                "[available|enabled|suspended]");
           }
 
           return false;
@@ -196,7 +201,8 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
     Object autoCompleteProperty = activity.getProperty(PROPERTY_AUTO_COMPLETE);
     if (autoCompleteProperty != null) {
-      String message = "Property autoComplete expression returns non-Boolean: "+autoCompleteProperty+" ("+autoCompleteProperty.getClass().getName()+")";
+      String message = "Property autoComplete expression returns non-Boolean: "
+          + autoCompleteProperty + " (" + autoCompleteProperty.getClass().getName() + ")";
       ensureInstanceOf(message, "autoComplete", autoCompleteProperty, Boolean.class);
 
       return (Boolean) autoCompleteProperty;
@@ -285,7 +291,6 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       super.performSuspension(execution);
     }
   }
-
 
   protected void performParentSuspension(CmmnActivityExecution execution) {
     if (!isAbleToSuspend(execution)) {

@@ -53,9 +53,9 @@ public class MigrationHistoricProcessInstanceTest {
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
 
-  //============================================================================
-  //===================================Migration================================
-  //============================================================================
+  // ============================================================================
+  // ===================================Migration================================
+  // ============================================================================
   protected ProcessDefinition sourceProcessDefinition;
   protected ProcessDefinition targetProcessDefinition;
   protected MigrationPlan migrationPlan;
@@ -65,44 +65,39 @@ public class MigrationHistoricProcessInstanceTest {
     runtimeService = rule.getRuntimeService();
     historyService = rule.getHistoryService();
 
-
     sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ModifiableBpmnModelInstance modifiedModel = modify(ProcessModels.ONE_TASK_PROCESS).changeElementId("Process", "Process2")
-                                                                                      .changeElementId("userTask", "userTask2");
+    ModifiableBpmnModelInstance modifiedModel = modify(ProcessModels.ONE_TASK_PROCESS)
+        .changeElementId("Process", "Process2").changeElementId("userTask", "userTask2");
     targetProcessDefinition = testHelper.deployAndGetDefinition(modifiedModel);
-    migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-                                                                                            .mapActivities("userTask", "userTask2")
-                                                                                            .build();
+    migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask2").build();
     runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoryProcessInstance() {
-    //given
-    HistoricProcessInstanceQuery sourceHistoryProcessInstanceQuery =
-        historyService.createHistoricProcessInstanceQuery()
-          .processDefinitionId(sourceProcessDefinition.getId());
-    HistoricProcessInstanceQuery targetHistoryProcessInstanceQuery =
-        historyService.createHistoricProcessInstanceQuery()
-          .processDefinitionId(targetProcessDefinition.getId());
+    // given
+    HistoricProcessInstanceQuery sourceHistoryProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
+    HistoricProcessInstanceQuery targetHistoryProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery().processDefinitionId(targetProcessDefinition.getId());
 
-
-    //when
+    // when
     assertEquals(1, sourceHistoryProcessInstanceQuery.count());
     assertEquals(0, targetHistoryProcessInstanceQuery.count());
-    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
-    runtimeService.newMigration(migrationPlan)
-      .processInstanceQuery(sourceProcessInstanceQuery)
-      .execute();
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(sourceProcessDefinition.getId());
+    runtimeService.newMigration(migrationPlan).processInstanceQuery(sourceProcessInstanceQuery)
+        .execute();
 
-    //then
+    // then
     assertEquals(0, sourceHistoryProcessInstanceQuery.count());
     assertEquals(1, targetHistoryProcessInstanceQuery.count());
 
     HistoricProcessInstance instance = targetHistoryProcessInstanceQuery.singleResult();
     assertEquals(instance.getProcessDefinitionKey(), targetProcessDefinition.getKey());
   }
-
 
 }

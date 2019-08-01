@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.util;
 
-
 /**
  * @author Thorben Lindhauer
  *
@@ -25,8 +24,8 @@ public class AuthorizationScenario {
 
   protected static final String INDENTATION = "   ";
 
-  protected AuthorizationSpec[] givenAuthorizations = new AuthorizationSpec[]{};
-  protected AuthorizationSpec[] missingAuthorizations = new AuthorizationSpec[]{};
+  protected AuthorizationSpec[] givenAuthorizations = new AuthorizationSpec[] {};
+  protected AuthorizationSpec[] missingAuthorizations = new AuthorizationSpec[] {};
 
   public static AuthorizationScenario scenario() {
     return new AuthorizationScenario();
@@ -45,7 +44,8 @@ public class AuthorizationScenario {
     return this;
   }
 
-  public AuthorizationScenario failsDueToRequired(AuthorizationSpec... expectedMissingAuthorizations) {
+  public AuthorizationScenario failsDueToRequired(
+      AuthorizationSpec... expectedMissingAuthorizations) {
     this.missingAuthorizations = expectedMissingAuthorizations;
     return this;
   }
@@ -76,6 +76,5 @@ public class AuthorizationScenario {
 
     return sb.toString();
   }
-
 
 }

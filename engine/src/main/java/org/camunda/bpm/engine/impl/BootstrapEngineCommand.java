@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
  */
 public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
-
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   @Override
@@ -45,33 +44,37 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   }
 
   protected void createHistoryCleanupJob(CommandContext commandContext) {
-    if (Context.getProcessEngineConfiguration().getManagementService().getTableMetaData("ACT_RU_JOB") != null) {
+    if (Context.getProcessEngineConfiguration().getManagementService()
+        .getTableMetaData("ACT_RU_JOB") != null) {
       // CAM-9671: avoid transaction rollback due to the OLE being caught in CommandContext#close
-      commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
-        
-        @Override
-        public Class<? extends DbEntity> getEntityType() {
-          return EverLivingJobEntity.class;
-        }
-        
-        @Override
-        public void failedOperation(DbOperation operation) {
-          // nothing do to, reconfiguration will be handled later on
-        }
-      });
+      commandContext.getDbEntityManager()
+          .registerOptimisticLockingListener(new OptimisticLockingListener() {
+
+            @Override
+            public Class<? extends DbEntity> getEntityType() {
+              return EverLivingJobEntity.class;
+            }
+
+            @Override
+            public void failedOperation(DbOperation operation) {
+              // nothing do to, reconfiguration will be handled later on
+            }
+          });
       Context.getProcessEngineConfiguration().getHistoryService().cleanUpHistoryAsync();
     }
   }
 
   public void checkDeploymentLockExists(CommandContext commandContext) {
-    PropertyEntity deploymentLockProperty = commandContext.getPropertyManager().findPropertyById("deployment.lock");
+    PropertyEntity deploymentLockProperty = commandContext.getPropertyManager()
+        .findPropertyById("deployment.lock");
     if (deploymentLockProperty == null) {
       LOG.noDeploymentLockPropertyFound();
     }
   }
 
   public void checkHistoryCleanupLockExists(CommandContext commandContext) {
-    PropertyEntity historyCleanupLockProperty = commandContext.getPropertyManager().findPropertyById("history.cleanup.job.lock");
+    PropertyEntity historyCleanupLockProperty = commandContext.getPropertyManager()
+        .findPropertyById("history.cleanup.job.lock");
     if (historyCleanupLockProperty == null) {
       LOG.noHistoryCleanupLockPropertyFound();
     }

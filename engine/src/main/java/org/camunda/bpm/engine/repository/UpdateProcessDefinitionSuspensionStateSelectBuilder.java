@@ -37,6 +37,7 @@ public interface UpdateProcessDefinitionSuspensionStateSelectBuilder {
    *          key of the process definition
    * @return the builder
    */
-  UpdateProcessDefinitionSuspensionStateTenantBuilder byProcessDefinitionKey(String processDefinitionKey);
+  UpdateProcessDefinitionSuspensionStateTenantBuilder byProcessDefinitionKey(
+      String processDefinitionKey);
 
 }

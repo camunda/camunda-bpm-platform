@@ -47,7 +47,7 @@ public class DatabasePrefixHandlerTest {
   }
 
   @Test
-  public void testRetrieveAlgorithmName(){
+  public void testRetrieveAlgorithmName() {
 
     // given
     String encryptedPasswordWithPrefix = "{SHA}n3fE9/7XOmgD3BkeJlC+JLyb/Qg=";
@@ -152,6 +152,5 @@ public class DatabasePrefixHandlerTest {
     // then
     assertThat(encryptedPassword, is(nullValue()));
   }
-
 
 }

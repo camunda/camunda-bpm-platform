@@ -49,7 +49,8 @@ import static org.junit.Assert.assertThat;
 public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configure(configuration, HistoryEventTypes.BATCH_START, HistoryEventTypes.BATCH_END);
     }
   };
@@ -70,27 +71,21 @@ public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSc
   }
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .userTask()
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().userTask().endEvent().done();
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
-  protected final BpmnModelInstance CALLING_PROCESS = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-    .startEvent()
-      .callActivity()
-        .calledElement(PROCESS_KEY)
-          .multiInstance()
-            .cardinality("5")
-          .multiInstanceDone()
-    .endEvent().done();
+  protected final BpmnModelInstance CALLING_PROCESS = Bpmn
+      .createExecutableProcess(CALLING_PROCESS_KEY).startEvent().callActivity()
+      .calledElement(PROCESS_KEY).multiInstance().cardinality("5").multiInstanceDone().endEvent()
+      .done();
 
   protected final Date END_DATE = new Date(1363608000000L);
 
@@ -108,8 +103,10 @@ public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSc
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY).getId();
 
     for (int i = 0; i < 5; i++) {
-      String processInstanceId = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).list().get(0).getId();
-      runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+      String processInstanceId = runtimeService.createProcessInstanceQuery()
+          .processDefinitionKey(PROCESS_KEY).list().get(0).getId();
+      runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId),
+          "aDeleteReason");
 
       ClockUtil.setCurrentTime(END_DATE);
 
@@ -150,8 +147,10 @@ public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSc
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY).getId();
 
     for (int i = 0; i < 5; i++) {
-        String processInstanceId = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).list().get(0).getId();
-      runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+      String processInstanceId = runtimeService.createProcessInstanceQuery()
+          .processDefinitionKey(PROCESS_KEY).list().get(0).getId();
+      runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId),
+          "aDeleteReason");
 
       ClockUtil.setCurrentTime(END_DATE);
 

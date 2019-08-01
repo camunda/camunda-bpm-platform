@@ -19,9 +19,9 @@ package org.camunda.bpm.engine.impl.history.handler;
 import java.util.List;
 
 /**
- * A {@link CompositeHistoryEventHandler} implementation which additionally adds
- * to the list of {@link HistoryEventHandler} the {@link DbHistoryEventHandler}
- * which persists events to a database.
+ * A {@link CompositeHistoryEventHandler} implementation which additionally adds to the list of
+ * {@link HistoryEventHandler} the {@link DbHistoryEventHandler} which persists events to a
+ * database.
  * 
  * @author Alexander Tyatenkov
  * 
@@ -29,8 +29,8 @@ import java.util.List;
 public class CompositeDbHistoryEventHandler extends CompositeHistoryEventHandler {
 
   /**
-   * Non-argument constructor that adds {@link DbHistoryEventHandler} to the
-   * list of {@link HistoryEventHandler}.
+   * Non-argument constructor that adds {@link DbHistoryEventHandler} to the list of
+   * {@link HistoryEventHandler}.
    */
   public CompositeDbHistoryEventHandler() {
     super();
@@ -38,9 +38,8 @@ public class CompositeDbHistoryEventHandler extends CompositeHistoryEventHandler
   }
 
   /**
-   * Constructor that takes a varargs parameter {@link HistoryEventHandler} that
-   * consume the event and adds {@link DbHistoryEventHandler} to the list of
-   * {@link HistoryEventHandler}.
+   * Constructor that takes a varargs parameter {@link HistoryEventHandler} that consume the event
+   * and adds {@link DbHistoryEventHandler} to the list of {@link HistoryEventHandler}.
    * 
    * @param historyEventHandlers
    *          the list of {@link HistoryEventHandler} that consume the event.
@@ -51,9 +50,8 @@ public class CompositeDbHistoryEventHandler extends CompositeHistoryEventHandler
   }
 
   /**
-   * Constructor that takes a list of {@link HistoryEventHandler} that consume
-   * the event and adds {@link DbHistoryEventHandler} to the list of
-   * {@link HistoryEventHandler}.
+   * Constructor that takes a list of {@link HistoryEventHandler} that consume the event and adds
+   * {@link DbHistoryEventHandler} to the list of {@link HistoryEventHandler}.
    * 
    * @param historyEventHandlers
    *          the list of {@link HistoryEventHandler} that consume the event.
@@ -64,8 +62,7 @@ public class CompositeDbHistoryEventHandler extends CompositeHistoryEventHandler
   }
 
   /**
-   * Add {@link DbHistoryEventHandler} to the list of
-   * {@link HistoryEventHandler}.
+   * Add {@link DbHistoryEventHandler} to the list of {@link HistoryEventHandler}.
    */
   private void addDefaultDbHistoryEventHandler() {
     historyEventHandlers.add(new DbHistoryEventHandler());

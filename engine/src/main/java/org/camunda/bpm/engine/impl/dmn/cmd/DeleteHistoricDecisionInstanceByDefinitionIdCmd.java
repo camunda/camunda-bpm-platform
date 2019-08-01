@@ -47,21 +47,21 @@ public class DeleteHistoricDecisionInstanceByDefinitionIdCmd implements Command<
   public Object execute(CommandContext commandContext) {
     ensureNotNull("decisionDefinitionId", decisionDefinitionId);
 
-    DecisionDefinitionEntity decisionDefinition = commandContext
-        .getDecisionDefinitionManager()
+    DecisionDefinitionEntity decisionDefinition = commandContext.getDecisionDefinitionManager()
         .findDecisionDefinitionById(decisionDefinitionId);
-    ensureNotNull("No decision definition found with id: " + decisionDefinitionId, "decisionDefinition", decisionDefinition);
+    ensureNotNull("No decision definition found with id: " + decisionDefinitionId,
+        "decisionDefinition", decisionDefinition);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkDeleteHistoricDecisionInstance(decisionDefinition.getKey());
     }
 
     long numInstances = getDecisionInstanceCount(commandContext);
     writeUserOperationLog(commandContext, numInstances);
 
-    commandContext
-      .getHistoricDecisionInstanceManager()
-      .deleteHistoricDecisionInstancesByDecisionDefinitionId(decisionDefinitionId);
+    commandContext.getHistoricDecisionInstanceManager()
+        .deleteHistoricDecisionInstancesByDecisionDefinitionId(decisionDefinitionId);
 
     return null;
   }
@@ -71,8 +71,8 @@ public class DeleteHistoricDecisionInstanceByDefinitionIdCmd implements Command<
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, false));
 
-    commandContext.getOperationLogManager()
-      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, propertyChanges);
+    commandContext.getOperationLogManager().logDecisionInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, propertyChanges);
   }
 
   protected long getDecisionInstanceCount(CommandContext commandContext) {
@@ -80,6 +80,6 @@ public class DeleteHistoricDecisionInstanceByDefinitionIdCmd implements Command<
     historicDecisionInstanceQuery.decisionDefinitionId(decisionDefinitionId);
 
     return commandContext.getHistoricDecisionInstanceManager()
-      .findHistoricDecisionInstanceCountByQueryCriteria(historicDecisionInstanceQuery);
+        .findHistoricDecisionInstanceCountByQueryCriteria(historicDecisionInstanceQuery);
   }
 }

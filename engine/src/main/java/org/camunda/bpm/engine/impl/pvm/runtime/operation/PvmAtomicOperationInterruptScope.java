@@ -32,14 +32,15 @@ public abstract class PvmAtomicOperationInterruptScope implements PvmAtomicOpera
     PvmExecutionImpl scopeExecution = !execution.isScope() ? execution.getParent() : execution;
 
     if (scopeExecution != execution) {
-      // remove the current execution before interrupting and continuing executing the interrupted activity
+      // remove the current execution before interrupting and continuing executing the interrupted
+      // activity
       // reason:
-      //   * interrupting should not attempt to fire end events for this execution
-      //   * the interruptingActivity is executed with the scope execution
+      // * interrupting should not attempt to fire end events for this execution
+      // * the interruptingActivity is executed with the scope execution
       execution.remove();
     }
 
-    scopeExecution.interrupt("Interrupting activity "+interruptingActivity+" executed.");
+    scopeExecution.interrupt("Interrupting activity " + interruptingActivity + " executed.");
 
     scopeExecution.setActivity(interruptingActivity);
     scopeExecution.setActive(true);

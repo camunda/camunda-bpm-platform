@@ -30,12 +30,13 @@ public class CaseVariableListenerInvocation extends DelegateInvocation {
   protected CaseVariableListener variableListenerInstance;
   protected DelegateCaseVariableInstance variableInstance;
 
-  public CaseVariableListenerInvocation(CaseVariableListener variableListenerInstance, DelegateCaseVariableInstance variableInstance) {
+  public CaseVariableListenerInvocation(CaseVariableListener variableListenerInstance,
+      DelegateCaseVariableInstance variableInstance) {
     this(variableListenerInstance, variableInstance, null);
   }
 
-  public CaseVariableListenerInvocation(CaseVariableListener variableListenerInstance, DelegateCaseVariableInstance variableInstance,
-      BaseDelegateExecution contextExecution) {
+  public CaseVariableListenerInvocation(CaseVariableListener variableListenerInstance,
+      DelegateCaseVariableInstance variableInstance, BaseDelegateExecution contextExecution) {
     super(contextExecution, null);
     this.variableListenerInstance = variableListenerInstance;
     this.variableInstance = variableInstance;

@@ -45,24 +45,27 @@ public interface HistoricBatchQuery extends Query<HistoricBatchQuery, HistoricBa
   HistoricBatchQuery withoutTenantId();
 
   /**
-   * Returns historic batches sorted by id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   * Returns historic batches sorted by id; must be followed by an invocation of {@link #asc()} or
+   * {@link #desc()}.
    */
   HistoricBatchQuery orderById();
 
   /**
-   * Returns historic batches sorted by start time; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   * Returns historic batches sorted by start time; must be followed by an invocation of
+   * {@link #asc()} or {@link #desc()}.
    */
   HistoricBatchQuery orderByStartTime();
 
   /**
-   * Returns historic batches sorted by end time; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   * Returns historic batches sorted by end time; must be followed by an invocation of
+   * {@link #asc()} or {@link #desc()}.
    */
   HistoricBatchQuery orderByEndTime();
 
   /**
-   * Returns historic batches sorted by tenant id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   * Returns historic batches sorted by tenant id; must be followed by an invocation of
+   * {@link #asc()} or {@link #desc()}.
    */
   HistoricBatchQuery orderByTenantId();
-
 
 }

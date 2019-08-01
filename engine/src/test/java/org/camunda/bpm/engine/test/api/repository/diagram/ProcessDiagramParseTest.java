@@ -66,29 +66,28 @@ public class ProcessDiagramParseTest {
     processEngineConfiguration.setEnableXxeProcessing(false);
 
     try {
-      final InputStream bpmnXmlStream = new FileInputStream(
-        resourcePath + ".bpmn20.xml");
-      final InputStream imageStream = new FileInputStream(
-        resourcePath + ".png");
+      final InputStream bpmnXmlStream = new FileInputStream(resourcePath + ".bpmn20.xml");
+      final InputStream imageStream = new FileInputStream(resourcePath + ".png");
 
       assertNotNull(bpmnXmlStream);
 
       // when we run this in the ProcessEngine context
-      engineRule.getProcessEngineConfiguration()
-        .getCommandExecutorTxRequired()
-        .execute(new Command<DiagramLayout>() {
-          @Override
-          public DiagramLayout execute(CommandContext commandContext) {
-            return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(bpmnXmlStream, imageStream);
-          }
-        });
+      engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+          .execute(new Command<DiagramLayout>() {
+            @Override
+            public DiagramLayout execute(CommandContext commandContext) {
+              return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(bpmnXmlStream,
+                  imageStream);
+            }
+          });
       fail("The test model contains a DOCTYPE declaration! The test should fail.");
     } catch (FileNotFoundException ex) {
       fail("The test BPMN model file is missing. " + ex.getMessage());
     } catch (Exception e) {
       // then
       assertThat(e.getMessage(), containsString("Error while parsing BPMN model"));
-      assertThat(e.getCause().getMessage(), containsString("http://apache.org/xml/features/disallow-doctype-decl"));
+      assertThat(e.getCause().getMessage(),
+          containsString("http://apache.org/xml/features/disallow-doctype-decl"));
     }
   }
 
@@ -97,22 +96,20 @@ public class ProcessDiagramParseTest {
     processEngineConfiguration.setEnableXxeProcessing(true);
 
     try {
-      final InputStream bpmnXmlStream = new FileInputStream(
-        resourcePath + ".bpmn20.xml");
-      final InputStream imageStream = new FileInputStream(
-        resourcePath + ".png");
+      final InputStream bpmnXmlStream = new FileInputStream(resourcePath + ".bpmn20.xml");
+      final InputStream imageStream = new FileInputStream(resourcePath + ".png");
 
       assertNotNull(bpmnXmlStream);
 
       // when we run this in the ProcessEngine context
-      engineRule.getProcessEngineConfiguration()
-        .getCommandExecutorTxRequired()
-        .execute(new Command<DiagramLayout>() {
-          @Override
-          public DiagramLayout execute(CommandContext commandContext) {
-            return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(bpmnXmlStream, imageStream);
-          }
-        });
+      engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+          .execute(new Command<DiagramLayout>() {
+            @Override
+            public DiagramLayout execute(CommandContext commandContext) {
+              return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(bpmnXmlStream,
+                  imageStream);
+            }
+          });
       fail("The test model contains a DOCTYPE declaration! The test should fail.");
     } catch (FileNotFoundException ex) {
       fail("The test BPMN model file is missing. " + ex.getMessage());

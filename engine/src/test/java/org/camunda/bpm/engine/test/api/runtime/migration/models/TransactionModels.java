@@ -28,23 +28,13 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
  */
 public class TransactionModels {
 
-  public static final BpmnModelInstance ONE_TASK_TRANSACTION = ProcessModels.newModel()
-    .startEvent()
-    .transaction("transaction")
-      .embeddedSubProcess()
-      .startEvent()
-      .userTask("userTask")
-      .endEvent("transactionEndEvent")
-    .transactionDone()
-    .endEvent()
-    .done();
+  public static final BpmnModelInstance ONE_TASK_TRANSACTION = ProcessModels.newModel().startEvent()
+      .transaction("transaction").embeddedSubProcess().startEvent().userTask("userTask")
+      .endEvent("transactionEndEvent").transactionDone().endEvent().done();
 
   public static final BpmnModelInstance CANCEL_BOUNDARY_EVENT = modify(ONE_TASK_TRANSACTION)
-    .activityBuilder("transaction")
-    .boundaryEvent("boundaryEvent")
-    .userTask("afterBoundaryTask")
-    .endEvent()
-    .done();
+      .activityBuilder("transaction").boundaryEvent("boundaryEvent").userTask("afterBoundaryTask")
+      .endEvent().done();
 
   static {
     makeCancelEvent(CANCEL_BOUNDARY_EVENT, "transactionEndEvent");

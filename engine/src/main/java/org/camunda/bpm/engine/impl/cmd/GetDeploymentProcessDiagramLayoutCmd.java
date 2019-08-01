@@ -29,12 +29,12 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 
-
 /**
- * Provides positions and dimensions of elements in a process diagram as
- * provided by {@link GetDeploymentProcessDiagramCmd}.
+ * Provides positions and dimensions of elements in a process diagram as provided by
+ * {@link GetDeploymentProcessDiagramCmd}.
  *
  * This command requires a process model and a diagram image to be deployed.
+ * 
  * @author Falko Menge
  */
 public class GetDeploymentProcessDiagramLayoutCmd implements Command<DiagramLayout>, Serializable {
@@ -44,34 +44,37 @@ public class GetDeploymentProcessDiagramLayoutCmd implements Command<DiagramLayo
 
   public GetDeploymentProcessDiagramLayoutCmd(String processDefinitionId) {
     if (processDefinitionId == null || processDefinitionId.length() < 1) {
-      throw new ProcessEngineException("The process definition id is mandatory, but '" + processDefinitionId + "' has been provided.");
+      throw new ProcessEngineException("The process definition id is mandatory, but '"
+          + processDefinitionId + "' has been provided.");
     }
     this.processDefinitionId = processDefinitionId;
   }
 
   public DiagramLayout execute(final CommandContext commandContext) {
-    ProcessDefinitionEntity processDefinition = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .findDeployedProcessDefinitionById(processDefinitionId);
+    ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration()
+        .getDeploymentCache().findDeployedProcessDefinitionById(processDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessDefinition(processDefinition);
     }
 
-    InputStream processModelStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-      public InputStream call() throws Exception {
-        return new GetDeploymentProcessModelCmd(processDefinitionId).execute(commandContext);
-      }
-    });
+    InputStream processModelStream = commandContext
+        .runWithoutAuthorization(new Callable<InputStream>() {
+          public InputStream call() throws Exception {
+            return new GetDeploymentProcessModelCmd(processDefinitionId).execute(commandContext);
+          }
+        });
 
-    InputStream processDiagramStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-      public InputStream call() throws Exception {
-        return new GetDeploymentProcessDiagramCmd(processDefinitionId).execute(commandContext);
-      }
-    });
+    InputStream processDiagramStream = commandContext
+        .runWithoutAuthorization(new Callable<InputStream>() {
+          public InputStream call() throws Exception {
+            return new GetDeploymentProcessDiagramCmd(processDefinitionId).execute(commandContext);
+          }
+        });
 
-    return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(processModelStream, processDiagramStream);
+    return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(processModelStream,
+        processDiagramStream);
   }
 
 }

@@ -26,7 +26,8 @@ public class ValidatingMigrationInstructionImpl implements ValidatingMigrationIn
   protected ActivityImpl targetActivity;
   protected boolean updateEventTrigger = false;
 
-  public ValidatingMigrationInstructionImpl(ActivityImpl sourceActivity, ActivityImpl targetActivity, boolean updateEventTrigger) {
+  public ValidatingMigrationInstructionImpl(ActivityImpl sourceActivity,
+      ActivityImpl targetActivity, boolean updateEventTrigger) {
     this.sourceActivity = sourceActivity;
     this.targetActivity = targetActivity;
     this.updateEventTrigger = updateEventTrigger;
@@ -46,14 +47,13 @@ public class ValidatingMigrationInstructionImpl implements ValidatingMigrationIn
   }
 
   public MigrationInstruction toMigrationInstruction() {
-    return new MigrationInstructionImpl(sourceActivity.getId(), targetActivity.getId(), updateEventTrigger);
+    return new MigrationInstructionImpl(sourceActivity.getId(), targetActivity.getId(),
+        updateEventTrigger);
   }
 
   public String toString() {
-    return "ValidatingMigrationInstructionImpl{" +
-      "sourceActivity=" + sourceActivity +
-      ", targetActivity=" + targetActivity +
-      '}';
+    return "ValidatingMigrationInstructionImpl{" + "sourceActivity=" + sourceActivity
+        + ", targetActivity=" + targetActivity + '}';
   }
 
 }

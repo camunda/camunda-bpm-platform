@@ -37,7 +37,8 @@ public class ProcessApplicationContextInterceptor extends CommandInterceptor {
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public ProcessApplicationContextInterceptor(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  public ProcessApplicationContextInterceptor(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.processEngineConfiguration = processEngineConfiguration;
   }
 
@@ -57,39 +58,34 @@ public class ProcessApplicationContextInterceptor extends CommandInterceptor {
           public T call() throws Exception {
             return next.execute(command);
           }
-        },
-        reference);
+        }, reference);
 
-      }
-      finally {
+      } finally {
         // restore the identifier for subsequent commands
         ProcessApplicationContextImpl.set(processApplicationIdentifier);
       }
-    }
-    else {
+    } else {
       return next.execute(command);
     }
   }
 
-  protected ProcessApplicationReference getPaReference(ProcessApplicationIdentifier processApplicationIdentifier) {
+  protected ProcessApplicationReference getPaReference(
+      ProcessApplicationIdentifier processApplicationIdentifier) {
     if (processApplicationIdentifier.getReference() != null) {
       return processApplicationIdentifier.getReference();
-    }
-    else if (processApplicationIdentifier.getProcessApplication() != null) {
+    } else if (processApplicationIdentifier.getProcessApplication() != null) {
       return processApplicationIdentifier.getProcessApplication().getReference();
-    }
-    else if (processApplicationIdentifier.getName() != null) {
-       RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
-       ProcessApplicationReference reference = runtimeContainerDelegate.getDeployedProcessApplication(processApplicationIdentifier.getName());
+    } else if (processApplicationIdentifier.getName() != null) {
+      RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
+      ProcessApplicationReference reference = runtimeContainerDelegate
+          .getDeployedProcessApplication(processApplicationIdentifier.getName());
 
-       if (reference == null) {
-         throw LOG.paWithNameNotRegistered(processApplicationIdentifier.getName());
-       }
-       else {
-         return reference;
-       }
-    }
-    else {
+      if (reference == null) {
+        throw LOG.paWithNameNotRegistered(processApplicationIdentifier.getName());
+      } else {
+        return reference;
+      }
+    } else {
       throw LOG.cannotReolvePa(processApplicationIdentifier);
     }
   }

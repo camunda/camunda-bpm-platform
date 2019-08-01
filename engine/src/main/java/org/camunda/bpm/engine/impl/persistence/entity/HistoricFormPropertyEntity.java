@@ -20,16 +20,16 @@ import org.camunda.bpm.engine.history.HistoricFormField;
 import org.camunda.bpm.engine.history.HistoricFormProperty;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
 
-
 /**
  * @author Tom Baeyens
  */
-public class HistoricFormPropertyEntity extends HistoricFormPropertyEventEntity implements HistoricFormProperty, HistoricFormField {
+public class HistoricFormPropertyEntity extends HistoricFormPropertyEventEntity
+    implements HistoricFormProperty, HistoricFormField {
 
   private static final long serialVersionUID = 1L;
 
   public String getPropertyValue() {
-    if(propertyValue != null) {
+    if (propertyValue != null) {
       return propertyValue.toString();
     } else {
       return null;

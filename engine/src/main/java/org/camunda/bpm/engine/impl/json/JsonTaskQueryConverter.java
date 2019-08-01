@@ -81,7 +81,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String PROCESS_DEFINITION_NAME = "processDefinitionName";
   public static final String PROCESS_DEFINITION_NAME_LIKE = "processDefinitionNameLike";
   public static final String PROCESS_INSTANCE_BUSINESS_KEY = "processInstanceBusinessKey";
-  public static final String PROCESS_INSTANCE_BUSINESS_KEYS ="processInstanceBusinessKeys";
+  public static final String PROCESS_INSTANCE_BUSINESS_KEYS = "processInstanceBusinessKeys";
   public static final String PROCESS_INSTANCE_BUSINESS_KEY_LIKE = "processInstanceBusinessKeyLike";
   public static final String DUE = "due";
   public static final String DUE_DATE = "dueDate";
@@ -149,7 +149,8 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     JsonUtil.addField(json, CANDIDATE_GROUP, query.getCandidateGroup());
     JsonUtil.addListField(json, CANDIDATE_GROUPS, query.getCandidateGroupsInternal());
     JsonUtil.addDefaultField(json, WITH_CANDIDATE_GROUPS, false, query.isWithCandidateGroups());
-    JsonUtil.addDefaultField(json, WITHOUT_CANDIDATE_GROUPS, false, query.isWithoutCandidateGroups());
+    JsonUtil.addDefaultField(json, WITHOUT_CANDIDATE_GROUPS, false,
+        query.isWithoutCandidateGroups());
     JsonUtil.addDefaultField(json, WITH_CANDIDATE_USERS, false, query.isWithCandidateUsers());
     JsonUtil.addDefaultField(json, WITHOUT_CANDIDATE_USERS, false, query.isWithoutCandidateUsers());
     JsonUtil.addField(json, INCLUDE_ASSIGNED_TASKS, query.isIncludeAssignedTasksInternal());
@@ -169,8 +170,10 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     JsonUtil.addField(json, PROCESS_DEFINITION_NAME, query.getProcessDefinitionName());
     JsonUtil.addField(json, PROCESS_DEFINITION_NAME_LIKE, query.getProcessDefinitionNameLike());
     JsonUtil.addField(json, PROCESS_INSTANCE_BUSINESS_KEY, query.getProcessInstanceBusinessKey());
-    JsonUtil.addArrayField(json, PROCESS_INSTANCE_BUSINESS_KEYS, query.getProcessInstanceBusinessKeys());
-    JsonUtil.addField(json, PROCESS_INSTANCE_BUSINESS_KEY_LIKE, query.getProcessInstanceBusinessKeyLike());
+    JsonUtil.addArrayField(json, PROCESS_INSTANCE_BUSINESS_KEYS,
+        query.getProcessInstanceBusinessKeys());
+    JsonUtil.addField(json, PROCESS_INSTANCE_BUSINESS_KEY_LIKE,
+        query.getProcessInstanceBusinessKeyLike());
     addVariablesFields(json, query.getVariables());
     JsonUtil.addDateField(json, DUE, query.getDueDate());
     JsonUtil.addDateField(json, DUE_BEFORE, query.getDueBefore());
@@ -187,14 +190,15 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     JsonUtil.addField(json, CASE_DEFINITION_NAME_LIKE, query.getCaseDefinitionNameLike());
     JsonUtil.addField(json, CASE_INSTANCE_ID, query.getCaseInstanceId());
     JsonUtil.addField(json, CASE_INSTANCE_BUSINESS_KEY, query.getCaseInstanceBusinessKey());
-    JsonUtil.addField(json, CASE_INSTANCE_BUSINESS_KEY_LIKE, query.getCaseInstanceBusinessKeyLike());
+    JsonUtil.addField(json, CASE_INSTANCE_BUSINESS_KEY_LIKE,
+        query.getCaseInstanceBusinessKeyLike());
     JsonUtil.addField(json, CASE_EXECUTION_ID, query.getCaseExecutionId());
     addTenantIdFields(json, query);
 
     if (query.getQueries().size() > 1 && !isOrQueryActive) {
       JsonArray orQueries = JsonUtil.createArray();
 
-      for (TaskQueryImpl orQuery: query.getQueries()) {
+      for (TaskQueryImpl orQuery : query.getQueries()) {
         if (orQuery != null && orQuery.isOrQueryActive()) {
           orQueries.add(toJsonObject(orQuery, true));
         }
@@ -205,9 +209,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
     if (query.getOrderingProperties() != null && !query.getOrderingProperties().isEmpty()) {
       JsonUtil.addField(json, ORDERING_PROPERTIES,
-          JsonQueryOrderingPropertyConverter.ARRAY_CONVERTER.toJsonArray(query.getOrderingProperties()));
+          JsonQueryOrderingPropertyConverter.ARRAY_CONVERTER
+              .toJsonArray(query.getOrderingProperties()));
     }
-
 
     // expressions
     for (Map.Entry<String, String> expressionEntry : query.getExpressions().entrySet()) {
@@ -221,8 +225,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     if (suspensionState != null) {
       if (suspensionState.equals(SuspensionState.ACTIVE)) {
         JsonUtil.addField(jsonObject, ACTIVE, true);
-      }
-      else if (suspensionState.equals(SuspensionState.SUSPENDED)) {
+      } else if (suspensionState.equals(SuspensionState.SUSPENDED)) {
         JsonUtil.addField(jsonObject, SUSPENDED, true);
       }
     }
@@ -242,17 +245,16 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     for (TaskQueryVariableValue variable : variables) {
       if (variable.isProcessInstanceVariable()) {
         addVariable(jsonObject, PROCESS_VARIABLES, variable);
-      }
-      else if(variable.isLocal()) {
+      } else if (variable.isLocal()) {
         addVariable(jsonObject, TASK_VARIABLES, variable);
-      }
-      else {
+      } else {
         addVariable(jsonObject, CASE_INSTANCE_VARIABLES, variable);
       }
     }
   }
 
-  protected void addVariable(JsonObject jsonObject, String variableType, TaskQueryVariableValue variable) {
+  protected void addVariable(JsonObject jsonObject, String variableType,
+      TaskQueryVariableValue variable) {
     JsonArray variables = JsonUtil.getArray(jsonObject, variableType);
 
     JsonUtil.addElement(variables, variableValueConverter, variable);
@@ -269,7 +271,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
       }
     }
     if (json.has(TASK_ID)) {
-      query.taskId(JsonUtil.getString(json,TASK_ID));
+      query.taskId(JsonUtil.getString(json, TASK_ID));
     }
     if (json.has(NAME)) {
       query.taskName(JsonUtil.getString(json, NAME));
@@ -317,7 +319,8 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
       query.taskUnassigned();
     }
     if (json.has(DELEGATION_STATE)) {
-      query.taskDelegationState(DelegationState.valueOf(JsonUtil.getString(json, DELEGATION_STATE)));
+      query
+          .taskDelegationState(DelegationState.valueOf(JsonUtil.getString(json, DELEGATION_STATE)));
     }
     if (json.has(CANDIDATE_USER)) {
       query.taskCandidateUser(JsonUtil.getString(json, CANDIDATE_USER));
@@ -392,10 +395,12 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
       query.processInstanceBusinessKey(JsonUtil.getString(json, PROCESS_INSTANCE_BUSINESS_KEY));
     }
     if (json.has(PROCESS_INSTANCE_BUSINESS_KEYS)) {
-      query.processInstanceBusinessKeyIn(getArray(JsonUtil.getArray(json, PROCESS_INSTANCE_BUSINESS_KEYS)));
+      query.processInstanceBusinessKeyIn(
+          getArray(JsonUtil.getArray(json, PROCESS_INSTANCE_BUSINESS_KEYS)));
     }
     if (json.has(PROCESS_INSTANCE_BUSINESS_KEY_LIKE)) {
-      query.processInstanceBusinessKeyLike(JsonUtil.getString(json, PROCESS_INSTANCE_BUSINESS_KEY_LIKE));
+      query.processInstanceBusinessKeyLike(
+          JsonUtil.getString(json, PROCESS_INSTANCE_BUSINESS_KEY_LIKE));
     }
     if (json.has(TASK_VARIABLES)) {
       addVariables(query, JsonUtil.getArray(json, TASK_VARIABLES), true, false);
@@ -467,14 +472,15 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
       query.withoutTenantId();
     }
     if (json.has(ORDER_BY)) {
-      List<QueryOrderingProperty> orderingProperties =
-          JsonLegacyQueryOrderingPropertyConverter.INSTANCE.fromOrderByString(JsonUtil.getString(json, ORDER_BY));
+      List<QueryOrderingProperty> orderingProperties = JsonLegacyQueryOrderingPropertyConverter.INSTANCE
+          .fromOrderByString(JsonUtil.getString(json, ORDER_BY));
 
       query.setOrderingProperties(orderingProperties);
     }
     if (json.has(ORDERING_PROPERTIES)) {
       JsonArray jsonArray = JsonUtil.getArray(json, ORDERING_PROPERTIES);
-      query.setOrderingProperties(JsonQueryOrderingPropertyConverter.ARRAY_CONVERTER.toObject(jsonArray));
+      query.setOrderingProperties(
+          JsonQueryOrderingPropertyConverter.ARRAY_CONVERTER.toObject(jsonArray));
     }
 
     // expressions
@@ -501,7 +507,8 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     return list;
   }
 
-  protected void addVariables(TaskQueryImpl query, JsonArray variables, boolean isTaskVariable, boolean isProcessVariable) {
+  protected void addVariables(TaskQueryImpl query, JsonArray variables, boolean isTaskVariable,
+      boolean isProcessVariable) {
     for (JsonElement variable : variables) {
       JsonObject variableObj = JsonUtil.getObject(variable);
       String name = JsonUtil.getString(variableObj, NAME);

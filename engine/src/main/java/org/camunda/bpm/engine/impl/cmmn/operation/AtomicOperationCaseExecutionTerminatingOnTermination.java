@@ -26,7 +26,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionTerminatingOnTermination extends AbstractAtomicOperationCaseExecutionTerminating {
+public class AtomicOperationCaseExecutionTerminatingOnTermination
+    extends AbstractAtomicOperationCaseExecutionTerminating {
 
   public String getCanonicalName() {
     return "case-execution-terminating-on-termination";

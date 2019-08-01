@@ -36,22 +36,22 @@ public class CmmnModelElementInstanceCmdTest extends PluggableProcessEngineTestC
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
   public void testRepositoryService() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .caseDefinitionKey(CASE_KEY)
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey(CASE_KEY).singleResult().getId();
 
     CmmnModelInstance modelInstance = repositoryService.getCmmnModelInstance(caseDefinitionId);
     assertNotNull(modelInstance);
 
-    Collection<ModelElementInstance> humanTasks = modelInstance.getModelElementsByType(modelInstance.getModel().getType(HumanTask.class));
+    Collection<ModelElementInstance> humanTasks = modelInstance
+        .getModelElementsByType(modelInstance.getModel().getType(HumanTask.class));
     assertEquals(1, humanTasks.size());
 
-    Collection<ModelElementInstance> planItems = modelInstance.getModelElementsByType(modelInstance.getModel().getType(PlanItem.class));
+    Collection<ModelElementInstance> planItems = modelInstance
+        .getModelElementsByType(modelInstance.getModel().getType(PlanItem.class));
     assertEquals(1, planItems.size());
 
-    Collection<ModelElementInstance> cases = modelInstance.getModelElementsByType(modelInstance.getModel().getType(Case.class));
+    Collection<ModelElementInstance> cases = modelInstance
+        .getModelElementsByType(modelInstance.getModel().getType(Case.class));
     assertEquals(1, cases.size());
 
   }

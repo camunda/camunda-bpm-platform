@@ -73,17 +73,12 @@ public abstract class AbstractConditionalEventTestCase {
   protected static final String FLOW_ID = "flow";
   protected static final String DELEGATED_PROCESS_KEY = "delegatedProcess";
 
-  protected static final BpmnModelInstance TASK_MODEL = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-          .startEvent()
-          .userTask(TASK_BEFORE_CONDITION_ID)
-          .name(TASK_BEFORE_CONDITION)
-          .endEvent().done();
-  protected static final BpmnModelInstance DELEGATED_PROCESS = Bpmn.createExecutableProcess(DELEGATED_PROCESS_KEY)
-    .startEvent()
-    .serviceTask()
-    .camundaExpression(EXPR_SET_VARIABLE)
-    .endEvent()
-    .done();
+  protected static final BpmnModelInstance TASK_MODEL = Bpmn
+      .createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY).startEvent()
+      .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().done();
+  protected static final BpmnModelInstance DELEGATED_PROCESS = Bpmn
+      .createExecutableProcess(DELEGATED_PROCESS_KEY).startEvent().serviceTask()
+      .camundaExpression(EXPR_SET_VARIABLE).endEvent().done();
   protected static final String TASK_AFTER_OUTPUT_MAPPING = "afterOutputMapping";
 
   protected List<Task> tasksAfterVariableIsSet;
@@ -108,29 +103,29 @@ public abstract class AbstractConditionalEventTestCase {
     this.repositoryService = engine.getRepositoryService();
     this.historyService = engine.getHistoryService();
     this.processEngineConfiguration = engine.getProcessEngineConfiguration();
-    this.conditionEventSubscriptionQuery = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutorTxRequired()).eventType(EventType.CONDITONAL.name());
+    this.conditionEventSubscriptionQuery = new EventSubscriptionQueryImpl(
+        processEngineConfiguration.getCommandExecutorTxRequired())
+            .eventType(EventType.CONDITONAL.name());
   }
 
   @After
   public void checkIfProcessCanBeFinished() {
-    //given tasks after variable was set
+    // given tasks after variable was set
     assertNotNull(tasksAfterVariableIsSet);
 
-    //when tasks are completed
+    // when tasks are completed
     for (Task task : tasksAfterVariableIsSet) {
       taskService.complete(task.getId());
     }
 
-    //then
+    // then
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
     assertNull(taskService.createTaskQuery().singleResult());
     assertNull(runtimeService.createProcessInstanceQuery().singleResult());
     tasksAfterVariableIsSet = null;
   }
 
-
-
-  public static void assertTaskNames(List<Task> actualTasks, String ... expectedTaskNames ) {
+  public static void assertTaskNames(List<Task> actualTasks, String... expectedTaskNames) {
     List<String> expectedNames = new ArrayList<String>(Arrays.asList(expectedTaskNames));
     for (Task task : actualTasks) {
       String actualTaskName = task.getName();
@@ -141,67 +136,60 @@ public abstract class AbstractConditionalEventTestCase {
     assertTrue(expectedNames.isEmpty());
   }
 
-  // conditional event sub process //////////////////////////////////////////////////////////////////////////////////////////
+  // conditional event sub process
+  // //////////////////////////////////////////////////////////////////////////////////////////
 
-  protected void deployConditionalEventSubProcess(BpmnModelInstance model, String parentId, boolean isInterrupting) {
+  protected void deployConditionalEventSubProcess(BpmnModelInstance model, String parentId,
+      boolean isInterrupting) {
     deployConditionalEventSubProcess(model, parentId, CONDITION_EXPR, isInterrupting);
   }
 
-  protected void deployConditionalEventSubProcess(BpmnModelInstance model, String parentId, String conditionExpr, boolean isInterrupting) {
-    final BpmnModelInstance modelInstance = addConditionalEventSubProcess(model, parentId, conditionExpr, TASK_AFTER_CONDITION_ID, isInterrupting);
-    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+  protected void deployConditionalEventSubProcess(BpmnModelInstance model, String parentId,
+      String conditionExpr, boolean isInterrupting) {
+    final BpmnModelInstance modelInstance = addConditionalEventSubProcess(model, parentId,
+        conditionExpr, TASK_AFTER_CONDITION_ID, isInterrupting);
+    engine.manageDeployment(repositoryService.createDeployment()
+        .addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
   }
 
-
-  protected BpmnModelInstance addConditionalEventSubProcess(BpmnModelInstance model, String parentId, String userTaskId, boolean isInterrupting) {
-    return addConditionalEventSubProcess(model, parentId, CONDITION_EXPR, userTaskId, isInterrupting);
+  protected BpmnModelInstance addConditionalEventSubProcess(BpmnModelInstance model,
+      String parentId, String userTaskId, boolean isInterrupting) {
+    return addConditionalEventSubProcess(model, parentId, CONDITION_EXPR, userTaskId,
+        isInterrupting);
   }
 
-  protected BpmnModelInstance addConditionalEventSubProcess(BpmnModelInstance model, String parentId, String conditionExpr, String userTaskId, boolean isInterrupting) {
-    return modify(model)
-      .addSubProcessTo(parentId)
-      .triggerByEvent()
-      .embeddedSubProcess()
-      .startEvent()
-      .interrupting(isInterrupting)
-      .condition(conditionExpr)
-      .userTask(userTaskId)
-      .name(TASK_AFTER_CONDITION)
-      .endEvent().done();
+  protected BpmnModelInstance addConditionalEventSubProcess(BpmnModelInstance model,
+      String parentId, String conditionExpr, String userTaskId, boolean isInterrupting) {
+    return modify(model).addSubProcessTo(parentId).triggerByEvent().embeddedSubProcess()
+        .startEvent().interrupting(isInterrupting).condition(conditionExpr).userTask(userTaskId)
+        .name(TASK_AFTER_CONDITION).endEvent().done();
   }
 
-  // conditional boundary event //////////////////////////////////////////////////////////////////////////////////////////
+  // conditional boundary event
+  // //////////////////////////////////////////////////////////////////////////////////////////
 
-
-  protected void deployConditionalBoundaryEventProcess(BpmnModelInstance model, String activityId, boolean isInterrupting) {
+  protected void deployConditionalBoundaryEventProcess(BpmnModelInstance model, String activityId,
+      boolean isInterrupting) {
     deployConditionalBoundaryEventProcess(model, activityId, CONDITION_EXPR, isInterrupting);
   }
 
-  protected void deployConditionalBoundaryEventProcess(BpmnModelInstance model, String activityId, String conditionExpr, boolean isInterrupting) {
-    final BpmnModelInstance modelInstance = addConditionalBoundaryEvent(model, activityId, conditionExpr, TASK_AFTER_CONDITION_ID, isInterrupting);
-    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+  protected void deployConditionalBoundaryEventProcess(BpmnModelInstance model, String activityId,
+      String conditionExpr, boolean isInterrupting) {
+    final BpmnModelInstance modelInstance = addConditionalBoundaryEvent(model, activityId,
+        conditionExpr, TASK_AFTER_CONDITION_ID, isInterrupting);
+    engine.manageDeployment(repositoryService.createDeployment()
+        .addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
   }
 
   protected BpmnModelInstance addConditionalBoundaryEvent(BpmnModelInstance model,
-                                                          String activityId,
-                                                          String userTaskId,
-                                                          boolean isInterrupting) {
-    return addConditionalBoundaryEvent(model, activityId, CONDITION_EXPR, userTaskId, isInterrupting);
+      String activityId, String userTaskId, boolean isInterrupting) {
+    return addConditionalBoundaryEvent(model, activityId, CONDITION_EXPR, userTaskId,
+        isInterrupting);
   }
 
   protected BpmnModelInstance addConditionalBoundaryEvent(BpmnModelInstance model,
-                                                          String activityId,
-                                                          String conditionExpr,
-                                                          String userTaskId,
-                                                          boolean isInterrupting) {
-    return modify(model)
-      .activityBuilder(activityId)
-      .boundaryEvent()
-        .cancelActivity(isInterrupting)
-        .condition(conditionExpr)
-      .userTask(userTaskId)
-        .name(TASK_AFTER_CONDITION)
-      .endEvent()
-      .done();
+      String activityId, String conditionExpr, String userTaskId, boolean isInterrupting) {
+    return modify(model).activityBuilder(activityId).boundaryEvent().cancelActivity(isInterrupting)
+        .condition(conditionExpr).userTask(userTaskId).name(TASK_AFTER_CONDITION).endEvent().done();
   }
 }

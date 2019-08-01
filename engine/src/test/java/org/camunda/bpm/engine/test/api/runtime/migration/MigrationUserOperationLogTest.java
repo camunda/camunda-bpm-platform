@@ -55,26 +55,28 @@ public class MigrationUserOperationLogTest {
   @Test
   public void testLogCreation() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
-        modify(ProcessModels.ONE_TASK_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     rule.getIdentityService().setAuthenticatedUserId(USER_ID);
-    rule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+    rule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
     rule.getIdentityService().clearAuthentication();
 
     // then
-    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().list();
+    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService()
+        .createUserOperationLogQuery().list();
     Assert.assertEquals(3, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
@@ -106,7 +108,8 @@ public class MigrationUserOperationLogTest {
     Assert.assertEquals("ProcessInstance", numInstanceEntry.getEntityType());
     Assert.assertEquals("Migrate", numInstanceEntry.getOperationType());
     Assert.assertEquals(sourceProcessDefinition.getId(), numInstanceEntry.getProcessDefinitionId());
-    Assert.assertEquals(sourceProcessDefinition.getKey(), numInstanceEntry.getProcessDefinitionKey());
+    Assert.assertEquals(sourceProcessDefinition.getKey(),
+        numInstanceEntry.getProcessDefinitionKey());
     Assert.assertNull(numInstanceEntry.getProcessInstanceId());
     Assert.assertNull(numInstanceEntry.getOrgValue());
     Assert.assertEquals("1", numInstanceEntry.getNewValue());

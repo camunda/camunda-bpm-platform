@@ -38,8 +38,7 @@ public class SingleEntryDecisionResultMapper implements DecisionResultMapper {
       TypedValue typedValue = decisionResult.getSingleEntryTyped();
       if (typedValue != null) {
         return typedValue;
-      }
-      else {
+      } else {
         return Variables.untypedNullValue();
       }
     } catch (DmnEngineException e) {

@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.impl.db;
 import org.camunda.bpm.engine.OptimisticLockingException;
 
 /**
- * Marks an entity as an historic entity to ensure that {@link OptimisticLockingException}s
- * are swallowed on UPDATE or DELETE operations.
+ * Marks an entity as an historic entity to ensure that {@link OptimisticLockingException}s are
+ * swallowed on UPDATE or DELETE operations.
  *
  * @author Tassilo Weidner
  */

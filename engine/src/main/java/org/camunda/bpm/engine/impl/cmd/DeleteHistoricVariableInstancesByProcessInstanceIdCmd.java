@@ -37,7 +37,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author Tobias Metzke
  *
  */
-public class DeleteHistoricVariableInstancesByProcessInstanceIdCmd implements Command<Void>, Serializable {
+public class DeleteHistoricVariableInstancesByProcessInstanceIdCmd
+    implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   private String processInstanceId;
@@ -45,30 +46,38 @@ public class DeleteHistoricVariableInstancesByProcessInstanceIdCmd implements Co
   public DeleteHistoricVariableInstancesByProcessInstanceIdCmd(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
-  
+
   @Override
   public Void execute(CommandContext commandContext) {
-    ensureNotEmpty(BadUserRequestException.class,"processInstanceId", processInstanceId);
+    ensureNotEmpty(BadUserRequestException.class, "processInstanceId", processInstanceId);
 
-    HistoricProcessInstanceEntity instance = commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstance(processInstanceId);
-    ensureNotNull(NotFoundException.class, "No historic process instance found with id: " + processInstanceId, "instance", instance);
-    
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    HistoricProcessInstanceEntity instance = commandContext.getHistoricProcessInstanceManager()
+        .findHistoricProcessInstance(processInstanceId);
+    ensureNotNull(NotFoundException.class,
+        "No historic process instance found with id: " + processInstanceId, "instance", instance);
+
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkDeleteHistoricVariableInstancesByProcessInstance(instance);
     }
 
-    commandContext.getHistoricDetailManager().deleteHistoricDetailsByProcessInstanceIds(Arrays.asList(processInstanceId));
-    commandContext.getHistoricVariableInstanceManager().deleteHistoricVariableInstanceByProcessInstanceIds(Arrays.asList(processInstanceId));
-    
+    commandContext.getHistoricDetailManager()
+        .deleteHistoricDetailsByProcessInstanceIds(Arrays.asList(processInstanceId));
+    commandContext.getHistoricVariableInstanceManager()
+        .deleteHistoricVariableInstanceByProcessInstanceIds(Arrays.asList(processInstanceId));
+
     // create user operation log
     ResourceDefinitionEntity<?> definition = null;
     try {
-      definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(instance.getProcessDefinitionId());
+      definition = commandContext.getProcessEngineConfiguration().getDeploymentCache()
+          .findDeployedProcessDefinitionById(instance.getProcessDefinitionId());
     } catch (NullValueException nve) {
       // definition has been deleted already
     }
-    commandContext.getOperationLogManager().logHistoricVariableOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, instance, definition, PropertyChange.EMPTY_CHANGE);
-    
+    commandContext.getOperationLogManager().logHistoricVariableOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, instance, definition,
+        PropertyChange.EMPTY_CHANGE);
+
     return null;
   }
 }

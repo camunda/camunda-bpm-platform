@@ -56,24 +56,14 @@ public class SetBusinessKeyTest {
 
   protected static final String PROCESS_KEY = "process";
 
-  protected static final BpmnModelInstance SYNC_SERVICE_TASK_PROCESS =
-      Bpmn.createExecutableProcess(PROCESS_KEY)
-      .startEvent("startEvent")
-      .serviceTask()
-        .camundaClass(SetBusinessKeyDelegate.class)
-      .userTask("userTask2")
-      .endEvent("endEvent")
-      .done();
+  protected static final BpmnModelInstance SYNC_SERVICE_TASK_PROCESS = Bpmn
+      .createExecutableProcess(PROCESS_KEY).startEvent("startEvent").serviceTask()
+      .camundaClass(SetBusinessKeyDelegate.class).userTask("userTask2").endEvent("endEvent").done();
 
-  protected static final BpmnModelInstance ASYNC_SERVICE_TASK_PROCESS =
-      Bpmn.createExecutableProcess(PROCESS_KEY)
-      .startEvent("startEvent")
-      .serviceTask()
-        .camundaAsyncBefore()
-        .camundaClass(SetBusinessKeyDelegate.class)
-      .userTask("userTask2")
-      .endEvent("endEvent")
-      .done();
+  protected static final BpmnModelInstance ASYNC_SERVICE_TASK_PROCESS = Bpmn
+      .createExecutableProcess(PROCESS_KEY).startEvent("startEvent").serviceTask()
+      .camundaAsyncBefore().camundaClass(SetBusinessKeyDelegate.class).userTask("userTask2")
+      .endEvent("endEvent").done();
 
   protected static final String BUSINESS_KEY_VARIABLE = "businessKeyVar";
   protected RuntimeService runtimeService;
@@ -96,7 +86,8 @@ public class SetBusinessKeyTest {
 
     // when
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY,
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     // then
     checkBusinessKeyChanged(newBusinessKeyValue);
@@ -108,7 +99,8 @@ public class SetBusinessKeyTest {
     testRule.deploy(ASYNC_SERVICE_TASK_PROCESS);
 
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY,
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     // when
     executeJob();
@@ -126,7 +118,8 @@ public class SetBusinessKeyTest {
 
     // when
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY,
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     // then
     checkBusinessKeyChanged(newBusinessKeyValue);
@@ -140,7 +133,8 @@ public class SetBusinessKeyTest {
     testRule.deploy(process);
 
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY,
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     completeTask("userTask1");
 
@@ -151,7 +145,6 @@ public class SetBusinessKeyTest {
     checkBusinessKeyChanged(newBusinessKeyValue);
   }
 
-
   @Test
   public void testNewKeyInStartTaskListener() {
     // given
@@ -161,7 +154,8 @@ public class SetBusinessKeyTest {
 
     // when
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY,
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     // then
     checkBusinessKeyChanged(newBusinessKeyValue);
@@ -175,7 +169,8 @@ public class SetBusinessKeyTest {
     testRule.deploy(process);
 
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY,
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     completeTask("userTask1");
 
@@ -193,7 +188,8 @@ public class SetBusinessKeyTest {
 
     // when
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey", Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey",
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     // then
     checkBusinessKeyChanged(newBusinessKeyValue);
@@ -205,7 +201,8 @@ public class SetBusinessKeyTest {
     testRule.deploy(ASYNC_SERVICE_TASK_PROCESS);
 
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey", Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey",
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     // when
     executeJob();
@@ -223,7 +220,8 @@ public class SetBusinessKeyTest {
 
     // when
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey", Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey",
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     // then
     checkBusinessKeyChanged(newBusinessKeyValue);
@@ -237,7 +235,8 @@ public class SetBusinessKeyTest {
     testRule.deploy(process);
 
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey", Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey",
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     completeTask("userTask1");
 
@@ -256,7 +255,8 @@ public class SetBusinessKeyTest {
     testRule.deploy(process);
 
     String newBusinessKeyValue = "newBusinessKey";
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey", Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey",
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     // when
     completeTask("userTask1");
@@ -277,41 +277,38 @@ public class SetBusinessKeyTest {
 
     // when
     String newBusinessKeyValue = null;
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey", Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, "aBusinessKey",
+        Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
 
     // then
     checkBusinessKeyChanged(newBusinessKeyValue);
   }
 
   protected void checkBusinessKeyChanged(String newBusinessKeyValue) {
-    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).singleResult();
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey(PROCESS_KEY).singleResult();
     assertNotNull(processInstance);
     assertEquals(newBusinessKeyValue, processInstance.getBusinessKey());
 
-    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery()
+        .singleResult();
     assertNotNull(historicInstance);
     assertEquals(newBusinessKeyValue, historicInstance.getBusinessKey());
   }
 
   protected BpmnModelInstance createModelExecutionListener(String listener) {
-    return Bpmn.createExecutableProcess(PROCESS_KEY)
-    .startEvent("startEvent")
-    .userTask("userTask1").name("User task")
-      .camundaExecutionListenerExpression(listener,
-            "${execution.setProcessBusinessKey(execution.getVariable(\"" + BUSINESS_KEY_VARIABLE + "\"))}")
-    .userTask("userTask2")
-    .endEvent("endEvent")
-    .done();
+    return Bpmn.createExecutableProcess(PROCESS_KEY).startEvent("startEvent").userTask("userTask1")
+        .name("User task")
+        .camundaExecutionListenerExpression(listener,
+            "${execution.setProcessBusinessKey(execution.getVariable(\"" + BUSINESS_KEY_VARIABLE
+                + "\"))}")
+        .userTask("userTask2").endEvent("endEvent").done();
   }
 
   protected BpmnModelInstance createModelTaskListener(String listener) {
-    return Bpmn.createExecutableProcess(PROCESS_KEY)
-    .startEvent("startEvent")
-    .userTask("userTask1").name("User task")
-      .camundaTaskListenerClass(listener, SetBusinessKeyListener.class)
-    .userTask("userTask2")
-    .endEvent("endEvent")
-    .done();
+    return Bpmn.createExecutableProcess(PROCESS_KEY).startEvent("startEvent").userTask("userTask1")
+        .name("User task").camundaTaskListenerClass(listener, SetBusinessKeyListener.class)
+        .userTask("userTask2").endEvent("endEvent").done();
   }
 
   protected void executeJob() {

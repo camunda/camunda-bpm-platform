@@ -36,8 +36,8 @@ public class FieldSpec {
   protected String stringValue;
   protected String childStringValue;
 
-  public FieldSpec(String fieldName, String expression, String childExpression,
-      String stringValue, String childStringValue) {
+  public FieldSpec(String fieldName, String expression, String childExpression, String stringValue,
+      String childStringValue) {
     this.fieldName = fieldName;
     this.expression = expression;
     this.childExpression = childExpression;
@@ -56,22 +56,26 @@ public class FieldSpec {
     assertEquals(getExpectedExpression(), expressionValue.getExpressionText());
   }
 
-  public void addFieldToListenerElement(CmmnModelInstance modelInstance, CamundaCaseExecutionListener listenerElement) {
-    CamundaField field = SpecUtil.createElement(modelInstance, listenerElement, null, CamundaField.class);
+  public void addFieldToListenerElement(CmmnModelInstance modelInstance,
+      CamundaCaseExecutionListener listenerElement) {
+    CamundaField field = SpecUtil.createElement(modelInstance, listenerElement, null,
+        CamundaField.class);
     field.setCamundaName(fieldName);
 
     if (expression != null) {
       field.setCamundaExpression(expression);
 
     } else if (childExpression != null) {
-      CamundaExpression fieldExpressionChild = SpecUtil.createElement(modelInstance, field, null, CamundaExpression.class);
+      CamundaExpression fieldExpressionChild = SpecUtil.createElement(modelInstance, field, null,
+          CamundaExpression.class);
       fieldExpressionChild.setTextContent(childExpression);
 
     } else if (stringValue != null) {
       field.setCamundaStringValue(stringValue);
 
     } else if (childStringValue != null) {
-      CamundaString fieldExpressionChild = SpecUtil.createElement(modelInstance, field, null, CamundaString.class);
+      CamundaString fieldExpressionChild = SpecUtil.createElement(modelInstance, field, null,
+          CamundaString.class);
       fieldExpressionChild.setTextContent(childStringValue);
     }
   }

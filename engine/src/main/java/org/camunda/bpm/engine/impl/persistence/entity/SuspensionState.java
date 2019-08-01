@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-
 /**
  * Contains a predefined set of states for process definitions and process instances
  *

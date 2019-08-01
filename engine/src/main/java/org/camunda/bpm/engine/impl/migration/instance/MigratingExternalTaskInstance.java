@@ -39,7 +39,8 @@ public class MigratingExternalTaskInstance implements MigratingInstance {
 
   protected List<MigratingInstance> dependentInstances = new ArrayList<MigratingInstance>();
 
-  public MigratingExternalTaskInstance(ExternalTaskEntity externalTask, MigratingActivityInstance migratingActivityInstance) {
+  public MigratingExternalTaskInstance(ExternalTaskEntity externalTask,
+      MigratingActivityInstance migratingActivityInstance) {
     this.externalTask = externalTask;
     this.migratingActivityInstance = migratingActivityInstance;
   }
@@ -78,7 +79,8 @@ public class MigratingExternalTaskInstance implements MigratingInstance {
   @Override
   public void migrateState() {
     ScopeImpl targetActivity = migratingActivityInstance.getTargetScope();
-    ProcessDefinition targetProcessDefinition = (ProcessDefinition) targetActivity.getProcessDefinition();
+    ProcessDefinition targetProcessDefinition = (ProcessDefinition) targetActivity
+        .getProcessDefinition();
 
     externalTask.setActivityId(targetActivity.getId());
     externalTask.setProcessDefinitionId(targetProcessDefinition.getId());

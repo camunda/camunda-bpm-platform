@@ -36,15 +36,14 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 public class ProcessEngineLoggingRuleTest {
 
   private static final String PERSISTENCE_LOGGER = "org.camunda.bpm.engine.persistence"; // 03
-  private static final String CONTAINER_INTEGRATION_LOGGER = "org.camunda.bpm.container"; //08
-  private static final String PROCESS_APPLICATION_LOGGER = "org.camunda.bpm.application"; //07
-  private static final String JOB_EXECUTOR_LOGGER = "org.camunda.bpm.engine.jobexecutor"; //14
+  private static final String CONTAINER_INTEGRATION_LOGGER = "org.camunda.bpm.container"; // 08
+  private static final String PROCESS_APPLICATION_LOGGER = "org.camunda.bpm.application"; // 07
+  private static final String JOB_EXECUTOR_LOGGER = "org.camunda.bpm.engine.jobexecutor"; // 14
 
   @Rule
   public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
-                                                      .watch(PERSISTENCE_LOGGER, CONTAINER_INTEGRATION_LOGGER)
-                                                        .level(Level.DEBUG)
-                                                      .watch(PROCESS_APPLICATION_LOGGER, Level.INFO);
+      .watch(PERSISTENCE_LOGGER, CONTAINER_INTEGRATION_LOGGER).level(Level.DEBUG)
+      .watch(PROCESS_APPLICATION_LOGGER, Level.INFO);
 
   @Test
   public void testWithoutAnnotation() {
@@ -65,14 +64,15 @@ public class ProcessEngineLoggingRuleTest {
 
     // then
     assertNotNull(expectedException);
-    assertThat(expectedException.getMessage(), containsString(ProcessEngineLoggingRule.NOT_WATCHING_ERROR));
+    assertThat(expectedException.getMessage(),
+        containsString(ProcessEngineLoggingRule.NOT_WATCHING_ERROR));
     testLogLevel(persistenceLog, Level.DEBUG);
     testLogLevel(containerLog, Level.DEBUG);
     testLogLevel(processAppLogger, Level.INFO);
   }
 
   @Test
-  @WatchLogger(loggerNames = {CONTAINER_INTEGRATION_LOGGER}, level = "WARN")
+  @WatchLogger(loggerNames = { CONTAINER_INTEGRATION_LOGGER }, level = "WARN")
   public void testOverrideWithAnnotation() {
     // given
 
@@ -91,14 +91,15 @@ public class ProcessEngineLoggingRuleTest {
 
     // then
     assertNotNull(expectedException);
-    assertThat(expectedException.getMessage(), containsString(ProcessEngineLoggingRule.NOT_WATCHING_ERROR));
+    assertThat(expectedException.getMessage(),
+        containsString(ProcessEngineLoggingRule.NOT_WATCHING_ERROR));
     testLogLevel(persistenceLog, Level.DEBUG);
     testLogLevel(containerLog, Level.WARN);
     testLogLevel(processAppLogger, Level.INFO);
   }
-  
+
   @Test
-  @WatchLogger(loggerNames = {JOB_EXECUTOR_LOGGER}, level = "ERROR")
+  @WatchLogger(loggerNames = { JOB_EXECUTOR_LOGGER }, level = "ERROR")
   public void testAddWatchedLoggerWithAnnotation() {
     // given
 
@@ -116,16 +117,15 @@ public class ProcessEngineLoggingRuleTest {
     testLogLevel(processAppLogger, Level.INFO);
     testLogLevel(jobExecutorLogger, Level.ERROR);
   }
-  
+
   @Test
-  @WatchLogger(loggerNames = {CONTAINER_INTEGRATION_LOGGER}, level = "OFF")
+  @WatchLogger(loggerNames = { CONTAINER_INTEGRATION_LOGGER }, level = "OFF")
   public void testTurnOffWatcherWithAnnotation() {
     // given
 
     // when
     logSomethingOnAllLevels();
 
-    
     List<ILoggingEvent> persistenceLog = loggingRule.getLog(PERSISTENCE_LOGGER);
     List<ILoggingEvent> containerLog = loggingRule.getLog(CONTAINER_INTEGRATION_LOGGER);
     List<ILoggingEvent> processAppLogger = loggingRule.getLog(PROCESS_APPLICATION_LOGGER);
@@ -138,21 +138,23 @@ public class ProcessEngineLoggingRuleTest {
 
     // then
     assertNotNull(expectedException);
-    assertThat(expectedException.getMessage(), containsString(ProcessEngineLoggingRule.NOT_WATCHING_ERROR));
+    assertThat(expectedException.getMessage(),
+        containsString(ProcessEngineLoggingRule.NOT_WATCHING_ERROR));
     testLogLevel(persistenceLog, Level.DEBUG);
     testLogLevel(processAppLogger, Level.INFO);
     assertThat(containerLog.size(), is(0));
   }
 
   @Test
-  @WatchLogger(loggerNames = {JOB_EXECUTOR_LOGGER, PERSISTENCE_LOGGER, CONTAINER_INTEGRATION_LOGGER, PROCESS_APPLICATION_LOGGER}, level = "DEBUG")
+  @WatchLogger(loggerNames = { JOB_EXECUTOR_LOGGER, PERSISTENCE_LOGGER,
+      CONTAINER_INTEGRATION_LOGGER, PROCESS_APPLICATION_LOGGER }, level = "DEBUG")
   public void testLogOrder() {
     logSomethingOnAllLevels();
 
     List<ILoggingEvent> fullLog = loggingRule.getLog();
     ILoggingEvent previousLogEntry = null;
     for (ILoggingEvent logEntry : fullLog) {
-      if(previousLogEntry != null) {
+      if (previousLogEntry != null) {
         assertTrue(previousLogEntry.getTimeStamp() <= logEntry.getTimeStamp());
       }
       previousLogEntry = logEntry;
@@ -166,29 +168,32 @@ public class ProcessEngineLoggingRuleTest {
 
   private void testAtLeastOneLogEntryWithLevelIsPresent(List<ILoggingEvent> log, Level level) {
     for (ILoggingEvent logEntry : log) {
-      if(logEntry.getLevel().equals(level)) {
+      if (logEntry.getLevel().equals(level)) {
         return;
       }
     }
     fail("Expected at least one log entry with level " + level + " in log");
   }
-  
+
   private void testAllLoggingEntriesAtLeastLevel(List<ILoggingEvent> log, Level level) {
     for (ILoggingEvent logStatement : log) {
       assertTrue(logStatement.getLevel().isGreaterOrEqual(level));
     }
   }
-  
+
   public void logSomethingOnAllLevels() {
     ProcessEngineLogger.PERSISTENCE_LOGGER.debugJobExecuted(null); // debug
     ProcessEngineLogger.PERSISTENCE_LOGGER.performingDatabaseOperation("test", "test", "test"); // info
-    ProcessEngineLogger.PERSISTENCE_LOGGER.removeEntryFromDeploymentCacheFailure("test", "test", new Throwable()); // warn
+    ProcessEngineLogger.PERSISTENCE_LOGGER.removeEntryFromDeploymentCacheFailure("test", "test",
+        new Throwable()); // warn
     ProcessEngineLogger.PERSISTENCE_LOGGER.noDeploymentLockPropertyFound(); // error
 
     ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER.debugAutoCompletedUrl("test"); // debug
     ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER.foundConfigJndi("test", "test"); // info
-    ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER.exceptionWhileStopping("test", "test", new Throwable()); // warn
-    ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER.interruptedWhileShuttingDownThreadPool(new InterruptedException()); // error
+    ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER.exceptionWhileStopping("test", "test",
+        new Throwable()); // warn
+    ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER
+        .interruptedWhileShuttingDownThreadPool(new InterruptedException()); // error
 
     ProcessEngineLogger.JOB_EXECUTOR_LOGGER.debugAcquiredJobNotFound("test"); // debug
     ProcessEngineLogger.JOB_EXECUTOR_LOGGER.startingUpJobExecutor("test"); // info
@@ -198,6 +203,7 @@ public class ProcessEngineLoggingRuleTest {
     ProcessEngineLogger.PROCESS_APPLICATION_LOGGER.paDoesNotProvideExecutionListener("test"); // debug
     ProcessEngineLogger.PROCESS_APPLICATION_LOGGER.detectedPa(Object.class); // info
     ProcessEngineLogger.PROCESS_APPLICATION_LOGGER.alreadyDeployed(); // warn
-    ProcessEngineLogger.PROCESS_APPLICATION_LOGGER.couldNotRemoveDefinitionsFromCache(new Throwable()); // error
+    ProcessEngineLogger.PROCESS_APPLICATION_LOGGER
+        .couldNotRemoveDefinitionsFromCache(new Throwable()); // error
   }
 }

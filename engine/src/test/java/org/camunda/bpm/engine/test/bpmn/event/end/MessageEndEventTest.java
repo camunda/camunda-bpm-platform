@@ -46,7 +46,8 @@ public class MessageEndEventTest extends PluggableProcessEngineTestCase {
     variables.put("wasExecuted", true);
     variables.put("expressionWasExecuted", false);
     variables.put("delegateExpressionWasExecuted", false);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        variables);
     assertNotNull(processInstance);
 
     assertProcessEnded(processInstance.getId());

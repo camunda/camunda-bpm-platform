@@ -39,7 +39,7 @@ import org.junit.rules.RuleChain;
 import org.junit.runners.Parameterized;
 
 /**
- * Represents a base class for  some similar handle external task authorization test cases.
+ * Represents a base class for some similar handle external task authorization test cases.
  * 
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
@@ -52,33 +52,26 @@ public abstract class HandleExternalTaskAuthorizationTest {
   public RuleChain chain = RuleChain.outerRule(engineRule).around(authRule);
 
   @Parameterized.Parameter
-  public AuthorizationScenario scenario;  
-  
+  public AuthorizationScenario scenario;
+
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.UPDATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
+            grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId",
+                Permissions.UPDATE_INSTANCE)),
+        scenario().withAuthorizations(
+            grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
+            .succeeds(),
+        scenario().withAuthorizations(
+            grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)).succeeds(),
+        scenario().withAuthorizations(grant(Resources.PROCESS_DEFINITION, "processDefinitionKey",
+            "userId", Permissions.UPDATE_INSTANCE)).succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
+            .succeeds());
   }
 
   @Before
@@ -96,41 +89,38 @@ public abstract class HandleExternalTaskAuthorizationTest {
   public void testCompleteExternalTask() {
 
     // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
-    List<LockedExternalTask> tasks = engineRule.getExternalTaskService()
-        .fetchAndLock(5, "workerId")
-        .topic("externalTaskTopic", 5000L)
-        .execute();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> tasks = engineRule.getExternalTaskService().fetchAndLock(5, "workerId")
+        .topic("externalTaskTopic", 5000L).execute();
 
     LockedExternalTask task = tasks.get(0);
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("processInstanceId", processInstance.getId())
-      .bindResource("processDefinitionKey", "oneExternalTaskProcess")
-      .start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("processInstanceId", processInstance.getId())
+        .bindResource("processDefinitionKey", "oneExternalTaskProcess").start();
 
     testExternalTaskApi(task);
 
     // then
-    if (authRule.assertScenario(scenario)) {      
+    if (authRule.assertScenario(scenario)) {
       assertExternalTaskResults();
     }
   }
-  
+
   /**
-   * Tests or either executes the external task api.
-   * The given locked external task is used to test there api.
+   * Tests or either executes the external task api. The given locked external task is used to test
+   * there api.
    * 
-   * @param task the external task which should be tested
+   * @param task
+   *          the external task which should be tested
    */
   public abstract void testExternalTaskApi(LockedExternalTask task);
-  
+
   /**
-   *  Contains assertions for the external task results, which are executed after the external task 
-   *  was executed.
+   * Contains assertions for the external task results, which are executed after the external task
+   * was executed.
    */
   public abstract void assertExternalTaskResults();
 }

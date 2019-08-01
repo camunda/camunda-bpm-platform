@@ -55,7 +55,8 @@ public class HistoricIncidentAuthorizationTest extends AuthorizationTest {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/authorization/timerStartEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/authorization/anotherOneIncidentProcess.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/authorization/anotherOneIncidentProcess.bpmn20.xml")
+            .getId();
     super.setUp();
   }
 
@@ -420,8 +421,10 @@ public class HistoricIncidentAuthorizationTest extends AuthorizationTest {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
-        List<HistoricIncident> incidents = Context.getProcessEngineConfiguration().getHistoryService().createHistoricIncidentQuery().list();
+        commandContext.getHistoricJobLogManager()
+            .deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
+        List<HistoricIncident> incidents = Context.getProcessEngineConfiguration()
+            .getHistoryService().createHistoricIncidentQuery().list();
         for (HistoricIncident incident : incidents) {
           commandContext.getHistoricIncidentManager().delete((HistoricIncidentEntity) incident);
         }

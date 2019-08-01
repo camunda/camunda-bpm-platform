@@ -81,102 +81,89 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   @Override
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
-    return createProcessInstanceByKey(processDefinitionKey)
-        .execute();
+    return createProcessInstanceByKey(processDefinitionKey).execute();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey) {
-    return createProcessInstanceByKey(processDefinitionKey)
-        .businessKey(businessKey)
-        .execute();
+  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey,
+      String businessKey) {
+    return createProcessInstanceByKey(processDefinitionKey).businessKey(businessKey).execute();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId) {
-    return createProcessInstanceByKey(processDefinitionKey)
-        .businessKey(businessKey)
-        .caseInstanceId(caseInstanceId)
-        .execute();
+  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey,
+      String caseInstanceId) {
+    return createProcessInstanceByKey(processDefinitionKey).businessKey(businessKey)
+        .caseInstanceId(caseInstanceId).execute();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, Map<String, Object> variables) {
-    return createProcessInstanceByKey(processDefinitionKey)
-        .setVariables(variables)
-        .execute();
+  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey,
+      Map<String, Object> variables) {
+    return createProcessInstanceByKey(processDefinitionKey).setVariables(variables).execute();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, Map<String, Object> variables) {
-    return createProcessInstanceByKey(processDefinitionKey)
-        .businessKey(businessKey)
-        .setVariables(variables)
-        .execute();
+  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey,
+      Map<String, Object> variables) {
+    return createProcessInstanceByKey(processDefinitionKey).businessKey(businessKey)
+        .setVariables(variables).execute();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId, Map<String, Object> variables) {
-    return createProcessInstanceByKey(processDefinitionKey)
-        .businessKey(businessKey)
-        .caseInstanceId(caseInstanceId)
-        .setVariables(variables)
-        .execute();
+  public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey,
+      String caseInstanceId, Map<String, Object> variables) {
+    return createProcessInstanceByKey(processDefinitionKey).businessKey(businessKey)
+        .caseInstanceId(caseInstanceId).setVariables(variables).execute();
   }
 
   @Override
   public ProcessInstance startProcessInstanceById(String processDefinitionId) {
-    return createProcessInstanceById(processDefinitionId)
-        .execute();
+    return createProcessInstanceById(processDefinitionId).execute();
   }
 
   @Override
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey) {
-    return createProcessInstanceById(processDefinitionId)
-        .businessKey(businessKey)
-        .execute();
+    return createProcessInstanceById(processDefinitionId).businessKey(businessKey).execute();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId) {
-    return createProcessInstanceById(processDefinitionId)
-        .businessKey(businessKey)
-        .caseInstanceId(caseInstanceId)
-        .execute();
+  public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey,
+      String caseInstanceId) {
+    return createProcessInstanceById(processDefinitionId).businessKey(businessKey)
+        .caseInstanceId(caseInstanceId).execute();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceById(String processDefinitionId, Map<String, Object> variables) {
-    return createProcessInstanceById(processDefinitionId)
-        .setVariables(variables)
-        .execute();
+  public ProcessInstance startProcessInstanceById(String processDefinitionId,
+      Map<String, Object> variables) {
+    return createProcessInstanceById(processDefinitionId).setVariables(variables).execute();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables) {
-    return createProcessInstanceById(processDefinitionId)
-        .businessKey(businessKey)
-        .setVariables(variables)
-        .execute();
+  public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey,
+      Map<String, Object> variables) {
+    return createProcessInstanceById(processDefinitionId).businessKey(businessKey)
+        .setVariables(variables).execute();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId, Map<String, Object> variables) {
-    return createProcessInstanceById(processDefinitionId)
-        .businessKey(businessKey)
-        .caseInstanceId(caseInstanceId)
-        .setVariables(variables)
-        .execute();
+  public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey,
+      String caseInstanceId, Map<String, Object> variables) {
+    return createProcessInstanceById(processDefinitionId).businessKey(businessKey)
+        .caseInstanceId(caseInstanceId).setVariables(variables).execute();
   }
 
   @Override
   public void deleteProcessInstance(String processInstanceId, String deleteReason) {
-    deleteProcessInstance(processInstanceId,deleteReason,false);
+    deleteProcessInstance(processInstanceId, deleteReason, false);
   }
 
   @Override
-  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason) {
-    return deleteProcessInstancesAsync(processInstanceIds, processInstanceQuery, deleteReason, false);
+  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds,
+      ProcessInstanceQuery processInstanceQuery, String deleteReason) {
+    return deleteProcessInstancesAsync(processInstanceIds, processInstanceQuery, deleteReason,
+        false);
   }
 
   @Override
@@ -185,59 +172,81 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public Batch deleteProcessInstancesAsync(ProcessInstanceQuery processInstanceQuery, String deleteReason) {
+  public Batch deleteProcessInstancesAsync(ProcessInstanceQuery processInstanceQuery,
+      String deleteReason) {
     return deleteProcessInstancesAsync(null, processInstanceQuery, deleteReason, false);
   }
 
   @Override
-  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners) {
-    return deleteProcessInstancesAsync(processInstanceIds, processInstanceQuery, deleteReason, skipCustomListeners, false);
+  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds,
+      ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners) {
+    return deleteProcessInstancesAsync(processInstanceIds, processInstanceQuery, deleteReason,
+        skipCustomListeners, false);
   }
 
   @Override
-  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses) {
-    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds, processInstanceQuery, deleteReason, skipCustomListeners, skipSubprocesses));
-  }
-
-  @Override
-  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners) {
-    deleteProcessInstance(processInstanceId,deleteReason,skipCustomListeners,false);
-  }
-
-  @Override
-  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated) {
-    deleteProcessInstance(processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, false);
-  }
-
-  @Override
-  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings) {
-    deleteProcessInstance(processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, skipIoMappings, false);
-  }
-
-  @Override
-  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings, boolean skipSubprocesses) {
-    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses, true));
-  }
-
-  @Override
-  public void deleteProcessInstanceIfExists(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings, boolean skipSubprocesses) {
-    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses, false));
-  }
-
-  @Override
-  public void deleteProcessInstances(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated){
-    deleteProcessInstances(processInstanceIds, deleteReason, skipCustomListeners, externallyTerminated, false);
-  }
-
-  @Override
-  public void deleteProcessInstances(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipSubprocesses){
-    commandExecutor.execute(new DeleteProcessInstancesCmd(processInstanceIds, deleteReason, skipCustomListeners, externallyTerminated, skipSubprocesses, true));
-  }
-
-  @Override
-  public void deleteProcessInstancesIfExists(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated,
+  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds,
+      ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners,
       boolean skipSubprocesses) {
-    commandExecutor.execute(new DeleteProcessInstancesCmd(processInstanceIds, deleteReason, skipCustomListeners, externallyTerminated, skipSubprocesses, false));
+    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds,
+        processInstanceQuery, deleteReason, skipCustomListeners, skipSubprocesses));
+  }
+
+  @Override
+  public void deleteProcessInstance(String processInstanceId, String deleteReason,
+      boolean skipCustomListeners) {
+    deleteProcessInstance(processInstanceId, deleteReason, skipCustomListeners, false);
+  }
+
+  @Override
+  public void deleteProcessInstance(String processInstanceId, String deleteReason,
+      boolean skipCustomListeners, boolean externallyTerminated) {
+    deleteProcessInstance(processInstanceId, deleteReason, skipCustomListeners,
+        externallyTerminated, false);
+  }
+
+  @Override
+  public void deleteProcessInstance(String processInstanceId, String deleteReason,
+      boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings) {
+    deleteProcessInstance(processInstanceId, deleteReason, skipCustomListeners,
+        externallyTerminated, skipIoMappings, false);
+  }
+
+  @Override
+  public void deleteProcessInstance(String processInstanceId, String deleteReason,
+      boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings,
+      boolean skipSubprocesses) {
+    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason,
+        skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses, true));
+  }
+
+  @Override
+  public void deleteProcessInstanceIfExists(String processInstanceId, String deleteReason,
+      boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings,
+      boolean skipSubprocesses) {
+    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason,
+        skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses, false));
+  }
+
+  @Override
+  public void deleteProcessInstances(List<String> processInstanceIds, String deleteReason,
+      boolean skipCustomListeners, boolean externallyTerminated) {
+    deleteProcessInstances(processInstanceIds, deleteReason, skipCustomListeners,
+        externallyTerminated, false);
+  }
+
+  @Override
+  public void deleteProcessInstances(List<String> processInstanceIds, String deleteReason,
+      boolean skipCustomListeners, boolean externallyTerminated, boolean skipSubprocesses) {
+    commandExecutor.execute(new DeleteProcessInstancesCmd(processInstanceIds, deleteReason,
+        skipCustomListeners, externallyTerminated, skipSubprocesses, true));
+  }
+
+  @Override
+  public void deleteProcessInstancesIfExists(List<String> processInstanceIds, String deleteReason,
+      boolean skipCustomListeners, boolean externallyTerminated, boolean skipSubprocesses) {
+    commandExecutor.execute(new DeleteProcessInstancesCmd(processInstanceIds, deleteReason,
+        skipCustomListeners, externallyTerminated, skipSubprocesses, false));
   }
 
   @Override
@@ -259,7 +268,6 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public IncidentQuery createIncidentQuery() {
     return new IncidentQueryImpl(commandExecutor);
   }
-
 
   @Override
   public EventSubscriptionQuery createEventSubscriptionQuery() {
@@ -283,7 +291,8 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   @Override
   public VariableMap getVariablesTyped(String executionId, boolean deserializeObjectValues) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, false, deserializeObjectValues));
+    return commandExecutor
+        .execute(new GetExecutionVariablesCmd(executionId, null, false, deserializeObjectValues));
   }
 
   @Override
@@ -298,7 +307,8 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   @Override
   public VariableMap getVariablesLocalTyped(String executionId, boolean deserializeObjectValues) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, true, deserializeObjectValues));
+    return commandExecutor
+        .execute(new GetExecutionVariablesCmd(executionId, null, true, deserializeObjectValues));
   }
 
   @Override
@@ -307,8 +317,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public VariableMap getVariablesTyped(String executionId, Collection<String> variableNames, boolean deserializeObjectValues) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, variableNames, false, deserializeObjectValues));
+  public VariableMap getVariablesTyped(String executionId, Collection<String> variableNames,
+      boolean deserializeObjectValues) {
+    return commandExecutor.execute(
+        new GetExecutionVariablesCmd(executionId, variableNames, false, deserializeObjectValues));
   }
 
   @Override
@@ -317,8 +329,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public VariableMap getVariablesLocalTyped(String executionId, Collection<String> variableNames, boolean deserializeObjectValues) {
-    return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, variableNames, true, deserializeObjectValues));
+  public VariableMap getVariablesLocalTyped(String executionId, Collection<String> variableNames,
+      boolean deserializeObjectValues) {
+    return commandExecutor.execute(
+        new GetExecutionVariablesCmd(executionId, variableNames, true, deserializeObjectValues));
   }
 
   @Override
@@ -332,8 +346,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public <T extends TypedValue> T getVariableTyped(String executionId, String variableName, boolean deserializeObjectValue) {
-    return commandExecutor.execute(new GetExecutionVariableTypedCmd<T>(executionId, variableName, false, deserializeObjectValue));
+  public <T extends TypedValue> T getVariableTyped(String executionId, String variableName,
+      boolean deserializeObjectValue) {
+    return commandExecutor.execute(new GetExecutionVariableTypedCmd<T>(executionId, variableName,
+        false, deserializeObjectValue));
   }
 
   @Override
@@ -342,8 +358,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public <T extends TypedValue> T getVariableLocalTyped(String executionId, String variableName, boolean deserializeObjectValue) {
-    return commandExecutor.execute(new GetExecutionVariableTypedCmd<T>(executionId, variableName, true, deserializeObjectValue));
+  public <T extends TypedValue> T getVariableLocalTyped(String executionId, String variableName,
+      boolean deserializeObjectValue) {
+    return commandExecutor.execute(new GetExecutionVariableTypedCmd<T>(executionId, variableName,
+        true, deserializeObjectValue));
   }
 
   @Override
@@ -377,7 +395,8 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     setVariables(executionId, variables, true);
   }
 
-  protected void setVariables(String executionId, Map<String, ? extends Object> variables, boolean local) {
+  protected void setVariables(String executionId, Map<String, ? extends Object> variables,
+      boolean local) {
     try {
       commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, local));
     } catch (ProcessEngineException ex) {
@@ -413,17 +432,21 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     commandExecutor.execute(new RemoveExecutionVariablesCmd(executionId, variableNames, true));
   }
 
-  public void updateVariables(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
+  public void updateVariables(String executionId, Map<String, ? extends Object> modifications,
+      Collection<String> deletions) {
     updateVariables(executionId, modifications, deletions, false);
   }
 
-  public void updateVariablesLocal(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
+  public void updateVariablesLocal(String executionId, Map<String, ? extends Object> modifications,
+      Collection<String> deletions) {
     updateVariables(executionId, modifications, deletions, true);
   }
 
-  protected void updateVariables(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions, boolean local) {
+  protected void updateVariables(String executionId, Map<String, ? extends Object> modifications,
+      Collection<String> deletions, boolean local) {
     try {
-      commandExecutor.execute(new PatchExecutionVariablesCmd(executionId, modifications, deletions, local));
+      commandExecutor
+          .execute(new PatchExecutionVariablesCmd(executionId, modifications, deletions, local));
     } catch (ProcessEngineException ex) {
       if (ExceptionUtil.checkValueTooLongException(ex)) {
         throw new BadUserRequestException("Variable value is too long", ex);
@@ -432,15 +455,14 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     }
   }
 
-
-
   @Override
   public void signal(String executionId) {
     commandExecutor.execute(new SignalCmd(executionId, null, null, null));
   }
 
   @Override
-  public void signal(String executionId, String signalName, Object signalData, Map<String, Object> processVariables) {
+  public void signal(String executionId, String signalName, Object signalData,
+      Map<String, Object> processVariables) {
     commandExecutor.execute(new SignalCmd(executionId, signalName, signalData, processVariables));
   }
 
@@ -470,44 +492,32 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   @Override
   public void suspendProcessInstanceById(String processInstanceId) {
-    updateProcessInstanceSuspensionState()
-      .byProcessInstanceId(processInstanceId)
-      .suspend();
+    updateProcessInstanceSuspensionState().byProcessInstanceId(processInstanceId).suspend();
   }
 
   @Override
   public void suspendProcessInstanceByProcessDefinitionId(String processDefinitionId) {
-    updateProcessInstanceSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .suspend();
+    updateProcessInstanceSuspensionState().byProcessDefinitionId(processDefinitionId).suspend();
   }
 
   @Override
   public void suspendProcessInstanceByProcessDefinitionKey(String processDefinitionKey) {
-    updateProcessInstanceSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .suspend();
+    updateProcessInstanceSuspensionState().byProcessDefinitionKey(processDefinitionKey).suspend();
   }
 
   @Override
   public void activateProcessInstanceById(String processInstanceId) {
-    updateProcessInstanceSuspensionState()
-      .byProcessInstanceId(processInstanceId)
-      .activate();
+    updateProcessInstanceSuspensionState().byProcessInstanceId(processInstanceId).activate();
   }
 
   @Override
   public void activateProcessInstanceByProcessDefinitionId(String processDefinitionId) {
-    updateProcessInstanceSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .activate();
+    updateProcessInstanceSuspensionState().byProcessDefinitionId(processDefinitionId).activate();
   }
 
   @Override
   public void activateProcessInstanceByProcessDefinitionKey(String processDefinitionKey) {
-    updateProcessInstanceSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .activate();
+    updateProcessInstanceSuspensionState().byProcessDefinitionKey(processDefinitionKey).activate();
   }
 
   @Override
@@ -522,55 +532,50 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   @Override
   public ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey) {
-    return createMessageCorrelation(messageName)
-        .processInstanceBusinessKey(businessKey)
+    return createMessageCorrelation(messageName).processInstanceBusinessKey(businessKey)
         .correlateStartMessage();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables) {
-    return createMessageCorrelation(messageName)
-        .setVariables(processVariables)
+  public ProcessInstance startProcessInstanceByMessage(String messageName,
+      Map<String, Object> processVariables) {
+    return createMessageCorrelation(messageName).setVariables(processVariables)
         .correlateStartMessage();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map<String, Object> processVariables) {
-    return createMessageCorrelation(messageName)
-        .processInstanceBusinessKey(businessKey)
-        .setVariables(processVariables)
+  public ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey,
+      Map<String, Object> processVariables) {
+    return createMessageCorrelation(messageName).processInstanceBusinessKey(businessKey)
+        .setVariables(processVariables).correlateStartMessage();
+  }
+
+  @Override
+  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName,
+      String processDefinitionId) {
+    return createMessageCorrelation(messageName).processDefinitionId(processDefinitionId)
         .correlateStartMessage();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId) {
-    return createMessageCorrelation(messageName)
-        .processDefinitionId(processDefinitionId)
-        .correlateStartMessage();
+  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName,
+      String processDefinitionId, String businessKey) {
+    return createMessageCorrelation(messageName).processDefinitionId(processDefinitionId)
+        .processInstanceBusinessKey(businessKey).correlateStartMessage();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey) {
-    return createMessageCorrelation(messageName)
-        .processDefinitionId(processDefinitionId)
-        .processInstanceBusinessKey(businessKey)
-        .correlateStartMessage();
+  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName,
+      String processDefinitionId, Map<String, Object> processVariables) {
+    return createMessageCorrelation(messageName).processDefinitionId(processDefinitionId)
+        .setVariables(processVariables).correlateStartMessage();
   }
 
   @Override
-  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, Map<String, Object> processVariables) {
-    return createMessageCorrelation(messageName)
-        .processDefinitionId(processDefinitionId)
-        .setVariables(processVariables)
-        .correlateStartMessage();
-  }
-
-  @Override
-  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName, String processDefinitionId, String businessKey, Map<String, Object> processVariables) {
-    return createMessageCorrelation(messageName)
-        .processDefinitionId(processDefinitionId)
-        .processInstanceBusinessKey(businessKey)
-        .setVariables(processVariables)
+  public ProcessInstance startProcessInstanceByMessageAndProcessDefinitionId(String messageName,
+      String processDefinitionId, String businessKey, Map<String, Object> processVariables) {
+    return createMessageCorrelation(messageName).processDefinitionId(processDefinitionId)
+        .processInstanceBusinessKey(businessKey).setVariables(processVariables)
         .correlateStartMessage();
   }
 
@@ -590,7 +595,8 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables) {
+  public void signalEventReceived(String signalName, String executionId,
+      Map<String, Object> processVariables) {
     createSignalEvent(signalName).executionId(executionId).setVariables(processVariables).send();
   }
 
@@ -606,9 +612,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables) {
+  public void messageEventReceived(String messageName, String executionId,
+      Map<String, Object> processVariables) {
     ensureNotNull("messageName", messageName);
-    commandExecutor.execute(new MessageEventReceivedCmd(messageName, executionId, processVariables));
+    commandExecutor
+        .execute(new MessageEventReceivedCmd(messageName, executionId, processVariables));
   }
 
   @Override
@@ -617,22 +625,18 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public void correlateMessage(String messageName, Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
-    createMessageCorrelation(messageName)
-      .processInstanceVariablesEqual(correlationKeys)
-      .setVariables(processVariables)
-      .correlate();
+  public void correlateMessage(String messageName, Map<String, Object> correlationKeys,
+      Map<String, Object> processVariables) {
+    createMessageCorrelation(messageName).processInstanceVariablesEqual(correlationKeys)
+        .setVariables(processVariables).correlate();
   }
 
   @Override
   public void correlateMessage(String messageName, String businessKey,
       Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
 
-    createMessageCorrelation(messageName)
-      .processInstanceVariablesEqual(correlationKeys)
-      .processInstanceBusinessKey(businessKey)
-      .setVariables(processVariables)
-      .correlate();
+    createMessageCorrelation(messageName).processInstanceVariablesEqual(correlationKeys)
+        .processInstanceBusinessKey(businessKey).setVariables(processVariables).correlate();
   }
 
   @Override
@@ -642,44 +646,45 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   @Override
   public void correlateMessage(String messageName, String businessKey) {
-    createMessageCorrelation(messageName)
-      .processInstanceBusinessKey(businessKey)
-      .correlate();
+    createMessageCorrelation(messageName).processInstanceBusinessKey(businessKey).correlate();
   }
 
   @Override
   public void correlateMessage(String messageName, Map<String, Object> correlationKeys) {
-    createMessageCorrelation(messageName)
-      .processInstanceVariablesEqual(correlationKeys)
-      .correlate();
+    createMessageCorrelation(messageName).processInstanceVariablesEqual(correlationKeys)
+        .correlate();
   }
 
   @Override
-  public void correlateMessage(String messageName, String businessKey, Map<String, Object> processVariables) {
-    createMessageCorrelation(messageName)
-      .processInstanceBusinessKey(businessKey)
-      .setVariables(processVariables)
-      .correlate();
+  public void correlateMessage(String messageName, String businessKey,
+      Map<String, Object> processVariables) {
+    createMessageCorrelation(messageName).processInstanceBusinessKey(businessKey)
+        .setVariables(processVariables).correlate();
   }
 
   @Override
-  public ProcessInstanceModificationBuilder createProcessInstanceModification(String processInstanceId) {
+  public ProcessInstanceModificationBuilder createProcessInstanceModification(
+      String processInstanceId) {
     return new ProcessInstanceModificationBuilderImpl(commandExecutor, processInstanceId);
   }
 
   @Override
   public ProcessInstantiationBuilder createProcessInstanceById(String processDefinitionId) {
-    return ProcessInstantiationBuilderImpl.createProcessInstanceById(commandExecutor, processDefinitionId);
+    return ProcessInstantiationBuilderImpl.createProcessInstanceById(commandExecutor,
+        processDefinitionId);
   }
 
   @Override
   public ProcessInstantiationBuilder createProcessInstanceByKey(String processDefinitionKey) {
-    return ProcessInstantiationBuilderImpl.createProcessInstanceByKey(commandExecutor, processDefinitionKey);
+    return ProcessInstantiationBuilderImpl.createProcessInstanceByKey(commandExecutor,
+        processDefinitionKey);
   }
 
   @Override
-  public MigrationPlanBuilder createMigrationPlan(String sourceProcessDefinitionId, String targetProcessDefinitionId) {
-    return new MigrationPlanBuilderImpl(commandExecutor, sourceProcessDefinitionId, targetProcessDefinitionId);
+  public MigrationPlanBuilder createMigrationPlan(String sourceProcessDefinitionId,
+      String targetProcessDefinitionId) {
+    return new MigrationPlanBuilderImpl(commandExecutor, sourceProcessDefinitionId,
+        targetProcessDefinitionId);
   }
 
   @Override
@@ -701,8 +706,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return createIncident(incidentType, executionId, configuration, null);
   }
 
-  public Incident createIncident(String incidentType, String executionId, String configuration, String message) {
-    return commandExecutor.execute(new CreateIncidentCmd(incidentType, executionId, configuration, message));
+  public Incident createIncident(String incidentType, String executionId, String configuration,
+      String message) {
+    return commandExecutor
+        .execute(new CreateIncidentCmd(incidentType, executionId, configuration, message));
   }
 
   public void resolveIncident(String incidentId) {

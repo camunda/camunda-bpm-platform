@@ -58,7 +58,6 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class StandaloneTaskGetVariableAuthorizationTest {
 
-
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
 
@@ -82,18 +81,10 @@ public class StandaloneTaskGetVariableAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(TASK, "taskId", userId, READ_VARIABLE)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "taskId", userId, READ_VARIABLE)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "*", userId, READ_VARIABLE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations()
+            .failsDueToRequired(grant(TASK, "taskId", userId, READ_VARIABLE)),
+        scenario().withAuthorizations(grant(TASK, "taskId", userId, READ_VARIABLE)),
+        scenario().withAuthorizations(grant(TASK, "*", userId, READ_VARIABLE)).succeeds());
   }
 
   @Before
@@ -103,7 +94,8 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     runtimeService = engineRule.getRuntimeService();
 
     authRule.createUserAndGroup("userId", "groupId");
-    ensureSpecificVariablePermission = processEngineConfiguration.isEnforceSpecificVariablePermission();
+    ensureSpecificVariablePermission = processEngineConfiguration
+        .isEnforceSpecificVariablePermission();
     // prerequisite of the whole test suite
     processEngineConfiguration.setEnforceSpecificVariablePermission(true);
   }
@@ -112,7 +104,8 @@ public class StandaloneTaskGetVariableAuthorizationTest {
   public void tearDown() {
     authRule.deleteUsersAndGroups();
     taskService.deleteTask(taskId, true);
-    processEngineConfiguration.setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
+    processEngineConfiguration
+        .setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   @Test
@@ -123,11 +116,7 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariables(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     Object variable = taskService.getVariable(taskId, VARIABLE_NAME);
 
@@ -146,11 +135,7 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariablesLocal(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     Object variable = taskService.getVariableLocal(taskId, VARIABLE_NAME);
 
@@ -169,11 +154,7 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariables(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     TypedValue typedValue = taskService.getVariableTyped(taskId, VARIABLE_NAME);
 
@@ -193,11 +174,7 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariablesLocal(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     TypedValue typedValue = taskService.getVariableLocalTyped(taskId, VARIABLE_NAME);
 
@@ -217,11 +194,7 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariables(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     Map<String, Object> variables = taskService.getVariables(taskId);
 
@@ -241,11 +214,7 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariablesLocal(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     Map<String, Object> variables = taskService.getVariablesLocal(taskId);
 
@@ -264,11 +233,7 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariables(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     VariableMap variables = taskService.getVariablesTyped(taskId);
 
@@ -287,11 +252,7 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariablesLocal(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     VariableMap variables = taskService.getVariablesLocalTyped(taskId);
 
@@ -311,11 +272,7 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariables(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     Map<String, Object> variables = taskService.getVariables(taskId, Arrays.asList(VARIABLE_NAME));
 
@@ -335,13 +292,10 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariablesLocal(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
-    Map<String, Object> variables = taskService.getVariablesLocal(taskId, Arrays.asList(VARIABLE_NAME));
+    Map<String, Object> variables = taskService.getVariablesLocal(taskId,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -358,13 +312,10 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariables(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
-    VariableMap variables = taskService.getVariablesTyped(taskId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = taskService.getVariablesTyped(taskId, Arrays.asList(VARIABLE_NAME),
+        false);
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -381,13 +332,10 @@ public class StandaloneTaskGetVariableAuthorizationTest {
     taskService.setVariablesLocal(taskId, getVariables());
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
-    VariableMap variables = taskService.getVariablesLocalTyped(taskId, Arrays.asList(VARIABLE_NAME), false);
+    VariableMap variables = taskService.getVariablesLocalTyped(taskId, Arrays.asList(VARIABLE_NAME),
+        false);
 
     // then
     if (authRule.assertScenario(scenario)) {

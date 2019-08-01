@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 
-
 /**
  * A simple first level cache for {@link DbEntity Entities}.
  *
@@ -51,7 +50,7 @@ public class DbEntityCache {
    * The motivation for indexing by type (class) is
    *
    * a) multiple entities of different types could have the same value as primary key. In the
-   *    process engine, TaskEntity and HistoricTaskEntity have the same id value.
+   * process engine, TaskEntity and HistoricTaskEntity have the same id value.
    *
    * b) performance (?)
    */
@@ -70,23 +69,26 @@ public class DbEntityCache {
   /**
    * get an object from the cache
    *
-   * @param type the type of the object
-   * @param id the id of the object
+   * @param type
+   *          the type of the object
+   * @param id
+   *          the id of the object
    * @return the object or 'null' if the object is not in the cache
-   * @throws ProcessEngineException if an object for the given id can be found but is of the wrong type.
+   * @throws ProcessEngineException
+   *           if an object for the given id can be found but is of the wrong type.
    */
   @SuppressWarnings("unchecked")
   public <T extends DbEntity> T get(Class<T> type, String id) {
     Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(type);
     CachedDbEntity cachedDbEntity = getCachedEntity(cacheKey, id);
-    if(cachedDbEntity != null) {
+    if (cachedDbEntity != null) {
       DbEntity dbEntity = cachedDbEntity.getEntity();
       if (!type.isAssignableFrom(dbEntity.getClass())) {
         throw LOG.entityCacheLookupException(type, id, dbEntity.getClass(), null);
       }
       try {
         return (T) dbEntity;
-      } catch(ClassCastException e) {
+      } catch (ClassCastException e) {
         throw LOG.entityCacheLookupException(type, id, dbEntity.getClass(), e);
       }
     } else {
@@ -99,7 +101,7 @@ public class DbEntityCache {
     Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(type);
     Map<String, CachedDbEntity> entities = cachedEntites.get(cacheKey);
     List<T> result = new ArrayList<T>();
-    if(entities == null) {
+    if (entities == null) {
       return Collections.emptyList();
     } else {
       for (CachedDbEntity cachedEntity : entities.values()) {
@@ -122,14 +124,16 @@ public class DbEntityCache {
   /**
    * Looks up an entity in the cache.
    *
-   * @param type the type of the object
-   * @param id the id of the CachedEntity to lookup
+   * @param type
+   *          the type of the object
+   * @param id
+   *          the id of the CachedEntity to lookup
    * @return the cached entity or null if the entity does not exist.
    */
   public CachedDbEntity getCachedEntity(Class<?> type, String id) {
     Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(type);
     Map<String, CachedDbEntity> entitiesByType = cachedEntites.get(cacheKey);
-    if(entitiesByType != null) {
+    if (entitiesByType != null) {
       return entitiesByType.get(id);
     } else {
       return null;
@@ -138,7 +142,9 @@ public class DbEntityCache {
 
   /**
    * Looks up an entity in the cache.
-   * @param dbEntity the entity for which the CachedEntity should be looked up
+   * 
+   * @param dbEntity
+   *          the entity for which the CachedEntity should be looked up
    * @return the cached entity or null if the entity does not exist.
    */
   public CachedDbEntity getCachedEntity(DbEntity dbEntity) {
@@ -148,7 +154,8 @@ public class DbEntityCache {
   /**
    * Put a new, {@link DbEntityState#TRANSIENT} object into the cache.
    *
-   * @param e the object to put into the cache
+   * @param e
+   *          the object to put into the cache
    */
   public void putTransient(DbEntity e) {
     CachedDbEntity cachedDbEntity = new CachedDbEntity();
@@ -160,7 +167,8 @@ public class DbEntityCache {
   /**
    * Put a {@link DbEntityState#PERSISTENT} object into the cache.
    *
-   * @param e the object to put into the cache
+   * @param e
+   *          the object to put into the cache
    */
   public void putPersistent(DbEntity e) {
     CachedDbEntity cachedDbEntity = new CachedDbEntity();
@@ -175,7 +183,8 @@ public class DbEntityCache {
   /**
    * Put a {@link DbEntityState#MERGED} object into the cache.
    *
-   * @param e the object to put into the cache
+   * @param e
+   *          the object to put into the cache
    */
   public void putMerged(DbEntity e) {
     CachedDbEntity cachedDbEntity = new CachedDbEntity();
@@ -192,14 +201,14 @@ public class DbEntityCache {
     Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(type);
 
     Map<String, CachedDbEntity> map = cachedEntites.get(cacheKey);
-    if(map == null) {
+    if (map == null) {
       map = new HashMap<String, CachedDbEntity>();
       cachedEntites.put(cacheKey, map);
     }
 
     // check whether this object is already present in the cache
     CachedDbEntity existingCachedEntity = map.get(entityToAdd.getEntity().getId());
-    if(existingCachedEntity == null) {
+    if (existingCachedEntity == null) {
       // no such entity exists -> put it into the cache
       map.put(entityToAdd.getEntity().getId(), entityToAdd);
 
@@ -209,22 +218,21 @@ public class DbEntityCache {
 
       case TRANSIENT:
         // cannot put TRANSIENT entity if entity with same id already exists in cache.
-        if(existingCachedEntity.getEntityState() == TRANSIENT) {
+        if (existingCachedEntity.getEntityState() == TRANSIENT) {
           throw LOG.entityCacheDuplicateEntryException("TRANSIENT", entityToAdd.getEntity().getId(),
-            entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
-        }
-        else {
+              entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
+        } else {
           throw LOG.alreadyMarkedEntityInEntityCacheException(entityToAdd.getEntity().getId(),
-            entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
+              entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
         }
 
       case PERSISTENT:
-        if(existingCachedEntity.getEntityState() == PERSISTENT) {
+        if (existingCachedEntity.getEntityState() == PERSISTENT) {
           // use new entity state, replacing the existing one.
           map.put(entityToAdd.getEntity().getId(), entityToAdd);
           break;
         }
-        if(existingCachedEntity.getEntityState() == DELETED_PERSISTENT
+        if (existingCachedEntity.getEntityState() == DELETED_PERSISTENT
             || existingCachedEntity.getEntityState() == DELETED_MERGED) {
           // ignore put -> this is already marked to be deleted
           break;
@@ -232,16 +240,16 @@ public class DbEntityCache {
 
         // otherwise fail:
         throw LOG.entityCacheDuplicateEntryException("PERSISTENT", entityToAdd.getEntity().getId(),
-          entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
+            entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
 
       case MERGED:
-        if(existingCachedEntity.getEntityState() == PERSISTENT
+        if (existingCachedEntity.getEntityState() == PERSISTENT
             || existingCachedEntity.getEntityState() == MERGED) {
           // use new entity state, replacing the existing one.
           map.put(entityToAdd.getEntity().getId(), entityToAdd);
           break;
         }
-        if(existingCachedEntity.getEntityState() == DELETED_PERSISTENT
+        if (existingCachedEntity.getEntityState() == DELETED_PERSISTENT
             || existingCachedEntity.getEntityState() == DELETED_MERGED) {
           // ignore put -> this is already marked to be deleted
           break;
@@ -249,7 +257,7 @@ public class DbEntityCache {
 
         // otherwise fail:
         throw LOG.entityCacheDuplicateEntryException("MERGED", entityToAdd.getEntity().getId(),
-          entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
+            entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
 
       default:
         // deletes are always added
@@ -261,13 +269,15 @@ public class DbEntityCache {
 
   /**
    * Remove an entity from the cache
-   * @param e the entity to remove
+   * 
+   * @param e
+   *          the entity to remove
    * @return
    */
   public boolean remove(DbEntity e) {
     Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(e.getClass());
     Map<String, CachedDbEntity> typeMap = cachedEntites.get(cacheKey);
-    if(typeMap != null) {
+    if (typeMap != null) {
       return typeMap.remove(e.getId()) != null;
     } else {
       return false;
@@ -284,7 +294,8 @@ public class DbEntityCache {
   /**
    * Allows checking whether the provided entity is present in the cache
    *
-   * @param dbEntity the entity to check
+   * @param dbEntity
+   *          the entity to check
    * @return true if the the provided entity is present in the cache
    */
   public boolean contains(DbEntity dbEntity) {
@@ -292,16 +303,17 @@ public class DbEntityCache {
   }
 
   /**
-   * Allows checking whether the provided entity is present in the cache
-   * and is {@link DbEntityState#PERSISTENT}.
-   *
-   * @param dbEntity the entity to check
-   * @return true if the provided entity is present in the cache and is
+   * Allows checking whether the provided entity is present in the cache and is
    * {@link DbEntityState#PERSISTENT}.
+   *
+   * @param dbEntity
+   *          the entity to check
+   * @return true if the provided entity is present in the cache and is
+   *         {@link DbEntityState#PERSISTENT}.
    */
   public boolean isPersistent(DbEntity dbEntity) {
     CachedDbEntity cachedDbEntity = getCachedEntity(dbEntity);
-    if(cachedDbEntity == null) {
+    if (cachedDbEntity == null) {
       return false;
     } else {
       return cachedDbEntity.getEntityState() == PERSISTENT;
@@ -309,16 +321,16 @@ public class DbEntityCache {
   }
 
   /**
-   * Allows checking whether the provided entity is present in the cache
-   * and is marked to be deleted.
+   * Allows checking whether the provided entity is present in the cache and is marked to be
+   * deleted.
    *
-   * @param dbEntity the entity to check
-   * @return true if the provided entity is present in the cache and is
-   * marked to be deleted
+   * @param dbEntity
+   *          the entity to check
+   * @return true if the provided entity is present in the cache and is marked to be deleted
    */
   public boolean isDeleted(DbEntity dbEntity) {
     CachedDbEntity cachedDbEntity = getCachedEntity(dbEntity);
-    if(cachedDbEntity == null) {
+    if (cachedDbEntity == null) {
       return false;
     } else {
       return cachedDbEntity.getEntityState() == DELETED_MERGED
@@ -328,16 +340,17 @@ public class DbEntityCache {
   }
 
   /**
-   * Allows checking whether the provided entity is present in the cache
-   * and is {@link DbEntityState#TRANSIENT}.
-   *
-   * @param dbEntity the entity to check
-   * @return true if the provided entity is present in the cache and is
+   * Allows checking whether the provided entity is present in the cache and is
    * {@link DbEntityState#TRANSIENT}.
+   *
+   * @param dbEntity
+   *          the entity to check
+   * @return true if the provided entity is present in the cache and is
+   *         {@link DbEntityState#TRANSIENT}.
    */
   public boolean isTransient(DbEntity dbEntity) {
     CachedDbEntity cachedDbEntity = getCachedEntity(dbEntity);
-    if(cachedDbEntity == null) {
+    if (cachedDbEntity == null) {
       return false;
     } else {
       return cachedDbEntity.getEntityState() == TRANSIENT;
@@ -353,21 +366,22 @@ public class DbEntityCache {
   }
 
   /**
-   * Sets an object to a deleted state. It will not be removed from the cache but
-   * transition to one of the DELETED states, depending on it's current state.
+   * Sets an object to a deleted state. It will not be removed from the cache but transition to one
+   * of the DELETED states, depending on it's current state.
    *
-   * @param dbEntity the object to mark deleted.
+   * @param dbEntity
+   *          the object to mark deleted.
    */
   public void setDeleted(DbEntity dbEntity) {
     CachedDbEntity cachedEntity = getCachedEntity(dbEntity);
-    if(cachedEntity != null) {
-      if(cachedEntity.getEntityState() == TRANSIENT) {
+    if (cachedEntity != null) {
+      if (cachedEntity.getEntityState() == TRANSIENT) {
         cachedEntity.setEntityState(DELETED_TRANSIENT);
 
-      } else if(cachedEntity.getEntityState() == PERSISTENT){
+      } else if (cachedEntity.getEntityState() == PERSISTENT) {
         cachedEntity.setEntityState(DELETED_PERSISTENT);
 
-      } else if(cachedEntity.getEntityState() == MERGED){
+      } else if (cachedEntity.getEntityState() == MERGED) {
         cachedEntity.setEntityState(DELETED_MERGED);
       }
     } else {
@@ -384,8 +398,7 @@ public class DbEntityCache {
     CachedDbEntity cachedEntity = getCachedEntity(dbEntity);
     if (cachedEntity.getEntityState() == DbEntityState.DELETED_TRANSIENT) {
       cachedEntity.setEntityState(DbEntityState.TRANSIENT);
-    }
-    else {
+    } else {
       cachedEntity.setEntityState(DbEntityState.MERGED);
     }
   }

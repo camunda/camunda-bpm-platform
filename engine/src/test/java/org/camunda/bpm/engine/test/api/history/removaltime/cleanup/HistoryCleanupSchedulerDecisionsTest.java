@@ -48,7 +48,8 @@ import static org.junit.Assert.assertThat;
 public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configure(configuration, HistoryEventTypes.DMN_DECISION_EVALUATE);
     }
   };
@@ -57,7 +58,8 @@ public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanup
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
 
@@ -73,23 +75,15 @@ public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanup
   }
 
   protected final String CALLING_PROCESS_CALLS_DMN_KEY = "callingProcessCallsDmn";
-  protected final BpmnModelInstance CALLING_PROCESS_CALLS_DMN = Bpmn.createExecutableProcess(CALLING_PROCESS_CALLS_DMN_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .businessRuleTask()
-        .camundaDecisionRef("dish-decision")
-        .multiInstance()
-          .sequential()
-          .cardinality("5")
-        .multiInstanceDone()
-    .endEvent().done();
+  protected final BpmnModelInstance CALLING_PROCESS_CALLS_DMN = Bpmn
+      .createExecutableProcess(CALLING_PROCESS_CALLS_DMN_KEY).camundaHistoryTimeToLive(5)
+      .startEvent().businessRuleTask().camundaDecisionRef("dish-decision").multiInstance()
+      .sequential().cardinality("5").multiInstanceDone().endEvent().done();
 
   protected final Date END_DATE = new Date(1363608000000L);
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldScheduleToNowByDecisionInputs() {
     // given
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
@@ -97,9 +91,7 @@ public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanup
     ClockUtil.setCurrentTime(END_DATE);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     engineConfiguration.setHistoryCleanupBatchSize(20);
     engineConfiguration.initHistoryCleanup();
@@ -117,9 +109,7 @@ public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanup
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldScheduleToLaterByDecisionInputs() {
     // given
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
@@ -127,9 +117,7 @@ public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanup
     ClockUtil.setCurrentTime(END_DATE);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     engineConfiguration.setHistoryCleanupBatchSize(21);
     engineConfiguration.initHistoryCleanup();
@@ -148,8 +136,7 @@ public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanup
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/api/history/removaltime/cleanup/decisonWithThreeOutputs.dmn11.xml"
-  })
+      "org/camunda/bpm/engine/test/api/history/removaltime/cleanup/decisonWithThreeOutputs.dmn11.xml" })
   public void shouldScheduleToNowByDecisionOutputs() {
     // given
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
@@ -157,9 +144,7 @@ public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanup
     ClockUtil.setCurrentTime(END_DATE);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     engineConfiguration.setHistoryCleanupBatchSize(25);
     engineConfiguration.initHistoryCleanup();
@@ -178,8 +163,7 @@ public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanup
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/api/history/removaltime/cleanup/decisonWithThreeOutputs.dmn11.xml"
-  })
+      "org/camunda/bpm/engine/test/api/history/removaltime/cleanup/decisonWithThreeOutputs.dmn11.xml" })
   public void shouldScheduleToLaterByDecisionOutputs() {
     // given
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
@@ -187,9 +171,7 @@ public class HistoryCleanupSchedulerDecisionsTest extends AbstractHistoryCleanup
     ClockUtil.setCurrentTime(END_DATE);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     engineConfiguration.setHistoryCleanupBatchSize(26);
     engineConfiguration.initHistoryCleanup();

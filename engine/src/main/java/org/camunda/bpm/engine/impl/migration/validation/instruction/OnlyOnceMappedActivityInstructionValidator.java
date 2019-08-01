@@ -23,22 +23,28 @@ import org.camunda.bpm.engine.impl.util.StringUtil;
 
 public class OnlyOnceMappedActivityInstructionValidator implements MigrationInstructionValidator {
 
-  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report) {
+  public void validate(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
+      MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
-    List<ValidatingMigrationInstruction> instructionsForSourceActivity = instructions.getInstructionsBySourceScope(sourceActivity);
+    List<ValidatingMigrationInstruction> instructionsForSourceActivity = instructions
+        .getInstructionsBySourceScope(sourceActivity);
 
     if (instructionsForSourceActivity.size() > 1) {
       addFailure(sourceActivity.getId(), instructionsForSourceActivity, report);
     }
   }
 
-  protected void addFailure(String sourceActivityId, List<ValidatingMigrationInstruction> migrationInstructions, MigrationInstructionValidationReportImpl report) {
-    report.addFailure("There are multiple mappings for source activity id '" + sourceActivityId +"': " +
-      StringUtil.join(new StringUtil.StringIterator<ValidatingMigrationInstruction>(migrationInstructions.iterator()) {
-        public String next() {
-          return iterator.next().toString();
-        }
-      }));
+  protected void addFailure(String sourceActivityId,
+      List<ValidatingMigrationInstruction> migrationInstructions,
+      MigrationInstructionValidationReportImpl report) {
+    report.addFailure("There are multiple mappings for source activity id '" + sourceActivityId
+        + "': " + StringUtil.join(new StringUtil.StringIterator<ValidatingMigrationInstruction>(
+            migrationInstructions.iterator()) {
+          public String next() {
+            return iterator.next().toString();
+          }
+        }));
   }
 
 }

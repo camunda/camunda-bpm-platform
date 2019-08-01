@@ -19,13 +19,15 @@ package org.camunda.bpm.engine.impl.core.model;
 /**
  * Key of a map property.
  *
- * @param K the type of keys maintained by the map
- * @param V the type of mapped values
+ * @param K
+ *          the type of keys maintained by the map
+ * @param V
+ *          the type of mapped values
  *
  * @author Philipp Ossler
  *
  */
-public class PropertyMapKey<K,V> {
+public class PropertyMapKey<K, V> {
 
   protected final String name;
   protected boolean allowOverwrite = true;
@@ -68,7 +70,7 @@ public class PropertyMapKey<K,V> {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    PropertyMapKey<?,?> other = (PropertyMapKey<?,?>) obj;
+    PropertyMapKey<?, ?> other = (PropertyMapKey<?, ?>) obj;
     if (name == null) {
       if (other.name != null)
         return false;

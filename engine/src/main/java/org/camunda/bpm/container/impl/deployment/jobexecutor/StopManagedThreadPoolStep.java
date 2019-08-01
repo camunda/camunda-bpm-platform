@@ -34,7 +34,8 @@ public class StopManagedThreadPoolStep extends DeploymentOperationStep {
 
   public void performOperationStep(DeploymentOperation operationContext) {
     PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
-    serviceContainer.stopService(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR);
+    serviceContainer.stopService(ServiceTypes.BPM_PLATFORM,
+        RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR);
   }
 
 }

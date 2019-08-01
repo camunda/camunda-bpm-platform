@@ -25,21 +25,19 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  */
 public class TransactionLogger extends ProcessEngineLogger {
 
-  public ProcessEngineException exceptionWhileInteractingWithTransaction(String operation, Throwable e) {
-    throw new ProcessEngineException(exceptionMessage(
-        "001",
-        "{} while {}",
-        e.getClass().getSimpleName(), operation), e);
+  public ProcessEngineException exceptionWhileInteractingWithTransaction(String operation,
+      Throwable e) {
+    throw new ProcessEngineException(
+        exceptionMessage("001", "{} while {}", e.getClass().getSimpleName(), operation), e);
   }
 
   public void debugTransactionOperation(String string) {
-    logDebug("002",
-        string);
+    logDebug("002", string);
   }
 
   public void exceptionWhileFiringEvent(TransactionState state, Throwable exception) {
-    logError("003",
-        "Exception while firing event {}: {}", state, exception.getMessage(), exception);
+    logError("003", "Exception while firing event {}: {}", state, exception.getMessage(),
+        exception);
   }
 
   public void debugFiringEventRolledBack() {

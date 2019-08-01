@@ -30,7 +30,7 @@ public class ScopeCollector implements TreeVisitor<ScopeImpl> {
   protected List<ScopeImpl> scopes = new ArrayList<ScopeImpl>();
 
   public void visit(ScopeImpl obj) {
-    if(obj != null && obj.isScope()) {
+    if (obj != null && obj.isScope()) {
       scopes.add(obj);
     }
   }

@@ -36,7 +36,6 @@ import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.TxContextCommandContextFactory;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -62,22 +61,26 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   }
 
   @Override
-  protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
+  protected Collection<? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new JtaTransactionInterceptor(transactionManager, false));
-    defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
+    defaultCommandInterceptorsTxRequired
+        .add(new JtaTransactionInterceptor(transactionManager, false));
+    defaultCommandInterceptorsTxRequired
+        .add(new CommandContextInterceptor(commandContextFactory, this));
     return defaultCommandInterceptorsTxRequired;
   }
 
   @Override
-  protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
+  protected Collection<? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequiresNew = new ArrayList<CommandInterceptor>();
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequiresNew.add(new JtaTransactionInterceptor(transactionManager, true));
-    defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this, true));
+    defaultCommandInterceptorsTxRequiresNew
+        .add(new JtaTransactionInterceptor(transactionManager, true));
+    defaultCommandInterceptorsTxRequiresNew
+        .add(new CommandContextInterceptor(commandContextFactory, this, true));
     return defaultCommandInterceptorsTxRequiresNew;
   }
 
@@ -86,17 +89,18 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
    */
   @Override
   protected void initCommandExecutorDbSchemaOperations() {
-    if(commandExecutorSchemaOperations == null) {
+    if (commandExecutorSchemaOperations == null) {
       List<CommandInterceptor> commandInterceptorsDbSchemaOperations = new ArrayList<CommandInterceptor>();
       commandInterceptorsDbSchemaOperations.add(new LogInterceptor());
-      commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, this));
+      commandInterceptorsDbSchemaOperations
+          .add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, this));
       commandInterceptorsDbSchemaOperations.add(actualCommandExecutor);
       commandExecutorSchemaOperations = initInterceptorChain(commandInterceptorsDbSchemaOperations);
     }
   }
 
   protected void initDbSchemaOperationsCommandContextFactory() {
-    if(dbSchemaOperationsCommandContextFactory == null) {
+    if (dbSchemaOperationsCommandContextFactory == null) {
       TxContextCommandContextFactory cmdContextFactory = new TxContextCommandContextFactory();
       cmdContextFactory.setProcessEngineConfiguration(this);
       cmdContextFactory.setTransactionContextFactory(new StandaloneTransactionContextFactory());
@@ -105,24 +109,25 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   }
 
   protected void initTransactionManager() {
-    if(transactionManager == null){
+    if (transactionManager == null) {
 
-      if(transactionManagerJndiName == null || transactionManagerJndiName.length() == 0) {
+      if (transactionManagerJndiName == null || transactionManagerJndiName.length() == 0) {
         throw LOG.invalidConfigTransactionManagerIsNull();
       }
 
       try {
-        transactionManager = (TransactionManager) new InitialContext().lookup(transactionManagerJndiName);
+        transactionManager = (TransactionManager) new InitialContext()
+            .lookup(transactionManagerJndiName);
 
-      } catch(NamingException e) {
-        throw LOG.invalidConfigCannotFindTransactionManger(transactionManagerJndiName+"'.", e);
+      } catch (NamingException e) {
+        throw LOG.invalidConfigCannotFindTransactionManger(transactionManagerJndiName + "'.", e);
       }
     }
   }
 
   @Override
   protected void initTransactionContextFactory() {
-    if(transactionContextFactory == null) {
+    if (transactionContextFactory == null) {
       transactionContextFactory = new JtaTransactionContextFactory(transactionManager);
     }
   }
@@ -147,7 +152,8 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     return dbSchemaOperationsCommandContextFactory;
   }
 
-  public void setDbSchemaOperationsCommandContextFactory(CommandContextFactory dbSchemaOperationsCommandContextFactory) {
+  public void setDbSchemaOperationsCommandContextFactory(
+      CommandContextFactory dbSchemaOperationsCommandContextFactory) {
     this.dbSchemaOperationsCommandContextFactory = dbSchemaOperationsCommandContextFactory;
   }
 }

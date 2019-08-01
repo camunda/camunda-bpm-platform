@@ -56,29 +56,18 @@ public class MigrationHistoricVariablesTest {
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
-  protected static final BpmnModelInstance ONE_BOUNDARY_TASK = ModifiableBpmnModelInstance.modify(ProcessModels.ONE_TASK_PROCESS)
-      .activityBuilder("userTask")
-      .boundaryEvent()
-      .message("Message")
-      .done();
+  protected static final BpmnModelInstance ONE_BOUNDARY_TASK = ModifiableBpmnModelInstance
+      .modify(ProcessModels.ONE_TASK_PROCESS).activityBuilder("userTask").boundaryEvent()
+      .message("Message").done();
 
-  protected static final BpmnModelInstance CONCURRENT_BOUNDARY_TASKS = ModifiableBpmnModelInstance.modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .activityBuilder("userTask1")
-      .boundaryEvent()
-      .message("Message")
-      .moveToActivity("userTask2")
-      .boundaryEvent()
-      .message("Message")
-      .done();
+  protected static final BpmnModelInstance CONCURRENT_BOUNDARY_TASKS = ModifiableBpmnModelInstance
+      .modify(ProcessModels.PARALLEL_GATEWAY_PROCESS).activityBuilder("userTask1").boundaryEvent()
+      .message("Message").moveToActivity("userTask2").boundaryEvent().message("Message").done();
 
-  protected static final BpmnModelInstance SUBPROCESS_CONCURRENT_BOUNDARY_TASKS = ModifiableBpmnModelInstance.modify(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS)
-      .activityBuilder("userTask1")
-      .boundaryEvent()
-      .message("Message")
-      .moveToActivity("userTask2")
-      .boundaryEvent()
-      .message("Message")
-      .done();
+  protected static final BpmnModelInstance SUBPROCESS_CONCURRENT_BOUNDARY_TASKS = ModifiableBpmnModelInstance
+      .modify(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS).activityBuilder("userTask1")
+      .boundaryEvent().message("Message").moveToActivity("userTask2").boundaryEvent()
+      .message("Message").done();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
@@ -98,17 +87,19 @@ public class MigrationHistoricVariablesTest {
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void noHistoryUpdateOnSameStructureMigration() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ONE_BOUNDARY_TASK);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ONE_BOUNDARY_TASK);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ONE_BOUNDARY_TASK);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ONE_BOUNDARY_TASK);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
     ExecutionTree scopeExecution = executionTreeBeforeMigration.getExecutions().get(0);
 
@@ -128,23 +119,22 @@ public class MigrationHistoricVariablesTest {
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void noHistoryUpdateOnAddScopeMigration() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(SUBPROCESS_CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(SUBPROCESS_CONCURRENT_BOUNDARY_TASKS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree userTask1CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask1")
-        .get(0)
-        .getParent();
+    ExecutionTree userTask1CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask1").get(0).getParent();
 
     runtimeService.setVariableLocal(userTask1CCExecutionBefore.getId(), "foo", 42);
 
@@ -161,28 +151,31 @@ public class MigrationHistoricVariablesTest {
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   public void testMigrateHistoryVariableInstance() {
-    //given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
-        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    // given
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceDefinition.getId());
 
     runtimeService.setVariable(processInstance.getId(), "test", 3537);
-    HistoricVariableInstance instance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricVariableInstance instance = historyService.createHistoricVariableInstanceQuery()
+        .singleResult();
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapActivities("userTask", "userTask").build();
 
-    //when
+    // when
     runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
-    //then
-    HistoricVariableInstance migratedInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    // then
+    HistoricVariableInstance migratedInstance = historyService.createHistoricVariableInstanceQuery()
+        .singleResult();
     assertEquals(targetDefinition.getKey(), migratedInstance.getProcessDefinitionKey());
     assertEquals(targetDefinition.getId(), migratedInstance.getProcessDefinitionId());
     assertEquals(instance.getActivityInstanceId(), migratedInstance.getActivityInstanceId());
@@ -192,25 +185,29 @@ public class MigrationHistoricVariablesTest {
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   public void testMigrateHistoryVariableInstanceMultiInstance() {
-    //given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
+    // given
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceDefinition.getId());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
-    //when
+    // when
     runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
-    //then
-    List<HistoricVariableInstance> migratedVariables = historyService.createHistoricVariableInstanceQuery().list();
-    Assert.assertEquals(6, migratedVariables.size()); // 3 loop counter + nrOfInstance + nrOfActiveInstances + nrOfCompletedInstances
+    // then
+    List<HistoricVariableInstance> migratedVariables = historyService
+        .createHistoricVariableInstanceQuery().list();
+    Assert.assertEquals(6, migratedVariables.size()); // 3 loop counter + nrOfInstance +
+                                                      // nrOfActiveInstances +
+                                                      // nrOfCompletedInstances
 
     for (HistoricVariableInstance variable : migratedVariables) {
       assertEquals(targetDefinition.getKey(), variable.getProcessDefinitionKey());
@@ -222,41 +219,42 @@ public class MigrationHistoricVariablesTest {
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   public void testMigrateEventScopeVariable() {
-    //given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    // given
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(CompensationModels.COMPENSATION_ONE_TASK_SUBPROCESS_MODEL);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapActivities("userTask2", "userTask2")
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("compensationBoundary", "compensationBoundary")
-      .build();
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapActivities("userTask2", "userTask2").mapActivities("subProcess", "subProcess")
+        .mapActivities("compensationBoundary", "compensationBoundary").build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceDefinition.getId());
 
-    Execution subProcessExecution = runtimeService.createExecutionQuery().activityId("userTask1").singleResult();
+    Execution subProcessExecution = runtimeService.createExecutionQuery().activityId("userTask1")
+        .singleResult();
 
     runtimeService.setVariableLocal(subProcessExecution.getId(), "foo", "bar");
 
     testHelper.completeTask("userTask1");
 
-    Execution eventScopeExecution = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
+    Execution eventScopeExecution = runtimeService.createExecutionQuery().activityId("subProcess")
+        .singleResult();
     HistoricVariableInstance eventScopeVariable = historyService
-      .createHistoricVariableInstanceQuery()
-      .executionIdIn(eventScopeExecution.getId())
-      .singleResult();
+        .createHistoricVariableInstanceQuery().executionIdIn(eventScopeExecution.getId())
+        .singleResult();
 
-    //when
-    runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(processInstance.getId())
-      .execute();
+    // when
+    runtimeService.newMigration(migrationPlan).processInstanceIds(processInstance.getId())
+        .execute();
 
     // then
     HistoricVariableInstance historicVariableInstance = historyService
-      .createHistoricVariableInstanceQuery()
-      .variableId(eventScopeVariable.getId())
-      .singleResult();
-    Assert.assertEquals(targetDefinition.getId(), historicVariableInstance.getProcessDefinitionId());
+        .createHistoricVariableInstanceQuery().variableId(eventScopeVariable.getId())
+        .singleResult();
+    Assert.assertEquals(targetDefinition.getId(),
+        historicVariableInstance.getProcessDefinitionId());
   }
 }

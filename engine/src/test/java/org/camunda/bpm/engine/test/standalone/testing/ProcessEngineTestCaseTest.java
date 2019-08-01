@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.test.ProcessEngineTestCase;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.hamcrest.CoreMatchers;
 
-
 /**
  * @author Joram Barrez
  * @author Falko Menge (camunda)
@@ -48,17 +47,17 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
   public void testRequiredHistoryLevelAudit() {
 
     assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+        CoreMatchers.<String> either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+            .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testRequiredHistoryLevelActivity() {
 
     assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
-        .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+        CoreMatchers.<String> either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+            .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+            .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)

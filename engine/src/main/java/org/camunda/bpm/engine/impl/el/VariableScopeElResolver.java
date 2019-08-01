@@ -27,11 +27,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-
 /**
- * Implementation of an {@link ELResolver} that resolves expressions
- * with the process variables of a given {@link VariableScope} as context.
- * <br>
+ * Implementation of an {@link ELResolver} that resolves expressions with the process variables of a
+ * given {@link VariableScope} as context. <br>
  * Also exposes the currently logged in username to be used in expressions (if any)
  *
  * @author Joram Barrez
@@ -44,36 +42,38 @@ public class VariableScopeElResolver extends ELResolver {
   public static final String TASK_KEY = "task";
   public static final String LOGGED_IN_USER_KEY = "authenticatedUserId";
 
-  public Object getValue(ELContext context, Object base, Object property)  {
+  public Object getValue(ELContext context, Object base, Object property) {
 
     Object object = context.getContext(VariableScope.class);
-    if(object != null) {
+    if (object != null) {
       VariableScope variableScope = (VariableScope) object;
       if (base == null) {
         String variable = (String) property; // according to javadoc, can only be a String
 
-        if( (EXECUTION_KEY.equals(property) && variableScope instanceof ExecutionEntity)
-                || (TASK_KEY.equals(property) && variableScope instanceof TaskEntity)
-                || (variableScope instanceof CaseExecutionEntity
-                && (CASE_EXECUTION_KEY.equals(property) || EXECUTION_KEY.equals(property))) ) {
+        if ((EXECUTION_KEY.equals(property) && variableScope instanceof ExecutionEntity)
+            || (TASK_KEY.equals(property) && variableScope instanceof TaskEntity)
+            || (variableScope instanceof CaseExecutionEntity
+                && (CASE_EXECUTION_KEY.equals(property) || EXECUTION_KEY.equals(property)))) {
           context.setPropertyResolved(true);
           return variableScope;
         } else if (EXECUTION_KEY.equals(property) && variableScope instanceof TaskEntity) {
           context.setPropertyResolved(true);
           return ((TaskEntity) variableScope).getExecution();
-        } else if(LOGGED_IN_USER_KEY.equals(property)){
+        } else if (LOGGED_IN_USER_KEY.equals(property)) {
           context.setPropertyResolved(true);
           return Context.getCommandContext().getAuthenticatedUserId();
         } else {
           if (variableScope.hasVariable(variable)) {
-            context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
+            context.setPropertyResolved(true); // if not set, the next elResolver in the
+                                               // CompositeElResolver will be called
             return variableScope.getVariable(variable);
           }
         }
       }
     }
 
-    // property resolution (eg. bean.value) will be done by the BeanElResolver (part of the CompositeElResolver)
+    // property resolution (eg. bean.value) will be done by the BeanElResolver (part of the
+    // CompositeElResolver)
     // It will use the bean resolved in this resolver as base.
 
     return null;
@@ -83,7 +83,7 @@ public class VariableScopeElResolver extends ELResolver {
     if (base == null) {
       String variable = (String) property;
       Object object = context.getContext(VariableScope.class);
-      return object != null && !((VariableScope)object).hasVariable(variable);
+      return object != null && !((VariableScope) object).hasVariable(variable);
     }
     return true;
   }
@@ -101,7 +101,7 @@ public class VariableScopeElResolver extends ELResolver {
     }
   }
 
-  public Class< ? > getCommonPropertyType(ELContext arg0, Object arg1) {
+  public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
     return Object.class;
   }
 
@@ -109,7 +109,7 @@ public class VariableScopeElResolver extends ELResolver {
     return null;
   }
 
-  public Class< ? > getType(ELContext arg0, Object arg1, Object arg2) {
+  public Class<?> getType(ELContext arg0, Object arg1, Object arg2) {
     return Object.class;
   }
 

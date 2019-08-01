@@ -112,7 +112,8 @@ public class LegacyUserOperationLogTest {
       assertEquals(4, query.count());
       assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
       assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_COMPLETE).count());
-      assertEquals(2, query.operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
+      assertEquals(2,
+          query.operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
 
     } finally {
       identityService.clearAuthentication();
@@ -135,16 +136,14 @@ public class LegacyUserOperationLogTest {
     assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "serviceTaskCalled"));
 
     assertEquals(5, userOperationLogQuery().count());
-    assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_COMPLETE).count());
-    assertEquals(2, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
     assertEquals(1, userOperationLogQuery()
-            .entityType(EntityTypes.DEPLOYMENT)
-            .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
-            .count());
-    assertEquals(1, userOperationLogQuery()
-            .entityType(EntityTypes.PROCESS_INSTANCE)
-            .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
-            .count());
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_COMPLETE).count());
+    assertEquals(2, userOperationLogQuery()
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
+    assertEquals(1, userOperationLogQuery().entityType(EntityTypes.DEPLOYMENT)
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
+    assertEquals(1, userOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE)
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
   }
 
   @Test
@@ -158,77 +157,70 @@ public class LegacyUserOperationLogTest {
 
     // then
     assertEquals(3, userOperationLogQuery().count());
-    assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
     assertEquals(1, userOperationLogQuery()
-            .entityType(EntityTypes.DEPLOYMENT)
-            .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
-            .count());
-    assertEquals(1, userOperationLogQuery()
-            .entityType(EntityTypes.PROCESS_INSTANCE)
-            .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
-            .count());
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
+    assertEquals(1, userOperationLogQuery().entityType(EntityTypes.DEPLOYMENT)
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
+    assertEquals(1, userOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE)
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
   }
 
   @Test
   public void testDontWriteDuplicateLogOnBatchDeletionJobExecution() {
-    ProcessDefinition definition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition definition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(definition.getId());
-    batch = runtimeService.deleteProcessInstancesAsync(
-        Arrays.asList(processInstance.getId()), null, "test reason");
+    batch = runtimeService.deleteProcessInstancesAsync(Arrays.asList(processInstance.getId()), null,
+        "test reason");
 
-    Job seedJob = managementService
-        .createJobQuery()
-        .singleResult();
+    Job seedJob = managementService.createJobQuery().singleResult();
     managementService.executeJob(seedJob.getId());
 
     for (Job pending : managementService.createJobQuery().list()) {
       managementService.executeJob(pending.getId());
     }
 
-    assertEquals(5, userOperationLogQuery().entityTypeIn(EntityTypes.PROCESS_INSTANCE, EntityTypes.DEPLOYMENT).count());
+    assertEquals(5, userOperationLogQuery()
+        .entityTypeIn(EntityTypes.PROCESS_INSTANCE, EntityTypes.DEPLOYMENT).count());
   }
 
   @Test
   public void testDontWriteDuplicateLogOnBatchMigrationJobExecution() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceDefinition.getId());
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
     batch = runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
-    Job seedJob = managementService
-        .createJobQuery()
-        .singleResult();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
+    Job seedJob = managementService.createJobQuery().singleResult();
     managementService.executeJob(seedJob.getId());
 
     Job migrationJob = managementService.createJobQuery()
-        .jobDefinitionId(batch.getBatchJobDefinitionId())
-        .singleResult();
+        .jobDefinitionId(batch.getBatchJobDefinitionId()).singleResult();
 
     // when
     managementService.executeJob(migrationJob.getId());
 
     // then
     assertEquals(9, userOperationLogQuery().count());
-    assertEquals(2, userOperationLogQuery()
-        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
-        .entityType(EntityTypes.DEPLOYMENT)
-        .count());
-    assertEquals(1, userOperationLogQuery()
-        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
-        .entityType(EntityTypes.PROCESS_INSTANCE)
-        .count());
-    assertEquals(3, userOperationLogQuery()
-        .operationType(UserOperationLogEntry.OPERATION_TYPE_MIGRATE)
-        .entityType(EntityTypes.PROCESS_INSTANCE)
-        .count());
+    assertEquals(2,
+        userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+            .entityType(EntityTypes.DEPLOYMENT).count());
+    assertEquals(1,
+        userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+            .entityType(EntityTypes.PROCESS_INSTANCE).count());
+    assertEquals(3,
+        userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_MIGRATE)
+            .entityType(EntityTypes.PROCESS_INSTANCE).count());
   }
 
   protected UserOperationLogQuery userOperationLogQuery() {

@@ -37,17 +37,11 @@ public class DeploymentRegistrationTest extends PluggableProcessEngineTestCase {
   public void testNoRegistrationCheckIfNoProcessApplicationIsDeployed() {
 
     // create two deployments; both contain a process with the same key
-    Deployment deployment1 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(BPMN_RESOURCE, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+    Deployment deployment1 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(BPMN_RESOURCE, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
-    Deployment deployment2 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     // assume an empty deployment cache (e.g. on a different engine)
     processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
@@ -63,8 +57,10 @@ public class DeploymentRegistrationTest extends PluggableProcessEngineTestCase {
     // this logic should not be executed.
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    ProcessDefinition version1 = repositoryService.createProcessDefinitionQuery().deploymentId(deployment1.getId()).singleResult();
-    ProcessDefinition version2 = repositoryService.createProcessDefinitionQuery().deploymentId(deployment2.getId()).singleResult();
+    ProcessDefinition version1 = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(deployment1.getId()).singleResult();
+    ProcessDefinition version2 = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(deployment2.getId()).singleResult();
 
     // accordingly the process definition cache should only contain the latest version now
     Cache cache = processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache();
@@ -76,7 +72,7 @@ public class DeploymentRegistrationTest extends PluggableProcessEngineTestCase {
 
   // helper ///////////////////////////////////////////
 
-  protected void deleteDeployments(Deployment... deployments){
+  protected void deleteDeployments(Deployment... deployments) {
     for (Deployment deployment : deployments) {
       repositoryService.deleteDeployment(deployment.getId(), true);
       managementService.unregisterProcessApplication(deployment.getId(), false);
@@ -84,12 +80,8 @@ public class DeploymentRegistrationTest extends PluggableProcessEngineTestCase {
   }
 
   protected BpmnModelInstance createProcessWithServiceTask(String key) {
-    return Bpmn.createExecutableProcess(key)
-      .startEvent()
-      .serviceTask()
-        .camundaExpression("${true}")
-      .endEvent()
-    .done();
+    return Bpmn.createExecutableProcess(key).startEvent().serviceTask().camundaExpression("${true}")
+        .endEvent().done();
   }
 
 }

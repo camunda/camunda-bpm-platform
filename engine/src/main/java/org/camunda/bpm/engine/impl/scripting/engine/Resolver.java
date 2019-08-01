@@ -19,9 +19,9 @@ package org.camunda.bpm.engine.impl.scripting.engine;
 import java.util.Set;
 
 /**
- * A resolver for Objects bound to a key. A resolver provides a set of read only key bindings.
- * This means that key it is not possible to clear a key binding (remove the object bound to the key)
- * or to replace a key binding (set a new object bound to the key).
+ * A resolver for Objects bound to a key. A resolver provides a set of read only key bindings. This
+ * means that key it is not possible to clear a key binding (remove the object bound to the key) or
+ * to replace a key binding (set a new object bound to the key).
  *
  * @author Daniel Meyer
  * @author Tom Baeyens
@@ -31,22 +31,26 @@ public interface Resolver {
   /**
    * Allows checking whether there is currently an object bound to the key.
    *
-   * @param key the key to check
+   * @param key
+   *          the key to check
    * @return true if there is currently an object bound to the key. False otherwise.
    */
   boolean containsKey(Object key);
 
   /**
-   * Returns the object currently bound to the key or false if no object is currently bound
-   * to the key
+   * Returns the object currently bound to the key or false if no object is currently bound to the
+   * key
    *
-   * @param key the key of the object to retrieve.
-   * @return the object currently bound to the key or 'null' if no object is currently bound to the key.
+   * @param key
+   *          the key of the object to retrieve.
+   * @return the object currently bound to the key or 'null' if no object is currently bound to the
+   *         key.
    */
   Object get(Object key);
 
   /**
    * Returns the set of key that can be resolved using this resolver.
+   * 
    * @return the set of keys that can be resolved by this resolver.
    */
   Set<String> keySet();

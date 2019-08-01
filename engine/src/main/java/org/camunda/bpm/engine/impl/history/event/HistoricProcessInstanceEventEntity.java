@@ -16,9 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
-
 /**
- * <p>{@link HistoryEvent} signifying a top-level event in a process instance.</p>
+ * <p>
+ * {@link HistoryEvent} signifying a top-level event in a process instance.
+ * </p>
  *
  * @author Daniel Meyer
  * @author Marcel Wieczorek
@@ -49,7 +50,7 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
   /** id of the activity which started the process instance */
   protected String startActivityId;
 
-  /** id of the tenant which belongs to the process instance  */
+  /** id of the tenant which belongs to the process instance */
   protected String tenantId;
 
   protected String state;
@@ -130,26 +131,15 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[businessKey=" + businessKey
-           + ", startUserId=" + startUserId
-           + ", superProcessInstanceId=" + superProcessInstanceId
-           + ", rootProcessInstanceId=" + rootProcessInstanceId
-           + ", superCaseInstanceId=" + superCaseInstanceId
-           + ", deleteReason=" + deleteReason
-           + ", durationInMillis=" + durationInMillis
-           + ", startTime=" + startTime
-           + ", endTime=" + endTime
-           + ", removalTime=" + removalTime
-           + ", endActivityId=" + endActivityId
-           + ", startActivityId=" + startActivityId
-           + ", id=" + id
-           + ", eventType=" + eventType
-           + ", executionId=" + executionId
-           + ", processDefinitionId=" + processDefinitionId
-           + ", processInstanceId=" + processInstanceId
-           + ", tenantId=" + tenantId
-           + "]";
+    return this.getClass().getSimpleName() + "[businessKey=" + businessKey + ", startUserId="
+        + startUserId + ", superProcessInstanceId=" + superProcessInstanceId
+        + ", rootProcessInstanceId=" + rootProcessInstanceId + ", superCaseInstanceId="
+        + superCaseInstanceId + ", deleteReason=" + deleteReason + ", durationInMillis="
+        + durationInMillis + ", startTime=" + startTime + ", endTime=" + endTime + ", removalTime="
+        + removalTime + ", endActivityId=" + endActivityId + ", startActivityId=" + startActivityId
+        + ", id=" + id + ", eventType=" + eventType + ", executionId=" + executionId
+        + ", processDefinitionId=" + processDefinitionId + ", processInstanceId="
+        + processInstanceId + ", tenantId=" + tenantId + "]";
   }
 
 }

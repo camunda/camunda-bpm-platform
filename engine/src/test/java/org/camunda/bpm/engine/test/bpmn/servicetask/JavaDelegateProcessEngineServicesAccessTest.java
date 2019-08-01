@@ -27,7 +27,8 @@ import org.camunda.bpm.model.bpmn.instance.Task;
  * @author Daniel Meyer
  *
  */
-public class JavaDelegateProcessEngineServicesAccessTest extends AbstractProcessEngineServicesAccessTest {
+public class JavaDelegateProcessEngineServicesAccessTest
+    extends AbstractProcessEngineServicesAccessTest {
 
   protected Class<?> getTestServiceAccessibleClass() {
     return AccessServicesJavaDelegate.class;

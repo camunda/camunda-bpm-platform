@@ -22,7 +22,6 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -31,15 +30,14 @@ public class GetUserInfoKeysCmd implements Command<List<String>>, Serializable {
   private static final long serialVersionUID = 1L;
   protected String userId;
   protected String userInfoType;
-  
+
   public GetUserInfoKeysCmd(String userId, String userInfoType) {
     this.userId = userId;
     this.userInfoType = userInfoType;
   }
 
   public List<String> execute(CommandContext commandContext) {
-    return commandContext
-      .getIdentityInfoManager()
-      .findUserInfoKeysByUserIdAndType(userId, userInfoType);
+    return commandContext.getIdentityInfoManager().findUserInfoKeysByUserIdAndType(userId,
+        userInfoType);
   }
 }

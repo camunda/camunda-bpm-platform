@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.util.DatabaseHelper;
 
 /**
- *  @author Philipp Ossler
+ * @author Philipp Ossler
  */
 public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
 
@@ -48,8 +48,9 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
   protected void runTest() throws Throwable {
     String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
 
-    if ((DbSqlSessionFactory.DB2.equals(databaseType) || DbSqlSessionFactory.MARIADB.equals(databaseType))
-      && processEngine.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
+    if ((DbSqlSessionFactory.DB2.equals(databaseType)
+        || DbSqlSessionFactory.MARIADB.equals(databaseType))
+        && processEngine.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
       // skip test method - if database is DB2 and MariaDB and Batch mode on
     } else {
       // invoke the test method
@@ -59,9 +60,9 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
 
   @Override
   protected void initializeProcessEngine() {
-    processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml")
-        .setJdbcStatementTimeout(STATEMENT_TIMEOUT_IN_SECONDS)
-        .buildProcessEngine();
+    processEngine = ProcessEngineConfiguration
+        .createProcessEngineConfigurationFromResource("camunda.cfg.xml")
+        .setJdbcStatementTimeout(STATEMENT_TIMEOUT_IN_SECONDS).buildProcessEngine();
   }
 
   @Override
@@ -126,7 +127,8 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
           commandContext.getJobManager().deleteJob((JobEntity) job, false);
         }
 
-        for (HistoricJobLog jobLog : commandContext.getDbEntityManager().createHistoricJobLogQuery().list()) {
+        for (HistoricJobLog jobLog : commandContext.getDbEntityManager().createHistoricJobLogQuery()
+            .list()) {
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogById(jobLog.getId());
         }
 
@@ -145,7 +147,8 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
     }
 
     public Void execute(CommandContext commandContext) {
-      DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(Context.getProcessEngineConfiguration().getIdGenerator());
+      DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(
+          Context.getProcessEngineConfiguration().getIdGenerator());
       DbEntityManager entityManager = dbEntityManagerFactory.openSession();
 
       JobEntity job = entityManager.selectById(JobEntity.class, JOB_ENTITY_ID);

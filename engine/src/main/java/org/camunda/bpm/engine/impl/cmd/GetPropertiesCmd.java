@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -39,12 +38,11 @@ public class GetPropertiesCmd implements Command<Map<String, String>>, Serializa
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCamundaAdmin();
 
-    List<PropertyEntity> propertyEntities = commandContext
-      .getDbEntityManager()
-      .selectList("selectProperties");
-    
+    List<PropertyEntity> propertyEntities = commandContext.getDbEntityManager()
+        .selectList("selectProperties");
+
     Map<String, String> properties = new HashMap<String, String>();
-    for (PropertyEntity propertyEntity: propertyEntities) {
+    for (PropertyEntity propertyEntity : propertyEntities) {
       properties.put(propertyEntity.getName(), propertyEntity.getValue());
     }
     return properties;

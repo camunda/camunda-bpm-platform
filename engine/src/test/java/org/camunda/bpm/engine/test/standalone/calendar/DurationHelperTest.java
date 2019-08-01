@@ -33,7 +33,7 @@ public class DurationHelperTest {
   public void tearDown() {
     ClockUtil.reset();
   }
-  
+
   @Test
   public void shouldNotExceedNumber() throws Exception {
     ClockUtil.setCurrentTime(new Date(0));
@@ -41,7 +41,6 @@ public class DurationHelperTest {
 
     ClockUtil.setCurrentTime(new Date(15000));
     assertEquals(20000, dh.getDateAfter().getTime());
-
 
     ClockUtil.setCurrentTime(new Date(30000));
     assertNull(dh.getDateAfter());
@@ -55,7 +54,6 @@ public class DurationHelperTest {
     ClockUtil.setCurrentTime(parse("19700101-00:00:15"));
     assertEquals(parse("19700101-00:00:20"), dh.getDateAfter());
 
-
     ClockUtil.setCurrentTime(parse("19700101-00:00:30"));
     assertNull(dh.getDateAfter());
   }
@@ -68,12 +66,11 @@ public class DurationHelperTest {
     ClockUtil.setCurrentTime(parse("19700101-00:00:20"));
     assertEquals(parse("19700101-00:00:30"), dh.getDateAfter());
 
-
     ClockUtil.setCurrentTime(parse("19700101-00:00:35"));
 
     assertEquals(parse("19700101-00:00:40"), dh.getDateAfter());
   }
-  
+
   @Test
   public void shouldNotExceedNumberWithStartDate() throws Exception {
     DurationHelper dh = new DurationHelper("R2/PT10S", new Date(0));
@@ -83,7 +80,8 @@ public class DurationHelperTest {
 
   @Test
   public void shouldNotExceedNumberPeriodsWithStartDate() throws Exception {
-    DurationHelper dh = new DurationHelper("R2/1970-01-01T00:00:00/1970-01-01T00:00:10", parse("19700101-00:00:00"));
+    DurationHelper dh = new DurationHelper("R2/1970-01-01T00:00:00/1970-01-01T00:00:10",
+        parse("19700101-00:00:00"));
 
     assertEquals(parse("19700101-00:00:20"), dh.getDateAfter(parse("19700101-00:00:15")));
     assertNull(dh.getDateAfter(parse("19700101-00:00:30")));
@@ -91,18 +89,17 @@ public class DurationHelperTest {
 
   @Test
   public void shouldNotExceedNumberNegativeWithStartDate() throws Exception {
-    DurationHelper dh = new DurationHelper("R2/PT10S/1970-01-01T00:00:50", parse("19700101-00:00:00"));
+    DurationHelper dh = new DurationHelper("R2/PT10S/1970-01-01T00:00:50",
+        parse("19700101-00:00:00"));
 
     assertEquals(parse("19700101-00:00:30"), dh.getDateAfter(parse("19700101-00:00:20")));
 
     assertEquals(parse("19700101-00:00:40"), dh.getDateAfter(parse("19700101-00:00:35")));
   }
 
-
   private Date parse(String str) throws Exception {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd-HH:mm:ss");
     return simpleDateFormat.parse(str);
   }
-
 
 }

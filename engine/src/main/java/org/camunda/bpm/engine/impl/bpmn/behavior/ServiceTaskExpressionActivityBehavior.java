@@ -22,8 +22,8 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
- * ActivityBehavior that evaluates an expression when executed. Optionally, it
- * sets the result of the expression as a variable on the execution.
+ * ActivityBehavior that evaluates an expression when executed. Optionally, it sets the result of
+ * the expression as a variable on the execution.
  *
  * @author Tom Baeyens
  * @author Christian Stettler
@@ -46,7 +46,8 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
     executeWithErrorPropagation(execution, new Callable<Void>() {
       @Override
       public Void call() throws Exception {
-        //getValue() can have side-effects, that's why we have to call it independently from the result variable
+        // getValue() can have side-effects, that's why we have to call it independently from the
+        // result variable
         Object value = expression.getValue(execution);
         if (resultVariable != null) {
           execution.setVariable(resultVariable, value);

@@ -39,35 +39,43 @@ import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_
 /**
  * @author Tassilo Weidner
  */
-public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<SetRemovalTimeBatchConfiguration> {
+public class DecisionSetRemovalTimeJobHandler
+    extends AbstractBatchJobHandler<SetRemovalTimeBatchConfiguration> {
 
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_DECISION_SET_REMOVAL_TIME);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(
+      Batch.TYPE_DECISION_SET_REMOVAL_TIME);
 
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
     if (isDmnEnabled(commandContext)) {
 
       String byteArrayId = configuration.getConfigurationByteArrayId();
       byte[] configurationByteArray = findByteArrayById(byteArrayId, commandContext).getBytes();
 
-      SetRemovalTimeBatchConfiguration batchConfiguration = readConfiguration(configurationByteArray);
+      SetRemovalTimeBatchConfiguration batchConfiguration = readConfiguration(
+          configurationByteArray);
 
       for (String instanceId : batchConfiguration.getIds()) {
 
-        HistoricDecisionInstanceEntity instance = findDecisionInstanceById(instanceId, commandContext);
+        HistoricDecisionInstanceEntity instance = findDecisionInstanceById(instanceId,
+            commandContext);
 
         if (instance != null) {
           if (batchConfiguration.isHierarchical()) {
 
             String rootDecisionInstanceId = getRootDecisionInstance(instance);
 
-            HistoricDecisionInstanceEntity rootInstance = findDecisionInstanceById(rootDecisionInstanceId, commandContext);
+            HistoricDecisionInstanceEntity rootInstance = findDecisionInstanceById(
+                rootDecisionInstanceId, commandContext);
 
-            Date removalTime = getOrCalculateRemovalTime(batchConfiguration, rootInstance, commandContext);
+            Date removalTime = getOrCalculateRemovalTime(batchConfiguration, rootInstance,
+                commandContext);
 
             addRemovalTimeToHierarchy(rootDecisionInstanceId, removalTime, commandContext);
 
           } else {
-            Date removalTime = getOrCalculateRemovalTime(batchConfiguration, instance, commandContext);
+            Date removalTime = getOrCalculateRemovalTime(batchConfiguration, instance,
+                commandContext);
 
             if (removalTime != instance.getRemovalTime()) {
               addRemovalTime(instanceId, removalTime, commandContext);
@@ -80,14 +88,16 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
   }
 
   protected String getRootDecisionInstance(HistoricDecisionInstanceEntity instance) {
-    return instance.getRootDecisionInstanceId() == null ? instance.getId() : instance.getRootDecisionInstanceId();
+    return instance.getRootDecisionInstanceId() == null ? instance.getId()
+        : instance.getRootDecisionInstanceId();
   }
 
-  protected Date getOrCalculateRemovalTime(SetRemovalTimeBatchConfiguration batchConfiguration, HistoricDecisionInstanceEntity instance, CommandContext commandContext) {
+  protected Date getOrCalculateRemovalTime(SetRemovalTimeBatchConfiguration batchConfiguration,
+      HistoricDecisionInstanceEntity instance, CommandContext commandContext) {
     if (batchConfiguration.hasRemovalTime()) {
       return batchConfiguration.getRemovalTime();
 
-    } else if (hasBaseTime(commandContext)){
+    } else if (hasBaseTime(commandContext)) {
       return calculateRemovalTime(instance, commandContext);
 
     } else {
@@ -96,14 +106,16 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
     }
   }
 
-  protected void addRemovalTimeToHierarchy(String instanceId, Date removalTime, CommandContext commandContext) {
+  protected void addRemovalTimeToHierarchy(String instanceId, Date removalTime,
+      CommandContext commandContext) {
     commandContext.getHistoricDecisionInstanceManager()
-      .addRemovalTimeToDecisionsByRootDecisionInstanceId(instanceId, removalTime);
+        .addRemovalTimeToDecisionsByRootDecisionInstanceId(instanceId, removalTime);
   }
 
-  protected void addRemovalTime(String instanceId, Date removalTime, CommandContext commandContext) {
+  protected void addRemovalTime(String instanceId, Date removalTime,
+      CommandContext commandContext) {
     commandContext.getHistoricDecisionInstanceManager()
-      .addRemovalTimeToDecisionsByDecisionInstanceId(instanceId, removalTime);
+        .addRemovalTimeToDecisionsByDecisionInstanceId(instanceId, removalTime);
   }
 
   protected boolean hasBaseTime(CommandContext commandContext) {
@@ -111,7 +123,8 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
   }
 
   protected boolean isStrategyStart(CommandContext commandContext) {
-    return HISTORY_REMOVAL_TIME_STRATEGY_START.equals(getHistoryRemovalTimeStrategy(commandContext));
+    return HISTORY_REMOVAL_TIME_STRATEGY_START
+        .equals(getHistoryRemovalTimeStrategy(commandContext));
   }
 
   protected boolean isStrategyEnd(CommandContext commandContext) {
@@ -119,47 +132,48 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
   }
 
   protected String getHistoryRemovalTimeStrategy(CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration()
-      .getHistoryRemovalTimeStrategy();
+    return commandContext.getProcessEngineConfiguration().getHistoryRemovalTimeStrategy();
   }
 
-  protected DecisionDefinition findDecisionDefinitionById(String decisionDefinitionId, CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration()
-      .getDeploymentCache()
-      .findDeployedDecisionDefinitionById(decisionDefinitionId);
+  protected DecisionDefinition findDecisionDefinitionById(String decisionDefinitionId,
+      CommandContext commandContext) {
+    return commandContext.getProcessEngineConfiguration().getDeploymentCache()
+        .findDeployedDecisionDefinitionById(decisionDefinitionId);
   }
 
   protected boolean isDmnEnabled(CommandContext commandContext) {
     return commandContext.getProcessEngineConfiguration().isDmnEnabled();
   }
 
-  protected Date calculateRemovalTime(HistoricDecisionInstanceEntity decisionInstance, CommandContext commandContext) {
-    DecisionDefinition decisionDefinition = findDecisionDefinitionById(decisionInstance.getDecisionDefinitionId(), commandContext);
+  protected Date calculateRemovalTime(HistoricDecisionInstanceEntity decisionInstance,
+      CommandContext commandContext) {
+    DecisionDefinition decisionDefinition = findDecisionDefinitionById(
+        decisionInstance.getDecisionDefinitionId(), commandContext);
 
-    return commandContext.getProcessEngineConfiguration()
-      .getHistoryRemovalTimeProvider()
-      .calculateRemovalTime(decisionInstance, decisionDefinition);
+    return commandContext.getProcessEngineConfiguration().getHistoryRemovalTimeProvider()
+        .calculateRemovalTime(decisionInstance, decisionDefinition);
   }
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId, CommandContext commandContext) {
-    return commandContext.getDbEntityManager()
-      .selectById(ByteArrayEntity.class, byteArrayId);
+    return commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, byteArrayId);
   }
 
-  protected HistoricDecisionInstanceEntity findDecisionInstanceById(String instanceId, CommandContext commandContext) {
+  protected HistoricDecisionInstanceEntity findDecisionInstanceById(String instanceId,
+      CommandContext commandContext) {
     return commandContext.getHistoricDecisionInstanceManager()
-      .findHistoricDecisionInstance(instanceId);
+        .findHistoricDecisionInstance(instanceId);
   }
 
   public JobDeclaration<BatchJobContext, MessageEntity> getJobDeclaration() {
     return JOB_DECLARATION;
   }
 
-  protected SetRemovalTimeBatchConfiguration createJobConfiguration(SetRemovalTimeBatchConfiguration configuration, List<String> decisionInstanceIds) {
+  protected SetRemovalTimeBatchConfiguration createJobConfiguration(
+      SetRemovalTimeBatchConfiguration configuration, List<String> decisionInstanceIds) {
     return new SetRemovalTimeBatchConfiguration(decisionInstanceIds)
-      .setRemovalTime(configuration.getRemovalTime())
-      .setHasRemovalTime(configuration.hasRemovalTime())
-      .setHierarchical(configuration.isHierarchical());
+        .setRemovalTime(configuration.getRemovalTime())
+        .setHasRemovalTime(configuration.hasRemovalTime())
+        .setHierarchical(configuration.isHierarchical());
   }
 
   protected JsonObjectConverter getJsonConverterInstance() {

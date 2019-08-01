@@ -43,12 +43,14 @@ public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchS
   BatchStatisticsQuery suspended();
 
   /**
-   * Returns batch statistics sorted by batch id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   * Returns batch statistics sorted by batch id; must be followed by an invocation of
+   * {@link #asc()} or {@link #desc()}.
    */
   BatchStatisticsQuery orderById();
 
   /**
-   * Returns batch statistics sorted by tenant id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   * Returns batch statistics sorted by tenant id; must be followed by an invocation of
+   * {@link #asc()} or {@link #desc()}.
    */
   BatchStatisticsQuery orderByTenantId();
 

@@ -46,5 +46,4 @@ public class MinValidator extends AbstractNumericValidator {
     return submittedValue >= configuration;
   }
 
-
 }

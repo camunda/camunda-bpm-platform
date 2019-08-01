@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -24,14 +23,12 @@ package org.camunda.bpm.engine.impl.db;
 public interface DbEntity {
 
   String getId();
+
   void setId(String id);
 
   /**
-   * Returns a representation of the object,
-   *  as would be stored in the database.
-   * Used when deciding if updates have
-   *  occurred to the object or not since
-   *  it was last loaded.
+   * Returns a representation of the object, as would be stored in the database. Used when deciding
+   * if updates have occurred to the object or not since it was last loaded.
    */
   Object getPersistentState();
 }

@@ -38,7 +38,7 @@ public class IntegerValueSerializer extends PrimitiveValueSerializer<IntegerValu
   public void writeValue(IntegerValue variableValue, ValueFields valueFields) {
     Integer value = variableValue.getValue();
 
-    if (value!=null) {
+    if (value != null) {
       valueFields.setLongValue(((Integer) value).longValue());
       valueFields.setTextValue(value.toString());
     } else {
@@ -51,7 +51,7 @@ public class IntegerValueSerializer extends PrimitiveValueSerializer<IntegerValu
   public IntegerValue readValue(ValueFields valueFields) {
     Integer intValue = null;
 
-    if(valueFields.getLongValue() != null) {
+    if (valueFields.getLongValue() != null) {
       intValue = Integer.valueOf(valueFields.getLongValue().intValue());
     }
 

@@ -37,9 +37,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
  * @author Anna Pazola
  *
  */
-public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<RestartProcessInstancesBatchConfiguration>{
+public class RestartProcessInstancesJobHandler
+    extends AbstractBatchJobHandler<RestartProcessInstancesBatchConfiguration> {
 
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_PROCESS_INSTANCE_RESTART);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(
+      Batch.TYPE_PROCESS_INSTANCE_RESTART);
 
   @Override
   public String getType() {
@@ -47,27 +49,32 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
   }
 
   @Override
-  protected void postProcessJob(RestartProcessInstancesBatchConfiguration configuration, JobEntity job) {
+  protected void postProcessJob(RestartProcessInstancesBatchConfiguration configuration,
+      JobEntity job) {
     CommandContext commandContext = Context.getCommandContext();
-    ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(configuration.getProcessDefinitionId());
+    ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionById(configuration.getProcessDefinitionId());
     job.setDeploymentId(processDefinitionEntity.getDeploymentId());
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
+  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
+    ByteArrayEntity configurationEntity = commandContext.getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    RestartProcessInstancesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    RestartProcessInstancesBatchConfiguration batchConfiguration = readConfiguration(
+        configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
+    boolean initialLegacyRestrictions = commandContext
+        .isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();
     commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
     try {
 
-      RestartProcessInstanceBuilderImpl builder = (RestartProcessInstanceBuilderImpl) commandContext.getProcessEngineConfiguration()
-          .getRuntimeService()
+      RestartProcessInstanceBuilderImpl builder = (RestartProcessInstanceBuilderImpl) commandContext
+          .getProcessEngineConfiguration().getRuntimeService()
           .restartProcessInstances(batchConfiguration.getProcessDefinitionId())
           .processInstanceIds(batchConfiguration.getIds());
 
@@ -106,10 +113,12 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
   }
 
   @Override
-  protected RestartProcessInstancesBatchConfiguration createJobConfiguration(RestartProcessInstancesBatchConfiguration configuration,
-      List<String> processIdsForJob) {
-    return new RestartProcessInstancesBatchConfiguration(processIdsForJob, configuration.getInstructions(), configuration.getProcessDefinitionId(),
-        configuration.isInitialVariables(), configuration.isSkipCustomListeners(), configuration.isSkipIoMappings(), configuration.isWithoutBusinessKey());
+  protected RestartProcessInstancesBatchConfiguration createJobConfiguration(
+      RestartProcessInstancesBatchConfiguration configuration, List<String> processIdsForJob) {
+    return new RestartProcessInstancesBatchConfiguration(processIdsForJob,
+        configuration.getInstructions(), configuration.getProcessDefinitionId(),
+        configuration.isInitialVariables(), configuration.isSkipCustomListeners(),
+        configuration.isSkipIoMappings(), configuration.isWithoutBusinessKey());
   }
 
   @Override

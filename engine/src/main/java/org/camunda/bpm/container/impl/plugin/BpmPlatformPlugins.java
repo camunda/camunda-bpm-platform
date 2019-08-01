@@ -44,8 +44,7 @@ public class BpmPlatformPlugins {
   public static BpmPlatformPlugins load(ClassLoader classLoader) {
     BpmPlatformPlugins plugins = new BpmPlatformPlugins();
 
-    Iterator<BpmPlatformPlugin> it = ServiceLoader
-        .load(BpmPlatformPlugin.class, classLoader)
+    Iterator<BpmPlatformPlugin> it = ServiceLoader.load(BpmPlatformPlugin.class, classLoader)
         .iterator();
 
     while (it.hasNext()) {

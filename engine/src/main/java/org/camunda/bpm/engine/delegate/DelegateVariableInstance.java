@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
  * @author Thorben Lindhauer
  *
  */
-public interface DelegateVariableInstance<T extends BaseDelegateExecution> extends VariableInstance, ProcessEngineServicesAware {
+public interface DelegateVariableInstance<T extends BaseDelegateExecution>
+    extends VariableInstance, ProcessEngineServicesAware {
 
   String getEventName();
 

@@ -26,13 +26,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 
-
 /**
  * @author Tom Baeyens
  */
 public class TweetExceptionHandler implements JobHandler<JobHandlerConfiguration> {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   public static final String TYPE = "tweet-exception";
 
@@ -42,9 +41,10 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     return TYPE;
   }
 
-  public void execute(JobHandlerConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(JobHandlerConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
     if (exceptionsRemaining.decrementAndGet() >= 0) {
-      throw new RuntimeException("exception remaining: "+exceptionsRemaining);
+      throw new RuntimeException("exception remaining: " + exceptionsRemaining);
     }
     LOG.info("no more exceptions to throw.");
   }
@@ -66,7 +66,6 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   public int getExceptionsRemaining() {
     return exceptionsRemaining.get();
   }
-
 
   public void setExceptionsRemaining(int exceptionsRemaining) {
     this.exceptionsRemaining.set(exceptionsRemaining);

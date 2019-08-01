@@ -37,8 +37,8 @@ public class ProcessEngineRuleRequiredHistoryLevelClassTest {
   public void requiredHistoryLevelOnClass() {
 
     assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+        CoreMatchers.<String> either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+            .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
   @Test
@@ -46,9 +46,9 @@ public class ProcessEngineRuleRequiredHistoryLevelClassTest {
   public void overrideRequiredHistoryLevelOnClass() {
 
     assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
-        .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+        CoreMatchers.<String> either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
+            .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+            .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
   protected String currentHistoryLevel() {

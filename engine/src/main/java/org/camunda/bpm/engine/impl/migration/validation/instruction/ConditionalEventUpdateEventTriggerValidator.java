@@ -28,11 +28,12 @@ public class ConditionalEventUpdateEventTriggerValidator implements MigrationIns
 
   @Override
   public void validate(ValidatingMigrationInstruction instruction,
-                       ValidatingMigrationInstructions instructions,
-                       MigrationInstructionValidationReportImpl report) {
+      ValidatingMigrationInstructions instructions,
+      MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
 
-    if (sourceActivity.getActivityBehavior() instanceof ConditionalEventBehavior && !instruction.isUpdateEventTrigger()) {
+    if (sourceActivity.getActivityBehavior() instanceof ConditionalEventBehavior
+        && !instruction.isUpdateEventTrigger()) {
       report.addFailure(MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG);
     }
   }

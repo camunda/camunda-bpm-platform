@@ -27,7 +27,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  *
  */
 public class DeleteUserPictureCmd implements Command<Void> {
-  
+
   protected String userId;
 
   public DeleteUserPictureCmd(String userId) {
@@ -38,19 +38,16 @@ public class DeleteUserPictureCmd implements Command<Void> {
     ensureNotNull("UserId", userId);
 
     IdentityInfoEntity infoEntity = commandContext.getIdentityInfoManager()
-      .findUserInfoByUserIdAndKey(userId, "picture");
-    
-    if(infoEntity != null) {
+        .findUserInfoByUserIdAndKey(userId, "picture");
+
+    if (infoEntity != null) {
       String byteArrayId = infoEntity.getValue();
-      if(byteArrayId != null) {
-        commandContext.getByteArrayManager()
-          .deleteByteArrayById(byteArrayId);
+      if (byteArrayId != null) {
+        commandContext.getByteArrayManager().deleteByteArrayById(byteArrayId);
       }
-      commandContext.getIdentityInfoManager()
-        .delete(infoEntity);
+      commandContext.getIdentityInfoManager().delete(infoEntity);
     }
-    
-    
+
     return null;
   }
 

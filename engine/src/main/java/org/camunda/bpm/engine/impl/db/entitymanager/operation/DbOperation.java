@@ -93,20 +93,18 @@ public abstract class DbOperation implements Recyclable {
     this.failure = failure;
   }
 
-  public enum State
-  {
-    NOT_APPLIED,
-    APPLIED,
+  public enum State {
+    NOT_APPLIED, APPLIED,
 
     /**
-     * Indicates that the operation was not performed for any reason except
-     * concurrent modifications.
+     * Indicates that the operation was not performed for any reason except concurrent
+     * modifications.
      */
     FAILED_ERROR,
 
     /**
-     * Indicates that the operation was not performed and that the reason
-     * was a concurrent modification to the data to be updated.
+     * Indicates that the operation was not performed and that the reason was a concurrent
+     * modification to the data to be updated.
      */
     FAILED_CONCURRENT_MODIFICATION
   }

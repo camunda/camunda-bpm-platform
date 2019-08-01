@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.scripting.engine;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 
-
 /**
  * @author Tom Baeyens
  */

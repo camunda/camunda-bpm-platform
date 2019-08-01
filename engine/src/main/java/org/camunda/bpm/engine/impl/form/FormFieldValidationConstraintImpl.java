@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
  * @author Daniel Meyer
  *
  */
-public class FormFieldValidationConstraintImpl implements FormFieldValidationConstraint, Serializable {
+public class FormFieldValidationConstraintImpl
+    implements FormFieldValidationConstraint, Serializable {
 
   private static final long serialVersionUID = 1L;
 

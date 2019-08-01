@@ -28,11 +28,13 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class IntermediateConditionalEventBehavior extends IntermediateCatchEventActivityBehavior implements ConditionalEventBehavior {
+public class IntermediateConditionalEventBehavior extends IntermediateCatchEventActivityBehavior
+    implements ConditionalEventBehavior {
 
   protected final ConditionalEventDefinition conditionalEvent;
 
-  public IntermediateConditionalEventBehavior(ConditionalEventDefinition conditionalEvent, boolean isAfterEventBasedGateway) {
+  public IntermediateConditionalEventBehavior(ConditionalEventDefinition conditionalEvent,
+      boolean isAfterEventBasedGateway) {
     super(isAfterEventBasedGateway);
     this.conditionalEvent = conditionalEvent;
   }
@@ -50,13 +52,13 @@ public class IntermediateConditionalEventBehavior extends IntermediateCatchEvent
   }
 
   @Override
-  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableEvent variableEvent) {
+  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription,
+      final VariableEvent variableEvent) {
     PvmExecutionImpl execution = eventSubscription.getExecution();
 
-    if (execution != null && !execution.isEnded()
-      && variableEvent != null
-      && conditionalEvent.tryEvaluate(variableEvent, execution)
-      && execution.isActive() && execution.isScope()) {
+    if (execution != null && !execution.isEnded() && variableEvent != null
+        && conditionalEvent.tryEvaluate(variableEvent, execution) && execution.isActive()
+        && execution.isScope()) {
       if (isAfterEventBasedGateway) {
         final ActivityImpl activity = eventSubscription.getActivity();
         execution.executeEventHandlerActivity(activity);

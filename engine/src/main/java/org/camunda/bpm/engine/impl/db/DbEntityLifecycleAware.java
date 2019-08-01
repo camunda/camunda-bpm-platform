@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.impl.db;
 
 /**
- * Interface which can be implemented by {@link DbEntity DbEntities} which
- * want to be aware of their lifecycle.
+ * Interface which can be implemented by {@link DbEntity DbEntities} which want to be aware of their
+ * lifecycle.
  *
  * @author Daniel Meyer
  *

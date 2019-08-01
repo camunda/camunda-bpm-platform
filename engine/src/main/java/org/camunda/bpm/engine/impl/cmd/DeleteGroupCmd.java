@@ -24,26 +24,25 @@ import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Tom Baeyens
  */
-public class DeleteGroupCmd extends AbstractWritableIdentityServiceCmd<Void>  implements Command<Void>, Serializable  {
+public class DeleteGroupCmd extends AbstractWritableIdentityServiceCmd<Void>
+    implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   String groupId;
-  
+
   public DeleteGroupCmd(String groupId) {
     this.groupId = groupId;
   }
-  
+
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("groupId", groupId);
-    
-    IdentityOperationResult operationResult = commandContext
-      .getWritableIdentityProvider()
-      .deleteGroup(groupId);
-    
+
+    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider()
+        .deleteGroup(groupId);
+
     commandContext.getOperationLogManager().logGroupOperation(operationResult, groupId);
 
     return null;

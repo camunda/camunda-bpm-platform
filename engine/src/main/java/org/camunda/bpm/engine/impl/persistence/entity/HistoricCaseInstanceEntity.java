@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity
 /**
  * @author Sebastian Menski
  */
-public class HistoricCaseInstanceEntity extends HistoricCaseInstanceEventEntity implements HistoricCaseInstance {
+public class HistoricCaseInstanceEntity extends HistoricCaseInstanceEventEntity
+    implements HistoricCaseInstance {
 
   private static final long serialVersionUID = 1L;
 

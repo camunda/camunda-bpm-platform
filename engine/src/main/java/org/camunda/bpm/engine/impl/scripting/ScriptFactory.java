@@ -19,10 +19,11 @@ package org.camunda.bpm.engine.impl.scripting;
 import org.camunda.bpm.engine.delegate.Expression;
 
 /**
- * <p>A script factory is responsible for creating a {@link ExecutableScript}
- * instance. Users may customize (subclass) this class in order to customize script
- * creation. For instance, some users may choose to pre-process scripts before
- * they are created.</p>
+ * <p>
+ * A script factory is responsible for creating a {@link ExecutableScript} instance. Users may
+ * customize (subclass) this class in order to customize script creation. For instance, some users
+ * may choose to pre-process scripts before they are created.
+ * </p>
  *
  * @author Daniel Meyer
  *

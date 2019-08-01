@@ -19,20 +19,21 @@ package org.camunda.bpm.application.impl.metadata;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.xml.Parser;
 
-
 /**
- * <p>A SAX Parser for the processes.xml file</p>
+ * <p>
+ * A SAX Parser for the processes.xml file
+ * </p>
  * 
  * @author Daniel Meyer
  *
  */
 public class ProcessesXmlParser extends Parser {
-  
+
   /**
    * The process application namespace
    */
   public static final String PROCESS_APP_NS = "http://www.camunda.org/schema/1.0/ProcessApplication";
-  
+
   /**
    * The location of the XSD file in the classpath.
    */
@@ -43,7 +44,8 @@ public class ProcessesXmlParser extends Parser {
    */
   public ProcessesXmlParse createParse() {
     ProcessesXmlParse processesXmlParse = new ProcessesXmlParse(this);
-    processesXmlParse.setSchemaResource(ReflectUtil.getResourceUrlAsString(PROCESS_APPLICATION_XSD));
+    processesXmlParse
+        .setSchemaResource(ReflectUtil.getResourceUrlAsString(PROCESS_APPLICATION_XSD));
     return processesXmlParse;
   }
 

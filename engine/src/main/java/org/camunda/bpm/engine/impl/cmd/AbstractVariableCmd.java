@@ -56,10 +56,11 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
 
     ExecutionEntity contextExecution = getContextExecution();
     if (contextExecution != null) {
-      contextExecution.dispatchDelayedEventsAndPerformOperation((Callback<PvmExecutionImpl, Void>) null);
+      contextExecution
+          .dispatchDelayedEventsAndPerformOperation((Callback<PvmExecutionImpl, Void>) null);
     }
 
-    if(!preventLogUserOperation) {
+    if (!preventLogUserOperation) {
       logVariableOperation(scope);
     }
 

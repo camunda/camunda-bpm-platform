@@ -25,11 +25,12 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 
-
 /**
- * Gives access to a deployed decision requirements diagram, e.g., a PNG image, through a stream of bytes.
+ * Gives access to a deployed decision requirements diagram, e.g., a PNG image, through a stream of
+ * bytes.
  */
-public class GetDeploymentDecisionRequirementsDiagramCmd implements Command<InputStream>, Serializable {
+public class GetDeploymentDecisionRequirementsDiagramCmd
+    implements Command<InputStream>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -40,19 +41,19 @@ public class GetDeploymentDecisionRequirementsDiagramCmd implements Command<Inpu
   }
 
   public InputStream execute(final CommandContext commandContext) {
-    DecisionRequirementsDefinition decisionRequirementsDefinition = new GetDeploymentDecisionRequirementsDefinitionCmd(decisionRequirementsDefinitionId).execute(commandContext);
+    DecisionRequirementsDefinition decisionRequirementsDefinition = new GetDeploymentDecisionRequirementsDefinitionCmd(
+        decisionRequirementsDefinitionId).execute(commandContext);
 
     final String deploymentId = decisionRequirementsDefinition.getDeploymentId();
     final String resourceName = decisionRequirementsDefinition.getDiagramResourceName();
 
-    if (resourceName != null ) {
+    if (resourceName != null) {
       return commandContext.runWithoutAuthorization(new Callable<InputStream>() {
         public InputStream call() throws Exception {
           return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
         }
       });
-    }
-    else {
+    } else {
       return null;
     }
   }

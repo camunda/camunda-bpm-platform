@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine;
 
-
 /**
  * Runtime exception that is the superclass of all exceptions in the process engine.
  *

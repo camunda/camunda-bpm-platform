@@ -47,17 +47,19 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
 
   @Override
   public void tearDown() throws Exception {
-    ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequiresNew().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+        .getCommandExecutorTxRequiresNew().execute(new Command<Void>() {
+          public Void execute(CommandContext commandContext) {
 
-        List<HistoricJobLog> jobLogs = processEngine.getHistoryService().createHistoricJobLogQuery().list();
-        for (HistoricJobLog jobLog : jobLogs) {
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogById(jobLog.getId());
-        }
+            List<HistoricJobLog> jobLogs = processEngine.getHistoryService()
+                .createHistoricJobLogQuery().list();
+            for (HistoricJobLog jobLog : jobLogs) {
+              commandContext.getHistoricJobLogManager().deleteHistoricJobLogById(jobLog.getId());
+            }
 
-        return null;
-      }
-    });
+            return null;
+          }
+        });
 
     assertEquals(0, processEngine.getHistoryService().createHistoricJobLogQuery().list().size());
 
@@ -68,7 +70,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
   protected void runTest() throws Throwable {
     String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
 
-    if (DbSqlSessionFactory.H2.equals(databaseType) && getName().equals("testConcurrentExclusiveCorrelation")) {
+    if (DbSqlSessionFactory.H2.equals(databaseType)
+        && getName().equals("testConcurrentExclusiveCorrelation")) {
       // skip test method - if database is H2
     } else {
       // invoke the test method
@@ -84,9 +87,11 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
 
     // and two threads correlating in parallel
-    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", false));
+    ThreadControl thread1 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", false));
     thread1.reportInterrupts();
-    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", false));
+    ThreadControl thread2 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", false));
     thread2.reportInterrupts();
 
     // both threads open a transaction and wait before correlating the message
@@ -124,9 +129,11 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
 
     // and two threads correlating in parallel
-    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", true));
+    ThreadControl thread1 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", true));
     thread1.reportInterrupts();
-    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", true));
+    ThreadControl thread2 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", true));
     thread2.reportInterrupts();
 
     // both threads open a transaction and wait before correlating the message
@@ -140,7 +147,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     // the service task was executed once
     assertEquals(1, InvocationLogListener.getInvocations());
 
-    // thread two attempts to acquire the exclusive lock but can't since thread 1 hasn't released it yet
+    // thread two attempts to acquire the exclusive lock but can't since thread 1 hasn't released it
+    // yet
     thread2.makeContinue();
     Thread.sleep(2000);
 
@@ -168,7 +176,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
-  public void testConcurrentExclusiveCorrelationToDifferentExecutions() throws InterruptedException {
+  public void testConcurrentExclusiveCorrelationToDifferentExecutions()
+      throws InterruptedException {
     InvocationLogListener.reset();
 
     // given a process instance
@@ -176,9 +185,11 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("testProcess");
 
     // and two threads correlating in parallel to each of the two instances
-    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", instance1.getId(), true));
+    ThreadControl thread1 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", instance1.getId(), true));
     thread1.reportInterrupts();
-    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", instance2.getId(), true));
+    ThreadControl thread2 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", instance2.getId(), true));
     thread2.reportInterrupts();
 
     // both threads open a transaction and wait before correlating the message
@@ -211,14 +222,16 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertNull(thread2.getException());
 
     // the follow-up task was reached in both instances
-    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
+    assertEquals(2,
+        taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
   }
 
   /**
    * Fails at least on mssql; mssql appears to lock more than the actual event subscription row
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
-  public void FAILING_testConcurrentExclusiveCorrelationToDifferentExecutionsCase2() throws InterruptedException {
+  public void FAILING_testConcurrentExclusiveCorrelationToDifferentExecutionsCase2()
+      throws InterruptedException {
     InvocationLogListener.reset();
 
     // given a process instance
@@ -226,9 +239,11 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("testProcess");
 
     // and two threads correlating in parallel to each of the two instances
-    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", instance1.getId(), true));
+    ThreadControl thread1 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", instance1.getId(), true));
     thread1.reportInterrupts();
-    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", instance2.getId(), true));
+    ThreadControl thread2 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", instance2.getId(), true));
     thread2.reportInterrupts();
 
     // both threads open a transaction and wait before correlating the message
@@ -259,7 +274,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertNull(thread1.getException());
 
     // the follow-up task was reached in both instances
-    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
+    assertEquals(2,
+        taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
@@ -270,9 +286,11 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
 
     // and two threads correlating in parallel (one exclusive, one non-exclusive)
-    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", true));
+    ThreadControl thread1 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", true));
     thread1.reportInterrupts();
-    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", false));
+    ThreadControl thread2 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", false));
     thread2.reportInterrupts();
 
     // both threads open a transaction and wait before correlating the message
@@ -290,7 +308,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     // the service task was executed twice
     assertEquals(2, InvocationLogListener.getInvocations());
 
-    // the first thread ends its transaction and releases the lock; the event subscription is now gone
+    // the first thread ends its transaction and releases the lock; the event subscription is now
+    // gone
     thread1.waitUntilDone();
     assertNull(thread1.getException());
 
@@ -307,10 +326,10 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
 
   /**
    * <p>
-   *   At least on MySQL, this test case fails with deadlock exceptions.
-   *   The reason is the combination of our flush with the locking of the event
-   *   subscription documented in the ticket CAM-3636.
+   * At least on MySQL, this test case fails with deadlock exceptions. The reason is the combination
+   * of our flush with the locking of the event subscription documented in the ticket CAM-3636.
    * </p>
+   * 
    * @throws InterruptedException
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
@@ -321,9 +340,11 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
 
     // and two threads correlating in parallel (one exclusive, one non-exclusive)
-    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", false));
+    ThreadControl thread1 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", false));
     thread1.reportInterrupts();
-    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", true));
+    ThreadControl thread2 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", true));
     thread2.reportInterrupts();
 
     // both threads open a transaction and wait before correlating the message
@@ -341,7 +362,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     // the service task was executed twice
     assertEquals(2, InvocationLogListener.getInvocations());
 
-    // thread one ends its transaction and blocks on flush when it attempts to delete the event subscription
+    // thread one ends its transaction and blocks on flush when it attempts to delete the event
+    // subscription
     thread1.makeContinue();
     Thread.sleep(5000);
     assertNull(thread1.getException());
@@ -370,9 +392,11 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
 
     // and two threads correlating in parallel
-    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("incoming", false));
+    ThreadControl thread1 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("incoming", false));
     thread1.reportInterrupts();
-    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("incoming", false));
+    ThreadControl thread2 = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("incoming", false));
     thread2.reportInterrupts();
 
     // both threads open a transaction and wait before correlating the message
@@ -431,7 +455,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     List<Task> tasks = taskService.createTaskQuery().list();
 
     // trigger tree compaction and wait before flush
-    ThreadControl taskCompletionThread = executeControllableCommand(new ControllableCompleteTaskCommand(tasks));
+    ThreadControl taskCompletionThread = executeControllableCommand(
+        new ControllableCompleteTaskCommand(tasks));
     taskCompletionThread.reportInterrupts();
 
     // stop task completion right before flush
@@ -489,12 +514,14 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     // given a process instance
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    List<Execution> tasks = runtimeService.createExecutionQuery().messageEventSubscriptionName("Message").list();
+    List<Execution> tasks = runtimeService.createExecutionQuery()
+        .messageEventSubscriptionName("Message").list();
     // two tasks waiting for the message
     assertEquals(2, tasks.size());
 
     // start first thread and wait in the second execution end listener
-    ThreadControl thread1 = executeControllableCommand(new ControllableMessageEventReceivedCommand(tasks.get(0).getId(), "Message", true));
+    ThreadControl thread1 = executeControllableCommand(
+        new ControllableMessageEventReceivedCommand(tasks.get(0).getId(), "Message", true));
     thread1.reportInterrupts();
     thread1.waitForSync();
 
@@ -502,7 +529,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertEquals(1, InvocationLogListener.getInvocations());
 
     // start second thread and complete the task
-    ThreadControl thread2 = executeControllableCommand(new ControllableMessageEventReceivedCommand(tasks.get(1).getId(), "Message", false));
+    ThreadControl thread2 = executeControllableCommand(
+        new ControllableMessageEventReceivedCommand(tasks.get(1).getId(), "Message", false));
     thread2.waitForSync();
     thread2.waitUntilDone();
 
@@ -573,7 +601,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
       this.exclusive = exclusive;
     }
 
-    public ControllableMessageCorrelationCommand(String messageName, String processInstanceId, boolean exclusive) {
+    public ControllableMessageCorrelationCommand(String messageName, String processInstanceId,
+        boolean exclusive) {
       this(messageName, exclusive);
       this.processInstanceId = processInstanceId;
     }
@@ -581,21 +610,21 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     @Override
     public Void execute(CommandContext commandContext) {
 
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync(); // thread will block here until makeContinue() is called form main thread
 
-      MessageCorrelationBuilderImpl correlationBuilder = new MessageCorrelationBuilderImpl(commandContext, messageName);
+      MessageCorrelationBuilderImpl correlationBuilder = new MessageCorrelationBuilderImpl(
+          commandContext, messageName);
       if (processInstanceId != null) {
         correlationBuilder.processInstanceId(processInstanceId);
       }
 
       if (exclusive) {
         correlationBuilder.correlateExclusively();
-      }
-      else {
+      } else {
         correlationBuilder.correlate();
       }
 
-      monitor.sync();  // thread will block here until waitUntilDone() is called form main thread
+      monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
 
       return null;
     }
@@ -608,7 +637,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     protected final String messageName;
     protected final boolean shouldWaitInListener;
 
-    public ControllableMessageEventReceivedCommand(String executionId, String messageName, boolean shouldWaitInListener) {
+    public ControllableMessageEventReceivedCommand(String executionId, String messageName,
+        boolean shouldWaitInListener) {
       this.executionId = executionId;
       this.messageName = messageName;
       this.shouldWaitInListener = shouldWaitInListener;
@@ -620,7 +650,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
         WaitingListener.setMonitor(monitor);
       }
 
-      MessageEventReceivedCmd receivedCmd = new MessageEventReceivedCmd(messageName, executionId, null);
+      MessageEventReceivedCmd receivedCmd = new MessageEventReceivedCmd(messageName, executionId,
+          null);
 
       receivedCmd.execute(commandContext);
 

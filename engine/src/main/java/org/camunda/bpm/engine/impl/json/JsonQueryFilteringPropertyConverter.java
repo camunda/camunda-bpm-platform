@@ -28,13 +28,13 @@ import org.camunda.bpm.engine.query.QueryProperty;
  * @author Thorben Lindhauer
  *
  */
-public class JsonQueryFilteringPropertyConverter extends JsonObjectConverter<QueryEntityRelationCondition> {
+public class JsonQueryFilteringPropertyConverter
+    extends JsonObjectConverter<QueryEntityRelationCondition> {
 
-  protected static JsonQueryFilteringPropertyConverter INSTANCE =
-      new JsonQueryFilteringPropertyConverter();
+  protected static JsonQueryFilteringPropertyConverter INSTANCE = new JsonQueryFilteringPropertyConverter();
 
-  protected static JsonArrayConverter<List<QueryEntityRelationCondition>> ARRAY_CONVERTER =
-    new JsonArrayOfObjectsConverter<>(INSTANCE);
+  protected static JsonArrayConverter<List<QueryEntityRelationCondition>> ARRAY_CONVERTER = new JsonArrayOfObjectsConverter<>(
+      INSTANCE);
 
   public static final String BASE_PROPERTY = "baseField";
   public static final String COMPARISON_PROPERTY = "comparisonField";
@@ -74,7 +74,8 @@ public class JsonQueryFilteringPropertyConverter extends JsonObjectConverter<Que
 
     QueryProperty comparisonProperty = null;
     if (jsonObject.has(COMPARISON_PROPERTY)) {
-      comparisonProperty = new QueryPropertyImpl(JsonUtil.getString(jsonObject, COMPARISON_PROPERTY));
+      comparisonProperty = new QueryPropertyImpl(
+          JsonUtil.getString(jsonObject, COMPARISON_PROPERTY));
     }
 
     return new QueryEntityRelationCondition(baseProperty, comparisonProperty, scalarValue);

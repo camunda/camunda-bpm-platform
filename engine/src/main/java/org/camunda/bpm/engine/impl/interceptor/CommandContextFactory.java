@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.interceptor;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -36,7 +35,8 @@ public class CommandContextFactory {
     return processEngineConfiguration;
   }
 
-  public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  public void setProcessEngineConfiguration(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.processEngineConfiguration = processEngineConfiguration;
   }
 

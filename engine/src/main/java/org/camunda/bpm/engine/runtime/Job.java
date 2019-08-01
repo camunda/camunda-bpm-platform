@@ -21,7 +21,6 @@ import java.util.Date;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.management.JobDefinition;
 
-
 /**
  * Represents one job (timer, message, etc.).
  *
@@ -61,19 +60,18 @@ public interface Job {
   String getExecutionId();
 
   /**
-   * Returns the number of retries this job has left.
-   * Whenever the jobexecutor fails to execute the job, this value is decremented.
-   * When it hits zero, the job is supposed to be dead and not retried again
-   * (ie a manual retry is required then).
+   * Returns the number of retries this job has left. Whenever the jobexecutor fails to execute the
+   * job, this value is decremented. When it hits zero, the job is supposed to be dead and not
+   * retried again (ie a manual retry is required then).
    */
   int getRetries();
 
   /**
-   * Returns the message of the exception that occurred, the last time the job was
-   * executed. Returns null when no exception occurred.
+   * Returns the message of the exception that occurred, the last time the job was executed. Returns
+   * null when no exception occurred.
    *
-   * To get the full exception stacktrace,
-   * use {@link ManagementService#getJobExceptionStacktrace(String)}
+   * To get the full exception stacktrace, use
+   * {@link ManagementService#getJobExceptionStacktrace(String)}
    */
   String getExceptionMessage();
 
@@ -88,8 +86,8 @@ public interface Job {
   String getJobDefinitionId();
 
   /**
-   * Indicates whether this job is suspended. If a job is suspended,
-   * the job will be not acquired by the job executor.
+   * Indicates whether this job is suspended. If a job is suspended, the job will be not acquired by
+   * the job executor.
    *
    * @return true if this Job is currently suspended.
    */
@@ -103,8 +101,8 @@ public interface Job {
   long getPriority();
 
   /**
-   * The id of the tenant this job belongs to. Can be <code>null</code>
-   * if the job belongs to no single tenant.
+   * The id of the tenant this job belongs to. Can be <code>null</code> if the job belongs to no
+   * single tenant.
    */
   String getTenantId();
 

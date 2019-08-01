@@ -23,8 +23,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to annotate a user-provided {@link AbstractProcessApplication} class and specify
- * the unique name of the process application.
+ * Used to annotate a user-provided {@link AbstractProcessApplication} class and specify the unique
+ * name of the process application.
  *
  * @author Daniel Meyer
  *
@@ -37,26 +37,25 @@ public @interface ProcessApplication {
   String DEFAULT_META_INF_PROCESSES_XML = "META-INF/processes.xml";
 
   /**
-   * Allows specifying the name of the process application.
-   * Overrides the {@code name} property.
+   * Allows specifying the name of the process application. Overrides the {@code name} property.
    */
   String value() default "";
 
   /**
-   * Allows specifying the name of the process application.
-   * Only applies if the {@code value} property is not set.
+   * Allows specifying the name of the process application. Only applies if the {@code value}
+   * property is not set.
    */
   String name() default "";
 
   /**
-   * Returns the location(s) of the <code>processes.xml</code> deployment descriptors.
-   * The default value is<code>{META-INF/processes.xml}</code>. The provided path(s)
-   * must be resolvable through the {@link ClassLoader#getResourceAsStream(String)}-Method
-   * of the classloader returned  by the {@link AbstractProcessApplication#getProcessApplicationClassloader()}
-   * method provided by the process application.
+   * Returns the location(s) of the <code>processes.xml</code> deployment descriptors. The default
+   * value is<code>{META-INF/processes.xml}</code>. The provided path(s) must be resolvable through
+   * the {@link ClassLoader#getResourceAsStream(String)}-Method of the classloader returned by the
+   * {@link AbstractProcessApplication#getProcessApplicationClassloader()} method provided by the
+   * process application.
    *
    * @return the location of the <code>processes.xml</code> file.
    */
-  String[] deploymentDescriptors() default {DEFAULT_META_INF_PROCESSES_XML};
+  String[] deploymentDescriptors() default { DEFAULT_META_INF_PROCESSES_XML };
 
 }

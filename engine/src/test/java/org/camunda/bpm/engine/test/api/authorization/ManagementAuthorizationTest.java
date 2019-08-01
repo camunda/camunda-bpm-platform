@@ -122,7 +122,8 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      managementService.createTablePageQuery().tableName("ACT_RE_PROCDEF").listPage(0, Integer.MAX_VALUE);
+      managementService.createTablePageQuery().tableName("ACT_RE_PROCDEF").listPage(0,
+          Integer.MAX_VALUE);
       fail("Exception expected: It should not be possible to get a table page");
     } catch (AuthorizationException e) {
       // then
@@ -138,7 +139,8 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
 
     // when
-    TablePage page = managementService.createTablePageQuery().tableName(tablePrefix + "ACT_RE_PROCDEF").listPage(0, Integer.MAX_VALUE);
+    TablePage page = managementService.createTablePageQuery()
+        .tableName(tablePrefix + "ACT_RE_PROCDEF").listPage(0, Integer.MAX_VALUE);
 
     // then
     assertNotNull(page);
@@ -147,7 +149,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   // get history level /////////////////////////////////
 
   public void testGetHistoryLevelWithoutAuthorization() {
-    //given
+    // given
 
     try {
       // when
@@ -161,7 +163,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   }
 
   public void testGetHistoryLevelAsCamundaAdmin() {
-    //given
+    // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when

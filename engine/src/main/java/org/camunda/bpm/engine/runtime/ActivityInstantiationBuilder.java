@@ -24,30 +24,26 @@ import java.util.Map;
 public interface ActivityInstantiationBuilder<T extends ActivityInstantiationBuilder<T>> {
 
   /**
-   * If an instruction is submitted before then the variable is set when the
-   * instruction is executed. Otherwise, the variable is set on the process
-   * instance itself.
+   * If an instruction is submitted before then the variable is set when the instruction is
+   * executed. Otherwise, the variable is set on the process instance itself.
    */
   T setVariable(String name, Object value);
 
   /**
-   * If an instruction is submitted before then the local variable is set when
-   * the instruction is executed. Otherwise, the variable is set on the process
-   * instance itself.
+   * If an instruction is submitted before then the local variable is set when the instruction is
+   * executed. Otherwise, the variable is set on the process instance itself.
    */
   T setVariableLocal(String name, Object value);
 
   /**
-   * If an instruction is submitted before then all variables are set when the
-   * instruction is executed. Otherwise, the variables are set on the process
-   * instance itself.
+   * If an instruction is submitted before then all variables are set when the instruction is
+   * executed. Otherwise, the variables are set on the process instance itself.
    */
   T setVariables(Map<String, Object> variables);
 
   /**
-   * If an instruction is submitted before then all local variables are set when
-   * the instruction is executed. Otherwise, the variables are set on the
-   * process instance itself.
+   * If an instruction is submitted before then all local variables are set when the instruction is
+   * executed. Otherwise, the variables are set on the process instance itself.
    */
   T setVariablesLocal(Map<String, Object> variables);
 

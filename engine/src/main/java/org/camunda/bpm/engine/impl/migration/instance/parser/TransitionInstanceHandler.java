@@ -34,18 +34,22 @@ import org.camunda.bpm.engine.runtime.TransitionInstance;
  * @author Thorben Lindhauer
  *
  */
-public class TransitionInstanceHandler implements MigratingInstanceParseHandler<TransitionInstance> {
+public class TransitionInstanceHandler
+    implements MigratingInstanceParseHandler<TransitionInstance> {
 
   @Override
-  public void handle(MigratingInstanceParseContext parseContext, TransitionInstance transitionInstance) {
+  public void handle(MigratingInstanceParseContext parseContext,
+      TransitionInstance transitionInstance) {
 
     if (!isAsyncTransitionInstance(transitionInstance)) {
       return;
     }
 
-    MigrationInstruction applyingInstruction = parseContext.getInstructionFor(transitionInstance.getActivityId());
+    MigrationInstruction applyingInstruction = parseContext
+        .getInstructionFor(transitionInstance.getActivityId());
 
-    ScopeImpl sourceScope = parseContext.getSourceProcessDefinition().findActivity(transitionInstance.getActivityId());
+    ScopeImpl sourceScope = parseContext.getSourceProcessDefinition()
+        .findActivity(transitionInstance.getActivityId());
     ScopeImpl targetScope = null;
 
     if (applyingInstruction != null) {
@@ -53,36 +57,34 @@ public class TransitionInstanceHandler implements MigratingInstanceParseHandler<
       targetScope = parseContext.getTargetProcessDefinition().findActivity(activityId);
     }
 
-    ExecutionEntity asyncExecution = Context
-        .getCommandContext()
-        .getExecutionManager()
+    ExecutionEntity asyncExecution = Context.getCommandContext().getExecutionManager()
         .findExecutionById(transitionInstance.getExecutionId());
 
-    MigratingTransitionInstance migratingTransitionInstance = parseContext.getMigratingProcessInstance()
-      .addTransitionInstance(
-        applyingInstruction,
-        transitionInstance,
-        sourceScope,
-        targetScope,
-        asyncExecution);
+    MigratingTransitionInstance migratingTransitionInstance = parseContext
+        .getMigratingProcessInstance().addTransitionInstance(applyingInstruction,
+            transitionInstance, sourceScope, targetScope, asyncExecution);
 
-    MigratingActivityInstance parentInstance = parseContext.getMigratingActivityInstanceById(transitionInstance.getParentActivityInstanceId());
+    MigratingActivityInstance parentInstance = parseContext
+        .getMigratingActivityInstanceById(transitionInstance.getParentActivityInstanceId());
     migratingTransitionInstance.setParent(parentInstance);
 
     List<JobEntity> jobs = asyncExecution.getJobs();
     parseContext.handleDependentTransitionInstanceJobs(migratingTransitionInstance, jobs);
 
-    parseContext.handleDependentVariables(migratingTransitionInstance, collectTransitionInstanceVariables(migratingTransitionInstance));
+    parseContext.handleDependentVariables(migratingTransitionInstance,
+        collectTransitionInstanceVariables(migratingTransitionInstance));
 
   }
 
   /**
-   * Workaround for CAM-5609: In general, only async continuations should be represented as TransitionInstances, but
-   * due to this bug, completed multi-instances are represented like that as well. We tolerate the second case.
+   * Workaround for CAM-5609: In general, only async continuations should be represented as
+   * TransitionInstances, but due to this bug, completed multi-instances are represented like that
+   * as well. We tolerate the second case.
    */
   protected boolean isAsyncTransitionInstance(TransitionInstance transitionInstance) {
     String executionId = transitionInstance.getExecutionId();
-    ExecutionEntity execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
+    ExecutionEntity execution = Context.getCommandContext().getExecutionManager()
+        .findExecutionById(executionId);
     for (JobEntity job : execution.getJobs()) {
       if (AsyncContinuationJobHandler.TYPE.equals(job.getJobHandlerType())) {
         return true;
@@ -92,15 +94,16 @@ public class TransitionInstanceHandler implements MigratingInstanceParseHandler<
     return false;
   }
 
-  protected List<VariableInstanceEntity> collectTransitionInstanceVariables(MigratingTransitionInstance instance) {
+  protected List<VariableInstanceEntity> collectTransitionInstanceVariables(
+      MigratingTransitionInstance instance) {
     List<VariableInstanceEntity> variables = new ArrayList<VariableInstanceEntity>();
     ExecutionEntity representativeExecution = instance.resolveRepresentativeExecution();
 
     if (representativeExecution.isConcurrent()) {
       variables.addAll(representativeExecution.getVariablesInternal());
-    }
-    else {
-      variables.addAll(ActivityInstanceHandler.getConcurrentLocalVariables(representativeExecution));
+    } else {
+      variables
+          .addAll(ActivityInstanceHandler.getConcurrentLocalVariables(representativeExecution));
     }
 
     return variables;

@@ -55,24 +55,18 @@ public class CreateAndResolveIncidentAuthorizationTest {
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.UPDATE_INSTANCE)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.UPDATE)
-        )
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.UPDATE_INSTANCE)
-        )
-        .succeeds()
-    );
+    return AuthorizationTestRule
+        .asParameters(
+            scenario().withoutAuthorizations().failsDueToRequired(
+                grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.UPDATE),
+                grant(
+                    Resources.PROCESS_DEFINITION, "Process", "userId",
+                    Permissions.UPDATE_INSTANCE)),
+            scenario().withAuthorizations(
+                grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.UPDATE))
+                .succeeds(),
+            scenario().withAuthorizations(grant(Resources.PROCESS_DEFINITION, "Process", "userId",
+                Permissions.UPDATE_INSTANCE)).succeeds());
   }
 
   @After
@@ -82,21 +76,20 @@ public class CreateAndResolveIncidentAuthorizationTest {
 
   @Test
   public void createIncident() {
-    //given
+    // given
     testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
-    ExecutionEntity execution = (ExecutionEntity) engineRule.getRuntimeService().createExecutionQuery().active().singleResult();
-    
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("processInstance", processInstance.getId())
-        .bindResource("processDefinition", "Process")
-        .start();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("Process");
+    ExecutionEntity execution = (ExecutionEntity) engineRule.getRuntimeService()
+        .createExecutionQuery().active().singleResult();
 
-    engineRule.getRuntimeService()
-        .createIncident("foo", execution.getId(), execution.getActivityId(), "bar");
+    authRule.init(scenario).withUser("userId")
+        .bindResource("processInstance", processInstance.getId())
+        .bindResource("processDefinition", "Process").start();
+
+    engineRule.getRuntimeService().createIncident("foo", execution.getId(),
+        execution.getActivityId(), "bar");
 
     // then
     authRule.assertScenario(scenario);
@@ -106,19 +99,18 @@ public class CreateAndResolveIncidentAuthorizationTest {
   public void resolveIncident() {
     testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
-    ExecutionEntity execution = (ExecutionEntity) engineRule.getRuntimeService().createExecutionQuery().active().singleResult();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("Process");
+    ExecutionEntity execution = (ExecutionEntity) engineRule.getRuntimeService()
+        .createExecutionQuery().active().singleResult();
 
     authRule.disableAuthorization();
-    Incident incident = engineRule.getRuntimeService()
-        .createIncident("foo", execution.getId(), execution.getActivityId(), "bar");
+    Incident incident = engineRule.getRuntimeService().createIncident("foo", execution.getId(),
+        execution.getActivityId(), "bar");
 
-    authRule
-        .init(scenario)
-        .withUser("userId")
+    authRule.init(scenario).withUser("userId")
         .bindResource("processInstance", processInstance.getId())
-        .bindResource("processDefinition", "Process")
-        .start();
+        .bindResource("processDefinition", "Process").start();
 
     // when
     engineRule.getRuntimeService().resolveIncident(incident.getId());

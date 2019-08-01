@@ -24,7 +24,9 @@ import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 
 /**
- * <p>Deployment operation step responsible for starting the JobExecutor</p>
+ * <p>
+ * Deployment operation step responsible for starting the JobExecutor
+ * </p>
  * 
  * @author Daniel Meyer
  * 
@@ -38,12 +40,12 @@ public class StartJobExecutorStep extends DeploymentOperationStep {
   public void performOperationStep(DeploymentOperation operationContext) {
 
     final JobExecutorXml jobExecutorXml = getJobExecutorXml(operationContext);
-    
+
     // add a deployment operation step for each job acquisition
-    for (JobAcquisitionXml jobAcquisitionXml : jobExecutorXml.getJobAcquisitions()) {      
-      operationContext.addStep(new StartJobAcquisitionStep(jobAcquisitionXml));                  
+    for (JobAcquisitionXml jobAcquisitionXml : jobExecutorXml.getJobAcquisitions()) {
+      operationContext.addStep(new StartJobAcquisitionStep(jobAcquisitionXml));
     }
-    
+
   }
 
   private JobExecutorXml getJobExecutorXml(DeploymentOperation operationContext) {
@@ -51,7 +53,5 @@ public class StartJobExecutorStep extends DeploymentOperationStep {
     JobExecutorXml jobExecutorXml = bpmPlatformXml.getJobExecutor();
     return jobExecutorXml;
   }
-  
-  
 
 }

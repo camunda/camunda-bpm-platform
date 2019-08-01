@@ -32,7 +32,8 @@ public class ChangeVariablePropertyDelegate implements JavaDelegate {
     SimpleSerializableBean variable = (SimpleSerializableBean) execution.getVariable("var");
     variable.setIntProperty(variable.getIntProperty() + 1);
 
-    boolean shouldExplicitlyUpdateVariable = (Boolean) execution.getVariable("shouldExplicitlyUpdateVariable");
+    boolean shouldExplicitlyUpdateVariable = (Boolean) execution
+        .getVariable("shouldExplicitlyUpdateVariable");
 
     if (shouldExplicitlyUpdateVariable) {
       execution.setVariableLocal("var", variable);

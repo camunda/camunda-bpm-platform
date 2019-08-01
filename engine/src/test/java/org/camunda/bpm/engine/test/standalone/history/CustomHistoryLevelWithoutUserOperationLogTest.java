@@ -70,7 +70,8 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
 
   HistoryLevel customHistoryLevelFullWUOL = new CustomHistoryLevelFullWithoutUserOperationLog();
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setJdbcUrl("jdbc:h2:mem:CustomHistoryLevelWithoutUserOperationLogTest");
       configuration.setCustomHistoryLevels(Arrays.asList(customHistoryLevelFullWUOL));
       configuration.setHistory("aCustomHistoryLevelWUOL");
@@ -84,7 +85,8 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(authRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(authRule).around(testRule);
 
   protected HistoryService historyService;
   protected RuntimeService runtimeService;
@@ -118,7 +120,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryProcessInstanceOperationsByProcessDefinitionKey() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -132,7 +134,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryProcessDefinitionOperationsById() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -146,7 +148,8 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryJobOperations() {
     // given
     process = runtimeService.startProcessInstanceByKey("process");
@@ -163,11 +166,13 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
   public void testQueryJobRetryOperationsById() {
     // given
     process = runtimeService.startProcessInstanceByKey("failedServiceTask");
-    Job job = managementService.createJobQuery().processInstanceId(process.getProcessInstanceId()).singleResult();
+    Job job = managementService.createJobQuery().processInstanceId(process.getProcessInstanceId())
+        .singleResult();
 
     managementService.setJobRetries(job.getId(), 10);
 
@@ -185,14 +190,11 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
 
     repositoryService.createProcessDefinitionQuery().singleResult();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("theTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("theTask").execute();
 
-    UserOperationLogQuery logQuery = query()
-      .entityType(EntityTypes.PROCESS_INSTANCE)
-      .operationType(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE);
+    UserOperationLogQuery logQuery = query().entityType(EntityTypes.PROCESS_INSTANCE)
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE);
 
     assertEquals(0, logQuery.count());
   }
@@ -200,7 +202,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   // ----- ADD VARIABLES -----
 
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryAddExecutionVariablesMapOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -213,7 +215,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryAddTaskVariableOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -228,29 +230,30 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
 
   // ----- PATCH VARIABLES -----
 
-    @Test  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Test
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryPatchExecutionVariablesOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    ((RuntimeServiceImpl) runtimeService)
-      .updateVariables(process.getId(), createMapForVariableAddition(), createCollectionForVariableDeletion());
+    ((RuntimeServiceImpl) runtimeService).updateVariables(process.getId(),
+        createMapForVariableAddition(), createCollectionForVariableDeletion());
 
     // then
-   verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE);
+    verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE);
   }
 
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryPatchTaskVariablesOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     processTaskId = taskService.createTaskQuery().singleResult().getId();
 
     // when
-    ((TaskServiceImpl) taskService)
-      .updateVariablesLocal(processTaskId, createMapForVariableAddition(), createCollectionForVariableDeletion());
+    ((TaskServiceImpl) taskService).updateVariablesLocal(processTaskId,
+        createMapForVariableAddition(), createCollectionForVariableDeletion());
 
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_MODIFY_VARIABLE);
@@ -259,7 +262,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   // ----- REMOVE VARIABLES -----
 
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryRemoveExecutionVariableOperation() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -270,9 +273,9 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
   }
-  
+
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryByEntityTypes() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -283,23 +286,23 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     taskService.setVariable(processTaskId, "foo", "bar");
 
     // then
-    UserOperationLogQuery query = historyService
-        .createUserOperationLogQuery()
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
         .entityTypeIn(EntityTypes.TASK, EntityTypes.VARIABLE);
 
     assertEquals(0, query.count());
   }
-  
+
   // ----- DELETE VARIABLE HISTORY -----
-  
+
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryDeleteVariableHistoryOperationOnRunningInstance() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     runtimeService.setVariable(process.getId(), "testVariable", "test");
     runtimeService.setVariable(process.getId(), "testVariable", "test2");
-    String variableInstanceId = historyService.createHistoricVariableInstanceQuery().singleResult().getId();
+    String variableInstanceId = historyService.createHistoricVariableInstanceQuery().singleResult()
+        .getId();
 
     // when
     historyService.deleteHistoricVariableInstance(variableInstanceId);
@@ -307,15 +310,16 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryDeleteVariableHistoryOperationOnHistoryInstance() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     runtimeService.setVariable(process.getId(), "testVariable", "test");
     runtimeService.deleteProcessInstance(process.getId(), "none");
-    String variableInstanceId = historyService.createHistoricVariableInstanceQuery().singleResult().getId();
+    String variableInstanceId = historyService.createHistoricVariableInstanceQuery().singleResult()
+        .getId();
 
     // when
     historyService.deleteHistoricVariableInstance(variableInstanceId);
@@ -323,24 +327,25 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testQueryDeleteVariableHistoryOperationOnCase() {
     // given
     CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
     caseService.setVariable(caseInstance.getId(), "myVariable", 1);
     caseService.setVariable(caseInstance.getId(), "myVariable", 2);
     caseService.setVariable(caseInstance.getId(), "myVariable", 3);
-    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
-    
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
+        .singleResult();
+
     // when
     historyService.deleteHistoricVariableInstance(variableInstance.getId());
 
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   @Test
   public void testQueryDeleteVariableHistoryOperationOnStandaloneTask() {
     // given
@@ -348,19 +353,20 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     taskService.saveTask(task);
     taskService.setVariable(task.getId(), "testVariable", "testValue");
     taskService.setVariable(task.getId(), "testVariable", "testValue2");
-    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
-    
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
+        .singleResult();
+
     // when
     historyService.deleteHistoricVariableInstance(variableInstance.getId());
-    
+
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
-    
+
     taskService.deleteTask(task.getId(), true);
   }
-  
+
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryDeleteVariablesHistoryOperationOnRunningInstance() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -376,9 +382,9 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryDeleteVariablesHistoryOperationOnHistoryInstance() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -395,7 +401,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryDeleteVariableAndVariablesHistoryOperationOnRunningInstance() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -405,7 +411,8 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     runtimeService.setVariable(process.getId(), "testVariable2", "test2");
     runtimeService.setVariable(process.getId(), "testVariable3", "test");
     runtimeService.setVariable(process.getId(), "testVariable3", "test2");
-    String variableInstanceId = historyService.createHistoricVariableInstanceQuery().variableName("testVariable").singleResult().getId();
+    String variableInstanceId = historyService.createHistoricVariableInstanceQuery()
+        .variableName("testVariable").singleResult().getId();
 
     // when
     historyService.deleteHistoricVariableInstance(variableInstanceId);
@@ -414,9 +421,9 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   @Test
-  @Deployment(resources = {ONE_TASK_PROCESS})
+  @Deployment(resources = { ONE_TASK_PROCESS })
   public void testQueryDeleteVariableAndVariablesHistoryOperationOnHistoryInstance() {
     // given
     process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -424,7 +431,8 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     runtimeService.setVariable(process.getId(), "testVariable2", "test");
     runtimeService.setVariable(process.getId(), "testVariable3", "test");
     runtimeService.deleteProcessInstance(process.getId(), "none");
-    String variableInstanceId = historyService.createHistoricVariableInstanceQuery().variableName("testVariable").singleResult().getId();
+    String variableInstanceId = historyService.createHistoricVariableInstanceQuery()
+        .variableName("testVariable").singleResult().getId();
 
     // when
     historyService.deleteHistoricVariableInstance(variableInstanceId);
@@ -433,23 +441,18 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
     // then
     verifyVariableOperationAsserts(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY);
   }
-  
+
   // --------------- CMMN --------------------
 
   @Test
-  @Deployment(resources={ONE_TASK_CASE})
+  @Deployment(resources = { ONE_TASK_CASE })
   public void testQueryByCaseDefinitionId() {
     // given:
     // a deployed case definition
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
     // an active case instance
-    caseService
-       .withCaseDefinition(caseDefinitionId)
-       .create();
+    caseService.withCaseDefinition(caseDefinitionId).create();
 
     Task task = taskService.createTaskQuery().singleResult();
 
@@ -460,9 +463,8 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
 
     // then
 
-    UserOperationLogQuery query = historyService
-      .createUserOperationLogQuery()
-      .caseDefinitionId(caseDefinitionId);
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
+        .caseDefinitionId(caseDefinitionId);
 
     assertEquals(0, query.count());
 
@@ -472,15 +474,11 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   @Test
   public void testQueryByDeploymentId() {
     // given
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addClasspathResource(ONE_TASK_PROCESS)
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addClasspathResource(ONE_TASK_PROCESS).deploy().getId();
 
     // when
-    UserOperationLogQuery query = historyService
-        .createUserOperationLogQuery()
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
         .deploymentId(deploymentId);
 
     // then
@@ -490,7 +488,7 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   }
 
   protected Map<String, Object> createMapForVariableAddition() {
-    Map<String, Object> variables =  new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("testVariable1", "THIS IS TESTVARIABLE!!!");
     variables.put("testVariable2", "OVER 9000!");
 
@@ -506,7 +504,8 @@ public class CustomHistoryLevelWithoutUserOperationLogTest {
   }
 
   protected void verifyVariableOperationAsserts(String operationType) {
-    UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE).operationType(operationType);
+    UserOperationLogQuery logQuery = query().entityType(EntityTypes.VARIABLE)
+        .operationType(operationType);
     assertEquals(0, logQuery.count());
   }
 

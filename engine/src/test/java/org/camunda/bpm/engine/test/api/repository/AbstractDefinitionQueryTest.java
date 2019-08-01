@@ -27,20 +27,12 @@ public abstract class AbstractDefinitionQueryTest extends PluggableProcessEngine
 
   @Override
   protected void setUp() throws Exception {
-    deploymentOneId = repositoryService
-      .createDeployment()
-      .name("firstDeployment")
-      .addClasspathResource(getResourceOnePath())
-      .addClasspathResource(getResourceTwoPath())
-      .deploy()
-      .getId();
+    deploymentOneId = repositoryService.createDeployment().name("firstDeployment")
+        .addClasspathResource(getResourceOnePath()).addClasspathResource(getResourceTwoPath())
+        .deploy().getId();
 
-    deploymentTwoId = repositoryService
-      .createDeployment()
-      .name("secondDeployment")
-      .addClasspathResource(getResourceOnePath())
-      .deploy()
-      .getId();
+    deploymentTwoId = repositoryService.createDeployment().name("secondDeployment")
+        .addClasspathResource(getResourceOnePath()).deploy().getId();
 
     super.setUp();
   }
@@ -62,7 +54,7 @@ public abstract class AbstractDefinitionQueryTest extends PluggableProcessEngine
 
     if (countExpected == 1) {
       assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
+    } else if (countExpected > 1) {
       verifySingleResultFails(query);
     } else if (countExpected == 0) {
       assertNull(query.singleResult());

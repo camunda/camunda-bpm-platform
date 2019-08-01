@@ -43,44 +43,36 @@ import static org.junit.Assert.assertTrue;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class CompensateEventOrderTest {
 
-  @Rule public ProcessEngineRule engineRule = new ProcessEngineRule(true);
-  @Rule public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  @Rule
+  public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Test
   public void testTwoCompensateEventsInReverseOrder() {
-    //given
-    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
-        .startEvent()
-          .serviceTask("serviceTask1")
-            .camundaClass(IncreaseCurrentTimeServiceTask.class.getName())
-            .boundaryEvent("compensationBoundary1")
-            .compensateEventDefinition()
-            .compensateEventDefinitionDone()
-          .moveToActivity("serviceTask1")
-          .serviceTask("serviceTask2")
-            .camundaClass(IncreaseCurrentTimeServiceTask.class.getName())
-            .boundaryEvent("compensationBoundary2")
-            .compensateEventDefinition()
-            .compensateEventDefinitionDone()
-          .moveToActivity("serviceTask2")
-          .intermediateThrowEvent("compensationEvent")
-            .compensateEventDefinition()
-            .waitForCompletion(true)
-            .compensateEventDefinitionDone()
-        .endEvent()
-        .done();
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1").startEvent()
+        .serviceTask("serviceTask1").camundaClass(IncreaseCurrentTimeServiceTask.class.getName())
+        .boundaryEvent("compensationBoundary1").compensateEventDefinition()
+        .compensateEventDefinitionDone().moveToActivity("serviceTask1").serviceTask("serviceTask2")
+        .camundaClass(IncreaseCurrentTimeServiceTask.class.getName())
+        .boundaryEvent("compensationBoundary2").compensateEventDefinition()
+        .compensateEventDefinitionDone().moveToActivity("serviceTask2")
+        .intermediateThrowEvent("compensationEvent").compensateEventDefinition()
+        .waitForCompletion(true).compensateEventDefinitionDone().endEvent().done();
 
     addServiceTaskCompensationHandler(model, "compensationBoundary1", "A");
     addServiceTaskCompensationHandler(model, "compensationBoundary2", "B");
 
     testHelper.deploy(model);
 
-    //when
-    engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", Variables.createVariables().putValue("currentTime", new Date()));
+    // when
+    engineRule.getRuntimeService().startProcessInstanceByKey("Process_1",
+        Variables.createVariables().putValue("currentTime", new Date()));
 
-    //then compensation activities are executed in the reverse order
-    List<HistoricActivityInstance> list = engineRule.getHistoryService().createHistoricActivityInstanceQuery()
-        .orderByHistoricActivityInstanceEndTime().asc()
+    // then compensation activities are executed in the reverse order
+    List<HistoricActivityInstance> list = engineRule.getHistoryService()
+        .createHistoricActivityInstanceQuery().orderByHistoricActivityInstanceEndTime().asc()
         .list();
 
     long indexA = searchForActivityIndex(list, "A");
@@ -93,7 +85,8 @@ public class CompensateEventOrderTest {
 
   }
 
-  private long searchForActivityIndex(List<HistoricActivityInstance> historicActivityInstances, String activityId) {
+  private long searchForActivityIndex(List<HistoricActivityInstance> historicActivityInstances,
+      String activityId) {
     for (int i = 0; i < historicActivityInstances.size(); i++) {
       HistoricActivityInstance historicActivityInstance = historicActivityInstances.get(i);
       if (historicActivityInstance.getActivityId().equals(activityId)) {
@@ -103,7 +96,8 @@ public class CompensateEventOrderTest {
     return -1;
   }
 
-  private void addServiceTaskCompensationHandler(BpmnModelInstance modelInstance, String boundaryEventId, String compensationHandlerId) {
+  private void addServiceTaskCompensationHandler(BpmnModelInstance modelInstance,
+      String boundaryEventId, String compensationHandlerId) {
 
     BoundaryEvent boundaryEvent = modelInstance.getModelElementById(boundaryEventId);
     BaseElement scope = (BaseElement) boundaryEvent.getParentElement();
@@ -121,6 +115,5 @@ public class CompensateEventOrderTest {
     scope.addChildElement(association);
 
   }
-
 
 }

@@ -146,12 +146,14 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
   }
 
   public void delete() {
-    HistoricIncidentManager historicIncidentManager = Context.getCommandContext().getHistoricIncidentManager();
+    HistoricIncidentManager historicIncidentManager = Context.getCommandContext()
+        .getHistoricIncidentManager();
     historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(seedJobDefinitionId);
     historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(monitorJobDefinitionId);
     historicIncidentManager.deleteHistoricIncidentsByJobDefinitionId(batchJobDefinitionId);
 
-    HistoricJobLogManager historicJobLogManager = Context.getCommandContext().getHistoricJobLogManager();
+    HistoricJobLogManager historicJobLogManager = Context.getCommandContext()
+        .getHistoricJobLogManager();
     historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(seedJobDefinitionId);
     historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(monitorJobDefinitionId);
     historicJobLogManager.deleteHistoricJobLogsByJobDefinitionId(batchJobDefinitionId);

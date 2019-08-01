@@ -19,18 +19,21 @@ package org.camunda.bpm.engine.impl.identity;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * <p>Allows to expose the id of the currently authenticated user,
- * his groups and his tenants to the process engine.</p>
+ * <p>
+ * Allows to expose the id of the currently authenticated user, his groups and his tenants to the
+ * process engine.
+ * </p>
  *
- * <p>The current authentication is managed using a Thread Local. The value can
- * be set using {@link #setCurrentAuthentication(String, List)},
- * retrieved using {@link #getCurrentAuthentication()} and cleared
- * using {@link #clearCurrentAuthentication()}.</p>
+ * <p>
+ * The current authentication is managed using a Thread Local. The value can be set using
+ * {@link #setCurrentAuthentication(String, List)}, retrieved using
+ * {@link #getCurrentAuthentication()} and cleared using {@link #clearCurrentAuthentication()}.
+ * </p>
  *
- * <p>Users typically do not use this class directly but rather use
- * the corresponding Service API methods:
+ * <p>
+ * Users typically do not use this class directly but rather use the corresponding Service API
+ * methods:
  * <ul>
  * <li></li>
  * </ul>
@@ -52,7 +55,8 @@ public class Authentication {
     this(authenticatedUserId, groupIds, null);
   }
 
-  public Authentication(String authenticatedUserId, List<String> authenticatedGroupIds, List<String> authenticatedTenantIds) {
+  public Authentication(String authenticatedUserId, List<String> authenticatedGroupIds,
+      List<String> authenticatedTenantIds) {
     this.authenticatedUserId = authenticatedUserId;
 
     if (authenticatedGroupIds != null) {

@@ -68,9 +68,9 @@ public class RuntimeByteArrayTest {
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   protected BatchMigrationHelper helper = new BatchMigrationHelper(engineRule, migrationRule);
 
-
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule)
+      .around(testRule);
 
   protected ProcessEngineConfigurationImpl configuration;
   protected RuntimeService runtimeService;
@@ -113,9 +113,11 @@ public class RuntimeByteArrayTest {
     testRule.deploy(instance);
     FileValue fileValue = createFile();
 
-    runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValueTyped("fileVar", fileValue));
+    runtimeService.startProcessInstanceByKey("Process",
+        Variables.createVariables().putValueTyped("fileVar", fileValue));
 
-    String byteArrayValueId = ((VariableInstanceEntity)runtimeService.createVariableInstanceQuery().singleResult()).getByteArrayValueId();
+    String byteArrayValueId = ((VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+        .singleResult()).getByteArrayValueId();
 
     // when
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
@@ -136,7 +138,8 @@ public class RuntimeByteArrayTest {
     id = task.getId();
     taskService.setVariablesLocal(id, variables);
 
-    String byteArrayValueId = ((VariableInstanceEntity)runtimeService.createVariableInstanceQuery().singleResult()).getByteArrayValueId();
+    String byteArrayValueId = ((VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+        .singleResult()).getByteArrayValueId();
 
     // when
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
@@ -150,7 +153,8 @@ public class RuntimeByteArrayTest {
     // when
     helper.migrateProcessInstancesAsync(15);
 
-    String byteArrayValueId = ((BatchEntity) managementService.createBatchQuery().singleResult()).getConfiguration();
+    String byteArrayValueId = ((BatchEntity) managementService.createBatchQuery().singleResult())
+        .getConfiguration();
 
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
         .execute(new GetByteArrayCommand(byteArrayValueId));
@@ -177,7 +181,8 @@ public class RuntimeByteArrayTest {
     JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
     assertNotNull(job);
 
-    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(job.getExceptionByteArrayId()));
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
+        .execute(new GetByteArrayCommand(job.getExceptionByteArrayId()));
 
     checkBinary(byteArrayEntity);
   }
@@ -185,12 +190,12 @@ public class RuntimeByteArrayTest {
   @Test
   public void testExternalTaskStacktraceBinary() {
     // given
-    testRule.deploy("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml");
+    testRule
+        .deploy("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml");
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-        .topic(TOPIC_NAME, LOCK_TIME)
-        .execute();
+        .topic(TOPIC_NAME, LOCK_TIME).execute();
 
     LockedExternalTask task = tasks.get(0);
 
@@ -207,11 +212,14 @@ public class RuntimeByteArrayTest {
     }
     assertNotNull(exceptionStackTrace);
 
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, exceptionStackTrace, 5, 3000L);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, exceptionStackTrace, 5,
+        3000L);
 
-    ExternalTaskEntity externalTask = (ExternalTaskEntity) externalTaskService.createExternalTaskQuery().singleResult();
+    ExternalTaskEntity externalTask = (ExternalTaskEntity) externalTaskService
+        .createExternalTaskQuery().singleResult();
 
-    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(externalTask.getErrorDetailsByteArrayId()));
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
+        .execute(new GetByteArrayCommand(externalTask.getErrorDetailsByteArrayId()));
 
     // then
     checkBinary(byteArrayEntity);
@@ -228,32 +236,19 @@ public class RuntimeByteArrayTest {
     String encoding = "crazy-encoding";
     String mimeType = "martini/dry";
 
-    FileValue fileValue = Variables
-        .fileValue(fileName)
-        .file("ABC".getBytes())
-        .encoding(encoding)
-        .mimeType(mimeType)
-        .create();
+    FileValue fileValue = Variables.fileValue(fileName).file("ABC".getBytes()).encoding(encoding)
+        .mimeType(mimeType).create();
     return fileValue;
   }
 
   protected BpmnModelInstance createProcess() {
-    return Bpmn.createExecutableProcess("Process")
-      .startEvent()
-      .userTask("user")
-      .endEvent()
-      .done();
+    return Bpmn.createExecutableProcess("Process").startEvent().userTask("user").endEvent().done();
   }
 
   protected BpmnModelInstance createFailingProcess() {
-    return Bpmn.createExecutableProcess("Process")
-      .startEvent()
-      .serviceTask("failing")
-      .camundaAsyncAfter()
-      .camundaAsyncBefore()
-      .camundaClass(FailingDelegate.class)
-      .endEvent()
-      .done();
+    return Bpmn.createExecutableProcess("Process").startEvent().serviceTask("failing")
+        .camundaAsyncAfter().camundaAsyncBefore().camundaClass(FailingDelegate.class).endEvent()
+        .done();
   }
 
   protected Date nowPlus(long millis) {

@@ -63,7 +63,8 @@ public class HistoricProcessInstanceManagerProcessInstancesForCleanupTest {
   private HistoryService historyService;
   private RuntimeService runtimeService;
 
-  @Rule public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Before
   public void init() {
@@ -94,76 +95,85 @@ public class HistoricProcessInstanceManagerProcessInstancesForCleanupTest {
 
   @Parameterized.Parameters
   public static Collection<Object[]> scenarios() {
-    return Arrays.asList(new Object[][] {
-        { 3, 5, 3, 7, 4, 50, 3 },
-        //not enough time has passed
+    return Arrays.asList(new Object[][] { { 3, 5, 3, 7, 4, 50, 3 },
+        // not enough time has passed
         { 3, 5, 3, 7, 2, 50, 0 },
-        //all historic process instances are old enough to be cleaned up
+        // all historic process instances are old enough to be cleaned up
         { 3, 5, 3, 7, 6, 50, 10 },
-        //batchSize will reduce the result
-        { 3, 5, 3, 7, 6, 4, 4 }
-    });
+        // batchSize will reduce the result
+        { 3, 5, 3, 7, 6, 4, 4 } });
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml" })
   public void testFindHistoricProcessInstanceIdsForCleanup() {
 
-    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Object>() {
-      @Override
-      public Object execute(CommandContext commandContext) {
+    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new Command<Object>() {
+          @Override
+          public Object execute(CommandContext commandContext) {
 
-        //given
-        //set different TTL for two process definition
-        updateTimeToLive(commandContext, ONE_TASK_PROCESS, processDefiniotion1TTL);
-        updateTimeToLive(commandContext, TWO_TASKS_PROCESS, processDefiniotion2TTL);
-        return null;
-      }
-    });
-    //start processes
+            // given
+            // set different TTL for two process definition
+            updateTimeToLive(commandContext, ONE_TASK_PROCESS, processDefiniotion1TTL);
+            updateTimeToLive(commandContext, TWO_TASKS_PROCESS, processDefiniotion2TTL);
+            return null;
+          }
+        });
+    // start processes
     List<String> ids = prepareHistoricProcesses(ONE_TASK_PROCESS, processInstancesOfProcess1Count);
     ids.addAll(prepareHistoricProcesses(TWO_TASKS_PROCESS, processInstancesOfProcess2Count));
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //some days passed
+    // some days passed
     ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), daysPassedAfterProcessEnd));
 
-    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Object>() {
-      @Override
-      public Object execute(CommandContext commandContext) {
-        //when
-        List<String> historicProcessInstanceIdsForCleanup = commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstanceIdsForCleanup(
-            batchSize, 0, 60);
+    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new Command<Object>() {
+          @Override
+          public Object execute(CommandContext commandContext) {
+            // when
+            List<String> historicProcessInstanceIdsForCleanup = commandContext
+                .getHistoricProcessInstanceManager()
+                .findHistoricProcessInstanceIdsForCleanup(batchSize, 0, 60);
 
-        //then
-        assertEquals(resultCount, historicProcessInstanceIdsForCleanup.size());
+            // then
+            assertEquals(resultCount, historicProcessInstanceIdsForCleanup.size());
 
-        if (resultCount > 0) {
+            if (resultCount > 0) {
 
-          List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-              .processInstanceIds(new HashSet<String>(historicProcessInstanceIdsForCleanup)).list();
+              List<HistoricProcessInstance> historicProcessInstances = historyService
+                  .createHistoricProcessInstanceQuery()
+                  .processInstanceIds(new HashSet<String>(historicProcessInstanceIdsForCleanup))
+                  .list();
 
-          for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
-            assertNotNull(historicProcessInstance.getEndTime());
-            List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService().createProcessDefinitionQuery()
-                .processDefinitionId(historicProcessInstance.getProcessDefinitionId()).list();
-            assertEquals(1, processDefinitions.size());
-            ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processDefinitions.get(0);
-            assertTrue(historicProcessInstance.getEndTime().before(DateUtils.addDays(ClockUtil.getCurrentTime(), processDefinition.getHistoryTimeToLive())));
+              for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
+                assertNotNull(historicProcessInstance.getEndTime());
+                List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService()
+                    .createProcessDefinitionQuery()
+                    .processDefinitionId(historicProcessInstance.getProcessDefinitionId()).list();
+                assertEquals(1, processDefinitions.size());
+                ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processDefinitions
+                    .get(0);
+                assertTrue(historicProcessInstance.getEndTime().before(DateUtils.addDays(
+                    ClockUtil.getCurrentTime(), processDefinition.getHistoryTimeToLive())));
+              }
+            }
+
+            return null;
           }
-        }
-
-        return null;
-      }
-    });
+        });
 
   }
 
   private void updateTimeToLive(CommandContext commandContext, String businessKey, int timeToLive) {
-    List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(businessKey).list();
+    List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService()
+        .createProcessDefinitionQuery().processDefinitionKey(businessKey).list();
     assertEquals(1, processDefinitions.size());
-    ProcessDefinitionEntity processDefinition1 = (ProcessDefinitionEntity) processDefinitions.get(0);
+    ProcessDefinitionEntity processDefinition1 = (ProcessDefinitionEntity) processDefinitions
+        .get(0);
     processDefinition1.setHistoryTimeToLive(timeToLive);
     commandContext.getDbEntityManager().merge(processDefinition1);
   }

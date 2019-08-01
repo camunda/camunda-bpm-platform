@@ -28,9 +28,11 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
 /**
- *  @author Philipp Ossler
+ * @author Philipp Ossler
  */
-public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDecisionInstanceQuery, HistoricDecisionInstance> implements HistoricDecisionInstanceQuery {
+public class HistoricDecisionInstanceQueryImpl
+    extends AbstractQuery<HistoricDecisionInstanceQuery, HistoricDecisionInstance>
+    implements HistoricDecisionInstanceQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -130,8 +132,10 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   }
 
   @Override
-  public HistoricDecisionInstanceQuery decisionDefinitionNameLike(String decisionDefinitionNameLike) {
-    ensureNotNull(NotValidException.class, "decisionDefinitionNameLike", decisionDefinitionNameLike);
+  public HistoricDecisionInstanceQuery decisionDefinitionNameLike(
+      String decisionDefinitionNameLike) {
+    ensureNotNull(NotValidException.class, "decisionDefinitionNameLike",
+        decisionDefinitionNameLike);
     this.decisionDefinitionNameLike = decisionDefinitionNameLike;
     return this;
   }
@@ -229,16 +233,14 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getHistoricDecisionInstanceManager()
-      .findHistoricDecisionInstanceCountByQueryCriteria(this);
+    return commandContext.getHistoricDecisionInstanceManager()
+        .findHistoricDecisionInstanceCountByQueryCriteria(this);
   }
 
   @Override
   public List<HistoricDecisionInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-        .getHistoricDecisionInstanceManager()
+    return commandContext.getHistoricDecisionInstanceManager()
         .findHistoricDecisionInstancesByQueryCriteria(this, page);
   }
 
@@ -349,15 +351,19 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   }
 
   @Override
-  public HistoricDecisionInstanceQuery decisionRequirementsDefinitionId(String decisionRequirementsDefinitionId) {
-    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionId", decisionRequirementsDefinitionId);
+  public HistoricDecisionInstanceQuery decisionRequirementsDefinitionId(
+      String decisionRequirementsDefinitionId) {
+    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionId",
+        decisionRequirementsDefinitionId);
     this.decisionRequirementsDefinitionId = decisionRequirementsDefinitionId;
     return this;
   }
 
   @Override
-  public HistoricDecisionInstanceQuery decisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey) {
-    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionKey", decisionRequirementsDefinitionKey);
+  public HistoricDecisionInstanceQuery decisionRequirementsDefinitionKey(
+      String decisionRequirementsDefinitionKey) {
+    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionKey",
+        decisionRequirementsDefinitionKey);
     this.decisionRequirementsDefinitionKey = decisionRequirementsDefinitionKey;
     return this;
   }

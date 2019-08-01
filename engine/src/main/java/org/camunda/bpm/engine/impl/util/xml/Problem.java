@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.util.xml;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.xml.sax.SAXParseException;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -37,11 +36,11 @@ public class Problem {
     this.line = e.getLineNumber();
     this.column = e.getColumnNumber();
   }
-  
+
   public Problem(String errorMessage, String resourceName, Element element) {
     this.errorMessage = errorMessage;
     this.resource = resourceName;
-    if (element!=null) {
+    if (element != null) {
       this.line = element.getLine();
       this.column = element.getColumn();
     }
@@ -61,8 +60,7 @@ public class Problem {
     while (throwable != null) {
       if (errorMessage == null) {
         errorMessage = throwable.getMessage();
-      }
-      else {
+      } else {
         errorMessage += ": " + throwable.getMessage();
       }
       throwable = throwable.getCause();
@@ -70,6 +68,7 @@ public class Problem {
   }
 
   public String toString() {
-    return errorMessage+(resource!=null ? " | "+resource : "")+" | line "+line+" | column "+column;
+    return errorMessage + (resource != null ? " | " + resource : "") + " | line " + line
+        + " | column " + column;
   }
 }

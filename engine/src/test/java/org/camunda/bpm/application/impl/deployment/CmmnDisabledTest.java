@@ -45,12 +45,13 @@ public class CmmnDisabledTest extends ResourceProcessEngineTestCase {
   }
 
   public void testCmmnDisabled() {
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-        .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-        .deploy();
+    ProcessApplicationDeployment deployment = repositoryService
+        .createDeployment(processApplication.getReference())
+        .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml").deploy();
 
     // process is deployed:
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     assertNotNull(processDefinition);
     assertEquals(1, processDefinition.getVersion());
 
@@ -65,12 +66,13 @@ public class CmmnDisabledTest extends ResourceProcessEngineTestCase {
   }
 
   public void testVariableInstanceQuery() {
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-        .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-        .deploy();
+    ProcessApplicationDeployment deployment = repositoryService
+        .createDeployment(processApplication.getReference())
+        .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml").deploy();
 
     VariableMap variables = Variables.createVariables().putValue("my-variable", "a-value");
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        variables);
 
     // variable instance query
     List<VariableInstance> result = runtimeService.createVariableInstanceQuery().list();

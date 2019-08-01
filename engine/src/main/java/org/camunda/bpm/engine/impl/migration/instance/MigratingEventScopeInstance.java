@@ -46,22 +46,13 @@ public class MigratingEventScopeInstance extends MigratingScopeInstance {
   protected Set<MigratingCompensationEventSubscriptionInstance> childCompensationSubscriptionInstances = new HashSet<MigratingCompensationEventSubscriptionInstance>();
   protected List<MigratingInstance> migratingDependentInstances = new ArrayList<MigratingInstance>();
 
-  public MigratingEventScopeInstance(
-      MigrationInstruction migrationInstruction,
-      ExecutionEntity eventScopeExecution,
-      ScopeImpl sourceScope,
-      ScopeImpl targetScope,
-      MigrationInstruction eventSubscriptionInstruction,
-      EventSubscriptionEntity eventSubscription,
-      ScopeImpl eventSubscriptionSourceScope,
-      ScopeImpl eventSubscriptionTargetScope
-      ) {
-    this.migratingEventSubscription =
-        new MigratingCompensationEventSubscriptionInstance(
-            eventSubscriptionInstruction,
-            eventSubscriptionSourceScope,
-            eventSubscriptionTargetScope,
-            eventSubscription);
+  public MigratingEventScopeInstance(MigrationInstruction migrationInstruction,
+      ExecutionEntity eventScopeExecution, ScopeImpl sourceScope, ScopeImpl targetScope,
+      MigrationInstruction eventSubscriptionInstruction, EventSubscriptionEntity eventSubscription,
+      ScopeImpl eventSubscriptionSourceScope, ScopeImpl eventSubscriptionTargetScope) {
+    this.migratingEventSubscription = new MigratingCompensationEventSubscriptionInstance(
+        eventSubscriptionInstruction, eventSubscriptionSourceScope, eventSubscriptionTargetScope,
+        eventSubscription);
     this.migrationInstruction = migrationInstruction;
     this.eventScopeExecution = eventScopeExecution;
 
@@ -73,13 +64,10 @@ public class MigratingEventScopeInstance extends MigratingScopeInstance {
   /**
    * Creates an emerged scope
    */
-  public MigratingEventScopeInstance(
-      EventSubscriptionEntity eventSubscription,
-      ExecutionEntity eventScopeExecution,
-      ScopeImpl targetScope
-      ) {
-    this.migratingEventSubscription =
-        new MigratingCompensationEventSubscriptionInstance(null, null, targetScope, eventSubscription);
+  public MigratingEventScopeInstance(EventSubscriptionEntity eventSubscription,
+      ExecutionEntity eventScopeExecution, ScopeImpl targetScope) {
+    this.migratingEventSubscription = new MigratingCompensationEventSubscriptionInstance(null, null,
+        targetScope, eventSubscription);
     this.eventScopeExecution = eventScopeExecution;
 
     // compensation handlers (not boundary events)
@@ -105,7 +93,8 @@ public class MigratingEventScopeInstance extends MigratingScopeInstance {
 
     migratingEventSubscription.attachState(targetActivityInstance);
 
-    ExecutionEntity representativeExecution = targetActivityInstance.resolveRepresentativeExecution();
+    ExecutionEntity representativeExecution = targetActivityInstance
+        .resolveRepresentativeExecution();
     eventScopeExecution.setParent(representativeExecution);
   }
 
@@ -163,8 +152,7 @@ public class MigratingEventScopeInstance extends MigratingScopeInstance {
   public void addChild(MigratingScopeInstance migratingScopeInstance) {
     if (migratingScopeInstance instanceof MigratingEventScopeInstance) {
       childInstances.add((MigratingEventScopeInstance) migratingScopeInstance);
-    }
-    else {
+    } else {
       throw MIGRATION_LOGGER.cannotHandleChild(this, migratingScopeInstance);
     }
   }
@@ -175,7 +163,8 @@ public class MigratingEventScopeInstance extends MigratingScopeInstance {
   }
 
   @Override
-  public void removeChild(MigratingCompensationEventSubscriptionInstance migratingEventSubscription) {
+  public void removeChild(
+      MigratingCompensationEventSubscriptionInstance migratingEventSubscription) {
     this.childCompensationSubscriptionInstances.remove(migratingEventSubscription);
   }
 
@@ -186,7 +175,8 @@ public class MigratingEventScopeInstance extends MigratingScopeInstance {
 
   @Override
   public void detachChildren() {
-    Set<MigratingProcessElementInstance> childrenCopy = new HashSet<MigratingProcessElementInstance>(getChildren());
+    Set<MigratingProcessElementInstance> childrenCopy = new HashSet<MigratingProcessElementInstance>(
+        getChildren());
     for (MigratingProcessElementInstance child : childrenCopy) {
       child.detachState();
     }
@@ -203,7 +193,8 @@ public class MigratingEventScopeInstance extends MigratingScopeInstance {
 
   @Override
   public Collection<MigratingProcessElementInstance> getChildren() {
-    Set<MigratingProcessElementInstance> children = new HashSet<MigratingProcessElementInstance>(childInstances);
+    Set<MigratingProcessElementInstance> children = new HashSet<MigratingProcessElementInstance>(
+        childInstances);
     children.addAll(childCompensationSubscriptionInstances);
     return children;
   }

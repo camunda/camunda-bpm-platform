@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.impl.management;
 import java.util.Map;
 
 /**
- * Represents an interface for the purge reporting.
- * Contains all information of the data which is deleted during the purge.
+ * Represents an interface for the purge reporting. Contains all information of the data which is
+ * deleted during the purge.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
@@ -29,8 +29,10 @@ public interface PurgeReporting<T> {
   /**
    * Adds the key value pair as report information to the current purge report.
    *
-   * @param key the report key
-   * @param value the report value
+   * @param key
+   *          the report key
+   * @param value
+   *          the report value
    */
   void addPurgeInformation(String key, T value);
 
@@ -51,14 +53,17 @@ public interface PurgeReporting<T> {
   /**
    * Returns the value for the given key.
    *
-   * @param key the key which exist in the current report
+   * @param key
+   *          the key which exist in the current report
    * @return the corresponding value
    */
   T getReportValue(String key);
 
   /**
    * Returns true if the key is present in the current report.
-   * @param key the key
+   * 
+   * @param key
+   *          the key
    * @return true if the key is present
    */
   boolean containsReport(String key);

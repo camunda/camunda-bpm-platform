@@ -45,8 +45,8 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
   protected List<String> historicProcessInstanceIds;
   protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
 
-  public DeleteHistoricProcessInstancesBatchCmd(List<String> historicProcessInstanceIds, HistoricProcessInstanceQuery historicProcessInstanceQuery,
-      String deleteReason) {
+  public DeleteHistoricProcessInstancesBatchCmd(List<String> historicProcessInstanceIds,
+      HistoricProcessInstanceQuery historicProcessInstanceQuery, String deleteReason) {
     super();
     this.historicProcessInstanceIds = historicProcessInstanceIds;
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
@@ -81,11 +81,9 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
     List<String> processInstanceIds = collectHistoricProcessInstanceIds();
 
     ensureNotEmpty(BadUserRequestException.class, "historicProcessInstanceIds", processInstanceIds);
-    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES);
-    writeUserOperationLog(commandContext,
-        deleteReason,
-        processInstanceIds.size(),
-        true);
+    checkAuthorizations(commandContext,
+        BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES);
+    writeUserOperationLog(commandContext, deleteReason, processInstanceIds.size(), true);
 
     BatchEntity batch = createBatch(commandContext, processInstanceIds);
 
@@ -100,22 +98,16 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
     return batch;
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext,
-                                       String deleteReason,
-                                       int numInstances,
-                                       boolean async) {
+  protected void writeUserOperationLog(CommandContext commandContext, String deleteReason,
+      int numInstances, boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
     propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
-    commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
-            null,
-            null,
-            null,
-            propertyChanges);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, null, null, null, propertyChanges);
   }
 
   @Override
@@ -124,7 +116,9 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
   }
 
   @Override
-  protected BatchJobHandler<BatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<BatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION);
+  protected BatchJobHandler<BatchConfiguration> getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
+    return (BatchJobHandler<BatchConfiguration>) processEngineConfiguration.getBatchHandlers()
+        .get(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION);
   }
 }

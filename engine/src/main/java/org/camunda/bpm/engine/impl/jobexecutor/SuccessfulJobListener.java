@@ -34,9 +34,8 @@ public class SuccessfulJobListener implements Command<Void> {
 
   protected void logJobSuccess(CommandContext commandContext) {
     if (commandContext.getProcessEngineConfiguration().isMetricsEnabled()) {
-      commandContext.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_SUCCESSFUL);
+      commandContext.getProcessEngineConfiguration().getMetricsRegistry()
+          .markOccurrence(Metrics.JOB_SUCCESSFUL);
     }
   }
 

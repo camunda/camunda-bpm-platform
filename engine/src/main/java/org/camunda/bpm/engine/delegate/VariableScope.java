@@ -75,38 +75,35 @@ public interface VariableScope {
   boolean hasVariableLocal(String variableName);
 
   /**
-   * Removes the variable and creates a new
-   * {@link HistoricVariableUpdateEntity}.
+   * Removes the variable and creates a new {@link HistoricVariableUpdateEntity}.
    */
   void removeVariable(String variableName);
 
   /**
-   * Removes the local variable and creates a new
-   * {@link HistoricVariableUpdateEntity}.
+   * Removes the local variable and creates a new {@link HistoricVariableUpdateEntity}.
    */
   void removeVariableLocal(String variableName);
 
   /**
-   * Removes the variables and creates a new
-   * {@link HistoricVariableUpdateEntity} for each of them.
+   * Removes the variables and creates a new {@link HistoricVariableUpdateEntity} for each of them.
    */
   void removeVariables(Collection<String> variableNames);
 
   /**
-   * Removes the local variables and creates a new
-   * {@link HistoricVariableUpdateEntity} for each of them.
+   * Removes the local variables and creates a new {@link HistoricVariableUpdateEntity} for each of
+   * them.
    */
   void removeVariablesLocal(Collection<String> variableNames);
 
   /**
-   * Removes the (local) variables and creates a new
-   * {@link HistoricVariableUpdateEntity} for each of them.
+   * Removes the (local) variables and creates a new {@link HistoricVariableUpdateEntity} for each
+   * of them.
    */
   void removeVariables();
 
   /**
-   * Removes the (local) variables and creates a new
-   * {@link HistoricVariableUpdateEntity} for each of them.
+   * Removes the (local) variables and creates a new {@link HistoricVariableUpdateEntity} for each
+   * of them.
    */
   void removeVariablesLocal();
 

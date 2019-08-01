@@ -45,15 +45,11 @@ public class ScriptCondition implements Condition {
     return evaluate(execution, execution);
   }
 
-
   @Override
   public boolean evaluate(VariableScope scope, DelegateExecution execution) {
     ScriptInvocation invocation = new ScriptInvocation(script, scope, execution);
     try {
-      Context
-        .getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(invocation);
+      Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
@@ -75,8 +71,8 @@ public class ScriptCondition implements Condition {
     try {
       result = evaluate(scope, execution);
     } catch (ProcessEngineException pee) {
-      if (! (pee.getMessage().contains("No such property") ||
-             pee.getCause() instanceof ScriptEvaluationException) ) {
+      if (!(pee.getMessage().contains("No such property")
+          || pee.getCause() instanceof ScriptEvaluationException)) {
         throw pee;
       }
     }

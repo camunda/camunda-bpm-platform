@@ -41,13 +41,13 @@ public class GetExternalTaskErrorDetailsCmd implements Command<String>, Serializ
   public String execute(CommandContext commandContext) {
     ensureNotNull("externalTaskId", externalTaskId);
 
-    ExternalTaskEntity externalTask = commandContext
-        .getExternalTaskManager()
+    ExternalTaskEntity externalTask = commandContext.getExternalTaskManager()
         .findExternalTaskById(externalTaskId);
 
     ensureNotNull("No external task found with id " + externalTaskId, "externalTask", externalTask);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessInstance(externalTask.getProcessInstanceId());
     }
 

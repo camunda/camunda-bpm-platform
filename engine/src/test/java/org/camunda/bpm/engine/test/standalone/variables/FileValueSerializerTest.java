@@ -77,14 +77,14 @@ public class FileValueSerializerTest {
     String filename = "";
     FileValue fileValue = Variables.fileValue(filename).create();
     ValueFields valueFields = new MockValueFields();
-    
+
     serializer.writeValue(fileValue, valueFields);
-    
+
     assertThat(valueFields.getByteArrayValue(), is(nullValue()));
     assertThat(valueFields.getTextValue(), is(filename));
     assertThat(valueFields.getTextValue2(), is(nullValue()));
   }
-  
+
   @Test
   public void testWriteMimetypeAndFilenameValue() {
     String filename = "test.txt";
@@ -103,7 +103,8 @@ public class FileValueSerializerTest {
   public void testWriteMimetypeFilenameAndBytesValue() throws UnsupportedEncodingException {
     String filename = "test.txt";
     String mimeType = "text/json";
-    InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
+    InputStream is = this.getClass().getClassLoader()
+        .getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
     FileValue fileValue = Variables.fileValue(filename).mimeType(mimeType).file(is).create();
     ValueFields valueFields = new MockValueFields();
 
@@ -119,8 +120,10 @@ public class FileValueSerializerTest {
     String filename = "test.txt";
     String mimeType = "text/json";
     Charset encoding = Charset.forName("UTF-8");
-    InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
-    FileValue fileValue = Variables.fileValue(filename).mimeType(mimeType).encoding(encoding).file(is).create();
+    InputStream is = this.getClass().getClassLoader()
+        .getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
+    FileValue fileValue = Variables.fileValue(filename).mimeType(mimeType).encoding(encoding)
+        .file(is).create();
     ValueFields valueFields = new MockValueFields();
 
     serializer.writeValue(fileValue, valueFields);
@@ -131,8 +134,10 @@ public class FileValueSerializerTest {
   }
 
   @Test
-  public void testWriteMimetypeFilenameAndBytesValueWithShortcutMethod() throws URISyntaxException, UnsupportedEncodingException {
-    File file = new File(this.getClass().getClassLoader().getResource("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt").toURI());
+  public void testWriteMimetypeFilenameAndBytesValueWithShortcutMethod()
+      throws URISyntaxException, UnsupportedEncodingException {
+    File file = new File(this.getClass().getClassLoader()
+        .getResource("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt").toURI());
     FileValue fileValue = Variables.fileValue(file);
     ValueFields valueFields = new MockValueFields();
 
@@ -150,7 +155,8 @@ public class FileValueSerializerTest {
 
   @Test
   public void testReadFileNameMimeTypeAndByteArray() throws IOException {
-    InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
+    InputStream is = this.getClass().getClassLoader()
+        .getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
     byte[] data = new byte[is.available()];
     DataInputStream dataInputStream = new DataInputStream(is);
     dataInputStream.readFully(data);
@@ -171,7 +177,8 @@ public class FileValueSerializerTest {
 
   @Test
   public void testReadFileNameEncodingAndByteArray() throws IOException {
-    InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
+    InputStream is = this.getClass().getClassLoader()
+        .getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
     byte[] data = new byte[is.available()];
     DataInputStream dataInputStream = new DataInputStream(is);
     dataInputStream.readFully(data);
@@ -193,7 +200,8 @@ public class FileValueSerializerTest {
 
   @Test
   public void testReadFullValue() throws IOException {
-    InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
+    InputStream is = this.getClass().getClassLoader()
+        .getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
     byte[] data = new byte[is.available()];
     DataInputStream dataInputStream = new DataInputStream(is);
     dataInputStream.readFully(data);
@@ -217,7 +225,8 @@ public class FileValueSerializerTest {
 
   @Test
   public void testReadFilenameAndByteArrayValue() throws IOException {
-    InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
+    InputStream is = this.getClass().getClassLoader()
+        .getResourceAsStream("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt");
     byte[] data = new byte[is.available()];
     DataInputStream dataInputStream = new DataInputStream(is);
     dataInputStream.readFully(data);
@@ -252,22 +261,22 @@ public class FileValueSerializerTest {
     MockValueFields valueFields = new MockValueFields();
     String filename = "";
     valueFields.setTextValue(filename);
-  
+
     FileValue fileValue = serializer.readValue(valueFields, true);
-  
+
     assertThat(fileValue.getFilename(), is(""));
     assertThat(fileValue.getMimeType(), is(nullValue()));
     assertThat(fileValue.getValue(), is(nullValue()));
   }
-  
+
   @Test
   public void testReadNullFilenameValue() {
     MockValueFields valueFields = new MockValueFields();
     String filename = null;
     valueFields.setTextValue(filename);
-  
+
     FileValue fileValue = serializer.readValue(valueFields, true);
-  
+
     assertThat(fileValue.getFilename(), is(""));
     assertThat(fileValue.getMimeType(), is(nullValue()));
     assertThat(fileValue.getValue(), is(nullValue()));

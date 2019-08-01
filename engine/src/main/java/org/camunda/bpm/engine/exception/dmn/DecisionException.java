@@ -19,7 +19,9 @@ package org.camunda.bpm.engine.exception.dmn;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
- * <p>This exception is thrown when something happens related to a decision.</p>
+ * <p>
+ * This exception is thrown when something happens related to a decision.
+ * </p>
  */
 public class DecisionException extends ProcessEngineException {
 

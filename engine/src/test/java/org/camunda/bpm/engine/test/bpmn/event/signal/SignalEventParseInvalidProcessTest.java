@@ -49,10 +49,12 @@ public class SignalEventParseInvalidProcessTest {
         { "InvalidProcessWithDuplicateSignalNames.bpmn20.xml", "duplicate signal name" },
         { "InvalidProcessWithNoSignalName.bpmn20.xml", "signal with id 'alertSignal' has no name" },
         { "InvalidProcessWithSignalNoId.bpmn20.xml", "signal must have an id" },
-        { "InvalidProcessWithSignalNoRef.bpmn20.xml", "signalEventDefinition does not have required property 'signalRef'" },
-        { "InvalidProcessWithMultipleSignalStartEvents.bpmn20.xml", "Cannot have more than one signal event subscription with name 'signal'" },
-        { "InvalidProcessWithMultipleInterruptingSignalEventSubProcesses.bpmn20.xml", "Cannot have more than one signal event subscription with name 'alert'" }
-    });
+        { "InvalidProcessWithSignalNoRef.bpmn20.xml",
+            "signalEventDefinition does not have required property 'signalRef'" },
+        { "InvalidProcessWithMultipleSignalStartEvents.bpmn20.xml",
+            "Cannot have more than one signal event subscription with name 'signal'" },
+        { "InvalidProcessWithMultipleInterruptingSignalEventSubProcesses.bpmn20.xml",
+            "Cannot have more than one signal event subscription with name 'alert'" } });
   }
 
   @Parameter(0)
@@ -75,8 +77,7 @@ public class SignalEventParseInvalidProcessTest {
   public void testParseInvalidProcessDefinition() {
     try {
       repositoryService.createDeployment()
-        .addClasspathResource(PROCESS_DEFINITION_DIRECTORY + processDefinitionResource)
-        .deploy();
+          .addClasspathResource(PROCESS_DEFINITION_DIRECTORY + processDefinitionResource).deploy();
 
       fail("exception expected: " + expectedErrorMessage);
     } catch (Exception e) {
@@ -86,7 +87,8 @@ public class SignalEventParseInvalidProcessTest {
 
   public void assertTextPresent(String expected, String actual) {
     if (actual == null || !actual.contains(expected)) {
-      throw new AssertionFailedError("expected presence of [" + expected + "], but was [" + actual + "]");
+      throw new AssertionFailedError(
+          "expected presence of [" + expected + "], but was [" + actual + "]");
     }
   }
 }

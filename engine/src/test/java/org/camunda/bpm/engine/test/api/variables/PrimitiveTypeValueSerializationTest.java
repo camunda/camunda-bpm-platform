@@ -52,15 +52,13 @@ public class PrimitiveTypeValueSerializationTest {
   @Parameters(name = "{index}: variable = {0}")
   public static Collection<Object[]> data() {
     return Arrays
-        .asList(new Object[][] {
-          { Variables.stringValue("a"), Variables.stringValue(null) },
-          { Variables.booleanValue(true), Variables.booleanValue(null) },
-          { Variables.integerValue(4), Variables.integerValue(null) },
-          { Variables.shortValue((short) 2), Variables.shortValue(null) },
-          { Variables.longValue(6L), Variables.longValue(null) },
-          { Variables.doubleValue(4.2), Variables.doubleValue(null) },
-          { Variables.dateValue(new Date()), Variables.dateValue(null) }
-        });
+        .asList(new Object[][] { { Variables.stringValue("a"), Variables.stringValue(null) },
+            { Variables.booleanValue(true), Variables.booleanValue(null) },
+            { Variables.integerValue(4), Variables.integerValue(null) },
+            { Variables.shortValue((short) 2), Variables.shortValue(null) },
+            { Variables.longValue(6L), Variables.longValue(null) },
+            { Variables.doubleValue(4.2), Variables.doubleValue(null) },
+            { Variables.dateValue(new Date()), Variables.dateValue(null) } });
   }
 
   @Parameter(0)
@@ -81,7 +79,8 @@ public class PrimitiveTypeValueSerializationTest {
     runtimeService = rule.getRuntimeService();
     repositoryService = rule.getRepositoryService();
 
-    deploymentId = repositoryService.createDeployment().addClasspathResource(BPMN_FILE).deploy().getId();
+    deploymentId = repositoryService.createDeployment().addClasspathResource(BPMN_FILE).deploy()
+        .getId();
   }
 
   @After
@@ -105,7 +104,8 @@ public class PrimitiveTypeValueSerializationTest {
 
     runtimeService.setVariable(instance.getId(), VARIABLE_NAME, typedValue);
 
-    TypedValue typedVariableValue = runtimeService.getVariableTyped(instance.getId(), VARIABLE_NAME);
+    TypedValue typedVariableValue = runtimeService.getVariableTyped(instance.getId(),
+        VARIABLE_NAME);
     assertEquals(typedValue.getType(), typedVariableValue.getType());
     assertEquals(typedValue.getValue(), typedVariableValue.getValue());
   }
@@ -118,7 +118,8 @@ public class PrimitiveTypeValueSerializationTest {
 
     assertEquals(null, runtimeService.getVariable(instance.getId(), VARIABLE_NAME));
 
-    TypedValue typedVariableValue = runtimeService.getVariableTyped(instance.getId(), VARIABLE_NAME);
+    TypedValue typedVariableValue = runtimeService.getVariableTyped(instance.getId(),
+        VARIABLE_NAME);
     assertEquals(nullValue.getType(), typedVariableValue.getType());
     assertEquals(null, typedVariableValue.getValue());
   }

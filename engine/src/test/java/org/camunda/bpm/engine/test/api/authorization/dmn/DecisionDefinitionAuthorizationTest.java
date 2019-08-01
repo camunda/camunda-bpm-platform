@@ -41,8 +41,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/authorization/singleDecision.dmn11.xml",
-        "org/camunda/bpm/engine/test/api/authorization/anotherDecision.dmn11.xml")
-        .getId();
+        "org/camunda/bpm/engine/test/api/authorization/anotherDecision.dmn11.xml").getId();
     super.setUp();
   }
 
@@ -124,7 +123,8 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, READ);
 
     // when
-    DecisionDefinition decisionDefinition = repositoryService.getDecisionDefinition(decisionDefinitionId);
+    DecisionDefinition decisionDefinition = repositoryService
+        .getDecisionDefinition(decisionDefinitionId);
 
     // then
     assertNotNull(decisionDefinition);
@@ -225,23 +225,24 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
   }
 
   public void testDecisionDefinitionUpdateTimeToLive() {
-    //given
+    // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
     createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, UPDATE);
 
-    //when
+    // when
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, 6);
 
-    //then
-    assertEquals(6, selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getHistoryTimeToLive().intValue());
+    // then
+    assertEquals(6,
+        selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getHistoryTimeToLive().intValue());
 
   }
 
   public void testDecisionDefinitionUpdateTimeToLiveWithoutAuthorizations() {
-    //given
+    // given
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
     try {
-      //when
+      // when
       repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, 6);
       fail("Exception expected");
 

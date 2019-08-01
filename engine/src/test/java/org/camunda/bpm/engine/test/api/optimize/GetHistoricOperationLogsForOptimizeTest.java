@@ -78,11 +78,9 @@ public class GetHistoricOperationLogsForOptimizeTest {
   private AuthorizationService authorizationService;
   private TaskService taskService;
 
-
   @Before
   public void init() {
-    ProcessEngineConfigurationImpl config =
-      engineRule.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl config = engineRule.getProcessEngineConfiguration();
     optimizeService = config.getOptimizeService();
     identityService = engineRule.getIdentityService();
     runtimeService = engineRule.getRuntimeService();
@@ -110,20 +108,16 @@ public class GetHistoricOperationLogsForOptimizeTest {
 
   @Test
   public void getHistoricUserOperationLogs() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-        .name("task")
-      .endEvent("endEvent")
-      .done();
+        .startEvent("startEvent").userTask("userTask").name("task").endEvent("endEvent").done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
     claimAllUserTasks();
 
     // when
-    List<UserOperationLogEntry> userOperationsLog =
-      optimizeService.getHistoricUserOperationLogs(pastDate(), null, 10);
+    List<UserOperationLogEntry> userOperationsLog = optimizeService
+        .getHistoricUserOperationLogs(pastDate(), null, 10);
 
     // then
     assertThat(userOperationsLog.size(), is(1));
@@ -133,12 +127,8 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void occurredAfterParameterWorks() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-        .camundaAssignee(userId)
-      .endEvent()
-      .done();
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("userTask").camundaAssignee(userId).endEvent().done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
@@ -154,11 +144,12 @@ public class GetHistoricOperationLogsForOptimizeTest {
     completeAllUserTasks();
 
     // when
-    List<UserOperationLogEntry> userOperationsLog =
-      optimizeService.getHistoricUserOperationLogs(now, null, 10);
+    List<UserOperationLogEntry> userOperationsLog = optimizeService
+        .getHistoricUserOperationLogs(now, null, 10);
 
     // then
-    Set<String> allowedOperationsTypes = new HashSet<>(Arrays.asList(OPERATION_TYPE_CLAIM, OPERATION_TYPE_COMPLETE));
+    Set<String> allowedOperationsTypes = new HashSet<>(
+        Arrays.asList(OPERATION_TYPE_CLAIM, OPERATION_TYPE_COMPLETE));
     assertThat(userOperationsLog.size(), is(2));
     assertTrue(allowedOperationsTypes.contains(userOperationsLog.get(0).getOperationType()));
     assertTrue(allowedOperationsTypes.contains(userOperationsLog.get(1).getOperationType()));
@@ -167,11 +158,8 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void occurredAtParameterWorks() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-      .endEvent()
-      .done();
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("userTask").endEvent().done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
@@ -183,8 +171,8 @@ public class GetHistoricOperationLogsForOptimizeTest {
     completeAllUserTasks();
 
     // when
-    List<UserOperationLogEntry> userOperationsLog =
-      optimizeService.getHistoricUserOperationLogs(null, now, 10);
+    List<UserOperationLogEntry> userOperationsLog = optimizeService
+        .getHistoricUserOperationLogs(null, now, 10);
 
     // then
     assertThat(userOperationsLog.size(), is(1));
@@ -195,11 +183,8 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void occurredAfterAndOccurredAtParameterWorks() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-      .endEvent()
-      .done();
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("userTask").endEvent().done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
@@ -211,23 +196,19 @@ public class GetHistoricOperationLogsForOptimizeTest {
     completeAllUserTasks();
 
     // when
-    List<UserOperationLogEntry> userOperationsLog =
-      optimizeService.getHistoricUserOperationLogs(now, now, 10);
+    List<UserOperationLogEntry> userOperationsLog = optimizeService
+        .getHistoricUserOperationLogs(now, now, 10);
 
     // then
     assertThat(userOperationsLog.size(), is(0));
   }
-//
+
+  //
   @Test
   public void maxResultsParameterWorks() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask()
-      .userTask()
-      .userTask()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask().userTask().userTask().endEvent().done();
     testHelper.deploy(simpleDefinition);
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
     claimAndCompleteAllUserTasks();
@@ -235,8 +216,8 @@ public class GetHistoricOperationLogsForOptimizeTest {
     claimAndCompleteAllUserTasks();
 
     // when
-    List<UserOperationLogEntry> userOperationsLog =
-      optimizeService.getHistoricUserOperationLogs(pastDate(), null, 3);
+    List<UserOperationLogEntry> userOperationsLog = optimizeService
+        .getHistoricUserOperationLogs(pastDate(), null, 3);
 
     // then
     assertThat(userOperationsLog.size(), is(3));
@@ -245,12 +226,8 @@ public class GetHistoricOperationLogsForOptimizeTest {
   @Test
   public void resultIsSortedByTimestamp() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-        .camundaAssignee(userId)
-      .endEvent()
-      .done();
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("userTask").camundaAssignee(userId).endEvent().done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
@@ -266,8 +243,8 @@ public class GetHistoricOperationLogsForOptimizeTest {
     completeAllUserTasks();
 
     // when
-    List<UserOperationLogEntry> userOperationsLog =
-      optimizeService.getHistoricUserOperationLogs(pastDate(), null, 4);
+    List<UserOperationLogEntry> userOperationsLog = optimizeService
+        .getHistoricUserOperationLogs(pastDate(), null, 4);
 
     // then
     assertThat(userOperationsLog.size(), is(3));
@@ -278,20 +255,19 @@ public class GetHistoricOperationLogsForOptimizeTest {
 
   @Test
   public void fetchOnlyUserTaskBasedLogEntries() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask()
-      .endEvent()
-      .done();
+        .startEvent("startEvent").userTask().endEvent().done();
     testHelper.deploy(simpleDefinition);
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
     createLogEntriesThatShouldNotBeReturned(processInstance.getId());
-    assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), greaterThan(0L));
+    assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(),
+        greaterThan(0L));
 
     // when
-    List<UserOperationLogEntry> userOperationsLog =
-      optimizeService.getHistoricUserOperationLogs(pastDate(), null, 10);
+    List<UserOperationLogEntry> userOperationsLog = optimizeService
+        .getHistoricUserOperationLogs(pastDate(), null, 10);
 
     // then
     assertThat(userOperationsLog.size(), is(0));
@@ -315,14 +291,8 @@ public class GetHistoricOperationLogsForOptimizeTest {
     taskService.setPriority(processTaskId, 10);
 
     // add and delete an attachment
-    Attachment attachment = taskService.createAttachment(
-      "image/ico",
-      processTaskId,
-      processInstanceId,
-      "favicon.ico",
-      "favicon",
-      "http://camunda.com/favicon.ico"
-    );
+    Attachment attachment = taskService.createAttachment("image/ico", processTaskId,
+        processInstanceId, "favicon.ico", "favicon", "http://camunda.com/favicon.ico");
     taskService.deleteAttachment(attachment.getId());
     runtimeService.deleteProcessInstance(processInstanceId, "that's why");
 
@@ -341,7 +311,6 @@ public class GetHistoricOperationLogsForOptimizeTest {
 
     taskService.deleteTask(userTask.getId(), true);
   }
-
 
   private Date pastDate() {
     return new Date(2L);
@@ -381,7 +350,8 @@ public class GetHistoricOperationLogsForOptimizeTest {
     identityService.saveUser(user);
   }
 
-  private void assertThatTasksHaveAllImportantInformation(UserOperationLogEntry userOperationLogEntry) {
+  private void assertThatTasksHaveAllImportantInformation(
+      UserOperationLogEntry userOperationLogEntry) {
     assertThat(userOperationLogEntry, notNullValue());
     assertThat(userOperationLogEntry.getId(), notNullValue());
     assertThat(userOperationLogEntry.getOperationType(), is(OPERATION_TYPE_CLAIM));
@@ -391,7 +361,8 @@ public class GetHistoricOperationLogsForOptimizeTest {
     assertThat(userOperationLogEntry.getProcessDefinitionKey(), is("process"));
     assertThat(userOperationLogEntry.getProcessDefinitionId(), notNullValue());
     assertThat(userOperationLogEntry.getUserId(), is(userId));
-    assertThat(userOperationLogEntry.getTaskId(), is(taskService.createTaskQuery().singleResult().getId()));
+    assertThat(userOperationLogEntry.getTaskId(),
+        is(taskService.createTaskQuery().singleResult().getId()));
     assertThat(userOperationLogEntry.getCategory(), is(CATEGORY_TASK_WORKER));
   }
 

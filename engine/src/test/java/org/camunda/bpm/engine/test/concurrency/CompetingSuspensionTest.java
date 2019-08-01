@@ -33,7 +33,7 @@ import org.slf4j.Logger;
  */
 public class CompetingSuspensionTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   static ControllableThread activeThread;
 
@@ -55,21 +55,18 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     @Override
     public void run() {
       try {
-        processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand<Void>(activeThread, createSuspendCommand()));
+        processEngineConfiguration.getCommandExecutorTxRequired()
+            .execute(new ControlledCommand<Void>(activeThread, createSuspendCommand()));
 
-      }
-      catch (OptimisticLockingException e) {
+      } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
 
     protected SuspendProcessDefinitionCmd createSuspendCommand() {
       UpdateProcessDefinitionSuspensionStateBuilderImpl builder = new UpdateProcessDefinitionSuspensionStateBuilderImpl()
-          .byProcessDefinitionId(processDefinitionId)
-          .includeProcessInstances(true);
+          .byProcessDefinitionId(processDefinitionId).includeProcessInstances(true);
 
       return new SuspendProcessDefinitionCmd(builder);
     }
@@ -93,33 +90,33 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     @Override
     public void run() {
       try {
-        processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new SignalCmd(executionId, null, null, null)));
+        processEngineConfiguration.getCommandExecutorTxRequired().execute(
+            new ControlledCommand(activeThread, new SignalCmd(executionId, null, null, null)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 
   /**
-   * Ensures that suspending a process definition and its process instances will also increase the revision of the executions
-   * such that concurrent updates fail with an OptimisticLockingException.
+   * Ensures that suspending a process definition and its process instances will also increase the
+   * revision of the executions such that concurrent updates fail with an
+   * OptimisticLockingException.
    */
   @Deployment
   public void testCompetingSuspension() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("CompetingSuspensionProcess").singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("CompetingSuspensionProcess").singleResult();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    Execution execution = runtimeService
-        .createExecutionQuery()
-        .processInstanceId(processInstance.getId())
-        .activityId("wait1")
-        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    Execution execution = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId()).activityId("wait1").singleResult();
 
-    SuspendProcessDefinitionThread suspensionThread = new SuspendProcessDefinitionThread(processDefinition.getId());
+    SuspendProcessDefinitionThread suspensionThread = new SuspendProcessDefinitionThread(
+        processDefinition.getId());
     suspensionThread.startAndWaitUntilControlIsReturned();
 
     SignalThread signalExecutionThread = new SignalThread(execution.getId());

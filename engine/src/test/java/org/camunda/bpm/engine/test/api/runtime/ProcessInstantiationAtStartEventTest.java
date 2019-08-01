@@ -36,15 +36,13 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
 
   @Override
   protected void setUp() throws Exception {
-    deployment(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
-        .startEvent()
-        .userTask()
-        .endEvent()
-        .done());
+    deployment(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().userTask()
+        .endEvent().done());
   }
 
   public void testStartProcessInstanceById() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
     runtimeService.createProcessInstanceById(processDefinition.getId()).execute();
 
@@ -60,7 +58,8 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
 
   public void testStartProcessInstanceAndSetBusinessKey() {
 
-    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).businessKey("businessKey").execute();
+    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).businessKey("businessKey")
+        .execute();
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertThat(processInstance, is(notNullValue()));
@@ -69,7 +68,8 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
 
   public void testStartProcessInstanceAndSetCaseInstanceId() {
 
-    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).caseInstanceId("caseInstanceId").execute();
+    runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY)
+        .caseInstanceId("caseInstanceId").execute();
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertThat(processInstance, is(notNullValue()));
@@ -78,7 +78,8 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
 
   public void testStartProcessInstanceAndSetVariable() {
 
-    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).setVariable("var", "value").execute();
+    ProcessInstance processInstance = runtimeService
+        .createProcessInstanceByKey(PROCESS_DEFINITION_KEY).setVariable("var", "value").execute();
 
     Object variable = runtimeService.getVariable(processInstance.getId(), "var");
     assertThat(variable, is(notNullValue()));
@@ -86,9 +87,11 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
   }
 
   public void testStartProcessInstanceAndSetVariables() {
-    Map<String, Object> variables = Variables.createVariables().putValue("var1", "v1").putValue("var2", "v2");
+    Map<String, Object> variables = Variables.createVariables().putValue("var1", "v1")
+        .putValue("var2", "v2");
 
-    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).setVariables(variables).execute();
+    ProcessInstance processInstance = runtimeService
+        .createProcessInstanceByKey(PROCESS_DEFINITION_KEY).setVariables(variables).execute();
 
     assertThat(runtimeService.getVariables(processInstance.getId()), is(variables));
   }

@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -42,7 +41,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
  * @author Falko Menge
  * @author Daniel Meyer
  */
-public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessInstanceQuery, ProcessInstance> implements ProcessInstanceQuery, Serializable {
+public class ProcessInstanceQueryImpl
+    extends AbstractVariableQueryImpl<ProcessInstanceQuery, ProcessInstance>
+    implements ProcessInstanceQuery, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
@@ -102,7 +103,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
-  public ProcessInstanceQuery processInstanceBusinessKey(String businessKey, String processDefinitionKey) {
+  public ProcessInstanceQuery processInstanceBusinessKey(String businessKey,
+      String processDefinitionKey) {
     ensureNotNull("Business key", businessKey);
     this.businessKey = businessKey;
     this.processDefinitionKey = processDefinitionKey;
@@ -146,7 +148,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public ProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
     if (isRootProcessInstances) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
     }
     this.superProcessInstanceId = superProcessInstanceId;
     return this;
@@ -177,7 +180,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public ProcessInstanceQuery orderByProcessInstanceId() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
     }
 
     orderBy(ProcessInstanceQueryProperty.PROCESS_INSTANCE_ID);
@@ -186,7 +190,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public ProcessInstanceQuery orderByProcessDefinitionId() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
     }
 
     orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION,
@@ -196,7 +201,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public ProcessInstanceQuery orderByProcessDefinitionKey() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
     }
 
     orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION,
@@ -206,7 +212,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public ProcessInstanceQuery orderByTenantId() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTenantId() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByTenantId() within 'or' query");
     }
 
     orderBy(ProcessInstanceQueryProperty.TENANT_ID);
@@ -215,7 +222,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public ProcessInstanceQuery orderByBusinessKey() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByBusinessKey() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByBusinessKey() within 'or' query");
     }
 
     orderBy(ProcessInstanceQueryProperty.BUSINESS_KEY);
@@ -282,15 +290,17 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public ProcessInstanceQuery rootProcessInstances() {
     if (superProcessInstanceId != null) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
     }
     isRootProcessInstances = true;
     return this;
   }
 
   public ProcessInstanceQuery leafProcessInstances() {
-    if(subProcessInstanceId != null) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both leafProcessInstances and subProcessInstanceId");
+    if (subProcessInstanceId != null) {
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set both leafProcessInstances and subProcessInstanceId");
     }
     isLeafProcessInstances = true;
     return this;
@@ -301,7 +311,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
-  //results /////////////////////////////////////////////////////////////////
+  // results /////////////////////////////////////////////////////////////////
 
   @Override
   protected void checkQueryOk() {
@@ -314,26 +324,20 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
 
-    return commandContext
-      .getExecutionManager()
-      .findProcessInstanceCountByQueryCriteria(this);
+    return commandContext.getExecutionManager().findProcessInstanceCountByQueryCriteria(this);
   }
 
   @Override
   public List<ProcessInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
 
-    return commandContext
-      .getExecutionManager()
-      .findProcessInstancesByQueryCriteria(this, page);
+    return commandContext.getExecutionManager().findProcessInstancesByQueryCriteria(this, page);
   }
 
   public List<String> executeIdsList(CommandContext commandContext) {
     checkQueryOk();
 
-    return commandContext
-      .getExecutionManager()
-      .findProcessInstancesIdsByQueryCriteria(this);
+    return commandContext.getExecutionManager().findProcessInstancesIdsByQueryCriteria(this);
   }
 
   @Override
@@ -344,7 +348,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
       VariableSerializers variableSerializers = Context.getProcessEngineConfiguration()
           .getVariableSerializers();
 
-      for (ProcessInstanceQueryImpl orQuery: queries) {
+      for (ProcessInstanceQueryImpl orQuery : queries) {
         for (QueryVariableValue var : orQuery.queryVariableValues) {
           var.initialize(variableSerializers);
         }
@@ -352,7 +356,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
   }
 
-  //getters /////////////////////////////////////////////////////////////////
+  // getters /////////////////////////////////////////////////////////////////
 
   public String getProcessInstanceId() {
     return processInstanceId;
@@ -494,7 +498,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   @Override
   public ProcessInstanceQuery endOr() {
-    if (!queries.isEmpty() && this != queries.get(queries.size()-1)) {
+    if (!queries.isEmpty() && this != queries.get(queries.size() - 1)) {
       throw new ProcessEngineException("Invalid query usage: cannot set endOr() before or()");
     }
 

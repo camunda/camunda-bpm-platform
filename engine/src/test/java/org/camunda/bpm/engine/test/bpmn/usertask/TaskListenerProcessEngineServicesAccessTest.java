@@ -28,7 +28,8 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
  * @author Daniel Meyer
  *
  */
-public class TaskListenerProcessEngineServicesAccessTest extends AbstractProcessEngineServicesAccessTest {
+public class TaskListenerProcessEngineServicesAccessTest
+    extends AbstractProcessEngineServicesAccessTest {
 
   protected Class<?> getTestServiceAccessibleClass() {
     return AccessServicesListener.class;

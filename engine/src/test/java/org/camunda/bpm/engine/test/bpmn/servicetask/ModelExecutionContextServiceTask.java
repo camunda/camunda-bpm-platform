@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 
-
 /**
  * @author Sebastian Menski
  */

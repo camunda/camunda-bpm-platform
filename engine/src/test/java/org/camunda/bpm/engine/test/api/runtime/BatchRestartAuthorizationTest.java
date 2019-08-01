@@ -68,42 +68,31 @@ public class BatchRestartAuthorizationTest {
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE)
-        )
-        .failsDueToRequired(
-          grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY)
-        )
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY, Permissions.CREATE_INSTANCE),
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES),
-          grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY, Permissions.CREATE_INSTANCE),
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)
-        )
-        .succeeds()
-    );
+    return AuthorizationTestRule
+        .asParameters(
+            scenario().withoutAuthorizations()
+                .failsDueToRequired(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                    grant(Resources.BATCH, "*", "userId",
+                        BatchPermissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES)),
+            scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE))
+                .failsDueToRequired(grant(Resources.PROCESS_DEFINITION, "Process", "userId",
+                    Permissions.READ_HISTORY)),
+            scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY))
+                .failsDueToRequired(
+                    grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)),
+            scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY,
+                    Permissions.CREATE_INSTANCE),
+                grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)),
+            scenario()
+                .withAuthorizations(
+                    grant(Resources.BATCH, "*", "userId",
+                        BatchPermissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES),
+                    grant(Resources.PROCESS_DEFINITION, "Process", "userId",
+                        Permissions.READ_HISTORY, Permissions.CREATE_INSTANCE),
+                    grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE))
+                .succeeds());
   }
 
   @After
@@ -115,14 +104,13 @@ public class BatchRestartAuthorizationTest {
   public void cleanBatch() {
     Batch batch = engineRule.getManagementService().createBatchQuery().singleResult();
     if (batch != null) {
-      engineRule.getManagementService().deleteBatch(
-          batch.getId(), true);
+      engineRule.getManagementService().deleteBatch(batch.getId(), true);
     }
 
-    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().singleResult();
+    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
+        .singleResult();
     if (historicBatch != null) {
-      engineRule.getHistoryService().deleteHistoricBatch(
-          historicBatch.getId());
+      engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
     }
   }
 
@@ -133,37 +121,36 @@ public class BatchRestartAuthorizationTest {
 
   @Test
   public void executeBatch() {
-    //given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    // given
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
 
-    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
-    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
+    ProcessInstance processInstance1 = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("Process");
+    ProcessInstance processInstance2 = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("Process");
     engineRule.getRuntimeService().deleteProcessInstance(processInstance1.getId(), TEST_REASON);
     engineRule.getRuntimeService().deleteProcessInstance(processInstance2.getId(), TEST_REASON);
 
-    authRule
-        .init(scenario)
-        .withUser("userId")
+    authRule.init(scenario).withUser("userId")
         .bindResource("processInstance1", processInstance1.getId())
         .bindResource("restartedProcessInstance", "*")
         .bindResource("processInstance2", processInstance2.getId())
-        .bindResource("processDefinition", "Process")
-        .bindResource("batchId", "*")
-        .start();
+        .bindResource("processDefinition", "Process").bindResource("batchId", "*").start();
 
-    Batch batch = engineRule.getRuntimeService()
-        .restartProcessInstances(processDefinition.getId())
+    Batch batch = engineRule.getRuntimeService().restartProcessInstances(processDefinition.getId())
         .processInstanceIds(processInstance1.getId(), processInstance2.getId())
-        .startAfterActivity("userTask1")
-        .executeAsync();
+        .startAfterActivity("userTask1").executeAsync();
 
     if (batch != null) {
-      Job job = engineRule.getManagementService().createJobQuery().jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
+      Job job = engineRule.getManagementService().createJobQuery()
+          .jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
 
       // seed job
       engineRule.getManagementService().executeJob(job.getId());
 
-      for (Job pending : engineRule.getManagementService().createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
+      for (Job pending : engineRule.getManagementService().createJobQuery()
+          .jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
         engineRule.getManagementService().executeJob(pending.getId());
       }
     }

@@ -140,11 +140,14 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     assertNotNull(modelInstance);
 
     Model model = modelInstance.getModel();
-    Collection<ModelElementInstance> events = modelInstance.getModelElementsByType(model.getType(Event.class));
+    Collection<ModelElementInstance> events = modelInstance
+        .getModelElementsByType(model.getType(Event.class));
     assertEquals(3, events.size());
-    Collection<ModelElementInstance> gateways = modelInstance.getModelElementsByType(model.getType(Gateway.class));
+    Collection<ModelElementInstance> gateways = modelInstance
+        .getModelElementsByType(model.getType(Gateway.class));
     assertEquals(1, gateways.size());
-    Collection<ModelElementInstance> tasks = modelInstance.getModelElementsByType(model.getType(Task.class));
+    Collection<ModelElementInstance> tasks = modelInstance
+        .getModelElementsByType(model.getType(Task.class));
     assertEquals(1, tasks.size());
 
     FlowElement flowElement = ModelExecutionContextExecutionListener.flowElement;
@@ -162,14 +165,9 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
   }
 
   private void deployAndStartTestProcess(String elementId, String eventName) {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-      .startEvent(START_ID)
-        .sequenceFlowId(SEQUENCE_FLOW_ID)
-      .intermediateCatchEvent(CATCH_EVENT_ID)
-      .parallelGateway(GATEWAY_ID)
-      .userTask(USER_TASK_ID)
-      .endEvent(END_ID)
-      .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent(START_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID).intermediateCatchEvent(CATCH_EVENT_ID)
+        .parallelGateway(GATEWAY_ID).userTask(USER_TASK_ID).endEvent(END_ID).done();
 
     addMessageEventDefinition((CatchEvent) modelInstance.getModelElementById(CATCH_EVENT_ID));
     addExecutionListener((BaseElement) modelInstance.getModelElementById(elementId), eventName);
@@ -182,21 +180,26 @@ public class ExecutionListenerBpmnModelExecutionContextTest extends PluggablePro
     message.setId(MESSAGE_ID);
     message.setName(MESSAGE_NAME);
     modelInstance.getDefinitions().addChildElement(message);
-    MessageEventDefinition messageEventDefinition = modelInstance.newInstance(MessageEventDefinition.class);
+    MessageEventDefinition messageEventDefinition = modelInstance
+        .newInstance(MessageEventDefinition.class);
     messageEventDefinition.setMessage(message);
     catchEvent.getEventDefinitions().add(messageEventDefinition);
   }
 
   private void addExecutionListener(BaseElement element, String eventName) {
-    ExtensionElements extensionElements = element.getModelInstance().newInstance(ExtensionElements.class);
-    ModelElementInstance executionListener = extensionElements.addExtensionElement(CAMUNDA_NS, "executionListener");
-    executionListener.setAttributeValueNs(CAMUNDA_NS, "class", ModelExecutionContextExecutionListener.class.getName());
+    ExtensionElements extensionElements = element.getModelInstance()
+        .newInstance(ExtensionElements.class);
+    ModelElementInstance executionListener = extensionElements.addExtensionElement(CAMUNDA_NS,
+        "executionListener");
+    executionListener.setAttributeValueNs(CAMUNDA_NS, "class",
+        ModelExecutionContextExecutionListener.class.getName());
     executionListener.setAttributeValueNs(CAMUNDA_NS, "event", eventName);
     element.setExtensionElements(extensionElements);
   }
 
   private void deployAndStartProcess(BpmnModelInstance modelInstance) {
-    deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("process.bpmn", modelInstance).deploy().getId();
     runtimeService.startProcessInstanceByKey(PROCESS_ID);
   }
 

@@ -19,14 +19,13 @@ package org.camunda.bpm.engine.test.bpmn.sendtask;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Kristin Polenz
  */
 public class DummySendTask implements JavaDelegate {
-  
+
   public static boolean wasExecuted = false;
-  
+
   public void execute(DelegateExecution execution) throws Exception {
     wasExecuted = true;
   }

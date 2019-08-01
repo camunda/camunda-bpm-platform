@@ -57,7 +57,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals("null", variable.getTypeName());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -68,19 +69,20 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals("stringValue", variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
   }
-
 
   @Deployment
   public void testInputElValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2l, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -91,7 +93,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -104,7 +107,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -117,7 +121,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -128,7 +133,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -141,7 +147,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -154,7 +161,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -165,7 +173,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -174,11 +183,13 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testInputExternalClasspathScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("scriptPath", "classpath://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
+    variables.put("scriptPath",
+        "classpath://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -191,53 +202,55 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValue.bpmn",
-    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
-  })
+      "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValue.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy" })
   public void testInputExternalDeploymentScriptValue() {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValueAsVariable.bpmn",
-    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
-  })
+      "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValueAsVariable.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy" })
   public void testInputExternalDeploymentScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("scriptPath", "deployment://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
+    variables.put("scriptPath",
+        "deployment://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValueAsBean.bpmn",
-    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
-  })
+      "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputExternalDeploymentScriptValueAsBean.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy" })
   public void testInputExternalDeploymentScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(execution.getId(), variable.getExecutionId());
@@ -248,7 +261,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testInputListElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     List<Object> value = (List<Object>) variable.getValue();
     assertEquals(2l, value.get(0));
@@ -261,7 +275,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testInputListMixedValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     List<Object> value = (List<Object>) variable.getValue();
     assertEquals("constantStringValue", value.get(0));
@@ -274,7 +289,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testInputMapElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     TreeMap<String, Object> value = (TreeMap) variable.getValue();
     assertEquals(2l, value.get("a"));
@@ -288,12 +304,14 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(var1);
     assertEquals(2l, var1.getValue());
     assertEquals(execution.getId(), var1.getExecutionId());
 
-    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2").singleResult();
+    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2")
+        .singleResult();
     assertNotNull(var2);
     assertEquals(3l, var2.getValue());
     assertEquals(execution.getId(), var2.getExecutionId());
@@ -304,12 +322,14 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(var1);
     assertEquals(2l, var1.getValue());
     assertEquals(execution.getId(), var1.getExecutionId());
 
-    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2").singleResult();
+    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2")
+        .singleResult();
     assertNotNull(var2);
     assertEquals("stringConstantValue", var2.getValue());
     assertEquals(execution.getId(), var2.getExecutionId());
@@ -323,14 +343,16 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
-    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     TreeMap<String, Object> value = (TreeMap) var1.getValue();
     List<Object> nestedList = (List<Object>) value.get("a");
     assertEquals("stringInListNestedInMap", nestedList.get(0));
     assertEquals("b", nestedList.get(1));
     assertEquals("stringValueWithExprKey", value.get("b"));
 
-    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2").singleResult();
+    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2")
+        .singleResult();
     assertNotNull(var2);
     assertEquals("stringConstantValue", var2.getValue());
     assertEquals(execution.getId(), var2.getExecutionId());
@@ -343,7 +365,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("exprKey", "vegie");
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     List<Object> value = (List<Object>) variable.getValue();
     assertEquals("constantStringValue", value.get(0));
@@ -371,7 +394,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("varExpr2", "b");
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     TreeMap<String, Object> value = (TreeMap) variable.getValue();
     assertEquals("potato", value.get("a"));
@@ -387,7 +411,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("varExprMapValue", "avocado");
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     TreeMap<String, Object> value = (TreeMap) variable.getValue();
     assertEquals("potato", value.get("a"));
@@ -410,7 +435,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testOutputNullValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals("null", variable.getTypeName());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -420,18 +446,19 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testOutputStringConstantValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals("stringValue", variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
   }
 
-
   @Deployment
   public void testOutputElValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2l, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -441,7 +468,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testOutputScriptValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -453,7 +481,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("scriptSource", "return 1 + 1");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -462,28 +491,19 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   // related to CAM-8072
   public void testOutputParameterAvailableAfterParallelGateway() {
     // given
-    BpmnModelInstance processDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .serviceTask()
-        .camundaOutputParameter("variable", "A")
-        .camundaExpression("${'this value does not matter'}")
-      .parallelGateway("fork")
-      .endEvent()
-      .moveToNode("fork")
-        .serviceTask().camundaExpression("${variable}")
-        .receiveTask()
-      .endEvent()
-    .done();
+    BpmnModelInstance processDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .serviceTask().camundaOutputParameter("variable", "A")
+        .camundaExpression("${'this value does not matter'}").parallelGateway("fork").endEvent()
+        .moveToNode("fork").serviceTask().camundaExpression("${variable}").receiveTask().endEvent()
+        .done();
 
     // when
     deployment(processDefinition);
     runtimeService.startProcessInstanceByKey("process");
 
     // then
-    VariableInstance variableInstance = runtimeService
-      .createVariableInstanceQuery()
-      .variableName("variable")
-      .singleResult();
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+        .variableName("variable").singleResult();
     assertNotNull(variableInstance);
   }
 
@@ -493,7 +513,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("onePlusOneBean", new OnePlusOneBean());
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -503,7 +524,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testOutputExternalScriptValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -515,7 +537,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("scriptPath", "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -527,7 +550,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("onePlusOneBean", new OnePlusOneBean());
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -537,7 +561,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testOutputExternalClasspathScriptValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -546,10 +571,12 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testOutputExternalClasspathScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("scriptPath", "classpath://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
+    variables.put("scriptPath",
+        "classpath://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -561,50 +588,52 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("onePlusOneBean", new OnePlusOneBean());
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValue.bpmn",
-    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
-  })
+      "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValue.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy" })
   public void testOutputExternalDeploymentScriptValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValueAsVariable.bpmn",
-    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
-  })
+      "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValueAsVariable.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy" })
   public void testOutputExternalDeploymentScriptValueAsVariable() {
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("scriptPath", "deployment://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
+    variables.put("scriptPath",
+        "deployment://org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValueAsBean.bpmn",
-    "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy"
-  })
+      "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputExternalDeploymentScriptValueAsBean.bpmn",
+      "org/camunda/bpm/engine/test/bpmn/iomapping/oneplusone.groovy" })
   public void testOutputExternalDeploymentScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     assertEquals(2, variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());
@@ -615,7 +644,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testOutputListElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     List<Object> value = (List<Object>) variable.getValue();
     assertEquals(2l, value.get(0));
@@ -628,7 +658,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testOutputListMixedValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     List<Object> value = (List<Object>) variable.getValue();
     assertEquals("constantStringValue", value.get(0));
@@ -641,7 +672,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testOutputMapElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     TreeMap<String, Object> value = (TreeMap) variable.getValue();
     assertEquals(2l, value.get("a"));
@@ -654,12 +686,14 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testOutputMultipleElValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(var1);
     assertEquals(2l, var1.getValue());
     assertEquals(pi.getId(), var1.getExecutionId());
 
-    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2").singleResult();
+    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2")
+        .singleResult();
     assertNotNull(var2);
     assertEquals(3l, var2.getValue());
     assertEquals(pi.getId(), var2.getExecutionId());
@@ -669,12 +703,14 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testOutputMultipleMixedValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(var1);
     assertEquals(2l, var1.getValue());
     assertEquals(pi.getId(), var1.getExecutionId());
 
-    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2").singleResult();
+    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2")
+        .singleResult();
     assertNotNull(var2);
     assertEquals("stringConstantValue", var2.getValue());
     assertEquals(pi.getId(), var2.getExecutionId());
@@ -687,7 +723,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("exprKey", "b");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     TreeMap<String, Object> value = (TreeMap) var1.getValue();
     List<Object> nestedList = (List<Object>) value.get("a");
     assertEquals("stringInListNestedInMap", nestedList.get(0));
@@ -695,7 +732,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals(pi.getId(), var1.getExecutionId());
     assertEquals("stringValueWithExprKey", value.get("b"));
 
-    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2").singleResult();
+    VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2")
+        .singleResult();
     assertNotNull(var2);
     assertEquals("stringConstantValue", var2.getValue());
     assertEquals(pi.getId(), var2.getExecutionId());
@@ -708,7 +746,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("exprKey", "vegie");
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     List<Object> value = (List<Object>) variable.getValue();
     assertEquals("constantStringValue", value.get(0));
@@ -732,13 +771,13 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public void testOutputMapElKey() {
 
-
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("varExpr1", "a");
     variables.put("varExpr2", "b");
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     TreeMap<String, Object> value = (TreeMap) variable.getValue();
     assertEquals("potato", value.get("a"));
@@ -753,7 +792,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("varExpr2", "b");
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1")
+        .singleResult();
     assertNotNull(variable);
     TreeMap<String, Object> value = (TreeMap) variable.getValue();
     assertEquals("potato", value.get("a"));
@@ -774,14 +814,15 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
 
   public void testInterruptingEventSubprocessIoSupport() {
     try {
-      repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInterruptingEventSubprocessIoSupport.bpmn")
-        .deploy();
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInterruptingEventSubprocessIoSupport.bpmn")
+          .deploy();
       fail("exception expected");
     } catch (ProcessEngineException e) {
       // happy path
-      assertTextPresent("camunda:inputOutput mapping unsupported for element type 'subProcess' with attribute 'triggeredByEvent = true'", e.getMessage());
+      assertTextPresent(
+          "camunda:inputOutput mapping unsupported for element type 'subProcess' with attribute 'triggeredByEvent = true'",
+          e.getMessage());
     }
   }
 
@@ -789,20 +830,23 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testSubprocessIoSupport() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("processVar", "value");
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess",
+        variables);
 
-    Execution subprocessExecution = runtimeService.createExecutionQuery().activityId("subprocessTask").singleResult();
-    Map<String, Object> variablesLocal = runtimeService.getVariablesLocal(subprocessExecution.getId());
+    Execution subprocessExecution = runtimeService.createExecutionQuery()
+        .activityId("subprocessTask").singleResult();
+    Map<String, Object> variablesLocal = runtimeService
+        .getVariablesLocal(subprocessExecution.getId());
     assertEquals(1, variablesLocal.size());
     assertEquals("value", variablesLocal.get("innerVar"));
 
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
 
-    String outerVariable = (String) runtimeService.getVariableLocal(processInstance.getId(), "outerVar");
+    String outerVariable = (String) runtimeService.getVariableLocal(processInstance.getId(),
+        "outerVar");
     assertNotNull(outerVariable);
     assertEquals("value", outerVariable);
-
 
   }
 
@@ -811,16 +855,19 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("counter", new AtomicInteger());
     variables.put("nrOfLoops", 2);
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSequentialActivity", variables);
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSequentialActivity",
+        variables);
 
     // first sequential mi execution
-    Execution miExecution = runtimeService.createExecutionQuery().activityId("miTask").singleResult();
+    Execution miExecution = runtimeService.createExecutionQuery().activityId("miTask")
+        .singleResult();
     assertNotNull(miExecution);
     assertFalse(instance.getId().equals(miExecution.getId()));
     assertEquals(0, runtimeService.getVariable(miExecution.getId(), "loopCounter"));
 
     // input mapping
-    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(1,
+        runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
     assertEquals(1, runtimeService.getVariableLocal(miExecution.getId(), "miCounterValue"));
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -833,14 +880,16 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals(1, runtimeService.getVariable(miExecution.getId(), "loopCounter"));
 
     // input mapping
-    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(1,
+        runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
     assertEquals(2, runtimeService.getVariableLocal(miExecution.getId(), "miCounterValue"));
 
     task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
 
     // variable does not exist outside of scope
-    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(0,
+        runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
   }
 
   @Deployment
@@ -848,15 +897,18 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("counter", new AtomicInteger());
     variables.put("nrOfLoops", 2);
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess", variables);
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess",
+        variables);
 
     // first sequential mi execution
-    Execution miScopeExecution = runtimeService.createExecutionQuery().activityId("task").singleResult();
+    Execution miScopeExecution = runtimeService.createExecutionQuery().activityId("task")
+        .singleResult();
     assertNotNull(miScopeExecution);
     assertEquals(0, runtimeService.getVariable(miScopeExecution.getId(), "loopCounter"));
 
     // input mapping
-    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(1,
+        runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
     assertEquals(1, runtimeService.getVariableLocal(miScopeExecution.getId(), "miCounterValue"));
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -869,14 +921,16 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals(1, runtimeService.getVariable(miScopeExecution.getId(), "loopCounter"));
 
     // input mapping
-    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(1,
+        runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
     assertEquals(2, runtimeService.getVariableLocal(miScopeExecution.getId(), "miCounterValue"));
 
     task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
 
     // variable does not exist outside of scope
-    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(0,
+        runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
   }
 
   @Deployment
@@ -884,7 +938,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("counter", new AtomicInteger());
     variables.put("nrOfLoops", 2);
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miParallelActivity", variables);
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miParallelActivity",
+        variables);
 
     Set<Integer> counters = new HashSet<Integer>();
 
@@ -905,14 +960,16 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertTrue(counters.contains(1));
     assertTrue(counters.contains(2));
 
-    assertEquals(2, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(2,
+        runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
 
     for (Task task : taskService.createTaskQuery().list()) {
       taskService.complete(task.getId());
     }
 
     // variable does not exist outside of scope
-    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(0,
+        runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
   }
 
   @Deployment
@@ -920,7 +977,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("counter", new AtomicInteger());
     variables.put("nrOfLoops", 2);
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miParallelSubprocess", variables);
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miParallelSubprocess",
+        variables);
 
     Set<Integer> counters = new HashSet<Integer>();
 
@@ -928,36 +986,41 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     Execution miScopeExecution1 = runtimeService.createExecutionQuery().activityId("task")
         .variableValueEquals("loopCounter", 0).singleResult();
     assertNotNull(miScopeExecution1);
-    counters.add((Integer) runtimeService.getVariableLocal(miScopeExecution1.getId(), "miCounterValue"));
+    counters.add(
+        (Integer) runtimeService.getVariableLocal(miScopeExecution1.getId(), "miCounterValue"));
 
     // second parallel mi execution
     Execution miScopeExecution2 = runtimeService.createExecutionQuery().activityId("task")
         .variableValueEquals("loopCounter", 1).singleResult();
     assertNotNull(miScopeExecution2);
     assertFalse(instance.getId().equals(miScopeExecution2.getId()));
-    counters.add((Integer) runtimeService.getVariableLocal(miScopeExecution2.getId(), "miCounterValue"));
+    counters.add(
+        (Integer) runtimeService.getVariableLocal(miScopeExecution2.getId(), "miCounterValue"));
 
     assertTrue(counters.contains(1));
     assertTrue(counters.contains(2));
 
-    assertEquals(2, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(2,
+        runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
 
     for (Task task : taskService.createTaskQuery().list()) {
       taskService.complete(task.getId());
     }
 
     // variable does not exist outside of scope
-    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
+    assertEquals(0,
+        runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
   }
 
   public void testMIOutputMappingDisallowed() {
     try {
-      repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testMIOutputMappingDisallowed.bpmn20.xml")
-      .deploy();
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testMIOutputMappingDisallowed.bpmn20.xml")
+          .deploy();
       fail("Exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("camunda:outputParameter not allowed for multi-instance constructs", e.getMessage());
+      assertTextPresent("camunda:outputParameter not allowed for multi-instance constructs",
+          e.getMessage());
     }
 
   }
@@ -968,7 +1031,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("throwInMapping", "in");
     variables.put("exception", new BpmnError("error"));
     runtimeService.startProcessInstanceByKey("testProcess", variables);
-    //we will only reach the user task if the BPMNError from the script was handled by the boundary event
+    // we will only reach the user task if the BPMNError from the script was handled by the boundary
+    // event
     Task task = taskService.createTaskQuery().singleResult();
     assertThat(task.getName(), is("User Task"));
   }
@@ -981,7 +1045,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("exception", new RuntimeException(exceptionMessage));
     try {
       runtimeService.startProcessInstanceByKey("testProcess", variables);
-    } catch(RuntimeException re){
+    } catch (RuntimeException re) {
       assertThat(re.getMessage(), containsString(exceptionMessage));
     }
   }
@@ -992,7 +1056,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("throwInMapping", "out");
     variables.put("exception", new BpmnError("error"));
     runtimeService.startProcessInstanceByKey("testProcess", variables);
-    //we will only reach the user task if the BPMNError from the script was handled by the boundary event
+    // we will only reach the user task if the BPMNError from the script was handled by the boundary
+    // event
     Task task = taskService.createTaskQuery().singleResult();
     assertThat(task.getName(), is("User Task"));
   }
@@ -1005,7 +1070,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("exception", new RuntimeException(exceptionMessage));
     try {
       runtimeService.startProcessInstanceByKey("testProcess", variables);
-    } catch(RuntimeException re){
+    } catch (RuntimeException re) {
       assertThat(re.getMessage(), containsString(exceptionMessage));
     }
   }
@@ -1022,8 +1087,10 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals("taskOk", task.getTaskDefinitionKey());
 
     // then: variable mapped exists
-    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("localNotMapped").count());
-    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("localMapped").count());
+    assertEquals(0,
+        runtimeService.createVariableInstanceQuery().variableName("localNotMapped").count());
+    assertEquals(0,
+        runtimeService.createVariableInstanceQuery().variableName("localMapped").count());
     assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("mapped").count());
 
     taskService.complete(task.getId());
@@ -1031,15 +1098,18 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
     // case 2: error occurs
-    runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("throwError", true));
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Collections.<String, Object> singletonMap("throwError", true));
 
     task = taskService.createTaskQuery().singleResult();
 
     assertNotNull(task);
     assertEquals("taskError", task.getTaskDefinitionKey());
 
-    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("localNotMapped").count());
-    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("localMapped").count());
+    assertEquals(0,
+        runtimeService.createVariableInstanceQuery().variableName("localNotMapped").count());
+    assertEquals(0,
+        runtimeService.createVariableInstanceQuery().variableName("localMapped").count());
     assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("mapped").count());
 
     taskService.complete(task.getId());
@@ -1073,7 +1143,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
     // case 2: error occurs
-    runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("throwError", true));
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Collections.<String, Object> singletonMap("throwError", true));
 
     task = taskService.createTaskQuery().singleResult();
 
@@ -1120,7 +1191,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
     // case 2: error occurs
-    runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("throwError", true));
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Collections.<String, Object> singletonMap("throwError", true));
 
     task = taskService.createTaskQuery().singleResult();
 
@@ -1152,9 +1224,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     ActivityInstance theTaskInstance = tree.getActivityInstances("theTask")[0];
 
     // when
-    VariableInstance variableInstance = runtimeService
-      .createVariableInstanceQuery()
-      .singleResult();
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
 
     // then
     assertEquals(theTaskInstance.getId(), variableInstance.getActivityInstanceId());
@@ -1163,21 +1233,15 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testCompositeExpressionForInputValue() {
 
     // given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
-      .startEvent()
-      .receiveTask()
-        .camundaInputParameter("var", "Hello World${'!'}")
-      .endEvent("end")
-      .done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process").startEvent().receiveTask()
+        .camundaInputParameter("var", "Hello World${'!'}").endEvent("end").done();
 
     deployment(instance);
     runtimeService.startProcessInstanceByKey("Process");
 
     // when
-    VariableInstance variableInstance = runtimeService
-      .createVariableInstanceQuery()
-      .variableName("var")
-      .singleResult();
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+        .variableName("var").singleResult();
 
     // then
     assertEquals("Hello World!", variableInstance.getValue());
@@ -1186,24 +1250,16 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   public void testCompositeExpressionForOutputValue() {
 
     // given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
-      .startEvent()
-      .serviceTask()
-        .camundaExpression("${true}")
-        .camundaInputParameter("var1", "World!")
-        .camundaOutputParameter("var2", "Hello ${var1}")
-      .userTask()
-      .endEvent("end")
-      .done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process").startEvent().serviceTask()
+        .camundaExpression("${true}").camundaInputParameter("var1", "World!")
+        .camundaOutputParameter("var2", "Hello ${var1}").userTask().endEvent("end").done();
 
     deployment(instance);
     runtimeService.startProcessInstanceByKey("Process");
 
     // when
-    VariableInstance variableInstance = runtimeService
-      .createVariableInstanceQuery()
-      .variableName("var2")
-      .singleResult();
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+        .variableName("var2").singleResult();
 
     // then
     assertEquals("Hello World!", variableInstance.getValue());
@@ -1215,7 +1271,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("foo", "bar");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", variables);
 
-    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var").singleResult();
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var")
+        .singleResult();
     assertNotNull(variable);
     assertEquals("baroque", variable.getValue());
     assertEquals(pi.getId(), variable.getExecutionId());

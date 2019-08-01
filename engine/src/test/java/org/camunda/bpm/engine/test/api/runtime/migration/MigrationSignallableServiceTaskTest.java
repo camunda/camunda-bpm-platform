@@ -48,71 +48,55 @@ public class MigrationSignallableServiceTaskTest {
   @Test
   public void testCannotMigrateActivityInstance() {
     // given
-    BpmnModelInstance model = ProcessModels.newModel()
-      .startEvent()
-      .serviceTask("serviceTask")
-      .camundaClass(SignallableServiceTaskDelegate.class.getName())
-      .endEvent()
-      .done();
+    BpmnModelInstance model = ProcessModels.newModel().startEvent().serviceTask("serviceTask")
+        .camundaClass(SignallableServiceTaskDelegate.class.getName()).endEvent().done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("serviceTask", "serviceTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("serviceTask", "serviceTask").build();
 
     // when
     try {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-        .hasActivityInstanceFailures("serviceTask",
-          "The type of the source activity is not supported for activity instance migration"
-        );
+      assertThat(e.getValidationReport()).hasActivityInstanceFailures("serviceTask",
+          "The type of the source activity is not supported for activity instance migration");
     }
   }
 
   @Test
   public void testCannotMigrateAsyncActivityInstance() {
     // given
-    BpmnModelInstance model = ProcessModels.newModel()
-      .startEvent()
-      .serviceTask("serviceTask")
-      .camundaAsyncBefore()
-      .camundaClass(SignallableServiceTaskDelegate.class.getName())
-      .endEvent()
-      .done();
+    BpmnModelInstance model = ProcessModels.newModel().startEvent().serviceTask("serviceTask")
+        .camundaAsyncBefore().camundaClass(SignallableServiceTaskDelegate.class.getName())
+        .endEvent().done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("serviceTask", "serviceTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("serviceTask", "serviceTask").build();
 
-    String processInstanceId = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId()).getId();
+    String processInstanceId = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId()).getId();
     testHelper.executeAvailableJobs();
 
     // when
     try {
-      rule.getRuntimeService().newMigration(migrationPlan)
-        .processInstanceIds(processInstanceId)
-        .execute();
+      rule.getRuntimeService().newMigration(migrationPlan).processInstanceIds(processInstanceId)
+          .execute();
 
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-        .hasActivityInstanceFailures("serviceTask",
-          "The type of the source activity is not supported for activity instance migration"
-        );
+      assertThat(e.getValidationReport()).hasActivityInstanceFailures("serviceTask",
+          "The type of the source activity is not supported for activity instance migration");
     }
   }
 
@@ -124,7 +108,8 @@ public class MigrationSignallableServiceTaskTest {
     }
 
     @Override
-    public void signal(ActivityExecution execution, String signalEvent, Object signalData) throws Exception {
+    public void signal(ActivityExecution execution, String signalEvent, Object signalData)
+        throws Exception {
       PvmTransition transition = execution.getActivity().getOutgoingTransitions().get(0);
       execution.leaveActivityViaTransition(transition);
     }

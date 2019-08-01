@@ -46,8 +46,9 @@ public class CaseExecutionVariableCmd implements Command<Void>, Serializable {
 
   protected CaseExecutionEntity caseExecution;
 
-  public CaseExecutionVariableCmd(String caseExecutionId, Map<String, Object> variables, Map<String, Object> variablesLocal,
-      Collection<String> variablesDeletions, Collection<String> variablesLocalDeletions) {
+  public CaseExecutionVariableCmd(String caseExecutionId, Map<String, Object> variables,
+      Map<String, Object> variablesLocal, Collection<String> variablesDeletions,
+      Collection<String> variablesLocalDeletions) {
     this.caseExecutionId = caseExecutionId;
     this.variables = variables;
     this.variablesLocal = variablesLocal;
@@ -58,19 +59,20 @@ public class CaseExecutionVariableCmd implements Command<Void>, Serializable {
 
   public CaseExecutionVariableCmd(CaseExecutionCommandBuilderImpl builder) {
     this(builder.getCaseExecutionId(), builder.getVariables(), builder.getVariablesLocal(),
-         builder.getVariableDeletions(), builder.getVariableLocalDeletions());
+        builder.getVariableDeletions(), builder.getVariableLocalDeletions());
   }
 
   public Void execute(CommandContext commandContext) {
     ensureNotNull("caseExecutionId", caseExecutionId);
 
-    caseExecution = commandContext
-      .getCaseExecutionManager()
-      .findCaseExecutionById(caseExecutionId);
+    caseExecution = commandContext.getCaseExecutionManager().findCaseExecutionById(caseExecutionId);
 
-    ensureNotNull(CaseExecutionNotFoundException.class, "There does not exist any case execution with id: '" + caseExecutionId + "'", "caseExecution", caseExecution);
+    ensureNotNull(CaseExecutionNotFoundException.class,
+        "There does not exist any case execution with id: '" + caseExecutionId + "'",
+        "caseExecution", caseExecution);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateCaseInstance(caseExecution);
     }
 

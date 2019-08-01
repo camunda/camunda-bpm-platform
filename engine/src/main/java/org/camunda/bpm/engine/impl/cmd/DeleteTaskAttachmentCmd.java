@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-
 /**
  * @author kristin.polenz@camunda.com
  */
@@ -43,31 +42,26 @@ public class DeleteTaskAttachmentCmd implements Command<Object>, Serializable {
   }
 
   public Object execute(CommandContext commandContext) {
-    AttachmentEntity attachment = (AttachmentEntity) commandContext
-      .getAttachmentManager()
-      .findAttachmentByTaskIdAndAttachmentId(taskId, attachmentId);
+    AttachmentEntity attachment = (AttachmentEntity) commandContext.getAttachmentManager()
+        .findAttachmentByTaskIdAndAttachmentId(taskId, attachmentId);
 
-    ensureNotNull("No attachment exist for task id '" + taskId + " and attachmentId '" + attachmentId + "'.", "attachment", attachment);
+    ensureNotNull(
+        "No attachment exist for task id '" + taskId + " and attachmentId '" + attachmentId + "'.",
+        "attachment", attachment);
 
-    commandContext
-      .getDbEntityManager()
-      .delete(attachment);
+    commandContext.getDbEntityManager().delete(attachment);
 
     if (attachment.getContentId() != null) {
-      commandContext
-        .getByteArrayManager()
-        .deleteByteArrayById(attachment.getContentId());
+      commandContext.getByteArrayManager().deleteByteArrayById(attachment.getContentId());
     }
 
     if (attachment.getTaskId() != null) {
-      TaskEntity task = commandContext
-        .getTaskManager()
-        .findTaskById(attachment.getTaskId());
+      TaskEntity task = commandContext.getTaskManager().findTaskById(attachment.getTaskId());
 
       PropertyChange propertyChange = new PropertyChange("name", null, attachment.getName());
 
-      commandContext.getOperationLogManager()
-        .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, task, propertyChange);
+      commandContext.getOperationLogManager().logAttachmentOperation(
+          UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT, task, propertyChange);
     }
 
     return null;

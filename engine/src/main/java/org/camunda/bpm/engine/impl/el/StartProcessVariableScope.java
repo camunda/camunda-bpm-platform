@@ -27,12 +27,10 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
 /**
  * Variable-scope only used to resolve variables when NO execution is active but
  * expression-resolving is needed. This occurs eg. when start-form properties have default's
- * defined. Even though variables are not available yet, expressions should be resolved
- * anyway.
+ * defined. Even though variables are not available yet, expressions should be resolved anyway.
  *
  * @author Frederik Heremans
  */
@@ -40,13 +38,14 @@ public class StartProcessVariableScope implements VariableScope {
 
   private static final StartProcessVariableScope INSTANCE = new StartProcessVariableScope();
 
-  private static VariableMap EMPTY_VARIABLE_MAP = Variables.fromMap(Collections.<String, Object>emptyMap());
+  private static VariableMap EMPTY_VARIABLE_MAP = Variables
+      .fromMap(Collections.<String, Object> emptyMap());
 
   /**
-   * Since a {@link StartProcessVariableScope} has no state, it's safe to use the same
-   * instance to prevent too many useless instances created.
+   * Since a {@link StartProcessVariableScope} has no state, it's safe to use the same instance to
+   * prevent too many useless instances created.
    */
-  public static StartProcessVariableScope getSharedInstance()  {
+  public static StartProcessVariableScope getSharedInstance() {
     return INSTANCE;
   }
 
@@ -98,7 +97,8 @@ public class StartProcessVariableScope implements VariableScope {
     return null;
   }
 
-  public <T extends TypedValue> T getVariableTyped(String variableName, boolean deserializeObjectValue) {
+  public <T extends TypedValue> T getVariableTyped(String variableName,
+      boolean deserializeObjectValue) {
     return null;
   }
 
@@ -106,7 +106,8 @@ public class StartProcessVariableScope implements VariableScope {
     return null;
   }
 
-  public <T extends TypedValue> T getVariableLocalTyped(String variableName, boolean deserializeObjectValue) {
+  public <T extends TypedValue> T getVariableLocalTyped(String variableName,
+      boolean deserializeObjectValue) {
     return null;
   }
 

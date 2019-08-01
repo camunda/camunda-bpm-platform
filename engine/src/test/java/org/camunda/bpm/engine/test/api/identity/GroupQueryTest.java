@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
-
 /**
  * @author Joram Barrez
  */
@@ -95,7 +94,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createGroupQuery().groupId(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByIdIn() {
@@ -114,11 +114,12 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     for (Group group : idInList) {
       boolean found = false;
       for (Group otherGroup : list) {
-        if(otherGroup.getId().equals(group.getId())) {
-          found = true; break;
+        if (otherGroup.getId().equals(group.getId())) {
+          found = true;
+          break;
         }
       }
-      if(!found) {
+      if (!found) {
         fail("Expected to find group " + group);
       }
     }
@@ -139,7 +140,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createGroupQuery().groupName(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByNameLike() {
@@ -163,7 +165,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createGroupQuery().groupNameLike(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByType() {
@@ -181,7 +184,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createGroupQuery().groupType(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByMember() {
@@ -212,7 +216,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createGroupQuery().groupMember(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByMemberOfTenant() {
@@ -238,7 +243,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(4, identityService.createGroupQuery().orderByGroupType().desc().count());
 
     // Multiple sortings
-    GroupQuery query = identityService.createGroupQuery().orderByGroupType().asc().orderByGroupName().desc();
+    GroupQuery query = identityService.createGroupQuery().orderByGroupType().asc()
+        .orderByGroupName().desc();
     List<Group> groups = query.list();
     assertEquals(4, query.count());
 
@@ -257,12 +263,14 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createGroupQuery().orderByGroupId().list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
     try {
       identityService.createGroupQuery().orderByGroupId().orderByGroupName().list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   private void verifyQueryResults(GroupQuery query, int countExpected) {
@@ -271,7 +279,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
 
     if (countExpected == 1) {
       assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
+    } else if (countExpected > 1) {
       verifySingleResultFails(query);
     } else if (countExpected == 0) {
       assertNull(query.singleResult());
@@ -282,7 +290,8 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
 }

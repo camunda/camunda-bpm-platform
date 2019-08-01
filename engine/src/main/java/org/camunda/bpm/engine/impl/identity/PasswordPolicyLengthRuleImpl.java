@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.identity.PasswordPolicyRule;
 public class PasswordPolicyLengthRuleImpl implements PasswordPolicyRule {
 
   public static final String PLACEHOLDER = DefaultPasswordPolicyImpl.PLACEHOLDER_PREFIX + "LENGTH";
-  
+
   protected int minLength;
 
   public PasswordPolicyLengthRuleImpl(int minLength) {

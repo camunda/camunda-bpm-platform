@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
-
 /**
  * @author Daniel Meyer
  */
@@ -34,14 +33,15 @@ public class ProcessEventJobHandler implements JobHandler<EventSubscriptionJobCo
     return TYPE;
   }
 
-  public void execute(EventSubscriptionJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(EventSubscriptionJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
     // lookup subscription:
     String eventSubscriptionId = configuration.getEventSubscriptionId();
     EventSubscriptionEntity eventSubscription = commandContext.getEventSubscriptionManager()
-      .findEventSubscriptionById(eventSubscriptionId);
+        .findEventSubscriptionById(eventSubscriptionId);
 
     // if event subscription is null, ignore
-    if(eventSubscription != null) {
+    if (eventSubscription != null) {
       eventSubscription.eventReceived(null, false);
     }
 

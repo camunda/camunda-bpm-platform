@@ -20,17 +20,16 @@ import org.camunda.bpm.container.impl.spi.PlatformServiceContainer.ServiceType;
 
 public enum TestServiceType implements ServiceType {
 
-    TYPE1("test.type1"),
-    TYPE2("test.type2");
+  TYPE1("test.type1"), TYPE2("test.type2");
 
-    protected String serviceRealm;
+  protected String serviceRealm;
 
-    private TestServiceType(String serviceRealm) {
-      this.serviceRealm = serviceRealm;
-    }
+  private TestServiceType(String serviceRealm) {
+    this.serviceRealm = serviceRealm;
+  }
 
-    public String getTypeName() {
-      return serviceRealm;
-    }
+  public String getTypeName() {
+    return serviceRealm;
+  }
 
 }

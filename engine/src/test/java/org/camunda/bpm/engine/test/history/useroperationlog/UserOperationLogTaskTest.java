@@ -53,12 +53,12 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   protected ProcessInstance process;
   protected Task task;
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testCreateAndCompleteTask() {
     startTestProcess();
 
     // expect: one entry for process instance creation,
-    //         no entry for the task creation by process engine
+    // no entry for the task creation by process engine
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     assertEquals(1, query.count());
 
@@ -73,7 +73,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, complete.getCategory());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testAssignTask() {
     startTestProcess();
 
@@ -93,7 +93,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testChangeTaskOwner() {
     startTestProcess();
 
@@ -113,7 +113,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testSetPriority() {
     startTestProcess();
 
@@ -152,7 +152,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, userOperationLogEntry.getCategory());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testClaimTask() {
     startTestProcess();
 
@@ -172,7 +172,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testDelegateTask() {
     startTestProcess();
 
@@ -185,15 +185,19 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertEquals(3, query.count());
 
     // assert: details
-    assertEquals("icke", queryOperationDetails(OPERATION_TYPE_DELEGATE, OWNER).singleResult().getNewValue());
-    assertEquals("er", queryOperationDetails(OPERATION_TYPE_DELEGATE, ASSIGNEE).singleResult().getNewValue());
-    assertEquals(DelegationState.PENDING.toString(), queryOperationDetails(OPERATION_TYPE_DELEGATE, DELEGATION).singleResult().getNewValue());
-    assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, queryOperationDetails(OPERATION_TYPE_DELEGATE, DELEGATION).singleResult().getCategory());
+    assertEquals("icke",
+        queryOperationDetails(OPERATION_TYPE_DELEGATE, OWNER).singleResult().getNewValue());
+    assertEquals("er",
+        queryOperationDetails(OPERATION_TYPE_DELEGATE, ASSIGNEE).singleResult().getNewValue());
+    assertEquals(DelegationState.PENDING.toString(),
+        queryOperationDetails(OPERATION_TYPE_DELEGATE, DELEGATION).singleResult().getNewValue());
+    assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER,
+        queryOperationDetails(OPERATION_TYPE_DELEGATE, DELEGATION).singleResult().getCategory());
 
     completeTestProcess();
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testResolveTask() {
     startTestProcess();
 
@@ -212,7 +216,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testSubmitTaskForm_Complete() {
     startTestProcess();
 
@@ -231,7 +235,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertProcessEnded(process.getId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testSubmitTaskForm_Resolve() {
     startTestProcess();
 
@@ -258,29 +262,18 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     completeTestProcess();
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCompleteCaseExecution() {
     // given
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
-    String caseInstanceId = caseService
-        .withCaseDefinition(caseDefinitionId)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinition(caseDefinitionId).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
     UserOperationLogQuery query = queryOperationDetails(OPERATION_TYPE_COMPLETE);
@@ -302,7 +295,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testKeepOpLogEntriesOnUndeployment() {
     // given
     startTestProcess();
@@ -325,29 +318,25 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE).count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testDeleteOpLogEntry() {
     // given
     startTestProcess();
 
     // an op log instance is created
     taskService.resolveTask(task.getId());
-    UserOperationLogEntry opLogEntry = historyService
-            .createUserOperationLogQuery()
-            .entityType(EntityTypes.TASK)
-            .singleResult();
+    UserOperationLogEntry opLogEntry = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.TASK).singleResult();
 
     // when the op log instance is deleted
     historyService.deleteUserOperationLogEntry(opLogEntry.getId());
 
     // then it should be removed from the database
-    assertEquals(0, historyService
-            .createUserOperationLogQuery()
-            .entityType(EntityTypes.TASK)
-            .count());
+    assertEquals(0,
+        historyService.createUserOperationLogQuery().entityType(EntityTypes.TASK).count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testDeleteOpLogEntryWithNullArgument() {
     // given
     startTestProcess();
@@ -364,7 +353,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml" })
   public void testDeleteOpLogNonExstingEntry() {
     // given
     startTestProcess();
@@ -395,9 +384,8 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "serviceTaskCalled"));
 
     // Filter only task entities, as the process start is also recorded
-    UserOperationLogQuery query = historyService
-            .createUserOperationLogQuery()
-            .entityType(EntityTypes.TASK);
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.TASK);
 
     assertEquals(1, query.count());
 
@@ -411,8 +399,8 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   }
 
   protected void startTestProcess() {
-    processDefinition = repositoryService
-        .createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
+    processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("oneTaskProcess").singleResult();
 
     process = runtimeService.startProcessInstanceById(processDefinition.getId());
     task = taskService.createTaskQuery().singleResult();

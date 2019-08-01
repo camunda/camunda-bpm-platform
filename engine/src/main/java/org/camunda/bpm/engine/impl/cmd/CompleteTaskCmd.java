@@ -49,8 +49,8 @@ public class CompleteTaskCmd implements Command<VariableMap>, Serializable {
     this(taskId, variables, false, false);
   }
 
-  public CompleteTaskCmd(String taskId, Map<String, Object> variables,
-      boolean returnVariables, boolean deserializeReturnedVariables) {
+  public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean returnVariables,
+      boolean deserializeReturnedVariables) {
     this.taskId = taskId;
     this.variables = variables;
     this.returnVariables = returnVariables;
@@ -74,21 +74,19 @@ public class CompleteTaskCmd implements Command<VariableMap>, Serializable {
     ExecutionVariableSnapshotObserver variablesListener = null;
 
     if (returnVariables && execution != null) {
-      variablesListener = new ExecutionVariableSnapshotObserver(execution, false, deserializeReturnedVariables);
+      variablesListener = new ExecutionVariableSnapshotObserver(execution, false,
+          deserializeReturnedVariables);
     }
 
     completeTask(task);
 
-    if (returnVariables)
-    {
+    if (returnVariables) {
       if (variablesListener != null) {
         return variablesListener.getVariables();
       } else {
         return task.getCaseDefinitionId() != null ? null : task.getVariablesTyped(false);
       }
-    }
-    else
-    {
+    } else {
       return null;
     }
 
@@ -99,7 +97,8 @@ public class CompleteTaskCmd implements Command<VariableMap>, Serializable {
   }
 
   protected void checkCompleteTask(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkTaskWork(task);
     }
   }

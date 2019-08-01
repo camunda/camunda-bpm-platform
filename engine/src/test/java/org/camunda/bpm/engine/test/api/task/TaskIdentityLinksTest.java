@@ -28,21 +28,17 @@ import org.camunda.bpm.engine.test.Deployment;
 
 import junit.framework.AssertionFailedError;
 
-
 /**
  * @author Tom Baeyens
  * @author Falko Menge
  */
 public class TaskIdentityLinksTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources="org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
   public void testCandidateUserLink() {
     runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
 
-    String taskId = taskService
-      .createTaskQuery()
-      .singleResult()
-      .getId();
+    String taskId = taskService.createTaskQuery().singleResult().getId();
 
     taskService.addCandidateUser(taskId, "kermit");
 
@@ -61,17 +57,14 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
   public void testCandidateGroupLink() {
     try {
       identityService.setAuthenticatedUserId("demo");
 
       runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
 
-      String taskId = taskService
-          .createTaskQuery()
-          .singleResult()
-          .getId();
+      String taskId = taskService.createTaskQuery().singleResult().getId();
 
       taskService.addCandidateGroup(taskId, "muppets");
 
@@ -85,7 +78,8 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTestCase {
 
       assertEquals(1, identityLinks.size());
 
-      if (processEngineConfiguration.getHistoryLevel().getId()>= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+      if (processEngineConfiguration.getHistoryLevel()
+          .getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
         List<Event> taskEvents = taskService.getTaskEvents(taskId);
         assertEquals(1, taskEvents.size());
         Event taskEvent = taskEvents.get(0);
@@ -98,7 +92,8 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTestCase {
 
       taskService.deleteCandidateGroup(taskId, "muppets");
 
-      if (processEngineConfiguration.getHistoryLevel().getId()>= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
+      if (processEngineConfiguration.getHistoryLevel()
+          .getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
         List<Event> taskEvents = taskService.getTaskEvents(taskId);
         Event taskEvent = findTaskEvent(taskEvents, Event.ACTION_DELETE_GROUP_LINK);
         assertEquals(Event.ACTION_DELETE_GROUP_LINK, taskEvent.getAction());
@@ -150,22 +145,19 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTestCase {
   }
 
   private Event findTaskEvent(List<Event> taskEvents, String action) {
-    for (Event event: taskEvents) {
+    for (Event event : taskEvents) {
       if (action.equals(event.getAction())) {
         return event;
       }
     }
-    throw new AssertionFailedError("no task event found with action "+action);
+    throw new AssertionFailedError("no task event found with action " + action);
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
   public void testCustomTypeUserLink() {
     runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
 
-    String taskId = taskService
-      .createTaskQuery()
-      .singleResult()
-      .getId();
+    String taskId = taskService.createTaskQuery().singleResult().getId();
 
     taskService.addUserIdentityLink(taskId, "kermit", "interestee");
 
@@ -184,14 +176,11 @@ public class TaskIdentityLinksTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
   public void testCustomLinkGroupLink() {
     runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
 
-    String taskId = taskService
-      .createTaskQuery()
-      .singleResult()
-      .getId();
+    String taskId = taskService.createTaskQuery().singleResult().getId();
 
     taskService.addGroupIdentityLink(taskId, "muppets", "playing");
 

@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.container.impl.spi;
 
-
 /**
  * @author Daniel Meyer
  * @author Roman Smirnov

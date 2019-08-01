@@ -26,8 +26,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
- * Job handler for batch monitor jobs. The batch monitor job
- * polls for the completion of the batch.
+ * Job handler for batch monitor jobs. The batch monitor job polls for the completion of the batch.
  */
 public class BatchMonitorJobHandler implements JobHandler<BatchMonitorJobConfiguration> {
 
@@ -37,7 +36,8 @@ public class BatchMonitorJobHandler implements JobHandler<BatchMonitorJobConfigu
     return TYPE;
   }
 
-  public void execute(BatchMonitorJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(BatchMonitorJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
 
     String batchId = configuration.getBatchId();
     BatchEntity batch = commandContext.getBatchManager().findBatchById(configuration.getBatchId());
@@ -47,8 +47,7 @@ public class BatchMonitorJobHandler implements JobHandler<BatchMonitorJobConfigu
 
     if (!completed) {
       batch.createMonitorJob(true);
-    }
-    else {
+    } else {
       batch.delete(false);
     }
   }

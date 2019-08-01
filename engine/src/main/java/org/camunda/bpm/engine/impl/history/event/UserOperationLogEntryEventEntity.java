@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 /**
  * @author Danny Gräf
  */
-public class UserOperationLogEntryEventEntity extends HistoryEvent implements UserOperationLogEntry {
+public class UserOperationLogEntryEventEntity extends HistoryEvent
+    implements UserOperationLogEntry {
 
   private static final long serialVersionUID = 1L;
 
@@ -155,7 +156,7 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
   public void setBatchId(String batchId) {
     this.batchId = batchId;
   }
-  
+
   public String getCategory() {
     return category;
   }
@@ -171,41 +172,26 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
-  
+
   public String getExternalTaskId() {
     return externalTaskId;
   }
-  
+
   public void setExternalTaskId(String externalTaskId) {
     this.externalTaskId = externalTaskId;
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-        + "[taskId" + taskId
-        + ", deploymentId" + deploymentId
-        + ", processDefinitionKey =" + processDefinitionKey
-        + ", jobId = " + jobId
-        + ", jobDefinitionId = " + jobDefinitionId
-        + ", batchId = " + batchId
-        + ", operationId =" + operationId
-        + ", operationType =" + operationType
-        + ", userId =" + userId
-        + ", timestamp =" + timestamp
-        + ", property =" + property
-        + ", orgValue =" + orgValue
-        + ", newValue =" + newValue
-        + ", id=" + id
-        + ", eventType=" + eventType
-        + ", executionId=" + executionId
-        + ", processDefinitionId=" + processDefinitionId
-        + ", rootProcessInstanceId=" + rootProcessInstanceId
-        + ", processInstanceId=" + processInstanceId
-        + ", externalTaskId=" + externalTaskId
-        + ", tenantId=" + tenantId
-        + ", entityType=" + entityType
-        + ", category=" + category
-        + "]";
+    return this.getClass().getSimpleName() + "[taskId" + taskId + ", deploymentId" + deploymentId
+        + ", processDefinitionKey =" + processDefinitionKey + ", jobId = " + jobId
+        + ", jobDefinitionId = " + jobDefinitionId + ", batchId = " + batchId + ", operationId ="
+        + operationId + ", operationType =" + operationType + ", userId =" + userId
+        + ", timestamp =" + timestamp + ", property =" + property + ", orgValue =" + orgValue
+        + ", newValue =" + newValue + ", id=" + id + ", eventType=" + eventType + ", executionId="
+        + executionId + ", processDefinitionId=" + processDefinitionId + ", rootProcessInstanceId="
+        + rootProcessInstanceId + ", processInstanceId=" + processInstanceId + ", externalTaskId="
+        + externalTaskId + ", tenantId=" + tenantId + ", entityType=" + entityType + ", category="
+        + category + "]";
   }
 }

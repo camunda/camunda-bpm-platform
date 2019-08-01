@@ -89,71 +89,47 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
 
   protected static final String PARENT_COMPLETE = "parentComplete";
 
-  public static List<String> TASK_OR_STAGE_CREATE_EVENTS = Arrays.asList(
-      CaseExecutionListener.CREATE
-    );
+  public static List<String> TASK_OR_STAGE_CREATE_EVENTS = Arrays
+      .asList(CaseExecutionListener.CREATE);
 
   public static List<String> TASK_OR_STAGE_UPDATE_EVENTS = Arrays.asList(
-      CaseExecutionListener.ENABLE,
-      CaseExecutionListener.DISABLE,
-      CaseExecutionListener.RE_ENABLE,
-      CaseExecutionListener.START,
-      CaseExecutionListener.MANUAL_START,
-      CaseExecutionListener.SUSPEND,
-      CaseExecutionListener.PARENT_SUSPEND,
-      CaseExecutionListener.RESUME,
-      CaseExecutionListener.PARENT_RESUME
-    );
+      CaseExecutionListener.ENABLE, CaseExecutionListener.DISABLE, CaseExecutionListener.RE_ENABLE,
+      CaseExecutionListener.START, CaseExecutionListener.MANUAL_START,
+      CaseExecutionListener.SUSPEND, CaseExecutionListener.PARENT_SUSPEND,
+      CaseExecutionListener.RESUME, CaseExecutionListener.PARENT_RESUME);
 
   public static List<String> TASK_OR_STAGE_END_EVENTS = Arrays.asList(
-      CaseExecutionListener.TERMINATE,
-      CaseExecutionListener.EXIT,
-      CaseExecutionListener.COMPLETE,
-      PARENT_COMPLETE
-    );
+      CaseExecutionListener.TERMINATE, CaseExecutionListener.EXIT, CaseExecutionListener.COMPLETE,
+      PARENT_COMPLETE);
 
   public static List<String> TASK_OR_STAGE_EVENTS = new ArrayList<String>();
 
-  public static List<String> EVENT_LISTENER_OR_MILESTONE_CREATE_EVENTS = Arrays.asList(
-      CaseExecutionListener.CREATE
-    );
+  public static List<String> EVENT_LISTENER_OR_MILESTONE_CREATE_EVENTS = Arrays
+      .asList(CaseExecutionListener.CREATE);
 
-  public static List<String> EVENT_LISTENER_OR_MILESTONE_UPDATE_EVENTS = Arrays.asList(
-      CaseExecutionListener.SUSPEND,
-      CaseExecutionListener.RESUME
-    );
+  public static List<String> EVENT_LISTENER_OR_MILESTONE_UPDATE_EVENTS = Arrays
+      .asList(CaseExecutionListener.SUSPEND, CaseExecutionListener.RESUME);
 
   public static List<String> EVENT_LISTENER_OR_MILESTONE_END_EVENTS = Arrays.asList(
-      CaseExecutionListener.TERMINATE,
-      CaseExecutionListener.PARENT_TERMINATE,
-      CaseExecutionListener.OCCUR,
-      PARENT_COMPLETE
-    );
+      CaseExecutionListener.TERMINATE, CaseExecutionListener.PARENT_TERMINATE,
+      CaseExecutionListener.OCCUR, PARENT_COMPLETE);
 
   public static List<String> EVENT_LISTENER_OR_MILESTONE_EVENTS = new ArrayList<String>();
 
-  public static List<String> CASE_PLAN_MODEL_CREATE_EVENTS = Arrays.asList(
-      CaseExecutionListener.CREATE
-    );
+  public static List<String> CASE_PLAN_MODEL_CREATE_EVENTS = Arrays
+      .asList(CaseExecutionListener.CREATE);
 
   public static List<String> CASE_PLAN_MODEL_UPDATE_EVENTS = Arrays.asList(
-      CaseExecutionListener.TERMINATE,
-      CaseExecutionListener.SUSPEND,
-      CaseExecutionListener.COMPLETE,
-      CaseExecutionListener.RE_ACTIVATE
-    );
+      CaseExecutionListener.TERMINATE, CaseExecutionListener.SUSPEND,
+      CaseExecutionListener.COMPLETE, CaseExecutionListener.RE_ACTIVATE);
 
-  public static List<String> CASE_PLAN_MODEL_CLOSE_EVENTS = Arrays.asList(
-      CaseExecutionListener.CLOSE
-    );
+  public static List<String> CASE_PLAN_MODEL_CLOSE_EVENTS = Arrays
+      .asList(CaseExecutionListener.CLOSE);
 
   public static List<String> CASE_PLAN_MODEL_EVENTS = new ArrayList<String>();
 
-  public static List<String> DEFAULT_VARIABLE_EVENTS = Arrays.asList(
-      VariableListener.CREATE,
-      VariableListener.DELETE,
-      VariableListener.UPDATE
-  );
+  public static List<String> DEFAULT_VARIABLE_EVENTS = Arrays.asList(VariableListener.CREATE,
+      VariableListener.DELETE, VariableListener.UPDATE);
 
   static {
     TASK_OR_STAGE_EVENTS.addAll(TASK_OR_STAGE_CREATE_EVENTS);
@@ -205,7 +181,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     return newActivity;
   }
 
-  protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeActivity(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     if (isDiscretionaryItem(element)) {
       activity.setProperty(PROPERTY_DISCRETIONARY, true);
     }
@@ -253,7 +230,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
 
   }
 
-  protected void initializeActivityType(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeActivityType(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     PlanItemDefinition definition = getDefinition(element);
 
     String activityType = null;
@@ -267,7 +245,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     activity.setProperty(PROPERTY_ACTIVITY_TYPE, activityType);
   }
 
-  protected void initializeDescription(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeDescription(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     String description = getDesciption(element);
     if (description == null) {
       description = getDocumentation(element);
@@ -275,11 +254,13 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     activity.setProperty(PROPERTY_ACTIVITY_DESCRIPTION, description);
   }
 
-  protected void initializeAutoComplete(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeAutoComplete(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     // noop
   }
 
-  protected void initializeRequiredRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeRequiredRule(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     PlanItemControl itemControl = getItemControl(element);
     PlanItemControl defaultControl = getDefaultControl(element);
 
@@ -298,7 +279,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
 
   }
 
-  protected void initializeManualActivationRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeManualActivationRule(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     PlanItemControl itemControl = getItemControl(element);
     PlanItemControl defaultControl = getDefaultControl(element);
 
@@ -311,13 +293,15 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
 
     if (manualActivationRule != null) {
-      CaseControlRule caseRule = initializeCaseControlRule(manualActivationRule.getCondition(), context);
+      CaseControlRule caseRule = initializeCaseControlRule(manualActivationRule.getCondition(),
+          context);
       activity.setProperty(PROPERTY_MANUAL_ACTIVATION_RULE, caseRule);
     }
 
   }
 
-  protected void initializeRepetitionRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeRepetitionRule(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     PlanItemControl itemControl = getItemControl(element);
     PlanItemControl defaultControl = getDefaultControl(element);
 
@@ -343,7 +327,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
   }
 
-  protected CaseControlRule initializeCaseControlRule(ConditionExpression condition, CmmnHandlerContext context) {
+  protected CaseControlRule initializeCaseControlRule(ConditionExpression condition,
+      CmmnHandlerContext context) {
     Expression expression = null;
 
     if (condition != null) {
@@ -357,16 +342,19 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     return new CaseControlRuleImpl(expression);
   }
 
-  protected void initializeCaseExecutionListeners(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeCaseExecutionListeners(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     PlanItemDefinition definition = getDefinition(element);
 
-    List<CamundaCaseExecutionListener> listeners = queryExtensionElementsByClass(definition, CamundaCaseExecutionListener.class);
+    List<CamundaCaseExecutionListener> listeners = queryExtensionElementsByClass(definition,
+        CamundaCaseExecutionListener.class);
 
     for (CamundaCaseExecutionListener listener : listeners) {
-      CaseExecutionListener caseExecutionListener = initializeCaseExecutionListener(element, activity, context, listener);
+      CaseExecutionListener caseExecutionListener = initializeCaseExecutionListener(element,
+          activity, context, listener);
 
       String eventName = listener.getCamundaEvent();
-      if(eventName != null) {
+      if (eventName != null) {
         activity.addListener(eventName, caseExecutionListener);
 
       } else {
@@ -377,9 +365,11 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
   }
 
-  protected CaseExecutionListener initializeCaseExecutionListener(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CamundaCaseExecutionListener listener) {
+  protected CaseExecutionListener initializeCaseExecutionListener(CmmnElement element,
+      CmmnActivity activity, CmmnHandlerContext context, CamundaCaseExecutionListener listener) {
     Collection<CamundaField> fields = listener.getCamundaFields();
-    List<FieldDeclaration> fieldDeclarations = initializeFieldDeclarations(element, activity, context, fields);
+    List<FieldDeclaration> fieldDeclarations = initializeFieldDeclarations(element, activity,
+        context, fields);
 
     ExpressionManager expressionManager = context.getExpressionManager();
 
@@ -399,10 +389,12 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
 
     } else if (delegateExpression != null) {
       Expression delegateExp = expressionManager.createExpression(delegateExpression);
-      caseExecutionListener = new DelegateExpressionCaseExecutionListener(delegateExp, fieldDeclarations);
+      caseExecutionListener = new DelegateExpressionCaseExecutionListener(delegateExp,
+          fieldDeclarations);
 
     } else if (scriptElement != null) {
-      ExecutableScript executableScript = initializeScript(element, activity, context, scriptElement);
+      ExecutableScript executableScript = initializeScript(element, activity, context,
+          scriptElement);
       if (executableScript != null) {
         caseExecutionListener = new ScriptCaseExecutionListener(executableScript);
       }
@@ -411,16 +403,19 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     return caseExecutionListener;
   }
 
-  protected void initializeVariableListeners(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeVariableListeners(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     PlanItemDefinition definition = getDefinition(element);
 
-    List<CamundaVariableListener> listeners = queryExtensionElementsByClass(definition, CamundaVariableListener.class);
+    List<CamundaVariableListener> listeners = queryExtensionElementsByClass(definition,
+        CamundaVariableListener.class);
 
     for (CamundaVariableListener listener : listeners) {
-      CaseVariableListener variableListener = initializeVariableListener(element, activity, context, listener);
+      CaseVariableListener variableListener = initializeVariableListener(element, activity, context,
+          listener);
 
       String eventName = listener.getCamundaEvent();
-      if(eventName != null) {
+      if (eventName != null) {
         activity.addVariableListener(eventName, variableListener);
 
       } else {
@@ -431,9 +426,11 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
   }
 
-  protected CaseVariableListener initializeVariableListener(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CamundaVariableListener listener) {
+  protected CaseVariableListener initializeVariableListener(CmmnElement element,
+      CmmnActivity activity, CmmnHandlerContext context, CamundaVariableListener listener) {
     Collection<CamundaField> fields = listener.getCamundaFields();
-    List<FieldDeclaration> fieldDeclarations = initializeFieldDeclarations(element, activity, context, fields);
+    List<FieldDeclaration> fieldDeclarations = initializeFieldDeclarations(element, activity,
+        context, fields);
 
     ExpressionManager expressionManager = context.getExpressionManager();
 
@@ -455,7 +452,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
       variableListener = new DelegateExpressionCaseVariableListener(delegateExp, fieldDeclarations);
 
     } else if (scriptElement != null) {
-      ExecutableScript executableScript = initializeScript(element, activity, context, scriptElement);
+      ExecutableScript executableScript = initializeScript(element, activity, context,
+          scriptElement);
       if (executableScript != null) {
         variableListener = new ScriptCaseVariableListener(executableScript);
       }
@@ -464,7 +462,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     return variableListener;
   }
 
-  protected ExecutableScript initializeScript(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CamundaScript script) {
+  protected ExecutableScript initializeScript(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context, CamundaScript script) {
     String language = script.getCamundaScriptFormat();
     String resource = script.getCamundaResource();
     String source = script.getTextContent();
@@ -475,25 +474,27 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
 
     try {
       return ScriptUtil.getScript(language, source, resource, context.getExpressionManager());
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // ignore
       return null;
     }
   }
 
-  protected List<FieldDeclaration> initializeFieldDeclarations(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, Collection<CamundaField> fields) {
+  protected List<FieldDeclaration> initializeFieldDeclarations(CmmnElement element,
+      CmmnActivity activity, CmmnHandlerContext context, Collection<CamundaField> fields) {
     List<FieldDeclaration> fieldDeclarations = new ArrayList<FieldDeclaration>();
 
     for (CamundaField field : fields) {
-      FieldDeclaration fieldDeclaration = initializeFieldDeclaration(element, activity, context, field);
+      FieldDeclaration fieldDeclaration = initializeFieldDeclaration(element, activity, context,
+          field);
       fieldDeclarations.add(fieldDeclaration);
     }
 
     return fieldDeclarations;
   }
 
-  protected FieldDeclaration initializeFieldDeclaration(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CamundaField field) {
+  protected FieldDeclaration initializeFieldDeclaration(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context, CamundaField field) {
     String name = field.getCamundaName();
     String type = Expression.class.getName();
 
@@ -546,7 +547,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     return null;
   }
 
-  protected void initializeEntryCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeEntryCriterias(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     Collection<Sentry> entryCriterias = getEntryCriterias(element);
 
     if (!entryCriterias.isEmpty()) {
@@ -563,7 +565,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
   }
 
-  protected void initializeExitCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeExitCriterias(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     Collection<Sentry> exitCriterias = getExitCriterias(element);
 
     if (!exitCriterias.isEmpty()) {
@@ -586,7 +589,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     return definition.getDefaultControl();
   }
 
-  protected <V extends ModelElementInstance> List<V> queryExtensionElementsByClass(CmmnElement element, Class<V> cls) {
+  protected <V extends ModelElementInstance> List<V> queryExtensionElementsByClass(
+      CmmnElement element, Class<V> cls) {
     ExtensionElements extensionElements = getExtensionElements(element);
 
     if (extensionElements != null) {
@@ -606,8 +610,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     if (isPlanItem(element)) {
       PlanItem planItem = (PlanItem) element;
       return planItem.getItemControl();
-    } else
-    if (isDiscretionaryItem(element)) {
+    } else if (isDiscretionaryItem(element)) {
       DiscretionaryItem discretionaryItem = (DiscretionaryItem) element;
       return discretionaryItem.getItemControl();
     }
@@ -636,8 +639,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     if (isPlanItem(element)) {
       PlanItem planItem = (PlanItem) element;
       return planItem.getDefinition();
-    } else
-    if (isDiscretionaryItem(element)) {
+    } else if (isDiscretionaryItem(element)) {
       DiscretionaryItem discretionaryItem = (DiscretionaryItem) element;
       return discretionaryItem.getDefinition();
     }
@@ -702,7 +704,6 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
 
     return builder.toString();
-
 
   }
 

@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.pvm.delegate;
 
-
-
 /**
  * @author Tom Baeyens
  */
@@ -26,10 +24,13 @@ public interface CompositeActivityBehavior extends ActivityBehavior {
   /**
    * Invoked when an execution is ended within the scope of the composite
    *
-   * @param scopeExecution scope execution for the activity which defined the behavior
-   * @param endedExecution the execution which ended
+   * @param scopeExecution
+   *          scope execution for the activity which defined the behavior
+   * @param endedExecution
+   *          the execution which ended
    */
-  void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution);
+  void concurrentChildExecutionEnded(ActivityExecution scopeExecution,
+      ActivityExecution endedExecution);
 
   void complete(ActivityExecution scopeExecution);
 }

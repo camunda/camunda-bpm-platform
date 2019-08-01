@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.test;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez

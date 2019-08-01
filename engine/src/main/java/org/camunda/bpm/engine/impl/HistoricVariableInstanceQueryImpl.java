@@ -33,8 +33,9 @@ import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 /**
  * @author Christian Lipphardt (camunda)
  */
-public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVariableInstanceQuery, HistoricVariableInstance> implements
-        HistoricVariableInstanceQuery {
+public class HistoricVariableInstanceQueryImpl
+    extends AbstractQuery<HistoricVariableInstanceQuery, HistoricVariableInstance>
+    implements HistoricVariableInstanceQuery {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -154,11 +155,13 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return this;
   }
 
-  public HistoricVariableInstanceQuery variableValueEquals(String variableName, Object variableValue) {
+  public HistoricVariableInstanceQuery variableValueEquals(String variableName,
+      Object variableValue) {
     ensureNotNull("variableName", variableName);
     ensureNotNull("variableValue", variableValue);
     this.variableName = variableName;
-    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
+    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS,
+        true);
     return this;
   }
 
@@ -170,7 +173,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   protected void ensureVariablesInitialized() {
     if (this.queryVariableValue != null) {
-      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration().getVariableSerializers();
+      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration()
+          .getVariableSerializers();
       queryVariableValue.initialize(variableSerializers);
     }
   }
@@ -194,25 +198,26 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext.getHistoricVariableInstanceManager().findHistoricVariableInstanceCountByQueryCriteria(this);
+    return commandContext.getHistoricVariableInstanceManager()
+        .findHistoricVariableInstanceCountByQueryCriteria(this);
   }
 
   public List<HistoricVariableInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
     List<HistoricVariableInstance> historicVariableInstances = commandContext
-            .getHistoricVariableInstanceManager()
-            .findHistoricVariableInstancesByQueryCriteria(this, page);
+        .getHistoricVariableInstanceManager()
+        .findHistoricVariableInstancesByQueryCriteria(this, page);
 
-    if (historicVariableInstances!=null) {
-      for (HistoricVariableInstance historicVariableInstance: historicVariableInstances) {
+    if (historicVariableInstances != null) {
+      for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
 
         HistoricVariableInstanceEntity variableInstanceEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
         if (shouldFetchValue(variableInstanceEntity)) {
           try {
             variableInstanceEntity.getTypedValue(isCustomObjectDeserializationEnabled);
 
-          } catch(Exception t) {
+          } catch (Exception t) {
             // do not fail if one of the variables fails to load
             LOG.exceptionWhileGettingValueForVariable(t);
           }
@@ -225,8 +230,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   protected boolean shouldFetchValue(HistoricVariableInstanceEntity entity) {
     // do not fetch values for byte arrays eagerly (unless requested by the user)
-    return isByteArrayFetchingEnabled
-        || !AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(entity.getSerializer().getType().getName());
+    return isByteArrayFetchingEnabled || !AbstractTypedValueSerializer.BINARY_VALUE_TYPES
+        .contains(entity.getSerializer().getType().getName());
   }
 
   // order by /////////////////////////////////////////////////////////////////

@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -32,10 +31,9 @@ public class PvmTestCase extends TestCase {
    * Asserts if the provided text is part of some text.
    */
   public void assertTextPresent(String expected, String actual) {
-    if ( (actual==null)
-         || (actual.indexOf(expected)==-1)
-       ) {
-      throw new AssertionFailedError("expected presence of ["+expected+"], but was ["+actual+"]");
+    if ((actual == null) || (actual.indexOf(expected) == -1)) {
+      throw new AssertionFailedError(
+          "expected presence of [" + expected + "], but was [" + actual + "]");
     }
   }
 

@@ -44,10 +44,8 @@ public class JobExecutorAcquireJobsDefaultTest extends AbstractJobExecutorAcquir
 
   @Parameterized.Parameters(name = "Job DueDate is set: {0}")
   public static Collection<Object[]> scenarios() throws ParseException {
-    return Arrays.asList(new Object[][] {
-      { false, null },
-      { true, ClockTestUtil.setClockToDateWithoutMilliseconds() }
-    });
+    return Arrays.asList(new Object[][] { { false, null },
+        { true, ClockTestUtil.setClockToDateWithoutMilliseconds() } });
   }
 
   @Before

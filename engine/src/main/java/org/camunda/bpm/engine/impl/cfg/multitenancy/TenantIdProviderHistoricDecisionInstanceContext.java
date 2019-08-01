@@ -21,7 +21,8 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
 /**
- * Provides information about a historic decision instance to a {@link TenantIdProvider} implementation.
+ * Provides information about a historic decision instance to a {@link TenantIdProvider}
+ * implementation.
  *
  * @author Kristin Polenz
  * @since 7.5
@@ -38,12 +39,14 @@ public class TenantIdProviderHistoricDecisionInstanceContext {
     this.decisionDefinition = decisionDefinition;
   }
 
-  public TenantIdProviderHistoricDecisionInstanceContext(DecisionDefinition decisionDefinition, DelegateExecution execution) {
+  public TenantIdProviderHistoricDecisionInstanceContext(DecisionDefinition decisionDefinition,
+      DelegateExecution execution) {
     this(decisionDefinition);
     this.execution = execution;
   }
 
-  public TenantIdProviderHistoricDecisionInstanceContext(DecisionDefinition decisionDefinition, DelegateCaseExecution caseExecution) {
+  public TenantIdProviderHistoricDecisionInstanceContext(DecisionDefinition decisionDefinition,
+      DelegateCaseExecution caseExecution) {
     this(decisionDefinition);
     this.caseExecution = caseExecution;
   }
@@ -56,16 +59,16 @@ public class TenantIdProviderHistoricDecisionInstanceContext {
   }
 
   /**
-   * @return the execution. This method returns the execution of the process instance
-   * which evaluated the decision definition.
+   * @return the execution. This method returns the execution of the process instance which
+   *         evaluated the decision definition.
    */
   public DelegateExecution getExecution() {
     return execution;
   }
 
   /**
-   * @return the case execution. This method returns the case execution of the CMMN case task
-   * which evaluated the decision definition.
+   * @return the case execution. This method returns the case execution of the CMMN case task which
+   *         evaluated the decision definition.
    */
   public DelegateCaseExecution getCaseExecution() {
     return caseExecution;

@@ -21,25 +21,29 @@ import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 
 /**
- * <p>Represents a managed process engine that is started / stopped inside the {@link MBeanServiceContainer}</p>
+ * <p>
+ * Represents a managed process engine that is started / stopped inside the
+ * {@link MBeanServiceContainer}
+ * </p>
  * 
  * @author Daniel Meyer
  *
  */
-public class JmxManagedProcessEngineController extends JmxManagedProcessEngine implements JmxManagedProcessEngineMBean {
-  
+public class JmxManagedProcessEngineController extends JmxManagedProcessEngine
+    implements JmxManagedProcessEngineMBean {
+
   protected ProcessEngineConfiguration processEngineConfiguration;
-  
+
   public JmxManagedProcessEngineController(ProcessEngineConfiguration processEngineConfiguration) {
     this.processEngineConfiguration = processEngineConfiguration;
   }
-  
+
   public void start(PlatformServiceContainer contanier) {
     processEngine = processEngineConfiguration.buildProcessEngine();
   }
-  
+
   public void stop(PlatformServiceContainer container) {
     processEngine.close();
   }
-  
+
 }

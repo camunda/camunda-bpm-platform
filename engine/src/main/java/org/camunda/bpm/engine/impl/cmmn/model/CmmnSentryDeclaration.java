@@ -113,9 +113,9 @@ public class CmmnSentryDeclaration implements Serializable {
   }
 
   public boolean hasVariableOnPart(String variableEventName, String variableName) {
-    for(CmmnVariableOnPartDeclaration variableOnPartDeclaration: variableOnParts) {
-      if(variableOnPartDeclaration.getVariableEvent().equals(variableEventName) &&
-         variableOnPartDeclaration.getVariableName().equals(variableName)) {
+    for (CmmnVariableOnPartDeclaration variableOnPartDeclaration : variableOnParts) {
+      if (variableOnPartDeclaration.getVariableEvent().equals(variableEventName)
+          && variableOnPartDeclaration.getVariableName().equals(variableName)) {
         return true;
       }
     }
@@ -123,7 +123,7 @@ public class CmmnSentryDeclaration implements Serializable {
   }
 
   public List<CmmnVariableOnPartDeclaration> getVariableOnParts() {
-    return variableOnParts;    
+    return variableOnParts;
   }
 
   // ifPart //////////////////////////////////////////////////////////////////

@@ -22,12 +22,13 @@ import org.camunda.bpm.engine.management.IncidentStatistics;
  * @author roman.smirnov
  */
 public class IncidentStatisticsEntity implements IncidentStatistics {
-  
+
   protected String incidentType;
   protected int incidentCount;
-  
-  public IncidentStatisticsEntity() {}
-  
+
+  public IncidentStatisticsEntity() {
+  }
+
   public String getIncidentType() {
     return incidentType;
   }
@@ -35,17 +36,15 @@ public class IncidentStatisticsEntity implements IncidentStatistics {
   public void setIncidenType(String incidentType) {
     this.incidentType = incidentType;
   }
-  
+
   public int getIncidentCount() {
     return incidentCount;
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[incidentType=" + incidentType
-           + ", incidentCount=" + incidentCount
-           + "]";
+    return this.getClass().getSimpleName() + "[incidentType=" + incidentType + ", incidentCount="
+        + incidentCount + "]";
   }
 
 }

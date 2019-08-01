@@ -41,14 +41,11 @@ public class HistoryLevelAudit extends HistoryLevelActivity {
 
   @Override
   public boolean isHistoryEventProduced(HistoryEventType eventType, Object entity) {
-    return super.isHistoryEventProduced(eventType, entity)
-        || VARIABLE_INSTANCE_CREATE == eventType
-        || VARIABLE_INSTANCE_UPDATE == eventType
-        || VARIABLE_INSTANCE_MIGRATE == eventType
+    return super.isHistoryEventProduced(eventType, entity) || VARIABLE_INSTANCE_CREATE == eventType
+        || VARIABLE_INSTANCE_UPDATE == eventType || VARIABLE_INSTANCE_MIGRATE == eventType
         || VARIABLE_INSTANCE_DELETE == eventType
 
-        || FORM_PROPERTY_UPDATE == eventType
-      ;
+        || FORM_PROPERTY_UPDATE == eventType;
 
   }
 

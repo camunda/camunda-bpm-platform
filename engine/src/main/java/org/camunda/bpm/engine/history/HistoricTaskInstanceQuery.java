@@ -22,13 +22,13 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.task.Task;
 
-
 /**
  * Allows programmatic querying for {@link HistoricTaskInstance}s.
  *
  * @author Tom Baeyens
  */
-public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQuery, HistoricTaskInstance> {
+public interface HistoricTaskInstanceQuery
+    extends Query<HistoricTaskInstanceQuery, HistoricTaskInstance> {
 
   /** Only select historic task instances for the given task id. */
   HistoricTaskInstanceQuery taskId(String taskId);
@@ -44,8 +44,10 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    */
   HistoricTaskInstanceQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys);
 
-  /** Only select historic tasks matching the given process instance business key.
-   *  The syntax is that of SQL: for example usage: nameLike(%camunda%)*/
+  /**
+   * Only select historic tasks matching the given process instance business key. The syntax is that
+   * of SQL: for example usage: nameLike(%camunda%)
+   */
   HistoricTaskInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey);
 
   /** Only select historic task instances for the given execution. */
@@ -58,14 +60,14 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery processDefinitionId(String processDefinitionId);
 
   /**
-   * Only select historic task instances which are part of a (historic) process instance
-   * which has the given process definition key.
+   * Only select historic task instances which are part of a (historic) process instance which has
+   * the given process definition key.
    */
   HistoricTaskInstanceQuery processDefinitionKey(String processDefinitionKey);
 
   /**
-   * Only select historic task instances which are part of a (historic) process instance
-   * which has the given definition name.
+   * Only select historic task instances which are part of a (historic) process instance which has
+   * the given definition name.
    */
   HistoricTaskInstanceQuery processDefinitionName(String processDefinitionName);
 
@@ -73,14 +75,14 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery caseDefinitionId(String caseDefinitionId);
 
   /**
-   * Only select historic task instances which are part of a case instance
-   * which has the given case definition key.
+   * Only select historic task instances which are part of a case instance which has the given case
+   * definition key.
    */
   HistoricTaskInstanceQuery caseDefinitionKey(String caseDefinitionKey);
 
   /**
-   * Only select historic task instances which are part of a (historic) case instance
-   * which has the given case definition name.
+   * Only select historic task instances which are part of a (historic) case instance which has the
+   * given case definition name.
    */
   HistoricTaskInstanceQuery caseDefinitionName(String caseDefinitionName);
 
@@ -95,39 +97,40 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery caseExecutionId(String caseExecutionId);
 
   /**
-   * Only select historic task instances with the given task name.
-   * This is the last name given to the task.
+   * Only select historic task instances with the given task name. This is the last name given to
+   * the task.
    */
   HistoricTaskInstanceQuery taskName(String taskName);
 
   /**
-   * Only select historic task instances with a task name like the given value.
-   * This is the last name given to the task.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%.
+   * Only select historic task instances with a task name like the given value. This is the last
+   * name given to the task. The syntax that should be used is the same as in SQL, eg. %activiti%.
    */
   HistoricTaskInstanceQuery taskNameLike(String taskNameLike);
 
   /**
-   * Only select historic task instances with the given task description.
-   * This is the last description given to the task.
+   * Only select historic task instances with the given task description. This is the last
+   * description given to the task.
    */
   HistoricTaskInstanceQuery taskDescription(String taskDescription);
 
   /**
-   * Only select historic task instances with a task description like the given value.
-   * This is the last description given to the task.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%.
+   * Only select historic task instances with a task description like the given value. This is the
+   * last description given to the task. The syntax that should be used is the same as in SQL, eg.
+   * %activiti%.
    */
   HistoricTaskInstanceQuery taskDescriptionLike(String taskDescriptionLike);
 
   /**
    * Only select historic task instances with the given task definition key.
+   * 
    * @see Task#getTaskDefinitionKey()
    */
   HistoricTaskInstanceQuery taskDefinitionKey(String taskDefinitionKey);
 
   /**
    * Only select historic task instances with one of the given task definition keys.
+   * 
    * @see Task#getTaskDefinitionKey()
    */
   HistoricTaskInstanceQuery taskDefinitionKeyIn(String... taskDefinitionKeys);
@@ -136,8 +139,8 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery taskDeleteReason(String taskDeleteReason);
 
   /**
-   * Only select historic task instances with a task description like the given value.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%.
+   * Only select historic task instances with a task description like the given value. The syntax
+   * that should be used is the same as in SQL, eg. %activiti%.
    */
   HistoricTaskInstanceQuery taskDeleteReasonLike(String taskDeleteReasonLike);
 
@@ -153,9 +156,8 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery taskAssignee(String taskAssignee);
 
   /**
-   * Only select historic task instances which were last taskAssigned to an assignee like
-   * the given value.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%.
+   * Only select historic task instances which were last taskAssigned to an assignee like the given
+   * value. The syntax that should be used is the same as in SQL, eg. %activiti%.
    */
   HistoricTaskInstanceQuery taskAssigneeLike(String taskAssigneeLike);
 
@@ -165,8 +167,8 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery taskOwner(String taskOwner);
 
   /**
-   * Only select historic task instances which have an owner like the one specified.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%.
+   * Only select historic task instances which have an owner like the one specified. The syntax that
+   * should be used is the same as in SQL, eg. %activiti%.
    */
   HistoricTaskInstanceQuery taskOwnerLike(String taskOwnerLike);
 
@@ -186,44 +188,44 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery unfinished();
 
   /**
-   * Only select historic task instances which are part of a process
-   * instance which is already finished.
+   * Only select historic task instances which are part of a process instance which is already
+   * finished.
    */
   HistoricTaskInstanceQuery processFinished();
 
   /**
-   * Only select historic task instances which are part of a process
-   * instance which is not finished yet.
+   * Only select historic task instances which are part of a process instance which is not finished
+   * yet.
    */
   HistoricTaskInstanceQuery processUnfinished();
 
   /**
-   * Only select historic task instances which have mapping
-   * with Historic identity links based on user id
+   * Only select historic task instances which have mapping with Historic identity links based on
+   * user id
    *
    * @since 7.5
    */
   HistoricTaskInstanceQuery taskInvolvedUser(String involvedUser);
 
   /**
-   * Only select historic task instances which have mapping
-   * with Historic identity links based on group id
+   * Only select historic task instances which have mapping with Historic identity links based on
+   * group id
    *
    * @since 7.5
    */
   HistoricTaskInstanceQuery taskInvolvedGroup(String involvedGroup);
 
   /**
-   * Only select historic task instances which have mapping
-   * with Historic identity links with the condition of user being a candidate
+   * Only select historic task instances which have mapping with Historic identity links with the
+   * condition of user being a candidate
    *
    * @since 7.5
    */
   HistoricTaskInstanceQuery taskHadCandidateUser(String candidateUser);
 
   /**
-   * Only select historic task instances which have mapping
-   * with Historic identity links with the condition of group being a candidate
+   * Only select historic task instances which have mapping with Historic identity links with the
+   * condition of group being a candidate
    *
    * @since 7.5
    */
@@ -236,9 +238,8 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery withoutCandidateGroups();
 
   /**
-   * Only select historic task instances which have a local task variable with the
-   * given name set to the given value. Make sure history-level is configured
-   * >= AUDIT when this feature is used.
+   * Only select historic task instances which have a local task variable with the given name set to
+   * the given value. Make sure history-level is configured >= AUDIT when this feature is used.
    */
   HistoricTaskInstanceQuery taskVariableValueEquals(String variableName, Object variableValue);
 
@@ -248,49 +249,52 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   /**
    * Only select historic task instances which are part of a process instance which have a variable
    * with the given name set to the given value. The last variable value in the variable updates
-   * ({@link HistoricDetail}) will be used, so make sure history-level is configured
-   * >= AUDIT when this feature is used.
+   * ({@link HistoricDetail}) will be used, so make sure history-level is configured >= AUDIT when
+   * this feature is used.
    */
   HistoricTaskInstanceQuery processVariableValueEquals(String variableName, Object variableValue);
 
   /**
-   * Only select historic task instances which have a variable with the given name, but
-   * with a different value than the passed value.
-   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
-   * are not supported.
+   * Only select historic task instances which have a variable with the given name, but with a
+   * different value than the passed value. Byte-arrays and {@link Serializable} objects (which are
+   * not primitive type wrappers) are not supported.
    */
-  HistoricTaskInstanceQuery processVariableValueNotEquals(String variableName, Object variableValue);
+  HistoricTaskInstanceQuery processVariableValueNotEquals(String variableName,
+      Object variableValue);
 
   /**
-   * Only select historic task instances which are part of a process that have a variable
-   * with the given name and matching the given value.
-   * The syntax is that of SQL: for example usage: valueLike(%value%)
-   * */
+   * Only select historic task instances which are part of a process that have a variable with the
+   * given name and matching the given value. The syntax is that of SQL: for example usage:
+   * valueLike(%value%)
+   */
   HistoricTaskInstanceQuery processVariableValueLike(String variableName, Object variableValue);
 
   /**
-   * Only select historic task instances which are part of a process that have a variable
-   * with the given name and a value greater than the given one.
+   * Only select historic task instances which are part of a process that have a variable with the
+   * given name and a value greater than the given one.
    */
-  HistoricTaskInstanceQuery processVariableValueGreaterThan(String variableName, Object variableValue);
+  HistoricTaskInstanceQuery processVariableValueGreaterThan(String variableName,
+      Object variableValue);
 
   /**
-   * Only select historic task instances which are part of a process that have a variable
-   * with the given name and a value greater than or equal to the given one.
+   * Only select historic task instances which are part of a process that have a variable with the
+   * given name and a value greater than or equal to the given one.
    */
-  HistoricTaskInstanceQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue);
+  HistoricTaskInstanceQuery processVariableValueGreaterThanOrEquals(String variableName,
+      Object variableValue);
 
   /**
-   * Only select historic task instances which are part of a process that have a variable
-   * with the given name and a value less than the given one.
+   * Only select historic task instances which are part of a process that have a variable with the
+   * given name and a value less than the given one.
    */
   HistoricTaskInstanceQuery processVariableValueLessThan(String variableName, Object variableValue);
 
   /**
-   * Only select historic task instances which are part of a process that have a variable
-   * with the given name and a value less than or equal to the given one.
+   * Only select historic task instances which are part of a process that have a variable with the
+   * given name and a value less than or equal to the given one.
    */
-  HistoricTaskInstanceQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue);
+  HistoricTaskInstanceQuery processVariableValueLessThanOrEquals(String variableName,
+      Object variableValue);
 
   /**
    * Only select select historic task instances with the given due date.
@@ -346,8 +350,8 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery startedBefore(Date date);
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of historic task instances without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of historic task instances without tenant id is database-specific.
    */
   HistoricTaskInstanceQuery orderByTenantId();
 
@@ -355,8 +359,8 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery orderByTaskId();
 
   /**
-   * Order by the historic activity instance id this task was used in
-   * (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Order by the historic activity instance id this task was used in (needs to be followed by
+   * {@link #asc()} or {@link #desc()}).
    */
   HistoricTaskInstanceQuery orderByHistoricActivityInstanceId();
 
@@ -415,30 +419,40 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery orderByCaseExecutionId();
 
   /**
-   * <p>After calling or(), a chain of several filter criteria could follow. Each filter criterion that follows or()
-   * will be linked together with an OR expression until the OR query is terminated. To terminate the OR query right
-   * after the last filter criterion was applied, {@link #endOr()} must be invoked.</p>
+   * <p>
+   * After calling or(), a chain of several filter criteria could follow. Each filter criterion that
+   * follows or() will be linked together with an OR expression until the OR query is terminated. To
+   * terminate the OR query right after the last filter criterion was applied, {@link #endOr()} must
+   * be invoked.
+   * </p>
    *
-   * @return an object of the type {@link HistoricTaskInstanceQuery} on which an arbitrary amount of filter criteria could be applied.
-   * The several filter criteria will be linked together by an OR expression.
+   * @return an object of the type {@link HistoricTaskInstanceQuery} on which an arbitrary amount of
+   *         filter criteria could be applied. The several filter criteria will be linked together
+   *         by an OR expression.
    *
-   * @throws ProcessEngineException when or() has been invoked directly after or() or after or() and trailing filter
-   * criteria. To prevent throwing this exception, {@link #endOr()} must be invoked after a chain of filter criteria to
-   * mark the end of the OR query.
-   * */
+   * @throws ProcessEngineException
+   *           when or() has been invoked directly after or() or after or() and trailing filter
+   *           criteria. To prevent throwing this exception, {@link #endOr()} must be invoked after
+   *           a chain of filter criteria to mark the end of the OR query.
+   */
   HistoricTaskInstanceQuery or();
 
   /**
-   * <p>endOr() terminates an OR query on which an arbitrary amount of filter criteria were applied. To terminate the
-   * OR query which has been started by invoking {@link #or()}, endOr() must be invoked. Filter criteria which are
-   * applied after calling endOr() are linked together by an AND expression.</p>
+   * <p>
+   * endOr() terminates an OR query on which an arbitrary amount of filter criteria were applied. To
+   * terminate the OR query which has been started by invoking {@link #or()}, endOr() must be
+   * invoked. Filter criteria which are applied after calling endOr() are linked together by an AND
+   * expression.
+   * </p>
    *
-   * @return an object of the type {@link HistoricTaskInstanceQuery} on which an arbitrary amount of filter criteria could be applied.
-   * The filter criteria will be linked together by an AND expression.
+   * @return an object of the type {@link HistoricTaskInstanceQuery} on which an arbitrary amount of
+   *         filter criteria could be applied. The filter criteria will be linked together by an AND
+   *         expression.
    *
-   * @throws ProcessEngineException when endOr() has been invoked before {@link #or()} was invoked. To prevent throwing
-   * this exception, {@link #or()} must be invoked first.
-   * */
+   * @throws ProcessEngineException
+   *           when endOr() has been invoked before {@link #or()} was invoked. To prevent throwing
+   *           this exception, {@link #or()} must be invoked first.
+   */
   HistoricTaskInstanceQuery endOr();
 
 }

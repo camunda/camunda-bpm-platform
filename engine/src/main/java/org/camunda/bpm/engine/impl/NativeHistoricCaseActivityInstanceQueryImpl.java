@@ -24,8 +24,9 @@ import org.camunda.bpm.engine.history.NativeHistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-
-public class NativeHistoricCaseActivityInstanceQueryImpl extends AbstractNativeQuery<NativeHistoricCaseActivityInstanceQuery, HistoricCaseActivityInstance> implements NativeHistoricCaseActivityInstanceQuery {
+public class NativeHistoricCaseActivityInstanceQueryImpl extends
+    AbstractNativeQuery<NativeHistoricCaseActivityInstanceQuery, HistoricCaseActivityInstance>
+    implements NativeHistoricCaseActivityInstanceQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,18 +38,17 @@ public class NativeHistoricCaseActivityInstanceQueryImpl extends AbstractNativeQ
     super(commandExecutor);
   }
 
- //results ////////////////////////////////////////////////////////////////
-  
-  public List<HistoricCaseActivityInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return commandContext
-      .getHistoricCaseActivityInstanceManager()
-      .findHistoricCaseActivityInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+  // results ////////////////////////////////////////////////////////////////
+
+  public List<HistoricCaseActivityInstance> executeList(CommandContext commandContext,
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return commandContext.getHistoricCaseActivityInstanceManager()
+        .findHistoricCaseActivityInstancesByNativeQuery(parameterMap, firstResult, maxResults);
   }
-  
+
   public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext
-      .getHistoricCaseActivityInstanceManager()
-      .findHistoricCaseActivityInstanceCountByNativeQuery(parameterMap);
+    return commandContext.getHistoricCaseActivityInstanceManager()
+        .findHistoricCaseActivityInstanceCountByNativeQuery(parameterMap);
   }
 
 }

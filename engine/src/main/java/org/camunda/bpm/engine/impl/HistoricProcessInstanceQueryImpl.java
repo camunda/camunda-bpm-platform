@@ -44,7 +44,9 @@ import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
  * @author Falko Menge
  * @author Bernd Ruecker
  */
-public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance> implements HistoricProcessInstanceQuery {
+public class HistoricProcessInstanceQueryImpl
+    extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance>
+    implements HistoricProcessInstanceQuery {
 
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
@@ -196,7 +198,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return this;
   }
 
-  public HistoricProcessInstanceQuery processDefinitionKeyNotIn(List<String> processDefinitionKeys) {
+  public HistoricProcessInstanceQuery processDefinitionKeyNotIn(
+      List<String> processDefinitionKeys) {
     ensureNotContainsNull("processDefinitionKeys", processDefinitionKeys);
     ensureNotContainsEmptyString("processDefinitionKeys", processDefinitionKeys);
     this.processKeyNotIn = processDefinitionKeys;
@@ -227,10 +230,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery rootProcessInstances() {
     if (superProcessInstanceId != null) {
-      throw new BadUserRequestException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+      throw new BadUserRequestException(
+          "Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
     }
     if (superCaseInstanceId != null) {
-      throw new BadUserRequestException("Invalid query usage: cannot set both rootProcessInstances and superCaseInstanceId");
+      throw new BadUserRequestException(
+          "Invalid query usage: cannot set both rootProcessInstances and superCaseInstanceId");
     }
     isRootProcessInstances = true;
     return this;
@@ -238,7 +243,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
     if (isRootProcessInstances) {
-      throw new BadUserRequestException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+      throw new BadUserRequestException(
+          "Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
     }
     this.superProcessInstanceId = superProcessInstanceId;
     return this;
@@ -251,7 +257,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery superCaseInstanceId(String superCaseInstanceId) {
     if (isRootProcessInstances) {
-      throw new BadUserRequestException("Invalid query usage: cannot set both rootProcessInstances and superCaseInstanceId");
+      throw new BadUserRequestException(
+          "Invalid query usage: cannot set both rootProcessInstances and superCaseInstanceId");
     }
     this.superCaseInstanceId = superCaseInstanceId;
     return this;
@@ -282,80 +289,89 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   @Override
   protected boolean hasExcludingConditions() {
-    return super.hasExcludingConditions()
-      || (finished && unfinished)
-      || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
-      || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore)
-      || CompareUtil.elementIsContainedInList(processDefinitionKey, processKeyNotIn)
-      || CompareUtil.elementIsNotContainedInList(processInstanceId, processInstanceIds);
+    return super.hasExcludingConditions() || (finished && unfinished)
+        || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
+        || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore)
+        || CompareUtil.elementIsContainedInList(processDefinitionKey, processKeyNotIn)
+        || CompareUtil.elementIsNotContainedInList(processInstanceId, processInstanceIds);
   }
 
-	public HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey() {
+  public HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessInstanceBusinessKey() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessInstanceBusinessKey() within 'or' query");
     }
     return orderBy(HistoricProcessInstanceQueryProperty.BUSINESS_KEY);
   }
 
   public HistoricProcessInstanceQuery orderByProcessInstanceDuration() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessInstanceDuration() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessInstanceDuration() within 'or' query");
     }
     return orderBy(HistoricProcessInstanceQueryProperty.DURATION);
   }
 
   public HistoricProcessInstanceQuery orderByProcessInstanceStartTime() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessInstanceStartTime() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessInstanceStartTime() within 'or' query");
     }
     return orderBy(HistoricProcessInstanceQueryProperty.START_TIME);
   }
 
   public HistoricProcessInstanceQuery orderByProcessInstanceEndTime() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessInstanceEndTime() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessInstanceEndTime() within 'or' query");
     }
     return orderBy(HistoricProcessInstanceQueryProperty.END_TIME);
   }
 
   public HistoricProcessInstanceQuery orderByProcessDefinitionId() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
     }
     return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_ID);
   }
 
   public HistoricProcessInstanceQuery orderByProcessDefinitionKey() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
     }
     return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY);
   }
 
   public HistoricProcessInstanceQuery orderByProcessDefinitionName() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessDefinitionName() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessDefinitionName() within 'or' query");
     }
     return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_NAME);
   }
 
   public HistoricProcessInstanceQuery orderByProcessDefinitionVersion() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessDefinitionVersion() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessDefinitionVersion() within 'or' query");
     }
     return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_VERSION);
   }
 
   public HistoricProcessInstanceQuery orderByProcessInstanceId() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
     }
     return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_INSTANCE_ID_);
   }
 
   public HistoricProcessInstanceQuery orderByTenantId() {
     if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTenantId() within 'or' query");
+      throw new ProcessEngineException(
+          "Invalid query usage: cannot set orderByTenantId() within 'or' query");
     }
     return orderBy(HistoricProcessInstanceQueryProperty.TENANT_ID);
   }
@@ -363,25 +379,21 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
-      .getHistoricProcessInstanceManager()
-      .findHistoricProcessInstanceCountByQueryCriteria(this);
+    return commandContext.getHistoricProcessInstanceManager()
+        .findHistoricProcessInstanceCountByQueryCriteria(this);
   }
 
   public List<HistoricProcessInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
-      .getHistoricProcessInstanceManager()
-      .findHistoricProcessInstancesByQueryCriteria(this, page);
+    return commandContext.getHistoricProcessInstanceManager()
+        .findHistoricProcessInstancesByQueryCriteria(this, page);
   }
 
   public List<String> executeIdsList(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
-        .getHistoricProcessInstanceManager()
-        .findHistoricProcessInstanceIds(this);
+    return commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstanceIds(this);
   }
 
   @Override
@@ -392,7 +404,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
       VariableSerializers variableSerializers = Context.getProcessEngineConfiguration()
           .getVariableSerializers();
 
-      for (HistoricProcessInstanceQueryImpl orQuery: queries) {
+      for (HistoricProcessInstanceQueryImpl orQuery : queries) {
         for (QueryVariableValue var : orQuery.queryVariableValues) {
           var.initialize(variableSerializers);
         }
@@ -637,7 +649,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   @Deprecated
-  private Date calculateBeforeMidnight(Date date){
+  private Date calculateBeforeMidnight(Date date) {
     Calendar cal = Calendar.getInstance();
     cal.setTime(date);
     cal.add(Calendar.DAY_OF_MONTH, 1);
@@ -646,7 +658,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   @Deprecated
-  private Date calculateMidnight(Date date){
+  private Date calculateMidnight(Date date) {
     Calendar cal = Calendar.getInstance();
     cal.setTime(date);
     cal.set(Calendar.MILLISECOND, 0);
@@ -718,35 +730,40 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   @Override
   public HistoricProcessInstanceQuery active() {
-    ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
+    ensureNull(BadUserRequestException.class,
+        "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_ACTIVE;
     return this;
   }
 
   @Override
   public HistoricProcessInstanceQuery suspended() {
-    ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
+    ensureNull(BadUserRequestException.class,
+        "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_SUSPENDED;
     return this;
   }
 
   @Override
   public HistoricProcessInstanceQuery completed() {
-    ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
+    ensureNull(BadUserRequestException.class,
+        "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_COMPLETED;
     return this;
   }
 
   @Override
   public HistoricProcessInstanceQuery externallyTerminated() {
-    ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
+    ensureNull(BadUserRequestException.class,
+        "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_EXTERNALLY_TERMINATED;
     return this;
   }
 
   @Override
   public HistoricProcessInstanceQuery internallyTerminated() {
-    ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
+    ensureNull(BadUserRequestException.class,
+        "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_INTERNALLY_TERMINATED;
     return this;
   }
@@ -766,7 +783,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   @Override
   public HistoricProcessInstanceQuery endOr() {
-    if (!queries.isEmpty() && this != queries.get(queries.size()-1)) {
+    if (!queries.isEmpty() && this != queries.get(queries.size() - 1)) {
       throw new ProcessEngineException("Invalid query usage: cannot set endOr() before or()");
     }
 

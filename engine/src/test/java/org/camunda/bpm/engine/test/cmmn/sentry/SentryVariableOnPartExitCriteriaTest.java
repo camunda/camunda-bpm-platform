@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithVariableOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithVariableOnPart.cmmn" })
   public void testExitTaskWithVariableOnPartSatisfied() {
     // given
     createCaseInstance();
@@ -41,10 +42,7 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
     assertTrue(secondHumanTask.isActive());
 
     // when
-    caseService
-      .withCaseExecution(firstHumanTaskId)
-      .setVariable("variable_1", 100)
-      .complete();
+    caseService.withCaseExecution(firstHumanTaskId).setVariable("variable_1", 100).complete();
 
     // then
     firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
@@ -54,7 +52,8 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
     assertNull(secondHumanTask);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithVariableOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithVariableOnPart.cmmn" })
   public void testExitTaskWithVariableOnPartNotSatisfied() {
     // given
     createCaseInstance();
@@ -68,10 +67,7 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
     assertTrue(secondHumanTask.isActive());
 
     // when
-    caseService
-      .withCaseExecution(firstHumanTaskId)
-      .setVariable("variable", 100)
-      .complete();
+    caseService.withCaseExecution(firstHumanTaskId).setVariable("variable", 100).complete();
 
     // then
     firstHumanTask = queryCaseExecutionById(firstHumanTaskId);
@@ -82,7 +78,8 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithMultipleOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTaskWithMultipleOnPart.cmmn" })
   public void testExitTaskWithMultipleOnPartSatisfied() {
     // given
     createCaseInstance();
@@ -91,7 +88,7 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
 
     CaseExecution humanTask1 = queryCaseExecutionByActivityId("HumanTask_1");
     assertTrue(humanTask1.isActive());
-    
+
     CaseExecution humanTask2 = queryCaseExecutionByActivityId("HumanTask_2");
     assertTrue(humanTask2.isActive());
 
@@ -112,7 +109,8 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
     assertNull(stageExecution);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTasksOfDifferentScopes.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryVariableOnPartExitCriteriaTest.testExitTasksOfDifferentScopes.cmmn" })
   public void testExitMultipleTasksOfDifferentScopes() {
     // given
     createCaseInstance();
@@ -126,6 +124,6 @@ public class SentryVariableOnPartExitCriteriaTest extends CmmnProcessEngineTestC
 
     CaseExecution stageExecution2 = queryCaseExecutionByActivityId("Stage_2");
     assertNull(stageExecution2);
-    
+
   }
 }

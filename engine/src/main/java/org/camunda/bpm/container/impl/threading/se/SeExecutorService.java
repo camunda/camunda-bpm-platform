@@ -41,7 +41,7 @@ public class SeExecutorService implements ExecutorService {
 
   public boolean schedule(Runnable runnable, boolean isLongRunning) {
 
-    if(isLongRunning) {
+    if (isLongRunning) {
       return executeLongRunning(runnable);
 
     } else {
@@ -60,8 +60,7 @@ public class SeExecutorService implements ExecutorService {
     try {
       threadPoolExecutor.execute(runnable);
       return true;
-    }
-    catch (RejectedExecutionException e) {
+    } catch (RejectedExecutionException e) {
       LOG.debugRejectedExecutionException(e);
       return false;
     }

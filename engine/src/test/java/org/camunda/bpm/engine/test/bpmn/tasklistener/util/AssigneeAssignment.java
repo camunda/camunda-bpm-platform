@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.bpmn.tasklistener.util;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 
-
 /**
  * @author Joram Barrez
  */
@@ -28,5 +27,5 @@ public class AssigneeAssignment implements TaskListener {
   public void notify(DelegateTask delegateTask) {
     delegateTask.setAssignee("kermit");
   }
-  
+
 }

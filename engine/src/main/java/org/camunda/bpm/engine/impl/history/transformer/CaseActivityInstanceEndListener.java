@@ -32,10 +32,10 @@ public class CaseActivityInstanceEndListener extends HistoryCaseExecutionListene
 
   protected HistoryEvent createHistoryEvent(DelegateCaseExecution caseExecution) {
     ensureHistoryLevelInitialized();
-    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_END, caseExecution)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_END,
+        caseExecution)) {
       return eventProducer.createCaseActivityInstanceEndEvt(caseExecution);
-    }
-    else {
+    } else {
       return null;
     }
   }

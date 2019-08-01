@@ -38,9 +38,11 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testVariableBasedRule.cmmn")
   public void testManualActivationRuleEvaluatesToTrue() {
-    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("manualActivation", true));
+    caseService.createCaseInstanceByKey("case",
+        Collections.<String, Object> singletonMap("manualActivation", true));
 
-    CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
     assertNotNull(taskExecution);
     assertTrue(taskExecution.isEnabled());
     assertFalse(taskExecution.isActive());
@@ -51,9 +53,11 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testVariableBasedRule.cmmn")
   public void testManualActivationRuleEvaluatesToFalse() {
-    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("manualActivation", false));
+    caseService.createCaseInstanceByKey("case",
+        Collections.<String, Object> singletonMap("manualActivation", false));
 
-    CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
     assertNotNull(taskExecution);
     assertFalse(taskExecution.isEnabled());
     assertTrue(taskExecution.isActive());
@@ -61,9 +65,11 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testDefaultVariableBasedRule.cmmn")
   public void testDefaultManualActivationRuleEvaluatesToTrue() {
-    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("manualActivation", true));
+    caseService.createCaseInstanceByKey("case",
+        Collections.<String, Object> singletonMap("manualActivation", true));
 
-    CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
     assertNotNull(taskExecution);
     assertTrue(taskExecution.isEnabled());
     assertFalse(taskExecution.isActive());
@@ -71,9 +77,11 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testDefaultVariableBasedRule.cmmn")
   public void testDefaultManualActivationRuleEvaluatesToFalse() {
-    caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("manualActivation", false));
+    caseService.createCaseInstanceByKey("case",
+        Collections.<String, Object> singletonMap("manualActivation", false));
 
-    CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
     assertNotNull(taskExecution);
     assertFalse(taskExecution.isEnabled());
     assertTrue(taskExecution.isActive());
@@ -83,30 +91,36 @@ public class ManualActivationRuleTest extends CmmnProcessEngineTestCase {
   public void testActivationWithoutManualActivationDefined() {
     caseService.createCaseInstanceByKey("case");
 
-    CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
-    assertThat(taskExecution,is(notNullValue()));
-    assertThat(taskExecution.isEnabled(),is(false));
-    assertThat("Human Task is active, when ManualActivation is omitted",taskExecution.isActive(),is(true));
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
+    assertThat(taskExecution, is(notNullValue()));
+    assertThat(taskExecution.isEnabled(), is(false));
+    assertThat("Human Task is active, when ManualActivation is omitted", taskExecution.isActive(),
+        is(true));
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testActivationWithoutManualActivationExpressionDefined.cmmn")
   public void testActivationWithoutManualActivationExpressionDefined() {
     caseService.createCaseInstanceByKey("case");
 
-    CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
-    assertThat(taskExecution,is(notNullValue()));
-    assertThat(taskExecution.isEnabled(),is(true));
-    assertThat("Human Task is not active, when ManualActivation's condition is empty",taskExecution.isActive(),is(false));
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
+    assertThat(taskExecution, is(notNullValue()));
+    assertThat(taskExecution.isEnabled(), is(true));
+    assertThat("Human Task is not active, when ManualActivation's condition is empty",
+        taskExecution.isActive(), is(false));
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testActivationWithoutManualActivationConditionDefined.cmmn")
   public void testActivationWithoutManualActivationConditionDefined() {
     caseService.createCaseInstanceByKey("case");
 
-    CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
-    assertThat(taskExecution,is(notNullValue()));
-    assertThat(taskExecution.isEnabled(),is(true));
-    assertThat("Human Task is not active, when ManualActivation's condition is empty",taskExecution.isActive(),is(false));
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
+    assertThat(taskExecution, is(notNullValue()));
+    assertThat(taskExecution.isEnabled(), is(true));
+    assertThat("Human Task is not active, when ManualActivation's condition is empty",
+        taskExecution.isActive(), is(false));
   }
 
 }

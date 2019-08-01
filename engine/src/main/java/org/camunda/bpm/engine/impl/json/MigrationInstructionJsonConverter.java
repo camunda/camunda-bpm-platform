@@ -32,19 +32,18 @@ public class MigrationInstructionJsonConverter extends JsonObjectConverter<Migra
   public JsonObject toJsonObject(MigrationInstruction instruction) {
     JsonObject json = JsonUtil.createObject();
 
-    JsonUtil.addArrayField(json, SOURCE_ACTIVITY_IDS, new String[]{instruction.getSourceActivityId()});
-    JsonUtil.addArrayField(json, TARGET_ACTIVITY_IDS, new String[]{instruction.getTargetActivityId()});
+    JsonUtil.addArrayField(json, SOURCE_ACTIVITY_IDS,
+        new String[] { instruction.getSourceActivityId() });
+    JsonUtil.addArrayField(json, TARGET_ACTIVITY_IDS,
+        new String[] { instruction.getTargetActivityId() });
     JsonUtil.addField(json, UPDATE_EVENT_TRIGGER, instruction.isUpdateEventTrigger());
 
     return json;
   }
 
   public MigrationInstruction toObject(JsonObject json) {
-    return new MigrationInstructionImpl(
-      readSourceActivityId(json),
-      readTargetActivityId(json),
-      JsonUtil.getBoolean(json, UPDATE_EVENT_TRIGGER)
-    );
+    return new MigrationInstructionImpl(readSourceActivityId(json), readTargetActivityId(json),
+        JsonUtil.getBoolean(json, UPDATE_EVENT_TRIGGER));
   }
 
   protected String readSourceActivityId(JsonObject json) {
@@ -54,6 +53,5 @@ public class MigrationInstructionJsonConverter extends JsonObjectConverter<Migra
   protected String readTargetActivityId(JsonObject json) {
     return JsonUtil.getString(JsonUtil.getArray(json, TARGET_ACTIVITY_IDS));
   }
-
 
 }

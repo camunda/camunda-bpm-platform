@@ -25,23 +25,26 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
- * <p>For synchronizing gateways (inclusive; parallel), the situation in which
- *  more tokens end up at the target gateway than there are incoming sequence flows
- *  must be avoided. Else, the migrated process instance may appear as broken to users
- *  since the migration logic cannot trigger these gateways immediately.
+ * <p>
+ * For synchronizing gateways (inclusive; parallel), the situation in which more tokens end up at
+ * the target gateway than there are incoming sequence flows must be avoided. Else, the migrated
+ * process instance may appear as broken to users since the migration logic cannot trigger these
+ * gateways immediately.
  *
- *  <p>Such situations can be avoided by enforcing that
- *  <ul>
- *  <li>the target gateway has at least the same number of incoming sequence flows
- *  <li>the target gateway's flow scope is not removed
- *  <li>there is not more than one instruction that maps to the target gateway
+ * <p>
+ * Such situations can be avoided by enforcing that
+ * <ul>
+ * <li>the target gateway has at least the same number of incoming sequence flows
+ * <li>the target gateway's flow scope is not removed
+ * <li>there is not more than one instruction that maps to the target gateway
  *
  * @author Thorben Lindhauer
  */
 public class GatewayMappingValidator implements MigrationInstructionValidator {
 
   @Override
-  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions,
+  public void validate(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
       MigrationInstructionValidationReportImpl report) {
 
     ActivityImpl targetActivity = instruction.getTargetActivity();
@@ -53,8 +56,8 @@ public class GatewayMappingValidator implements MigrationInstructionValidator {
     }
   }
 
-
-  protected void validateIncomingSequenceFlows(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions,
+  protected void validateIncomingSequenceFlows(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
       MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
     ActivityImpl targetActivity = instruction.getTargetActivity();
@@ -68,7 +71,8 @@ public class GatewayMappingValidator implements MigrationInstructionValidator {
     }
   }
 
-  protected void validateParentScopeMigrates(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions,
+  protected void validateParentScopeMigrates(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
       MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
     ScopeImpl flowScope = sourceActivity.getFlowScope();
@@ -80,14 +84,16 @@ public class GatewayMappingValidator implements MigrationInstructionValidator {
     }
   }
 
-  protected void validateSingleInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions,
+  protected void validateSingleInstruction(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
       MigrationInstructionValidationReportImpl report) {
     ActivityImpl targetActivity = instruction.getTargetActivity();
-    List<ValidatingMigrationInstruction> instructionsToTargetGateway =
-        instructions.getInstructionsByTargetScope(targetActivity);
+    List<ValidatingMigrationInstruction> instructionsToTargetGateway = instructions
+        .getInstructionsByTargetScope(targetActivity);
 
     if (instructionsToTargetGateway.size() > 1) {
-      report.addFailure("Only one gateway can be mapped to gateway '" + targetActivity.getId() + "'");
+      report
+          .addFailure("Only one gateway can be mapped to gateway '" + targetActivity.getId() + "'");
     }
   }
 
@@ -96,6 +102,5 @@ public class GatewayMappingValidator implements MigrationInstructionValidator {
     return behavior instanceof ParallelGatewayActivityBehavior
         || behavior instanceof InclusiveGatewayActivityBehavior;
   }
-
 
 }

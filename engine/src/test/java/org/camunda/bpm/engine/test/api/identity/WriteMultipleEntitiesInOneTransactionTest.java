@@ -30,12 +30,14 @@ import org.junit.Assert;
 public class WriteMultipleEntitiesInOneTransactionTest extends ResourceProcessEngineTestCase {
 
   public WriteMultipleEntitiesInOneTransactionTest() {
-    super("org/camunda/bpm/engine/test/api/identity/WriteMultipleEntitiesInOneTransactionTest.camunda.cfg.xml");
+    super(
+        "org/camunda/bpm/engine/test/api/identity/WriteMultipleEntitiesInOneTransactionTest.camunda.cfg.xml");
   }
 
-  public void testWriteMultipleEntitiesInOneTransaction(){
+  public void testWriteMultipleEntitiesInOneTransaction() {
 
-    // the identity service provider registered with the engine creates a user, a group, and a membership
+    // the identity service provider registered with the engine creates a user, a group, and a
+    // membership
     // in the following call:
     Assert.assertTrue(identityService.checkPassword("multipleEntities", "inOneStep"));
     User user = identityService.createUserQuery().userId("multipleEntities").singleResult();
@@ -45,7 +47,8 @@ public class WriteMultipleEntitiesInOneTransactionTest extends ResourceProcessEn
     Assert.assertEquals("{SHA}pfdzmt+49nwknTy7xhZd7ZW5suI=", user.getPassword());
 
     // It is expected, that the User is in exactly one Group
-    List<Group> groups = this.identityService.createGroupQuery().groupMember("multipleEntities").list();
+    List<Group> groups = this.identityService.createGroupQuery().groupMember("multipleEntities")
+        .list();
     Assert.assertEquals(1, groups.size());
 
     Group group = groups.get(0);

@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.standalone.pvm.activities;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-
 /**
  * @author Tom Baeyens
  */

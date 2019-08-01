@@ -55,7 +55,8 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     super.closeDownProcessEngine();
   }
 
-  @Deployment(resources = { "org/camunda/bpm/application/impl/event/ProcessApplicationEventListenerTest.testExecutionListener.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/application/impl/event/ProcessApplicationEventListenerTest.testExecutionListener.bpmn20.xml" })
   public void testExecutionListenerNull() {
 
     // this test verifies that the process application can return a 'null'
@@ -70,7 +71,8 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
 
   }
 
-  @Deployment(resources = { "org/camunda/bpm/application/impl/event/ProcessApplicationEventListenerTest.testExecutionListener.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/application/impl/event/ProcessApplicationEventListenerTest.testExecutionListener.bpmn20.xml" })
   public void testShouldInvokeExecutionListenerOnStartAndEndOfProcessInstance() {
     final AtomicInteger processDefinitionEventCount = new AtomicInteger();
 
@@ -92,11 +94,12 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     // Start process instance.
     runtimeService.startProcessInstanceByKey("startToEnd");
 
-    // Start and end of the process 
+    // Start and end of the process
     assertEquals(2, processDefinitionEventCount.get());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/application/impl/event/ProcessApplicationEventListenerTest.testExecutionListener.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/application/impl/event/ProcessApplicationEventListenerTest.testExecutionListener.bpmn20.xml" })
   public void testShouldNotIncrementExecutionListenerCountOnStartAndEndOfProcessInstance() {
     final AtomicInteger eventCount = new AtomicInteger();
 
@@ -124,13 +127,13 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
   @Deployment
   public void testExecutionListener() {
     final AtomicInteger eventCount = new AtomicInteger();
-    
+
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
       public ExecutionListener getExecutionListener() {
         // this process application returns an execution listener
         return new ExecutionListener() {
           public void notify(DelegateExecution execution) throws Exception {
-              eventCount.incrementAndGet();
+            eventCount.incrementAndGet();
           }
         };
       }
@@ -144,17 +147,17 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
 
     // 7 events received
     assertEquals(7, eventCount.get());
-   }
+  }
 
   @Deployment
   public void testExecutionListenerWithErrorBoundaryEvent() {
     final AtomicInteger eventCount = new AtomicInteger();
-    
+
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
       public ExecutionListener getExecutionListener() {
         return new ExecutionListener() {
           public void notify(DelegateExecution execution) throws Exception {
-              eventCount.incrementAndGet();
+            eventCount.incrementAndGet();
           }
         };
       }
@@ -163,20 +166,23 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     // register app so that it is notified about events
     managementService.registerProcessApplication(deploymentId, processApplication.getReference());
 
-    // 1. (start)startEvent(end) -(take)-> (start)serviceTask(end) -(take)-> (start)endEvent(end) (8 Events)
+    // 1. (start)startEvent(end) -(take)-> (start)serviceTask(end) -(take)-> (start)endEvent(end) (8
+    // Events)
 
     // start process instance
     runtimeService.startProcessInstanceByKey("executionListener");
 
     assertEquals(10, eventCount.get());
-    
+
     // reset counter
     eventCount.set(0);
-    
-    // 2. (start)startEvent(end) -(take)-> (start)serviceTask(end)/(start)errorBoundaryEvent(end) -(take)-> (start)endEvent(end) (10 Events)
+
+    // 2. (start)startEvent(end) -(take)-> (start)serviceTask(end)/(start)errorBoundaryEvent(end)
+    // -(take)-> (start)endEvent(end) (10 Events)
 
     // start process instance
-    runtimeService.startProcessInstanceByKey("executionListener", Collections.<String, Object>singletonMap("shouldThrowError", true));
+    runtimeService.startProcessInstanceByKey("executionListener",
+        Collections.<String, Object> singletonMap("shouldThrowError", true));
 
     assertEquals(12, eventCount.get());
   }
@@ -184,12 +190,12 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
   @Deployment
   public void testExecutionListenerWithTimerBoundaryEvent() {
     final AtomicInteger eventCount = new AtomicInteger();
-    
+
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
       public ExecutionListener getExecutionListener() {
         return new ExecutionListener() {
           public void notify(DelegateExecution execution) throws Exception {
-              eventCount.incrementAndGet();
+            eventCount.incrementAndGet();
           }
         };
       }
@@ -198,7 +204,8 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     // register app so that it is notified about events
     managementService.registerProcessApplication(deploymentId, processApplication.getReference());
 
-    // 1. (start)startEvent(end) -(take)-> (start)userTask(end) -(take)-> (start)endEvent(end) (8 Events)
+    // 1. (start)startEvent(end) -(take)-> (start)userTask(end) -(take)-> (start)endEvent(end) (8
+    // Events)
 
     // start process instance
     runtimeService.startProcessInstanceByKey("executionListener");
@@ -208,11 +215,12 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     taskService.complete(task.getId());
 
     assertEquals(10, eventCount.get());
-    
+
     // reset counter
     eventCount.set(0);
-    
-    // 2. (start)startEvent(end) -(take)-> (start)userTask(end)/(start)timerBoundaryEvent(end) -(take)-> (start)endEvent(end) (10 Events)
+
+    // 2. (start)startEvent(end) -(take)-> (start)userTask(end)/(start)timerBoundaryEvent(end)
+    // -(take)-> (start)endEvent(end) (10 Events)
 
     // start process instance
     runtimeService.startProcessInstanceByKey("executionListener");
@@ -227,12 +235,12 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
   @Deployment
   public void testExecutionListenerWithSignalBoundaryEvent() {
     final AtomicInteger eventCount = new AtomicInteger();
-    
+
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
       public ExecutionListener getExecutionListener() {
         return new ExecutionListener() {
           public void notify(DelegateExecution execution) throws Exception {
-              eventCount.incrementAndGet();
+            eventCount.incrementAndGet();
           }
         };
       }
@@ -241,7 +249,8 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     // register app so that it is notified about events
     managementService.registerProcessApplication(deploymentId, processApplication.getReference());
 
-    // 1. (start)startEvent(end) -(take)-> (start)userTask(end) -(take)-> (start)endEvent(end) (8 Events)
+    // 1. (start)startEvent(end) -(take)-> (start)userTask(end) -(take)-> (start)endEvent(end) (8
+    // Events)
 
     // start process instance
     runtimeService.startProcessInstanceByKey("executionListener");
@@ -251,11 +260,12 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     taskService.complete(task.getId());
 
     assertEquals(10, eventCount.get());
-    
+
     // reset counter
     eventCount.set(0);
-    
-    // 2. (start)startEvent(end) -(take)-> (start)userTask(end)/(start)signalBoundaryEvent(end) -(take)-> (start)endEvent(end) (10 Events)
+
+    // 2. (start)startEvent(end) -(take)-> (start)userTask(end)/(start)signalBoundaryEvent(end)
+    // -(take)-> (start)endEvent(end) (10 Events)
 
     // start process instance
     runtimeService.startProcessInstanceByKey("executionListener");
@@ -286,7 +296,6 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
 
     // register app so that it is notified about events
     managementService.registerProcessApplication(deploymentId, processApplication.getReference());
-
 
     // start process instance
     runtimeService.startProcessInstanceByKey("executionListener");
@@ -320,14 +329,15 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     managementService.registerProcessApplication(deploymentId, processApplication.getReference());
 
     // start process instance
-    ProcessInstance taskListenerProcess = runtimeService.startProcessInstanceByKey("taskListenerProcess");
+    ProcessInstance taskListenerProcess = runtimeService
+        .startProcessInstanceByKey("taskListenerProcess");
 
     // create event received
     assertEquals(1, events.size());
     assertEquals(TaskListener.EVENTNAME_CREATE, events.get(0));
 
     Task task = taskService.createTaskQuery().singleResult();
-    //assign task:
+    // assign task:
     taskService.setAssignee(task.getId(), "jonny");
     assertEquals(2, events.size());
     assertEquals(TaskListener.EVENTNAME_ASSIGNMENT, events.get(1));
@@ -340,7 +350,8 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
     assertEquals(TaskListener.EVENTNAME_CREATE, events.get(3));
 
     // delete process instance so last task will be deleted
-    runtimeService.deleteProcessInstance(taskListenerProcess.getProcessInstanceId(), "test delete event");
+    runtimeService.deleteProcessInstance(taskListenerProcess.getProcessInstanceId(),
+        "test delete event");
     assertEquals(5, events.size());
     assertEquals(TaskListener.EVENTNAME_DELETE, events.get(4));
 
@@ -358,8 +369,9 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
           public void notify(DelegateExecution delegateExecution) {
             String currentActivityId = delegateExecution.getCurrentActivityId();
             String eventName = delegateExecution.getEventName();
-            if ("timer".equals(currentActivityId) &&
-                (ExecutionListener.EVENTNAME_START.equals(eventName) || ExecutionListener.EVENTNAME_END.equals(eventName))) {
+            if ("timer".equals(currentActivityId)
+                && (ExecutionListener.EVENTNAME_START.equals(eventName)
+                    || ExecutionListener.EVENTNAME_END.equals(eventName))) {
               timerEvents.add(delegateExecution.getEventName());
             }
           }
@@ -397,8 +409,9 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
           public void notify(DelegateExecution delegateExecution) {
             String currentActivityId = delegateExecution.getCurrentActivityId();
             String eventName = delegateExecution.getEventName();
-            if ("signal".equals(currentActivityId) &&
-                (ExecutionListener.EVENTNAME_START.equals(eventName) || ExecutionListener.EVENTNAME_END.equals(eventName))) {
+            if ("signal".equals(currentActivityId)
+                && (ExecutionListener.EVENTNAME_START.equals(eventName)
+                    || ExecutionListener.EVENTNAME_END.equals(eventName))) {
               timerEvents.add(delegateExecution.getEventName());
             }
           }

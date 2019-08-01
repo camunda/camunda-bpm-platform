@@ -26,7 +26,8 @@ public interface ExecutionObserver {
   /**
    * Callback which is called in the clearExecution method of the ExecutionEntity.
    *
-   * @param execution the execution which is been observed
+   * @param execution
+   *          the execution which is been observed
    */
   public void onClear(ExecutionEntity execution);
 }

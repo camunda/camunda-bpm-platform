@@ -24,17 +24,18 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 /**
- * Checks if the test is ignored than the current history level is lower than
- * the required history level which is specified on the super class.
+ * Checks if the test is ignored than the current history level is lower than the required history
+ * level which is specified on the super class.
  */
-public class ProcessEngineRuleRequiredHistoryLevelSuperClassTest extends ProcessEngineRuleRequiredHistoryLevelClassTest {
+public class ProcessEngineRuleRequiredHistoryLevelSuperClassTest
+    extends ProcessEngineRuleRequiredHistoryLevelClassTest {
 
   @Test
   public void requiredHistoryLevelOnSuperClass() {
 
     assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+        CoreMatchers.<String> either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
+            .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
   }
 
 }

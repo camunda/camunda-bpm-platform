@@ -90,10 +90,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
   @Parameterized.Parameters(name = "Job DueDate is set: {0}")
   public static Collection<Object[]> scenarios() throws ParseException {
-    return Arrays.asList(new Object[][] {
-      { false, null },
-      { true, TEST_DATE }
-    });
+    return Arrays.asList(new Object[][] { { false, null }, { true, TEST_DATE } });
   }
 
   @Before
@@ -117,16 +114,16 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   public void executeDecisionInstances() {
     testRule.deploy("org/camunda/bpm/engine/test/api/dmn/Example.dmn");
 
-    VariableMap variables = Variables.createVariables()
-        .putValue("status", "silver")
-        .putValue("sum", 723);
+    VariableMap variables = Variables.createVariables().putValue("status", "silver").putValue("sum",
+        723);
 
     for (int i = 0; i < 10; i++) {
       decisionService.evaluateDecisionByKey(DECISION).variables(variables).evaluate();
     }
 
-    List<HistoricDecisionInstance> decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
-    for(HistoricDecisionInstance decisionInstance : decisionInstances) {
+    List<HistoricDecisionInstance> decisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().list();
+    for (HistoricDecisionInstance decisionInstance : decisionInstances) {
       decisionInstanceIds.add(decisionInstance.getId());
     }
   }
@@ -165,7 +162,8 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   @Test
   public void createBatchDeletionByQuery() {
     // given
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
 
     // when
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(query, null);
@@ -186,7 +184,8 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   @Test
   public void createBatchDeletionByInvalidQueryByKey() {
     // given
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey("foo");
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey("foo");
 
     // then
     thrown.expect(BadUserRequestException.class);
@@ -198,10 +197,12 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   @Test
   public void createBatchDeletionByIdsAndQuery() {
     // given
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
 
     // when
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query,
+        null);
 
     // then
     assertBatchCreated(batch, 10);
@@ -222,7 +223,8 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // and there exists a deletion job definition
     JobDefinition deletionJobDefinition = helper.getExecutionJobDefinition(batch);
     assertNotNull(deletionJobDefinition);
-    assertEquals(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION, deletionJobDefinition.getJobType());
+    assertEquals(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION,
+        deletionJobDefinition.getJobType());
 
     // and a seed job with no relation to a process or execution etc.
     Job seedJob = helper.getSeedJob(batch);
@@ -243,10 +245,12 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   @Test
   public void createSeedJobByQuery() {
     // given
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
 
     // when
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query,
+        null);
 
     // then there exists a seed job definition with the batch id as
     // configuration
@@ -258,7 +262,8 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // and there exists a deletion job definition
     JobDefinition deletionJobDefinition = helper.getExecutionJobDefinition(batch);
     assertNotNull(deletionJobDefinition);
-    assertEquals(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION, deletionJobDefinition.getJobType());
+    assertEquals(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION,
+        deletionJobDefinition.getJobType());
 
     // and a seed job with no relation to a process or execution etc.
     Job seedJob = helper.getSeedJob(batch);
@@ -279,7 +284,8 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   @Test
   public void createSeedJobByIdsAndQuery() {
     // given
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
 
     // when
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(query, null);
@@ -294,7 +300,8 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // and there exists a deletion job definition
     JobDefinition deletionJobDefinition = helper.getExecutionJobDefinition(batch);
     assertNotNull(deletionJobDefinition);
-    assertEquals(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION, deletionJobDefinition.getJobType());
+    assertEquals(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION,
+        deletionJobDefinition.getJobType());
 
     // and a seed job with no relation to a process or execution etc.
     Job seedJob = helper.getSeedJob(batch);
@@ -320,7 +327,8 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
 
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
-    JobDefinition deletionJobDefinition = helper.getExecutionJobDefinition(batch);;
+    JobDefinition deletionJobDefinition = helper.getExecutionJobDefinition(batch);
+    ;
 
     // when
     helper.executeSeedJob(batch);
@@ -348,12 +356,14 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // given
     rule.getProcessEngineConfiguration().setBatchJobsPerSeed(5);
 
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
 
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(query, null);
 
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
-    JobDefinition deletionJobDefinition = helper.getExecutionJobDefinition(batch);;
+    JobDefinition deletionJobDefinition = helper.getExecutionJobDefinition(batch);
+    ;
 
     // when
     helper.executeSeedJob(batch);
@@ -381,12 +391,15 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     // given
     rule.getProcessEngineConfiguration().setBatchJobsPerSeed(5);
 
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
 
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query,
+        null);
 
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
-    JobDefinition deletionJobDefinition = helper.getExecutionJobDefinition(batch);;
+    JobDefinition deletionJobDefinition = helper.getExecutionJobDefinition(batch);
+    ;
 
     // when
     helper.executeSeedJob(batch);
@@ -435,7 +448,8 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   @Test
   public void createMonitorJobByQuery() {
     // given
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(query, null);
 
     // when
@@ -459,8 +473,10 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   @Test
   public void createMonitorJobByIdsAndQuery() {
     // given
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query,
+        null);
 
     // when
     helper.executeSeedJob(batch);
@@ -501,7 +517,8 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   @Test
   public void deleteInstancesByQuery() {
     // given
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(query, null);
 
     helper.executeSeedJob(batch);
@@ -519,8 +536,10 @@ public class BatchHistoricDecisionInstanceDeletionTest {
   @Test
   public void deleteInstancesByIdsAndQuery() {
     // given
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query,
+        null);
 
     helper.executeSeedJob(batch);
     List<Job> deletionJobs = helper.getExecutionJobs(batch);
@@ -552,8 +571,7 @@ public class BatchHistoricDecisionInstanceDeletionTest {
     public JobDefinition getExecutionJobDefinition(Batch batch) {
       return engineRule.getManagementService().createJobDefinitionQuery()
           .jobDefinitionId(batch.getBatchJobDefinitionId())
-          .jobType(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION)
-          .singleResult();
+          .jobType(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION).singleResult();
     }
   }
 

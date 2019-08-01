@@ -26,9 +26,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEn
 import java.util.List;
 import java.util.Map;
 
-
-public class NativeHistoricVariableInstanceQueryImpl extends AbstractNativeQuery<NativeHistoricVariableInstanceQuery, HistoricVariableInstance>
-        implements NativeHistoricVariableInstanceQuery {
+public class NativeHistoricVariableInstanceQueryImpl
+    extends AbstractNativeQuery<NativeHistoricVariableInstanceQuery, HistoricVariableInstance>
+    implements NativeHistoricVariableInstanceQuery {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -44,39 +44,38 @@ public class NativeHistoricVariableInstanceQueryImpl extends AbstractNativeQuery
     super(commandExecutor);
   }
 
-
-  //results ////////////////////////////////////////////////////////////////
+  // results ////////////////////////////////////////////////////////////////
 
   @Override
   public NativeHistoricVariableInstanceQuery disableCustomObjectDeserialization() {
-        this.isCustomObjectDeserializationEnabled = false;
-        return this;
+    this.isCustomObjectDeserializationEnabled = false;
+    return this;
   }
 
-  public List<HistoricVariableInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
+  public List<HistoricVariableInstance> executeList(CommandContext commandContext,
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
     List<HistoricVariableInstance> historicVariableInstances = commandContext
-            .getHistoricVariableInstanceManager()
-            .findHistoricVariableInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+        .getHistoricVariableInstanceManager()
+        .findHistoricVariableInstancesByNativeQuery(parameterMap, firstResult, maxResults);
 
-    if (historicVariableInstances!=null) {
-      for (HistoricVariableInstance historicVariableInstance: historicVariableInstances) {
+    if (historicVariableInstances != null) {
+      for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
 
         HistoricVariableInstanceEntity variableInstanceEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
-          try {
-            variableInstanceEntity.getTypedValue(isCustomObjectDeserializationEnabled);
-          } catch(Exception t) {
-            // do not fail if one of the variables fails to load
-            LOG.exceptionWhileGettingValueForVariable(t);
-          }
+        try {
+          variableInstanceEntity.getTypedValue(isCustomObjectDeserializationEnabled);
+        } catch (Exception t) {
+          // do not fail if one of the variables fails to load
+          LOG.exceptionWhileGettingValueForVariable(t);
+        }
       }
     }
     return historicVariableInstances;
   }
 
   public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext
-      .getHistoricVariableInstanceManager()
-      .findHistoricVariableInstanceCountByNativeQuery(parameterMap);
+    return commandContext.getHistoricVariableInstanceManager()
+        .findHistoricVariableInstanceCountByNativeQuery(parameterMap);
   }
 
 }

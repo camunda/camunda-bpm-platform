@@ -74,13 +74,8 @@ public class RestartProcessInstanceUserOperationLogTest {
 
   @Before
   public void createBpmnModelInstance() {
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .userTask("user1")
-        .sequenceFlowId("seq")
-        .userTask("user2")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").userTask("user1")
+        .sequenceFlowId("seq").userTask("user2").endEvent("end").done();
   }
 
   @After
@@ -92,6 +87,7 @@ public class RestartProcessInstanceUserOperationLogTest {
   public void removeBatches() {
     helper.removeAllRunningAndHistoricBatches();
   }
+
   @Test
   public void testLogCreationAsync() {
     // given
@@ -100,20 +96,21 @@ public class RestartProcessInstanceUserOperationLogTest {
 
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("process1");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("process1");
-    
+
     runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
     runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
 
     // when
-    runtimeService.restartProcessInstances(processDefinition.getId()).startAfterActivity("user1").processInstanceIds(processInstance1.getId(), processInstance2.getId()).executeAsync();
+    runtimeService.restartProcessInstances(processDefinition.getId()).startAfterActivity("user1")
+        .processInstanceIds(processInstance1.getId(), processInstance2.getId()).executeAsync();
     rule.getIdentityService().clearAuthentication();
 
     // then
-    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().operationType("RestartProcessInstance").list();
+    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService()
+        .createUserOperationLogQuery().operationType("RestartProcessInstance").list();
     Assert.assertEquals(2, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
-
 
     UserOperationLogEntry asyncEntry = entries.get("async");
     Assert.assertNotNull(asyncEntry);
@@ -153,15 +150,16 @@ public class RestartProcessInstanceUserOperationLogTest {
     runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
 
     // when
-    runtimeService.restartProcessInstances(processDefinition.getId()).startAfterActivity("user1").processInstanceIds(processInstance1.getId(), processInstance2.getId()).execute();
+    runtimeService.restartProcessInstances(processDefinition.getId()).startAfterActivity("user1")
+        .processInstanceIds(processInstance1.getId(), processInstance2.getId()).execute();
     rule.getIdentityService().clearAuthentication();
 
     // then
-    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().operationType("RestartProcessInstance").list();
+    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService()
+        .createUserOperationLogQuery().operationType("RestartProcessInstance").list();
     Assert.assertEquals(2, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
-
 
     UserOperationLogEntry asyncEntry = entries.get("async");
     Assert.assertNotNull(asyncEntry);
@@ -193,9 +191,11 @@ public class RestartProcessInstanceUserOperationLogTest {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
-    Batch batch = runtimeService.restartProcessInstances(processDefinition.getId()).startBeforeActivity("user1").processInstanceIds(processInstance.getId()).executeAsync();
+    Batch batch = runtimeService.restartProcessInstances(processDefinition.getId())
+        .startBeforeActivity("user1").processInstanceIds(processInstance.getId()).executeAsync();
 
     helper.executeSeedJob(batch);
 
@@ -205,7 +205,8 @@ public class RestartProcessInstanceUserOperationLogTest {
     rule.getIdentityService().clearAuthentication();
 
     // then
-    Assert.assertEquals(0, rule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).count());
+    Assert.assertEquals(0, rule.getHistoryService().createUserOperationLogQuery()
+        .entityType(EntityTypes.PROCESS_INSTANCE).count());
   }
 
   @Test
@@ -213,12 +214,11 @@ public class RestartProcessInstanceUserOperationLogTest {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
-    runtimeService.restartProcessInstances(processDefinition.getId())
-      .startAfterActivity("user1")
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    runtimeService.restartProcessInstances(processDefinition.getId()).startAfterActivity("user1")
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
 
     // when
     testRule.waitForJobExecutorToProcessAllJobs(5000L);

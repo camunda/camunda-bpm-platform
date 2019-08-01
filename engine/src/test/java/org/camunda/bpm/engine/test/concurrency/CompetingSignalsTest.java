@@ -25,13 +25,12 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.slf4j.Logger;
 
-
 /**
  * @author Tom Baeyens
  */
 public class CompetingSignalsTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   Thread testThread = Thread.currentThread();
   static ControllableThread activeThread;
@@ -57,7 +56,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 
@@ -69,7 +68,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   @Deployment
   public void testCompetingSignals() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CompetingSignalsProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("CompetingSignalsProcess");
     String processInstanceId = processInstance.getId();
 
     LOG.debug("test thread starts thread one");
@@ -87,7 +87,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
+    assertTextPresent("was updated by another transaction concurrently",
+        threadTwo.exception.getMessage());
   }
 
 }

@@ -31,8 +31,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * Helper class for implementing BPMN 2.0 activities, offering convenience
- * methods specific to BPMN 2.0.
+ * Helper class for implementing BPMN 2.0 activities, offering convenience methods specific to BPMN
+ * 2.0.
  *
  * This class can be used by inheritance or aggregation.
  *
@@ -43,13 +43,12 @@ public class BpmnActivityBehavior {
   protected static BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   /**
-   * Performs the default outgoing BPMN 2.0 behavior, which is having parallel
-   * paths of executions for the outgoing sequence flow.
+   * Performs the default outgoing BPMN 2.0 behavior, which is having parallel paths of executions
+   * for the outgoing sequence flow.
    *
-   * More precisely: every sequence flow that has a condition which evaluates to
-   * true (or which doesn't have a condition), is selected for continuation of
-   * the process instance. If multiple sequencer flow are selected, multiple,
-   * parallel paths of executions are created.
+   * More precisely: every sequence flow that has a condition which evaluates to true (or which
+   * doesn't have a condition), is selected for continuation of the process instance. If multiple
+   * sequencer flow are selected, multiple, parallel paths of executions are created.
    */
   public void performDefaultOutgoingBehavior(ActivityExecution activityExceution) {
     performOutgoingBehavior(activityExceution, true, null);
@@ -57,13 +56,12 @@ public class BpmnActivityBehavior {
 
   /**
    * Performs the default outgoing BPMN 2.0 behavior (@see
-   * {@link #performDefaultOutgoingBehavior(ActivityExecution)}), but without
-   * checking the conditions on the outgoing sequence flow.
+   * {@link #performDefaultOutgoingBehavior(ActivityExecution)}), but without checking the
+   * conditions on the outgoing sequence flow.
    *
-   * This means that every outgoing sequence flow is selected for continuing the
-   * process instance, regardless of having a condition or not. In case of
-   * multiple outgoing sequence flow, multiple parallel paths of executions will
-   * be created.
+   * This means that every outgoing sequence flow is selected for continuing the process instance,
+   * regardless of having a condition or not. In case of multiple outgoing sequence flow, multiple
+   * parallel paths of executions will be created.
    */
   public void performIgnoreConditionsOutgoingBehavior(ActivityExecution activityExecution) {
     performOutgoingBehavior(activityExecution, false, null);
@@ -75,11 +73,11 @@ public class BpmnActivityBehavior {
    * @param execution
    *          The current execution context
    * @param checkConditions
-   *          Whether or not to check conditions before determining whether or
-   *          not to take a transition.
+   *          Whether or not to check conditions before determining whether or not to take a
+   *          transition.
    */
-  protected void performOutgoingBehavior(ActivityExecution execution,
-          boolean checkConditions, List<ActivityExecution> reusableExecutions) {
+  protected void performOutgoingBehavior(ActivityExecution execution, boolean checkConditions,
+      List<ActivityExecution> reusableExecutions) {
 
     LOG.leavingActivity(execution.getActivity().getId());
 
@@ -89,7 +87,8 @@ public class BpmnActivityBehavior {
     List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
     for (PvmTransition outgoingTransition : outgoingTransitions) {
       if (defaultSequenceFlow == null || !outgoingTransition.getId().equals(defaultSequenceFlow)) {
-        Condition condition = (Condition) outgoingTransition.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
+        Condition condition = (Condition) outgoingTransition
+            .getProperty(BpmnParse.PROPERTYNAME_CONDITION);
         if (condition == null || !checkConditions || condition.evaluate(execution)) {
           transitionsToTake.add(outgoingTransition);
         }
@@ -111,11 +110,13 @@ public class BpmnActivityBehavior {
     } else {
 
       if (defaultSequenceFlow != null) {
-        PvmTransition defaultTransition = execution.getActivity().findOutgoingTransition(defaultSequenceFlow);
+        PvmTransition defaultTransition = execution.getActivity()
+            .findOutgoingTransition(defaultSequenceFlow);
         if (defaultTransition != null) {
           execution.leaveActivityViaTransition(defaultTransition);
         } else {
-          throw LOG.missingDefaultFlowException(execution.getActivity().getId(), defaultSequenceFlow);
+          throw LOG.missingDefaultFlowException(execution.getActivity().getId(),
+              defaultSequenceFlow);
         }
 
       } else if (!outgoingTransitions.isEmpty()) {
@@ -123,9 +124,10 @@ public class BpmnActivityBehavior {
 
       } else {
 
-        if (((ActivityImpl) execution.getActivity()).isCompensationHandler() && isAncestorCompensationThrowing(execution)) {
+        if (((ActivityImpl) execution.getActivity()).isCompensationHandler()
+            && isAncestorCompensationThrowing(execution)) {
 
-         execution.endCompensation();
+          execution.endCompensation();
 
         } else {
           LOG.missingOutgoingSequenceFlow(execution.getActivity().getId());

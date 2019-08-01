@@ -67,20 +67,20 @@ public abstract class CmmnSentryPart implements Serializable {
   }
 
   /**
-   * @deprecated since 7.4 A new instance of a sentry
-   * does not reference the source case execution id anymore.
+   * @deprecated since 7.4 A new instance of a sentry does not reference the source case execution
+   *             id anymore.
    */
   public abstract String getSourceCaseExecutionId();
 
   /**
-   * @deprecated since 7.4 A new instance of a sentry
-   * does not reference the source case execution id anymore.
+   * @deprecated since 7.4 A new instance of a sentry does not reference the source case execution
+   *             id anymore.
    */
   public abstract CmmnExecution getSourceCaseExecution();
 
   /**
-   * @deprecated since 7.4 A new instance of a sentry
-   * does not reference the source case execution id anymore.
+   * @deprecated since 7.4 A new instance of a sentry does not reference the source case execution
+   *             id anymore.
    */
   public abstract void setSourceCaseExecution(CmmnExecution sourceCaseExecution);
 
@@ -115,5 +115,5 @@ public abstract class CmmnSentryPart implements Serializable {
   public void setVariableName(String variableName) {
     this.variableName = variableName;
   }
-  
+
 }

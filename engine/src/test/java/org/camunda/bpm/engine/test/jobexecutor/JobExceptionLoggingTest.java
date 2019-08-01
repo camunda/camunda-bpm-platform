@@ -46,7 +46,8 @@ public class JobExceptionLoggingTest {
   private static final String CONTEXT_LOGGER = "org.camunda.bpm.engine.context";
 
   public ProcessEngineRule engineRule = new ProcessEngineRule();
-  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule().watch(CONTEXT_LOGGER, JOBEXECUTOR_LOGGER).level(Level.DEBUG);
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
+      .watch(CONTEXT_LOGGER, JOBEXECUTOR_LOGGER).level(Level.DEBUG);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(loggingRule);
@@ -87,8 +88,10 @@ public class JobExceptionLoggingTest {
     testRule.waitForJobExecutorToProcessAllJobs();
     jobExecutor.shutdown();
 
-    List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER, "Exception while executing job");
-    List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER, "Exception while closing command context");
+    List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER,
+        "Exception while executing job");
+    List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER,
+        "Exception while closing command context");
 
     // then
     assertThat(jobLog.size()).isEqualTo(1);
@@ -101,16 +104,18 @@ public class JobExceptionLoggingTest {
     // given a job that always throws an Exception
     processEngineConfiguration.setEnableCmdExceptionLogging(true);
     runtimeService.startProcessInstanceByKey("testProcess");
-    
+
     // when executing the job and wait
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
     testRule.waitForJobExecutorToProcessAllJobs();
     jobExecutor.shutdown();
 
-    List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER, "Exception while executing job");
-    List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER, "Exception while closing command context");
-    
+    List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER,
+        "Exception while executing job");
+    List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER,
+        "Exception while closing command context");
+
     // then
     assertThat(jobLog.size()).isEqualTo(1);
     assertThat(ctxLog.size()).isEqualTo(1);
@@ -120,12 +125,9 @@ public class JobExceptionLoggingTest {
   public void shouldNotLogExceptionWhenApiCallReducedLogging() {
     // given
     processEngineConfiguration.setEnableCmdExceptionLogging(false);
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("failingDelegate")
-        .startEvent()
-        .serviceTask()
-          .camundaClass("org.camunda.bpm.engine.test.jobexecutor.FailingDelegate")
-          .camundaAsyncBefore()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("failingDelegate").startEvent()
+        .serviceTask().camundaClass("org.camunda.bpm.engine.test.jobexecutor.FailingDelegate")
+        .camundaAsyncBefore().done();
     testRule.deploy(modelInstance);
 
     runtimeService.startProcessInstanceByKey("failingDelegate");
@@ -138,8 +140,10 @@ public class JobExceptionLoggingTest {
     } catch (RuntimeException e) {
       expectedException = e;
     }
-    List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER, "Exception while executing job");
-    List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER, "Exception while closing command context");
+    List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER,
+        "Exception while executing job");
+    List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER,
+        "Exception while closing command context");
 
     // then
     // make sure the exceptions is thrown...
@@ -154,10 +158,8 @@ public class JobExceptionLoggingTest {
   public void shouldNotLogExceptionWhenUserApiCallReducedLogging() {
     // given
     processEngineConfiguration.setEnableCmdExceptionLogging(false);
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("failingDelegate")
-        .startEvent()
-        .serviceTask()
-          .camundaClass("org.camunda.bpm.engine.test.jobexecutor.FailingDelegate")
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("failingDelegate").startEvent()
+        .serviceTask().camundaClass("org.camunda.bpm.engine.test.jobexecutor.FailingDelegate")
         .done();
     testRule.deploy(modelInstance);
 
@@ -168,8 +170,10 @@ public class JobExceptionLoggingTest {
     } catch (RuntimeException e) {
       expectedException = e;
     }
-    List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER, "Exception while executing job");
-    List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER, "Exception while closing command context");
+    List<ILoggingEvent> jobLog = loggingRule.getFilteredLog(JOBEXECUTOR_LOGGER,
+        "Exception while executing job");
+    List<ILoggingEvent> ctxLog = loggingRule.getFilteredLog(CONTEXT_LOGGER,
+        "Exception while closing command context");
 
     // then
     // make sure the exceptions is thrown...

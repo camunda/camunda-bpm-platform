@@ -26,8 +26,8 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
 /**
- * {@link DelegateInvocation} invoking a {@link DecisionDefinition}
- * in a given {@link VariableContext}.
+ * {@link DelegateInvocation} invoking a {@link DecisionDefinition} in a given
+ * {@link VariableContext}.
  *
  * The DmnEngine instance is resolved from the Context.
  *
@@ -43,7 +43,8 @@ public class DecisionInvocation extends DelegateInvocation {
   protected DecisionDefinition decisionDefinition;
   protected VariableContext variableContext;
 
-  public DecisionInvocation(DecisionDefinition decisionDefinition, VariableContext variableContext) {
+  public DecisionInvocation(DecisionDefinition decisionDefinition,
+      VariableContext variableContext) {
     super(null, (DecisionDefinitionEntity) decisionDefinition);
     this.decisionDefinition = decisionDefinition;
     this.variableContext = variableContext;
@@ -51,10 +52,10 @@ public class DecisionInvocation extends DelegateInvocation {
 
   @Override
   protected void invoke() throws Exception {
-    final DmnEngine dmnEngine = Context.getProcessEngineConfiguration()
-      .getDmnEngine();
+    final DmnEngine dmnEngine = Context.getProcessEngineConfiguration().getDmnEngine();
 
-    invocationResult = dmnEngine.evaluateDecision((DmnDecision) decisionDefinition, variableContext);
+    invocationResult = dmnEngine.evaluateDecision((DmnDecision) decisionDefinition,
+        variableContext);
   }
 
   @Override

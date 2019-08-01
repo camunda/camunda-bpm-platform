@@ -53,7 +53,8 @@ import static org.junit.Assert.assertEquals;
 public class HistoryCleanupDmnDisabledTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setDmnEnabled(false);
       return configuration;
     }
@@ -63,7 +64,8 @@ public class HistoryCleanupDmnDisabledTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   private RuntimeService runtimeService;
   private HistoryService historyService;
@@ -80,21 +82,22 @@ public class HistoryCleanupDmnDisabledTest {
   }
 
   @After
-  public void clearDatabase(){
-    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+  public void clearDatabase() {
+    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new Command<Void>() {
+          public Void execute(CommandContext commandContext) {
 
-        List<Job> jobs = engineRule.getManagementService().createJobQuery().list();
-        if (jobs.size() > 0) {
-          assertEquals(1, jobs.size());
-          String jobId = jobs.get(0).getId();
-          commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-        }
+            List<Job> jobs = engineRule.getManagementService().createJobQuery().list();
+            if (jobs.size() > 0) {
+              assertEquals(1, jobs.size());
+              String jobId = jobs.get(0).getId();
+              commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
+              commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+            }
 
-        return null;
-      }
-    });
+            return null;
+          }
+        });
 
     clearMetrics();
 
@@ -109,20 +112,20 @@ public class HistoryCleanupDmnDisabledTest {
   }
 
   @Test
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void historyCleanupWithDisabledDmn() {
 
     prepareHistoricProcesses("oneTaskProcess");
 
     ClockUtil.setCurrentTime(new Date());
-    //when
+    // when
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
 
     engineRule.getManagementService().executeJob(jobId);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey("oneTaskProcess").count());
   }
 
   private void prepareHistoricProcesses(String businessKey) {

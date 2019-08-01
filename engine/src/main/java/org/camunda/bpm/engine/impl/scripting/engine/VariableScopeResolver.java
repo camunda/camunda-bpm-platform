@@ -23,7 +23,6 @@ import java.util.Set;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
 
-
 /**
  * Bindings implementation using an {@link ExecutionImpl} as 'back-end'.
  *

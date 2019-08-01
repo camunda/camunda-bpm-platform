@@ -67,8 +67,10 @@ public abstract class AbstractBatchAuthorizationTest {
         .changeElementId(ProcessModels.PROCESS_KEY, "ONE_TASK_PROCESS"));
     sourceDefinition2 = testHelper.deployAndGetDefinition(modify(ProcessModels.TWO_TASKS_PROCESS)
         .changeElementId(ProcessModels.PROCESS_KEY, "TWO_TASKS_PROCESS"));
-    processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
-    processInstance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition2.getId());
+    processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
+    processInstance2 = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition2.getId());
   }
 
   @After
@@ -81,25 +83,24 @@ public abstract class AbstractBatchAuthorizationTest {
   public void cleanBatch() {
     Batch batch = engineRule.getManagementService().createBatchQuery().singleResult();
     if (batch != null) {
-      engineRule.getManagementService().deleteBatch(
-          batch.getId(), true);
+      engineRule.getManagementService().deleteBatch(batch.getId(), true);
     }
 
-    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().singleResult();
+    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
+        .singleResult();
     if (historicBatch != null) {
-      engineRule.getHistoryService().deleteHistoricBatch(
-          historicBatch.getId());
+      engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
     }
   }
 
   protected void executeSeedAndBatchJobs() {
     Job job = engineRule.getManagementService().createJobQuery()
-        .jobDefinitionId(batch.getSeedJobDefinitionId())
-        .singleResult();
-    //seed job
+        .jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
+    // seed job
     managementService.executeJob(job.getId());
 
-    for (Job pending : managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
+    for (Job pending : managementService.createJobQuery()
+        .jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
       managementService.executeJob(pending.getId());
     }
   }

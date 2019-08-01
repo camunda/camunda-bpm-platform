@@ -27,20 +27,16 @@ import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate.DelegateEx
 import org.camunda.bpm.model.bpmn.Bpmn;
 
 /**
- * Tests if a {@link DelegateExecution} has the correct tenant-id. The
- * assertions are checked inside the service tasks.
+ * Tests if a {@link DelegateExecution} has the correct tenant-id. The assertions are checked inside
+ * the service tasks.
  */
 public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTestCase {
 
   protected static final String PROCESS_DEFINITION_KEY = "testProcess";
 
   public void testSingleExecution() {
-    deploymentForTenant("tenant1", Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
-      .startEvent()
-      .serviceTask()
-        .camundaClass(AssertingJavaDelegate.class.getName())
-      .endEvent()
-    .done());
+    deploymentForTenant("tenant1", Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent()
+        .serviceTask().camundaClass(AssertingJavaDelegate.class.getName()).endEvent().done());
 
     AssertingJavaDelegate.addAsserts(hasTenantId("tenant1"));
 
@@ -49,18 +45,11 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
 
   public void testConcurrentExecution() {
 
-    deploymentForTenant("tenant1", Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
-      .startEvent()
-      .parallelGateway("fork")
-        .serviceTask()
-          .camundaClass(AssertingJavaDelegate.class.getName())
-        .parallelGateway("join")
-        .endEvent()
-        .moveToNode("fork")
-          .serviceTask()
-          .camundaClass(AssertingJavaDelegate.class.getName())
-          .connectTo("join")
-          .done());
+    deploymentForTenant("tenant1",
+        Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().parallelGateway("fork")
+            .serviceTask().camundaClass(AssertingJavaDelegate.class.getName())
+            .parallelGateway("join").endEvent().moveToNode("fork").serviceTask()
+            .camundaClass(AssertingJavaDelegate.class.getName()).connectTo("join").done());
 
     AssertingJavaDelegate.addAsserts(hasTenantId("tenant1"));
 
@@ -68,17 +57,11 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
   }
 
   public void testEmbeddedSubprocess() {
-    deploymentForTenant("tenant1", Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
-        .startEvent()
-        .subProcess()
-          .embeddedSubProcess()
-            .startEvent()
-            .serviceTask()
-              .camundaClass(AssertingJavaDelegate.class.getName())
-            .endEvent()
-        .subProcessDone()
-        .endEvent()
-      .done());
+    deploymentForTenant("tenant1",
+        Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().subProcess()
+            .embeddedSubProcess().startEvent().serviceTask()
+            .camundaClass(AssertingJavaDelegate.class.getName()).endEvent().subProcessDone()
+            .endEvent().done());
 
     AssertingJavaDelegate.addAsserts(hasTenantId("tenant1"));
 
@@ -86,11 +69,8 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
   }
 
   protected void startProcessInstance(String processDefinitionKey) {
-    ProcessDefinition processDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey(processDefinitionKey)
-        .latestVersion()
-        .singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(processDefinitionKey).latestVersion().singleResult();
 
     runtimeService.startProcessInstanceById(processDefinition.getId());
   }

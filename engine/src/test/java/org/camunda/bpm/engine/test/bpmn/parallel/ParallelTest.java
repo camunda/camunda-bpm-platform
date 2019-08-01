@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.bpmn.parallel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  * @author Tom Baeyens
  */

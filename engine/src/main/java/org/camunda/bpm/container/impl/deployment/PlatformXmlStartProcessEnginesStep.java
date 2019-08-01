@@ -26,17 +26,19 @@ import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 
 /**
- * <p> Retrieves the List of ProcessEngines from an attached {@link ProcessesXml}.</p>
+ * <p>
+ * Retrieves the List of ProcessEngines from an attached {@link ProcessesXml}.
+ * </p>
  * 
- * @see AbstractParseBpmPlatformXmlStep 
- *  
+ * @see AbstractParseBpmPlatformXmlStep
+ * 
  */
 public class PlatformXmlStartProcessEnginesStep extends AbstractStartProcessEnginesStep {
 
   protected List<ProcessEngineXml> getProcessEnginesXmls(DeploymentOperation operationContext) {
-    
+
     final BpmPlatformXml bpmPlatformXml = operationContext.getAttachment(BPM_PLATFORM_XML);
-    
+
     return bpmPlatformXml.getProcessEngines();
   }
 

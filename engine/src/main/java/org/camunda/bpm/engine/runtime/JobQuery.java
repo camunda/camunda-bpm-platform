@@ -20,7 +20,6 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.query.Query;
 
-
 /**
  * Allows programmatic querying of {@link Job}s.
  *
@@ -53,16 +52,20 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Only select jobs which have retries left */
   JobQuery withRetriesLeft();
 
-  /** Only select jobs which are executable,
-   * ie. retries &gt; 0 and duedate is null or duedate is in the past **/
+  /**
+   * Only select jobs which are executable, ie. retries &gt; 0 and duedate is null or duedate is in
+   * the past
+   **/
   JobQuery executable();
 
-  /** Only select jobs that are timers.
-   * Cannot be used together with {@link #messages()} */
+  /**
+   * Only select jobs that are timers. Cannot be used together with {@link #messages()}
+   */
   JobQuery timers();
 
-  /** Only select jobs that are messages.
-   * Cannot be used together with {@link #timers()} */
+  /**
+   * Only select jobs that are messages. Cannot be used together with {@link #timers()}
+   */
   JobQuery messages();
 
   /** Only select jobs where the duedate is lower than the given date. */
@@ -71,25 +74,33 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Only select jobs where the duedate is higher then the given date. */
   JobQuery duedateHigherThan(Date date);
 
-  /** Only select jobs where the duedate is lower then the given date.
+  /**
+   * Only select jobs where the duedate is lower then the given date.
+   * 
    * @deprecated
    */
   @Deprecated
   JobQuery duedateLowerThen(Date date);
 
-  /** Only select jobs where the duedate is lower then or equals the given date.
+  /**
+   * Only select jobs where the duedate is lower then or equals the given date.
+   * 
    * @deprecated
    */
   @Deprecated
   JobQuery duedateLowerThenOrEquals(Date date);
 
-  /** Only select jobs where the duedate is higher then the given date.
+  /**
+   * Only select jobs where the duedate is higher then the given date.
+   * 
    * @deprecated
    */
   @Deprecated
   JobQuery duedateHigherThen(Date date);
 
-  /** Only select jobs where the duedate is higher then or equals the given date.
+  /**
+   * Only select jobs where the duedate is higher then or equals the given date.
+   * 
    * @deprecated
    */
   @Deprecated
@@ -137,12 +148,12 @@ public interface JobQuery extends Query<JobQuery, Job> {
   JobQuery withoutTenantId();
 
   /**
-   * Select jobs which have no tenant id. Can be used in combination
-   * with {@link #tenantIdIn(String...)}.
+   * Select jobs which have no tenant id. Can be used in combination with
+   * {@link #tenantIdIn(String...)}.
    */
   JobQuery includeJobsWithoutTenantId();
 
-  //sorting //////////////////////////////////////////
+  // sorting //////////////////////////////////////////
 
   /** Order by job id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobQuery orderByJobId();
@@ -166,15 +177,17 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobQuery orderByProcessDefinitionId();
 
-  /** Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   JobQuery orderByProcessDefinitionKey();
 
   /** Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobQuery orderByExecutionId();
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of job without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of job without tenant id is database-specific.
    */
   JobQuery orderByTenantId();
 

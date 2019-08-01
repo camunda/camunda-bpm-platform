@@ -75,8 +75,7 @@ public class BatchStatisticsQueryTest {
 
   @After
   public void resetBatchJobsPerSeed() {
-    engineRule.getProcessEngineConfiguration()
-      .setBatchJobsPerSeed(defaultBatchJobsPerSeed);
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(defaultBatchJobsPerSeed);
   }
 
   @After
@@ -150,8 +149,7 @@ public class BatchStatisticsQueryTest {
 
     // when
     BatchStatistics statistics = managementService.createBatchStatisticsQuery()
-      .batchId(batch.getId())
-      .singleResult();
+        .batchId(batch.getId()).singleResult();
 
     // then
     assertEquals(batch.getId(), statistics.getId());
@@ -160,12 +158,9 @@ public class BatchStatisticsQueryTest {
   @Test
   public void testQueryByNullId() {
     try {
-      managementService.createBatchStatisticsQuery()
-        .batchId(null)
-        .singleResult();
+      managementService.createBatchStatisticsQuery().batchId(null).singleResult();
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Batch id is null"));
     }
   }
@@ -178,8 +173,7 @@ public class BatchStatisticsQueryTest {
 
     // when
     List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
-      .batchId("unknown")
-      .list();
+        .batchId("unknown").list();
 
     // then
     assertEquals(0, statistics.size());
@@ -193,8 +187,7 @@ public class BatchStatisticsQueryTest {
 
     // when
     List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
-      .type(Batch.TYPE_PROCESS_INSTANCE_MIGRATION)
-      .list();
+        .type(Batch.TYPE_PROCESS_INSTANCE_MIGRATION).list();
 
     // then
     assertEquals(2, statistics.size());
@@ -203,12 +196,9 @@ public class BatchStatisticsQueryTest {
   @Test
   public void testQueryByNullType() {
     try {
-      managementService.createBatchStatisticsQuery()
-        .type(null)
-        .list();
+      managementService.createBatchStatisticsQuery().type(null).list();
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Type is null"));
     }
   }
@@ -221,8 +211,7 @@ public class BatchStatisticsQueryTest {
 
     // when
     List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
-      .type("unknown")
-      .list();
+        .type("unknown").list();
 
     // then
     assertEquals(0, statistics.size());
@@ -235,9 +224,8 @@ public class BatchStatisticsQueryTest {
     helper.migrateProcessInstancesAsync(1);
 
     // when
-    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
-      .orderById().asc()
-      .list();
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery().orderById()
+        .asc().list();
 
     // then
     verifySorting(statistics, batchStatisticsById());
@@ -250,9 +238,8 @@ public class BatchStatisticsQueryTest {
     helper.migrateProcessInstancesAsync(1);
 
     // when
-    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
-      .orderById().desc()
-      .list();
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery().orderById()
+        .desc().list();
 
     // then
     verifySorting(statistics, inverted(batchStatisticsById()));
@@ -261,28 +248,22 @@ public class BatchStatisticsQueryTest {
   @Test
   public void testQueryOrderingPropertyWithoutOrder() {
     try {
-      managementService.createBatchStatisticsQuery()
-        .orderById()
-        .list();
+      managementService.createBatchStatisticsQuery().orderById().list();
       Assert.fail("exception expected");
-    }
-    catch (NotValidException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Invalid query: "
-        + "call asc() or desc() after using orderByXX()"));
+    } catch (NotValidException e) {
+      Assert.assertThat(e.getMessage(), CoreMatchers
+          .containsString("Invalid query: " + "call asc() or desc() after using orderByXX()"));
     }
   }
 
   @Test
   public void testQueryOrderWithoutOrderingProperty() {
     try {
-      managementService.createBatchStatisticsQuery()
-        .asc()
-        .list();
+      managementService.createBatchStatisticsQuery().asc().list();
       Assert.fail("exception expected");
-    }
-    catch (NotValidException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("You should call any of the orderBy methods "
-        + "first before specifying a direction"));
+    } catch (NotValidException e) {
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString(
+          "You should call any of the orderBy methods " + "first before specifying a direction"));
     }
   }
 
@@ -292,8 +273,7 @@ public class BatchStatisticsQueryTest {
     helper.createMigrationBatchWithSize(3);
 
     // when
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
-      .singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().singleResult();
 
     // then
     assertEquals(3, batchStatistics.getTotalJobs());
@@ -312,8 +292,7 @@ public class BatchStatisticsQueryTest {
     helper.executeJob(helper.getSeedJob(batch));
 
     // then
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
-      .singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().singleResult();
 
     assertEquals(13, batchStatistics.getTotalJobs());
     assertEquals(10, batchStatistics.getJobsCreated());
@@ -331,8 +310,7 @@ public class BatchStatisticsQueryTest {
     helper.completeSeedJobs(batch);
 
     // then
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
-      .singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().singleResult();
 
     assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
@@ -351,8 +329,7 @@ public class BatchStatisticsQueryTest {
     helper.completeJobs(batch, 1);
 
     // then
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
-      .singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().singleResult();
 
     assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
@@ -371,8 +348,7 @@ public class BatchStatisticsQueryTest {
     helper.failExecutionJobs(batch, 1);
 
     // then
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
-      .singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().singleResult();
 
     assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
@@ -392,8 +368,7 @@ public class BatchStatisticsQueryTest {
     helper.failExecutionJobs(batch, 1);
 
     // then
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
-      .singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().singleResult();
 
     assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
@@ -412,8 +387,7 @@ public class BatchStatisticsQueryTest {
     helper.failExecutionJobs(batch, 3);
 
     // then
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
-      .singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().singleResult();
 
     assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
@@ -426,8 +400,7 @@ public class BatchStatisticsQueryTest {
     helper.completeJobs(batch, 3);
 
     // then
-    batchStatistics = managementService.createBatchStatisticsQuery()
-      .singleResult();
+    batchStatistics = managementService.createBatchStatisticsQuery().singleResult();
 
     assertEquals(3, batchStatistics.getTotalJobs());
     assertEquals(3, batchStatistics.getJobsCreated());
@@ -446,8 +419,7 @@ public class BatchStatisticsQueryTest {
     deleteMigrationJobs(batch);
 
     // then
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
-      .singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().singleResult();
 
     assertEquals(13, batchStatistics.getTotalJobs());
     assertEquals(10, batchStatistics.getJobsCreated());
@@ -467,8 +439,7 @@ public class BatchStatisticsQueryTest {
     helper.failExecutionJobs(batch, 2);
 
     // then
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
-      .singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().singleResult();
 
     assertEquals(13, batchStatistics.getTotalJobs());
     assertEquals(10, batchStatistics.getJobsCreated());
@@ -497,7 +468,7 @@ public class BatchStatisticsQueryTest {
 
     // then
     List<BatchStatistics> batchStatisticsList = managementService.createBatchStatisticsQuery()
-      .list();
+        .list();
 
     for (BatchStatistics batchStatistics : batchStatisticsList) {
       if (batch1.getId().equals(batchStatistics.getId())) {
@@ -507,16 +478,14 @@ public class BatchStatisticsQueryTest {
         assertEquals(3, batchStatistics.getRemainingJobs());
         assertEquals(0, batchStatistics.getCompletedJobs());
         assertEquals(0, batchStatistics.getFailedJobs());
-      }
-      else if (batch2.getId().equals(batchStatistics.getId())) {
+      } else if (batch2.getId().equals(batchStatistics.getId())) {
         // batch 2
         assertEquals(13, batchStatistics.getTotalJobs());
         assertEquals(10, batchStatistics.getJobsCreated());
         assertEquals(11, batchStatistics.getRemainingJobs());
         assertEquals(2, batchStatistics.getCompletedJobs());
         assertEquals(3, batchStatistics.getFailedJobs());
-      }
-      else if (batch3.getId().equals(batchStatistics.getId())) {
+      } else if (batch3.getId().equals(batchStatistics.getId())) {
         // batch 3
         assertEquals(15, batchStatistics.getTotalJobs());
         assertEquals(15, batchStatistics.getJobsCreated());
@@ -536,7 +505,8 @@ public class BatchStatisticsQueryTest {
     managementService.suspendBatchById(batch.getId());
 
     // then
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().batchId(batch.getId()).singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
+        .batchId(batch.getId()).singleResult();
 
     assertTrue(batchStatistics.isSuspended());
   }
@@ -551,7 +521,8 @@ public class BatchStatisticsQueryTest {
     managementService.activateBatchById(batch.getId());
 
     // then
-    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery().batchId(batch.getId()).singleResult();
+    BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
+        .batchId(batch.getId()).singleResult();
 
     assertFalse(batchStatistics.isSuspended());
   }
@@ -596,14 +567,11 @@ public class BatchStatisticsQueryTest {
     for (Batch batch : query.list()) {
       foundIds.add(batch.getId());
     }
-    assertThat(foundIds, hasItems(
-      batch1.getId(),
-      batch3.getId()
-    ));
+    assertThat(foundIds, hasItems(batch1.getId(), batch3.getId()));
   }
 
   protected void deleteMigrationJobs(Batch batch) {
-    for (Job migrationJob: helper.getExecutionJobs(batch)) {
+    for (Job migrationJob : helper.getExecutionJobs(batch)) {
       managementService.deleteJob(migrationJob.getId());
     }
   }

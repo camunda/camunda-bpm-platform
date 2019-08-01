@@ -18,8 +18,6 @@ package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.query.QueryProperty;
 
-
-
 /**
  * @author Daniel Meyer
  */

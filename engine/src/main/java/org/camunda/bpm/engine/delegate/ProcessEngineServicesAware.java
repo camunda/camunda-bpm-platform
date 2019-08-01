@@ -20,8 +20,9 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 
 /**
- * <p>Interface providing access to the {@link ProcessEngineServices} from Java
- * delegation code.</p>
+ * <p>
+ * Interface providing access to the {@link ProcessEngineServices} from Java delegation code.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -29,16 +30,15 @@ import org.camunda.bpm.engine.ProcessEngineServices;
 public interface ProcessEngineServicesAware {
 
   /**
-   * Returns the {@link ProcessEngineServices} providing access to the
-   * public API of the process engine.
+   * Returns the {@link ProcessEngineServices} providing access to the public API of the process
+   * engine.
    *
    * @return the {@link ProcessEngineServices}.
    */
   ProcessEngineServices getProcessEngineServices();
 
   /**
-   * Returns the {@link ProcessEngine} providing access to the
-   * public API of the process engine.
+   * Returns the {@link ProcessEngine} providing access to the public API of the process engine.
    *
    * @return the {@link ProcessEngine}.
    */

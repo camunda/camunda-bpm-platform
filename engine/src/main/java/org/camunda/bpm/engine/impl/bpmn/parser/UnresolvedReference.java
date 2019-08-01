@@ -18,12 +18,11 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
-
 /**
  * @author Joram Barrez
  */
 public interface UnresolvedReference {
-  
+
   void resolve(ProcessDefinitionImpl processDefinition);
 
 }

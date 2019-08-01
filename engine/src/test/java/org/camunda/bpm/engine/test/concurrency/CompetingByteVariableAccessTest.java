@@ -27,16 +27,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 /**
- * thread1:
- *  t=1: fetch byte variable
- *  t=4: update byte variable value
+ * thread1: t=1: fetch byte variable t=4: update byte variable value
  *
- * thread2:
- *  t=2: fetch and delete byte variable and entity
- *  t=3: commit transaction
+ * thread2: t=2: fetch and delete byte variable and entity t=3: commit transaction
  *
- * This test ensures that thread1's command fails with an OptimisticLockingException,
- * not with a NullPointerException or something in that direction.
+ * This test ensures that thread1's command fails with an OptimisticLockingException, not with a
+ * NullPointerException or something in that direction.
  *
  * @author Thorben Lindhauer
  */
@@ -45,18 +41,16 @@ public class CompetingByteVariableAccessTest extends ConcurrencyTestCase {
   private ThreadControl asyncThread;
 
   public void testConcurrentVariableRemoval() {
-    deployment(createExecutableProcess("test")
-        .startEvent()
-          .userTask()
-        .endEvent()
-        .done());
+    deployment(createExecutableProcess("test").startEvent().userTask().endEvent().done());
 
     final byte[] byteVar = "asd".getBytes();
 
-    String pid = runtimeService.startProcessInstanceByKey("test", createVariables().putValue("byteVar", byteVar)).getId();
+    String pid = runtimeService
+        .startProcessInstanceByKey("test", createVariables().putValue("byteVar", byteVar)).getId();
 
     // start a controlled Fetch and Update variable command
-    asyncThread = executeControllableCommand(new FetchAndUpdateVariableCmd(pid, "byteVar", "bsd".getBytes()));
+    asyncThread = executeControllableCommand(
+        new FetchAndUpdateVariableCmd(pid, "byteVar", "bsd".getBytes()));
 
     asyncThread.waitForSync();
 
@@ -72,7 +66,6 @@ public class CompetingByteVariableAccessTest extends ConcurrencyTestCase {
     Throwable exception = asyncThread.getException();
     assertNotNull(exception);
     assertTrue(exception instanceof OptimisticLockingException);
-
 
   }
 
@@ -91,15 +84,16 @@ public class CompetingByteVariableAccessTest extends ConcurrencyTestCase {
     public Void execute(CommandContext commandContext) {
 
       ExecutionEntity execution = commandContext.getExecutionManager()
-        .findExecutionById(executionId);
+          .findExecutionById(executionId);
 
       // fetch the variable instance but not the value (make sure the byte array is lazily fetched)
-      VariableInstanceEntity varInstance = (VariableInstanceEntity) execution.getVariableInstanceLocal(varName);
+      VariableInstanceEntity varInstance = (VariableInstanceEntity) execution
+          .getVariableInstanceLocal(varName);
       String byteArrayValueId = varInstance.getByteArrayValueId();
       assertNotNull("Byte array id is expected to be not null", byteArrayValueId);
 
       CachedDbEntity cachedByteArray = commandContext.getDbEntityManager().getDbEntityCache()
-        .getCachedEntity(ByteArrayEntity.class, byteArrayValueId);
+          .getCachedEntity(ByteArrayEntity.class, byteArrayValueId);
 
       assertNull("Byte array is expected to be not fetched yet / lazily fetched.", cachedByteArray);
 

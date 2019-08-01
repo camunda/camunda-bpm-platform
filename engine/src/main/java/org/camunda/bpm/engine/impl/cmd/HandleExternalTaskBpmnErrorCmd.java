@@ -39,7 +39,8 @@ public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
     this.errorCode = errorCode;
   }
 
-  public HandleExternalTaskBpmnErrorCmd(String externalTaskId, String workerId, String errorCode, String errorMessage, Map<String, Object> variables) {
+  public HandleExternalTaskBpmnErrorCmd(String externalTaskId, String workerId, String errorCode,
+      String errorMessage, Map<String, Object> variables) {
     super(externalTaskId, workerId);
     this.errorCode = errorCode;
     this.errorMessage = errorMessage;
@@ -54,7 +55,8 @@ public class HandleExternalTaskBpmnErrorCmd extends HandleExternalTaskCmd {
 
   @Override
   public String getErrorMessageOnWrongWorkerAccess() {
-    return "Bpmn error of External Task " + externalTaskId + " cannot be reported by worker '" + workerId;
+    return "Bpmn error of External Task " + externalTaskId + " cannot be reported by worker '"
+        + workerId;
   }
 
   @Override

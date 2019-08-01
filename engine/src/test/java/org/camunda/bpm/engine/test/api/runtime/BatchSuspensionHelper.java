@@ -28,7 +28,8 @@ public class BatchSuspensionHelper extends BatchHelper {
 
   @Override
   public JobDefinition getExecutionJobDefinition(Batch batch) {
-   return getManagementService()
-     .createJobDefinitionQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).jobType(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE).singleResult();
+    return getManagementService().createJobDefinitionQuery()
+        .jobDefinitionId(batch.getBatchJobDefinitionId())
+        .jobType(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE).singleResult();
   }
 }

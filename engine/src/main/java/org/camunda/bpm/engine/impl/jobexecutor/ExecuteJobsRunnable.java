@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import java.util.List;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -47,7 +46,8 @@ public class ExecuteJobsRunnable implements Runnable {
     final JobExecutorContext jobExecutorContext = new JobExecutorContext();
 
     final List<String> currentProcessorJobQueue = jobExecutorContext.getCurrentProcessorJobQueue();
-    CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
 
     currentProcessorJobQueue.addAll(jobIds);
 
@@ -56,23 +56,23 @@ public class ExecuteJobsRunnable implements Runnable {
       while (!currentProcessorJobQueue.isEmpty()) {
 
         String nextJobId = currentProcessorJobQueue.remove(0);
-        if(jobExecutor.isActive()) {
+        if (jobExecutor.isActive()) {
           JobFailureCollector jobFailureCollector = new JobFailureCollector(nextJobId);
           try {
-            ExecuteJobHelper.executeJob(nextJobId, commandExecutor, jobFailureCollector, new ExecuteJobsCmd(nextJobId, jobFailureCollector));
-          }
-          catch(Throwable t) {
-            if(ProcessEngineLogger.shouldLogJobException(processEngine.getProcessEngineConfiguration(), jobFailureCollector.getJob())) {
+            ExecuteJobHelper.executeJob(nextJobId, commandExecutor, jobFailureCollector,
+                new ExecuteJobsCmd(nextJobId, jobFailureCollector));
+          } catch (Throwable t) {
+            if (ProcessEngineLogger.shouldLogJobException(
+                processEngine.getProcessEngineConfiguration(), jobFailureCollector.getJob())) {
               ExecuteJobHelper.LOGGING_HANDLER.exceptionWhileExecutingJob(nextJobId, t);
             }
           }
         } else {
-            try {
-              unlockJob(nextJobId, commandExecutor);
-            }
-            catch(Throwable t) {
-              LOG.exceptionWhileUnlockingJob(nextJobId, t);
-            }
+          try {
+            unlockJob(nextJobId, commandExecutor);
+          } catch (Throwable t) {
+            LOG.exceptionWhileUnlockingJob(nextJobId, t);
+          }
         }
       }
 
@@ -88,7 +88,8 @@ public class ExecuteJobsRunnable implements Runnable {
 
   /**
    * Note: this is a hook to be overridden by
-   * org.camunda.bpm.container.impl.threading.ra.inflow.JcaInflowExecuteJobsRunnable.executeJob(String, CommandExecutor)
+   * org.camunda.bpm.container.impl.threading.ra.inflow.JcaInflowExecuteJobsRunnable.executeJob(String,
+   * CommandExecutor)
    */
   protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
     ExecuteJobHelper.executeJob(nextJobId, commandExecutor);

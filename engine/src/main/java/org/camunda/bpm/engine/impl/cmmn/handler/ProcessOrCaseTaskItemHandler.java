@@ -39,10 +39,12 @@ public abstract class ProcessOrCaseTaskItemHandler extends CallingTaskItemHandle
     return new CallableElement();
   }
 
-  protected void initializeCallableElement(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeCallableElement(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     super.initializeCallableElement(element, activity, context);
 
-    ProcessOrCaseTaskActivityBehavior behavior = (ProcessOrCaseTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessOrCaseTaskActivityBehavior behavior = (ProcessOrCaseTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     // inputs
@@ -52,7 +54,8 @@ public abstract class ProcessOrCaseTaskItemHandler extends CallingTaskItemHandle
     initializeOutputParameter(element, activity, context, callableElement);
   }
 
-  protected void initializeInputParameter(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CallableElement callableElement) {
+  protected void initializeInputParameter(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context, CallableElement callableElement) {
     ExpressionManager expressionManager = context.getExpressionManager();
 
     List<CamundaIn> inputs = getInputs(element);
@@ -62,7 +65,8 @@ public abstract class ProcessOrCaseTaskItemHandler extends CallingTaskItemHandle
       // businessKey
       String businessKey = input.getCamundaBusinessKey();
       if (businessKey != null && !businessKey.isEmpty()) {
-        ParameterValueProvider businessKeyValueProvider = createParameterValueProvider(businessKey, expressionManager);
+        ParameterValueProvider businessKeyValueProvider = createParameterValueProvider(businessKey,
+            expressionManager);
         callableElement.setBusinessKeyValueProvider(businessKeyValueProvider);
 
       } else {
@@ -87,7 +91,8 @@ public abstract class ProcessOrCaseTaskItemHandler extends CallingTaskItemHandle
           source = input.getCamundaSourceExpression();
         }
 
-        ParameterValueProvider sourceValueProvider = createParameterValueProvider(source, expressionManager);
+        ParameterValueProvider sourceValueProvider = createParameterValueProvider(source,
+            expressionManager);
         parameter.setSourceValueProvider(sourceValueProvider);
 
         // target
@@ -97,7 +102,8 @@ public abstract class ProcessOrCaseTaskItemHandler extends CallingTaskItemHandle
     }
   }
 
-  protected void initializeOutputParameter(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CallableElement callableElement) {
+  protected void initializeOutputParameter(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context, CallableElement callableElement) {
     ExpressionManager expressionManager = context.getExpressionManager();
 
     List<CamundaOut> outputs = getOutputs(element);
@@ -121,7 +127,8 @@ public abstract class ProcessOrCaseTaskItemHandler extends CallingTaskItemHandle
         source = output.getCamundaSourceExpression();
       }
 
-      ParameterValueProvider sourceValueProvider = createParameterValueProvider(source, expressionManager);
+      ParameterValueProvider sourceValueProvider = createParameterValueProvider(source,
+          expressionManager);
       parameter.setSourceValueProvider(sourceValueProvider);
 
       // target

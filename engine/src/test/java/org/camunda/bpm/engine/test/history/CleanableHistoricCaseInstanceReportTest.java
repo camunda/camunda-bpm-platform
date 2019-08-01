@@ -78,7 +78,8 @@ public class CleanableHistoricCaseInstanceReportTest {
 
   @After
   public void cleanUp() {
-    List<HistoricCaseInstance> instanceList = historyService.createHistoricCaseInstanceQuery().active().list();
+    List<HistoricCaseInstance> instanceList = historyService.createHistoricCaseInstanceQuery()
+        .active().list();
     if (!instanceList.isEmpty()) {
       for (HistoricCaseInstance instance : instanceList) {
 
@@ -86,17 +87,21 @@ public class CleanableHistoricCaseInstanceReportTest {
         caseService.closeCaseInstance(instance.getId());
       }
     }
-    List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery().list();
+    List<HistoricCaseInstance> historicCaseInstances = historyService
+        .createHistoricCaseInstanceQuery().list();
     for (HistoricCaseInstance historicCaseInstance : historicCaseInstances) {
       historyService.deleteHistoricCaseInstance(historicCaseInstance.getId());
     }
   }
 
-  private void prepareCaseInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
+  private void prepareCaseInstances(String key, int daysInThePast, Integer historyTimeToLive,
+      int instanceCount) {
     // update time to live
-    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().caseDefinitionKey(key).list();
+    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey(key).list();
     assertEquals(1, caseDefinitions.size());
-    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitions.get(0).getId(), historyTimeToLive);
+    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitions.get(0).getId(),
+        historyTimeToLive);
 
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, daysInThePast));
@@ -110,7 +115,8 @@ public class CleanableHistoricCaseInstanceReportTest {
     ClockUtil.setCurrentTime(oldCurrentTime);
   }
 
-  private void checkResultNumbers(CleanableHistoricCaseInstanceReportResult result, int expectedCleanable, int expectedFinished) {
+  private void checkResultNumbers(CleanableHistoricCaseInstanceReportResult result,
+      int expectedCleanable, int expectedFinished) {
     assertEquals(expectedCleanable, result.getCleanableCaseInstanceCount());
     assertEquals(expectedFinished, result.getFinishedCaseInstanceCount());
   }
@@ -121,7 +127,8 @@ public class CleanableHistoricCaseInstanceReportTest {
     prepareCaseInstances(CASE_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService.createCleanableHistoricCaseInstanceReport().list();
+    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricCaseInstanceReport().list();
     long count = historyService.createCleanableHistoricCaseInstanceReport().count();
 
     // then
@@ -137,7 +144,8 @@ public class CleanableHistoricCaseInstanceReportTest {
     prepareCaseInstances(CASE_DEFINITION_KEY, 0, 5, 5);
 
     // when
-    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService.createCleanableHistoricCaseInstanceReport().list();
+    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricCaseInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -151,7 +159,8 @@ public class CleanableHistoricCaseInstanceReportTest {
     prepareCaseInstances(CASE_DEFINITION_KEY, 0, 0, 5);
 
     // when
-    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService.createCleanableHistoricCaseInstanceReport().list();
+    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricCaseInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -165,7 +174,8 @@ public class CleanableHistoricCaseInstanceReportTest {
     prepareCaseInstances(CASE_DEFINITION_KEY, 0, null, 5);
 
     // when
-    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService.createCleanableHistoricCaseInstanceReport().list();
+    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricCaseInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -175,7 +185,8 @@ public class CleanableHistoricCaseInstanceReportTest {
   @Test
   public void testReportComplex() {
     // given
-    testRule.deploy("org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
+    testRule.deploy("org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+        "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
         "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithHistoryTimeToLive.cmmn");
     prepareCaseInstances(CASE_DEFINITION_KEY, 0, 5, 10);
     prepareCaseInstances(CASE_DEFINITION_KEY, -6, 5, 10);
@@ -183,15 +194,14 @@ public class CleanableHistoricCaseInstanceReportTest {
     prepareCaseInstances(THIRD_CASE_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService.createCleanableHistoricCaseInstanceReport().list();
-    String id = repositoryService.createCaseDefinitionQuery().caseDefinitionKey(SECOND_CASE_DEFINITION_KEY).singleResult().getId();
+    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricCaseInstanceReport().list();
+    String id = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey(SECOND_CASE_DEFINITION_KEY).singleResult().getId();
     CleanableHistoricCaseInstanceReportResult secondReportResult = historyService
-        .createCleanableHistoricCaseInstanceReport()
-        .caseDefinitionIdIn(id)
-        .singleResult();
+        .createCleanableHistoricCaseInstanceReport().caseDefinitionIdIn(id).singleResult();
     CleanableHistoricCaseInstanceReportResult thirdReportResult = historyService
-        .createCleanableHistoricCaseInstanceReport()
-        .caseDefinitionKeyIn(THIRD_CASE_DEFINITION_KEY)
+        .createCleanableHistoricCaseInstanceReport().caseDefinitionKeyIn(THIRD_CASE_DEFINITION_KEY)
         .singleResult();
 
     // then
@@ -213,7 +223,8 @@ public class CleanableHistoricCaseInstanceReportTest {
 
   @Test
   public void testReportByInvalidCaseDefinitionId() {
-    CleanableHistoricCaseInstanceReport report = historyService.createCleanableHistoricCaseInstanceReport();
+    CleanableHistoricCaseInstanceReport report = historyService
+        .createCleanableHistoricCaseInstanceReport();
 
     try {
       report.caseDefinitionIdIn(null);
@@ -232,7 +243,8 @@ public class CleanableHistoricCaseInstanceReportTest {
 
   @Test
   public void testReportByInvalidCaseDefinitionKey() {
-    CleanableHistoricCaseInstanceReport report = historyService.createCleanableHistoricCaseInstanceReport();
+    CleanableHistoricCaseInstanceReport report = historyService
+        .createCleanableHistoricCaseInstanceReport();
 
     try {
       report.caseDefinitionKeyIn(null);
@@ -252,15 +264,18 @@ public class CleanableHistoricCaseInstanceReportTest {
   @Test
   public void testReportCompact() {
     // given
-    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().caseDefinitionKey(CASE_DEFINITION_KEY).list();
+    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey(CASE_DEFINITION_KEY).list();
     assertEquals(1, caseDefinitions.size());
 
-    List<CleanableHistoricCaseInstanceReportResult> resultWithZeros = historyService.createCleanableHistoricCaseInstanceReport().list();
+    List<CleanableHistoricCaseInstanceReportResult> resultWithZeros = historyService
+        .createCleanableHistoricCaseInstanceReport().list();
     assertEquals(1, resultWithZeros.size());
     assertEquals(0, resultWithZeros.get(0).getFinishedCaseInstanceCount());
 
     // when
-    long resultCountWithoutZeros = historyService.createCleanableHistoricCaseInstanceReport().compact().count();
+    long resultCountWithoutZeros = historyService.createCleanableHistoricCaseInstanceReport()
+        .compact().count();
 
     // then
     assertEquals(0, resultCountWithoutZeros);
@@ -269,17 +284,15 @@ public class CleanableHistoricCaseInstanceReportTest {
   @Test
   public void testReportOrderByFinishedAsc() {
     // given
-    testRule.deploy("org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn");
+    testRule.deploy("org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+        "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn");
     prepareCaseInstances(THIRD_CASE_DEFINITION_KEY, -6, 5, 8);
     prepareCaseInstances(CASE_DEFINITION_KEY, -6, 5, 4);
     prepareCaseInstances(SECOND_CASE_DEFINITION_KEY, -6, 5, 6);
 
     // when
     List<CleanableHistoricCaseInstanceReportResult> reportResult = historyService
-        .createCleanableHistoricCaseInstanceReport()
-        .orderByFinished()
-        .asc()
-        .list();
+        .createCleanableHistoricCaseInstanceReport().orderByFinished().asc().list();
 
     // then
     assertEquals(3, reportResult.size());
@@ -291,17 +304,15 @@ public class CleanableHistoricCaseInstanceReportTest {
   @Test
   public void testReportOrderByFinishedDesc() {
     // given
-    testRule.deploy("org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn");
+    testRule.deploy("org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+        "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn");
     prepareCaseInstances(THIRD_CASE_DEFINITION_KEY, -6, 5, 8);
     prepareCaseInstances(CASE_DEFINITION_KEY, -6, 5, 4);
     prepareCaseInstances(SECOND_CASE_DEFINITION_KEY, -6, 5, 6);
 
     // when
     List<CleanableHistoricCaseInstanceReportResult> reportResult = historyService
-        .createCleanableHistoricCaseInstanceReport()
-        .orderByFinished()
-        .desc()
-        .list();
+        .createCleanableHistoricCaseInstanceReport().orderByFinished().desc().list();
 
     // then
     assertEquals(3, reportResult.size());

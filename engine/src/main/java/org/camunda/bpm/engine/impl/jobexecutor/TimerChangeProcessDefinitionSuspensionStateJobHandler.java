@@ -30,7 +30,8 @@ import com.google.gson.JsonObject;
  * @author Joram Barrez
  * @author roman.smirnov
  */
-public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler implements JobHandler<ProcessDefinitionSuspensionStateConfiguration> {
+public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler
+    implements JobHandler<ProcessDefinitionSuspensionStateConfiguration> {
 
   protected static final String JOB_HANDLER_CFG_BY = "by";
   protected static final String JOB_HANDLER_CFG_PROCESS_DEFINITION_ID = "processDefinitionId";
@@ -39,13 +40,15 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
 
   protected static final String JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES = "includeProcessInstances";
 
-  public void execute(ProcessDefinitionSuspensionStateConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(ProcessDefinitionSuspensionStateConfiguration configuration,
+      ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     AbstractSetProcessDefinitionStateCmd cmd = getCommand(configuration);
     cmd.disableLogUserOperation();
     cmd.execute(commandContext);
   }
 
-  protected abstract AbstractSetProcessDefinitionStateCmd getCommand(ProcessDefinitionSuspensionStateConfiguration configuration);
+  protected abstract AbstractSetProcessDefinitionStateCmd getCommand(
+      ProcessDefinitionSuspensionStateConfiguration configuration);
 
   @Override
   public ProcessDefinitionSuspensionStateConfiguration newConfiguration(String canonicalString) {
@@ -54,7 +57,8 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
     return ProcessDefinitionSuspensionStateConfiguration.fromJson(jsonObject);
   }
 
-  public static class ProcessDefinitionSuspensionStateConfiguration implements JobHandlerConfiguration {
+  public static class ProcessDefinitionSuspensionStateConfiguration
+      implements JobHandlerConfiguration {
 
     protected String processDefinitionKey;
     protected String processDefinitionId;
@@ -103,7 +107,8 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
         }
 
       } else {
-        throw new ProcessEngineException("Unexpected job handler configuration for property '" + JOB_HANDLER_CFG_BY + "': " + by);
+        throw new ProcessEngineException("Unexpected job handler configuration for property '"
+            + JOB_HANDLER_CFG_BY + "': " + by);
       }
 
       builder.includeProcessInstances(includeProcessInstances);
@@ -116,25 +121,30 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
 
       config.by = JsonUtil.getString(jsonObject, JOB_HANDLER_CFG_BY);
       if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_ID)) {
-        config.processDefinitionId = JsonUtil.getString(jsonObject, JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
+        config.processDefinitionId = JsonUtil.getString(jsonObject,
+            JOB_HANDLER_CFG_PROCESS_DEFINITION_ID);
       }
       if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY)) {
-        config.processDefinitionKey = JsonUtil.getString(jsonObject, JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
+        config.processDefinitionKey = JsonUtil.getString(jsonObject,
+            JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY);
       }
       if (jsonObject.has(JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID)) {
         config.isTenantIdSet = true;
         if (!JsonUtil.isNull(jsonObject, JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID)) {
-          config.tenantId = JsonUtil.getString(jsonObject, JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID);
+          config.tenantId = JsonUtil.getString(jsonObject,
+              JOB_HANDLER_CFG_PROCESS_DEFINITION_TENANT_ID);
         }
       }
       if (jsonObject.has(JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES)) {
-        config.includeProcessInstances = JsonUtil.getBoolean(jsonObject, JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES);
+        config.includeProcessInstances = JsonUtil.getBoolean(jsonObject,
+            JOB_HANDLER_CFG_INCLUDE_PROCESS_INSTANCES);
       }
 
       return config;
     }
 
-    public static ProcessDefinitionSuspensionStateConfiguration byProcessDefinitionId(String processDefinitionId, boolean includeProcessInstances) {
+    public static ProcessDefinitionSuspensionStateConfiguration byProcessDefinitionId(
+        String processDefinitionId, boolean includeProcessInstances) {
       ProcessDefinitionSuspensionStateConfiguration configuration = new ProcessDefinitionSuspensionStateConfiguration();
 
       configuration.by = JOB_HANDLER_CFG_PROCESS_DEFINITION_ID;
@@ -144,7 +154,8 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
       return configuration;
     }
 
-    public static ProcessDefinitionSuspensionStateConfiguration byProcessDefinitionKey(String processDefinitionKey, boolean includeProcessInstances) {
+    public static ProcessDefinitionSuspensionStateConfiguration byProcessDefinitionKey(
+        String processDefinitionKey, boolean includeProcessInstances) {
       ProcessDefinitionSuspensionStateConfiguration configuration = new ProcessDefinitionSuspensionStateConfiguration();
 
       configuration.by = JOB_HANDLER_CFG_PROCESS_DEFINITION_KEY;
@@ -154,8 +165,10 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
       return configuration;
     }
 
-    public static ProcessDefinitionSuspensionStateConfiguration byProcessDefinitionKeyAndTenantId(String processDefinitionKey, String tenantId, boolean includeProcessInstances) {
-      ProcessDefinitionSuspensionStateConfiguration configuration = byProcessDefinitionKey(processDefinitionKey, includeProcessInstances);
+    public static ProcessDefinitionSuspensionStateConfiguration byProcessDefinitionKeyAndTenantId(
+        String processDefinitionKey, String tenantId, boolean includeProcessInstances) {
+      ProcessDefinitionSuspensionStateConfiguration configuration = byProcessDefinitionKey(
+          processDefinitionKey, includeProcessInstances);
 
       configuration.isTenantIdSet = true;
       configuration.tenantId = tenantId;
@@ -164,10 +177,10 @@ public abstract class TimerChangeProcessDefinitionSuspensionStateJobHandler impl
 
     }
 
-
   }
 
-  public void onDelete(ProcessDefinitionSuspensionStateConfiguration configuration, JobEntity jobEntity) {
+  public void onDelete(ProcessDefinitionSuspensionStateConfiguration configuration,
+      JobEntity jobEntity) {
     // do nothing
   }
 

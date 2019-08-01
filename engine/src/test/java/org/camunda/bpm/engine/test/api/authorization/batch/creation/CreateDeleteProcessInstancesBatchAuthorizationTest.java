@@ -31,40 +31,29 @@ import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class CreateDeleteProcessInstancesBatchAuthorizationTest extends BatchCreationAuthorizationTest {
+public class CreateDeleteProcessInstancesBatchAuthorizationTest
+    extends BatchCreationAuthorizationTest {
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+            grant(Resources.BATCH, "batchId", "userId",
+                BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES)),
         scenario()
-            .withoutAuthorizations()
-            .failsDueToRequired(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES)
-            ).succeeds()
-    );
+            .withAuthorizations(grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
+        scenario().withAuthorizations(grant(Resources.BATCH, "batchId", "userId",
+            BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES)).succeeds());
   }
 
   @Test
   public void testBatchProcessInstanceDeletion() {
-    //given
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("batchId", "*")
-        .start();
+    // given
+    authRule.init(scenario).withUser("userId").bindResource("batchId", "*").start();
 
     // when
     List<String> processInstanceIds = Collections.singletonList(processInstance.getId());
-    runtimeService.deleteProcessInstancesAsync(
-        processInstanceIds, null, TEST_REASON);
+    runtimeService.deleteProcessInstancesAsync(processInstanceIds, null, TEST_REASON);
 
     // then
     authRule.assertScenario(scenario);

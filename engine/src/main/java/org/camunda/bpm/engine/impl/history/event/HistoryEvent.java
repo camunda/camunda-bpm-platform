@@ -25,22 +25,27 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 
 /**
- * <p>The base class for all history events.</p>
+ * <p>
+ * The base class for all history events.
+ * </p>
  *
- * <p>A history event contains data about an event that has happened
- * in a process instance. Such an event may be the start of an activity,
- * the end of an activity, a task instance that is created or other similar
- * events...</p>
+ * <p>
+ * A history event contains data about an event that has happened in a process instance. Such an
+ * event may be the start of an activity, the end of an activity, a task instance that is created or
+ * other similar events...
+ * </p>
  *
- * <p>History events contain data in a serializable form. Some
- * implementations may persist events directly or may serialize
- * them as an intermediate representation for later processing
- * (ie. in an asynchronous implementation).</p>
+ * <p>
+ * History events contain data in a serializable form. Some implementations may persist events
+ * directly or may serialize them as an intermediate representation for later processing (ie. in an
+ * asynchronous implementation).
+ * </p>
  *
- * <p>This class implements {@link DbEntity}. This was chosen so
- * that {@link HistoryEvent}s can be easily persisted using the
- * {@link DbEntityManager}. This may not be used by all {@link HistoryEventHandler}
- * implementations but it does also not cause harm.</p>
+ * <p>
+ * This class implements {@link DbEntity}. This was chosen so that {@link HistoryEvent}s can be
+ * easily persisted using the {@link DbEntityManager}. This may not be used by all
+ * {@link HistoryEventHandler} implementations but it does also not cause harm.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -52,30 +57,41 @@ public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
   // constants deprecated since 7.2
 
   @Deprecated
-  public static final String ACTIVITY_EVENT_TYPE_START = HistoryEventTypes.ACTIVITY_INSTANCE_START.getEventName();
+  public static final String ACTIVITY_EVENT_TYPE_START = HistoryEventTypes.ACTIVITY_INSTANCE_START
+      .getEventName();
   @Deprecated
-  public static final String ACTIVITY_EVENT_TYPE_UPDATE = HistoryEventTypes.ACTIVITY_INSTANCE_END.getEventName();
+  public static final String ACTIVITY_EVENT_TYPE_UPDATE = HistoryEventTypes.ACTIVITY_INSTANCE_END
+      .getEventName();
   @Deprecated
-  public static final String ACTIVITY_EVENT_TYPE_END = HistoryEventTypes.ACTIVITY_INSTANCE_END.getEventName();
+  public static final String ACTIVITY_EVENT_TYPE_END = HistoryEventTypes.ACTIVITY_INSTANCE_END
+      .getEventName();
 
   @Deprecated
-  public static final String TASK_EVENT_TYPE_CREATE = HistoryEventTypes.TASK_INSTANCE_CREATE.getEventName();
+  public static final String TASK_EVENT_TYPE_CREATE = HistoryEventTypes.TASK_INSTANCE_CREATE
+      .getEventName();
   @Deprecated
-  public static final String TASK_EVENT_TYPE_UPDATE = HistoryEventTypes.TASK_INSTANCE_UPDATE.getEventName();
+  public static final String TASK_EVENT_TYPE_UPDATE = HistoryEventTypes.TASK_INSTANCE_UPDATE
+      .getEventName();
   @Deprecated
-  public static final String TASK_EVENT_TYPE_COMPLETE = HistoryEventTypes.TASK_INSTANCE_COMPLETE.getEventName();
+  public static final String TASK_EVENT_TYPE_COMPLETE = HistoryEventTypes.TASK_INSTANCE_COMPLETE
+      .getEventName();
   @Deprecated
-  public static final String TASK_EVENT_TYPE_DELETE = HistoryEventTypes.TASK_INSTANCE_DELETE.getEventName();
+  public static final String TASK_EVENT_TYPE_DELETE = HistoryEventTypes.TASK_INSTANCE_DELETE
+      .getEventName();
 
   @Deprecated
-  public static final String VARIABLE_EVENT_TYPE_CREATE = HistoryEventTypes.VARIABLE_INSTANCE_CREATE.getEventName();
+  public static final String VARIABLE_EVENT_TYPE_CREATE = HistoryEventTypes.VARIABLE_INSTANCE_CREATE
+      .getEventName();
   @Deprecated
-  public static final String VARIABLE_EVENT_TYPE_UPDATE = HistoryEventTypes.VARIABLE_INSTANCE_UPDATE.getEventName();
+  public static final String VARIABLE_EVENT_TYPE_UPDATE = HistoryEventTypes.VARIABLE_INSTANCE_UPDATE
+      .getEventName();
   @Deprecated
-  public static final String VARIABLE_EVENT_TYPE_DELETE = HistoryEventTypes.VARIABLE_INSTANCE_DELETE.getEventName();
+  public static final String VARIABLE_EVENT_TYPE_DELETE = HistoryEventTypes.VARIABLE_INSTANCE_DELETE
+      .getEventName();
 
   @Deprecated
-  public static final String FORM_PROPERTY_UPDATE = HistoryEventTypes.FORM_PROPERTY_UPDATE.getEventName();
+  public static final String FORM_PROPERTY_UPDATE = HistoryEventTypes.FORM_PROPERTY_UPDATE
+      .getEventName();
 
   @Deprecated
   public static final String INCIDENT_CREATE = HistoryEventTypes.INCIDENT_CREATE.getEventName();
@@ -86,7 +102,8 @@ public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
 
   public static final String IDENTITY_LINK_ADD = HistoryEventTypes.IDENTITY_LINK_ADD.getEventName();
 
-  public static final String IDENTITY_LINK_DELETE = HistoryEventTypes.IDENTITY_LINK_DELETE.getEventName();
+  public static final String IDENTITY_LINK_DELETE = HistoryEventTypes.IDENTITY_LINK_DELETE
+      .getEventName();
 
   /** each {@link HistoryEvent} has a unique id */
   protected String id;
@@ -129,8 +146,9 @@ public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
 
   /**
    * The type of the activity audit event.
+   * 
    * @see HistoryEventType#getEventName()
-   * */
+   */
   protected String eventType;
 
   protected long sequenceCounter;
@@ -283,15 +301,10 @@ public class HistoryEvent implements Serializable, DbEntity, HistoricEntity {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", eventType=" + eventType
-           + ", executionId=" + executionId
-           + ", processDefinitionId=" + processDefinitionId
-           + ", processInstanceId=" + processInstanceId
-           + ", rootProcessInstanceId=" + rootProcessInstanceId
-           + ", removalTime=" + removalTime
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", eventType=" + eventType
+        + ", executionId=" + executionId + ", processDefinitionId=" + processDefinitionId
+        + ", processInstanceId=" + processInstanceId + ", rootProcessInstanceId="
+        + rootProcessInstanceId + ", removalTime=" + removalTime + "]";
   }
 
 }

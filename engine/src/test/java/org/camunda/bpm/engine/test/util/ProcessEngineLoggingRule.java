@@ -68,7 +68,7 @@ public class ProcessEngineLoggingRule extends TestWatcher {
     Logger logger;
     try {
       logger = (Logger) LoggerFactory.getLogger(loggerName);
-      if(logger.getLevel() == null || globalLevel.isGreaterOrEqual(logger.getLevel())) {
+      if (logger.getLevel() == null || globalLevel.isGreaterOrEqual(logger.getLevel())) {
         logger.setLevel(globalLevel);
       }
     } catch (ClassCastException e) {
@@ -94,11 +94,11 @@ public class ProcessEngineLoggingRule extends TestWatcher {
     return allLogs;
   }
 
-  public List<ILoggingEvent> getFilteredLog(String subString){
+  public List<ILoggingEvent> getFilteredLog(String subString) {
     List<ILoggingEvent> log = getLog();
     return filterLog(log, subString);
   }
-  
+
   public List<ILoggingEvent> getFilteredLog(String loggerName, String subString) {
     List<ILoggingEvent> log = getLog(loggerName);
     return filterLog(log, subString);
@@ -136,18 +136,18 @@ public class ProcessEngineLoggingRule extends TestWatcher {
       listAppender.setName(APPENDER_NAME);
       listAppender.start();
       Logger logger = loggerEntry.getValue();
-      if(logger.getLevel() == null) {
+      if (logger.getLevel() == null) {
         logger.setLevel(globalLevel);
       }
       logger.addAppender(listAppender);
       allWatched.put(loggerEntry.getKey(), logger);
     }
   }
-  
-  private List<ILoggingEvent> filterLog(List<ILoggingEvent> log, String subString){
+
+  private List<ILoggingEvent> filterLog(List<ILoggingEvent> log, String subString) {
     List<ILoggingEvent> filteredLog = new ArrayList<>();
     for (ILoggingEvent logEntry : log) {
-      if(logEntry.getFormattedMessage().contains(subString)) {
+      if (logEntry.getFormattedMessage().contains(subString)) {
         filteredLog.add(logEntry);
       }
     }

@@ -33,9 +33,11 @@ public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavi
 
   protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
-  protected void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey) {
+  protected void triggerCallableElement(CmmnActivityExecution execution,
+      Map<String, Object> variables, String businessKey) {
     ProcessDefinitionImpl definition = getProcessDefinitionToCall(execution, getCallableElement());
-    PvmProcessInstance processInstance = execution.createSubProcessInstance(definition, businessKey);
+    PvmProcessInstance processInstance = execution.createSubProcessInstance(definition,
+        businessKey);
     processInstance.start(variables);
   }
 

@@ -25,17 +25,16 @@ import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.query.QueryProperty;
 
-
 /**
- * Deserializes query ordering properties from the deprecated 7.2 format in which
- * the SQL-like orderBy parameter was used.
+ * Deserializes query ordering properties from the deprecated 7.2 format in which the SQL-like
+ * orderBy parameter was used.
  *
  * Is able to deserialize strings like:
  *
  * <ul>
- *   <li>RES.ID_ asc</li>
- *   <li>LOWER(RES.NAME_) desc</li>
- *   <li>RES.ID_ asc, RES.NAME_ desc</li>
+ * <li>RES.ID_ asc</li>
+ * <li>LOWER(RES.NAME_) desc</li>
+ * <li>RES.ID_ asc, RES.NAME_ desc</li>
  * </ul>
  *
  * @author Thorben Lindhauer
@@ -44,8 +43,7 @@ public class JsonLegacyQueryOrderingPropertyConverter {
 
   public static final String ORDER_BY_DELIMITER = ",";
 
-  public static JsonLegacyQueryOrderingPropertyConverter INSTANCE =
-      new JsonLegacyQueryOrderingPropertyConverter();
+  public static JsonLegacyQueryOrderingPropertyConverter INSTANCE = new JsonLegacyQueryOrderingPropertyConverter();
 
   public List<QueryOrderingProperty> fromOrderByString(String orderByString) {
     List<QueryOrderingProperty> properties = new ArrayList<QueryOrderingProperty>();

@@ -18,10 +18,6 @@ package org.camunda.bpm.engine.impl.persistence.deploy;
 
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 
-
-
-
-
 /**
  * @author Tom Baeyens
  */

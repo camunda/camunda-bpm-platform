@@ -62,32 +62,30 @@ public class DeleteProcessInstancesBatchAuthorizationTest extends AbstractBatchA
         scenario()
             .withAuthorizations(
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.DELETE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
-            )
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ,
+                    Permissions.DELETE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ))
             .failsDueToRequired(
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.DELETE),
-                grant(Resources.PROCESS_DEFINITION, "Process_2", "userId", Permissions.DELETE_INSTANCE)
-            ),
+                grant(Resources.PROCESS_DEFINITION, "Process_2", "userId",
+                    Permissions.DELETE_INSTANCE)),
+        scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+            grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.ALL),
+            grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL))
+            .succeeds(),
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.BATCH, "*", "userId",
+                    BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES),
                 grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.ALL),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL)
-            ).succeeds(),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES),
-                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.ALL),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL)
-            ).succeeds(),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_DEFINITION, "Process_2", "userId", Permissions.READ_INSTANCE, Permissions.DELETE_INSTANCE),
-                grant(Resources.PROCESS_DEFINITION, "Process_1", "userId", Permissions.READ_INSTANCE, Permissions.DELETE_INSTANCE)
-            ).succeeds()
-    );
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL))
+            .succeeds(),
+        scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+            grant(Resources.PROCESS_DEFINITION, "Process_2", "userId", Permissions.READ_INSTANCE,
+                Permissions.DELETE_INSTANCE),
+            grant(Resources.PROCESS_DEFINITION, "Process_1", "userId", Permissions.READ_INSTANCE,
+                Permissions.DELETE_INSTANCE))
+            .succeeds());
   }
 
   @Test
@@ -108,47 +106,42 @@ public class DeleteProcessInstancesBatchAuthorizationTest extends AbstractBatchA
 
   @Test
   public void testWithQuery() {
-    //given
+    // given
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
-        .processInstanceIds(new HashSet<String>(Arrays.asList(processInstance.getId(), processInstance2.getId())));
+        .processInstanceIds(
+            new HashSet<String>(Arrays.asList(processInstance.getId(), processInstance2.getId())));
 
-    authRule
-        .init(scenario)
-        .withUser("userId")
+    authRule.init(scenario).withUser("userId")
         .bindResource("processInstance1", processInstance.getId())
         .bindResource("processInstance2", processInstance2.getId())
-        .bindResource("Process_2", sourceDefinition2.getKey())
-        .start();
+        .bindResource("Process_2", sourceDefinition2.getKey()).start();
 
     // when
 
-    batch = runtimeService.deleteProcessInstancesAsync(null,
-        processInstanceQuery, TEST_REASON);
+    batch = runtimeService.deleteProcessInstancesAsync(null, processInstanceQuery, TEST_REASON);
     executeSeedAndBatchJobs();
 
     // then
     if (authRule.assertScenario(scenario)) {
       if (testHelper.isHistoryLevelFull()) {
-        assertThat(engineRule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).count(), is(BATCH_OPERATIONS));
+        assertThat(engineRule.getHistoryService().createUserOperationLogQuery()
+            .entityType(EntityTypes.PROCESS_INSTANCE).count(), is(BATCH_OPERATIONS));
       }
     }
   }
 
   protected void setupAndExecuteProcessInstancesListTest() {
-    //given
-    List<String> processInstanceIds = Arrays.asList(processInstance.getId(), processInstance2.getId());
-    authRule
-        .init(scenario)
-        .withUser("userId")
+    // given
+    List<String> processInstanceIds = Arrays.asList(processInstance.getId(),
+        processInstance2.getId());
+    authRule.init(scenario).withUser("userId")
         .bindResource("processInstance1", processInstance.getId())
         .bindResource("processInstance2", processInstance2.getId())
         .bindResource("Process_2", sourceDefinition2.getKey())
-        .bindResource("Process_1", sourceDefinition.getKey())
-        .start();
+        .bindResource("Process_1", sourceDefinition.getKey()).start();
 
     // when
-    batch = runtimeService.deleteProcessInstancesAsync(
-        processInstanceIds, null, TEST_REASON);
+    batch = runtimeService.deleteProcessInstancesAsync(processInstanceIds, null, TEST_REASON);
 
     executeSeedAndBatchJobs();
   }
@@ -159,8 +152,10 @@ public class DeleteProcessInstancesBatchAuthorizationTest extends AbstractBatchA
       assertEquals("userId", batch.getCreateUserId());
 
       if (testHelper.isHistoryLevelFull()) {
-        assertThat(engineRule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).count(), is(BATCH_OPERATIONS));
-        HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().list().get(0);
+        assertThat(engineRule.getHistoryService().createUserOperationLogQuery()
+            .entityType(EntityTypes.PROCESS_INSTANCE).count(), is(BATCH_OPERATIONS));
+        HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
+            .list().get(0);
         assertEquals("userId", historicBatch.getCreateUserId());
       }
 

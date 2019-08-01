@@ -20,11 +20,9 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 
-
 /**
- * This test ensures that if a user selects
- * {@link ProcessEngineConfiguration#HISTORY_VARIABLE}, the level is internally
- * mapped to {@link ProcessEngineConfigurationImpl#HISTORYLEVEL_ACTIVITY}.
+ * This test ensures that if a user selects {@link ProcessEngineConfiguration#HISTORY_VARIABLE}, the
+ * level is internally mapped to {@link ProcessEngineConfigurationImpl#HISTORYLEVEL_ACTIVITY}.
  *
  * @author Daniel Meyer
  */

@@ -29,8 +29,8 @@ public class GetByteArrayCommand implements Command<ByteArrayEntity> {
   }
 
   public ByteArrayEntity execute(CommandContext commandContext) {
-    return (ByteArrayEntity) commandContext.getDbEntityManager()
-      .selectOne("selectByteArray", byteArrayId);
+    return (ByteArrayEntity) commandContext.getDbEntityManager().selectOne("selectByteArray",
+        byteArrayId);
   }
 
 }

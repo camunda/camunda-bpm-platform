@@ -61,7 +61,6 @@ public class PasswordHashingTest {
   protected List<PasswordEncryptor> camundaDefaultPasswordChecker;
   protected SaltGenerator camundaDefaultSaltGenerator;
 
-
   @Before
   public void initialize() {
     runtimeService = engineRule.getRuntimeService();
@@ -133,7 +132,8 @@ public class PasswordHashingTest {
     user = identityService.createUserQuery().userId(USER_NAME).singleResult();
 
     // then
-    // obtain the expected value on the command line like so: echo -n password12345678910 | openssl dgst -binary -sha1 | openssl base64
+    // obtain the expected value on the command line like so: echo -n password12345678910 | openssl
+    // dgst -binary -sha1 | openssl base64
     assertThat(user.getPassword(), is("{SHA}n3fE9/7XOmgD3BkeJlC+JLyb/Qg="));
   }
 
@@ -149,9 +149,11 @@ public class PasswordHashingTest {
     user = identityService.createUserQuery().userId(USER_NAME).singleResult();
 
     // then
-    // obtain the expected value on the command line like so: echo -n password12345678910 | openssl dgst -binary -sha512 | openssl base64
-    assertThat(user.getPassword(), is("{SHA-512}sM1U4nCzoDbdUugvJ7dJ6rLc7t1ZPPsnAbUpTqi5nXCYp7PTZCHExuzjoxLLYoUK" +
-      "Gd637jKqT8d9tpsZs3K5+g=="));
+    // obtain the expected value on the command line like so: echo -n password12345678910 | openssl
+    // dgst -binary -sha512 | openssl base64
+    assertThat(user.getPassword(),
+        is("{SHA-512}sM1U4nCzoDbdUugvJ7dJ6rLc7t1ZPPsnAbUpTqi5nXCYp7PTZCHExuzjoxLLYoUK"
+            + "Gd637jKqT8d9tpsZs3K5+g=="));
   }
 
   @Test
@@ -190,7 +192,8 @@ public class PasswordHashingTest {
   @Test
   public void plugInCustomPasswordEncryptor() {
     // given
-    setEncryptors(new MyCustomPasswordEncryptor(PASSWORD, ALGORITHM_NAME), Collections.<PasswordEncryptor>emptyList());
+    setEncryptors(new MyCustomPasswordEncryptor(PASSWORD, ALGORITHM_NAME),
+        Collections.<PasswordEncryptor> emptyList());
     User user = identityService.newUser(USER_NAME);
     user.setPassword(PASSWORD);
     identityService.saveUser(user);
@@ -213,14 +216,17 @@ public class PasswordHashingTest {
 
     String userName2 = "Fozzie";
     String anotherAlgorithmName = "marvelousAlgorithm";
-    createUserWithEncryptor(userName2, new MyCustomPasswordEncryptor(PASSWORD, anotherAlgorithmName));
+    createUserWithEncryptor(userName2,
+        new MyCustomPasswordEncryptor(PASSWORD, anotherAlgorithmName));
 
     String userName3 = "Gonzo";
     createUserWithEncryptor(userName3, new ShaHashDigest());
 
     List<PasswordEncryptor> additionalEncryptorsForPasswordChecking = new LinkedList<PasswordEncryptor>();
-    additionalEncryptorsForPasswordChecking.add(new MyCustomPasswordEncryptor(PASSWORD, ALGORITHM_NAME));
-    additionalEncryptorsForPasswordChecking.add(new MyCustomPasswordEncryptor(PASSWORD, anotherAlgorithmName));
+    additionalEncryptorsForPasswordChecking
+        .add(new MyCustomPasswordEncryptor(PASSWORD, ALGORITHM_NAME));
+    additionalEncryptorsForPasswordChecking
+        .add(new MyCustomPasswordEncryptor(PASSWORD, anotherAlgorithmName));
     PasswordEncryptor defaultEncryptor = new ShaHashDigest();
     setEncryptors(defaultEncryptor, additionalEncryptorsForPasswordChecking);
 
@@ -236,18 +242,20 @@ public class PasswordHashingTest {
   }
 
   protected void createUserWithEncryptor(String userName, PasswordEncryptor encryptor) {
-    setEncryptors(encryptor, Collections.<PasswordEncryptor>emptyList());
+    setEncryptors(encryptor, Collections.<PasswordEncryptor> emptyList());
     User user = identityService.newUser(userName);
     user.setPassword(PASSWORD);
     identityService.saveUser(user);
   }
 
   protected void setDefaultEncryptor(PasswordEncryptor defaultEncryptor) {
-    setEncryptors(defaultEncryptor, Collections.<PasswordEncryptor>emptyList());
+    setEncryptors(defaultEncryptor, Collections.<PasswordEncryptor> emptyList());
   }
 
-  protected void setEncryptors(PasswordEncryptor defaultEncryptor, List<PasswordEncryptor> additionalEncryptorsForPasswordChecking) {
-    processEngineConfiguration.setPasswordManager(new PasswordManager(defaultEncryptor, additionalEncryptorsForPasswordChecking));
+  protected void setEncryptors(PasswordEncryptor defaultEncryptor,
+      List<PasswordEncryptor> additionalEncryptorsForPasswordChecking) {
+    processEngineConfiguration.setPasswordManager(
+        new PasswordManager(defaultEncryptor, additionalEncryptorsForPasswordChecking));
   }
 
 }

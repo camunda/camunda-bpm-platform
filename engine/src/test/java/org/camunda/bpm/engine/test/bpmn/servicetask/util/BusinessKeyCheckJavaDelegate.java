@@ -19,10 +19,8 @@ package org.camunda.bpm.engine.test.bpmn.servicetask.util;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-
 /**
- * Delegate that gets the business-key from the delegate-execution and puts the
- * value in a variable.
+ * Delegate that gets the business-key from the delegate-execution and puts the value in a variable.
  * 
  * @author Frederik Heremans
  */

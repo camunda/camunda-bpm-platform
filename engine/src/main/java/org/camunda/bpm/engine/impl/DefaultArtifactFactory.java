@@ -20,11 +20,8 @@ import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
- * Default ArtifactService implementation.
- * This version uses Class.newInstance() to create
- * new Artifacts.
- * This is the default behaviour like has been in old
- * camunda/activity versions.
+ * Default ArtifactService implementation. This version uses Class.newInstance() to create new
+ * Artifacts. This is the default behaviour like has been in old camunda/activity versions.
  *
  * @since 7.2.0
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>

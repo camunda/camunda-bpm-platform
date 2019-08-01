@@ -48,33 +48,29 @@ public class CustomHistoryTest extends ResourceProcessEngineTestCase {
     // then the historic variable instances and their values exist
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().count());
 
-    HistoricVariableInstance historicStringVariable =
-        historyService.createHistoricVariableInstanceQuery().variableName("aStringVariable").singleResult();
+    HistoricVariableInstance historicStringVariable = historyService
+        .createHistoricVariableInstanceQuery().variableName("aStringVariable").singleResult();
     assertNotNull(historicStringVariable);
     assertEquals(value, historicStringVariable.getValue());
 
-    HistoricVariableInstance historicBytesVariable =
-        historyService.createHistoricVariableInstanceQuery().variableName("aBytesVariable").singleResult();
+    HistoricVariableInstance historicBytesVariable = historyService
+        .createHistoricVariableInstanceQuery().variableName("aBytesVariable").singleResult();
     assertNotNull(historicBytesVariable);
     assertTrue(Arrays.equals(value.getBytes(), (byte[]) historicBytesVariable.getValue()));
 
     // then the historic variable updates and their values exist
     assertEquals(2, historyService.createHistoricDetailQuery().variableUpdates().count());
 
-    HistoricVariableUpdate historicStringVariableUpdate =
-        (HistoricVariableUpdate) historyService.createHistoricDetailQuery()
-          .variableUpdates()
-          .variableInstanceId(historicStringVariable.getId())
-          .singleResult();
+    HistoricVariableUpdate historicStringVariableUpdate = (HistoricVariableUpdate) historyService
+        .createHistoricDetailQuery().variableUpdates()
+        .variableInstanceId(historicStringVariable.getId()).singleResult();
 
     assertNotNull(historicStringVariableUpdate);
     assertEquals(value, historicStringVariableUpdate.getValue());
 
-    HistoricVariableUpdate historicByteVariableUpdate =
-        (HistoricVariableUpdate) historyService.createHistoricDetailQuery()
-          .variableUpdates()
-          .variableInstanceId(historicBytesVariable.getId())
-          .singleResult();
+    HistoricVariableUpdate historicByteVariableUpdate = (HistoricVariableUpdate) historyService
+        .createHistoricDetailQuery().variableUpdates()
+        .variableInstanceId(historicBytesVariable.getId()).singleResult();
     assertNotNull(historicByteVariableUpdate);
     assertTrue(Arrays.equals(value.getBytes(), (byte[]) historicByteVariableUpdate.getValue()));
 

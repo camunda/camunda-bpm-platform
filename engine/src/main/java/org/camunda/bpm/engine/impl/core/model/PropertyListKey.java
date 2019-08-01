@@ -19,7 +19,8 @@ package org.camunda.bpm.engine.impl.core.model;
 /**
  * Key of a list property.
  *
- * @param T the type of elements in the list
+ * @param T
+ *          the type of elements in the list
  *
  * @author Philipp Ossler
  *

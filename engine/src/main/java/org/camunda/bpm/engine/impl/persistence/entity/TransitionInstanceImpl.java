@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.runtime.TransitionInstance;
  * @author Daniel Meyer
  *
  */
-public class TransitionInstanceImpl extends ProcessElementInstanceImpl implements TransitionInstance {
+public class TransitionInstanceImpl extends ProcessElementInstanceImpl
+    implements TransitionInstance {
 
   protected String executionId;
   protected String activityId;
@@ -66,16 +67,10 @@ public class TransitionInstanceImpl extends ProcessElementInstanceImpl implement
   }
 
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[executionId=" + executionId
-           + ", targetActivityId=" + activityId
-           + ", activityName=" + activityName
-           + ", activityType=" + activityType
-           + ", id=" + id
-           + ", parentActivityInstanceId=" + parentActivityInstanceId
-           + ", processInstanceId=" + processInstanceId
-           + ", processDefinitionId=" + processDefinitionId
-           + "]";
+    return this.getClass().getSimpleName() + "[executionId=" + executionId + ", targetActivityId="
+        + activityId + ", activityName=" + activityName + ", activityType=" + activityType + ", id="
+        + id + ", parentActivityInstanceId=" + parentActivityInstanceId + ", processInstanceId="
+        + processInstanceId + ", processDefinitionId=" + processDefinitionId + "]";
   }
 
 }

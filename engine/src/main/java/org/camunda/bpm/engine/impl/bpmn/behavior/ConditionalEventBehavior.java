@@ -21,9 +21,8 @@ import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
- * Represents an interface for the condition event behaviors.
- * Makes it possible to leave the current activity if the condition of the
- * conditional event is satisfied.
+ * Represents an interface for the condition event behaviors. Makes it possible to leave the current
+ * activity if the condition of the conditional event is satisfied.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
@@ -39,8 +38,11 @@ public interface ConditionalEventBehavior {
   /**
    * Checks the condition, on satisfaction the activity is leaved.
    *
-   * @param eventSubscription the event subscription which contains all necessary informations
-   * @param variableEvent the variableEvent to evaluate the condition
+   * @param eventSubscription
+   *          the event subscription which contains all necessary informations
+   * @param variableEvent
+   *          the variableEvent to evaluate the condition
    */
-  void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableEvent variableEvent);
+  void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription,
+      final VariableEvent variableEvent);
 }

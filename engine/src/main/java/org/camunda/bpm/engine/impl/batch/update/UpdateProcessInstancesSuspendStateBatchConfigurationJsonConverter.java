@@ -21,14 +21,16 @@ import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonObject;
 
-public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter extends JsonObjectConverter<UpdateProcessInstancesSuspendStateBatchConfiguration> {
+public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter
+    extends JsonObjectConverter<UpdateProcessInstancesSuspendStateBatchConfiguration> {
 
   public static final UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter INSTANCE = new UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter();
 
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
   public static final String SUSPENDING = "suspended";
 
-  public JsonObject toJsonObject(UpdateProcessInstancesSuspendStateBatchConfiguration configuration) {
+  public JsonObject toJsonObject(
+      UpdateProcessInstancesSuspendStateBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
@@ -37,8 +39,8 @@ public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter e
   }
 
   public UpdateProcessInstancesSuspendStateBatchConfiguration toObject(JsonObject json) {
-    UpdateProcessInstancesSuspendStateBatchConfiguration configuration =
-      new UpdateProcessInstancesSuspendStateBatchConfiguration(readProcessInstanceIds(json), JsonUtil.getBoolean(json, SUSPENDING));
+    UpdateProcessInstancesSuspendStateBatchConfiguration configuration = new UpdateProcessInstancesSuspendStateBatchConfiguration(
+        readProcessInstanceIds(json), JsonUtil.getBoolean(json, SUSPENDING));
 
     return configuration;
   }

@@ -64,7 +64,7 @@ public class CmmnActivity extends CoreActivity {
 
   public CmmnActivity createActivity(String activityId) {
     CmmnActivity activity = new CmmnActivity(activityId, caseDefinition);
-    if (activityId!=null) {
+    if (activityId != null) {
       namedActivities.put(activityId, activity);
     }
     activity.setParent(this);
@@ -174,21 +174,21 @@ public class CmmnActivity extends CoreActivity {
   // variable listeners
 
   /**
-   * Returns a map of all variable listeners defined on this activity or any of
-   * its parents activities. The map's key is the id of the respective activity
-   * the listener is defined on.
+   * Returns a map of all variable listeners defined on this activity or any of its parents
+   * activities. The map's key is the id of the respective activity the listener is defined on.
    */
-  public Map<String, List<VariableListener<?>>> getVariableListeners(String eventName, boolean includeCustomListeners) {
+  public Map<String, List<VariableListener<?>>> getVariableListeners(String eventName,
+      boolean includeCustomListeners) {
     Map<String, Map<String, List<VariableListener<?>>>> listenerCache;
     if (includeCustomListeners) {
       if (resolvedVariableListeners == null) {
-        resolvedVariableListeners = new HashMap<String, Map<String,List<VariableListener<?>>>>();
+        resolvedVariableListeners = new HashMap<String, Map<String, List<VariableListener<?>>>>();
       }
 
       listenerCache = resolvedVariableListeners;
     } else {
       if (resolvedBuiltInVariableListeners == null) {
-        resolvedBuiltInVariableListeners = new HashMap<String, Map<String,List<VariableListener<?>>>>();
+        resolvedBuiltInVariableListeners = new HashMap<String, Map<String, List<VariableListener<?>>>>();
       }
       listenerCache = resolvedBuiltInVariableListeners;
     }

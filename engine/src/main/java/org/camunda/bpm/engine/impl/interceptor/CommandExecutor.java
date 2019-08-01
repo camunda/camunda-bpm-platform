@@ -16,16 +16,12 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-
-
-
 /**
  * The command executor for internal usage/
  * 
  * @author Tom Baeyens
  */
 public interface CommandExecutor {
-
 
   <T> T execute(Command<T> command);
 }

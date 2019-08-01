@@ -19,7 +19,9 @@ package org.camunda.bpm.engine.exception;
 import org.camunda.bpm.engine.BadUserRequestException;
 
 /**
- * <p>This exception is thrown, if an entity (case execution, case definition) is not found.</p>
+ * <p>
+ * This exception is thrown, if an entity (case execution, case definition) is not found.
+ * </p>
  *
  * @author Roman Smirnov
  *

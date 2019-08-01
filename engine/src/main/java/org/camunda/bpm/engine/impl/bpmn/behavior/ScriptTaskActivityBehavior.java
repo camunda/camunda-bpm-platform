@@ -52,7 +52,8 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
       @Override
       public Void call() throws Exception {
         ScriptInvocation invocation = new ScriptInvocation(script, execution);
-        Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
+        Context.getProcessEngineConfiguration().getDelegateInterceptor()
+            .handleInvocation(invocation);
         Object result = invocation.getInvocationResult();
         if (result != null && resultVariable != null) {
           execution.setVariable(resultVariable, result);
@@ -64,13 +65,12 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
   }
 
   /**
-   * Searches recursively through the exception to see if the exception itself
-   * or one of its causes is a {@link BpmnError}.
+   * Searches recursively through the exception to see if the exception itself or one of its causes
+   * is a {@link BpmnError}.
    *
    * @param e
    *          the exception to check
-   * @return the BpmnError that was the cause of this exception or null if no
-   *         BpmnError was found
+   * @return the BpmnError that was the cause of this exception or null if no BpmnError was found
    */
   protected BpmnError checkIfCauseOfExceptionIsBpmnError(Throwable e) {
     if (e instanceof BpmnError) {

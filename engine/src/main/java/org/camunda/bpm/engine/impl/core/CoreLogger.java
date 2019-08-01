@@ -29,56 +29,47 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
  */
 public class CoreLogger extends ProcessEngineLogger {
 
-  public void debugMappingValueFromOuterScopeToInnerScope(Object value, AbstractVariableScope outerScope, String name, AbstractVariableScope innerScope) {
-    logDebug(
-        "001",
-        "Mapping value '{} from outer scope '{}' to variable '{}' in inner scope '{}'.",
+  public void debugMappingValueFromOuterScopeToInnerScope(Object value,
+      AbstractVariableScope outerScope, String name, AbstractVariableScope innerScope) {
+    logDebug("001", "Mapping value '{} from outer scope '{}' to variable '{}' in inner scope '{}'.",
         value, outerScope, name, innerScope);
   }
 
-  public void debugMappingValuefromInnerScopeToOuterScope(Object value, AbstractVariableScope innerScope, String name, AbstractVariableScope outerScope) {
-    logDebug(
-        "002",
-        "Mapping value '{}' from inner scope '{}' to variable '{}' in outer scope '{}'.",
-        value, innerScope, name, outerScope);
+  public void debugMappingValuefromInnerScopeToOuterScope(Object value,
+      AbstractVariableScope innerScope, String name, AbstractVariableScope outerScope) {
+    logDebug("002",
+        "Mapping value '{}' from inner scope '{}' to variable '{}' in outer scope '{}'.", value,
+        innerScope, name, outerScope);
   }
 
-  public void debugPerformingAtomicOperation(CoreAtomicOperation<?> atomicOperation, CoreExecution e) {
-    logDebug(
-        "003",
-        "Performing atomic operation {} on {}", atomicOperation, e);
+  public void debugPerformingAtomicOperation(CoreAtomicOperation<?> atomicOperation,
+      CoreExecution e) {
+    logDebug("003", "Performing atomic operation {} on {}", atomicOperation, e);
   }
 
-  public ProcessEngineException duplicateVariableInstanceException(CoreVariableInstance variableInstance) {
-    return new ProcessEngineException(exceptionMessage(
-        "004",
+  public ProcessEngineException duplicateVariableInstanceException(
+      CoreVariableInstance variableInstance) {
+    return new ProcessEngineException(exceptionMessage("004",
         "Cannot add variable instance with name {}. Variable already exists",
-        variableInstance.getName()
-      ));
+        variableInstance.getName()));
   }
 
-  public ProcessEngineException missingVariableInstanceException(CoreVariableInstance variableInstance) {
-    return new ProcessEngineException(exceptionMessage(
-        "005",
+  public ProcessEngineException missingVariableInstanceException(
+      CoreVariableInstance variableInstance) {
+    return new ProcessEngineException(exceptionMessage("005",
         "Cannot update variable instance with name {}. Variable does not exist",
-        variableInstance.getName()
-      ));
+        variableInstance.getName()));
   }
 
   public ProcessEngineException transientVariableException(String variableName) {
-    return new ProcessEngineException(exceptionMessage(
-        "006",
+    return new ProcessEngineException(exceptionMessage("006",
         "Cannot set transient variable with name {} to non-transient variable and vice versa.",
-        variableName
-      ));
+        variableName));
   }
 
   public ProcessEngineException javaSerializationProhibitedException(String variableName) {
-    return new ProcessEngineException(exceptionMessage(
-        "007",
-        "Cannot set variable with name {}. Java serialization format is prohibited",
-        variableName
-      ));
+    return new ProcessEngineException(exceptionMessage("007",
+        "Cannot set variable with name {}. Java serialization format is prohibited", variableName));
   }
 
 }

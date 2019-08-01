@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormProperty;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -44,9 +43,11 @@ public abstract class FormDataImpl implements FormData, Serializable {
   public String getFormKey() {
     return formKey;
   }
+
   public String getDeploymentId() {
     return deploymentId;
   }
+
   public List<FormProperty> getFormProperties() {
     return formProperties;
   }
@@ -66,6 +67,7 @@ public abstract class FormDataImpl implements FormData, Serializable {
   public List<FormField> getFormFields() {
     return formFields;
   }
+
   public void setFormFields(List<FormField> formFields) {
     this.formFields = formFields;
   }

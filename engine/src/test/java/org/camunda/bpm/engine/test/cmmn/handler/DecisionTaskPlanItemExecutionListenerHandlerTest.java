@@ -45,7 +45,8 @@ public class DecisionTaskPlanItemExecutionListenerHandlerTest extends CmmnElemen
 
   protected AbstractExecutionListenerSpec testSpecification;
 
-  public DecisionTaskPlanItemExecutionListenerHandlerTest(AbstractExecutionListenerSpec testSpecification) {
+  public DecisionTaskPlanItemExecutionListenerHandlerTest(
+      AbstractExecutionListenerSpec testSpecification) {
     this.testSpecification = testSpecification;
   }
 

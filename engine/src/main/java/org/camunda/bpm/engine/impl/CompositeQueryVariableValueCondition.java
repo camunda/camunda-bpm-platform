@@ -47,7 +47,8 @@ public class CompositeQueryVariableValueCondition extends AbstractQueryVariableV
     for (ValueType type : concreteTypes) {
       if (type.canConvertFromTypedValue(typedValue)) {
         TypedValue convertedValue = type.convertFromTypedValue(typedValue);
-        SingleQueryVariableValueCondition aggregatedValue = new SingleQueryVariableValueCondition(wrappedQueryValue);
+        SingleQueryVariableValueCondition aggregatedValue = new SingleQueryVariableValueCondition(
+            wrappedQueryValue);
         aggregatedValue.initializeValue(serializers, convertedValue);
         aggregatedValues.add(aggregatedValue);
       }

@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -43,8 +42,10 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   protected Map<String, TransitionImpl> namedOutgoingTransitions = new HashMap<String, TransitionImpl>();
   protected List<TransitionImpl> incomingTransitions = new ArrayList<TransitionImpl>();
 
-  /** the inner behavior of an activity. For activities which are flow scopes,
-   * this must be a CompositeActivityBehavior. */
+  /**
+   * the inner behavior of an activity. For activities which are flow scopes, this must be a
+   * CompositeActivityBehavior.
+   */
   protected ActivityBehavior activityBehavior;
 
   /** The start behavior for this activity. */
@@ -71,9 +72,10 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     transition.setSource(this);
     outgoingTransitions.add(transition);
 
-    if (transitionId!=null) {
+    if (transitionId != null) {
       if (namedOutgoingTransitions.containsKey(transitionId)) {
-        throw new PvmException("activity '"+id+" has duplicate transition '"+transitionId+"'");
+        throw new PvmException(
+            "activity '" + id + " has duplicate transition '" + transitionId + "'");
       }
       namedOutgoingTransitions.put(transitionId, transition);
     }
@@ -87,7 +89,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   @Override
   public String toString() {
-    return "Activity("+id+")";
+    return "Activity(" + id + ")";
   }
 
   // restricted setters ///////////////////////////////////////////////////////
@@ -191,9 +193,9 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   public PvmScope getLevelOfSubprocessScope() {
     ScopeImpl levelOfSubprocessScope = getFlowScope();
-    while(!levelOfSubprocessScope.isSubProcessScope) {
+    while (!levelOfSubprocessScope.isSubProcessScope) {
       // cast always possible since process definition is always a sub process scope
-      levelOfSubprocessScope = ((PvmActivity)levelOfSubprocessScope).getFlowScope();
+      levelOfSubprocessScope = ((PvmActivity) levelOfSubprocessScope).getFlowScope();
     }
     return levelOfSubprocessScope;
   }
@@ -239,10 +241,9 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   public ActivityImpl getParentFlowScopeActivity() {
     ScopeImpl flowScope = getFlowScope();
-    if(flowScope != getProcessDefinition()) {
+    if (flowScope != getProcessDefinition()) {
       return (ActivityImpl) flowScope;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -260,11 +261,13 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
   /**
    * Find the compensation handler of this activity.
    *
-   * @return the compensation handler or <code>null</code>, if this activity has no compensation handler.
+   * @return the compensation handler or <code>null</code>, if this activity has no compensation
+   *         handler.
    */
   public ActivityImpl findCompensationHandler() {
-    String compensationHandlerId = (String) getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID);
-    if(compensationHandlerId != null) {
+    String compensationHandlerId = (String) getProperty(
+        BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID);
+    if (compensationHandlerId != null) {
       return getProcessDefinition().findActivity(compensationHandlerId);
     } else {
       return null;
@@ -286,9 +289,9 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     return Boolean.TRUE.equals(isTriggeredByEvent);
   }
 
-  //============================================================================
-  //===============================DELEGATES====================================
-  //============================================================================
+  // ============================================================================
+  // ===============================DELEGATES====================================
+  // ============================================================================
   /**
    * The delegate for the async before attribute update.
    */
@@ -321,8 +324,10 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     /**
      * Method which is called if the asyncBefore property should be updated.
      *
-     * @param asyncBefore the new value for the asyncBefore flag
-     * @param exclusive the exclusive flag
+     * @param asyncBefore
+     *          the new value for the asyncBefore flag
+     * @param exclusive
+     *          the exclusive flag
      */
     public void updateAsyncBefore(boolean asyncBefore, boolean exclusive);
   }
@@ -335,8 +340,10 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     /**
      * Method which is called if the asyncAfter property should be updated.
      *
-     * @param asyncAfter the new value for the asyncBefore flag
-     * @param exclusive the exclusive flag
+     * @param asyncAfter
+     *          the new value for the asyncBefore flag
+     * @param exclusive
+     *          the exclusive flag
      */
     public void updateAsyncAfter(boolean asyncAfter, boolean exclusive);
   }

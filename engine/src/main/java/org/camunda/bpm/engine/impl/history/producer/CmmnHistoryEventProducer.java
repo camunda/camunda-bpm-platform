@@ -20,9 +20,10 @@ import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
- * <p>The producer for CMMN history events. The history event producer is
- * responsible for extracting data from the runtime structures
- * (Executions, Tasks, ...) and adding the data to a {@link HistoryEvent}.
+ * <p>
+ * The producer for CMMN history events. The history event producer is responsible for extracting
+ * data from the runtime structures (Executions, Tasks, ...) and adding the data to a
+ * {@link HistoryEvent}.
  *
  * @author Sebastian Menski
  */
@@ -31,7 +32,8 @@ public interface CmmnHistoryEventProducer {
   /**
    * Creates the history event fired when a case instance is <strong>created</strong>.
    *
-   * @param caseExecution the current case execution
+   * @param caseExecution
+   *          the current case execution
    * @return the created history event
    */
   public HistoryEvent createCaseInstanceCreateEvt(DelegateCaseExecution caseExecution);
@@ -39,7 +41,8 @@ public interface CmmnHistoryEventProducer {
   /**
    * Creates the history event fired when a case instance is <strong>updated</strong>.
    *
-   * @param caseExecution the current case execution
+   * @param caseExecution
+   *          the current case execution
    * @return the created history event
    */
   public HistoryEvent createCaseInstanceUpdateEvt(DelegateCaseExecution caseExecution);
@@ -47,7 +50,8 @@ public interface CmmnHistoryEventProducer {
   /**
    * Creates the history event fired when a case instance is <strong>closed</strong>.
    *
-   * @param caseExecution the current case execution
+   * @param caseExecution
+   *          the current case execution
    * @return the created history event
    */
   public HistoryEvent createCaseInstanceCloseEvt(DelegateCaseExecution caseExecution);
@@ -55,7 +59,8 @@ public interface CmmnHistoryEventProducer {
   /**
    * Creates the history event fired when a case activity instance is <strong>created</strong>.
    *
-   * @param caseExecution the current case execution
+   * @param caseExecution
+   *          the current case execution
    * @return the created history event
    */
   public HistoryEvent createCaseActivityInstanceCreateEvt(DelegateCaseExecution caseExecution);
@@ -63,7 +68,8 @@ public interface CmmnHistoryEventProducer {
   /**
    * Creates the history event fired when a case activity instance is <strong>updated</strong>.
    *
-   * @param caseExecution the current case execution
+   * @param caseExecution
+   *          the current case execution
    * @return the created history event
    */
   public HistoryEvent createCaseActivityInstanceUpdateEvt(DelegateCaseExecution caseExecution);
@@ -71,7 +77,8 @@ public interface CmmnHistoryEventProducer {
   /**
    * Creates the history event fired when a case activity instance is <strong>ended</strong>.
    *
-   * @param caseExecution the current case execution
+   * @param caseExecution
+   *          the current case execution
    * @return the created history event
    */
   public HistoryEvent createCaseActivityInstanceEndEvt(DelegateCaseExecution caseExecution);

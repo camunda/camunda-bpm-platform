@@ -127,13 +127,13 @@ public class ScriptCompilationTest extends PluggableProcessEngineTestCase {
   }
 
   protected Object executeScript(final ExecutableScript script) {
-    final ScriptingEnvironment scriptingEnvironment = processEngineConfiguration.getScriptingEnvironment();
-    return processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
-        public Object execute(CommandContext commandContext) {
-          return scriptingEnvironment.execute(script, null);
-        }
-      });
+    final ScriptingEnvironment scriptingEnvironment = processEngineConfiguration
+        .getScriptingEnvironment();
+    return processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
+      public Object execute(CommandContext commandContext) {
+        return scriptingEnvironment.execute(script, null);
+      }
+    });
   }
 
 }

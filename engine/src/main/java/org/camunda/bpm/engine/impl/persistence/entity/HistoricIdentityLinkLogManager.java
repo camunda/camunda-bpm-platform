@@ -38,56 +38,68 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
  */
 public class HistoricIdentityLinkLogManager extends AbstractHistoricManager {
 
-  public long findHistoricIdentityLinkLogCountByQueryCriteria(HistoricIdentityLinkLogQueryImpl query) {
+  public long findHistoricIdentityLinkLogCountByQueryCriteria(
+      HistoricIdentityLinkLogQueryImpl query) {
     configureQuery(query);
-    return (Long) getDbEntityManager().selectOne("selectHistoricIdentityLinkCountByQueryCriteria", query);
+    return (Long) getDbEntityManager().selectOne("selectHistoricIdentityLinkCountByQueryCriteria",
+        query);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricIdentityLinkLog> findHistoricIdentityLinkLogByQueryCriteria(HistoricIdentityLinkLogQueryImpl query, Page page) {
+  public List<HistoricIdentityLinkLog> findHistoricIdentityLinkLogByQueryCriteria(
+      HistoricIdentityLinkLogQueryImpl query, Page page) {
     configureQuery(query);
-    return getDbEntityManager().selectList("selectHistoricIdentityLinkByQueryCriteria", query, page);
+    return getDbEntityManager().selectList("selectHistoricIdentityLinkByQueryCriteria", query,
+        page);
   }
 
-  public void addRemovalTimeToIdentityLinkLogByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToIdentityLinkLogByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricIdentityLinkLogEventEntity.class, "updateIdentityLinkLogByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricIdentityLinkLogEventEntity.class,
+        "updateIdentityLinkLogByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToIdentityLinkLogByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public void addRemovalTimeToIdentityLinkLogByProcessInstanceId(String processInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricIdentityLinkLogEventEntity.class, "updateIdentityLinkLogByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricIdentityLinkLogEventEntity.class,
+        "updateIdentityLinkLogByProcessInstanceId", parameters);
   }
 
   public void deleteHistoricIdentityLinksLogByProcessDefinitionId(String processDefId) {
     if (isHistoryEventProduced()) {
-      getDbEntityManager().delete(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByProcessDefinitionId", processDefId);
+      getDbEntityManager().delete(HistoricIdentityLinkLogEntity.class,
+          "deleteHistoricIdentityLinksByProcessDefinitionId", processDefId);
     }
   }
 
   public void deleteHistoricIdentityLinksLogByTaskId(String taskId) {
     if (isHistoryEventProduced()) {
-      getDbEntityManager().delete(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByTaskId", taskId);
+      getDbEntityManager().delete(HistoricIdentityLinkLogEntity.class,
+          "deleteHistoricIdentityLinksByTaskId", taskId);
     }
   }
 
-  public void deleteHistoricIdentityLinksLogByTaskProcessInstanceIds(List<String> processInstanceIds) {
-    getDbEntityManager().deletePreserveOrder(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByTaskProcessInstanceIds", processInstanceIds);
+  public void deleteHistoricIdentityLinksLogByTaskProcessInstanceIds(
+      List<String> processInstanceIds) {
+    getDbEntityManager().deletePreserveOrder(HistoricIdentityLinkLogEntity.class,
+        "deleteHistoricIdentityLinksByTaskProcessInstanceIds", processInstanceIds);
   }
 
   public void deleteHistoricIdentityLinksLogByTaskCaseInstanceIds(List<String> caseInstanceIds) {
-    getDbEntityManager().deletePreserveOrder(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByTaskCaseInstanceIds", caseInstanceIds);
+    getDbEntityManager().deletePreserveOrder(HistoricIdentityLinkLogEntity.class,
+        "deleteHistoricIdentityLinksByTaskCaseInstanceIds", caseInstanceIds);
   }
 
-  public DbOperation deleteHistoricIdentityLinkLogByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteHistoricIdentityLinkLogByRemovalTime(Date removalTime, int minuteFrom,
+      int minuteTo, int batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -96,8 +108,8 @@ public class HistoricIdentityLinkLogManager extends AbstractHistoricManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinkLogByRemovalTime",
+    return getDbEntityManager().deletePreserveOrder(HistoricIdentityLinkLogEntity.class,
+        "deleteHistoricIdentityLinkLogByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
@@ -108,8 +120,8 @@ public class HistoricIdentityLinkLogManager extends AbstractHistoricManager {
 
   protected boolean isHistoryEventProduced() {
     HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    return historyLevel.isHistoryEventProduced(HistoryEventTypes.IDENTITY_LINK_ADD, null) ||
-           historyLevel.isHistoryEventProduced(HistoryEventTypes.IDENTITY_LINK_DELETE, null);
+    return historyLevel.isHistoryEventProduced(HistoryEventTypes.IDENTITY_LINK_ADD, null)
+        || historyLevel.isHistoryEventProduced(HistoryEventTypes.IDENTITY_LINK_DELETE, null);
   }
 
 }

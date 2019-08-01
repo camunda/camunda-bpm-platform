@@ -40,7 +40,7 @@ public class DbGroupQueryImpl extends GroupQueryImpl {
     super(commandExecutor);
   }
 
-  //results ////////////////////////////////////////////////////////
+  // results ////////////////////////////////////////////////////////
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();

@@ -25,44 +25,24 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  */
 public class MultiInstanceProcessModels {
 
-  public static final BpmnModelInstance PAR_MI_ONE_TASK_PROCESS =
-      modify(ProcessModels.ONE_TASK_PROCESS)
-        .activityBuilder("userTask")
-        .multiInstance()
-        .parallel()
-        .cardinality("3")
-        .done();
+  public static final BpmnModelInstance PAR_MI_ONE_TASK_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).activityBuilder("userTask").multiInstance().parallel()
+          .cardinality("3").done();
 
-  public static final BpmnModelInstance PAR_MI_SUBPROCESS_PROCESS =
-      modify(ProcessModels.SUBPROCESS_PROCESS)
-        .activityBuilder("subProcess")
-        .multiInstance()
-        .parallel()
-        .cardinality("3")
-        .done();
+  public static final BpmnModelInstance PAR_MI_SUBPROCESS_PROCESS = modify(
+      ProcessModels.SUBPROCESS_PROCESS).activityBuilder("subProcess").multiInstance().parallel()
+          .cardinality("3").done();
 
-  public static final BpmnModelInstance PAR_MI_DOUBLE_SUBPROCESS_PROCESS =
-      modify(ProcessModels.DOUBLE_SUBPROCESS_PROCESS)
-      .activityBuilder("outerSubProcess")
-      .multiInstance()
-      .parallel()
-      .cardinality("3")
-      .done();
+  public static final BpmnModelInstance PAR_MI_DOUBLE_SUBPROCESS_PROCESS = modify(
+      ProcessModels.DOUBLE_SUBPROCESS_PROCESS).activityBuilder("outerSubProcess").multiInstance()
+          .parallel().cardinality("3").done();
 
-  public static final BpmnModelInstance SEQ_MI_ONE_TASK_PROCESS =
-      modify(ProcessModels.ONE_TASK_PROCESS)
-        .activityBuilder("userTask")
-        .multiInstance()
-        .sequential()
-        .cardinality("3")
-        .done();
+  public static final BpmnModelInstance SEQ_MI_ONE_TASK_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).activityBuilder("userTask").multiInstance().sequential()
+          .cardinality("3").done();
 
-  public static final BpmnModelInstance SEQ_MI_SUBPROCESS_PROCESS =
-      modify(ProcessModels.SUBPROCESS_PROCESS)
-        .activityBuilder("subProcess")
-        .multiInstance()
-        .sequential()
-        .cardinality("3")
-        .done();
+  public static final BpmnModelInstance SEQ_MI_SUBPROCESS_PROCESS = modify(
+      ProcessModels.SUBPROCESS_PROCESS).activityBuilder("subProcess").multiInstance().sequential()
+          .cardinality("3").done();
 
 }

@@ -17,12 +17,15 @@
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
 /**
- * Represents a callback which should be called after work was done. This interface is similar to the
- * {@link java.util.concurrent.Callable} interface, with the exception that the callback method does not throw any
- * catching exception. Without this restriction the caller does not have to catch any exception.
+ * Represents a callback which should be called after work was done. This interface is similar to
+ * the {@link java.util.concurrent.Callable} interface, with the exception that the callback method
+ * does not throw any catching exception. Without this restriction the caller does not have to catch
+ * any exception.
  *
- * @param <P> the type of the callback parameter
- * @param <R> the type of the callback result
+ * @param <P>
+ *          the type of the callback parameter
+ * @param <R>
+ *          the type of the callback result
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public interface Callback<P, R> {
@@ -30,7 +33,8 @@ public interface Callback<P, R> {
   /**
    * The callback which should be called/executed after work was done.
    *
-   * @param param the parameter for the callback
+   * @param param
+   *          the parameter for the callback
    * @return the result of the callback
    */
   R callback(P param);

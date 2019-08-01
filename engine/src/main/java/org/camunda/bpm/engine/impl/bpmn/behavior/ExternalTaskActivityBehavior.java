@@ -30,18 +30,20 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
 
 /**
- * Implements behavior of external task activities, i.e. all service-task-like
- * activities that have camunda:type="external".
+ * Implements behavior of external task activities, i.e. all service-task-like activities that have
+ * camunda:type="external".
  *
  * @author Thorben Lindhauer
  * @author Christopher Zell
  */
-public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior implements MigrationObserverBehavior {
+public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior
+    implements MigrationObserverBehavior {
 
   protected ParameterValueProvider topicNameValueProvider;
   protected ParameterValueProvider priorityValueProvider;
 
-  public ExternalTaskActivityBehavior(ParameterValueProvider topicName, ParameterValueProvider paramValueProvider) {
+  public ExternalTaskActivityBehavior(ParameterValueProvider topicName,
+      ParameterValueProvider paramValueProvider) {
     this.topicNameValueProvider = topicName;
     this.priorityValueProvider = paramValueProvider;
   }
@@ -49,7 +51,8 @@ public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior i
   @Override
   public void execute(ActivityExecution execution) throws Exception {
     ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    PriorityProvider<ExternalTaskActivityBehavior> provider = Context.getProcessEngineConfiguration().getExternalTaskPriorityProvider();
+    PriorityProvider<ExternalTaskActivityBehavior> provider = Context
+        .getProcessEngineConfiguration().getExternalTaskPriorityProvider();
 
     long priority = provider.determinePriority(executionEntity, this, null);
     String topic = (String) topicNameValueProvider.getValue(executionEntity);
@@ -59,7 +62,8 @@ public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior i
   }
 
   @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
     leave(execution);
   }
 
@@ -69,9 +73,13 @@ public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior i
 
   /**
    * It's used to propagate the bpmn error from an external task.
-   * @param error the error which should be propagated
-   * @param execution the current activity execution
-   * @throws Exception throws an exception if no handler was found
+   * 
+   * @param error
+   *          the error which should be propagated
+   * @param execution
+   *          the current activity execution
+   * @throws Exception
+   *           throws an exception if no handler was found
    */
   public void propagateBpmnError(BpmnError error, ActivityExecution execution) throws Exception {
     BpmnExceptionHandler.propagateBpmnError(error, execution);
@@ -82,11 +90,13 @@ public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior i
   }
 
   @Override
-  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
+  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext,
+      MigratingActivityInstance migratingInstance) {
     ExecutionEntity execution = migratingInstance.resolveRepresentativeExecution();
 
     for (ExternalTaskEntity task : execution.getExternalTasks()) {
-      MigratingExternalTaskInstance migratingTask = new MigratingExternalTaskInstance(task, migratingInstance);
+      MigratingExternalTaskInstance migratingTask = new MigratingExternalTaskInstance(task,
+          migratingInstance);
       migratingInstance.addMigratingDependentInstance(migratingTask);
       parseContext.consume(task);
       parseContext.submit(migratingTask);

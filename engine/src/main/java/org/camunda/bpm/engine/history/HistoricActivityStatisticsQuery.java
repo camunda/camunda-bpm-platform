@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.query.Query;
  * @author Roman Smirnov
  *
  */
-public interface HistoricActivityStatisticsQuery extends Query<HistoricActivityStatisticsQuery, HistoricActivityStatistics> {
+public interface HistoricActivityStatisticsQuery
+    extends Query<HistoricActivityStatisticsQuery, HistoricActivityStatistics> {
 
   /**
    * Include an aggregation of finished instances in the result.
@@ -42,16 +43,24 @@ public interface HistoricActivityStatisticsQuery extends Query<HistoricActivityS
    */
   HistoricActivityStatisticsQuery includeCompleteScope();
 
-  /** Only select historic activities of process instances that were started before the given date. */
+  /**
+   * Only select historic activities of process instances that were started before the given date.
+   */
   HistoricActivityStatisticsQuery startedBefore(Date date);
 
-  /** Only select historic activities of process instances that were started after the given date. */
+  /**
+   * Only select historic activities of process instances that were started after the given date.
+   */
   HistoricActivityStatisticsQuery startedAfter(Date date);
 
-  /** Only select historic activities of process instances that were finished before the given date. */
+  /**
+   * Only select historic activities of process instances that were finished before the given date.
+   */
   HistoricActivityStatisticsQuery finishedBefore(Date date);
 
-  /** Only select historic activities of process instances that were finished after the given date. */
+  /**
+   * Only select historic activities of process instances that were finished after the given date.
+   */
   HistoricActivityStatisticsQuery finishedAfter(Date date);
 
   /**

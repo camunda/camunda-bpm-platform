@@ -38,45 +38,52 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 public class HistoricStatisticsManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
-  public List<HistoricActivityStatistics> getHistoricStatisticsGroupedByActivity(HistoricActivityStatisticsQueryImpl query, Page page) {
+  public List<HistoricActivityStatistics> getHistoricStatisticsGroupedByActivity(
+      HistoricActivityStatisticsQueryImpl query, Page page) {
     if (ensureHistoryReadOnProcessDefinition(query)) {
       return getDbEntityManager().selectList("selectHistoricActivityStatistics", query, page);
-    }
-    else {
+    } else {
       return new ArrayList<HistoricActivityStatistics>();
     }
   }
 
-  public long getHistoricStatisticsCountGroupedByActivity(HistoricActivityStatisticsQueryImpl query) {
+  public long getHistoricStatisticsCountGroupedByActivity(
+      HistoricActivityStatisticsQueryImpl query) {
     if (ensureHistoryReadOnProcessDefinition(query)) {
       return (Long) getDbEntityManager().selectOne("selectHistoricActivityStatisticsCount", query);
-    }
-    else {
+    } else {
       return 0;
     }
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricCaseActivityStatistics> getHistoricStatisticsGroupedByCaseActivity(HistoricCaseActivityStatisticsQueryImpl query, Page page) {
+  public List<HistoricCaseActivityStatistics> getHistoricStatisticsGroupedByCaseActivity(
+      HistoricCaseActivityStatisticsQueryImpl query, Page page) {
     return getDbEntityManager().selectList("selectHistoricCaseActivityStatistics", query, page);
   }
 
-  public long getHistoricStatisticsCountGroupedByCaseActivity(HistoricCaseActivityStatisticsQueryImpl query) {
-    return (Long) getDbEntityManager().selectOne("selectHistoricCaseActivityStatisticsCount", query);
+  public long getHistoricStatisticsCountGroupedByCaseActivity(
+      HistoricCaseActivityStatisticsQueryImpl query) {
+    return (Long) getDbEntityManager().selectOne("selectHistoricCaseActivityStatisticsCount",
+        query);
   }
 
-  protected boolean ensureHistoryReadOnProcessDefinition(HistoricActivityStatisticsQueryImpl query) {
+  protected boolean ensureHistoryReadOnProcessDefinition(
+      HistoricActivityStatisticsQueryImpl query) {
     CommandContext commandContext = getCommandContext();
 
-    if(isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
+    if (isAuthorizationEnabled() && getCurrentAuthentication() != null
+        && commandContext.isAuthorizationCheckEnabled()) {
       String processDefinitionId = query.getProcessDefinitionId();
-      ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+      ProcessDefinitionEntity definition = getProcessDefinitionManager()
+          .findLatestProcessDefinitionById(processDefinitionId);
 
       if (definition == null) {
         return false;
       }
 
-      return getAuthorizationManager().isAuthorized(READ_HISTORY, PROCESS_DEFINITION, definition.getKey());
+      return getAuthorizationManager().isAuthorized(READ_HISTORY, PROCESS_DEFINITION,
+          definition.getKey());
     }
 
     return true;

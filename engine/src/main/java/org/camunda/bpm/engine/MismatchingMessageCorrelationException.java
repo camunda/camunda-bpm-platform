@@ -21,8 +21,7 @@ import java.util.Map;
 /**
  * @author Thorben Lindhauer
  */
-public class MismatchingMessageCorrelationException extends
-    ProcessEngineException {
+public class MismatchingMessageCorrelationException extends ProcessEngineException {
 
   private static final long serialVersionUID = 1L;
 
@@ -34,15 +33,15 @@ public class MismatchingMessageCorrelationException extends
     this("Cannot correlate message '" + messageName + "': " + reason);
   }
 
-  public MismatchingMessageCorrelationException(String messageName,
-      String businessKey, Map<String, Object> correlationKeys) {
-    this("Cannot correlate message '" + messageName + "' with process instance business key '" + businessKey
-        + "' and correlation keys " + correlationKeys);
+  public MismatchingMessageCorrelationException(String messageName, String businessKey,
+      Map<String, Object> correlationKeys) {
+    this("Cannot correlate message '" + messageName + "' with process instance business key '"
+        + businessKey + "' and correlation keys " + correlationKeys);
   }
 
-  public MismatchingMessageCorrelationException(String messageName,
-      String businessKey, Map<String, Object> correlationKeys, String reason) {
-    this("Cannot correlate message '" + messageName + "' with process instance business key '" + businessKey
-        + "' and correlation keys " + correlationKeys + ": " + reason);
+  public MismatchingMessageCorrelationException(String messageName, String businessKey,
+      Map<String, Object> correlationKeys, String reason) {
+    this("Cannot correlate message '" + messageName + "' with process instance business key '"
+        + businessKey + "' and correlation keys " + correlationKeys + ": " + reason);
   }
 }

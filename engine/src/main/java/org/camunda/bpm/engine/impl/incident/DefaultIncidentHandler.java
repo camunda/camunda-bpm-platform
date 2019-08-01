@@ -24,14 +24,16 @@ import org.camunda.bpm.engine.runtime.Incident;
 
 /**
  * <p>
- * An incident handler that logs incidents of a certain type
- * as instances of {@link Incident} to the engine database.</p>
+ * An incident handler that logs incidents of a certain type as instances of {@link Incident} to the
+ * engine database.
+ * </p>
  *
  * <p>
  * By default, the process engine has two default handlers:
  * <ul>
- * <li>type <code>failedJob</code>: Indicates jobs without retries left. This incident handler is active by default and must be disabled
- * via {@link org.camunda.bpm.engine.ProcessEngineConfiguration#setCreateIncidentOnFailedJobEnabled(boolean)}.
+ * <li>type <code>failedJob</code>: Indicates jobs without retries left. This incident handler is
+ * active by default and must be disabled via
+ * {@link org.camunda.bpm.engine.ProcessEngineConfiguration#setCreateIncidentOnFailedJobEnabled(boolean)}.
  * <li>type <code>failedExternalTask</code>: Indicates external tasks without retries left
  * </p>
  *
@@ -61,7 +63,7 @@ public class DefaultIncidentHandler implements IncidentHandler {
   public Incident createIncident(IncidentContext context, String message) {
     IncidentEntity newIncident = IncidentEntity.createAndInsertIncident(type, context, message);
 
-    if(context.getExecutionId() != null) {
+    if (context.getExecutionId() != null) {
       newIncident.createRecursiveIncidents();
     }
 
@@ -77,9 +79,7 @@ public class DefaultIncidentHandler implements IncidentHandler {
   }
 
   protected void removeIncident(IncidentContext context, boolean incidentResolved) {
-    List<Incident> incidents = Context
-        .getCommandContext()
-        .getIncidentManager()
+    List<Incident> incidents = Context.getCommandContext().getIncidentManager()
         .findIncidentByConfiguration(context.getConfiguration());
 
     for (Incident currentIncident : incidents) {

@@ -79,19 +79,15 @@ public class DeleteHistoricProcessInstancesAuthorizationTest {
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
-        scenario()
-            .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY)
-            )
-            .failsDueToRequired(
-                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.DELETE_HISTORY)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY)
-            ).succeeds()
-    );
+    return AuthorizationTestRule
+        .asParameters(
+            scenario()
+                .withAuthorizations(grant(Resources.PROCESS_DEFINITION, "Process", "userId",
+                    Permissions.READ_HISTORY))
+                .failsDueToRequired(grant(Resources.PROCESS_DEFINITION, "Process", "userId",
+                    Permissions.DELETE_HISTORY)),
+            scenario().withAuthorizations(grant(Resources.PROCESS_DEFINITION, "Process", "userId",
+                Permissions.READ_HISTORY, Permissions.DELETE_HISTORY)).succeeds());
   }
 
   @Before
@@ -105,12 +101,15 @@ public class DeleteHistoricProcessInstancesAuthorizationTest {
   }
 
   public void deployAndCompleteProcesses() {
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
-    processInstance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
+    processInstance2 = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
-    List<String> processInstanceIds = Arrays.asList(
-        new String[]{processInstance.getId(), processInstance2.getId()});
+    List<String> processInstanceIds = Arrays
+        .asList(new String[] { processInstance.getId(), processInstance2.getId() });
     runtimeService.deleteProcessInstances(processInstanceIds, null, false, false);
 
     historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
@@ -127,14 +126,12 @@ public class DeleteHistoricProcessInstancesAuthorizationTest {
 
   @Test
   public void testProcessInstancesList() {
-    //given
-    List<String> processInstanceIds = Arrays.asList(historicProcessInstance.getId(), historicProcessInstance2.getId());
-    authRule
-        .init(scenario)
-        .withUser("userId")
+    // given
+    List<String> processInstanceIds = Arrays.asList(historicProcessInstance.getId(),
+        historicProcessInstance2.getId());
+    authRule.init(scenario).withUser("userId")
         .bindResource("processInstance1", processInstance.getId())
-        .bindResource("processInstance2", processInstance2.getId())
-        .start();
+        .bindResource("processInstance2", processInstance2.getId()).start();
 
     // when
     historyService.deleteHistoricProcessInstances(processInstanceIds);

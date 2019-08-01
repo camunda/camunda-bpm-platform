@@ -55,8 +55,7 @@ public class JtaTransactionContext implements TransactionContext {
       if (status != Status.STATUS_NO_TRANSACTION && status != Status.STATUS_ROLLEDBACK) {
         transaction.setRollbackOnly();
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileInteractingWithTransaction("setting transaction rollback only", e);
     }
   }
@@ -64,19 +63,19 @@ public class JtaTransactionContext implements TransactionContext {
   protected Transaction getTransaction() {
     try {
       return transactionManager.getTransaction();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileInteractingWithTransaction("getting transaction", e);
     }
   }
 
-  public void addTransactionListener(TransactionState transactionState, final TransactionListener transactionListener) {
+  public void addTransactionListener(TransactionState transactionState,
+      final TransactionListener transactionListener) {
     Transaction transaction = getTransaction();
     CommandContext commandContext = Context.getCommandContext();
     try {
-      transaction.registerSynchronization(new TransactionStateSynchronization(transactionState, transactionListener, commandContext));
-    }
-    catch (Exception e) {
+      transaction.registerSynchronization(new TransactionStateSynchronization(transactionState,
+          transactionListener, commandContext));
+    } catch (Exception e) {
       throw LOG.exceptionWhileInteractingWithTransaction("registering synchronization", e);
     }
   }
@@ -87,23 +86,26 @@ public class JtaTransactionContext implements TransactionContext {
     protected final TransactionState transactionState;
     private final CommandContext commandContext;
 
-    public TransactionStateSynchronization(TransactionState transactionState, TransactionListener transactionListener, CommandContext commandContext) {
+    public TransactionStateSynchronization(TransactionState transactionState,
+        TransactionListener transactionListener, CommandContext commandContext) {
       this.transactionState = transactionState;
       this.transactionListener = transactionListener;
       this.commandContext = commandContext;
     }
 
     public void beforeCompletion() {
-      if(TransactionState.COMMITTING.equals(transactionState)
-         || TransactionState.ROLLINGBACK.equals(transactionState)) {
+      if (TransactionState.COMMITTING.equals(transactionState)
+          || TransactionState.ROLLINGBACK.equals(transactionState)) {
         transactionListener.execute(commandContext);
       }
     }
 
     public void afterCompletion(int status) {
-      if(Status.STATUS_ROLLEDBACK == status && TransactionState.ROLLED_BACK.equals(transactionState)) {
+      if (Status.STATUS_ROLLEDBACK == status
+          && TransactionState.ROLLED_BACK.equals(transactionState)) {
         transactionListener.execute(commandContext);
-      } else if(Status.STATUS_COMMITTED == status && TransactionState.COMMITTED.equals(transactionState)) {
+      } else if (Status.STATUS_COMMITTED == status
+          && TransactionState.COMMITTED.equals(transactionState)) {
         transactionListener.execute(commandContext);
       }
     }
@@ -112,7 +114,8 @@ public class JtaTransactionContext implements TransactionContext {
 
   public boolean isTransactionActive() {
     try {
-      return transactionManager.getStatus() != Status.STATUS_MARKED_ROLLBACK && transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION;
+      return transactionManager.getStatus() != Status.STATUS_MARKED_ROLLBACK
+          && transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION;
     } catch (SystemException e) {
       throw LOG.exceptionWhileInteractingWithTransaction("getting transaction state", e);
     }

@@ -48,7 +48,7 @@ public class PvmAtomicOperationActivityLeave implements PvmAtomicOperation {
 
       ActivityImpl activity = execution.getActivity();
       String activityInstanceId = execution.getActivityInstanceId();
-      if(activityInstanceId != null) {
+      if (activityInstanceId != null) {
         LOG.debugLeavesActivityInstance(execution, activityInstanceId);
       }
 
@@ -57,10 +57,12 @@ public class PvmAtomicOperationActivityLeave implements PvmAtomicOperation {
       } catch (RuntimeException e) {
         throw e;
       } catch (Exception e) {
-        throw new PvmException("couldn't leave activity <"+activity.getProperty("type")+" id=\""+activity.getId()+"\" ...>: "+e.getMessage(), e);
+        throw new PvmException("couldn't leave activity <" + activity.getProperty("type") + " id=\""
+            + activity.getId() + "\" ...>: " + e.getMessage(), e);
       }
     } else {
-      throw new PvmException("Behavior of current activity is not an instance of " + FlowNodeActivityBehavior.class.getSimpleName() + ". Execution " + execution);
+      throw new PvmException("Behavior of current activity is not an instance of "
+          + FlowNodeActivityBehavior.class.getSimpleName() + ". Execution " + execution);
     }
   }
 

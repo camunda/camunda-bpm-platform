@@ -129,9 +129,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   protected transient TaskEntity task;
 
   /**
-   * This property will be used if <code>this</code>
-   * {@link CmmnExecution} is in state {@link CaseExecutionState#NEW}
-   * to note that an entry criterion is satisfied.
+   * This property will be used if <code>this</code> {@link CmmnExecution} is in state
+   * {@link CaseExecutionState#NEW} to note that an entry criterion is satisfied.
    */
   protected boolean entryCriterionSatisfied = false;
 
@@ -145,16 +144,16 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   protected abstract List<? extends CmmnExecution> getCaseExecutionsInternal();
 
   public CmmnExecution findCaseExecution(String activityId) {
-    if ((getActivity()!=null) && (getActivity().getId().equals(activityId))) {
-     return this;
-   }
-   for (CmmnExecution nestedExecution : getCaseExecutions()) {
-     CmmnExecution result = nestedExecution.findCaseExecution(activityId);
-     if (result != null) {
-       return result;
-     }
-   }
-   return null;
+    if ((getActivity() != null) && (getActivity().getId().equals(activityId))) {
+      return this;
+    }
+    for (CmmnExecution nestedExecution : getCaseExecutions()) {
+      CmmnExecution result = nestedExecution.findCaseExecution(activityId);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   // task /////////////////////////////////////////////////////////////////////
@@ -174,9 +173,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
     taskDecorator.decorate(task, this);
 
-    Context.getCommandContext()
-      .getHistoricTaskInstanceManager()
-      .createHistoricTask(task);
+    Context.getCommandContext().getHistoricTaskInstanceManager().createHistoricTask(task);
 
     // All properties set, now firing 'create' event
     task.fireEvent(TaskListener.EVENTNAME_CREATE);
@@ -184,7 +181,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return task;
   }
 
-  // super execution  ////////////////////////////////////////////////////////
+  // super execution ////////////////////////////////////////////////////////
 
   public abstract PvmExecutionImpl getSuperExecution();
 
@@ -198,9 +195,11 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition);
 
-  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey);
+  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition,
+      String businessKey);
 
-  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId);
+  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition,
+      String businessKey, String caseInstanceId);
 
   // sub-/super- case instance ////////////////////////////////////////////////////
 
@@ -210,7 +209,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition);
 
-  public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);
+  public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition,
+      String businessKey);
 
   public abstract CmmnExecution getSuperCaseExecution();
 
@@ -226,7 +226,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   public void createSentryParts() {
     CmmnActivity activity = getActivity();
-    ensureNotNull("Case execution '"+id+"': has no current activity", "activity", activity);
+    ensureNotNull("Case execution '" + id + "': has no current activity", "activity", activity);
 
     List<CmmnSentryDeclaration> sentries = activity.getSentries();
 
@@ -247,9 +247,11 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
           addSentryPart(onPart);
         }
 
-        List<CmmnVariableOnPartDeclaration> variableOnPartDeclarations = sentryDeclaration.getVariableOnParts();
-        for(CmmnVariableOnPartDeclaration variableOnPartDeclaration: variableOnPartDeclarations) {
-          CmmnSentryPart variableOnPart = createVariableOnPart(sentryDeclaration, variableOnPartDeclaration);
+        List<CmmnVariableOnPartDeclaration> variableOnPartDeclarations = sentryDeclaration
+            .getVariableOnParts();
+        for (CmmnVariableOnPartDeclaration variableOnPartDeclaration : variableOnPartDeclarations) {
+          CmmnSentryPart variableOnPart = createVariableOnPart(sentryDeclaration,
+              variableOnPartDeclaration);
           addSentryPart(variableOnPart);
         }
 
@@ -257,7 +259,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     }
   }
 
-  protected CmmnSentryPart createOnPart(CmmnSentryDeclaration sentryDeclaration, CmmnOnPartDeclaration onPartDeclaration) {
+  protected CmmnSentryPart createOnPart(CmmnSentryDeclaration sentryDeclaration,
+      CmmnOnPartDeclaration onPartDeclaration) {
     CmmnSentryPart sentryPart = createSentryPart(sentryDeclaration, PLAN_ITEM_ON_PART);
 
     // set the standard event
@@ -266,7 +269,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
     // set source case execution
     CmmnActivity source = onPartDeclaration.getSource();
-    ensureNotNull("The source of sentry '"+sentryDeclaration.getId()+"' is null.", "source", source);
+    ensureNotNull("The source of sentry '" + sentryDeclaration.getId() + "' is null.", "source",
+        source);
 
     String sourceActivityId = source.getId();
     sentryPart.setSource(sourceActivityId);
@@ -276,11 +280,13 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return sentryPart;
   }
 
-  protected CmmnSentryPart createIfPart(CmmnSentryDeclaration sentryDeclaration, CmmnIfPartDeclaration ifPartDeclaration) {
+  protected CmmnSentryPart createIfPart(CmmnSentryDeclaration sentryDeclaration,
+      CmmnIfPartDeclaration ifPartDeclaration) {
     return createSentryPart(sentryDeclaration, IF_PART);
   }
 
-  protected CmmnSentryPart createVariableOnPart(CmmnSentryDeclaration sentryDeclaration, CmmnVariableOnPartDeclaration variableOnPartDeclaration) {
+  protected CmmnSentryPart createVariableOnPart(CmmnSentryDeclaration sentryDeclaration,
+      CmmnVariableOnPartDeclaration variableOnPartDeclaration) {
     CmmnSentryPart sentryPart = createSentryPart(sentryDeclaration, VARIABLE_ON_PART);
 
     // set the variable event
@@ -360,9 +366,10 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
     List<CmmnSentryPart> sentryParts = collectSentryParts(sentries);
 
-    List<String> affectedSentries = collectAffectedSentriesWithVariableOnParts(variableName, transition, sentryParts);
+    List<String> affectedSentries = collectAffectedSentriesWithVariableOnParts(variableName,
+        transition, sentryParts);
 
-    List<CmmnSentryPart> affectedSentryParts = getAffectedSentryParts(sentries,affectedSentries);
+    List<CmmnSentryPart> affectedSentryParts = getAffectedSentryParts(sentries, affectedSentries);
     forceUpdateOnCaseSentryParts(affectedSentryParts);
 
     List<String> allSentries = new ArrayList<String>(sentries.keySet());
@@ -400,8 +407,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   protected boolean isNotSatisfiedIfPartOnly(CmmnSentryPart sentryPart) {
     return IF_PART.equals(sentryPart.getType())
-        && getSentries().get(sentryPart.getSentryId()).size() == 1
-        && !sentryPart.isSatisfied();
+        && getSentries().get(sentryPart.getSentryId()).size() == 1 && !sentryPart.isSatisfied();
   }
 
   protected void addIdIfNotSatisfied(List<String> affectedSentries, CmmnSentryPart sentryPart) {
@@ -418,7 +424,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     }
   }
 
-  protected List<String> collectAffectedSentriesWithVariableOnParts(String variableName, String variableEvent, List<CmmnSentryPart> sentryParts) {
+  protected List<String> collectAffectedSentriesWithVariableOnParts(String variableName,
+      String variableEvent, List<CmmnSentryPart> sentryParts) {
 
     List<String> affectedSentries = new ArrayList<String>();
 
@@ -428,8 +435,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       String sentryVariableEvent = sentryPart.getVariableEvent();
       CmmnExecution execution = sentryPart.getCaseExecution();
       if (VARIABLE_ON_PART.equals(sentryPart.getType()) && sentryVariableName.equals(variableName)
-        && sentryVariableEvent.equals(variableEvent)
-        && !hasVariableWithSameNameInParent(execution, sentryVariableName)) {
+          && sentryVariableEvent.equals(variableEvent)
+          && !hasVariableWithSameNameInParent(execution, sentryVariableName)) {
 
         addIdIfNotSatisfied(affectedSentries, sentryPart);
       }
@@ -439,7 +446,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   protected boolean hasVariableWithSameNameInParent(CmmnExecution execution, String variableName) {
-    while(execution != null) {
+    while (execution != null) {
       if (execution.getId().equals(getId())) {
         return false;
       }
@@ -452,27 +459,28 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return false;
   }
 
-  protected Map<String,List<CmmnSentryPart>> collectAllSentries() {
-    Map<String,List<CmmnSentryPart>> sentries = new HashMap<String, List<CmmnSentryPart>>();
+  protected Map<String, List<CmmnSentryPart>> collectAllSentries() {
+    Map<String, List<CmmnSentryPart>> sentries = new HashMap<String, List<CmmnSentryPart>>();
     List<? extends CmmnExecution> caseExecutions = getCaseExecutions();
-    for(CmmnExecution caseExecution: caseExecutions) {
+    for (CmmnExecution caseExecution : caseExecutions) {
       sentries.putAll(caseExecution.collectAllSentries());
     }
     sentries.putAll(getSentries());
     return sentries;
   }
 
-  protected List<CmmnSentryPart> getAffectedSentryParts(Map<String,List<CmmnSentryPart>> allSentries, List<String> affectedSentries) {
+  protected List<CmmnSentryPart> getAffectedSentryParts(
+      Map<String, List<CmmnSentryPart>> allSentries, List<String> affectedSentries) {
     List<CmmnSentryPart> affectedSentryParts = new ArrayList<CmmnSentryPart>();
-    for(String affectedSentryId: affectedSentries) {
+    for (String affectedSentryId : affectedSentries) {
       affectedSentryParts.addAll(allSentries.get(affectedSentryId));
     }
     return affectedSentryParts;
   }
 
-  protected List<CmmnSentryPart> collectSentryParts(Map<String,List<CmmnSentryPart>> sentries) {
+  protected List<CmmnSentryPart> collectSentryParts(Map<String, List<CmmnSentryPart>> sentries) {
     List<CmmnSentryPart> sentryParts = new ArrayList<CmmnSentryPart>();
-    for(String sentryId: sentries.keySet()) {
+    for (String sentryId : sentries.keySet()) {
       sentryParts.addAll(sentries.get(sentryId));
     }
     return sentryParts;
@@ -491,8 +499,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   /**
-   * Checks for each given sentry id whether the corresponding
-   * sentry is satisfied.
+   * Checks for each given sentry id whether the corresponding sentry is satisfied.
    */
   protected List<String> getSatisfiedSentries(List<String> sentryIds) {
     List<String> result = new ArrayList<String>();
@@ -511,10 +518,11 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   /**
-   * Checks for each given sentry id in the execution tree whether the corresponding
-   * sentry is satisfied.
+   * Checks for each given sentry id in the execution tree whether the corresponding sentry is
+   * satisfied.
    */
-  protected List<String> getSatisfiedSentriesInExecutionTree(List<String> sentryIds, Map<String, List<CmmnSentryPart>> allSentries) {
+  protected List<String> getSatisfiedSentriesInExecutionTree(List<String> sentryIds,
+      Map<String, List<CmmnSentryPart>> allSentries) {
     List<String> result = new ArrayList<String>();
 
     if (sentryIds != null) {
@@ -590,7 +598,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   protected void collectCaseExecutionsInExecutionTree(List<CmmnExecution> children) {
-    for(CmmnExecution child: getCaseExecutions()) {
+    for (CmmnExecution child : getCaseExecutions()) {
       child.collectCaseExecutionsInExecutionTree(children);
     }
     children.addAll(getCaseExecutions());
@@ -599,7 +607,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   protected void checkAndFireExitCriteria(List<String> satisfiedSentries) {
     if (isActive()) {
       CmmnActivity activity = getActivity();
-      ensureNotNull(PvmException.class, "Case execution '"+getId()+"': has no current activity.", "activity", activity);
+      ensureNotNull(PvmException.class,
+          "Case execution '" + getId() + "': has no current activity.", "activity", activity);
 
       // trigger first exitCriteria
       List<CmmnSentryDeclaration> exitCriteria = activity.getExitCriteria();
@@ -619,15 +628,15 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       // is available
 
       CmmnActivity activity = getActivity();
-      ensureNotNull(PvmException.class, "Case execution '"+getId()+"': has no current activity.", "activity", activity);
+      ensureNotNull(PvmException.class,
+          "Case execution '" + getId() + "': has no current activity.", "activity", activity);
 
       List<CmmnSentryDeclaration> criteria = activity.getEntryCriteria();
       for (CmmnSentryDeclaration sentryDeclaration : criteria) {
         if (sentryDeclaration != null && satisfiedSentries.contains(sentryDeclaration.getId())) {
           if (isAvailable()) {
             fireEntryCriteria();
-          }
-          else {
+          } else {
             entryCriterionSatisfied = true;
           }
           break;
@@ -658,7 +667,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   }
 
-  protected boolean isSentryPartsSatisfied(String sentryId, List<? extends CmmnSentryPart> sentryParts) {
+  protected boolean isSentryPartsSatisfied(String sentryId,
+      List<? extends CmmnSentryPart> sentryParts) {
     // if part will be evaluated in the end
     CmmnSentryPart ifPart = null;
 
@@ -692,19 +702,23 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     if (ifPart != null) {
 
       CmmnExecution execution = ifPart.getCaseExecution();
-      ensureNotNull("Case execution of sentry '"+ifPart.getSentryId() +"': is null", execution);
+      ensureNotNull("Case execution of sentry '" + ifPart.getSentryId() + "': is null", execution);
 
       CmmnActivity activity = ifPart.getCaseExecution().getActivity();
-      ensureNotNull("Case execution '"+id+"': has no current activity", "activity", activity);
+      ensureNotNull("Case execution '" + id + "': has no current activity", "activity", activity);
 
       CmmnSentryDeclaration sentryDeclaration = activity.getSentry(sentryId);
-      ensureNotNull("Case execution '"+id+"': has no declaration for sentry '"+sentryId+"'", "sentryDeclaration", sentryDeclaration);
+      ensureNotNull("Case execution '" + id + "': has no declaration for sentry '" + sentryId + "'",
+          "sentryDeclaration", sentryDeclaration);
 
       CmmnIfPartDeclaration ifPartDeclaration = sentryDeclaration.getIfPart();
-      ensureNotNull("Sentry declaration '"+sentryId+"' has no definied ifPart, but there should be one defined for case execution '"+id+"'.", "ifPartDeclaration", ifPartDeclaration);
+      ensureNotNull("Sentry declaration '" + sentryId
+          + "' has no definied ifPart, but there should be one defined for case execution '" + id
+          + "'.", "ifPartDeclaration", ifPartDeclaration);
 
       Expression condition = ifPartDeclaration.getCondition();
-      ensureNotNull("A condition was expected for ifPart of Sentry declaration '"+sentryId+"' for case execution '"+id+"'.", "condition", condition);
+      ensureNotNull("A condition was expected for ifPart of Sentry declaration '" + sentryId
+          + "' for case execution '" + id + "'.", "condition", condition);
 
       Object result = condition.getValue(this);
       ensureInstanceOf("condition expression returns non-Boolean", "result", result, Boolean.class);
@@ -720,13 +734,13 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return true;
   }
 
-  protected boolean containsIfPartAndExecutionActive(String sentryId, Map<String,List<CmmnSentryPart>> sentries) {
+  protected boolean containsIfPartAndExecutionActive(String sentryId,
+      Map<String, List<CmmnSentryPart>> sentries) {
     List<? extends CmmnSentryPart> sentryParts = sentries.get(sentryId);
 
     for (CmmnSentryPart part : sentryParts) {
       CmmnExecution caseExecution = part.getCaseExecution();
-      if (IF_PART.equals(part.getType()) && caseExecution != null
-          && caseExecution.isActive()) {
+      if (IF_PART.equals(part.getType()) && caseExecution != null && caseExecution.isActive()) {
         return true;
       }
     }
@@ -748,8 +762,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   public String getBusinessKey() {
     if (this.isCaseInstanceExecution()) {
       return businessKey;
-    }
-    else return getCaseBusinessKey();
+    } else
+      return getCaseBusinessKey();
   }
 
   // case definition ///////////////////////////////////////////////////////
@@ -809,17 +823,17 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return getParent();
   }
 
-  //delete/remove /////////////////////////////////////////////////////
+  // delete/remove /////////////////////////////////////////////////////
 
   public void deleteCascade() {
-   performOperation(CASE_EXECUTION_DELETE_CASCADE);
+    performOperation(CASE_EXECUTION_DELETE_CASCADE);
   }
 
   public void remove() {
-   CmmnExecution parent = getParent();
-   if (parent!=null) {
-     parent.getCaseExecutionsInternal().remove(this);
-   }
+    CmmnExecution parent = getParent();
+    if (parent != null) {
+      parent.getCaseExecutionsInternal().remove(this);
+    }
   }
 
   // required //////////////////////////////////////////////////
@@ -928,7 +942,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   public void create(Map<String, Object> variables) {
-    if(variables != null) {
+    if (variables != null) {
       setVariables(variables);
     }
 
@@ -946,7 +960,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
     return children;
   }
-
 
   public void triggerChildExecutionsLifecycle(List<CmmnExecution> children) {
     // then notify create listener for each created
@@ -1064,15 +1077,14 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   // variable listeners
   public void dispatchEvent(VariableEvent variableEvent) {
-    boolean invokeCustomListeners =
-        Context
-          .getProcessEngineConfiguration()
-          .isInvokeCustomVariableListeners();
+    boolean invokeCustomListeners = Context.getProcessEngineConfiguration()
+        .isInvokeCustomVariableListeners();
 
     Map<String, List<VariableListener<?>>> listeners = getActivity()
         .getVariableListeners(variableEvent.getEventName(), invokeCustomListeners);
 
-    // only attempt to invoke listeners if there are any (as this involves resolving the upwards execution hierarchy)
+    // only attempt to invoke listeners if there are any (as this involves resolving the upwards
+    // execution hierarchy)
     if (!listeners.isEmpty()) {
       getCaseInstance().queueVariableEvent(variableEvent, invokeCustomListeners);
     }
@@ -1099,19 +1111,20 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
       CmmnExecution sourceExecution = (CmmnExecution) nextEvent.getSourceScope();
 
-      DelegateCaseVariableInstanceImpl delegateVariable =
-          DelegateCaseVariableInstanceImpl.fromVariableInstance(nextEvent.getVariableInstance());
+      DelegateCaseVariableInstanceImpl delegateVariable = DelegateCaseVariableInstanceImpl
+          .fromVariableInstance(nextEvent.getVariableInstance());
       delegateVariable.setEventName(nextEvent.getEventName());
       delegateVariable.setSourceExecution(sourceExecution);
 
-      Map<String, List<VariableListener<?>>> listenersByActivity =
-          sourceExecution.getActivity().getVariableListeners(delegateVariable.getEventName(), includeCustomerListeners);
+      Map<String, List<VariableListener<?>>> listenersByActivity = sourceExecution.getActivity()
+          .getVariableListeners(delegateVariable.getEventName(), includeCustomerListeners);
 
       CmmnExecution currentExecution = sourceExecution;
       while (currentExecution != null) {
 
         if (currentExecution.getActivityId() != null) {
-          List<VariableListener<?>> listeners = listenersByActivity.get(currentExecution.getActivityId());
+          List<VariableListener<?>> listeners = listenersByActivity
+              .get(currentExecution.getActivityId());
 
           if (listeners != null) {
             delegateVariable.setScopeExecution(currentExecution);
@@ -1119,10 +1132,10 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
             for (VariableListener<?> listener : listeners) {
               try {
                 CaseVariableListener caseVariableListener = (CaseVariableListener) listener;
-                CaseVariableListenerInvocation invocation = new CaseVariableListenerInvocation(caseVariableListener, delegateVariable, currentExecution);
-                Context.getProcessEngineConfiguration()
-                  .getDelegateInterceptor()
-                  .handleInvocation(invocation);
+                CaseVariableListenerInvocation invocation = new CaseVariableListenerInvocation(
+                    caseVariableListener, delegateVariable, currentExecution);
+                Context.getProcessEngineConfiguration().getDelegateInterceptor()
+                    .handleInvocation(invocation);
               } catch (Exception e) {
                 throw LOG.invokeVariableListenerException(e);
               }
@@ -1146,13 +1159,13 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return variableEventsQueue;
   }
 
-  // toString() //////////////////////////////////////  ///////////
+  // toString() ////////////////////////////////////// ///////////
 
   public String toString() {
     if (isCaseInstanceExecution()) {
-      return "CaseInstance["+getToStringIdentity()+"]";
+      return "CaseInstance[" + getToStringIdentity() + "]";
     } else {
-      return "CmmnExecution["+getToStringIdentity() + "]";
+      return "CmmnExecution[" + getToStringIdentity() + "]";
     }
   }
 

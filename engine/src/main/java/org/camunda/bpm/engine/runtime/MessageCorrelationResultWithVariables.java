@@ -19,8 +19,10 @@ package org.camunda.bpm.engine.runtime;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
- * <p> * The result of a {@link MessageCorrelationResult message correlation}
- * containing the process variables</p>
+ * <p>
+ * * The result of a {@link MessageCorrelationResult message correlation} containing the process
+ * variables
+ * </p>
  *
  * @author Yana.Vasileva
  * @since 7.11
@@ -29,8 +31,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 public interface MessageCorrelationResultWithVariables extends MessageCorrelationResult {
 
   /**
-   * Returns the process variables of the process instance on which the message
-   * was correlated to.
+   * Returns the process variables of the process instance on which the message was correlated to.
    *
    * @return the variable map of the process variables
    */

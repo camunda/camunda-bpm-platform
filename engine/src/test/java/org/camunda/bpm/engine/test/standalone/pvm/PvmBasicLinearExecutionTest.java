@@ -28,28 +28,18 @@ import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.While;
 
-
 /**
  * @author Tom Baeyens
  */
 public class PvmBasicLinearExecutionTest extends PvmTestCase {
 
   /**
-   * +-------+   +-----+
-   * | start |-->| end |
-   * +-------+   +-----+
+   * +-------+ +-----+ | start |-->| end | +-------+ +-----+
    */
   public void testStartEnd() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new End())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("end").endActivity().createActivity("end")
+        .behavior(new End()).endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -59,25 +49,13 @@ public class PvmBasicLinearExecutionTest extends PvmTestCase {
   }
 
   /**
-   * +-----+   +-----+   +-------+
-   * | one |-->| two |-->| three |
-   * +-----+   +-----+   +-------+
+   * +-----+ +-----+ +-------+ | one |-->| two |-->| three | +-----+ +-----+ +-------+
    */
   public void testSingleAutomatic() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("one")
-        .initial()
-        .behavior(new Automatic())
-        .transition("two")
-      .endActivity()
-      .createActivity("two")
-        .behavior(new Automatic())
-        .transition("three")
-      .endActivity()
-      .createActivity("three")
-        .behavior(new End())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("one")
+        .initial().behavior(new Automatic()).transition("two").endActivity().createActivity("two")
+        .behavior(new Automatic()).transition("three").endActivity().createActivity("three")
+        .behavior(new End()).endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -87,25 +65,13 @@ public class PvmBasicLinearExecutionTest extends PvmTestCase {
   }
 
   /**
-   * +-----+   +-----+   +-------+
-   * | one |-->| two |-->| three |
-   * +-----+   +-----+   +-------+
+   * +-----+ +-----+ +-------+ | one |-->| two |-->| three | +-----+ +-----+ +-------+
    */
   public void testSingleWaitState() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("one")
-        .initial()
-        .behavior(new Automatic())
-        .transition("two")
-      .endActivity()
-      .createActivity("two")
-        .behavior(new WaitState())
-        .transition("three")
-      .endActivity()
-      .createActivity("three")
-        .behavior(new End())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("one")
+        .initial().behavior(new Automatic()).transition("two").endActivity().createActivity("two")
+        .behavior(new WaitState()).transition("three").endActivity().createActivity("three")
+        .behavior(new End()).endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -120,37 +86,17 @@ public class PvmBasicLinearExecutionTest extends PvmTestCase {
   }
 
   /**
-   * +-----+   +-----+   +-------+   +------+    +------+
-   * | one |-->| two |-->| three |-->| four |--> | five |
-   * +-----+   +-----+   +-------+   +------+    +------+
+   * +-----+ +-----+ +-------+ +------+ +------+ | one |-->| two |-->| three |-->| four |--> | five
+   * | +-----+ +-----+ +-------+ +------+ +------+
    */
   public void testCombinationOfWaitStatesAndAutomatics() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("one")
-      .endActivity()
-      .createActivity("one")
-        .behavior(new WaitState())
-        .transition("two")
-      .endActivity()
-      .createActivity("two")
-        .behavior(new WaitState())
-        .transition("three")
-      .endActivity()
-      .createActivity("three")
-        .behavior(new Automatic())
-        .transition("four")
-      .endActivity()
-      .createActivity("four")
-        .behavior(new Automatic())
-        .transition("five")
-      .endActivity()
-      .createActivity("five")
-        .behavior(new End())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("one").endActivity().createActivity("one")
+        .behavior(new WaitState()).transition("two").endActivity().createActivity("two")
+        .behavior(new WaitState()).transition("three").endActivity().createActivity("three")
+        .behavior(new Automatic()).transition("four").endActivity().createActivity("four")
+        .behavior(new Automatic()).transition("five").endActivity().createActivity("five")
+        .behavior(new End()).endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -168,44 +114,19 @@ public class PvmBasicLinearExecutionTest extends PvmTestCase {
   }
 
   /**
-   *                  +----------------------------+
-   *                  v                            |
-   * +-------+   +------+   +-----+   +-----+    +-------+
-   * | start |-->| loop |-->| one |-->| two |--> | three |
-   * +-------+   +------+   +-----+   +-----+    +-------+
-   *                  |
-   *                  |   +-----+
-   *                  +-->| end |
-   *                      +-----+
+   * +----------------------------+ v | +-------+ +------+ +-----+ +-----+ +-------+ | start |-->|
+   * loop |-->| one |-->| two |--> | three | +-------+ +------+ +-----+ +-----+ +-------+ | |
+   * +-----+ +-->| end | +-----+
    */
   public void testWhileLoop() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("loop")
-      .endActivity()
-      .createActivity("loop")
-        .behavior(new While("count", 0, 10))
-        .transition("one", "more")
-        .transition("end", "done")
-      .endActivity()
-      .createActivity("one")
-        .behavior(new Automatic())
-        .transition("two")
-      .endActivity()
-      .createActivity("two")
-        .behavior(new Automatic())
-        .transition("three")
-      .endActivity()
-      .createActivity("three")
-        .behavior(new Automatic())
-        .transition("loop")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new End())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("loop").endActivity().createActivity("loop")
+        .behavior(new While("count", 0, 10)).transition("one", "more").transition("end", "done")
+        .endActivity().createActivity("one").behavior(new Automatic()).transition("two")
+        .endActivity().createActivity("two").behavior(new Automatic()).transition("three")
+        .endActivity().createActivity("three").behavior(new Automatic()).transition("loop")
+        .endActivity().createActivity("end").behavior(new End()).endActivity()
+        .buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();

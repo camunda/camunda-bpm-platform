@@ -32,11 +32,11 @@ import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 
-
 /**
- * A Bpmn scope. The scope has references to two lists of activities:
- * - the flow activities (activities for which the {@link ActivityImpl#getFlowScope() flow scope} is this scope
- * - event listener activities (activities for which the {@link ActivityImpl#getEventScope() event scope} is this scope.
+ * A Bpmn scope. The scope has references to two lists of activities: - the flow activities
+ * (activities for which the {@link ActivityImpl#getFlowScope() flow scope} is this scope - event
+ * listener activities (activities for which the {@link ActivityImpl#getEventScope() event scope} is
+ * this scope.
  *
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -47,7 +47,7 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
 
   protected boolean isSubProcessScope = false;
 
-  /** The activities for which the flow scope is this scope  */
+  /** The activities for which the flow scope is this scope */
   protected List<ActivityImpl> flowActivities = new ArrayList<ActivityImpl>();
   protected Map<String, ActivityImpl> namedFlowActivities = new HashMap<String, ActivityImpl>();
 
@@ -85,14 +85,13 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
   }
 
   public ActivityImpl findActivityAtLevelOfSubprocess(String activityId) {
-    if(!isSubProcessScope()) {
+    if (!isSubProcessScope()) {
       throw new ProcessEngineException("This is not a sub process scope.");
     }
     ActivityImpl activity = findActivity(activityId);
-    if(activity == null || activity.getLevelOfSubprocessScope() != this) {
+    if (activity == null || activity.getLevelOfSubprocessScope() != this) {
       return null;
-    }
-    else {
+    } else {
       return activity;
     }
   }
@@ -102,11 +101,9 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
     return namedFlowActivities.get(activityId);
   }
 
-
   /**
-   * Represents the backlog error callback interface.
-   * Contains a callback method, which is called if the activity in the backlog
-   * is not read till the end of parsing.
+   * Represents the backlog error callback interface. Contains a callback method, which is called if
+   * the activity in the backlog is not read till the end of parsing.
    */
   public interface BacklogErrorCallback {
     /**
@@ -116,9 +113,8 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
   }
 
   /**
-   * The key identifies the activity which is referenced but not read yet.
-   * The value is the error callback, which is called if the activity is not
-   * read till the end of parsing.
+   * The key identifies the activity which is referenced but not read yet. The value is the error
+   * callback, which is called if the activity is not read till the end of parsing.
    */
   protected final Map<String, BacklogErrorCallback> BACKLOG = new HashMap<String, BacklogErrorCallback>();
 
@@ -143,8 +139,10 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
   /**
    * Add's the given activity reference and the error callback to the backlog.
    *
-   * @param activityRef the activity reference which is not read until now
-   * @param callback the error callback which should called if activity will not be read
+   * @param activityRef
+   *          the activity reference which is not read until now
+   * @param callback
+   *          the error callback which should called if activity will not be read
    */
   public void addToBacklog(String activityRef, BacklogErrorCallback callback) {
     BACKLOG.put(activityRef, callback);
@@ -152,7 +150,7 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
 
   public ActivityImpl createActivity(String activityId) {
     ActivityImpl activity = new ActivityImpl(activityId, processDefinition);
-    if (activityId!=null) {
+    if (activityId != null) {
       if (processDefinition.findActivity(activityId) != null) {
         throw new PvmException("duplicate activity id '" + activityId + "'");
       }
@@ -164,7 +162,7 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
     activity.flowScope = this;
     flowActivities.add(activity);
 
-    return  activity;
+    return activity;
   }
 
   public boolean isAncestorFlowScopeOf(ScopeImpl other) {
@@ -172,8 +170,7 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
     while (otherAncestor != null) {
       if (this == otherAncestor) {
         return true;
-      }
-      else {
+      } else {
         otherAncestor = otherAncestor.getFlowScope();
       }
     }
@@ -207,7 +204,8 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
   }
 
   @Deprecated
-  public void addExecutionListener(String eventName, ExecutionListener executionListener, int index) {
+  public void addExecutionListener(String eventName, ExecutionListener executionListener,
+      int index) {
     super.addListener(eventName, executionListener, index);
   }
 

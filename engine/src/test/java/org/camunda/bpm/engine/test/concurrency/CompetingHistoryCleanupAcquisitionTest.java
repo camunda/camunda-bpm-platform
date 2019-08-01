@@ -75,15 +75,12 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestCase 
   /**
    * Problem
    *
-   * GIVEN
-   * Within the Execution TX the job lock was removed
+   * GIVEN Within the Execution TX the job lock was removed
    *
-   * WHEN
-   * 1) the acquisition thread tries to lock the job
-   * 2) the cleanup scheduler reschedules the job
+   * WHEN 1) the acquisition thread tries to lock the job 2) the cleanup scheduler reschedules the
+   * job
    *
-   * THEN
-   * The acquisition fails due to an Optimistic Locking Exception
+   * THEN The acquisition fails due to an Optimistic Locking Exception
    */
   public void testAcquiringEverLivingJobSucceeds() {
     // given
@@ -96,7 +93,8 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestCase 
     cleanupThread = executeControllableCommand(new CleanupThread(jobId));
 
     cleanupThread.waitForSync(); // wait before flush of execution
-    cleanupThread.makeContinueAndWaitForSync(); // flush execution and wait before flush of rescheduler
+    cleanupThread.makeContinueAndWaitForSync(); // flush execution and wait before flush of
+                                                // rescheduler
 
     jobExecutor.start();
 
@@ -120,15 +118,12 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestCase 
   /**
    * Problem
    *
-   * GIVEN
-   * Within the Execution TX the job lock was removed
+   * GIVEN Within the Execution TX the job lock was removed
    *
-   * WHEN
-   * 1) the cleanup scheduler reschedules the job
-   * 2) the acquisition thread tries to lock the job
+   * WHEN 1) the cleanup scheduler reschedules the job 2) the acquisition thread tries to lock the
+   * job
    *
-   * THEN
-   * The cleanup scheduler fails to reschedule the job due to an Optimistic Locking Exception
+   * THEN The cleanup scheduler fails to reschedule the job due to an Optimistic Locking Exception
    */
   public void testReschedulingEverLivingJobSucceeds() {
     // given
@@ -139,7 +134,8 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestCase 
     cleanupThread = executeControllableCommand(new CleanupThread(jobId));
 
     cleanupThread.waitForSync(); // wait before flush of execution
-    cleanupThread.makeContinueAndWaitForSync(); // flush execution and wait before flush of rescheduler
+    cleanupThread.makeContinueAndWaitForSync(); // flush execution and wait before flush of
+                                                // rescheduler
 
     jobExecutor.start();
 
@@ -152,7 +148,6 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestCase 
     cleanupThread.makeContinue(); // flush rescheduler
 
     cleanupThread.join();
-
 
     Job job = managementService.createJobQuery().jobId(jobId).singleResult();
 
@@ -172,34 +167,36 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestCase 
       syncBeforeFlush.set(true);
 
       managementService.executeJob(jobId);
-      
+
       return null;
     }
 
   }
 
-  // helpers ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // helpers
+  // ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   protected void initializeProcessEngine() {
     processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("camunda.cfg.xml");
+        .createProcessEngineConfigurationFromResource("camunda.cfg.xml");
 
     jobExecutor.setMaxJobsPerAcquisition(1);
     processEngineConfiguration.setJobExecutor(jobExecutor);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("12:00");
 
-    processEngineConfiguration.setCustomPostCommandInterceptorsTxRequiresNew(Collections.<CommandInterceptor>singletonList(new CommandInterceptor() {
-      @Override
-      public <T> T execute(Command<T> command) {
+    processEngineConfiguration.setCustomPostCommandInterceptorsTxRequiresNew(
+        Collections.<CommandInterceptor> singletonList(new CommandInterceptor() {
+          @Override
+          public <T> T execute(Command<T> command) {
 
-        T executed = next.execute(command);
-        if(syncBeforeFlush.get() != null && syncBeforeFlush.get()) {
-          cleanupThread.sync();
-        }
+            T executed = next.execute(command);
+            if (syncBeforeFlush.get() != null && syncBeforeFlush.get()) {
+              cleanupThread.sync();
+            }
 
-        return executed;
-      }
-    }));
+            return executed;
+          }
+        }));
 
     processEngine = processEngineConfiguration.buildProcessEngine();
   }
@@ -210,11 +207,10 @@ public class CompetingHistoryCleanupAcquisitionTest extends ConcurrencyTestCase 
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        commandContext.getMeterLogManager()
-          .deleteAll();
+        commandContext.getMeterLogManager().deleteAll();
 
         commandContext.getHistoricJobLogManager()
-          .deleteHistoricJobLogsByHandlerType("history-cleanup");
+            .deleteHistoricJobLogsByHandlerType("history-cleanup");
 
         return null;
       }

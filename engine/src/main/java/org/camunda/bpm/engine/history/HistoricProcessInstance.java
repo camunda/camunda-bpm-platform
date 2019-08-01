@@ -34,7 +34,10 @@ public interface HistoricProcessInstance {
   String STATE_EXTERNALLY_TERMINATED = "EXTERNALLY_TERMINATED";
   String STATE_INTERNALLY_TERMINATED = "INTERNALLY_TERMINATED";
 
-  /** The process instance id (== as the id for the runtime {@link ProcessInstance process instance}). */
+  /**
+   * The process instance id (== as the id for the runtime {@link ProcessInstance process
+   * instance}).
+   */
   String getId();
 
   /** The user provided unique reference to this process instance. */
@@ -64,16 +67,20 @@ public interface HistoricProcessInstance {
   /** The difference between {@link #getEndTime()} and {@link #getStartTime()} . */
   Long getDurationInMillis();
 
-  /** Reference to the activity in which this process instance ended.
-   *  Note that a process instance can have multiple end events, in this case it might not be deterministic
-   *  which activity id will be referenced here. Use a {@link HistoricActivityInstanceQuery} instead to query
-   *  for end events of the process instance (use the activityTYpe attribute)
-   *  */
+  /**
+   * Reference to the activity in which this process instance ended. Note that a process instance
+   * can have multiple end events, in this case it might not be deterministic which activity id will
+   * be referenced here. Use a {@link HistoricActivityInstanceQuery} instead to query for end events
+   * of the process instance (use the activityTYpe attribute)
+   */
   @Deprecated
   String getEndActivityId();
 
-  /** The authenticated user that started this process instance.
-   * @see IdentityService#setAuthenticatedUserId(String) */
+  /**
+   * The authenticated user that started this process instance.
+   * 
+   * @see IdentityService#setAuthenticatedUserId(String)
+   */
   String getStartUserId();
 
   /** The start activity. */
@@ -83,39 +90,43 @@ public interface HistoricProcessInstance {
   String getDeleteReason();
 
   /**
-   * The process instance id of a potential super process instance or null if no super process instance exists
+   * The process instance id of a potential super process instance or null if no super process
+   * instance exists
    */
   String getSuperProcessInstanceId();
 
   /**
-   * The process instance id of the top-level (root) process instance or null if no root process instance exists
+   * The process instance id of the top-level (root) process instance or null if no root process
+   * instance exists
    */
   String getRootProcessInstanceId();
 
   /**
-   * The case instance id of a potential super case instance or null if no super case instance exists
+   * The case instance id of a potential super case instance or null if no super case instance
+   * exists
    */
   String getSuperCaseInstanceId();
 
   /**
-   * The case instance id of a potential super case instance or null if no super case instance exists
+   * The case instance id of a potential super case instance or null if no super case instance
+   * exists
    */
   String getCaseInstanceId();
 
   /**
-   * The id of the tenant this historic process instance belongs to. Can be <code>null</code>
-   * if the historic process instance belongs to no single tenant.
+   * The id of the tenant this historic process instance belongs to. Can be <code>null</code> if the
+   * historic process instance belongs to no single tenant.
    */
   String getTenantId();
 
   /**
-   * Return current state of HistoricProcessInstance, following values are recognized during process engine operations:
+   * Return current state of HistoricProcessInstance, following values are recognized during process
+   * engine operations:
    *
-   *  STATE_ACTIVE - running process instance
-   *  STATE_SUSPENDED - suspended process instances
-   *  STATE_COMPLETED - completed through normal end event
-   *  STATE_EXTERNALLY_TERMINATED - terminated externally, for instance through REST API
-   *  STATE_INTERNALLY_TERMINATED - terminated internally, for instance by terminating boundary event
+   * STATE_ACTIVE - running process instance STATE_SUSPENDED - suspended process instances
+   * STATE_COMPLETED - completed through normal end event STATE_EXTERNALLY_TERMINATED - terminated
+   * externally, for instance through REST API STATE_INTERNALLY_TERMINATED - terminated internally,
+   * for instance by terminating boundary event
    */
   String getState();
 }

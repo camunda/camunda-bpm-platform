@@ -42,9 +42,7 @@ public class ViolateIntegrityConstraintDelegate implements JavaDelegate {
     insertOperation.setOperationType(DbOperationType.INSERT);
     insertOperation.setEntity(newExecution);
 
-    Context.getCommandContext()
-      .getDbSqlSession()
-      .executeDbOperation(insertOperation);
+    Context.getCommandContext().getDbSqlSession().executeDbOperation(insertOperation);
 
   }
 

@@ -111,8 +111,8 @@ public class CommandContext {
   protected boolean restrictUserOperationLogToAuthenticatedUsers;
 
   protected TransactionContext transactionContext;
-  protected Map<Class< ? >, SessionFactory> sessionFactories;
-  protected Map<Class< ? >, Session> sessions = new HashMap<Class< ? >, Session>();
+  protected Map<Class<?>, SessionFactory> sessionFactories;
+  protected Map<Class<?>, Session> sessions = new HashMap<Class<?>, Session>();
   protected List<Session> sessionList = new ArrayList<Session>();
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
@@ -127,18 +127,21 @@ public class CommandContext {
     this(processEngineConfiguration, processEngineConfiguration.getTransactionContextFactory());
   }
 
-  public CommandContext(ProcessEngineConfigurationImpl processEngineConfiguration, TransactionContextFactory transactionContextFactory) {
+  public CommandContext(ProcessEngineConfigurationImpl processEngineConfiguration,
+      TransactionContextFactory transactionContextFactory) {
     this.processEngineConfiguration = processEngineConfiguration;
     this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
     sessionFactories = processEngineConfiguration.getSessionFactories();
     this.transactionContext = transactionContextFactory.openTransactionContext(this);
-    this.restrictUserOperationLogToAuthenticatedUsers = processEngineConfiguration.isRestrictUserOperationLogToAuthenticatedUsers();
+    this.restrictUserOperationLogToAuthenticatedUsers = processEngineConfiguration
+        .isRestrictUserOperationLogToAuthenticatedUsers();
   }
 
-  public void performOperation(final CmmnAtomicOperation executionOperation, final CaseExecutionEntity execution) {
+  public void performOperation(final CmmnAtomicOperation executionOperation,
+      final CaseExecutionEntity execution) {
     ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
 
-    if(requiresContextSwitch(targetProcessApplication)) {
+    if (requiresContextSwitch(targetProcessApplication)) {
       Context.executeWithinProcessApplication(new Callable<Void>() {
         public Void call() throws Exception {
           performOperation(executionOperation, execution);
@@ -202,15 +205,13 @@ public class CommandContext {
             // fire command failed (must not fail itself)
             fireCommandFailed(commandInvocationContext.getThrowable());
 
-            if(shouldLogCmdException()) {
+            if (shouldLogCmdException()) {
               if (shouldLogInfo(commandInvocationContext.getThrowable())) {
                 LOG.infoException(commandInvocationContext.getThrowable());
-              }
-              else if (shouldLogFine(commandInvocationContext.getThrowable())) {
+              } else if (shouldLogFine(commandInvocationContext.getThrowable())) {
                 LOG.debugException(commandInvocationContext.getThrowable());
-              }
-              else {
-                  LOG.errorException(commandInvocationContext.getThrowable());
+              } else {
+                LOG.errorException(commandInvocationContext.getThrowable());
               }
             }
             transactionContext.rollback();
@@ -234,11 +235,12 @@ public class CommandContext {
   }
 
   protected boolean shouldLogFine(Throwable exception) {
-    return exception instanceof OptimisticLockingException || exception instanceof BadUserRequestException;
+    return exception instanceof OptimisticLockingException
+        || exception instanceof BadUserRequestException;
   }
 
   protected boolean shouldLogCmdException() {
-      return ProcessEngineLogger.shouldLogCmdException(processEngineConfiguration);
+    return ProcessEngineLogger.shouldLogCmdException(processEngineConfiguration);
   }
 
   protected void fireCommandContextClose() {
@@ -251,15 +253,14 @@ public class CommandContext {
     for (CommandContextListener listener : commandContextListeners) {
       try {
         listener.onCommandFailed(this, t);
-      }
-      catch(Throwable ex) {
+      } catch (Throwable ex) {
         LOG.exceptionWhileInvokingOnCommandFailed(t);
       }
     }
   }
 
   protected void flushSessions() {
-    for (int i = 0; i< sessionList.size(); i++) {
+    for (int i = 0; i < sessionList.size(); i++) {
       sessionList.get(i).flush();
     }
   }
@@ -274,12 +275,13 @@ public class CommandContext {
     }
   }
 
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings({ "unchecked" })
   public <T> T getSession(Class<T> sessionClass) {
     Session session = sessions.get(sessionClass);
     if (session == null) {
       SessionFactory sessionFactory = sessionFactories.get(sessionClass);
-      ensureNotNull("no session factory configured for " + sessionClass.getName(), "sessionFactory", sessionFactory);
+      ensureNotNull("no session factory configured for " + sessionClass.getName(), "sessionFactory",
+          sessionFactory);
       session = sessionFactory.openSession();
       sessions.put(sessionClass, session);
       sessionList.add(0, session);
@@ -416,7 +418,7 @@ public class CommandContext {
     return getSession(EventSubscriptionManager.class);
   }
 
-  public Map<Class< ? >, SessionFactory> getSessionFactories() {
+  public Map<Class<?>, SessionFactory> getSessionFactories() {
     return sessionFactories;
   }
 
@@ -459,7 +461,7 @@ public class CommandContext {
   public TenantManager getTenantManager() {
     return getSession(TenantManager.class);
   }
-  
+
   public SchemaLogManager getSchemaLogManager() {
     return getSession(SchemaLogManager.class);
   }
@@ -507,7 +509,7 @@ public class CommandContext {
   // getters and setters //////////////////////////////////////////////////////
 
   public void registerCommandContextListener(CommandContextListener commandContextListener) {
-    if(!commandContextListeners.contains(commandContextListener)) {
+    if (!commandContextListeners.contains(commandContextListener)) {
       commandContextListeners.add(commandContextListener);
     }
   }
@@ -516,7 +518,7 @@ public class CommandContext {
     return transactionContext;
   }
 
-  public Map<Class< ? >, Session> getSessions() {
+  public Map<Class<?>, Session> getSessions() {
     return sessions;
   }
 
@@ -549,7 +551,7 @@ public class CommandContext {
   public String getAuthenticatedUserId() {
     IdentityService identityService = processEngineConfiguration.getIdentityService();
     Authentication currentAuthentication = identityService.getCurrentAuthentication();
-    if(currentAuthentication == null) {
+    if (currentAuthentication == null) {
       return null;
     } else {
       return currentAuthentication.getUserId();
@@ -559,7 +561,7 @@ public class CommandContext {
   public List<String> getAuthenticatedGroupIds() {
     IdentityService identityService = processEngineConfiguration.getIdentityService();
     Authentication currentAuthentication = identityService.getCurrentAuthentication();
-    if(currentAuthentication == null) {
+    if (currentAuthentication == null) {
       return null;
     } else {
       return currentAuthentication.getGroupIds();
@@ -626,7 +628,8 @@ public class CommandContext {
     return restrictUserOperationLogToAuthenticatedUsers;
   }
 
-  public void setRestrictUserOperationLogToAuthenticatedUsers(boolean restrictUserOperationLogToAuthenticatedUsers) {
+  public void setRestrictUserOperationLogToAuthenticatedUsers(
+      boolean restrictUserOperationLogToAuthenticatedUsers) {
     this.restrictUserOperationLogToAuthenticatedUsers = restrictUserOperationLogToAuthenticatedUsers;
   }
 
@@ -643,7 +646,7 @@ public class CommandContext {
   public void setOperationId(String operationId) {
     this.operationId = operationId;
   }
-  
+
   public OptimizeManager getOptimizeManager() {
     return getSession(OptimizeManager.class);
   }

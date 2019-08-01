@@ -136,10 +136,12 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
   public ProcessInstanceWithVariables executeWithVariablesInReturn() {
     return executeWithVariablesInReturn(false, false);
   }
-  
+
   @Override
-  public ProcessInstanceWithVariables executeWithVariablesInReturn(boolean skipCustomListeners, boolean skipIoMappings) {
-    ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId, processDefinitionKey);
+  public ProcessInstanceWithVariables executeWithVariablesInReturn(boolean skipCustomListeners,
+      boolean skipIoMappings) {
+    ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId,
+        processDefinitionKey);
 
     if (isProcessDefinitionTenantIdSet && processDefinitionId != null) {
       throw LOG.exceptionStartProcessInstanceByIdAndTenantId();
@@ -149,7 +151,7 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
 
     if (modificationBuilder.getModificationOperations().isEmpty()) {
 
-      if(skipCustomListeners || skipIoMappings) {
+      if (skipCustomListeners || skipIoMappings) {
         throw LOG.exceptionStartProcessInstanceAtStartActivityAndSkipListenersOrMapping();
       }
       // start at the default start activity
@@ -206,13 +208,15 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
     this.modificationBuilder = modificationBuilder;
   }
 
-  public static ProcessInstantiationBuilder createProcessInstanceById(CommandExecutor commandExecutor, String processDefinitionId) {
+  public static ProcessInstantiationBuilder createProcessInstanceById(
+      CommandExecutor commandExecutor, String processDefinitionId) {
     ProcessInstantiationBuilderImpl builder = new ProcessInstantiationBuilderImpl(commandExecutor);
     builder.processDefinitionId = processDefinitionId;
     return builder;
   }
 
-  public static ProcessInstantiationBuilder createProcessInstanceByKey(CommandExecutor commandExecutor, String processDefinitionKey) {
+  public static ProcessInstantiationBuilder createProcessInstanceByKey(
+      CommandExecutor commandExecutor, String processDefinitionKey) {
     ProcessInstantiationBuilderImpl builder = new ProcessInstantiationBuilderImpl(commandExecutor);
     builder.processDefinitionKey = processDefinitionKey;
     return builder;

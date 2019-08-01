@@ -52,9 +52,11 @@ public class MultiTenancyMigrationAsyncTest {
   protected MigrationTestRule migrationRule = new MigrationTestRule(defaultEngineRule);
 
   @Rule
-  public RuleChain defaultRuleChin = RuleChain.outerRule(defaultEngineRule).around(defaultTestRule).around(migrationRule);
+  public RuleChain defaultRuleChin = RuleChain.outerRule(defaultEngineRule).around(defaultTestRule)
+      .around(migrationRule);
 
-  protected BatchMigrationHelper batchHelper = new BatchMigrationHelper(defaultEngineRule, migrationRule);
+  protected BatchMigrationHelper batchHelper = new BatchMigrationHelper(defaultEngineRule,
+      migrationRule);
 
   @After
   public void removeBatches() {
@@ -64,18 +66,19 @@ public class MultiTenancyMigrationAsyncTest {
   @Test
   public void canMigrateInstanceBetweenSameTenantCase1() {
     // given
-    ProcessDefinition sourceDefinition = defaultTestRule.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = defaultTestRule.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = defaultTestRule.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = defaultTestRule.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessInstance processInstance = defaultEngineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
-    MigrationPlan migrationPlan = defaultEngineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+    ProcessInstance processInstance = defaultEngineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
+    MigrationPlan migrationPlan = defaultEngineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
-    Batch batch = defaultEngineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    Batch batch = defaultEngineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
 
     batchHelper.executeSeedJob(batch);
 
@@ -89,18 +92,19 @@ public class MultiTenancyMigrationAsyncTest {
   @Test
   public void cannotMigrateInstanceWithoutTenantIdToDifferentTenant() {
     // given
-    ProcessDefinition sourceDefinition = defaultTestRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = defaultTestRule.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = defaultTestRule
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = defaultTestRule.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessInstance processInstance = defaultEngineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
-    MigrationPlan migrationPlan = defaultEngineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+    ProcessInstance processInstance = defaultEngineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
+    MigrationPlan migrationPlan = defaultEngineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
-    Batch batch = defaultEngineRule.getRuntimeService()
-        .newMigration(migrationPlan)
-        .processInstanceIds(Arrays.asList(processInstance.getId()))
-        .executeAsync();
+    Batch batch = defaultEngineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
 
     batchHelper.executeSeedJob(batch);
 
@@ -114,11 +118,11 @@ public class MultiTenancyMigrationAsyncTest {
             + "' without tenant to a process definition with a tenant ('tenant1')"));
   }
 
-  protected void assertMigratedTo(ProcessInstance processInstance, ProcessDefinition targetDefinition) {
-    Assert.assertEquals(1, defaultEngineRule.getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstance.getId())
-      .processDefinitionId(targetDefinition.getId())
-      .count());
+  protected void assertMigratedTo(ProcessInstance processInstance,
+      ProcessDefinition targetDefinition) {
+    Assert.assertEquals(1,
+        defaultEngineRule.getRuntimeService().createProcessInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .processDefinitionId(targetDefinition.getId()).count());
   }
 }

@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * @author  Daniel Meyer
+ * @author Daniel Meyer
  */
 public abstract class AbstractGetFormVariablesCmd implements Command<VariableMap>, Serializable {
 
@@ -36,7 +36,8 @@ public abstract class AbstractGetFormVariablesCmd implements Command<VariableMap
   public Collection<String> formVariableNames;
   protected boolean deserializeObjectValues;
 
-  public AbstractGetFormVariablesCmd(String resourceId, Collection<String> formVariableNames, boolean deserializeObjectValues) {
+  public AbstractGetFormVariablesCmd(String resourceId, Collection<String> formVariableNames,
+      boolean deserializeObjectValues) {
     this.resourceId = resourceId;
     this.formVariableNames = formVariableNames;
     this.deserializeObjectValues = deserializeObjectValues;
@@ -45,10 +46,9 @@ public abstract class AbstractGetFormVariablesCmd implements Command<VariableMap
   protected TypedValue createVariable(FormField formField, VariableScope variableScope) {
     TypedValue value = formField.getValue();
 
-    if(value != null) {
+    if (value != null) {
       return value;
-    }
-    else {
+    } else {
       return null;
     }
 

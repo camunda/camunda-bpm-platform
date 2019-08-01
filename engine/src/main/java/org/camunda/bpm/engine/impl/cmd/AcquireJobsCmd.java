@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 import java.util.*;
 
-
 /**
  * @author Nick Burch
  * @author Daniel Meyer
@@ -55,9 +54,8 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
 
     acquiredJobs = new AcquiredJobs(numJobsToAcquire);
 
-    List<AcquirableJobEntity> jobs = commandContext
-      .getJobManager()
-      .findNextJobsToExecute(new Page(0, numJobsToAcquire));
+    List<AcquirableJobEntity> jobs = commandContext.getJobManager()
+        .findNextJobsToExecute(new Page(0, numJobsToAcquire));
 
     Map<String, List<String>> exclusiveJobsByProcessInstance = new HashMap<String, List<String>>();
 
@@ -65,15 +63,14 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
 
       lockJob(job);
 
-      if(job.isExclusive()) {
+      if (job.isExclusive()) {
         List<String> list = exclusiveJobsByProcessInstance.get(job.getProcessInstanceId());
         if (list == null) {
           list = new ArrayList<String>();
           exclusiveJobsByProcessInstance.put(job.getProcessInstanceId(), list);
         }
         list.add(job.getId());
-      }
-      else {
+      } else {
         acquiredJobs.addJobIdBatch(job.getId());
       }
     }
@@ -84,10 +81,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
 
     // register an OptimisticLockingListener which is notified about jobs which cannot be acquired.
     // the listener removes them from the list of acquired jobs.
-    commandContext
-      .getDbEntityManager()
-      .registerOptimisticLockingListener(this);
-
+    commandContext.getDbEntityManager().registerOptimisticLockingListener(this);
 
     return acquiredJobs;
   }
@@ -112,7 +106,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
     if (operation instanceof DbEntityOperation) {
 
       DbEntityOperation entityOperation = (DbEntityOperation) operation;
-      if(AcquirableJobEntity.class.isAssignableFrom(entityOperation.getEntityType())) {
+      if (AcquirableJobEntity.class.isAssignableFrom(entityOperation.getEntityType())) {
         // could not lock the job -> remove it from list of acquired jobs
         acquiredJobs.removeJobId(entityOperation.getEntity().getId());
       }

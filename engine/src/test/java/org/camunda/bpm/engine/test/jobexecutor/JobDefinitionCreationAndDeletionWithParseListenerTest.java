@@ -43,12 +43,10 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 /**
- * Represents a test class, which uses parse listeners
- * to delete job definitions for asyncBefore activities and create job
- * definitions for asyncAfter.
- * The parse listeners are called after the bpmn xml was parsed.
- * They set the activity asyncBefore property to false and the asyncAfter to true.
- * In this case there should delete and create some job declarations for the activity which
+ * Represents a test class, which uses parse listeners to delete job definitions for asyncBefore
+ * activities and create job definitions for asyncAfter. The parse listeners are called after the
+ * bpmn xml was parsed. They set the activity asyncBefore property to false and the asyncAfter to
+ * true. In this case there should delete and create some job declarations for the activity which
  * was asyncBefore before and are now asyncAfter.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
@@ -60,12 +58,14 @@ public class JobDefinitionCreationAndDeletionWithParseListenerTest {
    */
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       List<BpmnParseListener> listeners = new ArrayList<BpmnParseListener>();
-      listeners.add(new AbstractBpmnParseListener(){
+      listeners.add(new AbstractBpmnParseListener() {
 
         @Override
-        public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
+        public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope,
+            ActivityImpl activity) {
           activity.setAsyncBefore(false);
           activity.setAsyncAfter(true);
         }
@@ -89,16 +89,18 @@ public class JobDefinitionCreationAndDeletionWithParseListenerTest {
 
   @Test
   public void testDeleteNonExistingAndCreateNewJobDefinitionWithParseListener() {
-    //given
+    // given
     String modelFileName = "jobCreationWithinParseListener.bpmn20.xml";
-    InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
-    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
+    InputStream in = JobDefinitionCreationWithParseListenerTest.class
+        .getResourceAsStream(modelFileName);
+    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment()
+        .addInputStream(modelFileName, in);
 
-    //when the asyncBefore is set to false and the asyncAfter to true in the parse listener
+    // when the asyncBefore is set to false and the asyncAfter to true in the parse listener
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);
 
-    //then there exists one job definition
+    // then there exists one job definition
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     JobDefinition jobDef = query.singleResult();
     assertNotNull(jobDef);
@@ -109,16 +111,18 @@ public class JobDefinitionCreationAndDeletionWithParseListenerTest {
 
   @Test
   public void testDeleteJobDefinitionWithParseListenerAndAsyncInXml() {
-    //given the asyncBefore is set in the xml
+    // given the asyncBefore is set in the xml
     String modelFileName = "jobAsyncBeforeCreationWithinParseListener.bpmn20.xml";
-    InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
-    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
+    InputStream in = JobDefinitionCreationWithParseListenerTest.class
+        .getResourceAsStream(modelFileName);
+    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment()
+        .addInputStream(modelFileName, in);
 
-    //when the asyncBefore is set to false and the asyncAfter to true in the parse listener
+    // when the asyncBefore is set to false and the asyncAfter to true in the parse listener
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);
 
-    //then there exists one job definition
+    // then there exists one job definition
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     JobDefinition jobDef = query.singleResult();
     assertNotNull(jobDef);
@@ -129,16 +133,18 @@ public class JobDefinitionCreationAndDeletionWithParseListenerTest {
 
   @Test
   public void testDeleteJobDefinitionWithParseListenerAndAsyncBothInXml() {
-    //given the asyncBefore AND asyncAfter is set in the xml
+    // given the asyncBefore AND asyncAfter is set in the xml
     String modelFileName = "jobAsyncBothCreationWithinParseListener.bpmn20.xml";
-    InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
-    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
+    InputStream in = JobDefinitionCreationWithParseListenerTest.class
+        .getResourceAsStream(modelFileName);
+    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment()
+        .addInputStream(modelFileName, in);
 
-    //when the asyncBefore is set to false and the asyncAfter to true in the parse listener
+    // when the asyncBefore is set to false and the asyncAfter to true in the parse listener
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);
 
-    //then there exists one job definition
+    // then there exists one job definition
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     JobDefinition jobDef = query.singleResult();
     assertNotNull(jobDef);

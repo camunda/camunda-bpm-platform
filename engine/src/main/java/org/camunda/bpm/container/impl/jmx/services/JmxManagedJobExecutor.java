@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
  * @author Daniel Meyer
  *
  */
-public class JmxManagedJobExecutor implements PlatformService<JobExecutor>, JmxManagedJobExecutorMBean {
+public class JmxManagedJobExecutor
+    implements PlatformService<JobExecutor>, JmxManagedJobExecutorMBean {
 
   protected final JobExecutor jobExecutor;
 
@@ -34,7 +35,8 @@ public class JmxManagedJobExecutor implements PlatformService<JobExecutor>, JmxM
 
   public void start(PlatformServiceContainer mBeanServiceContainer) {
     // no-op:
-    // job executor is lazy-started when first process engine is registered and jobExecutorActivate = true
+    // job executor is lazy-started when first process engine is registered and jobExecutorActivate
+    // = true
     // See: #CAM-4817
   }
 

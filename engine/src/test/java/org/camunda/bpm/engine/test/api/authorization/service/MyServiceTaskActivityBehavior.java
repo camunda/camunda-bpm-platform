@@ -23,9 +23,11 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
  * @author Roman Smirnov
  *
  */
-public abstract class MyServiceTaskActivityBehavior extends MyDelegationService implements SignallableActivityBehavior {
+public abstract class MyServiceTaskActivityBehavior extends MyDelegationService
+    implements SignallableActivityBehavior {
 
-  public void signal(ActivityExecution execution, String signalEvent, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalEvent, Object signalData)
+      throws Exception {
     logAuthentication(execution);
     logInstancesCount(execution);
   }

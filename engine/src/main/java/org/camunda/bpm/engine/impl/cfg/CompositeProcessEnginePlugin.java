@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cfg;
 
-
 import org.camunda.bpm.engine.ProcessEngine;
 
 import java.util.ArrayList;
@@ -25,8 +24,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * {@link ProcessEnginePlugin} that provides composite behavior. When registered on an engine configuration,
- * all plugins added to this composite will be triggered on preInit/postInit/postProcessEngineBuild.
+ * {@link ProcessEnginePlugin} that provides composite behavior. When registered on an engine
+ * configuration, all plugins added to this composite will be triggered on
+ * preInit/postInit/postProcessEngineBuild.
  * <p>
  * Use to encapsulate common behavior (like engine configuration).
  */
@@ -41,13 +41,16 @@ public class CompositeProcessEnginePlugin extends AbstractProcessEnginePlugin {
     this.plugins = new ArrayList<ProcessEnginePlugin>();
   }
 
-
   /**
    * New instance with vararg.
-   * @param plugin first plugin
-   * @param additionalPlugins additional vararg plugins
+   * 
+   * @param plugin
+   *          first plugin
+   * @param additionalPlugins
+   *          additional vararg plugins
    */
-  public CompositeProcessEnginePlugin(ProcessEnginePlugin plugin, ProcessEnginePlugin... additionalPlugins) {
+  public CompositeProcessEnginePlugin(ProcessEnginePlugin plugin,
+      ProcessEnginePlugin... additionalPlugins) {
     this();
     addProcessEnginePlugin(plugin, additionalPlugins);
   }
@@ -55,7 +58,8 @@ public class CompositeProcessEnginePlugin extends AbstractProcessEnginePlugin {
   /**
    * New instance with initial plugins.
    *
-   * @param plugins the initial plugins. Must not be null.
+   * @param plugins
+   *          the initial plugins. Must not be null.
    */
   public CompositeProcessEnginePlugin(final List<ProcessEnginePlugin> plugins) {
     this();
@@ -65,11 +69,14 @@ public class CompositeProcessEnginePlugin extends AbstractProcessEnginePlugin {
   /**
    * Add one (or more) plugins.
    *
-   * @param plugin first plugin
-   * @param additionalPlugins additional vararg plugins
+   * @param plugin
+   *          first plugin
+   * @param additionalPlugins
+   *          additional vararg plugins
    * @return self for fluent usage
    */
-  public CompositeProcessEnginePlugin addProcessEnginePlugin(ProcessEnginePlugin plugin, ProcessEnginePlugin... additionalPlugins) {
+  public CompositeProcessEnginePlugin addProcessEnginePlugin(ProcessEnginePlugin plugin,
+      ProcessEnginePlugin... additionalPlugins) {
     return this.addProcessEnginePlugins(toList(plugin, additionalPlugins));
   }
 
@@ -78,10 +85,12 @@ public class CompositeProcessEnginePlugin extends AbstractProcessEnginePlugin {
    *
    * If collection is not sortable, order of plugin execution can not be guaranteed.
    *
-   * @param plugins plugins to add
+   * @param plugins
+   *          plugins to add
    * @return self for fluent usage
    */
-  public CompositeProcessEnginePlugin addProcessEnginePlugins(final Collection<ProcessEnginePlugin> plugins) {
+  public CompositeProcessEnginePlugin addProcessEnginePlugins(
+      final Collection<ProcessEnginePlugin> plugins) {
     this.plugins.addAll(plugins);
 
     return this;
@@ -122,8 +131,8 @@ public class CompositeProcessEnginePlugin extends AbstractProcessEnginePlugin {
     return this.getClass().getSimpleName() + plugins;
   }
 
-
-  private static List<ProcessEnginePlugin> toList(ProcessEnginePlugin plugin, ProcessEnginePlugin... additionalPlugins) {
+  private static List<ProcessEnginePlugin> toList(ProcessEnginePlugin plugin,
+      ProcessEnginePlugin... additionalPlugins) {
     final List<ProcessEnginePlugin> plugins = new ArrayList<ProcessEnginePlugin>();
     plugins.add(plugin);
     if (additionalPlugins != null && additionalPlugins.length > 0) {

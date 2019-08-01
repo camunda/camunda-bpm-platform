@@ -22,12 +22,16 @@ import java.util.ServiceLoader;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 
 /**
- * <p>SPI interface that allows providing a custom ElResolver implementation.</p>
+ * <p>
+ * SPI interface that allows providing a custom ElResolver implementation.
+ * </p>
  *
- * <p>Implementations of this interface are looked up through the Java SE {@link ServiceLoader} facilities.
- * If you want to provide a custom implementation in your application, place a file named
- * <code>META-INF/org.camunda.bpm.application.ProcessApplicationElResolver</code> inside your application
- * which contains the fully qualified classname of your implementation.</p>
+ * <p>
+ * Implementations of this interface are looked up through the Java SE {@link ServiceLoader}
+ * facilities. If you want to provide a custom implementation in your application, place a file
+ * named <code>META-INF/org.camunda.bpm.application.ProcessApplicationElResolver</code> inside your
+ * application which contains the fully qualified classname of your implementation.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -39,7 +43,8 @@ public interface ProcessApplicationElResolver {
   static int CDI_RESOLVER = 200;
 
   /**
-   *  Allows to set a precedence to the ElResolver. Resolver with a lower precedence will be invoked first.
+   * Allows to set a precedence to the ElResolver. Resolver with a lower precedence will be invoked
+   * first.
    */
   Integer getPrecedence();
 
@@ -53,7 +58,8 @@ public interface ProcessApplicationElResolver {
    *
    * @see ProcessApplicationElResolver#getPrecedence()
    */
-  public static class ProcessApplicationElResolverSorter implements Comparator<ProcessApplicationElResolver> {
+  public static class ProcessApplicationElResolverSorter
+      implements Comparator<ProcessApplicationElResolver> {
 
     public int compare(ProcessApplicationElResolver o1, ProcessApplicationElResolver o2) {
       return (-1) * o1.getPrecedence().compareTo(o2.getPrecedence());

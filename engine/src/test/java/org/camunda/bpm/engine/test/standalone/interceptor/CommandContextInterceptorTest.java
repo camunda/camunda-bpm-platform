@@ -48,13 +48,16 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
   }
 
   public void testCommandContextNestedFailingCommands() {
-    final ExceptionThrowingCmd innerCommand1 = new ExceptionThrowingCmd(new IdentifiableRuntimeException(1));
-    final ExceptionThrowingCmd innerCommand2 = new ExceptionThrowingCmd(new IdentifiableRuntimeException(2));
+    final ExceptionThrowingCmd innerCommand1 = new ExceptionThrowingCmd(
+        new IdentifiableRuntimeException(1));
+    final ExceptionThrowingCmd innerCommand2 = new ExceptionThrowingCmd(
+        new IdentifiableRuntimeException(2));
 
     try {
       processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
         public Object execute(CommandContext commandContext) {
-          CommandExecutor commandExecutor = Context.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+          CommandExecutor commandExecutor = Context.getProcessEngineConfiguration()
+              .getCommandExecutorTxRequired();
 
           commandExecutor.execute(innerCommand1);
           commandExecutor.execute(innerCommand2);
@@ -73,11 +76,13 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
   }
 
   public void testCommandContextNestedTryCatch() {
-    final ExceptionThrowingCmd innerCommand = new ExceptionThrowingCmd(new IdentifiableRuntimeException(1));
+    final ExceptionThrowingCmd innerCommand = new ExceptionThrowingCmd(
+        new IdentifiableRuntimeException(1));
 
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
-        CommandExecutor commandExecutor = Context.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+        CommandExecutor commandExecutor = Context.getProcessEngineConfiguration()
+            .getCommandExecutorTxRequired();
 
         try {
           commandExecutor.execute(innerCommand);
@@ -95,12 +100,8 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testCommandContextNestedFailingCommandsNotExceptions() {
-    final BpmnModelInstance modelInstance =
-      Bpmn.createExecutableProcess("processThrowingThrowable")
-        .startEvent()
-          .serviceTask()
-          .camundaClass(ThrowErrorJavaDelegate.class)
-        .endEvent().done();
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("processThrowingThrowable")
+        .startEvent().serviceTask().camundaClass(ThrowErrorJavaDelegate.class).endEvent().done();
 
     deployment(modelInstance);
 
@@ -115,7 +116,7 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
       });
       fail("Exception expected");
     } catch (StackOverflowError t) {
-      //OK
+      // OK
       errorThrown = true;
     }
 
@@ -148,6 +149,7 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
 
     private static final long serialVersionUID = 1L;
     protected int id;
+
     public IdentifiableRuntimeException(int id) {
       this.id = id;
     }

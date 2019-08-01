@@ -43,15 +43,17 @@ public abstract class DelegateFormHandler {
     this.deploymentId = deploymentId;
   }
 
-  public void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
+  public void parseConfiguration(Element activityElement, DeploymentEntity deployment,
+      ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
     // should not be called!
   }
 
   protected <T> T performContextSwitch(final Callable<T> callable) {
 
-    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication(deploymentId);
+    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil
+        .getTargetProcessApplication(deploymentId);
 
-    if(targetProcessApplication != null) {
+    if (targetProcessApplication != null) {
 
       return Context.executeWithinProcessApplication(new Callable<T>() {
         public T call() throws Exception {
@@ -76,11 +78,10 @@ public abstract class DelegateFormHandler {
   }
 
   public void submitFormVariables(final VariableMap properties, final VariableScope variableScope) {
-    performContextSwitch(new Callable<Void> () {
+    performContextSwitch(new Callable<Void>() {
       public Void call() throws Exception {
-        Context.getProcessEngineConfiguration()
-            .getDelegateInterceptor()
-            .handleInvocation(new SubmitFormVariablesInvocation(formHandler, properties, variableScope));
+        Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(
+            new SubmitFormVariablesInvocation(formHandler, properties, variableScope));
 
         return null;
       }

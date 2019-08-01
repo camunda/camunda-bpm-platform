@@ -32,17 +32,13 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
 
   public void testBpmnActivityInstances() {
-    deployment(Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .manualTask()
-      .endEvent()
-    .done());
+    deployment(
+        Bpmn.createExecutableProcess("testProcess").startEvent().manualTask().endEvent().done());
 
     // given
     // that no activity instances have been executed
-    assertEquals(0l, managementService.createMetricsQuery()
-      .name(Metrics.ACTIVTY_INSTANCE_START)
-      .sum());
+    assertEquals(0l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     // if
     // a process instance is started
@@ -50,26 +46,23 @@ public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
 
     // then
     // the increased count is immediately visible
-    assertEquals(3l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+    assertEquals(3l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     // and force the db metrics reporter to report
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // still 3
-    assertEquals(3l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+    assertEquals(3l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
   }
 
   public void testStandaloneTask() {
 
     // given
     // that no activity instances have been executed
-    assertEquals(0l, managementService.createMetricsQuery()
-      .name(Metrics.ACTIVTY_INSTANCE_START)
-      .sum());
+    assertEquals(0l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     // if
     // I complete a standalone task
@@ -78,23 +71,21 @@ public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
 
     // then
     // the increased count is immediately visible
-    assertEquals(1l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+    assertEquals(1l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     // and force the db metrics reporter to report
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // still 1
-    assertEquals(1l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+    assertEquals(1l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     taskService.deleteTask(task.getId());
 
     // clean up
     HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
-    if(hti!=null) {
+    if (hti != null) {
       historyService.deleteHistoricTaskInstance(hti.getId());
     }
   }
@@ -103,43 +94,38 @@ public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
   public void testCmmnActivitiyInstances() {
     // given
     // that no activity instances have been executed
-    assertEquals(0l, managementService.createMetricsQuery()
-      .name(Metrics.ACTIVTY_INSTANCE_START)
-      .sum());
+    assertEquals(0l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     caseService.createCaseInstanceByKey("case");
 
-    assertEquals(1l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+    assertEquals(1l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     // start PI_HumanTask_1 and PI_Milestone_1
     List<CaseExecution> list = caseService.createCaseExecutionQuery().enabled().list();
     for (CaseExecution caseExecution : list) {
-      caseService.withCaseExecution(caseExecution.getId())
-        .manualStart();
+      caseService.withCaseExecution(caseExecution.getId()).manualStart();
     }
 
-    assertEquals(2l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+    assertEquals(2l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     // and force the db metrics reporter to report
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // still 2
-    assertEquals(2l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+    assertEquals(2l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     // trigger the milestone
-    CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
     caseService.completeCaseExecution(taskExecution.getId());
 
     // milestone is counted
-    assertEquals(3l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_START)
-        .sum());
+    assertEquals(3l,
+        managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
   }
 

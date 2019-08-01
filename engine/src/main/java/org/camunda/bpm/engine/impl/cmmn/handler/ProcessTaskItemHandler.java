@@ -36,25 +36,29 @@ public class ProcessTaskItemHandler extends ProcessOrCaseTaskItemHandler {
     return (ProcessTask) super.getDefinition(element);
   }
 
-  protected String getDefinitionKey(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getDefinitionKey(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     ProcessTask definition = getDefinition(element);
 
     return definition.getProcess();
   }
 
-  protected String getBinding(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getBinding(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     ProcessTask definition = getDefinition(element);
 
     return definition.getCamundaProcessBinding();
   }
 
-  protected String getVersion(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getVersion(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     ProcessTask definition = getDefinition(element);
 
     return definition.getCamundaProcessVersion();
   }
 
-  protected String getTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getTenantId(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     ProcessTask definition = getDefinition(element);
 
     return definition.getCamundaProcessTenantId();

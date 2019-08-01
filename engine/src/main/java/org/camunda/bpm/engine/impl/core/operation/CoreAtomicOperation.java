@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
  * @author Roman Smirnov
  * @author Sebastian Menski
  *
- * @param <T> The execution type this atomic operation should work on.
+ * @param <T>
+ *          The execution type this atomic operation should work on.
  */
 public interface CoreAtomicOperation<T extends CoreExecution> {
 

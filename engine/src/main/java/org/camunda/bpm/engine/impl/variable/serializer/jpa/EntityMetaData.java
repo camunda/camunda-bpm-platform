@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
 public class EntityMetaData {
 
   private boolean isJPAEntity = false;
-  private Class< ? > entityClass;
+  private Class<?> entityClass;
   private Method idMethod;
   private Field idField;
 
@@ -39,11 +39,11 @@ public class EntityMetaData {
     this.isJPAEntity = isJPAEntity;
   }
 
-  public Class< ? > getEntityClass() {
+  public Class<?> getEntityClass() {
     return entityClass;
   }
 
-  public void setEntityClass(Class< ? > entityClass) {
+  public void setEntityClass(Class<?> entityClass) {
     this.entityClass = entityClass;
   }
 
@@ -67,11 +67,11 @@ public class EntityMetaData {
 
   public Class<?> getIdType() {
     Class<?> idType = null;
-    if(idField != null) {
+    if (idField != null) {
       idType = idField.getType();
     } else if (idMethod != null) {
       idType = idMethod.getReturnType();
-    } 
+    }
     return idType;
   }
 }

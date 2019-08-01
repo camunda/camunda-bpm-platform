@@ -51,15 +51,19 @@ public class DeleteHistoricCaseInstancesBulkCmd implements Command<Void>, Serial
       @Override
       public Void call() throws Exception {
         ensureEquals(BadUserRequestException.class, "ClosedCaseInstanceIds",
-            new HistoricCaseInstanceQueryImpl().closed().caseInstanceIds(new HashSet<String>(caseInstanceIds)).count(), caseInstanceIds.size());
+            new HistoricCaseInstanceQueryImpl().closed()
+                .caseInstanceIds(new HashSet<String>(caseInstanceIds)).count(),
+            caseInstanceIds.size());
         return null;
       }
     });
 
-    commandContext.getOperationLogManager().logCaseInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, 
-        null, Collections.singletonList(new PropertyChange("nrOfInstances", null, caseInstanceIds.size())));
-    
-    commandContext.getHistoricCaseInstanceManager().deleteHistoricCaseInstancesByIds(caseInstanceIds);
+    commandContext.getOperationLogManager().logCaseInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, null, Collections
+            .singletonList(new PropertyChange("nrOfInstances", null, caseInstanceIds.size())));
+
+    commandContext.getHistoricCaseInstanceManager()
+        .deleteHistoricCaseInstancesByIds(caseInstanceIds);
 
     return null;
   }

@@ -52,20 +52,24 @@ public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
     Collection<String> processInstanceIds = collectProcessInstanceIds(commandContext);
 
-    ensureNotEmpty(BadUserRequestException.class, "Modification instructions cannot be empty", instructions);
-    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty", "Process instance ids", processInstanceIds);
-    ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null", "Process instance ids", processInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "Modification instructions cannot be empty",
+        instructions);
+    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty",
+        "Process instance ids", processInstanceIds);
+    ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null",
+        "Process instance ids", processInstanceIds);
 
     checkPermissions(commandContext);
 
-    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
-    ensureNotNull(BadUserRequestException.class, "Process definition id cannot be null", processDefinition);
+    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext,
+        builder.getProcessDefinitionId());
+    ensureNotNull(BadUserRequestException.class, "Process definition id cannot be null",
+        processDefinition);
 
-    writeUserOperationLog(commandContext, processDefinition,
-        processInstanceIds.size(),
-        true);
+    writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), true);
 
-    BatchEntity batch = createBatch(commandContext, instructions, processInstanceIds, processDefinition);
+    BatchEntity batch = createBatch(commandContext, instructions, processInstanceIds,
+        processDefinition);
     batch.createSeedJobDefinition();
     batch.createMonitorJobDefinition();
     batch.createBatchJobDefinition();
@@ -77,18 +81,23 @@ public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd
   }
 
   protected void checkPermissions(CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES);
     }
   }
 
-  protected BatchEntity createBatch(CommandContext commandContext, List<AbstractProcessInstanceModificationCommand> instructions,
+  protected BatchEntity createBatch(CommandContext commandContext,
+      List<AbstractProcessInstanceModificationCommand> instructions,
       Collection<String> processInstanceIds, ProcessDefinitionEntity processDefinition) {
 
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    BatchJobHandler<ModificationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext
+        .getProcessEngineConfiguration();
+    BatchJobHandler<ModificationBatchConfiguration> batchJobHandler = getBatchJobHandler(
+        processEngineConfiguration);
 
-    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(new ArrayList<String>(processInstanceIds), builder.getProcessDefinitionId(), instructions,
+    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(
+        new ArrayList<String>(processInstanceIds), builder.getProcessDefinitionId(), instructions,
         builder.isSkipCustomListeners(), builder.isSkipIoMappings());
 
     BatchEntity batch = new BatchEntity();
@@ -105,9 +114,11 @@ public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd
   }
 
   @SuppressWarnings("unchecked")
-  protected BatchJobHandler<ModificationBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  protected BatchJobHandler<ModificationBatchConfiguration> getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     Map<String, BatchJobHandler<?>> batchHandlers = processEngineConfiguration.getBatchHandlers();
-    return (BatchJobHandler<ModificationBatchConfiguration>) batchHandlers.get(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION);
+    return (BatchJobHandler<ModificationBatchConfiguration>) batchHandlers
+        .get(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION);
   }
 
 }

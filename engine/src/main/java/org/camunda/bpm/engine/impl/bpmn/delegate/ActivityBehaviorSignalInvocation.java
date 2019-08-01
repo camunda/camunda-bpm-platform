@@ -31,7 +31,8 @@ public class ActivityBehaviorSignalInvocation extends DelegateInvocation {
   protected String signalName;
   protected Object signalData;
 
-  public ActivityBehaviorSignalInvocation(SignallableActivityBehavior behaviorInstance, ActivityExecution execution, String signalName, Object signalData) {
+  public ActivityBehaviorSignalInvocation(SignallableActivityBehavior behaviorInstance,
+      ActivityExecution execution, String signalName, Object signalData) {
     super(execution, null);
     this.behaviorInstance = behaviorInstance;
     this.execution = execution;

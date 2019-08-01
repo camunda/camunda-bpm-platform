@@ -37,18 +37,20 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
 
   private final static AdministratorAuthorizationPluginLogger LOG = ProcessEngineLogger.ADMIN_PLUGIN_LOGGER;
 
-  /** The name of the administrator group.
+  /**
+   * The name of the administrator group.
    *
-   * If this name is set to a non-null and non-empty value,
-   * the plugin will create group-level Administrator authorizations
-   * on all built-in resources. */
+   * If this name is set to a non-null and non-empty value, the plugin will create group-level
+   * Administrator authorizations on all built-in resources.
+   */
   protected String administratorGroupName;
 
-  /** The name of the administrator user.
+  /**
+   * The name of the administrator user.
    *
-   * If this name is set to a non-null and non-empty value,
-   * the plugin will create group-level Administrator authorizations
-   * on all built-in resources. */
+   * If this name is set to a non-null and non-empty value, the plugin will create group-level
+   * Administrator authorizations on all built-in resources.
+   */
   protected String administratorUserName;
 
   protected boolean authorizationEnabled;
@@ -64,16 +66,17 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
   }
 
   public void postProcessEngineBuild(ProcessEngine processEngine) {
-    if(!authorizationEnabled) {
+    if (!authorizationEnabled) {
       return;
     }
 
     final AuthorizationService authorizationService = processEngine.getAuthorizationService();
 
-    if(administratorGroupName != null && administratorGroupName.length()>0) {
+    if (administratorGroupName != null && administratorGroupName.length() > 0) {
       // create ADMIN authorizations on all built-in resources for configured group
       for (Resource resource : Resources.values()) {
-        if(authorizationService.createAuthorizationQuery().groupIdIn(administratorGroupName).resourceType(resource).resourceId(ANY).count() == 0) {
+        if (authorizationService.createAuthorizationQuery().groupIdIn(administratorGroupName)
+            .resourceType(resource).resourceId(ANY).count() == 0) {
           AuthorizationEntity adminGroupAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
           adminGroupAuth.setGroupId(administratorGroupName);
           adminGroupAuth.setResource(resource);
@@ -86,10 +89,11 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
       }
     }
 
-    if(administratorUserName != null && administratorUserName.length()>0) {
+    if (administratorUserName != null && administratorUserName.length() > 0) {
       // create ADMIN authorizations on all built-in resources for configured user
       for (Resource resource : Resources.values()) {
-        if(authorizationService.createAuthorizationQuery().userIdIn(administratorUserName).resourceType(resource).resourceId(ANY).count() == 0) {
+        if (authorizationService.createAuthorizationQuery().userIdIn(administratorUserName)
+            .resourceType(resource).resourceId(ANY).count() == 0) {
           AuthorizationEntity adminUserAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
           adminUserAuth.setUserId(administratorUserName);
           adminUserAuth.setResource(resource);
@@ -102,8 +106,6 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
     }
 
   }
-
-
 
   // getter / setters ////////////////////////////////////
 

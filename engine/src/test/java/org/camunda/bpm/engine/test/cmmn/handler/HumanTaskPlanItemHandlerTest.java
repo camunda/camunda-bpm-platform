@@ -72,7 +72,6 @@ import org.camunda.bpm.model.cmmn.instance.camunda.CamundaTaskListener;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * @author Roman Smirnov
  *
@@ -527,7 +526,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testCreateTaskListenerByClass() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String className = "org.camunda.bpm.test.tasklistener.ABC";
     String event = TaskListener.EVENTNAME_CREATE;
@@ -563,7 +563,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testCreateTaskListenerByDelegateExpression() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String delegateExpression = "${myDelegateExpression}";
     String event = TaskListener.EVENTNAME_CREATE;
@@ -599,7 +600,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testCreateTaskListenerByExpression() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String expression = "${myExpression}";
     String event = TaskListener.EVENTNAME_CREATE;
@@ -634,7 +636,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testCompleteTaskListenerByClass() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String className = "org.camunda.bpm.test.tasklistener.ABC";
     String event = TaskListener.EVENTNAME_COMPLETE;
@@ -670,7 +673,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testCompleteTaskListenerByDelegateExpression() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String delegateExpression = "${myDelegateExpression}";
     String event = TaskListener.EVENTNAME_COMPLETE;
@@ -706,7 +710,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testCompleteTaskListenerByExpression() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String expression = "${myExpression}";
     String event = TaskListener.EVENTNAME_COMPLETE;
@@ -741,7 +746,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testAssignmentTaskListenerByClass() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String className = "org.camunda.bpm.test.tasklistener.ABC";
     String event = TaskListener.EVENTNAME_ASSIGNMENT;
@@ -777,7 +783,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testAssignmentTaskListenerByDelegateExpression() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String delegateExpression = "${myDelegateExpression}";
     String event = TaskListener.EVENTNAME_ASSIGNMENT;
@@ -813,7 +820,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testAssignmentTaskListenerByExpression() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String expression = "${myExpression}";
     String event = TaskListener.EVENTNAME_ASSIGNMENT;
@@ -848,7 +856,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testDeleteTaskListenerByClass() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String className = "org.camunda.bpm.test.tasklistener.ABC";
     String event = TaskListener.EVENTNAME_DELETE;
@@ -884,7 +893,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testDeleteTaskListenerByDelegateExpression() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String delegateExpression = "${myDelegateExpression}";
     String event = TaskListener.EVENTNAME_DELETE;
@@ -920,7 +930,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testDeleteTaskListenerByExpression() {
     // given:
     ExtensionElements extensionElements = addExtensionElements(humanTask);
-    CamundaTaskListener taskListener = createElement(extensionElements, null, CamundaTaskListener.class);
+    CamundaTaskListener taskListener = createElement(extensionElements, null,
+        CamundaTaskListener.class);
 
     String expression = "${myExpression}";
     String event = TaskListener.EVENTNAME_DELETE;
@@ -958,7 +969,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     Body body = createElement(conditionExpression, null, Body.class);
     body.setTextContent("${test}");
 
@@ -993,7 +1005,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
-    ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression1 = createElement(ifPart1, "def",
+        ConditionExpression.class);
     Body body1 = createElement(conditionExpression1, null, Body.class);
     body1.setTextContent("${test}");
 
@@ -1004,7 +1017,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
-    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
+    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl",
+        ConditionExpression.class);
     Body body2 = createElement(conditionExpression2, null, Body.class);
     body2.setTextContent("${test}");
 
@@ -1017,8 +1031,10 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     context.setParent(parent);
 
     // transform Sentry
-    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1, context);
-    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2, context);
+    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1,
+        context);
+    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2,
+        context);
 
     // when
     CmmnActivity newActivity = handler.handleElement(planItem, context);
@@ -1041,7 +1057,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     Body body = createElement(conditionExpression, null, Body.class);
     body.setTextContent("${test}");
 
@@ -1076,7 +1093,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
-    ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression1 = createElement(ifPart1, "def",
+        ConditionExpression.class);
     Body body1 = createElement(conditionExpression1, null, Body.class);
     body1.setTextContent("${test}");
 
@@ -1087,7 +1105,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
-    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
+    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl",
+        ConditionExpression.class);
     Body body2 = createElement(conditionExpression2, null, Body.class);
     body2.setTextContent("${test}");
 
@@ -1100,8 +1119,10 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     context.setParent(parent);
 
     // transform Sentry
-    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1, context);
-    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2, context);
+    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1,
+        context);
+    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2,
+        context);
 
     // when
     CmmnActivity newActivity = handler.handleElement(planItem, context);
@@ -1124,7 +1145,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     Body body = createElement(conditionExpression, null, Body.class);
     body.setTextContent("${test}");
 
@@ -1161,8 +1183,10 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testManualActivationRule() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
-    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1",
+        ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -1179,9 +1203,12 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testManualActivationRuleByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1", DefaultControl.class);
-    ManualActivationRule manualActivationRule = createElement(defaultControl, "ManualActivationRule_1", ManualActivationRule.class);
-    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1",
+        DefaultControl.class);
+    ManualActivationRule manualActivationRule = createElement(defaultControl,
+        "ManualActivationRule_1", ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -1200,7 +1227,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
     RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -1217,9 +1245,11 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testRequiredRuleByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1", DefaultControl.class);
+    PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1",
+        DefaultControl.class);
     RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -1237,8 +1267,10 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRule() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -1255,9 +1287,12 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testRepetitionRuleByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1", DefaultControl.class);
-    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1",
+        DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -1275,8 +1310,10 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRuleStandardEvents() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -1295,9 +1332,12 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testRepetitionRuleStandardEventsByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1", DefaultControl.class);
-    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1",
+        DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -1317,8 +1357,10 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRuleCustomStandardEvents() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     repetitionRule.setCamundaRepeatOnStandardEvent(CaseExecutionListener.DISABLE);
@@ -1338,9 +1380,12 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testRepetitionRuleCustomStandardEventsByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1", DefaultControl.class);
-    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1",
+        DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     repetitionRule.setCamundaRepeatOnStandardEvent(CaseExecutionListener.DISABLE);

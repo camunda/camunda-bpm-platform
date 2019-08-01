@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
-
 /**
  * @author Kristin Polenz
  */
@@ -41,24 +40,25 @@ public class SetJobDuedateCmd implements Command<Void>, Serializable {
 
   public SetJobDuedateCmd(String jobId, Date newDuedate) {
     if (jobId == null || jobId.length() < 1) {
-      throw new ProcessEngineException("The job id is mandatory, but '" + jobId + "' has been provided.");
+      throw new ProcessEngineException(
+          "The job id is mandatory, but '" + jobId + "' has been provided.");
     }
     this.jobId = jobId;
     this.newDuedate = newDuedate;
   }
 
   public Void execute(CommandContext commandContext) {
-    JobEntity job = commandContext
-            .getJobManager()
-            .findJobById(jobId);
+    JobEntity job = commandContext.getJobManager().findJobById(jobId);
     if (job != null) {
 
-      for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+          .getCommandCheckers()) {
         checker.checkUpdateJob(job);
       }
-      
-      commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_SET_DUEDATE, jobId, 
-          job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), job.getProcessDefinitionKey(),
+
+      commandContext.getOperationLogManager().logJobOperation(
+          UserOperationLogEntry.OPERATION_TYPE_SET_DUEDATE, jobId, job.getJobDefinitionId(),
+          job.getProcessInstanceId(), job.getProcessDefinitionId(), job.getProcessDefinitionKey(),
           Collections.singletonList(new PropertyChange("duedate", job.getDuedate(), newDuedate)));
 
       job.setDuedate(newDuedate);

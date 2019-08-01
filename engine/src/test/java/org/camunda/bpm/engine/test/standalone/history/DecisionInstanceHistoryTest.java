@@ -35,13 +35,16 @@ public class DecisionInstanceHistoryTest extends ResourceProcessEngineTestCase {
 
   @Deployment(resources = DECISION_SINGLE_OUTPUT_DMN)
   public void testDecisionDefinitionPassedToHistoryLevel() {
-    RecordHistoryLevel historyLevel = (RecordHistoryLevel) processEngineConfiguration.getHistoryLevel();
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey("testDecision").singleResult();
+    RecordHistoryLevel historyLevel = (RecordHistoryLevel) processEngineConfiguration
+        .getHistoryLevel();
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey("testDecision").singleResult();
 
     VariableMap variables = Variables.createVariables().putValue("input1", true);
     decisionService.evaluateDecisionTableByKey("testDecision", variables);
 
-    List<RecordHistoryLevel.ProducedHistoryEvent> producedHistoryEvents = historyLevel.getProducedHistoryEvents();
+    List<RecordHistoryLevel.ProducedHistoryEvent> producedHistoryEvents = historyLevel
+        .getProducedHistoryEvents();
     assertEquals(1, producedHistoryEvents.size());
 
     RecordHistoryLevel.ProducedHistoryEvent producedHistoryEvent = producedHistoryEvents.get(0);

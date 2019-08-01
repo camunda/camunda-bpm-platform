@@ -23,19 +23,20 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementIns
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingTransitionInstance;
 
-public class NoUnmappedLeafInstanceValidator implements
-  MigratingActivityInstanceValidator,
-  MigratingTransitionInstanceValidator,
-  MigratingCompensationInstanceValidator {
+public class NoUnmappedLeafInstanceValidator implements MigratingActivityInstanceValidator,
+    MigratingTransitionInstanceValidator, MigratingCompensationInstanceValidator {
 
-  public void validate(MigratingActivityInstance migratingInstance, MigratingProcessInstance migratingProcessInstance, MigratingActivityInstanceValidationReportImpl instanceReport) {
+  public void validate(MigratingActivityInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
+      MigratingActivityInstanceValidationReportImpl instanceReport) {
     if (isInvalid(migratingInstance)) {
       instanceReport.addFailure("There is no migration instruction for this instance's activity");
     }
   }
 
   @Override
-  public void validate(MigratingTransitionInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+  public void validate(MigratingTransitionInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
       MigratingTransitionInstanceValidationReportImpl instanceReport) {
     if (isInvalid(migratingInstance)) {
       instanceReport.addFailure("There is no migration instruction for this instance's activity");
@@ -43,22 +44,24 @@ public class NoUnmappedLeafInstanceValidator implements
   }
 
   @Override
-  public void validate(MigratingCompensationEventSubscriptionInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+  public void validate(MigratingCompensationEventSubscriptionInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
       MigratingActivityInstanceValidationReportImpl ancestorInstanceReport) {
     if (isInvalid(migratingInstance)) {
-      ancestorInstanceReport.addFailure(
-            "Cannot migrate subscription for compensation handler '" + migratingInstance.getSourceScope().getId() + "'. "
+      ancestorInstanceReport.addFailure("Cannot migrate subscription for compensation handler '"
+          + migratingInstance.getSourceScope().getId() + "'. "
           + "There is no migration instruction for the compensation boundary event");
     }
   }
 
   @Override
-  public void validate(MigratingEventScopeInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+  public void validate(MigratingEventScopeInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
       MigratingActivityInstanceValidationReportImpl ancestorInstanceReport) {
     if (isInvalid(migratingInstance)) {
-      ancestorInstanceReport.addFailure(
-          "Cannot migrate subscription for compensation handler '" + migratingInstance.getEventSubscription().getSourceScope().getId() + "'. "
-        + "There is no migration instruction for the compensation start event");
+      ancestorInstanceReport.addFailure("Cannot migrate subscription for compensation handler '"
+          + migratingInstance.getEventSubscription().getSourceScope().getId() + "'. "
+          + "There is no migration instruction for the compensation start event");
     }
   }
 
@@ -67,7 +70,8 @@ public class NoUnmappedLeafInstanceValidator implements
   }
 
   protected boolean isInvalid(MigratingEventScopeInstance migratingInstance) {
-    return hasNoInstruction(migratingInstance.getEventSubscription()) && migratingInstance.getChildren().isEmpty();
+    return hasNoInstruction(migratingInstance.getEventSubscription())
+        && migratingInstance.getChildren().isEmpty();
   }
 
   protected boolean isInvalid(MigratingTransitionInstance migratingInstance) {

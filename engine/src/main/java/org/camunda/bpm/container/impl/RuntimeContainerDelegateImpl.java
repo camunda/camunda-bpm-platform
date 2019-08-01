@@ -52,14 +52,16 @@ import java.util.Set;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
- * <p>This is the default {@link RuntimeContainerDelegate} implementation that delegates
- * to the local {@link MBeanServer} infrastructure. The MBeanServer is available
- * as per the Java Virtual Machine and allows the process engine to expose
- * Management Resources.</p>
+ * <p>
+ * This is the default {@link RuntimeContainerDelegate} implementation that delegates to the local
+ * {@link MBeanServer} infrastructure. The MBeanServer is available as per the Java Virtual Machine
+ * and allows the process engine to expose Management Resources.
+ * </p>
  *
  * @author Daniel Meyer
  */
-public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, ProcessEngineService, ProcessApplicationService {
+public class RuntimeContainerDelegateImpl
+    implements RuntimeContainerDelegate, ProcessEngineService, ProcessApplicationService {
 
   protected final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
@@ -72,19 +74,22 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
 
   @Override
   public void registerProcessEngine(ProcessEngine processEngine) {
-    ensureNotNull("Cannot register process engine in Jmx Runtime Container", "process engine", processEngine);
+    ensureNotNull("Cannot register process engine in Jmx Runtime Container", "process engine",
+        processEngine);
 
     String processEngineName = processEngine.getName();
 
     // build and start the service.
     JmxManagedProcessEngine managedProcessEngine = new JmxManagedProcessEngine(processEngine);
-    serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, processEngineName, managedProcessEngine);
+    serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, processEngineName,
+        managedProcessEngine);
 
   }
 
   @Override
   public void unregisterProcessEngine(ProcessEngine processEngine) {
-    ensureNotNull("Cannot unregister process engine in Jmx Runtime Container", "process engine", processEngine);
+    ensureNotNull("Cannot unregister process engine in Jmx Runtime Container", "process engine",
+        processEngine);
 
     serviceContainer.stopService(ServiceTypes.PROCESS_ENGINE, processEngine.getName());
 
@@ -94,12 +99,12 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
   public void deployProcessApplication(AbstractProcessApplication processApplication) {
     ensureNotNull("Process application", processApplication);
 
-    final String operationName = "Deployment of Process Application " + processApplication.getName();
+    final String operationName = "Deployment of Process Application "
+        + processApplication.getName();
 
     serviceContainer.createDeploymentOperation(operationName)
-      .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
-      .addSteps(getDeploymentSteps())
-      .execute();
+        .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
+        .addSteps(getDeploymentSteps()).execute();
 
     LOG.paDeployed(processApplication.getName());
   }
@@ -119,39 +124,28 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
 
     // perform the undeployment
     serviceContainer.createUndeploymentOperation(operationName)
-      .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
-      .addSteps(getUndeploymentSteps())
-      .execute();
+        .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
+        .addSteps(getUndeploymentSteps()).execute();
 
     LOG.paUndeployed(processApplication.getName());
   }
 
-
   protected List<DeploymentOperationStep> getDeploymentSteps() {
-    return Arrays.asList(
-      new ParseProcessesXmlStep(),
-      new ProcessesXmlStartProcessEnginesStep(),
-      new DeployProcessArchivesStep(),
-      new StartProcessApplicationServiceStep(),
-      new PostDeployInvocationStep());
+    return Arrays.asList(new ParseProcessesXmlStep(), new ProcessesXmlStartProcessEnginesStep(),
+        new DeployProcessArchivesStep(), new StartProcessApplicationServiceStep(),
+        new PostDeployInvocationStep());
   }
 
   protected List<DeploymentOperationStep> getUndeploymentSteps() {
-    return Arrays.asList(
-      new PreUndeployInvocationStep(),
-      new UndeployProcessArchivesStep(),
-      new ProcessesXmlStopProcessEnginesStep(),
-      new StopProcessApplicationServiceStep(),
-      new NotifyPostProcessApplicationUndeployedStep()
-    );
+    return Arrays.asList(new PreUndeployInvocationStep(), new UndeployProcessArchivesStep(),
+        new ProcessesXmlStopProcessEnginesStep(), new StopProcessApplicationServiceStep(),
+        new NotifyPostProcessApplicationUndeployedStep());
   }
-
 
   @Override
   public ProcessEngineService getProcessEngineService() {
     return this;
   }
-
 
   @Override
   public ProcessApplicationService getProcessApplicationService() {
@@ -194,7 +188,8 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
 
   @Override
   public Set<String> getProcessApplicationNames() {
-    List<JmxManagedProcessApplication> processApplications = serviceContainer.getServiceValuesByType(ServiceTypes.PROCESS_APPLICATION);
+    List<JmxManagedProcessApplication> processApplications = serviceContainer
+        .getServiceValuesByType(ServiceTypes.PROCESS_APPLICATION);
     Set<String> processApplicationNames = new HashSet<String>();
     for (JmxManagedProcessApplication jmxManagedProcessApplication : processApplications) {
       processApplicationNames.add(jmxManagedProcessApplication.getProcessApplicationName());
@@ -205,7 +200,8 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
   @Override
   public ProcessApplicationInfo getProcessApplicationInfo(String processApplicationName) {
 
-    JmxManagedProcessApplication processApplicationService = serviceContainer.getServiceValue(ServiceTypes.PROCESS_APPLICATION, processApplicationName);
+    JmxManagedProcessApplication processApplicationService = serviceContainer
+        .getServiceValue(ServiceTypes.PROCESS_APPLICATION, processApplicationName);
 
     if (processApplicationService == null) {
       return null;
@@ -216,7 +212,8 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
 
   @Override
   public ProcessApplicationReference getDeployedProcessApplication(String processApplicationName) {
-    JmxManagedProcessApplication processApplicationService = serviceContainer.getServiceValue(ServiceTypes.PROCESS_APPLICATION, processApplicationName);
+    JmxManagedProcessApplication processApplicationService = serviceContainer
+        .getServiceValue(ServiceTypes.PROCESS_APPLICATION, processApplicationName);
 
     if (processApplicationService == null) {
       return null;

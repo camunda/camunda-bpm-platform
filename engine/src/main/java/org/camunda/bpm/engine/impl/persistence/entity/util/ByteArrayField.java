@@ -25,8 +25,8 @@ import org.camunda.bpm.engine.repository.ResourceType;
 import java.util.Date;
 
 /**
- * A byte array value field what load and save {@link ByteArrayEntity}. It can
- * be used in an entity which implements {@link ValueFields}.
+ * A byte array value field what load and save {@link ByteArrayEntity}. It can be used in an entity
+ * which implements {@link ValueFields}.
  *
  * @author Philipp Ossler
  */
@@ -41,7 +41,8 @@ public class ByteArrayField {
   protected String rootProcessInstanceId;
   protected Date removalTime;
 
-  public ByteArrayField(Nameable nameProvider, ResourceType type, String rootProcessInstanceId, Date removalTime) {
+  public ByteArrayField(Nameable nameProvider, ResourceType type, String rootProcessInstanceId,
+      Date removalTime) {
     this(nameProvider, type);
     this.removalTime = removalTime;
     this.rootProcessInstanceId = rootProcessInstanceId;
@@ -66,8 +67,7 @@ public class ByteArrayField {
 
     if (byteArrayValue != null) {
       return byteArrayValue.getBytes();
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -78,9 +78,7 @@ public class ByteArrayField {
       if (byteArrayId != null) {
         // no lazy fetching outside of command context
         if (Context.getCommandContext() != null) {
-          return byteArrayValue = Context
-              .getCommandContext()
-              .getDbEntityManager()
+          return byteArrayValue = Context.getCommandContext().getDbEntityManager()
               .selectById(ByteArrayEntity.class, byteArrayId);
         }
       }
@@ -96,28 +94,24 @@ public class ByteArrayField {
   public void setByteArrayValue(byte[] bytes, boolean isTransient) {
     if (bytes != null) {
       // note: there can be cases where byteArrayId is not null
-      //   but the corresponding byte array entity has been removed in parallel;
-      //   thus we also need to check if the actual byte array entity still exists
+      // but the corresponding byte array entity has been removed in parallel;
+      // thus we also need to check if the actual byte array entity still exists
       if (this.byteArrayId != null && getByteArrayEntity() != null) {
         byteArrayValue.setBytes(bytes);
-      }
-      else {
+      } else {
         deleteByteArrayValue();
 
-        byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes, type, rootProcessInstanceId, removalTime);
+        byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes, type,
+            rootProcessInstanceId, removalTime);
 
         // avoid insert of byte array value for a transient variable
         if (!isTransient) {
-          Context.
-          getCommandContext()
-          .getByteArrayManager()
-          .insertByteArray(byteArrayValue);
+          Context.getCommandContext().getByteArrayManager().insertByteArray(byteArrayValue);
 
           byteArrayId = byteArrayValue.getId();
         }
       }
-    }
-    else {
+    } else {
       deleteByteArrayValue();
     }
 
@@ -125,14 +119,13 @@ public class ByteArrayField {
 
   public void deleteByteArrayValue() {
     if (byteArrayId != null) {
-      // the next apparently useless line is probably to ensure consistency in the DbSqlSession cache,
+      // the next apparently useless line is probably to ensure consistency in the DbSqlSession
+      // cache,
       // but should be checked and docked here (or removed if it turns out to be unnecessary)
       getByteArrayEntity();
 
       if (byteArrayValue != null) {
-        Context.getCommandContext()
-               .getDbEntityManager()
-               .delete(byteArrayValue);
+        Context.getCommandContext().getDbEntityManager().delete(byteArrayValue);
       }
 
       byteArrayId = null;

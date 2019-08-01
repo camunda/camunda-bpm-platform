@@ -69,15 +69,11 @@ public class BatchSuspensionAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.UPDATE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.UPDATE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations()
+            .failsDueToRequired(grant(Resources.BATCH, "batchId", "userId", Permissions.UPDATE)),
+        scenario()
+            .withAuthorizations(grant(Resources.BATCH, "batchId", "userId", Permissions.UPDATE))
+            .succeeds());
   }
 
   protected MigrationPlan migrationPlan;
@@ -91,13 +87,13 @@ public class BatchSuspensionAuthorizationTest {
 
   @Before
   public void deployProcessesAndCreateMigrationPlan() {
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    migrationPlan = engineRule
-        .getRuntimeService()
-        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .build();
+    migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId()).build();
   }
 
   @After
@@ -114,28 +110,20 @@ public class BatchSuspensionAuthorizationTest {
   public void testSuspendBatch() {
 
     // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
-    batch = engineRule
-        .getRuntimeService()
-        .newMigration(migrationPlan)
-        .processInstanceIds(singletonList(processInstance.getId()))
-        .executeAsync();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(singletonList(processInstance.getId())).executeAsync();
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("batchId", batch.getId())
-      .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", batch.getId()).start();
 
     engineRule.getManagementService().suspendBatchById(batch.getId());
 
     // then
     if (authRule.assertScenario(scenario)) {
-      batch = engineRule.getManagementService()
-        .createBatchQuery()
-        .batchId(batch.getId())
-        .singleResult();
+      batch = engineRule.getManagementService().createBatchQuery().batchId(batch.getId())
+          .singleResult();
 
       Assert.assertTrue(batch.isSuspended());
     }
@@ -144,30 +132,22 @@ public class BatchSuspensionAuthorizationTest {
   @Test
   public void testActivateBatch() {
     // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
-    batch = engineRule
-        .getRuntimeService()
-        .newMigration(migrationPlan)
-        .processInstanceIds(singletonList(processInstance.getId()))
-        .executeAsync();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(singletonList(processInstance.getId())).executeAsync();
 
     engineRule.getManagementService().suspendBatchById(batch.getId());
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("batchId", batch.getId())
-      .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", batch.getId()).start();
 
     engineRule.getManagementService().activateBatchById(batch.getId());
 
     // then
     if (authRule.assertScenario(scenario)) {
-      batch = engineRule.getManagementService()
-        .createBatchQuery()
-        .batchId(batch.getId())
-        .singleResult();
+      batch = engineRule.getManagementService().createBatchQuery().batchId(batch.getId())
+          .singleResult();
 
       Assert.assertFalse(batch.isSuspended());
     }

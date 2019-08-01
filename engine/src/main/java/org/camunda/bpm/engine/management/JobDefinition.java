@@ -20,13 +20,16 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
- * <p>A Job Definition provides details about asynchronous background
- * processing ("Jobs") performed by the process engine.</p>
+ * <p>
+ * A Job Definition provides details about asynchronous background processing ("Jobs") performed by
+ * the process engine.
+ * </p>
  *
- * <p>Each Job Definition corresponds to a Timer or Asynchronous continuation
- * job installed in the process engine. Jobs definitions are installed when
- * BPMN 2.0 processes containing timer activities or asynchronous continuations
- * are deployed.</p>
+ * <p>
+ * Each Job Definition corresponds to a Timer or Asynchronous continuation job installed in the
+ * process engine. Jobs definitions are installed when BPMN 2.0 processes containing timer
+ * activities or asynchronous continuations are deployed.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -70,30 +73,31 @@ public interface JobDefinition {
    */
   String getActivityId();
 
-
   /**
-   * Indicates whether this job definition is suspended. If a job Definition is suspended,
-   * No Jobs created form the job definition will be acquired by the job executor.
+   * Indicates whether this job definition is suspended. If a job Definition is suspended, No Jobs
+   * created form the job definition will be acquired by the job executor.
    *
    * @return true if this Job Definition is currently suspended.
    */
   boolean isSuspended();
 
   /**
-   * <p>Returns the execution priority for jobs of this definition, if it was set using the
-   * {@link ManagementService} API. When a job is assigned a priority, the job definition's overriding
-   * priority (if set) is used instead of the values defined in the BPMN XML.</p>
+   * <p>
+   * Returns the execution priority for jobs of this definition, if it was set using the
+   * {@link ManagementService} API. When a job is assigned a priority, the job definition's
+   * overriding priority (if set) is used instead of the values defined in the BPMN XML.
+   * </p>
    *
-   * @return the priority that overrides the default/BPMN XML priority or <code>null</code> if
-   *   no overriding priority is set
+   * @return the priority that overrides the default/BPMN XML priority or <code>null</code> if no
+   *         overriding priority is set
    *
    * @since 7.4
    */
   Long getOverridingJobPriority();
 
   /**
-   * The id of the tenant this job definition belongs to. Can be <code>null</code>
-   * if the definition belongs to no single tenant.
+   * The id of the tenant this job definition belongs to. Can be <code>null</code> if the definition
+   * belongs to no single tenant.
    */
   String getTenantId();
 

@@ -96,7 +96,8 @@ public abstract class MigratingJobInstance implements MigratingInstance, Removin
     }
 
     // update process definition reference
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) targetScope.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) targetScope
+        .getProcessDefinition();
     jobEntity.setProcessDefinitionId(processDefinition.getId());
     jobEntity.setProcessDefinitionKey(processDefinition.getKey());
 

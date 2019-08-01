@@ -19,7 +19,10 @@ package org.camunda.bpm.engine.impl.interceptor;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 
 /**
- * <p>This {@link CommandContextFactory} allows to explicitly pass in a {@link TransactionContextFactory}.</p>
+ * <p>
+ * This {@link CommandContextFactory} allows to explicitly pass in a
+ * {@link TransactionContextFactory}.
+ * </p>
  *
  * @author Daniel Meyer
  *

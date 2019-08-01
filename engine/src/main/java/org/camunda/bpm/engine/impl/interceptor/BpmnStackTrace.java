@@ -37,17 +37,16 @@ public class BpmnStackTrace {
   protected List<AtomicOperationInvocation> perfromedInvocations = new ArrayList<AtomicOperationInvocation>();
 
   public void printStackTrace(boolean verbose) {
-    if(perfromedInvocations.isEmpty()) {
+    if (perfromedInvocations.isEmpty()) {
       return;
     }
 
     StringWriter writer = new StringWriter();
     writer.write("BPMN Stack Trace:\n");
 
-    if(!verbose) {
+    if (!verbose) {
       logNonVerbose(writer);
-    }
-    else {
+    } else {
       logVerbose(writer);
     }
 
@@ -76,7 +75,7 @@ public class BpmnStackTrace {
 
   protected void logActivityTrace(StringWriter writer, List<Map<String, String>> activities) {
     for (int i = 0; i < activities.size(); i++) {
-      if(i != 0) {
+      if (i != 0) {
         writer.write("\t  ^\n");
         writer.write("\t  |\n");
       }
@@ -100,7 +99,7 @@ public class BpmnStackTrace {
     List<Map<String, String>> activityTrace = new ArrayList<Map<String, String>>();
     for (AtomicOperationInvocation atomicOperationInvocation : perfromedInvocations) {
       String activityId = atomicOperationInvocation.getActivityId();
-      if(activityId == null) {
+      if (activityId == null) {
         continue;
       }
 
@@ -112,8 +111,8 @@ public class BpmnStackTrace {
         activity.put("activityName", activityName);
       }
 
-      if(activityTrace.isEmpty() ||
-          !activity.get("activityId").equals(activityTrace.get(0).get("activityId"))) {
+      if (activityTrace.isEmpty()
+          || !activity.get("activityId").equals(activityTrace.get(0).get("activityId"))) {
         activityTrace.add(0, activity);
       }
     }
@@ -132,11 +131,11 @@ public class BpmnStackTrace {
     writer.write(", ");
     writer.write(invocation.getExecution().toString());
 
-    if(invocation.isPerformAsync()) {
+    if (invocation.isPerformAsync()) {
       writer.write(", ASYNC");
     }
 
-    if(invocation.getApplicationContextName() != null) {
+    if (invocation.getApplicationContextName() != null) {
       writer.write(", pa=");
       writer.write(invocation.getApplicationContextName());
     }

@@ -23,29 +23,34 @@ import java.util.Date;
  *
  * @author Tassilo Weidner
  */
-public interface SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder extends SetRemovalTimeToHistoricProcessInstancesBuilder {
+public interface SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder
+    extends SetRemovalTimeToHistoricProcessInstancesBuilder {
 
   /**
    * Sets the removal time to an absolute date.
    *
-   * @param removalTime supposed to be set to historic entities.
+   * @param removalTime
+   *          supposed to be set to historic entities.
    * @return the builder.
    */
   SetRemovalTimeToHistoricProcessInstancesBuilder absoluteRemovalTime(Date removalTime);
 
   /**
-   * <p> Calculates the removal time dynamically based on the respective process definition time to
-   * live and the process engine's removal time strategy.
+   * <p>
+   * Calculates the removal time dynamically based on the respective process definition time to live
+   * and the process engine's removal time strategy.
    *
-   * <p> In case {@link #hierarchical()} is enabled, the removal time is being calculated
-   * based on the base time and time to live of the historic root process instance.
+   * <p>
+   * In case {@link #hierarchical()} is enabled, the removal time is being calculated based on the
+   * base time and time to live of the historic root process instance.
    *
    * @return the builder.
    */
   SetRemovalTimeToHistoricProcessInstancesBuilder calculatedRemovalTime();
 
   /**
-   * <p> Sets the removal time to {@code null}.
+   * <p>
+   * Sets the removal time to {@code null}.
    *
    * @return the builder.
    */

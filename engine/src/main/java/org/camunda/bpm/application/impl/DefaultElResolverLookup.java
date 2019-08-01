@@ -37,33 +37,37 @@ public class DefaultElResolverLookup {
 
   public final static ELResolver lookupResolver(AbstractProcessApplication processApplication) {
 
-    ServiceLoader<ProcessApplicationElResolver> providers = ServiceLoader.load(ProcessApplicationElResolver.class);
+    ServiceLoader<ProcessApplicationElResolver> providers = ServiceLoader
+        .load(ProcessApplicationElResolver.class);
     List<ProcessApplicationElResolver> sortedProviders = new ArrayList<ProcessApplicationElResolver>();
     for (ProcessApplicationElResolver provider : providers) {
       sortedProviders.add(provider);
     }
 
-    if(sortedProviders.isEmpty()) {
+    if (sortedProviders.isEmpty()) {
       return null;
 
     } else {
       // sort providers first
-      Collections.sort(sortedProviders, new ProcessApplicationElResolver.ProcessApplicationElResolverSorter());
+      Collections.sort(sortedProviders,
+          new ProcessApplicationElResolver.ProcessApplicationElResolverSorter());
 
       // add all providers to a composite resolver
       CompositeELResolver compositeResolver = new CompositeELResolver();
       StringBuilder summary = new StringBuilder();
-      summary.append(String.format("ElResolvers found for Process Application %s", processApplication.getName()));
+      summary.append(String.format("ElResolvers found for Process Application %s",
+          processApplication.getName()));
 
       for (ProcessApplicationElResolver processApplicationElResolver : sortedProviders) {
         ELResolver elResolver = processApplicationElResolver.getElResolver(processApplication);
 
         if (elResolver != null) {
           compositeResolver.add(elResolver);
-          summary.append(String.format("Class %s", processApplicationElResolver.getClass().getName()));
-        }
-        else {
-          LOG.noElResolverProvided(processApplication.getName(), processApplicationElResolver.getClass().getName());
+          summary
+              .append(String.format("Class %s", processApplicationElResolver.getClass().getName()));
+        } else {
+          LOG.noElResolverProvided(processApplication.getName(),
+              processApplicationElResolver.getClass().getName());
         }
       }
 

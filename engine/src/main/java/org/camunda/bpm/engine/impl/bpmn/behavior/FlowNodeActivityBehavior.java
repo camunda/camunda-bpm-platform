@@ -22,10 +22,9 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 
-
 /**
- * Superclass for all 'connectable' BPMN 2.0 process elements: tasks, gateways and events.
- * This means that any subclass can be the source or target of a sequenceflow.
+ * Superclass for all 'connectable' BPMN 2.0 process elements: tasks, gateways and events. This
+ * means that any subclass can be the source or target of a sequenceflow.
  *
  * Corresponds with the notion of the 'flownode' in BPMN 2.0.
  *
@@ -45,11 +44,12 @@ public abstract class FlowNodeActivityBehavior implements SignallableActivityBeh
   }
 
   /**
-   * Default way of leaving a BPMN 2.0 activity: evaluate the conditions on the
-   * outgoing sequence flow and take those that evaluate to true.
+   * Default way of leaving a BPMN 2.0 activity: evaluate the conditions on the outgoing sequence
+   * flow and take those that evaluate to true.
    */
   public void leave(ActivityExecution execution) {
-    ((ExecutionEntity) execution).dispatchDelayedEventsAndPerformOperation(PvmAtomicOperation.ACTIVITY_LEAVE);
+    ((ExecutionEntity) execution)
+        .dispatchDelayedEventsAndPerformOperation(PvmAtomicOperation.ACTIVITY_LEAVE);
   }
 
   public void doLeave(ActivityExecution execution) {
@@ -60,7 +60,8 @@ public abstract class FlowNodeActivityBehavior implements SignallableActivityBeh
     bpmnActivityBehavior.performIgnoreConditionsOutgoingBehavior(activityContext);
   }
 
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
     // concrete activity behaviors that do accept signals should override this method;
 
     throw LOG.unsupportedSignalException(execution.getActivity().getId());

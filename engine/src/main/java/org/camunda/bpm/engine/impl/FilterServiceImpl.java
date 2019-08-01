@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.impl.cmd.SaveFilterCmd;
 import org.camunda.bpm.engine.impl.filter.FilterQueryImpl;
 import org.camunda.bpm.engine.query.Query;
 
-
 /**
  * @author Sebastian Menski
  */
@@ -79,12 +78,15 @@ public class FilterServiceImpl extends ServiceImpl implements FilterService {
 
   @SuppressWarnings("unchecked")
   public <T> List<T> listPage(String filterId, int firstResult, int maxResults) {
-    return (List<T>) commandExecutor.execute(new ExecuteFilterListPageCmd(filterId, firstResult, maxResults));
+    return (List<T>) commandExecutor
+        .execute(new ExecuteFilterListPageCmd(filterId, firstResult, maxResults));
   }
 
   @SuppressWarnings("unchecked")
-  public <T, Q extends Query<?, T>> List<T> listPage(String filterId, Q extendingQuery, int firstResult, int maxResults) {
-    return (List<T>) commandExecutor.execute(new ExecuteFilterListPageCmd(filterId, extendingQuery, firstResult, maxResults));
+  public <T, Q extends Query<?, T>> List<T> listPage(String filterId, Q extendingQuery,
+      int firstResult, int maxResults) {
+    return (List<T>) commandExecutor
+        .execute(new ExecuteFilterListPageCmd(filterId, extendingQuery, firstResult, maxResults));
   }
 
   @SuppressWarnings("unchecked")

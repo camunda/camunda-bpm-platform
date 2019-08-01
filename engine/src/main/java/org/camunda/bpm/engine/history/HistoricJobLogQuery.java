@@ -42,10 +42,14 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Only select historic job log entries with the given job definition configuration type. */
   HistoricJobLogQuery jobDefinitionConfiguration(String jobDefinitionConfiguration);
 
-  /** Only select historic job log entries which are associated with one of the given activity ids. **/
+  /**
+   * Only select historic job log entries which are associated with one of the given activity ids.
+   **/
   HistoricJobLogQuery activityIdIn(String... activityIds);
 
-  /** Only select historic job log entries which are associated with one of the given execution ids. **/
+  /**
+   * Only select historic job log entries which are associated with one of the given execution ids.
+   **/
   HistoricJobLogQuery executionIdIn(String... executionIds);
 
   /** Only select historic job log entries with the process instance id. */
@@ -64,16 +68,15 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   HistoricJobLogQuery tenantIdIn(String... tenantIds);
 
   /**
-   * Only select log entries where the job had a priority higher than or
-   * equal to the given priority.
+   * Only select log entries where the job had a priority higher than or equal to the given
+   * priority.
    *
    * @since 7.4
    */
   HistoricJobLogQuery jobPriorityHigherThanOrEquals(long priority);
 
   /**
-   * Only select log entries where the job had a priority lower than or
-   * equal to the given priority.
+   * Only select log entries where the job had a priority lower than or equal to the given priority.
    *
    * @since 7.4
    */
@@ -86,8 +89,7 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   HistoricJobLogQuery failureLog();
 
   /**
-   * Only select historic job logs which belongs to a
-   * <code>successful</code> executed job.
+   * Only select historic job logs which belongs to a <code>successful</code> executed job.
    */
   HistoricJobLogQuery successLog();
 
@@ -128,31 +130,36 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByProcessDefinitionId();
 
-  /** Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   HistoricJobLogQuery orderByProcessDefinitionKey();
 
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByDeploymentId();
 
-
   /**
-   * <p>Sort the {@link HistoricJobLog historic job logs} in the order in which
-   * they occurred and needs to be followed by {@link #asc()} or {@link #desc()}.</p>
+   * <p>
+   * Sort the {@link HistoricJobLog historic job logs} in the order in which they occurred and needs
+   * to be followed by {@link #asc()} or {@link #desc()}.
+   * </p>
    *
-   * <p>The set of all {@link HistoricJobLog historic job logs} is a <strong>partially ordered
+   * <p>
+   * The set of all {@link HistoricJobLog historic job logs} is a <strong>partially ordered
    * set</strong>. Due to this fact {@link HistoricJobLog historic job logs} with different
-   * {@link HistoricJobLog#getJobId() job ids} are <strong>incomparable</strong>. Only {@link
-   * HistoricJobLog historic job logs} with the same {@link HistoricJobLog#getJobId() job id} can
-   * be <strong>totally ordered</strong> by using {@link #jobId(String)} and {@link #orderPartiallyByOccurrence()}
-   * which will return a result set ordered by its occurrence.</p>
+   * {@link HistoricJobLog#getJobId() job ids} are <strong>incomparable</strong>. Only
+   * {@link HistoricJobLog historic job logs} with the same {@link HistoricJobLog#getJobId() job id}
+   * can be <strong>totally ordered</strong> by using {@link #jobId(String)} and
+   * {@link #orderPartiallyByOccurrence()} which will return a result set ordered by its occurrence.
+   * </p>
    *
    * @since 7.3
    */
   HistoricJobLogQuery orderPartiallyByOccurrence();
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of job log entries without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of job log entries without tenant id is database-specific.
    */
   HistoricJobLogQuery orderByTenantId();
 

@@ -37,46 +37,51 @@ public class BatchModificationHelper extends BatchHelper {
     currentProcessInstances = new ArrayList<String>();
   }
 
-  public Batch startAfterAsync(String key, int numberOfProcessInstances, String activityId, String processDefinitionId) {
+  public Batch startAfterAsync(String key, int numberOfProcessInstances, String activityId,
+      String processDefinitionId) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = startInstances(key, numberOfProcessInstances);
 
-    return runtimeService
-      .createModification(processDefinitionId)
-      .startAfterActivity(activityId)
-      .processInstanceIds(processInstanceIds)
-      .executeAsync();
+    return runtimeService.createModification(processDefinitionId).startAfterActivity(activityId)
+        .processInstanceIds(processInstanceIds).executeAsync();
   }
 
-  public Batch startBeforeAsync(String key, int numberOfProcessInstances, String activityId, String processDefinitionId) {
+  public Batch startBeforeAsync(String key, int numberOfProcessInstances, String activityId,
+      String processDefinitionId) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = startInstances(key, numberOfProcessInstances);
 
-    return runtimeService.createModification(processDefinitionId).startBeforeActivity(activityId).processInstanceIds(processInstanceIds).executeAsync();
+    return runtimeService.createModification(processDefinitionId).startBeforeActivity(activityId)
+        .processInstanceIds(processInstanceIds).executeAsync();
   }
 
-  public Batch startTransitionAsync(String key, int numberOfProcessInstances, String transitionId, String processDefinitionId) {
+  public Batch startTransitionAsync(String key, int numberOfProcessInstances, String transitionId,
+      String processDefinitionId) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = startInstances(key, numberOfProcessInstances);
 
-    return runtimeService.createModification(processDefinitionId).startTransition(transitionId).processInstanceIds(processInstanceIds).executeAsync();
+    return runtimeService.createModification(processDefinitionId).startTransition(transitionId)
+        .processInstanceIds(processInstanceIds).executeAsync();
   }
 
-  public Batch cancelAllAsync(String key, int numberOfProcessInstances, String activityId, String processDefinitionId) {
+  public Batch cancelAllAsync(String key, int numberOfProcessInstances, String activityId,
+      String processDefinitionId) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = startInstances(key, numberOfProcessInstances);
 
-    return runtimeService.createModification(processDefinitionId).cancelAllForActivity(activityId).processInstanceIds(processInstanceIds).executeAsync();
+    return runtimeService.createModification(processDefinitionId).cancelAllForActivity(activityId)
+        .processInstanceIds(processInstanceIds).executeAsync();
   }
 
   public List<String> startInstances(String key, int numOfInstances) {
     List<String> instances = new ArrayList<String>();
     for (int i = 0; i < numOfInstances; i++) {
-      ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(key);
+      ProcessInstance processInstance = engineRule.getRuntimeService()
+          .startProcessInstanceByKey(key);
       instances.add(processInstance.getId());
     }
 
@@ -86,8 +91,9 @@ public class BatchModificationHelper extends BatchHelper {
 
   @Override
   public JobDefinition getExecutionJobDefinition(Batch batch) {
-    return engineRule.getManagementService()
-        .createJobDefinitionQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).jobType(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION).singleResult();
+    return engineRule.getManagementService().createJobDefinitionQuery()
+        .jobDefinitionId(batch.getBatchJobDefinitionId())
+        .jobType(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION).singleResult();
   }
 
 }

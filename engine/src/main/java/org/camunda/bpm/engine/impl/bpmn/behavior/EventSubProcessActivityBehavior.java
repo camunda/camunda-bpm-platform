@@ -27,18 +27,23 @@ public class EventSubProcessActivityBehavior extends SubProcessActivityBehavior 
 
   public void complete(ActivityExecution scopeExecution) {
     // check whether legacy behavior needs to be performed.
-    if(!LegacyBehavior.eventSubprocessComplete(scopeExecution)) {
-      // in case legacy behavior is not performed, the event subprocess behaves in the same way as a regular subprocess.
+    if (!LegacyBehavior.eventSubprocessComplete(scopeExecution)) {
+      // in case legacy behavior is not performed, the event subprocess behaves in the same way as a
+      // regular subprocess.
       super.complete(scopeExecution);
     }
   }
 
-  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
+  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution,
+      ActivityExecution endedExecution) {
     // Check whether legacy behavior needs to be performed.
     // Legacy behavior means that the event subprocess is not a scope and as a result does not
-    // join concurrent executions on it's own. Instead it delegates to the the subprocess activity behavior in which it is embedded.
-    if(!LegacyBehavior.eventSubprocessConcurrentChildExecutionEnded(scopeExecution, endedExecution)) {
-      // in case legacy behavior is not performed, the event subprocess behaves in the same way as a regular subprocess.
+    // join concurrent executions on it's own. Instead it delegates to the the subprocess activity
+    // behavior in which it is embedded.
+    if (!LegacyBehavior.eventSubprocessConcurrentChildExecutionEnded(scopeExecution,
+        endedExecution)) {
+      // in case legacy behavior is not performed, the event subprocess behaves in the same way as a
+      // regular subprocess.
       super.concurrentChildExecutionEnded(scopeExecution, endedExecution);
     }
   }

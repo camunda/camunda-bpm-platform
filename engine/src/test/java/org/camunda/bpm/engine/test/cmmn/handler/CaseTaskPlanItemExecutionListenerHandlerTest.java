@@ -45,7 +45,8 @@ public class CaseTaskPlanItemExecutionListenerHandlerTest extends CmmnElementHan
 
   protected AbstractExecutionListenerSpec testSpecification;
 
-  public CaseTaskPlanItemExecutionListenerHandlerTest(AbstractExecutionListenerSpec testSpecification) {
+  public CaseTaskPlanItemExecutionListenerHandlerTest(
+      AbstractExecutionListenerSpec testSpecification) {
     this.testSpecification = testSpecification;
   }
 

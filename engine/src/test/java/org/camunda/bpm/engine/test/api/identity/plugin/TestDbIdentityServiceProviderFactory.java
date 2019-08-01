@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
  * @author Simon Jonischkeit
  *
  */
-public class TestDbIdentityServiceProviderFactory implements SessionFactory{
+public class TestDbIdentityServiceProviderFactory implements SessionFactory {
 
   @Override
   public Class<?> getSessionType() {

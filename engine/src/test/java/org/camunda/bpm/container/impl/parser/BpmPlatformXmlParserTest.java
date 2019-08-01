@@ -33,7 +33,9 @@ import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
- * <p>The testcases for the {@link BpmPlatformXmlParser}</p>
+ * <p>
+ * The testcases for the {@link BpmPlatformXmlParser}
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -54,9 +56,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
   public void testParseBpmPlatformXmlNoEngine() {
 
     BpmPlatformXml bpmPlatformXml = parser.createParse()
-      .sourceUrl(getStreamUrl("bpmplatform_xml_no_engine.xml"))
-      .execute()
-      .getBpmPlatformXml();
+        .sourceUrl(getStreamUrl("bpmplatform_xml_no_engine.xml")).execute().getBpmPlatformXml();
 
     assertNotNull(bpmPlatformXml);
     assertNotNull(bpmPlatformXml.getJobExecutor());
@@ -67,7 +67,8 @@ public class BpmPlatformXmlParserTest extends TestCase {
 
     JobAcquisitionXml jobAcquisitionXml = jobExecutorXml.getJobAcquisitions().get(0);
     assertEquals("default", jobAcquisitionXml.getName());
-    assertEquals("org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor", jobAcquisitionXml.getJobExecutorClassName());
+    assertEquals("org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor",
+        jobAcquisitionXml.getJobExecutorClassName());
 
     assertEquals(2, jobAcquisitionXml.getProperties().size());
 
@@ -76,9 +77,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
   public void testParseBpmPlatformXmlOneEngine() {
 
     BpmPlatformXml bpmPlatformXml = parser.createParse()
-      .sourceUrl(getStreamUrl("bpmplatform_xml_one_engine.xml"))
-      .execute()
-      .getBpmPlatformXml();
+        .sourceUrl(getStreamUrl("bpmplatform_xml_one_engine.xml")).execute().getBpmPlatformXml();
 
     assertNotNull(bpmPlatformXml);
     assertNotNull(bpmPlatformXml.getJobExecutor());
@@ -90,7 +89,8 @@ public class BpmPlatformXmlParserTest extends TestCase {
 
     JobAcquisitionXml jobAcquisitionXml = jobExecutorXml.getJobAcquisitions().get(0);
     assertEquals("default", jobAcquisitionXml.getName());
-    assertEquals("org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor", jobAcquisitionXml.getJobExecutorClassName());
+    assertEquals("org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor",
+        jobAcquisitionXml.getJobExecutorClassName());
 
     assertEquals(2, jobAcquisitionXml.getProperties().size());
 
@@ -111,9 +111,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
   public void testParseBpmPlatformXmlEnginePlugin() {
 
     BpmPlatformXml bpmPlatformXml = parser.createParse()
-      .sourceUrl(getStreamUrl("bpmplatform_xml_engine_plugin.xml"))
-      .execute()
-      .getBpmPlatformXml();
+        .sourceUrl(getStreamUrl("bpmplatform_xml_engine_plugin.xml")).execute().getBpmPlatformXml();
 
     assertNotNull(bpmPlatformXml);
     assertEquals(1, bpmPlatformXml.getProcessEngines().size());
@@ -147,9 +145,8 @@ public class BpmPlatformXmlParserTest extends TestCase {
   public void testParseBpmPlatformXmlMultipleEnginePlugins() {
 
     BpmPlatformXml bpmPlatformXml = parser.createParse()
-      .sourceUrl(getStreamUrl("bpmplatform_xml_multiple_engine_plugins.xml"))
-      .execute()
-      .getBpmPlatformXml();
+        .sourceUrl(getStreamUrl("bpmplatform_xml_multiple_engine_plugins.xml")).execute()
+        .getBpmPlatformXml();
 
     assertNotNull(bpmPlatformXml);
     assertEquals(1, bpmPlatformXml.getProcessEngines().size());
@@ -166,8 +163,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
   public void testParseProcessesXmlAntStyleProperties() {
 
     BpmPlatformXml platformXml = parser.createParse()
-        .sourceUrl(getStreamUrl("bpmplatform_xml_ant_style_properties.xml"))
-        .execute()
+        .sourceUrl(getStreamUrl("bpmplatform_xml_ant_style_properties.xml")).execute()
         .getBpmPlatformXml();
 
     assertNotNull(platformXml);

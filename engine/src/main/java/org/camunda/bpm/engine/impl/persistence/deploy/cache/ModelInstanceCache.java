@@ -40,7 +40,8 @@ public abstract class ModelInstanceCache<InstanceType extends ModelInstance, Def
   protected Cache<String, InstanceType> instanceCache;
   protected ResourceDefinitionCache<DefinitionType> definitionCache;
 
-  public ModelInstanceCache(CacheFactory factory, int cacheCapacity, ResourceDefinitionCache<DefinitionType> definitionCache) {
+  public ModelInstanceCache(CacheFactory factory, int cacheCapacity,
+      ResourceDefinitionCache<DefinitionType> definitionCache) {
     this.instanceCache = factory.createCache(cacheCapacity);
     this.definitionCache = definitionCache;
   }
@@ -64,11 +65,13 @@ public abstract class ModelInstanceCache<InstanceType extends ModelInstance, Def
 
   protected InstanceType loadAndCacheBpmnModelInstance(final DefinitionType definitionEntity) {
     final CommandContext commandContext = Context.getCommandContext();
-    InputStream bpmnResourceInputStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-      public InputStream call() throws Exception {
-        return new GetDeploymentResourceCmd(definitionEntity.getDeploymentId(), definitionEntity.getResourceName()).execute(commandContext);
-      }
-    });
+    InputStream bpmnResourceInputStream = commandContext
+        .runWithoutAuthorization(new Callable<InputStream>() {
+          public InputStream call() throws Exception {
+            return new GetDeploymentResourceCmd(definitionEntity.getDeploymentId(),
+                definitionEntity.getResourceName()).execute(commandContext);
+          }
+        });
 
     try {
       InstanceType bpmnModelInstance = readModelFromStream(bpmnResourceInputStream);
@@ -82,7 +85,8 @@ public abstract class ModelInstanceCache<InstanceType extends ModelInstance, Def
 
   public void removeAllDefinitionsByDeploymentId(final String deploymentId) {
     // remove all definitions for a specific deployment
-    List<? extends ResourceDefinition> allDefinitionsForDeployment = getAllDefinitionsForDeployment(deploymentId);
+    List<? extends ResourceDefinition> allDefinitionsForDeployment = getAllDefinitionsForDeployment(
+        deploymentId);
     for (ResourceDefinition definition : allDefinitionsForDeployment) {
       try {
         instanceCache.remove(definition.getId());
@@ -108,9 +112,11 @@ public abstract class ModelInstanceCache<InstanceType extends ModelInstance, Def
 
   protected abstract void throwLoadModelException(String definitionId, Exception e);
 
-  protected abstract void logRemoveEntryFromDeploymentCacheFailure(String definitionId, Exception e);
+  protected abstract void logRemoveEntryFromDeploymentCacheFailure(String definitionId,
+      Exception e);
 
   protected abstract InstanceType readModelFromStream(InputStream stream);
 
-  protected abstract List<? extends ResourceDefinition> getAllDefinitionsForDeployment(String deploymentId);
+  protected abstract List<? extends ResourceDefinition> getAllDefinitionsForDeployment(
+      String deploymentId);
 }

@@ -32,9 +32,7 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
   protected final String DEFINITION_KEY = "oneMilestoneCase";
   protected final String MILESTONE_KEY = "PI_Milestone_1";
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn" })
   public void testManualStart() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -42,17 +40,13 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .manualStart();
+      caseService.withCaseExecution(caseTaskId).manualStart();
       fail();
     } catch (NotAllowedException e) {
     }
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn" })
   public void testDisable() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -60,17 +54,13 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .disable();
+      caseService.withCaseExecution(caseTaskId).disable();
       fail();
     } catch (NotAllowedException e) {
     }
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn" })
   public void testReenable() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -78,17 +68,13 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .reenable();
+      caseService.withCaseExecution(caseTaskId).reenable();
       fail();
     } catch (NotAllowedException e) {
     }
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn" })
   public void testComplete() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -96,34 +82,26 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .complete();
+      caseService.withCaseExecution(caseTaskId).complete();
       fail();
     } catch (NotAllowedException e) {
     }
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn" })
   public void testTerminate() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
-   
+
     String caseTaskId = queryCaseExecutionByActivityId(MILESTONE_KEY).getId();
 
-    caseService
-     .withCaseExecution(caseTaskId)
-     .terminate();
+    caseService.withCaseExecution(caseTaskId).terminate();
 
     CaseExecution caseMilestone = queryCaseExecutionByActivityId(MILESTONE_KEY);
     assertNull(caseMilestone);
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCase.cmmn" })
   public void testTerminateNonFluent() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -138,29 +116,20 @@ public class CaseServiceMilestoneTest extends PluggableProcessEngineTestCase {
   }
 
   protected CaseInstance createCaseInstance(String caseDefinitionKey) {
-    return caseService
-        .withCaseDefinitionByKey(caseDefinitionKey)
-        .create();
+    return caseService.withCaseDefinitionByKey(caseDefinitionKey).create();
   }
 
   protected CaseExecution queryCaseExecutionByActivityId(String activityId) {
-    return caseService
-        .createCaseExecutionQuery()
-        .activityId(activityId)
-        .singleResult();
+    return caseService.createCaseExecutionQuery().activityId(activityId).singleResult();
   }
 
   protected CaseInstance queryCaseInstanceByKey(String caseDefinitionKey) {
-    return caseService
-        .createCaseInstanceQuery()
-        .caseDefinitionKey(caseDefinitionKey)
+    return caseService.createCaseInstanceQuery().caseDefinitionKey(caseDefinitionKey)
         .singleResult();
   }
 
   protected Task queryTask() {
-    return taskService
-        .createTaskQuery()
-        .singleResult();
+    return taskService.createTaskQuery().singleResult();
   }
 
 }

@@ -66,19 +66,15 @@ public class EvaluateDecisionAuthorizationTest {
   @Parameters(name = "scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.DECISION_DEFINITION, DECISION_DEFINITION_KEY, "userId", Permissions.CREATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.DECISION_DEFINITION, DECISION_DEFINITION_KEY, "userId", Permissions.CREATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.DECISION_DEFINITION, "*", "userId", Permissions.CREATE_INSTANCE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations()
+            .failsDueToRequired(grant(Resources.DECISION_DEFINITION, DECISION_DEFINITION_KEY,
+                "userId", Permissions.CREATE_INSTANCE)),
+        scenario().withAuthorizations(grant(Resources.DECISION_DEFINITION, DECISION_DEFINITION_KEY,
+            "userId", Permissions.CREATE_INSTANCE)).succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.DECISION_DEFINITION, "*", "userId", Permissions.CREATE_INSTANCE))
+            .succeeds());
   }
 
   @Before
@@ -96,12 +92,15 @@ public class EvaluateDecisionAuthorizationTest {
   public void evaluateDecisionById() {
 
     // given
-    DecisionDefinition decisionDefinition = engineRule.getRepositoryService().createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = engineRule.getRepositoryService()
+        .createDecisionDefinitionQuery().singleResult();
 
     // when
-    authRule.init(scenario).withUser("userId").bindResource("decisionDefinitionKey", DECISION_DEFINITION_KEY).start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("decisionDefinitionKey", DECISION_DEFINITION_KEY).start();
 
-    DmnDecisionTableResult decisionResult = engineRule.getDecisionService().evaluateDecisionTableById(decisionDefinition.getId(), createVariables());
+    DmnDecisionTableResult decisionResult = engineRule.getDecisionService()
+        .evaluateDecisionTableById(decisionDefinition.getId(), createVariables());
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -114,12 +113,15 @@ public class EvaluateDecisionAuthorizationTest {
   public void evaluateDecisionByKey() {
 
     // given
-    DecisionDefinition decisionDefinition = engineRule.getRepositoryService().createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = engineRule.getRepositoryService()
+        .createDecisionDefinitionQuery().singleResult();
 
     // when
-    authRule.init(scenario).withUser("userId").bindResource("decisionDefinitionKey", DECISION_DEFINITION_KEY).start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("decisionDefinitionKey", DECISION_DEFINITION_KEY).start();
 
-    DmnDecisionTableResult decisionResult = engineRule.getDecisionService().evaluateDecisionTableByKey(decisionDefinition.getKey(), createVariables());
+    DmnDecisionTableResult decisionResult = engineRule.getDecisionService()
+        .evaluateDecisionTableByKey(decisionDefinition.getKey(), createVariables());
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -132,13 +134,16 @@ public class EvaluateDecisionAuthorizationTest {
   public void evaluateDecisionByKeyAndVersion() {
 
     // given
-    DecisionDefinition decisionDefinition = engineRule.getRepositoryService().createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = engineRule.getRepositoryService()
+        .createDecisionDefinitionQuery().singleResult();
 
     // when
-    authRule.init(scenario).withUser("userId").bindResource("decisionDefinitionKey", DECISION_DEFINITION_KEY).start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("decisionDefinitionKey", DECISION_DEFINITION_KEY).start();
 
-    DmnDecisionTableResult decisionResult = engineRule.getDecisionService().evaluateDecisionTableByKeyAndVersion(decisionDefinition.getKey(),
-        decisionDefinition.getVersion(), createVariables());
+    DmnDecisionTableResult decisionResult = engineRule.getDecisionService()
+        .evaluateDecisionTableByKeyAndVersion(decisionDefinition.getKey(),
+            decisionDefinition.getVersion(), createVariables());
 
     // then
     if (authRule.assertScenario(scenario)) {

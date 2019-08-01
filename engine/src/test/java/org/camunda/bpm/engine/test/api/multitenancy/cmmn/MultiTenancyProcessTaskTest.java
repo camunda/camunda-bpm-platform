@@ -45,10 +45,7 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
   protected static final String PROCESS_TASK_ID = "PI_ProcessTask_1";
 
   protected static final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .userTask()
-      .endEvent()
-      .done();
+      .startEvent().userTask().endEvent().done();
 
   public void testStartProcessInstanceWithDeploymentBinding() {
 
@@ -58,7 +55,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     createCaseInstance("testCaseDeployment", TENANT_ONE);
     createCaseInstance("testCaseDeployment", TENANT_TWO);
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("testProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
@@ -71,7 +69,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     createCaseInstance("testCase", TENANT_ONE);
     createCaseInstance("testCase", TENANT_TWO);
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("testProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
@@ -89,9 +88,12 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     ProcessDefinition latestProcessTenantTwo = repositoryService.createProcessDefinitionQuery()
         .tenantIdIn(TENANT_TWO).processDefinitionKey("testProcess").latestVersion().singleResult();
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("testProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).processDefinitionId(latestProcessTenantTwo.getId()).count(), is(1L));
+    assertThat(
+        query.tenantIdIn(TENANT_TWO).processDefinitionId(latestProcessTenantTwo.getId()).count(),
+        is(1L));
   }
 
   public void testStartProcessInstanceWithVersionBinding() {
@@ -102,7 +104,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
     createCaseInstance("testCaseVersion", TENANT_ONE);
     createCaseInstance("testCaseVersion", TENANT_TWO);
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("testProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
@@ -157,7 +160,8 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
 
     caseService.withCaseDefinitionByKey("testCase").create();
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("testProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
@@ -167,17 +171,21 @@ public class MultiTenancyProcessTaskTest extends PluggableProcessEngineTestCase 
 
     caseService.withCaseDefinitionByKey("testCase").create();
 
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(PROCESS_TASK_ID).singleResult();
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(PROCESS_TASK_ID)
+        .singleResult();
     caseService.withCaseExecution(caseExecution.getId()).manualStart();
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("testProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
   protected void createCaseInstance(String caseDefinitionKey, String tenantId) {
-    caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId).create();
+    caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId)
+        .create();
 
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(PROCESS_TASK_ID).tenantIdIn(tenantId).singleResult();
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(PROCESS_TASK_ID)
+        .tenantIdIn(tenantId).singleResult();
     caseService.withCaseExecution(caseExecution.getId()).manualStart();
   }
 

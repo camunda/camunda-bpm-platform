@@ -26,17 +26,18 @@ import org.camunda.bpm.engine.authorization.Resources;
  *
  */
 public interface ProcessInstantiationBuilder
-    extends ActivityInstantiationBuilder<ProcessInstantiationBuilder>, InstantiationBuilder<ProcessInstantiationBuilder> {
+    extends ActivityInstantiationBuilder<ProcessInstantiationBuilder>,
+    InstantiationBuilder<ProcessInstantiationBuilder> {
 
   /**
-   * Specify the id of the tenant the process definition belongs to. Can only be
-   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   * Specify the id of the tenant the process definition belongs to. Can only be used when the
+   * definition is referenced by <code>key</code> and not by <code>id</code>.
    */
   ProcessInstantiationBuilder processDefinitionTenantId(String tenantId);
 
   /**
-   * Specify that the process definition belongs to no tenant. Can only be
-   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   * Specify that the process definition belongs to no tenant. Can only be used when the definition
+   * is referenced by <code>key</code> and not by <code>id</code>.
    */
   ProcessInstantiationBuilder processDefinitionWithoutTenantId();
 
@@ -56,9 +57,8 @@ public interface ProcessInstantiationBuilder
    * @return the newly created process instance
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE} permission on
-   *           {@link Resources#PROCESS_INSTANCE} and no
-   *           {@link Permissions#CREATE_INSTANCE} permission on
-   *           {@link Resources#PROCESS_DEFINITION}.
+   *           {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE}
+   *           permission on {@link Resources#PROCESS_DEFINITION}.
    * @see also {@link #executeWithVariablesInReturn()}.
    */
   ProcessInstance execute();
@@ -67,61 +67,55 @@ public interface ProcessInstantiationBuilder
    * Start the process instance.
    *
    * @param skipCustomListeners
-   *          specifies whether custom listeners (task and execution) should be
-   *          invoked when executing the instructions. Only supported for
-   *          instructions.
+   *          specifies whether custom listeners (task and execution) should be invoked when
+   *          executing the instructions. Only supported for instructions.
    * @param skipIoMappings
-   *          specifies whether input/output mappings for tasks should be
-   *          invoked throughout the transaction when executing the
-   *          instructions. Only supported for instructions.
+   *          specifies whether input/output mappings for tasks should be invoked throughout the
+   *          transaction when executing the instructions. Only supported for instructions.
    * @return the newly created process instance
    * @see also {@link #executeWithVariablesInReturn(boolean, boolean)}.
    */
   ProcessInstance execute(boolean skipCustomListeners, boolean skipIoMappings);
 
   /**
-   * Start the process instance. If no instantiation instructions are set then
-   * the instance start at the default start activity. Otherwise, all
-   * instructions are executed in the order they are submitted. Custom execution
-   * and task listeners, as well as task input output mappings are triggered.
+   * Start the process instance. If no instantiation instructions are set then the instance start at
+   * the default start activity. Otherwise, all instructions are executed in the order they are
+   * submitted. Custom execution and task listeners, as well as task input output mappings are
+   * triggered.
    *
    * @return the newly created process instance with the latest variables
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE} permission on
-   *           {@link Resources#PROCESS_INSTANCE} and no
-   *           {@link Permissions#CREATE_INSTANCE} permission on
-   *           {@link Resources#PROCESS_DEFINITION}.
+   *           {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE}
+   *           permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessInstanceWithVariables executeWithVariablesInReturn();
 
   /**
-   * Start the process instance. If no instantiation instructions are set then
-   * the instance start at the default start activity. Otherwise, all
-   * instructions are executed in the order they are submitted.
+   * Start the process instance. If no instantiation instructions are set then the instance start at
+   * the default start activity. Otherwise, all instructions are executed in the order they are
+   * submitted.
    *
    * @param skipCustomListeners
-   *          specifies whether custom listeners (task and execution) should be
-   *          invoked when executing the instructions. Only supported for
-   *          instructions.
+   *          specifies whether custom listeners (task and execution) should be invoked when
+   *          executing the instructions. Only supported for instructions.
    * @param skipIoMappings
-   *          specifies whether input/output mappings for tasks should be
-   *          invoked throughout the transaction when executing the
-   *          instructions. Only supported for instructions.
+   *          specifies whether input/output mappings for tasks should be invoked throughout the
+   *          transaction when executing the instructions. Only supported for instructions.
    * @return the newly created process instance with the latest variables
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE} permission on
-   *           {@link Resources#PROCESS_INSTANCE} and no
-   *           {@link Permissions#CREATE_INSTANCE} permission on
-   *           {@link Resources#PROCESS_DEFINITION}.
+   *           {@link Resources#PROCESS_INSTANCE} and no {@link Permissions#CREATE_INSTANCE}
+   *           permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @throws ProcessEngineException
-   *           if {@code skipCustomListeners} or {@code skipIoMappings} is set
-   *           to true but no instructions are submitted. Both options are not
-   *           supported when the instance starts at the default start activity.
-   *           Use {@link #execute()} instead.
+   *           if {@code skipCustomListeners} or {@code skipIoMappings} is set to true but no
+   *           instructions are submitted. Both options are not supported when the instance starts
+   *           at the default start activity. Use {@link #execute()} instead.
    *
    */
-  ProcessInstanceWithVariables executeWithVariablesInReturn(boolean skipCustomListeners, boolean skipIoMappings);
+  ProcessInstanceWithVariables executeWithVariablesInReturn(boolean skipCustomListeners,
+      boolean skipIoMappings);
 }

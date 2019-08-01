@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.impl.util.JsonUtil;
 /**
  * @author Sebastian Menski
  */
-public class JsonTaskQueryVariableValueConverter extends JsonObjectConverter<TaskQueryVariableValue> {
+public class JsonTaskQueryVariableValueConverter
+    extends JsonObjectConverter<TaskQueryVariableValue> {
 
   public JsonObject toJsonObject(TaskQueryVariableValue variable) {
     JsonObject jsonObject = JsonUtil.createObject();

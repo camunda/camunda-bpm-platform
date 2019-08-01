@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogTest {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml" })
   public void testSetOverridingPriority() {
     // given a job definition
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
@@ -40,7 +40,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42);
 
     // then an op log entry is written
-    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+        .singleResult();
     assertNotNull(userOperationLogEntry);
 
     assertEquals(EntityTypes.JOB_DEFINITION, userOperationLogEntry.getEntityType());
@@ -54,15 +55,17 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     assertEquals(null, userOperationLogEntry.getOrgValue());
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
-    
+
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
-    assertEquals(jobDefinition.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
-    assertEquals(jobDefinition.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
+    assertEquals(jobDefinition.getProcessDefinitionId(),
+        userOperationLogEntry.getProcessDefinitionId());
+    assertEquals(jobDefinition.getProcessDefinitionKey(),
+        userOperationLogEntry.getProcessDefinitionKey());
     assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml" })
   public void testOverwriteOverridingPriority() {
     // given a job definition
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
@@ -85,7 +88,7 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
 
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY,
         userOperationLogEntry.getOperationType());
-    
+
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertEquals("overridingPriority", userOperationLogEntry.getProperty());
@@ -93,7 +96,7 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     assertEquals("42", userOperationLogEntry.getOrgValue());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml" })
   public void testClearOverridingPriority() {
     // given a job definition
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
@@ -122,15 +125,17 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     assertEquals("42", userOperationLogEntry.getOrgValue());
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
-    
+
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
-    assertEquals(jobDefinition.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
-    assertEquals(jobDefinition.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
+    assertEquals(jobDefinition.getProcessDefinitionId(),
+        userOperationLogEntry.getProcessDefinitionId());
+    assertEquals(jobDefinition.getProcessDefinitionKey(),
+        userOperationLogEntry.getProcessDefinitionKey());
     assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml" })
   public void testSetOverridingPriorityCascadeToJobs() {
     // given a job definition and job
     runtimeService.startProcessInstanceByKey("asyncTaskProcess");
@@ -144,8 +149,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     assertEquals(3, historyService.createUserOperationLogQuery().count());
 
     // (1): One for the process instance start
-    UserOperationLogEntry processInstanceStartOpLogEntry = historyService.createUserOperationLogQuery()
-        .entityType(EntityTypes.PROCESS_INSTANCE).singleResult();
+    UserOperationLogEntry processInstanceStartOpLogEntry = historyService
+        .createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).singleResult();
     assertNotNull(processInstanceStartOpLogEntry);
 
     // (2): One for the job definition priority
@@ -164,7 +169,8 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
     assertEquals(EntityTypes.JOB, jobOpLogEntry.getEntityType());
     assertNull("id should null because it is a bulk update operation", jobOpLogEntry.getJobId());
 
-    assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY, jobOpLogEntry.getOperationType());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY,
+        jobOpLogEntry.getOperationType());
 
     assertEquals("priority", jobOpLogEntry.getProperty());
     assertEquals("42", jobOpLogEntry.getNewValue());
@@ -172,7 +178,7 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
         jobOpLogEntry.getOrgValue());
 
     assertEquals(USER_ID, jobOpLogEntry.getUserId());
-    
+
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, jobOpLogEntry.getCategory());
 
     // these properties should be there to narrow down the bulk update (like a SQL WHERE clasue)

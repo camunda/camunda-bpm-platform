@@ -336,7 +336,8 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 3);
 
     disableAuthorization();
-    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
+        .list();
     for (HistoricProcessInstance instance : instances) {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }
@@ -355,8 +356,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    HistoricTaskInstanceQuery query = historyService
-        .createHistoricTaskInstanceQuery()
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
         .taskId(taskId);
     verifyQueryResults(query, 0);
     enableAuthorization();
@@ -397,8 +397,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    HistoricTaskInstanceQuery query = historyService
-        .createHistoricTaskInstanceQuery()
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
         .taskId(taskId);
     verifyQueryResults(query, 0);
     enableAuthorization();
@@ -416,8 +415,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    HistoricTaskInstanceQuery query = historyService
-        .createHistoricTaskInstanceQuery()
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
         .taskId(taskId);
     verifyQueryResults(query, 0);
     enableAuthorization();
@@ -442,8 +440,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
     // then
     disableAuthorization();
-    HistoricTaskInstanceQuery query = historyService
-        .createHistoricTaskInstanceQuery()
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
         .taskId(taskId);
     verifyQueryResults(query, 0);
     enableAuthorization();
@@ -463,10 +460,9 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      historyService
-              .createHistoricTaskInstanceReport()
-              .duration(PeriodUnit.MONTH);
-      fail("Exception expected: It should not be possible to create a historic task instance report");
+      historyService.createHistoricTaskInstanceReport().duration(PeriodUnit.MONTH);
+      fail(
+          "Exception expected: It should not be possible to create a historic task instance report");
     } catch (AuthorizationException e) {
       // then
       List<MissingAuthorization> missingAuthorizations = e.getMissingAuthorizations();
@@ -491,9 +487,8 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(TASK, ANY, userId, READ_HISTORY);
 
     // when
-    List<DurationReportResult> result = historyService
-            .createHistoricTaskInstanceReport()
-            .duration(PeriodUnit.MONTH);
+    List<DurationReportResult> result = historyService.createHistoricTaskInstanceReport()
+        .duration(PeriodUnit.MONTH);
 
     // then
     assertEquals(1, result.size());
@@ -512,8 +507,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
     // when
     List<HistoricTaskInstanceReportResult> result = historyService
-            .createHistoricTaskInstanceReport()
-            .countByProcessDefinitionKey();
+        .createHistoricTaskInstanceReport().countByProcessDefinitionKey();
 
     // then
     assertEquals(1, result.size());
@@ -532,8 +526,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
     // when
     List<HistoricTaskInstanceReportResult> result = historyService
-            .createHistoricTaskInstanceReport()
-            .countByTaskName();
+        .createHistoricTaskInstanceReport().countByTaskName();
 
     // then
     assertEquals(1, result.size());

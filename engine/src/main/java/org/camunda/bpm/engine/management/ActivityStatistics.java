@@ -24,17 +24,17 @@ public interface ActivityStatistics {
    * The activity id.
    */
   String getId();
-  
+
   /**
    * The number of all instances of the activity.
    */
   int getInstances();
-  
+
   /**
    * The number of all failed jobs for the activity.
    */
   int getFailedJobs();
-  
+
   /**
    * Returns a list of incident statistics.
    */

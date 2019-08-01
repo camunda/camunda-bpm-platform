@@ -23,8 +23,7 @@ import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Implementation of the {@link VariableContext} interface backed
- * by a {@link VariableScope}.
+ * Implementation of the {@link VariableContext} interface backed by a {@link VariableScope}.
  *
  * @author Daniel Meyer
  *

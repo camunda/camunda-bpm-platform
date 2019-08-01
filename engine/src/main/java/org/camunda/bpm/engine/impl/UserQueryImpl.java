@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-
 /**
  * @author Joram Barrez
  */
@@ -112,7 +111,7 @@ public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> imple
     return this;
   }
 
-  //sorting //////////////////////////////////////////////////////////
+  // sorting //////////////////////////////////////////////////////////
 
   public UserQuery orderByUserId() {
     return orderBy(UserQueryProperty.USER_ID);
@@ -130,35 +129,44 @@ public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> imple
     return orderBy(UserQueryProperty.LAST_NAME);
   }
 
-  //getters //////////////////////////////////////////////////////////
+  // getters //////////////////////////////////////////////////////////
 
   public String getId() {
     return id;
   }
+
   public String[] getIds() {
     return ids;
   }
+
   public String getFirstName() {
     return firstName;
   }
+
   public String getFirstNameLike() {
     return firstNameLike;
   }
+
   public String getLastName() {
     return lastName;
   }
+
   public String getLastNameLike() {
     return lastNameLike;
   }
+
   public String getEmail() {
     return email;
   }
+
   public String getEmailLike() {
     return emailLike;
   }
+
   public String getGroupId() {
     return groupId;
   }
+
   public String getTenantId() {
     return tenantId;
   }

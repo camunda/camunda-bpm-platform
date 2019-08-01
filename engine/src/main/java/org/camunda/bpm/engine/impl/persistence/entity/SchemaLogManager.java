@@ -34,16 +34,19 @@ public class SchemaLogManager extends AbstractManager {
 
   public Long findSchemaLogEntryCountByQueryCriteria(SchemaLogQuery schemaLogQuery) {
     if (isAuthorized()) {
-      return (Long) getDbEntityManager().selectOne("selectSchemaLogEntryCountByQueryCriteria", schemaLogQuery);
+      return (Long) getDbEntityManager().selectOne("selectSchemaLogEntryCountByQueryCriteria",
+          schemaLogQuery);
     } else {
       return 0L;
     }
   }
 
   @SuppressWarnings("unchecked")
-  public List<SchemaLogEntry> findSchemaLogEntriesByQueryCriteria(SchemaLogQueryImpl schemaLogQueryImpl, Page page) {
+  public List<SchemaLogEntry> findSchemaLogEntriesByQueryCriteria(
+      SchemaLogQueryImpl schemaLogQueryImpl, Page page) {
     if (isAuthorized()) {
-      return getDbEntityManager().selectList("selectSchemaLogEntryByQueryCriteria", schemaLogQueryImpl, page);
+      return getDbEntityManager().selectList("selectSchemaLogEntryByQueryCriteria",
+          schemaLogQueryImpl, page);
     } else {
       return Collections.emptyList();
     }

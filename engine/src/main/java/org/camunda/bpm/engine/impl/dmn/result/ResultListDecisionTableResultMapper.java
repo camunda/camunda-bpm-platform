@@ -19,8 +19,7 @@ package org.camunda.bpm.engine.impl.dmn.result;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 
 /**
- * Maps the decision result to a list of pairs that contains output name and
- * untyped entry.
+ * Maps the decision result to a list of pairs that contains output name and untyped entry.
  *
  * @author Philipp Ossler
  */

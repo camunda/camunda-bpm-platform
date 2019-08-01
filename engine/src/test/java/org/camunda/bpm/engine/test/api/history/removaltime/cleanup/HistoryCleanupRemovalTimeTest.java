@@ -132,10 +132,9 @@ public class HistoryCleanupRemovalTimeTest {
 
     engineConfiguration = engineRule.getProcessEngineConfiguration();
 
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
-      .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
-      .initHistoryRemovalTime();
+    engineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
+        .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
+        .initHistoryRemovalTime();
 
     engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
 
@@ -145,7 +144,7 @@ public class HistoryCleanupRemovalTimeTest {
 
     engineConfiguration.setBatchOperationHistoryTimeToLive(null);
     engineConfiguration.setBatchOperationsForHistoryCleanup(null);
-    
+
     engineConfiguration.setHistoryTimeToLive(null);
 
     engineConfiguration.initHistoryCleanup();
@@ -166,10 +165,8 @@ public class HistoryCleanupRemovalTimeTest {
   @AfterClass
   public static void tearDownAfterAll() {
     if (engineConfiguration != null) {
-      engineConfiguration
-        .setHistoryRemovalTimeProvider(null)
-        .setHistoryRemovalTimeStrategy(null)
-        .initHistoryRemovalTime();
+      engineConfiguration.setHistoryRemovalTimeProvider(null).setHistoryRemovalTimeStrategy(null)
+          .initHistoryRemovalTime();
 
       engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
 
@@ -188,58 +185,41 @@ public class HistoryCleanupRemovalTimeTest {
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .userTask("userTask").name("userTask")
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().userTask("userTask").name("userTask").endEvent()
+      .done();
 
-
-  protected final BpmnModelInstance CALLED_PROCESS_INCIDENT = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .startEvent()
-      .scriptTask()
-        .camundaAsyncBefore()
-        .scriptFormat("groovy")
-        .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
-      .userTask("userTask")
-    .endEvent().done();
+  protected final BpmnModelInstance CALLED_PROCESS_INCIDENT = Bpmn
+      .createExecutableProcess(PROCESS_KEY).startEvent().scriptTask().camundaAsyncBefore()
+      .scriptFormat("groovy")
+      .scriptText(
+          "if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
+      .userTask("userTask").endEvent().done();
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
-  protected final BpmnModelInstance CALLING_PROCESS = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .callActivity()
-        .calledElement(PROCESS_KEY)
-    .endEvent().done();
-  
-  protected final BpmnModelInstance CALLING_PROCESS_WO_TTL = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .startEvent()
-        .callActivity()
-          .calledElement(PROCESS_KEY)
-      .endEvent().done();
+  protected final BpmnModelInstance CALLING_PROCESS = Bpmn
+      .createExecutableProcess(CALLING_PROCESS_KEY).camundaHistoryTimeToLive(5).startEvent()
+      .callActivity().calledElement(PROCESS_KEY).endEvent().done();
+
+  protected final BpmnModelInstance CALLING_PROCESS_WO_TTL = Bpmn
+      .createExecutableProcess(CALLING_PROCESS_KEY).startEvent().callActivity()
+      .calledElement(PROCESS_KEY).endEvent().done();
 
   protected final String CALLING_PROCESS_CALLS_DMN_KEY = "callingProcessCallsDmn";
-  protected final BpmnModelInstance CALLING_PROCESS_CALLS_DMN = Bpmn.createExecutableProcess(CALLING_PROCESS_CALLS_DMN_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .businessRuleTask()
-        .camundaAsyncAfter()
-        .camundaDecisionRef("dish-decision")
-    .endEvent().done();
+  protected final BpmnModelInstance CALLING_PROCESS_CALLS_DMN = Bpmn
+      .createExecutableProcess(CALLING_PROCESS_CALLS_DMN_KEY).camundaHistoryTimeToLive(5)
+      .startEvent().businessRuleTask().camundaAsyncAfter().camundaDecisionRef("dish-decision")
+      .endEvent().done();
 
   protected final Date END_DATE = new Date(1363608000000L);
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldCleanupDecisionInstance() {
     // given
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -247,7 +227,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     managementService.executeJob(jobId);
 
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().list();
 
     // assume
     assertThat(historicDecisionInstances.size(), is(3));
@@ -264,28 +245,21 @@ public class HistoryCleanupRemovalTimeTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldCleanupStandaloneDecisionInstance() {
     // given
     ClockUtil.setCurrentTime(END_DATE);
 
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
-      .decisionDefinitionKey("dish-decision")
-      .singleResult();
+        .decisionDefinitionKey("dish-decision").singleResult();
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 5);
 
-
     // when
-    decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
-      .putValue("temperature", 32)
-      .putValue("dayType", "Weekend"));
+    decisionService.evaluateDecisionTableByKey("dish-decision",
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
-      .includeInputs()
-      .includeOutputs()
-      .list();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().list();
 
     // assume
     assertThat(historicDecisionInstances.size(), is(3));
@@ -295,27 +269,21 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     runHistoryCleanup();
 
-    historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
-      .includeInputs()
-      .includeOutputs()
-      .list();
+    historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().includeInputs()
+        .includeOutputs().list();
 
     // then
     assertThat(historicDecisionInstances.size(), is(0));
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldReportMetricsForDecisionInstanceCleanup() {
     // given
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -329,25 +297,20 @@ public class HistoryCleanupRemovalTimeTest {
     runHistoryCleanup();
 
     long removedDecisionInstancesSum = managementService.createMetricsQuery()
-      .name(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES)
-      .sum();
+        .name(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES).sum();
 
     // then
     assertThat(removedDecisionInstancesSum, is(3L));
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldCleanupDecisionInputInstance() {
     // given
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -355,9 +318,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     managementService.executeJob(jobId);
 
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
-      .includeInputs()
-      .list();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().includeInputs().list();
 
     // assume
     assertThat(historicDecisionInstances.size(), is(3));
@@ -367,26 +329,21 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     runHistoryCleanup();
 
-    historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
-      .includeInputs()
-      .list();
+    historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().includeInputs()
+        .list();
 
     // then
     assertThat(historicDecisionInstances.size(), is(0));
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldCleanupDecisionOutputInstance() {
     // given
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -394,9 +351,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     managementService.executeJob(jobId);
 
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
-      .includeOutputs()
-      .list();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().includeOutputs().list();
 
     // assume
     assertThat(historicDecisionInstances.size(), is(3));
@@ -408,8 +364,7 @@ public class HistoryCleanupRemovalTimeTest {
     runHistoryCleanup();
 
     historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
-      .includeOutputs()
-      .list();
+        .includeOutputs().list();
 
     // then
     assertThat(historicDecisionInstances.size(), is(0));
@@ -430,9 +385,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     taskService.complete(taskId);
 
-    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+    List<HistoricProcessInstance> historicProcessInstances = historyService
+        .createHistoricProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).list();
 
     // assume
     assertThat(historicProcessInstances.size(), is(1));
@@ -444,13 +398,12 @@ public class HistoryCleanupRemovalTimeTest {
     runHistoryCleanup();
 
     historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+        .processDefinitionKey(PROCESS_KEY).list();
 
     // then
     assertThat(historicProcessInstances.size(), is(0));
   }
-  
+
   @Test
   public void shouldNotCleanupProcessInstanceWithoutTTL() {
     // given
@@ -466,9 +419,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     taskService.complete(taskId);
 
-    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+    List<HistoricProcessInstance> historicProcessInstances = historyService
+        .createHistoricProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).list();
 
     // assume
     assertThat(historicProcessInstances.size(), is(1));
@@ -480,18 +432,17 @@ public class HistoryCleanupRemovalTimeTest {
     runHistoryCleanup();
 
     historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+        .processDefinitionKey(PROCESS_KEY).list();
 
     // then
     assertThat(historicProcessInstances.size(), is(1));
   }
-  
+
   @Test
   public void shouldCleanupProcessInstanceWithoutTTLWithConfigDefault() {
     // given
     engineConfiguration.setHistoryTimeToLive("5");
-    
+
     testRule.deploy(CALLING_PROCESS_WO_TTL);
 
     testRule.deploy(PROCESS);
@@ -504,9 +455,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     taskService.complete(taskId);
 
-    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+    List<HistoricProcessInstance> historicProcessInstances = historyService
+        .createHistoricProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).list();
 
     // assume
     assertThat(historicProcessInstances.size(), is(1));
@@ -518,8 +468,7 @@ public class HistoryCleanupRemovalTimeTest {
     runHistoryCleanup();
 
     historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+        .processDefinitionKey(PROCESS_KEY).list();
 
     // then
     assertThat(historicProcessInstances.size(), is(0));
@@ -546,8 +495,7 @@ public class HistoryCleanupRemovalTimeTest {
     runHistoryCleanup();
 
     long removedProcessInstancesSum = managementService.createMetricsQuery()
-      .name(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES)
-      .sum();
+        .name(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES).sum();
 
     // then
     assertThat(removedProcessInstancesSum, is(2L));
@@ -568,7 +516,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     taskService.complete(taskId);
 
-    List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().list();
+    List<HistoricActivityInstance> historicActivityInstances = historyService
+        .createHistoricActivityInstanceQuery().list();
 
     // assume
     assertThat(historicActivityInstances.size(), is(6));
@@ -599,7 +548,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     taskService.complete(taskId);
 
-    List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
+    List<HistoricTaskInstance> historicTaskInstances = historyService
+        .createHistoricTaskInstanceQuery().list();
 
     // assume
     assertThat(historicTaskInstances.size(), is(1));
@@ -624,7 +574,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
+    runtimeService.setVariable(processInstance.getId(), "aVariableName",
+        Variables.stringValue("anotherVariableValue"));
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -632,7 +583,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     taskService.complete(taskId);
 
-    List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
+    List<HistoricVariableInstance> historicVariableInstances = historyService
+        .createHistoricVariableInstanceQuery().list();
 
     // assume
     assertThat(historicVariableInstances.size(), is(1));
@@ -656,14 +608,14 @@ public class HistoryCleanupRemovalTimeTest {
     testRule.deploy(PROCESS);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("aVariableName", Variables.stringValue("aVariableValue")));
+        Variables.createVariables().putValue("aVariableName",
+            Variables.stringValue("aVariableValue")));
 
-    runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
+    runtimeService.setVariable(processInstance.getId(), "aVariableName",
+        Variables.stringValue("anotherVariableValue"));
 
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery()
-      .variableUpdates()
-      .list();
+        .variableUpdates().list();
 
     // assume
     assertThat(historicDetails.size(), is(2));
@@ -679,9 +631,7 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     runHistoryCleanup();
 
-    historicDetails = historyService.createHistoricDetailQuery()
-      .variableUpdates()
-      .list();
+    historicDetails = historyService.createHistoricDetailQuery().variableUpdates().list();
 
     // then
     assertThat(historicDetails.size(), is(0));
@@ -702,7 +652,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     try {
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
     List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
 
@@ -729,26 +680,19 @@ public class HistoryCleanupRemovalTimeTest {
   @Test
   public void shouldCleanupExternalTaskLog() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
-      .startEvent()
-        .serviceTask().camundaExternalTask("anExternalTaskTopic")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess").startEvent().serviceTask()
+        .camundaExternalTask("anExternalTaskTopic").endEvent().done());
 
-    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .callActivity()
-          .calledElement("calledProcess")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess").camundaHistoryTimeToLive(5)
+        .startEvent().callActivity().calledElement("calledProcess").endEvent().done());
 
     runtimeService.startProcessInstanceByKey("callingProcess");
 
     LockedExternalTask externalTask = externalTaskService.fetchAndLock(1, "aWorkerId")
-      .topic("anExternalTaskTopic", 3000)
-      .execute()
-      .get(0);
+        .topic("anExternalTaskTopic", 3000).execute().get(0);
 
-    List<HistoricExternalTaskLog> externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
+    List<HistoricExternalTaskLog> externalTaskLogs = historyService
+        .createHistoricExternalTaskLogQuery().list();
 
     // assume
     assertThat(externalTaskLogs.size(), is(1));
@@ -773,24 +717,19 @@ public class HistoryCleanupRemovalTimeTest {
     // given
     testRule.deploy(CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
-      .startEvent().camundaAsyncBefore()
-        .userTask("userTask").name("userTask")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY).startEvent().camundaAsyncBefore()
+        .userTask("userTask").name("userTask").endEvent().done());
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     ClockUtil.setCurrentTime(END_DATE);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     managementService.executeJob(jobId);
 
     List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+        .processDefinitionKey(PROCESS_KEY).list();
 
     // assume
     assertThat(jobLogs.size(), is(2));
@@ -804,9 +743,7 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     runHistoryCleanup();
 
-    jobLogs = historyService.createHistoricJobLogQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+    jobLogs = historyService.createHistoricJobLogQuery().processDefinitionKey(PROCESS_KEY).list();
 
     // then
     assertThat(jobLogs.size(), is(0));
@@ -817,22 +754,19 @@ public class HistoryCleanupRemovalTimeTest {
     // given
     testRule.deploy(CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
-      .startEvent().camundaAsyncBefore()
-        .userTask("userTask").name("userTask")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY).startEvent().camundaAsyncBefore()
+        .userTask("userTask").name("userTask").endEvent().done());
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     identityService.setAuthenticatedUserId("aUserId");
     managementService.setJobRetries(jobId, 65);
     identityService.clearAuthentication();
 
-    List<UserOperationLogEntry> userOperationLogs = historyService.createUserOperationLogQuery().list();
+    List<UserOperationLogEntry> userOperationLogs = historyService.createUserOperationLogQuery()
+        .list();
 
     // assume
     assertThat(userOperationLogs.size(), is(1));
@@ -869,7 +803,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     taskService.addCandidateUser(taskId, "aUserId");
 
-    List<HistoricIdentityLinkLog> historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinkLogs = historyService
+        .createHistoricIdentityLinkLogQuery().list();
 
     // assume
     assertThat(historicIdentityLinkLogs.size(), is(1));
@@ -898,10 +833,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     taskService.createComment(null, processInstanceId, "aMessage");
 
@@ -936,12 +869,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
-    taskService.createAttachment(null, null, processInstanceId, null, null, "http://camunda.com").getId();
+    taskService.createAttachment(null, null, processInstanceId, null, null, "http://camunda.com")
+        .getId();
 
     List<Attachment> attachments = taskService.getProcessInstanceAttachments(processInstanceId);
 
@@ -974,17 +906,15 @@ public class HistoryCleanupRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     try {
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
-    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity) historyService.createHistoricJobLogQuery()
-      .failureLog()
-      .singleResult();
+    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity) historyService
+        .createHistoricJobLogQuery().failureLog().singleResult();
 
     ByteArrayEntity byteArray = findByteArrayById(jobLog.getExceptionByteArrayId());
 
@@ -1023,7 +953,9 @@ public class HistoryCleanupRemovalTimeTest {
 
     String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
 
-    String batchId = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason").getId();
+    String batchId = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason")
+        .getId();
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -1044,8 +976,7 @@ public class HistoryCleanupRemovalTimeTest {
 
     // assume
     List<HistoricJobLog> historicJobLogs = historyService.createHistoricJobLogQuery()
-      .jobDefinitionConfiguration(batchId)
-      .list();
+        .jobDefinitionConfiguration(batchId).list();
 
     assertThat(historicJobLogs.size(), is(6));
 
@@ -1055,9 +986,8 @@ public class HistoryCleanupRemovalTimeTest {
     runHistoryCleanup();
 
     historicBatches = historyService.createHistoricBatchQuery().list();
-    historicJobLogs = historyService.createHistoricJobLogQuery()
-      .jobDefinitionConfiguration(batchId)
-      .list();
+    historicJobLogs = historyService.createHistoricJobLogQuery().jobDefinitionConfiguration(batchId)
+        .list();
 
     // then
     assertThat(historicBatches.size(), is(0));
@@ -1076,7 +1006,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
 
-    runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId),
+        "aDeleteReason");
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -1101,29 +1032,25 @@ public class HistoryCleanupRemovalTimeTest {
     runHistoryCleanup();
 
     long removedBatchesSum = managementService.createMetricsQuery()
-      .name(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS)
-      .sum();
+        .name(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS).sum();
 
     // then
     assertThat(removedBatchesSum, is(1L));
   }
 
-  // parallelism test cases ////////////////////////////////////////////////////////////////////////////////////////////
+  // parallelism test cases
+  // ////////////////////////////////////////////////////////////////////////////////////////////
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldDistributeWorkForDecisions() {
     // given
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-          Variables.createVariables()
-            .putValue("temperature", 32)
-            .putValue("dayType", "Weekend"));
+            Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
@@ -1141,7 +1068,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricDecisionInstance> decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+    List<HistoricDecisionInstance> decisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().list();
 
     // assume
     assertThat(jobs.size(), is(3));
@@ -1189,7 +1117,7 @@ public class HistoryCleanupRemovalTimeTest {
     testRule.deploy(PROCESS);
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
@@ -1208,7 +1136,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().list();
 
     // assume
     assertThat(jobs.size(), is(3));
@@ -1256,7 +1185,7 @@ public class HistoryCleanupRemovalTimeTest {
     testRule.deploy(PROCESS);
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
         String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -1276,7 +1205,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricActivityInstance> activityInstances = historyService.createHistoricActivityInstanceQuery().list();
+    List<HistoricActivityInstance> activityInstances = historyService
+        .createHistoricActivityInstanceQuery().list();
 
     // assume
     assertThat(jobs.size(), is(3));
@@ -1324,7 +1254,7 @@ public class HistoryCleanupRemovalTimeTest {
     testRule.deploy(PROCESS);
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
         String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -1344,7 +1274,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+    List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery()
+        .list();
 
     // assume
     assertThat(jobs.size(), is(3));
@@ -1392,10 +1323,12 @@ public class HistoryCleanupRemovalTimeTest {
     testRule.deploy(PROCESS);
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+      if (i % 4 == 0) {
+        ProcessInstance processInstance = runtimeService
+            .startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-        runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
+        runtimeService.setVariable(processInstance.getId(), "aVariableName",
+            Variables.stringValue("anotherVariableValue"));
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
@@ -1414,7 +1347,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricVariableInstance> variableInstances = historyService.createHistoricVariableInstanceQuery().list();
+    List<HistoricVariableInstance> variableInstances = historyService
+        .createHistoricVariableInstanceQuery().list();
 
     // assume
     assertThat(jobs.size(), is(3));
@@ -1462,10 +1396,12 @@ public class HistoryCleanupRemovalTimeTest {
     testRule.deploy(PROCESS);
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
+      if (i % 4 == 0) {
+        ProcessInstance processInstance = runtimeService
+            .startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-        runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
+        runtimeService.setVariable(processInstance.getId(), "aVariableName",
+            Variables.stringValue("anotherVariableValue"));
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
@@ -1531,7 +1467,7 @@ public class HistoryCleanupRemovalTimeTest {
     testRule.deploy(CALLED_PROCESS_INCIDENT);
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
         String jobId = managementService.createJobQuery().singleResult().getId();
@@ -1540,7 +1476,8 @@ public class HistoryCleanupRemovalTimeTest {
 
         try {
           managementService.executeJob(jobId);
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
@@ -1601,28 +1538,20 @@ public class HistoryCleanupRemovalTimeTest {
   @Test
   public void shouldDistributeWorkForExternalTaskLogs() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
-      .startEvent()
-        .serviceTask().camundaExternalTask("anExternalTaskTopic")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess").startEvent().serviceTask()
+        .camundaExternalTask("anExternalTaskTopic").endEvent().done());
 
-    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .callActivity()
-          .calledElement("calledProcess")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess").camundaHistoryTimeToLive(5)
+        .startEvent().callActivity().calledElement("calledProcess").endEvent().done());
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey("callingProcess");
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
         LockedExternalTask externalTask = externalTaskService.fetchAndLock(1, "aWorkerId")
-          .topic("anExternalTaskTopic", 3000)
-          .execute()
-          .get(0);
+            .topic("anExternalTaskTopic", 3000).execute().get(0);
 
         externalTaskService.complete(externalTask.getId(), "aWorkerId");
       }
@@ -1637,7 +1566,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricExternalTaskLog> externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
+    List<HistoricExternalTaskLog> externalTaskLogs = historyService
+        .createHistoricExternalTaskLogQuery().list();
 
     // assume
     assertThat(jobs.size(), is(3));
@@ -1682,20 +1612,16 @@ public class HistoryCleanupRemovalTimeTest {
     // given
     testRule.deploy(CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
-      .startEvent().camundaAsyncBefore()
-        .userTask("userTask").name("userTask")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY).startEvent().camundaAsyncBefore()
+        .userTask("userTask").name("userTask").endEvent().done());
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
-        String jobId = managementService.createJobQuery()
-          .singleResult()
-          .getId();
+        String jobId = managementService.createJobQuery().singleResult().getId();
 
         managementService.executeJob(jobId);
 
@@ -1714,8 +1640,7 @@ public class HistoryCleanupRemovalTimeTest {
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
     List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+        .processDefinitionKey(PROCESS_KEY).list();
 
     // assume
     assertThat(jobs.size(), is(3));
@@ -1727,9 +1652,7 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     managementService.executeJob(jobOne.getId());
 
-    jobLogs = historyService.createHistoricJobLogQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+    jobLogs = historyService.createHistoricJobLogQuery().processDefinitionKey(PROCESS_KEY).list();
 
     // then
     assertThat(jobLogs.size(), is(20));
@@ -1740,9 +1663,7 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     managementService.executeJob(jobTwo.getId());
 
-    jobLogs = historyService.createHistoricJobLogQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+    jobLogs = historyService.createHistoricJobLogQuery().processDefinitionKey(PROCESS_KEY).list();
 
     // then
     assertThat(jobLogs.size(), is(10));
@@ -1753,9 +1674,7 @@ public class HistoryCleanupRemovalTimeTest {
     // when
     managementService.executeJob(jobThree.getId());
 
-    jobLogs = historyService.createHistoricJobLogQuery()
-      .processDefinitionKey(PROCESS_KEY)
-      .list();
+    jobLogs = historyService.createHistoricJobLogQuery().processDefinitionKey(PROCESS_KEY).list();
 
     // then
     assertThat(jobLogs.size(), is(0));
@@ -1766,18 +1685,14 @@ public class HistoryCleanupRemovalTimeTest {
     // given
     testRule.deploy(CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
-      .startEvent().camundaAsyncBefore()
-        .userTask("userTask").name("userTask")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY).startEvent().camundaAsyncBefore()
+        .userTask("userTask").name("userTask").endEvent().done());
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-        String jobId = managementService.createJobQuery()
-          .singleResult()
-          .getId();
+        String jobId = managementService.createJobQuery().singleResult().getId();
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
@@ -1801,7 +1716,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<UserOperationLogEntry> userOperationLogs = historyService.createUserOperationLogQuery().list();
+    List<UserOperationLogEntry> userOperationLogs = historyService.createUserOperationLogQuery()
+        .list();
 
     // assume
     assertThat(jobs.size(), is(3));
@@ -1849,7 +1765,7 @@ public class HistoryCleanupRemovalTimeTest {
     testRule.deploy(PROCESS);
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
@@ -1871,7 +1787,8 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<Job> jobs = historyService.findHistoryCleanupJobs();
 
-    List<HistoricIdentityLinkLog> historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinkLogs = historyService
+        .createHistoricIdentityLinkLogQuery().list();
 
     // assume
     assertThat(jobs.size(), is(3));
@@ -1920,13 +1837,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<String> processInstanceIds = new ArrayList<>();
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
         String processInstanceId = runtimeService.createProcessInstanceQuery()
-          .activityIdIn("userTask")
-          .singleResult()
-          .getId();
+            .activityIdIn("userTask").singleResult().getId();
 
         processInstanceIds.add(processInstanceId);
 
@@ -1997,19 +1912,19 @@ public class HistoryCleanupRemovalTimeTest {
 
     List<String> processInstanceIds = new ArrayList<>();
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
         String processInstanceId = runtimeService.createProcessInstanceQuery()
-          .activityIdIn("userTask")
-          .singleResult()
-          .getId();
+            .activityIdIn("userTask").singleResult().getId();
 
         processInstanceIds.add(processInstanceId);
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
-        taskService.createAttachment(null, null, processInstanceId, null, null, "http://camunda.com").getId();
+        taskService
+            .createAttachment(null, null, processInstanceId, null, null, "http://camunda.com")
+            .getId();
 
         String taskId = taskService.createTaskQuery().singleResult().getId();
         taskService.complete(taskId);
@@ -2073,18 +1988,17 @@ public class HistoryCleanupRemovalTimeTest {
     testRule.deploy(CALLED_PROCESS_INCIDENT);
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-        String jobId = managementService.createJobQuery()
-          .singleResult()
-          .getId();
+        String jobId = managementService.createJobQuery().singleResult().getId();
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
         try {
           managementService.executeJob(jobId);
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
 
         managementService.setJobRetries(jobId, 0);
 
@@ -2152,12 +2066,13 @@ public class HistoryCleanupRemovalTimeTest {
     testRule.deploy(CALLING_PROCESS);
 
     for (int i = 0; i < 60; i++) {
-      if (i%4 == 0) {
+      if (i % 4 == 0) {
         String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
 
         ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
 
-        runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+        runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId),
+            "aDeleteReason");
 
         String jobId = managementService.createJobQuery().singleResult().getId();
         managementService.executeJob(jobId);
@@ -2222,14 +2137,14 @@ public class HistoryCleanupRemovalTimeTest {
     assertThat(historicBatches.size(), is(0));
   }
 
-  // report tests //////////////////////////////////////////////////////////////////////////////////////////////////////
+  // report tests
+  // //////////////////////////////////////////////////////////////////////////////////////////////////////
 
   @Test
   public void shouldSeeCleanableButNoFinishedProcessInstancesInReport() {
     // given
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
-      .initHistoryRemovalTime();
+    engineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
+        .initHistoryRemovalTime();
 
     testRule.deploy(PROCESS);
 
@@ -2242,9 +2157,8 @@ public class HistoryCleanupRemovalTimeTest {
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 
     // when
-    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport()
-      .compact()
-      .singleResult();
+    CleanableHistoricProcessInstanceReportResult report = historyService
+        .createCleanableHistoricProcessInstanceReport().compact().singleResult();
 
     // then
     assertThat(report.getCleanableProcessInstanceCount(), is(5L));
@@ -2254,9 +2168,8 @@ public class HistoryCleanupRemovalTimeTest {
   @Test
   public void shouldSeeFinishedButNoCleanableProcessInstancesInReport() {
     // given
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
-      .initHistoryRemovalTime();
+    engineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
+        .initHistoryRemovalTime();
 
     testRule.deploy(PROCESS);
 
@@ -2270,9 +2183,8 @@ public class HistoryCleanupRemovalTimeTest {
     }
 
     // when
-    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport()
-      .compact()
-      .singleResult();
+    CleanableHistoricProcessInstanceReportResult report = historyService
+        .createCleanableHistoricProcessInstanceReport().compact().singleResult();
 
     // then
     assertThat(report.getFinishedProcessInstanceCount(), is(5L));
@@ -2282,9 +2194,8 @@ public class HistoryCleanupRemovalTimeTest {
   @Test
   public void shouldNotSeeCleanableProcessInstancesReport() {
     // given
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
-      .initHistoryRemovalTime();
+    engineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
+        .initHistoryRemovalTime();
 
     testRule.deploy(PROCESS);
 
@@ -2297,23 +2208,19 @@ public class HistoryCleanupRemovalTimeTest {
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 
     // when
-    CleanableHistoricProcessInstanceReportResult report = historyService.createCleanableHistoricProcessInstanceReport()
-      .compact()
-      .singleResult();
+    CleanableHistoricProcessInstanceReportResult report = historyService
+        .createCleanableHistoricProcessInstanceReport().compact().singleResult();
 
     // then
     assertThat(report, nullValue());
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldSeeCleanableDecisionInstancesInReport() {
     // given
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
-      .initHistoryRemovalTime();
+    engineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
+        .initHistoryRemovalTime();
 
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
 
@@ -2321,18 +2228,15 @@ public class HistoryCleanupRemovalTimeTest {
 
     for (int i = 0; i < 5; i++) {
       runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-        Variables.createVariables()
-          .putValue("temperature", 32)
-          .putValue("dayType", "Weekend"));
+          Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
     }
 
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 
     // when
-    CleanableHistoricDecisionInstanceReportResult report = historyService.createCleanableHistoricDecisionInstanceReport()
-      .decisionDefinitionKeyIn("dish-decision")
-      .compact()
-      .singleResult();
+    CleanableHistoricDecisionInstanceReportResult report = historyService
+        .createCleanableHistoricDecisionInstanceReport().decisionDefinitionKeyIn("dish-decision")
+        .compact().singleResult();
 
     // then
     assertThat(report.getCleanableDecisionInstanceCount(), is(5L));
@@ -2340,14 +2244,11 @@ public class HistoryCleanupRemovalTimeTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldNotSeeCleanableDecisionInstancesInReport() {
     // given
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
-      .initHistoryRemovalTime();
+    engineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
+        .initHistoryRemovalTime();
 
     testRule.deploy(CALLING_PROCESS_CALLS_DMN);
 
@@ -2355,18 +2256,15 @@ public class HistoryCleanupRemovalTimeTest {
 
     for (int i = 0; i < 5; i++) {
       runtimeService.startProcessInstanceByKey(CALLING_PROCESS_CALLS_DMN_KEY,
-        Variables.createVariables()
-          .putValue("temperature", 32)
-          .putValue("dayType", "Weekend"));
+          Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
     }
 
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 
     // when
-    CleanableHistoricDecisionInstanceReportResult report = historyService.createCleanableHistoricDecisionInstanceReport()
-      .decisionDefinitionKeyIn("dish-decision")
-      .compact()
-      .singleResult();
+    CleanableHistoricDecisionInstanceReportResult report = historyService
+        .createCleanableHistoricDecisionInstanceReport().decisionDefinitionKeyIn("dish-decision")
+        .compact().singleResult();
 
     // then
     assertThat(report.getCleanableDecisionInstanceCount(), is(0L));
@@ -2376,9 +2274,8 @@ public class HistoryCleanupRemovalTimeTest {
   @Test
   public void shouldSeeCleanableBatchesInReport() {
     // given
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
-      .initHistoryRemovalTime();
+    engineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START)
+        .initHistoryRemovalTime();
 
     engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
     engineConfiguration.initHistoryCleanup();
@@ -2389,12 +2286,14 @@ public class HistoryCleanupRemovalTimeTest {
 
     ClockUtil.setCurrentTime(END_DATE);
 
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 
     // when
-    CleanableHistoricBatchReportResult report = historyService.createCleanableHistoricBatchReport().singleResult();
+    CleanableHistoricBatchReportResult report = historyService.createCleanableHistoricBatchReport()
+        .singleResult();
 
     // then
     assertThat(report.getCleanableBatchesCount(), is(1L));
@@ -2407,9 +2306,8 @@ public class HistoryCleanupRemovalTimeTest {
   @Test
   public void shouldNotSeeCleanableBatchesInReport() {
     // given
-    engineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
-      .initHistoryRemovalTime();
+    engineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
+        .initHistoryRemovalTime();
 
     engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
     engineConfiguration.initHistoryCleanup();
@@ -2420,12 +2318,14 @@ public class HistoryCleanupRemovalTimeTest {
 
     ClockUtil.setCurrentTime(END_DATE);
 
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 
     // when
-    CleanableHistoricBatchReportResult report = historyService.createCleanableHistoricBatchReport().singleResult();
+    CleanableHistoricBatchReportResult report = historyService.createCleanableHistoricBatchReport()
+        .singleResult();
 
     // then
     assertThat(report.getCleanableBatchesCount(), is(0L));
@@ -2469,24 +2369,24 @@ public class HistoryCleanupRemovalTimeTest {
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId) {
     return engineConfiguration.getCommandExecutorTxRequired()
-      .execute(new GetByteArrayCommand(byteArrayId));
+        .execute(new GetByteArrayCommand(byteArrayId));
   }
 
   protected List<ByteArrayEntity> findByteArrays() {
-    List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
-      .failureLog()
-      .list();
+    List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery().failureLog().list();
 
     List<ByteArrayEntity> byteArrays = new ArrayList<>();
-    for (HistoricJobLog jobLog: jobLogs) {
-      byteArrays.add(findByteArrayById(((HistoricJobLogEventEntity) jobLog).getExceptionByteArrayId()));
+    for (HistoricJobLog jobLog : jobLogs) {
+      byteArrays
+          .add(findByteArrayById(((HistoricJobLogEventEntity) jobLog).getExceptionByteArrayId()));
     }
 
     return byteArrays;
   }
 
   protected void clearJobLog(final String jobId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
         commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
@@ -2496,8 +2396,7 @@ public class HistoryCleanupRemovalTimeTest {
   }
 
   protected void clearJob(final String jobId) {
-    engineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
+    engineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
         JobEntity job = commandContext.getJobManager().findJobById(jobId);
         if (job != null) {
@@ -2509,8 +2408,7 @@ public class HistoryCleanupRemovalTimeTest {
   }
 
   protected void clearMeterLog() {
-    engineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
+    engineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
         commandContext.getMeterLogManager().deleteAll();
 

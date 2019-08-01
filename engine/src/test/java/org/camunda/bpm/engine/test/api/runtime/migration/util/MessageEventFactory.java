@@ -31,12 +31,10 @@ public class MessageEventFactory implements BpmnEventFactory {
   public static final String MESSAGE_NAME = "message";
 
   @Override
-  public MigratingBpmnEventTrigger addBoundaryEvent(ProcessEngine engine, BpmnModelInstance modelInstance, String activityId, String boundaryEventId) {
-    ModifiableBpmnModelInstance.wrap(modelInstance)
-      .activityBuilder(activityId)
-      .boundaryEvent(boundaryEventId)
-        .message(MESSAGE_NAME)
-      .done();
+  public MigratingBpmnEventTrigger addBoundaryEvent(ProcessEngine engine,
+      BpmnModelInstance modelInstance, String activityId, String boundaryEventId) {
+    ModifiableBpmnModelInstance.wrap(modelInstance).activityBuilder(activityId)
+        .boundaryEvent(boundaryEventId).message(MESSAGE_NAME).done();
 
     MessageTrigger trigger = new MessageTrigger();
     trigger.engine = engine;
@@ -47,15 +45,11 @@ public class MessageEventFactory implements BpmnEventFactory {
   }
 
   @Override
-  public MigratingBpmnEventTrigger addEventSubProcess(ProcessEngine engine, BpmnModelInstance modelInstance, String parentId, String subProcessId, String startEventId) {
-    ModifiableBpmnModelInstance.wrap(modelInstance)
-      .addSubProcessTo(parentId)
-      .id(subProcessId)
-      .triggerByEvent()
-      .embeddedSubProcess()
-        .startEvent(startEventId).message(MESSAGE_NAME)
-      .subProcessDone()
-      .done();
+  public MigratingBpmnEventTrigger addEventSubProcess(ProcessEngine engine,
+      BpmnModelInstance modelInstance, String parentId, String subProcessId, String startEventId) {
+    ModifiableBpmnModelInstance.wrap(modelInstance).addSubProcessTo(parentId).id(subProcessId)
+        .triggerByEvent().embeddedSubProcess().startEvent(startEventId).message(MESSAGE_NAME)
+        .subProcessDone().done();
 
     MessageTrigger trigger = new MessageTrigger();
     trigger.engine = engine;
@@ -64,7 +58,6 @@ public class MessageEventFactory implements BpmnEventFactory {
 
     return trigger;
   }
-
 
   protected static class MessageTrigger implements MigratingBpmnEventTrigger {
 
@@ -75,12 +68,12 @@ public class MessageEventFactory implements BpmnEventFactory {
     @Override
     public void trigger(String processInstanceId) {
       engine.getRuntimeService().createMessageCorrelation(messageName)
-        .processInstanceId(processInstanceId)
-        .correlateWithResult();
+          .processInstanceId(processInstanceId).correlateWithResult();
     }
 
     @Override
-    public void assertEventTriggerMigrated(MigrationTestRule migrationContext, String targetActivityId) {
+    public void assertEventTriggerMigrated(MigrationTestRule migrationContext,
+        String targetActivityId) {
       migrationContext.assertEventSubscriptionMigrated(activityId, targetActivityId, messageName);
     }
 

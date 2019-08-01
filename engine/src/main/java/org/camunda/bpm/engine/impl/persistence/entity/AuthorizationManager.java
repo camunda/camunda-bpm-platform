@@ -101,7 +101,7 @@ import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
  * @author Daniel Meyer
  *
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class AuthorizationManager extends AbstractManager {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
@@ -111,11 +111,11 @@ public class AuthorizationManager extends AbstractManager {
   protected static final List<String> EMPTY_LIST = new ArrayList<String>();
 
   /**
-   * Group ids for which authorizations exist in the database.
-   * This is initialized once per command by the {@link #filterAuthenticatedGroupIds(List)} method. (Manager
-   * instances are command scoped).
-   * It is used to only check authorizations for groups for which authorizations exist. In other words,
-   * if for a given group no authorization exists in the DB, then auth checks are not performed for this group.
+   * Group ids for which authorizations exist in the database. This is initialized once per command
+   * by the {@link #filterAuthenticatedGroupIds(List)} method. (Manager instances are command
+   * scoped). It is used to only check authorizations for groups for which authorizations exist. In
+   * other words, if for a given group no authorization exists in the DB, then auth checks are not
+   * performed for this group.
    */
   protected Set<String> availableAuthorizedGroupIds = null;
 
@@ -136,25 +136,31 @@ public class AuthorizationManager extends AbstractManager {
     getDbEntityManager().insert(authorization);
   }
 
-  public List<Authorization> selectAuthorizationByQueryCriteria(AuthorizationQueryImpl authorizationQuery) {
+  public List<Authorization> selectAuthorizationByQueryCriteria(
+      AuthorizationQueryImpl authorizationQuery) {
     configureQuery(authorizationQuery, AUTHORIZATION);
-    return getDbEntityManager().selectList("selectAuthorizationByQueryCriteria", authorizationQuery);
+    return getDbEntityManager().selectList("selectAuthorizationByQueryCriteria",
+        authorizationQuery);
   }
 
   public Long selectAuthorizationCountByQueryCriteria(AuthorizationQueryImpl authorizationQuery) {
     configureQuery(authorizationQuery, AUTHORIZATION);
-    return (Long) getDbEntityManager().selectOne("selectAuthorizationCountByQueryCriteria", authorizationQuery);
+    return (Long) getDbEntityManager().selectOne("selectAuthorizationCountByQueryCriteria",
+        authorizationQuery);
   }
 
-  public AuthorizationEntity findAuthorizationByUserIdAndResourceId(int type, String userId, Resource resource, String resourceId) {
+  public AuthorizationEntity findAuthorizationByUserIdAndResourceId(int type, String userId,
+      Resource resource, String resourceId) {
     return findAuthorization(type, userId, null, resource, resourceId);
   }
 
-  public AuthorizationEntity findAuthorizationByGroupIdAndResourceId(int type, String groupId, Resource resource, String resourceId) {
+  public AuthorizationEntity findAuthorizationByGroupIdAndResourceId(int type, String groupId,
+      Resource resource, String resourceId) {
     return findAuthorization(type, null, groupId, resource, resourceId);
   }
 
-  public AuthorizationEntity findAuthorization(int type, String userId, String groupId, Resource resource, String resourceId) {
+  public AuthorizationEntity findAuthorization(int type, String userId, String groupId,
+      Resource resource, String resourceId) {
     Map<String, Object> params = new HashMap<String, Object>();
 
     params.put("type", type);
@@ -166,7 +172,8 @@ public class AuthorizationManager extends AbstractManager {
       params.put("resourceType", resource.resourceType());
     }
 
-    return (AuthorizationEntity) getDbEntityManager().selectOne("selectAuthorizationByParameters", params);
+    return (AuthorizationEntity) getDbEntityManager().selectOne("selectAuthorizationByParameters",
+        params);
   }
 
   public void update(AuthorizationEntity authorization) {
@@ -184,7 +191,7 @@ public class AuthorizationManager extends AbstractManager {
   // authorization checks ///////////////////////////////////////////
 
   public void checkAuthorization(CompositePermissionCheck compositePermissionCheck) {
-    if(isAuthCheckExecuted()) {
+    if (isAuthCheckExecuted()) {
 
       Authentication currentAuthentication = getCurrentAuthentication();
       String userId = currentAuthentication.getUserId();
@@ -194,11 +201,9 @@ public class AuthorizationManager extends AbstractManager {
 
         List<MissingAuthorization> missingAuthorizations = new ArrayList<MissingAuthorization>();
 
-        for (PermissionCheck check: compositePermissionCheck.getAllPermissionChecks()) {
-          missingAuthorizations.add(new MissingAuthorization(
-              check.getPermission().getName(),
-              check.getResource().resourceName(),
-              check.getResourceId()));
+        for (PermissionCheck check : compositePermissionCheck.getAllPermissionChecks()) {
+          missingAuthorizations.add(new MissingAuthorization(check.getPermission().getName(),
+              check.getResource().resourceName(), check.getResourceId()));
         }
 
         throw new AuthorizationException(userId, missingAuthorizations);
@@ -212,15 +217,13 @@ public class AuthorizationManager extends AbstractManager {
 
   @Override
   public void checkAuthorization(Permission permission, Resource resource, String resourceId) {
-    if(isAuthCheckExecuted()) {
+    if (isAuthCheckExecuted()) {
       Authentication currentAuthentication = getCurrentAuthentication();
-      boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
+      boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(),
+          currentAuthentication.getGroupIds(), permission, resource, resourceId);
       if (!isAuthorized) {
-        throw new AuthorizationException(
-            currentAuthentication.getUserId(),
-            permission.getName(),
-            resource.resourceName(),
-            resourceId);
+        throw new AuthorizationException(currentAuthentication.getUserId(), permission.getName(),
+            resource.resourceName(), resourceId);
       }
     }
 
@@ -232,8 +235,10 @@ public class AuthorizationManager extends AbstractManager {
     // command context will not be done.
     final Authentication currentAuthentication = getCurrentAuthentication();
 
-    if(isAuthorizationEnabled() && currentAuthentication != null && currentAuthentication.getUserId() != null) {
-      return isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
+    if (isAuthorizationEnabled() && currentAuthentication != null
+        && currentAuthentication.getUserId() != null) {
+      return isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(),
+          permission, resource, resourceId);
 
     } else {
       return true;
@@ -241,7 +246,8 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-  public boolean isAuthorized(String userId, List<String> groupIds, Permission permission, Resource resource, String resourceId) {
+  public boolean isAuthorized(String userId, List<String> groupIds, Permission permission,
+      Resource resource, String resourceId) {
     if (!isPermissionDisabled(permission)) {
       PermissionCheck permCheck = new PermissionCheck();
       permCheck.setPermission(permission);
@@ -254,42 +260,47 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-  public boolean isAuthorized(String userId, List<String> groupIds, PermissionCheck permissionCheck) {
-    if(!isAuthorizationEnabled()) {
+  public boolean isAuthorized(String userId, List<String> groupIds,
+      PermissionCheck permissionCheck) {
+    if (!isAuthorizationEnabled()) {
       return true;
     }
 
     if (!isResourceValidForPermission(permissionCheck)) {
-      throw LOG.invalidResourceForPermission(permissionCheck.getResource().resourceName(), permissionCheck.getPermission().getName());
+      throw LOG.invalidResourceForPermission(permissionCheck.getResource().resourceName(),
+          permissionCheck.getPermission().getName());
     }
 
     List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
 
     boolean isRevokeAuthorizationCheckEnabled = isRevokeAuthCheckEnabled(userId, groupIds);
-    CompositePermissionCheck compositePermissionCheck = createCompositePermissionCheck(permissionCheck);
-    AuthorizationCheck authCheck = new AuthorizationCheck(userId, filteredGroupIds, compositePermissionCheck, isRevokeAuthorizationCheckEnabled);
+    CompositePermissionCheck compositePermissionCheck = createCompositePermissionCheck(
+        permissionCheck);
+    AuthorizationCheck authCheck = new AuthorizationCheck(userId, filteredGroupIds,
+        compositePermissionCheck, isRevokeAuthorizationCheckEnabled);
     return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
   }
 
   protected boolean isRevokeAuthCheckEnabled(String userId, List<String> groupIds) {
     Boolean isRevokeAuthCheckEnabled = this.isRevokeAuthCheckUsed;
 
-    if(isRevokeAuthCheckEnabled == null) {
-      String configuredMode = Context.getProcessEngineConfiguration().getAuthorizationCheckRevokes();
-      if(configuredMode != null) {
+    if (isRevokeAuthCheckEnabled == null) {
+      String configuredMode = Context.getProcessEngineConfiguration()
+          .getAuthorizationCheckRevokes();
+      if (configuredMode != null) {
         configuredMode = configuredMode.toLowerCase();
       }
-      if(ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS.equals(configuredMode)) {
+      if (ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS.equals(configuredMode)) {
         isRevokeAuthCheckEnabled = true;
-      }
-      else if(ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_NEVER.equals(configuredMode)) {
+      } else if (ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_NEVER
+          .equals(configuredMode)) {
         isRevokeAuthCheckEnabled = false;
-      }
-      else {
+      } else {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put("userId", userId);
         params.put("authGroupIds", filterAuthenticatedGroupIds(groupIds));
-        isRevokeAuthCheckEnabled = getDbEntityManager().selectBoolean("selectRevokeAuthorization", params);
+        isRevokeAuthCheckEnabled = getDbEntityManager().selectBoolean("selectRevokeAuthorization",
+            params);
       }
       this.isRevokeAuthCheckUsed = isRevokeAuthCheckEnabled;
     }
@@ -297,22 +308,26 @@ public class AuthorizationManager extends AbstractManager {
     return isRevokeAuthCheckEnabled;
   }
 
-  protected CompositePermissionCheck createCompositePermissionCheck(PermissionCheck permissionCheck) {
+  protected CompositePermissionCheck createCompositePermissionCheck(
+      PermissionCheck permissionCheck) {
     CompositePermissionCheck compositePermissionCheck = new CompositePermissionCheck();
     compositePermissionCheck.setAtomicChecks(Arrays.asList(permissionCheck));
     return compositePermissionCheck;
   }
 
-  public boolean isAuthorized(String userId, List<String> groupIds, CompositePermissionCheck compositePermissionCheck) {
+  public boolean isAuthorized(String userId, List<String> groupIds,
+      CompositePermissionCheck compositePermissionCheck) {
     for (PermissionCheck permissionCheck : compositePermissionCheck.getAllPermissionChecks()) {
       if (!isResourceValidForPermission(permissionCheck)) {
-        throw LOG.invalidResourceForPermission(permissionCheck.getResource().resourceName(), permissionCheck.getPermission().getName());
+        throw LOG.invalidResourceForPermission(permissionCheck.getResource().resourceName(),
+            permissionCheck.getPermission().getName());
       }
     }
     List<String> filteredGroupIds = filterAuthenticatedGroupIds(groupIds);
 
     boolean isRevokeAuthorizationCheckEnabled = isRevokeAuthCheckEnabled(userId, groupIds);
-    AuthorizationCheck authCheck = new AuthorizationCheck(userId, filteredGroupIds, compositePermissionCheck, isRevokeAuthorizationCheckEnabled);
+    AuthorizationCheck authCheck = new AuthorizationCheck(userId, filteredGroupIds,
+        compositePermissionCheck, isRevokeAuthorizationCheckEnabled);
     return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
   }
 
@@ -320,9 +335,9 @@ public class AuthorizationManager extends AbstractManager {
     Authentication currentAuthentication = getCurrentAuthentication();
 
     if (currentAuthentication != null) {
-      return isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), compositePermissionCheck);
-    }
-    else {
+      return isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(),
+          compositePermissionCheck);
+    } else {
       return true;
     }
   }
@@ -330,7 +345,8 @@ public class AuthorizationManager extends AbstractManager {
   protected boolean isResourceValidForPermission(PermissionCheck permissionCheck) {
     Resource[] permissionResources = permissionCheck.getPermission().getTypes();
     Resource givenResource = permissionCheck.getResource();
-    return ResourceTypeUtil.resourceIsContainedInArray(givenResource.resourceType(), permissionResources);
+    return ResourceTypeUtil.resourceIsContainedInArray(givenResource.resourceType(),
+        permissionResources);
   }
 
   public void validateResourceCompatibility(AuthorizationEntity authorization) {
@@ -344,7 +360,6 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-
   // authorization checks on queries ////////////////////////////////
 
   public void configureQuery(ListQueryParameterObject query) {
@@ -352,27 +367,25 @@ public class AuthorizationManager extends AbstractManager {
     AuthorizationCheck authCheck = query.getAuthCheck();
     authCheck.getPermissionChecks().clear();
 
-    if(isAuthCheckExecuted()) {
+    if (isAuthCheckExecuted()) {
       Authentication currentAuthentication = getCurrentAuthentication();
       authCheck.setAuthUserId(currentAuthentication.getUserId());
       authCheck.setAuthGroupIds(currentAuthentication.getGroupIds());
       enableQueryAuthCheck(authCheck);
-    }
-    else {
+    } else {
       authCheck.setAuthorizationCheckEnabled(false);
       authCheck.setAuthUserId(null);
       authCheck.setAuthGroupIds(null);
     }
   }
 
-  public void configureQueryHistoricFinishedInstanceReport(ListQueryParameterObject query, Resource resource) {
+  public void configureQueryHistoricFinishedInstanceReport(ListQueryParameterObject query,
+      Resource resource) {
     configureQuery(query);
 
-    CompositePermissionCheck compositePermissionCheck = new PermissionCheckBuilder()
-      .conjunctive()
-        .atomicCheck(resource, "RES.KEY_", READ)
-        .atomicCheck(resource, "RES.KEY_", READ_HISTORY)
-      .build();
+    CompositePermissionCheck compositePermissionCheck = new PermissionCheckBuilder().conjunctive()
+        .atomicCheck(resource, "RES.KEY_", READ).atomicCheck(resource, "RES.KEY_", READ_HISTORY)
+        .build();
 
     query.getAuthCheck().setPermissionChecks(compositePermissionCheck);
   }
@@ -383,7 +396,8 @@ public class AuthorizationManager extends AbstractManager {
 
     authCheck.setAuthorizationCheckEnabled(true);
     authCheck.setAuthGroupIds(filterAuthenticatedGroupIds(authGroupIds));
-    authCheck.setRevokeAuthorizationCheckEnabled(isRevokeAuthCheckEnabled(authUserId, authGroupIds));
+    authCheck
+        .setRevokeAuthorizationCheckEnabled(isRevokeAuthCheckEnabled(authUserId, authGroupIds));
   }
 
   @Override
@@ -395,16 +409,17 @@ public class AuthorizationManager extends AbstractManager {
     configureQuery(query, resource, queryParam, Permissions.READ);
   }
 
-  public void configureQuery(AbstractQuery query, Resource resource, String queryParam, Permission permission) {
+  public void configureQuery(AbstractQuery query, Resource resource, String queryParam,
+      Permission permission) {
     configureQuery(query);
     CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-        .atomicCheck(resource, queryParam, permission)
-        .build();
+        .atomicCheck(resource, queryParam, permission).build();
     addPermissionCheck(query.getAuthCheck(), permissionCheck);
   }
 
   public boolean isPermissionDisabled(Permission permission) {
-    List<String> disabledPermissions = getCommandContext().getProcessEngineConfiguration().getDisabledPermissions();
+    List<String> disabledPermissions = getCommandContext().getProcessEngineConfiguration()
+        .getDisabledPermissions();
     if (disabledPermissions != null) {
       for (String disabledPermission : disabledPermissions) {
         if (permission.getName().equals(disabledPermission)) {
@@ -415,9 +430,11 @@ public class AuthorizationManager extends AbstractManager {
     return false;
   }
 
-  protected void addPermissionCheck(AuthorizationCheck authCheck, CompositePermissionCheck compositeCheck) {
+  protected void addPermissionCheck(AuthorizationCheck authCheck,
+      CompositePermissionCheck compositeCheck) {
     CommandContext commandContext = getCommandContext();
-    if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
+    if (isAuthorizationEnabled() && getCurrentAuthentication() != null
+        && commandContext.isAuthorizationCheckEnabled()) {
       authCheck.setPermissionChecks(compositeCheck);
     }
   }
@@ -426,47 +443,52 @@ public class AuthorizationManager extends AbstractManager {
 
   public void deleteAuthorizationsByResourceId(Resource resource, String resourceId) {
 
-    if(resourceId == null) {
+    if (resourceId == null) {
       throw new IllegalArgumentException("Resource id cannot be null");
     }
 
-    if(isAuthorizationEnabled()) {
+    if (isAuthorizationEnabled()) {
       Map<String, Object> deleteParams = new HashMap<String, Object>();
       deleteParams.put("resourceType", resource.resourceType());
       deleteParams.put("resourceId", resourceId);
-      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId", deleteParams);
+      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId",
+          deleteParams);
     }
 
   }
 
-  public void deleteAuthorizationsByResourceIdAndUserId(Resource resource, String resourceId, String userId) {
+  public void deleteAuthorizationsByResourceIdAndUserId(Resource resource, String resourceId,
+      String userId) {
 
-    if(resourceId == null) {
+    if (resourceId == null) {
       throw new IllegalArgumentException("Resource id cannot be null");
     }
 
-    if(isAuthorizationEnabled()) {
+    if (isAuthorizationEnabled()) {
       Map<String, Object> deleteParams = new HashMap<String, Object>();
       deleteParams.put("resourceType", resource.resourceType());
       deleteParams.put("resourceId", resourceId);
       deleteParams.put("userId", userId);
-      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId", deleteParams);
+      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId",
+          deleteParams);
     }
 
   }
 
-  public void deleteAuthorizationsByResourceIdAndGroupId(Resource resource, String resourceId, String groupId) {
+  public void deleteAuthorizationsByResourceIdAndGroupId(Resource resource, String resourceId,
+      String groupId) {
 
-    if(resourceId == null) {
+    if (resourceId == null) {
       throw new IllegalArgumentException("Resource id cannot be null");
     }
 
-    if(isAuthorizationEnabled()) {
+    if (isAuthorizationEnabled()) {
       Map<String, Object> deleteParams = new HashMap<String, Object>();
       deleteParams.put("resourceType", resource.resourceType());
       deleteParams.put("resourceId", resourceId);
       deleteParams.put("groupId", groupId);
-      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId", deleteParams);
+      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId",
+          deleteParams);
     }
 
   }
@@ -476,9 +498,8 @@ public class AuthorizationManager extends AbstractManager {
   /* MEMBER OF CAMUNDA_ADMIN */
 
   /**
-   * Checks if the current authentication contains the group
-   * {@link Groups#CAMUNDA_ADMIN}. The check is ignored if the authorization is
-   * disabled or no authentication exists.
+   * Checks if the current authentication contains the group {@link Groups#CAMUNDA_ADMIN}. The check
+   * is ignored if the authorization is disabled or no authentication exists.
    *
    * @throws AuthorizationException
    */
@@ -487,7 +508,7 @@ public class AuthorizationManager extends AbstractManager {
     CommandContext commandContext = Context.getCommandContext();
 
     if (isAuthorizationEnabled() && commandContext.isAuthorizationCheckEnabled()
-        && currentAuthentication != null  && !isCamundaAdmin(currentAuthentication)) {
+        && currentAuthentication != null && !isCamundaAdmin(currentAuthentication)) {
 
       throw LOG.requiredCamundaAdminException();
     }
@@ -539,17 +560,14 @@ public class AuthorizationManager extends AbstractManager {
 
       if (!authorizationCheck.isRevokeAuthorizationCheckEnabled()) {
         CompositePermissionCheck permCheck = new PermissionCheckBuilder()
-            .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", Permissions.CREATE_INSTANCE)
-            .build();
+            .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", Permissions.CREATE_INSTANCE).build();
 
         query.addProcessDefinitionCreatePermissionCheck(permCheck);
 
       } else {
-        CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-            .conjunctive()
+        CompositePermissionCheck permissionCheck = new PermissionCheckBuilder().conjunctive()
             .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", READ)
-            .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", Permissions.CREATE_INSTANCE)
-            .build();
+            .atomicCheck(PROCESS_DEFINITION, "RES.KEY_", Permissions.CREATE_INSTANCE).build();
         addPermissionCheck(authorizationCheck, permissionCheck);
       }
 
@@ -561,11 +579,9 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureExecutionQuery(AbstractQuery query) {
     configureQuery(query);
-    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-        .disjunctive()
+    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder().disjunctive()
         .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
-        .atomicCheck(PROCESS_DEFINITION, "P.KEY_", READ_INSTANCE)
-        .build();
+        .atomicCheck(PROCESS_DEFINITION, "P.KEY_", READ_INSTANCE).build();
     addPermissionCheck(query.getAuthCheck(), permissionCheck);
   }
 
@@ -574,17 +590,15 @@ public class AuthorizationManager extends AbstractManager {
   public void configureTaskQuery(TaskQueryImpl query) {
     configureQuery(query);
 
-    if(query.getAuthCheck().isAuthorizationCheckEnabled()) {
+    if (query.getAuthCheck().isAuthorizationCheckEnabled()) {
 
       // necessary authorization check when the task is part of
       // a running process instance
 
-      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-              .disjunctive()
-              .atomicCheck(TASK, "RES.ID_", READ)
-              .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_TASK)
-              .build();
-        addPermissionCheck(query.getAuthCheck(), permissionCheck);
+      CompositePermissionCheck permissionCheck = new PermissionCheckBuilder().disjunctive()
+          .atomicCheck(TASK, "RES.ID_", READ)
+          .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_TASK).build();
+      addPermissionCheck(query.getAuthCheck(), permissionCheck);
     }
   }
 
@@ -592,19 +606,16 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureEventSubscriptionQuery(EventSubscriptionQueryImpl query) {
     configureQuery(query);
-    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-            .disjunctive()
-            .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
-            .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
-            .build();
+    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder().disjunctive()
+        .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
+        .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE).build();
     addPermissionCheck(query.getAuthCheck(), permissionCheck);
   }
 
   public void configureConditionalEventSubscriptionQuery(ListQueryParameterObject query) {
     configureQuery(query);
     CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-        .atomicCheck(PROCESS_DEFINITION, "P.KEY_", READ)
-        .build();
+        .atomicCheck(PROCESS_DEFINITION, "P.KEY_", READ).build();
     addPermissionCheck(query.getAuthCheck(), permissionCheck);
   }
 
@@ -612,11 +623,9 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureIncidentQuery(IncidentQueryImpl query) {
     configureQuery(query);
-    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-            .disjunctive()
-            .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
-            .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
-            .build();
+    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder().disjunctive()
+        .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
+        .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE).build();
     addPermissionCheck(query.getAuthCheck(), permissionCheck);
   }
 
@@ -625,24 +634,20 @@ public class AuthorizationManager extends AbstractManager {
   protected void configureVariableInstanceQuery(VariableInstanceQueryImpl query) {
     configureQuery(query);
 
-    if(query.getAuthCheck().isAuthorizationCheckEnabled()) {
+    if (query.getAuthCheck().isAuthorizationCheckEnabled()) {
 
       CompositePermissionCheck permissionCheck;
       if (isEnsureSpecificVariablePermission()) {
-        permissionCheck = new PermissionCheckBuilder()
-            .disjunctive()
+        permissionCheck = new PermissionCheckBuilder().disjunctive()
             .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE_VARIABLE)
-            .atomicCheck(TASK, "RES.TASK_ID_", READ_VARIABLE)
-            .build();
+            .atomicCheck(TASK, "RES.TASK_ID_", READ_VARIABLE).build();
       } else {
-        permissionCheck = new PermissionCheckBuilder()
-              .disjunctive()
-              .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
-              .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
-              .atomicCheck(TASK, "RES.TASK_ID_", READ)
-              .build();
+        permissionCheck = new PermissionCheckBuilder().disjunctive()
+            .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
+            .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
+            .atomicCheck(TASK, "RES.TASK_ID_", READ).build();
       }
-        addPermissionCheck(query.getAuthCheck(), permissionCheck);
+      addPermissionCheck(query.getAuthCheck(), permissionCheck);
     }
   }
 
@@ -656,11 +661,9 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureJobQuery(JobQueryImpl query) {
     configureQuery(query);
-    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-        .disjunctive()
+    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder().disjunctive()
         .atomicCheck(PROCESS_INSTANCE, "RES.PROCESS_INSTANCE_ID_", READ)
-        .atomicCheck(PROCESS_DEFINITION, "RES.PROCESS_DEF_KEY_", READ_INSTANCE)
-        .build();
+        .atomicCheck(PROCESS_DEFINITION, "RES.PROCESS_DEF_KEY_", READ_INSTANCE).build();
     addPermissionCheck(query.getAuthCheck(), permissionCheck);
   }
 
@@ -691,7 +694,7 @@ public class AuthorizationManager extends AbstractManager {
     if (isEnsureSpecificVariablePermission()) {
       readPermission = READ_HISTORY_VARIABLE;
     }
-    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_",  readPermission);
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", readPermission);
   }
 
   // historic detail query ////////////////////////////////
@@ -712,10 +715,10 @@ public class AuthorizationManager extends AbstractManager {
     configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
   }
 
-  //historic identity link query ////////////////////////////////
+  // historic identity link query ////////////////////////////////
 
   public void configureHistoricIdentityLinkQuery(HistoricIdentityLinkLogQueryImpl query) {
-   configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
   }
 
   public void configureHistoricDecisionInstanceQuery(HistoricDecisionInstanceQueryImpl query) {
@@ -732,11 +735,9 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureUserOperationLogQuery(UserOperationLogQueryImpl query) {
     configureQuery(query);
-    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-        .disjunctive()
-          .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
-          .atomicCheck(Resources.OPERATION_LOG_CATEGORY, "RES.CATEGORY_", READ)
-        .build();
+    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder().disjunctive()
+        .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY)
+        .atomicCheck(Resources.OPERATION_LOG_CATEGORY, "RES.CATEGORY_", READ).build();
     addPermissionCheck(query.getAuthCheck(), permissionCheck);
   }
 
@@ -755,32 +756,27 @@ public class AuthorizationManager extends AbstractManager {
     query.getJobPermissionChecks().clear();
     query.getIncidentPermissionChecks().clear();
 
-    if(query.getAuthCheck().isAuthorizationCheckEnabled()) {
+    if (query.getAuthCheck().isAuthorizationCheckEnabled()) {
 
       CompositePermissionCheck processInstancePermissionCheck = new PermissionCheckBuilder()
-          .disjunctive()
-          .atomicCheck(PROCESS_INSTANCE, "EXECUTION.PROC_INST_ID_", READ)
-          .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
-          .build();
+          .disjunctive().atomicCheck(PROCESS_INSTANCE, "EXECUTION.PROC_INST_ID_", READ)
+          .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE).build();
 
-      query.addProcessInstancePermissionCheck(processInstancePermissionCheck.getAllPermissionChecks());
+      query.addProcessInstancePermissionCheck(
+          processInstancePermissionCheck.getAllPermissionChecks());
 
       if (query.isFailedJobsToInclude()) {
-        CompositePermissionCheck jobPermissionCheck = new PermissionCheckBuilder()
-            .disjunctive()
+        CompositePermissionCheck jobPermissionCheck = new PermissionCheckBuilder().disjunctive()
             .atomicCheck(PROCESS_INSTANCE, "JOB.PROCESS_INSTANCE_ID_", READ)
-            .atomicCheck(PROCESS_DEFINITION, "JOB.PROCESS_DEF_KEY_", READ_INSTANCE)
-            .build();
+            .atomicCheck(PROCESS_DEFINITION, "JOB.PROCESS_DEF_KEY_", READ_INSTANCE).build();
 
         query.addJobPermissionCheck(jobPermissionCheck.getAllPermissionChecks());
       }
 
       if (query.isIncidentsToInclude()) {
         CompositePermissionCheck incidentPermissionCheck = new PermissionCheckBuilder()
-            .disjunctive()
-            .atomicCheck(PROCESS_INSTANCE, "INC.PROC_INST_ID_", READ)
-            .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
-            .build();
+            .disjunctive().atomicCheck(PROCESS_INSTANCE, "INC.PROC_INST_ID_", READ)
+            .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE).build();
 
         query.addIncidentPermissionCheck(incidentPermissionCheck.getAllPermissionChecks());
 
@@ -788,7 +784,8 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-  public void configureProcessDefinitionStatisticsQuery(ProcessDefinitionStatisticsQueryImpl query) {
+  public void configureProcessDefinitionStatisticsQuery(
+      ProcessDefinitionStatisticsQueryImpl query) {
     configureQuery(query, PROCESS_DEFINITION, "RES.KEY_");
   }
 
@@ -799,25 +796,22 @@ public class AuthorizationManager extends AbstractManager {
     query.getJobPermissionChecks().clear();
     query.getIncidentPermissionChecks().clear();
 
-    if(query.getAuthCheck().isAuthorizationCheckEnabled()) {
+    if (query.getAuthCheck().isAuthorizationCheckEnabled()) {
 
       CompositePermissionCheck processInstancePermissionCheck = new PermissionCheckBuilder()
-          .disjunctive()
-          .atomicCheck(PROCESS_INSTANCE, "E.PROC_INST_ID_", READ)
-          .atomicCheck(PROCESS_DEFINITION, "P.KEY_", READ_INSTANCE)
-          .build();
+          .disjunctive().atomicCheck(PROCESS_INSTANCE, "E.PROC_INST_ID_", READ)
+          .atomicCheck(PROCESS_DEFINITION, "P.KEY_", READ_INSTANCE).build();
 
       // the following is need in order to evaluate whether to perform authCheck or not
       query.getAuthCheck().setPermissionChecks(processInstancePermissionCheck);
       // the actual check
-      query.addProcessInstancePermissionCheck(processInstancePermissionCheck.getAllPermissionChecks());
+      query.addProcessInstancePermissionCheck(
+          processInstancePermissionCheck.getAllPermissionChecks());
 
       if (query.isFailedJobsToInclude()) {
-        CompositePermissionCheck jobPermissionCheck = new PermissionCheckBuilder()
-            .disjunctive()
+        CompositePermissionCheck jobPermissionCheck = new PermissionCheckBuilder().disjunctive()
             .atomicCheck(PROCESS_INSTANCE, "JOB.PROCESS_INSTANCE_ID_", READ)
-            .atomicCheck(PROCESS_DEFINITION, "JOB.PROCESS_DEF_KEY_", READ_INSTANCE)
-            .build();
+            .atomicCheck(PROCESS_DEFINITION, "JOB.PROCESS_DEF_KEY_", READ_INSTANCE).build();
 
         // the following is need in order to evaluate whether to perform authCheck or not
         query.getAuthCheck().setPermissionChecks(jobPermissionCheck);
@@ -827,10 +821,8 @@ public class AuthorizationManager extends AbstractManager {
 
       if (query.isIncidentsToInclude()) {
         CompositePermissionCheck incidentPermissionCheck = new PermissionCheckBuilder()
-            .disjunctive()
-            .atomicCheck(PROCESS_INSTANCE, "I.PROC_INST_ID_", READ)
-            .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE)
-            .build();
+            .disjunctive().atomicCheck(PROCESS_INSTANCE, "I.PROC_INST_ID_", READ)
+            .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE).build();
 
         // the following is need in order to evaluate whether to perform authCheck or not
         query.getAuthCheck().setPermissionChecks(incidentPermissionCheck);
@@ -843,30 +835,20 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureExternalTaskQuery(ExternalTaskQueryImpl query) {
     configureQuery(query);
-    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
-        .disjunctive()
+    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder().disjunctive()
         .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
-        .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_INSTANCE)
-        .build();
+        .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_INSTANCE).build();
     addPermissionCheck(query.getAuthCheck(), permissionCheck);
   }
 
   public void configureExternalTaskFetch(ListQueryParameterObject parameter) {
     configureQuery(parameter);
 
-    CompositePermissionCheck permissionCheck = newPermissionCheckBuilder()
-      .conjunctive()
-      .composite()
-        .disjunctive()
-        .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
-        .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_INSTANCE)
-        .done()
-      .composite()
-        .disjunctive()
-        .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", UPDATE)
-        .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", UPDATE_INSTANCE)
-        .done()
-      .build();
+    CompositePermissionCheck permissionCheck = newPermissionCheckBuilder().conjunctive().composite()
+        .disjunctive().atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
+        .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_INSTANCE).done().composite()
+        .disjunctive().atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", UPDATE)
+        .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", UPDATE_INSTANCE).done().build();
 
     addPermissionCheck(parameter.getAuthCheck(), permissionCheck);
   }
@@ -875,7 +857,8 @@ public class AuthorizationManager extends AbstractManager {
     configureQuery(query, DECISION_DEFINITION, "RES.KEY_");
   }
 
-  public void configureDecisionRequirementsDefinitionQuery(DecisionRequirementsDefinitionQueryImpl query) {
+  public void configureDecisionRequirementsDefinitionQuery(
+      DecisionRequirementsDefinitionQueryImpl query) {
     configureQuery(query, DECISION_REQUIREMENTS_DEFINITION, "RES.KEY_");
   }
 
@@ -888,12 +871,12 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public List<String> filterAuthenticatedGroupIds(List<String> authenticatedGroupIds) {
-    if(authenticatedGroupIds == null || authenticatedGroupIds.isEmpty()) {
+    if (authenticatedGroupIds == null || authenticatedGroupIds.isEmpty()) {
       return EMPTY_LIST;
-    }
-    else {
-      if(availableAuthorizedGroupIds == null) {
-        availableAuthorizedGroupIds = new HashSet<String>(getDbEntityManager().selectList("selectAuthorizedGroupIds"));
+    } else {
+      if (availableAuthorizedGroupIds == null) {
+        availableAuthorizedGroupIds = new HashSet<String>(
+            getDbEntityManager().selectList("selectAuthorizedGroupIds"));
       }
       Set<String> copy = new HashSet<String>(availableAuthorizedGroupIds);
       copy.retainAll(authenticatedGroupIds);
@@ -906,10 +889,8 @@ public class AuthorizationManager extends AbstractManager {
     Authentication currentAuthentication = getCurrentAuthentication();
     CommandContext commandContext = Context.getCommandContext();
 
-    return isAuthorizationEnabled()
-        && commandContext.isAuthorizationCheckEnabled()
-        && currentAuthentication != null
-        && currentAuthentication.getUserId() != null;
+    return isAuthorizationEnabled() && commandContext.isAuthorizationCheckEnabled()
+        && currentAuthentication != null && currentAuthentication.getUserId() != null;
 
   }
 

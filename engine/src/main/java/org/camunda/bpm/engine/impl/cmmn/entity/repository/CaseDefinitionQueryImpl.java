@@ -34,7 +34,8 @@ import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
  * @author Roman Smirnov
  *
  */
-public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, CaseDefinition> implements CaseDefinitionQuery {
+public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, CaseDefinition>
+    implements CaseDefinitionQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -156,7 +157,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   }
 
   public CaseDefinitionQuery includeCaseDefinitionsWithoutTenantId() {
-    this.includeDefinitionsWithoutTenantId  = true;
+    this.includeDefinitionsWithoutTenantId = true;
     return this;
   }
 
@@ -199,22 +200,18 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(id, ids);
   }
 
-  //results ////////////////////////////////////////////
+  // results ////////////////////////////////////////////
 
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getCaseDefinitionManager()
-      .findCaseDefinitionCountByQueryCriteria(this);
+    return commandContext.getCaseDefinitionManager().findCaseDefinitionCountByQueryCriteria(this);
   }
 
   @Override
   public List<CaseDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getCaseDefinitionManager()
-      .findCaseDefinitionsByQueryCriteria(this, page);
+    return commandContext.getCaseDefinitionManager().findCaseDefinitionsByQueryCriteria(this, page);
   }
 
   @Override
@@ -222,8 +219,10 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     super.checkQueryOk();
 
     // latest() makes only sense when used with key() or keyLike()
-    if (latest && ( (id != null) || (name != null) || (nameLike != null) || (version != null) || (deploymentId != null) ) ){
-      throw new NotValidException("Calling latest() can only be used in combination with key(String) and keyLike(String)");
+    if (latest && ((id != null) || (name != null) || (nameLike != null) || (version != null)
+        || (deploymentId != null))) {
+      throw new NotValidException(
+          "Calling latest() can only be used in combination with key(String) and keyLike(String)");
     }
   }
 

@@ -28,8 +28,8 @@ import org.camunda.bpm.engine.management.UpdateJobSuspensionStateBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateTenantBuilder;
 
-public class UpdateJobSuspensionStateBuilderImpl
-    implements UpdateJobSuspensionStateBuilder, UpdateJobSuspensionStateSelectBuilder, UpdateJobSuspensionStateTenantBuilder {
+public class UpdateJobSuspensionStateBuilderImpl implements UpdateJobSuspensionStateBuilder,
+    UpdateJobSuspensionStateSelectBuilder, UpdateJobSuspensionStateTenantBuilder {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -51,9 +51,9 @@ public class UpdateJobSuspensionStateBuilderImpl
   }
 
   /**
-   * Creates a builder without CommandExecutor which can not be used to update
-   * the suspension state via {@link #activate()} or {@link #suspend()}. Can be
-   * used in combination with your own command.
+   * Creates a builder without CommandExecutor which can not be used to update the suspension state
+   * via {@link #activate()} or {@link #suspend()}. Can be used in combination with your own
+   * command.
    */
   public UpdateJobSuspensionStateBuilderImpl() {
     this(null);
@@ -127,10 +127,12 @@ public class UpdateJobSuspensionStateBuilderImpl
   }
 
   protected void validateParameters() {
-    ensureOnlyOneNotNull("Need to specify either a job id, a job definition id, a process instance id, a process definition id or a process definition key.", jobId,
-        jobDefinitionId, processInstanceId, processDefinitionId, processDefinitionKey);
+    ensureOnlyOneNotNull(
+        "Need to specify either a job id, a job definition id, a process instance id, a process definition id or a process definition key.",
+        jobId, jobDefinitionId, processInstanceId, processDefinitionId, processDefinitionKey);
 
-    if (isProcessDefinitionTenantIdSet && (jobId != null || jobDefinitionId != null || processInstanceId != null || processDefinitionId != null)) {
+    if (isProcessDefinitionTenantIdSet && (jobId != null || jobDefinitionId != null
+        || processInstanceId != null || processDefinitionId != null)) {
       throw LOG.exceptionUpdateSuspensionStateForTenantOnlyByProcessDefinitionKey();
     }
 

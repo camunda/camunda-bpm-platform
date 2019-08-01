@@ -70,28 +70,27 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstance() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree("userTask").scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree("userTask").scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .transition("userTask")
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .transition("userTask").done());
 
     testHelper.assertJobMigrated("userTask", "userTask", AsyncContinuationJobHandler.TYPE);
 
@@ -107,21 +106,22 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstanceChangeActivityId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
-        modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
-        .changeElementId("userTask", "userTaskReplacement"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
+            .changeElementId("userTask", "userTaskReplacement"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "userTaskReplacement")
-        .build();
+        .mapActivities("userTask", "userTaskReplacement").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertJobMigrated("userTask", "userTaskReplacement", AsyncContinuationJobHandler.TYPE);
+    testHelper.assertJobMigrated("userTask", "userTaskReplacement",
+        AsyncContinuationJobHandler.TYPE);
 
     // and it is possible to successfully execute the migrated job
     Job job = testHelper.snapshotAfterMigration.getJobs().get(0);
@@ -135,39 +135,37 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstanceConcurrent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "userTask")
-        .build();
+        .mapActivities("userTask", "userTask").build();
 
     ProcessInstance processInstance = rule.getRuntimeService()
         .createProcessInstanceById(migrationPlan.getSourceProcessDefinitionId())
-        .startBeforeActivity("userTask")
-        .startBeforeActivity("userTask")
-        .execute();
+        .startBeforeActivity("userTask").startBeforeActivity("userTask").execute();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    TransitionInstance[] transitionInstances = testHelper.snapshotAfterMigration.getActivityTree().getTransitionInstances("userTask");
+    TransitionInstance[] transitionInstances = testHelper.snapshotAfterMigration.getActivityTree()
+        .getTransitionInstances("userTask");
 
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("userTask").concurrent().noScope().id(transitionInstances[0].getExecutionId()).up()
-          .child("userTask").concurrent().noScope().id(transitionInstances[1].getExecutionId())
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("userTask")
+            .concurrent().noScope().id(transitionInstances[0].getExecutionId()).up()
+            .child("userTask").concurrent().noScope().id(transitionInstances[1].getExecutionId())
+            .done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .transition("userTask")
-        .transition("userTask")
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .transition("userTask").transition("userTask").done());
 
     Assert.assertEquals(2, testHelper.snapshotAfterMigration.getJobs().size());
 
@@ -183,15 +181,17 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncAfterTransitionInstance() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
@@ -212,26 +212,28 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncAfterTransitionInstanceChangeActivityId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
-        modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
-        .changeElementId("userTask1", "userTaskReplacement1")
-        .changeElementId("userTask2", "userTaskReplacement2"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
+            .changeElementId("userTask1", "userTaskReplacement1")
+            .changeElementId("userTask2", "userTaskReplacement2"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask1", "userTaskReplacement1")
-        .mapActivities("userTask2", "userTaskReplacement2")
-        .build();
+        .mapActivities("userTask2", "userTaskReplacement2").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    testHelper.assertJobMigrated("userTask1", "userTaskReplacement1", AsyncContinuationJobHandler.TYPE);
+    testHelper.assertJobMigrated("userTask1", "userTaskReplacement1",
+        AsyncContinuationJobHandler.TYPE);
 
     // and it is possible to successfully execute the migrated job
     Job job = testHelper.snapshotAfterMigration.getJobs().get(0);
@@ -245,14 +247,14 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstanceRemoveIncomingFlow() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
-        .removeFlowNode("startEvent"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
+        modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS).removeFlowNode("startEvent"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "userTask")
-        .build();
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -272,18 +274,18 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstanceAddIncomingFlow() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
-        .removeFlowNode("startEvent"));
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
+        modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS).removeFlowNode("startEvent"));
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "userTask")
-        .build();
+        .mapActivities("userTask", "userTask").build();
 
     // when
-    ProcessInstance processInstance = rule.getRuntimeService().createProcessInstanceById(sourceProcessDefinition.getId())
-        .startBeforeActivity("userTask")
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .createProcessInstanceById(sourceProcessDefinition.getId()).startBeforeActivity("userTask")
         .execute();
 
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -303,17 +305,18 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncAfterTransitionInstanceRemoveOutgoingFlowCase1() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
-        .removeFlowNode("endEvent")
-        .removeFlowNode("userTask2"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
+            .removeFlowNode("endEvent").removeFlowNode("userTask2"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
@@ -331,15 +334,17 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncAfterTransitionInstanceRemoveOutgoingFlowCase2() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_SUBPROCESS_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_SUBPROCESS_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask1", "userTask1")
-        .build();
+        .mapActivities("userTask1", "userTask1").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
@@ -356,21 +361,21 @@ public class MigrationTransitionInstancesTest {
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
-
   @Test
   public void testMigrateAsyncAfterTransitionInstanceAddOutgoingFlowCase1() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
-        .removeFlowNode("endEvent")
-        .removeFlowNode("userTask2"));
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
+            .removeFlowNode("endEvent").removeFlowNode("userTask2"));
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
@@ -391,19 +396,18 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncAfterTransitionInstanceAddOutgoingFlowCase2() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
-        .activityBuilder("userTask1")
-        .userTask("userTask3")
-        .endEvent()
-        .done());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
+            .activityBuilder("userTask1").userTask("userTask3").endEvent().done());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
@@ -411,7 +415,6 @@ public class MigrationTransitionInstancesTest {
 
     // then
     testHelper.assertJobMigrated("userTask1", "userTask1", AsyncContinuationJobHandler.TYPE);
-
 
     // and it is possible to successfully execute the migrated job
     Job job = testHelper.snapshotAfterMigration.getJobs().get(0);
@@ -425,49 +428,45 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncAfterTransitionInstanceAddOutgoingFlowCase3() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
-        .changeElementId("flow1", "flow2")
-        .activityBuilder("userTask1")
-        .sequenceFlowId("flow3")
-        .userTask("userTask3")
-        .endEvent()
-        .done());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
+            .changeElementId("flow1", "flow2").activityBuilder("userTask1").sequenceFlowId("flow3")
+            .userTask("userTask3").endEvent().done());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasTransitionInstanceFailures("userTask1",
-          "Transition instance is assigned to a sequence flow that cannot be matched in the target activity"
-        );
+    } catch (MigratingProcessInstanceValidationException e) {
+      assertThat(e.getValidationReport()).hasTransitionInstanceFailures("userTask1",
+          "Transition instance is assigned to a sequence flow that cannot be matched in the target activity");
     }
   }
 
   @Test
   public void testMigrateAsyncAfterTransitionInstanceReplaceOutgoingFlow() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS)
-        .changeElementId("flow1", "flow2"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
+        modify(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS).changeElementId("flow1", "flow2"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
     testHelper.completeTask("userTask1");
 
     // when
@@ -488,13 +487,14 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateTransitionInstanceJobProperties() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = rule.getRuntimeService()
         .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
@@ -503,8 +503,8 @@ public class MigrationTransitionInstancesTest {
     rule.getManagementService().setJobPriority(jobBeforeMigration.getId(), 42);
 
     // TODO: fix CAM-5692
-//    Date newDueDate = new DateTime().plusHours(10).toDate();
-//    rule.getManagementService().setJobDuedate(jobBeforeMigration.getId(), newDueDate);
+    // Date newDueDate = new DateTime().plusHours(10).toDate();
+    // rule.getManagementService().setJobDuedate(jobBeforeMigration.getId(), newDueDate);
     rule.getManagementService().setJobRetries(jobBeforeMigration.getId(), 52);
     rule.getManagementService().suspendJobById(jobBeforeMigration.getId());
 
@@ -515,7 +515,7 @@ public class MigrationTransitionInstancesTest {
     Job job = testHelper.snapshotAfterMigration.getJobs().get(0);
 
     Assert.assertEquals(42, job.getPriority());
-//    Assert.assertEquals(newDueDate, job.getDuedate());
+    // Assert.assertEquals(newDueDate, job.getDuedate());
     Assert.assertEquals(52, job.getRetries());
     Assert.assertTrue(job.isSuspended());
   }
@@ -523,13 +523,14 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeStartEventTransitionInstanceCase1() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_START_EVENT_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_START_EVENT_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_START_EVENT_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_START_EVENT_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("startEvent", "startEvent")
-        .build();
+        .mapActivities("startEvent", "startEvent").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -539,7 +540,8 @@ public class MigrationTransitionInstancesTest {
 
     // and it is possible to successfully execute the migrated job
     Job job = testHelper.snapshotAfterMigration.getJobs().get(0);
-    Assert.assertEquals("Replace this non-API assert with a proper test case that fails when the wrong atomic operation is used",
+    Assert.assertEquals(
+        "Replace this non-API assert with a proper test case that fails when the wrong atomic operation is used",
         "process-start", ((JobEntity) job).getJobHandlerConfigurationRaw());
     rule.getManagementService().executeJob(job.getId());
 
@@ -551,43 +553,43 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeStartEventTransitionInstanceCase2() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_START_EVENT_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_START_EVENT_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("startEvent", "subProcessStart")
-        .build();
+        .mapActivities("startEvent", "subProcessStart").build();
 
     // when
     try {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasTransitionInstanceFailures("startEvent",
-          "A transition instance that instantiates the process can only be migrated to a process-level flow node"
-        );
+    } catch (MigratingProcessInstanceValidationException e) {
+      assertThat(e.getValidationReport()).hasTransitionInstanceFailures("startEvent",
+          "A transition instance that instantiates the process can only be migrated to a process-level flow node");
     }
   }
 
   @Test
   public void testMigrateAsyncBeforeStartEventTransitionInstanceCase3() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("subProcessStart", "subProcessStart")
-        .build();
+        .mapActivities("subProcessStart", "subProcessStart").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertJobMigrated("subProcessStart", "subProcessStart", AsyncContinuationJobHandler.TYPE);
+    testHelper.assertJobMigrated("subProcessStart", "subProcessStart",
+        AsyncContinuationJobHandler.TYPE);
 
     // and it is possible to successfully execute the migrated job
     Job job = testHelper.snapshotAfterMigration.getJobs().get(0);
@@ -601,13 +603,14 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeStartEventTransitionInstanceCase4() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_START_EVENT_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_START_EVENT_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("subProcessStart", "startEvent")
-        .build();
+        .mapActivities("subProcessStart", "startEvent").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -627,30 +630,28 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstanceAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "userTask")
-        .build();
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-    .hasProcessDefinitionId(targetProcessDefinition.getId())
-    .matches(
-      describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .child("userTask").scope()
-      .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("userTask").scope()
+            .done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .beginScope("subProcess")
-          .transition("userTask")
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .beginScope("subProcess").transition("userTask").done());
 
     testHelper.assertJobMigrated("userTask", "userTask", AsyncContinuationJobHandler.TYPE);
 
@@ -666,39 +667,33 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstanceConcurrentAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "userTask")
-        .build();
+        .mapActivities("userTask", "userTask").build();
 
     ProcessInstance processInstance = rule.getRuntimeService()
         .createProcessInstanceById(migrationPlan.getSourceProcessDefinitionId())
-        .startBeforeActivity("userTask")
-        .startBeforeActivity("userTask")
-        .execute();
+        .startBeforeActivity("userTask").startBeforeActivity("userTask").execute();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child(null).scope()
-            .child("userTask").concurrent().noScope().up()
-            .child("userTask").concurrent().noScope()
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child(null).scope()
+            .child("userTask").concurrent().noScope().up().child("userTask").concurrent().noScope()
+            .done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .beginScope("subProcess")
-          .transition("userTask")
-          .transition("userTask")
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .beginScope("subProcess").transition("userTask").transition("userTask").done());
 
     Assert.assertEquals(2, testHelper.snapshotAfterMigration.getJobs().size());
 
@@ -714,14 +709,15 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstanceWithIncident() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
-        .changeElementId("userTask", "newUserTask"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
+            .changeElementId("userTask", "newUserTask"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "newUserTask")
-        .build();
+        .mapActivities("userTask", "newUserTask").build();
 
     ProcessInstance processInstance = rule.getRuntimeService()
         .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
@@ -729,7 +725,8 @@ public class MigrationTransitionInstancesTest {
     Job job = rule.getManagementService().createJobQuery().singleResult();
     rule.getManagementService().setJobRetries(job.getId(), 0);
 
-    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
+    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery()
+        .singleResult();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -754,22 +751,18 @@ public class MigrationTransitionInstancesTest {
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
-
-
-
   @Test
   public void testMigrateAsyncBeforeInnerMultiInstance() {
     // given
     BpmnModelInstance model = modify(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS)
-      .asyncBeforeInnerMiActivity("userTask");
+        .asyncBeforeInnerMiActivity("userTask");
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -798,15 +791,14 @@ public class MigrationTransitionInstancesTest {
   public void testMigrateAsyncAfterInnerMultiInstance() {
     // given
     BpmnModelInstance model = modify(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS)
-      .asyncAfterInnerMiActivity("userTask");
+        .asyncAfterInnerMiActivity("userTask");
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = rule.getRuntimeService()
         .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
@@ -838,38 +830,37 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testCannotMigrateAsyncBeforeTransitionInstanceToNonAsyncActivity() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
     // when
     try {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-        .hasTransitionInstanceFailures("userTask",
-          "Target activity is not asyncBefore"
-        );
+      assertThat(e.getValidationReport()).hasTransitionInstanceFailures("userTask",
+          "Target activity is not asyncBefore");
     }
   }
 
   @Test
   public void testCannotMigrateAsyncAfterTransitionInstanceToNonAsyncActivity() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_AFTER_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask1", "userTask")
-        .build();
+        .mapActivities("userTask1", "userTask").build();
 
     ProcessInstance processInstance = rule.getRuntimeService()
         .startProcessInstanceById(sourceProcessDefinition.getId());
@@ -880,21 +871,20 @@ public class MigrationTransitionInstancesTest {
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-        .hasTransitionInstanceFailures("userTask1",
-          "Target activity is not asyncAfter"
-        );
+      assertThat(e.getValidationReport()).hasTransitionInstanceFailures("userTask1",
+          "Target activity is not asyncAfter");
     }
   }
 
   @Test
   public void testCannotMigrateUnmappedTransitionInstance() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -904,23 +894,18 @@ public class MigrationTransitionInstancesTest {
     try {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-        .hasTransitionInstanceFailures("userTask",
-          "There is no migration instruction for this instance's activity"
-        );
+      assertThat(e.getValidationReport()).hasTransitionInstanceFailures("userTask",
+          "There is no migration instruction for this instance's activity");
     }
   }
 
   @Test
   public void testCannotMigrateUnmappedTransitionInstanceAtNonLeafActivity() {
     // given
-    BpmnModelInstance model = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess")
-      .camundaAsyncBefore(true)
-      .done();
+    BpmnModelInstance model = modify(ProcessModels.SUBPROCESS_PROCESS).activityBuilder("subProcess")
+        .camundaAsyncBefore(true).done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
@@ -933,29 +918,30 @@ public class MigrationTransitionInstancesTest {
     try {
       testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-        .hasTransitionInstanceFailures("subProcess",
-          "There is no migration instruction for this instance's activity"
-        );
+      assertThat(e.getValidationReport()).hasTransitionInstanceFailures("subProcess",
+          "There is no migration instruction for this instance's activity");
     }
   }
 
   @Test
   public void testCannotMigrateUnmappedTransitionInstanceWithIncident() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
 
-    // the user task is not mapped in the migration plan, i.e. there is no instruction to migrate the job
+    // the user task is not mapped in the migration plan, i.e. there is no instruction to migrate
+    // the job
     // and the incident
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
 
     Job job = rule.getManagementService().createJobQuery().singleResult();
     rule.getManagementService().setJobRetries(job.getId(), 0);
@@ -964,13 +950,10 @@ public class MigrationTransitionInstancesTest {
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-        .hasTransitionInstanceFailures("userTask",
-          "There is no migration instruction for this instance's activity"
-        );
+      assertThat(e.getValidationReport()).hasTransitionInstanceFailures("userTask",
+          "There is no migration instruction for this instance's activity");
     }
 
   }
@@ -978,14 +961,15 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstanceToDifferentProcessKey() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
-        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -998,29 +982,27 @@ public class MigrationTransitionInstancesTest {
   public void testMigrateAsyncAfterCompensateEventSubProcessStartEvent() {
     // given
     BpmnModelInstance model = modify(EventSubProcessModels.COMPENSATE_EVENT_SUBPROCESS_PROCESS)
-        .flowNodeBuilder("eventSubProcessStart")
-        .camundaAsyncAfter()
-        .done();
+        .flowNodeBuilder("eventSubProcessStart").camundaAsyncAfter().done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("eventSubProcess", "eventSubProcess")
-      .mapActivities("eventSubProcessStart", "eventSubProcessStart")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess")
+        .mapActivities("eventSubProcess", "eventSubProcess")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().createProcessInstanceById(sourceProcessDefinition.getId())
-      .startBeforeActivity("eventSubProcess")
-      .execute();
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .createProcessInstanceById(sourceProcessDefinition.getId())
+        .startBeforeActivity("eventSubProcess").execute();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    testHelper.assertJobMigrated("eventSubProcessStart", "eventSubProcessStart", AsyncContinuationJobHandler.TYPE);
+    testHelper.assertJobMigrated("eventSubProcessStart", "eventSubProcessStart",
+        AsyncContinuationJobHandler.TYPE);
   }
 
   /**
@@ -1030,24 +1012,21 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncAfterBoundaryEventWithChangedEventScope() {
     BpmnModelInstance sourceProcess = modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .activityBuilder("userTask1")
-        .boundaryEvent("boundary").message("Message").camundaAsyncAfter()
-        .userTask("afterBoundaryTask")
-        .endEvent()
-      .done();
-    BpmnModelInstance targetProcess = modify(sourceProcess).swapElementIds("userTask1", "userTask2");
+        .activityBuilder("userTask1").boundaryEvent("boundary").message("Message")
+        .camundaAsyncAfter().userTask("afterBoundaryTask").endEvent().done();
+    BpmnModelInstance targetProcess = modify(sourceProcess).swapElementIds("userTask1",
+        "userTask2");
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("boundary", "boundary")
-        .mapActivities("userTask1", "userTask1")
-        .mapActivities("userTask2", "userTask2")
-        .build();
+        .mapActivities("boundary", "boundary").mapActivities("userTask1", "userTask1")
+        .mapActivities("userTask2", "userTask2").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -1059,34 +1038,28 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testFailMigrateFailedJobIncident() {
     // given
-    BpmnModelInstance model = ProcessModels.newModel()
-      .startEvent()
-      .serviceTask("serviceTask")
-      .camundaAsyncBefore()
-      .camundaClass(AlwaysFailingDelegate.class.getName())
-      .endEvent()
-      .done();
+    BpmnModelInstance model = ProcessModels.newModel().startEvent().serviceTask("serviceTask")
+        .camundaAsyncBefore().camundaClass(AlwaysFailingDelegate.class.getName()).endEvent().done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(model).changeElementId("serviceTask", "newServiceTask"));
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(model).changeElementId("serviceTask", "newServiceTask"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    String processInstanceId = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId()).getId();
+    String processInstanceId = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId()).getId();
     testHelper.executeAvailableJobs();
 
     // when
     try {
-      rule.getRuntimeService().newMigration(migrationPlan)
-        .processInstanceIds(processInstanceId)
-        .execute();
+      rule.getRuntimeService().newMigration(migrationPlan).processInstanceIds(processInstanceId)
+          .execute();
 
       Assert.fail("should fail");
-    }
-    catch (MigratingProcessInstanceValidationException e) {
+    } catch (MigratingProcessInstanceValidationException e) {
       // then
       Assert.assertTrue(e instanceof MigratingProcessInstanceValidationException);
     }

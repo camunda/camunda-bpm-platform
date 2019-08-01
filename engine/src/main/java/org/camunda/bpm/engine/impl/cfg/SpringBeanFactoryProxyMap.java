@@ -24,7 +24,6 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.springframework.beans.factory.BeanFactory;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -37,14 +36,14 @@ public class SpringBeanFactoryProxyMap implements Map<Object, Object> {
   }
 
   public Object get(Object key) {
-    if ( (key==null) || (!String.class.isAssignableFrom(key.getClass())) ) {
+    if ((key == null) || (!String.class.isAssignableFrom(key.getClass()))) {
       return null;
     }
     return beanFactory.getBean((String) key);
   }
 
   public boolean containsKey(Object key) {
-    if ( (key==null) || (!String.class.isAssignableFrom(key.getClass())) ) {
+    if ((key == null) || (!String.class.isAssignableFrom(key.getClass()))) {
       return false;
     }
     return beanFactory.containsBean((String) key);
@@ -74,7 +73,7 @@ public class SpringBeanFactoryProxyMap implements Map<Object, Object> {
     throw new ProcessEngineException("unsupported operation on configuration beans");
   }
 
-  public void putAll(Map< ? extends Object, ? extends Object> m) {
+  public void putAll(Map<? extends Object, ? extends Object> m) {
     throw new ProcessEngineException("unsupported operation on configuration beans");
   }
 

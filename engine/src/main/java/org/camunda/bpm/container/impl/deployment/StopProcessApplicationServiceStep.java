@@ -24,7 +24,10 @@ import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 
 /**
- * <p>Deployment operations step responsible for removing the {@link JmxManagedProcessApplication} service.</p>
+ * <p>
+ * Deployment operations step responsible for removing the {@link JmxManagedProcessApplication}
+ * service.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -38,7 +41,8 @@ public class StopProcessApplicationServiceStep extends DeploymentOperationStep {
   public void performOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
+    final AbstractProcessApplication processApplication = operationContext
+        .getAttachment(Attachments.PROCESS_APPLICATION);
 
     // remove the service
     serviceContainer.stopService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());

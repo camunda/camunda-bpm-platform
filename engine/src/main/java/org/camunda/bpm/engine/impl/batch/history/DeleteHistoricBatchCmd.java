@@ -33,10 +33,13 @@ public class DeleteHistoricBatchCmd implements Command<Object> {
   }
 
   public Object execute(CommandContext commandContext) {
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Historic batch id must not be null", "historic batch id", batchId);
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Historic batch id must not be null",
+        "historic batch id", batchId);
 
-    HistoricBatchEntity historicBatch = commandContext.getHistoricBatchManager().findHistoricBatchById(batchId);
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Historic batch for id '" + batchId + "' cannot be found", "historic batch", historicBatch);
+    HistoricBatchEntity historicBatch = commandContext.getHistoricBatchManager()
+        .findHistoricBatchById(batchId);
+    EnsureUtil.ensureNotNull(BadUserRequestException.class,
+        "Historic batch for id '" + batchId + "' cannot be found", "historic batch", historicBatch);
 
     checkAccess(commandContext, historicBatch);
 
@@ -48,14 +51,15 @@ public class DeleteHistoricBatchCmd implements Command<Object> {
   }
 
   protected void checkAccess(CommandContext commandContext, HistoricBatchEntity batch) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkDeleteHistoricBatch(batch);
     }
   }
 
   protected void writeUserOperationLog(CommandContext commandContext) {
-    commandContext.getOperationLogManager()
-      .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, batchId, PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logBatchOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, batchId, PropertyChange.EMPTY_CHANGE);
   }
 
 }

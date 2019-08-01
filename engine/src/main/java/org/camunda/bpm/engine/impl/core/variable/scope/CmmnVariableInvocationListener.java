@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class CmmnVariableInvocationListener implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
+public class CmmnVariableInvocationListener
+    implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
 
   public static final CmmnVariableInvocationListener INSTANCE = new CmmnVariableInvocationListener();
 

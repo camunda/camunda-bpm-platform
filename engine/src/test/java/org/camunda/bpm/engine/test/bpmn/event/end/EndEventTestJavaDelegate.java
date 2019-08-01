@@ -23,9 +23,9 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  * @author Joram Barrez
  */
 public class EndEventTestJavaDelegate implements JavaDelegate {
-  
+
   public static int timesCalled = 0;
-  
+
   public void execute(DelegateExecution execution) throws Exception {
     timesCalled++;
     Thread.sleep(3000L);

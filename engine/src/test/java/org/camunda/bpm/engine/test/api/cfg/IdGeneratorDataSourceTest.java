@@ -22,7 +22,6 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 public class IdGeneratorDataSourceTest extends ResourceProcessEngineTestCase {
 
   public IdGeneratorDataSourceTest() {
@@ -32,7 +31,7 @@ public class IdGeneratorDataSourceTest extends ResourceProcessEngineTestCase {
   @Deployment
   public void testIdGeneratorDataSource() {
     List<Thread> threads = new ArrayList<Thread>();
-    for (int i=0; i<20; i++) {
+    for (int i = 0; i < 20; i++) {
       Thread thread = new Thread() {
         public void run() {
           for (int j = 0; j < 5; j++) {
@@ -44,7 +43,7 @@ public class IdGeneratorDataSourceTest extends ResourceProcessEngineTestCase {
       threads.add(thread);
     }
 
-    for (Thread thread: threads) {
+    for (Thread thread : threads) {
       try {
         thread.join();
       } catch (InterruptedException e) {

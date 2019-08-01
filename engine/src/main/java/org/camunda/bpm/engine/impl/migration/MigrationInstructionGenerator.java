@@ -24,9 +24,8 @@ import org.camunda.bpm.engine.impl.migration.validation.instruction.ValidatingMi
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
 /**
- * Generates all migration instructions which represent a direct one
- * to one mapping of mapped entities in two process definitions. See
- * also {@link MigrationActivityMatcher}.
+ * Generates all migration instructions which represent a direct one to one mapping of mapped
+ * entities in two process definitions. See also {@link MigrationActivityMatcher}.
  *
  * @author Thorben Lindhauer
  *
@@ -34,13 +33,15 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 public interface MigrationInstructionGenerator {
 
   /**
-   * Sets the list of migration activity validators which validate that a activity
-   * is a candidate for the migration.
+   * Sets the list of migration activity validators which validate that a activity is a candidate
+   * for the migration.
    *
-   * @param migrationActivityValidators the list of validators to check
+   * @param migrationActivityValidators
+   *          the list of validators to check
    * @return this generator instance
    */
-  MigrationInstructionGenerator migrationActivityValidators(List<MigrationActivityValidator> migrationActivityValidators);
+  MigrationInstructionGenerator migrationActivityValidators(
+      List<MigrationActivityValidator> migrationActivityValidators);
 
   /**
    * Sets the list of migration instruction validators currently used by the process engine.
@@ -48,18 +49,21 @@ public interface MigrationInstructionGenerator {
    *
    * @return this
    */
-  MigrationInstructionGenerator migrationInstructionValidators(List<MigrationInstructionValidator> migrationInstructionValidators);
+  MigrationInstructionGenerator migrationInstructionValidators(
+      List<MigrationInstructionValidator> migrationInstructionValidators);
 
   /**
-   * Generate all migration instructions for mapped activities between two process definitions. A activity can be mapped
-   * if the {@link MigrationActivityMatcher} matches it with an activity from the target process definition.
+   * Generate all migration instructions for mapped activities between two process definitions. A
+   * activity can be mapped if the {@link MigrationActivityMatcher} matches it with an activity from
+   * the target process definition.
    *
-   * @param sourceProcessDefinition the source process definition
-   * @param targetProcessDefinition the target process definiton
+   * @param sourceProcessDefinition
+   *          the source process definition
+   * @param targetProcessDefinition
+   *          the target process definiton
    * @return the list of generated instructions
    */
   ValidatingMigrationInstructions generate(ProcessDefinitionImpl sourceProcessDefinition,
-                                           ProcessDefinitionImpl targetProcessDefinition,
-                                           boolean updateEventTriggers);
+      ProcessDefinitionImpl targetProcessDefinition, boolean updateEventTriggers);
 
 }

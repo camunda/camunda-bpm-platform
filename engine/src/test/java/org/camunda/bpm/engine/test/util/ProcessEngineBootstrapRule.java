@@ -42,7 +42,7 @@ public class ProcessEngineBootstrapRule extends TestWatcher {
 
   public ProcessEngine bootstrapEngine(String configurationResource) {
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource(configurationResource);
+        .createProcessEngineConfigurationFromResource(configurationResource);
     configureEngine(processEngineConfiguration);
     return processEngineConfiguration.buildProcessEngine();
   }
@@ -65,14 +65,15 @@ public class ProcessEngineBootstrapRule extends TestWatcher {
 
   private void deleteHistoryCleanupJob() {
     final List<Job> jobs = processEngine.getHistoryService().findHistoryCleanupJobs();
-    for (final Job job: jobs) {
-      ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
-          commandContext.getJobManager().deleteJob((JobEntity) job);
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
-          return null;
-        }
-      });
+    for (final Job job : jobs) {
+      ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+          .getCommandExecutorTxRequired().execute(new Command<Void>() {
+            public Void execute(CommandContext commandContext) {
+              commandContext.getJobManager().deleteJob((JobEntity) job);
+              commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
+              return null;
+            }
+          });
     }
   }
 

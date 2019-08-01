@@ -206,8 +206,10 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
   public void testManualActivationRule() {
     // given
     ItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", ItemControl.class);
-    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
-    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1",
+        ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -224,9 +226,12 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
   @Test
   public void testManualActivationRuleByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1", DefaultControl.class);
-    ManualActivationRule manualActivationRule = createElement(defaultControl, "ManualActivationRule_1", ManualActivationRule.class);
-    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1",
+        DefaultControl.class);
+    ManualActivationRule manualActivationRule = createElement(defaultControl,
+        "ManualActivationRule_1", ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -245,7 +250,8 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
     // given
     ItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", ItemControl.class);
     RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -262,9 +268,11 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
   @Test
   public void testRequiredRuleByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1", DefaultControl.class);
+    PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1",
+        DefaultControl.class);
     RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);

@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 
-
 /**
  * @author Roman Smirnov
  *
@@ -47,9 +46,13 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
 
   @Override
   public void setUp() throws Exception {
-    firstDeploymentId = createDeployment("first", "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml").getId();
-    secondDeploymentId = createDeployment("second", "org/camunda/bpm/engine/test/api/authorization/timerStartEventProcess.bpmn20.xml").getId();
-    thirdDeploymentId = createDeployment("third", "org/camunda/bpm/engine/test/api/authorization/timerBoundaryEventProcess.bpmn20.xml").getId();
+    firstDeploymentId = createDeployment("first",
+        "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml").getId();
+    secondDeploymentId = createDeployment("second",
+        "org/camunda/bpm/engine/test/api/authorization/timerStartEventProcess.bpmn20.xml").getId();
+    thirdDeploymentId = createDeployment("third",
+        "org/camunda/bpm/engine/test/api/authorization/timerBoundaryEventProcess.bpmn20.xml")
+            .getId();
     super.setUp();
   }
 
@@ -61,7 +64,8 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     deleteDeployment(thirdDeploymentId);
   }
 
-  // deployment statistics query without process instance authorizations /////////////////////////////////////////////
+  // deployment statistics query without process instance authorizations
+  // /////////////////////////////////////////////
 
   public void testQueryWithoutAuthorization() {
     // given
@@ -115,7 +119,8 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  // deployment statistics query (including process instances) /////////////////////////////////////////////
+  // deployment statistics query (including process instances)
+  // /////////////////////////////////////////////
 
   public void testQueryWithReadPermissionOnProcessInstance() {
     // given
@@ -268,7 +273,8 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  // deployment statistics query (including failed jobs) /////////////////////////////////////////////
+  // deployment statistics query (including failed jobs)
+  // /////////////////////////////////////////////
 
   public void testQueryIncludingFailedJobsWithReadPermissionOnProcessInstance() {
     // given
@@ -288,8 +294,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
         .includeFailedJobs();
 
     // then
@@ -328,8 +333,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
         .includeFailedJobs();
 
     // then
@@ -368,8 +372,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
         .includeFailedJobs();
 
     // then
@@ -408,8 +411,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
         .includeFailedJobs();
 
     // then
@@ -449,8 +451,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
         .includeIncidents();
 
     // then
@@ -489,8 +490,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
         .includeIncidents();
 
     // then
@@ -529,8 +529,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
         .includeIncidents();
 
     // then
@@ -569,8 +568,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
         .includeIncidents();
 
     // then
@@ -590,7 +588,8 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  // deployment statistics query (including failed jobs and incidents) /////////////////////////////////////////////
+  // deployment statistics query (including failed jobs and incidents)
+  // /////////////////////////////////////////////
 
   public void testQueryIncludingFailedJobsAndIncidentsWithReadPermissionOnProcessInstance() {
     // given
@@ -610,10 +609,8 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
-        .includeFailedJobs()
-        .includeIncidents();
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
+        .includeFailedJobs().includeIncidents();
 
     // then
     List<DeploymentStatistics> statistics = query.list();
@@ -651,10 +648,8 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
-        .includeFailedJobs()
-        .includeIncidents();
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
+        .includeFailedJobs().includeIncidents();
 
     // then
     List<DeploymentStatistics> statistics = query.list();
@@ -692,10 +687,8 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ_INSTANCE);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
-        .includeFailedJobs()
-        .includeIncidents();
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
+        .includeFailedJobs().includeIncidents();
 
     // then
     List<DeploymentStatistics> statistics = query.list();
@@ -733,10 +726,8 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
 
     // when
-    DeploymentStatisticsQuery query = managementService
-        .createDeploymentStatisticsQuery()
-        .includeFailedJobs()
-        .includeIncidents();
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery()
+        .includeFailedJobs().includeIncidents();
 
     // then
     List<DeploymentStatistics> statistics = query.list();
@@ -761,15 +752,15 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
 
-  protected void verifyStatisticsResult(DeploymentStatistics statistics, int instances, int failedJobs, int incidents) {
+  protected void verifyStatisticsResult(DeploymentStatistics statistics, int instances,
+      int failedJobs, int incidents) {
     assertEquals("Instances", instances, statistics.getInstances());
     assertEquals("Failed Jobs", failedJobs, statistics.getFailedJobs());
 
     List<IncidentStatistics> incidentStatistics = statistics.getIncidentStatistics();
     if (incidents == 0) {
       assertTrue("Incidents supposed to be empty", incidentStatistics.isEmpty());
-    }
-    else {
+    } else {
       // the test does have only one type of incidents
       assertEquals("Incidents", incidents, incidentStatistics.get(0).getIncidentCount());
     }

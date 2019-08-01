@@ -32,7 +32,8 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
- * These testcases verify that job definitions are created upon deployment of the process definition.
+ * These testcases verify that job definitions are created upon deployment of the process
+ * definition.
  *
  * @author Daniel Meyer
  *
@@ -43,8 +44,10 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
   public void testTimerStartEvent() {
 
     // given
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess").singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+        .processDefinitionKey("testProcess").singleResult();
 
     // then assert
     assertNotNull(jobDefinition);
@@ -62,8 +65,10 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
   public void testTimerBoundaryEvent() {
 
     // given
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess").singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+        .processDefinitionKey("testProcess").singleResult();
 
     // then assert
     assertNotNull(jobDefinition);
@@ -77,13 +82,16 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
   public void testMultipleTimerBoundaryEvents() {
 
     // given
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    JobDefinitionQuery jobDefinitionQuery = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess");
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    JobDefinitionQuery jobDefinitionQuery = managementService.createJobDefinitionQuery()
+        .processDefinitionKey("testProcess");
 
     // then assert
     assertEquals(2, jobDefinitionQuery.count());
 
-    JobDefinition jobDefinition = jobDefinitionQuery.activityIdIn("theBoundaryEvent1").singleResult();
+    JobDefinition jobDefinition = jobDefinitionQuery.activityIdIn("theBoundaryEvent1")
+        .singleResult();
     assertNotNull(jobDefinition);
     assertEquals(TimerExecuteNestedActivityJobHandler.TYPE, jobDefinition.getJobType());
     assertEquals("theBoundaryEvent1", jobDefinition.getActivityId());
@@ -102,8 +110,10 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
   public void testEventBasedGateway() {
 
     // given
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    JobDefinitionQuery jobDefinitionQuery = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess");
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    JobDefinitionQuery jobDefinitionQuery = managementService.createJobDefinitionQuery()
+        .processDefinitionKey("testProcess");
 
     // then assert
     assertEquals(2, jobDefinitionQuery.count());
@@ -127,8 +137,10 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
   public void testTimerIntermediateEvent() {
 
     // given
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess").singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+        .processDefinitionKey("testProcess").singleResult();
 
     // then assert
     assertNotNull(jobDefinition);
@@ -142,8 +154,10 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
   public void testAsyncContinuation() {
 
     // given
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess").singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+        .processDefinitionKey("testProcess").singleResult();
 
     // then assert
     assertNotNull(jobDefinition);
@@ -156,13 +170,16 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
   @Deployment
   public void testAsyncContinuationOfMultiInstance() {
     // given
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess").singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+        .processDefinitionKey("testProcess").singleResult();
 
     // then assert
     assertNotNull(jobDefinition);
     assertEquals(AsyncContinuationJobHandler.TYPE, jobDefinition.getJobType());
-    assertEquals("theService" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, jobDefinition.getActivityId());
+    assertEquals("theService" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX,
+        jobDefinition.getActivityId());
     assertEquals(MessageJobDeclaration.ASYNC_AFTER, jobDefinition.getJobConfiguration());
     assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
   }
@@ -170,8 +187,10 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
   @Deployment
   public void testAsyncContinuationOfActivityWrappedInMultiInstance() {
     // given
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess").singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+        .processDefinitionKey("testProcess").singleResult();
 
     // then assert
     assertNotNull(jobDefinition);
@@ -181,8 +200,9 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
     assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuation.bpmn20.xml",
-      "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testMultipleProcessesWithinDeployment.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuation.bpmn20.xml",
+      "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testMultipleProcessesWithinDeployment.bpmn20.xml" })
   public void testMultipleProcessDeployment() {
     JobDefinitionQuery query = managementService.createJobDefinitionQuery();
     List<JobDefinition> jobDefinitions = query.list();

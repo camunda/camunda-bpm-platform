@@ -43,29 +43,25 @@ public class MigrationHorizontalScopeChangeTest {
   public void testCannotMigrateHorizontallyBetweenScopes() {
 
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
 
     // when
     try {
       rule.getRuntimeService()
-        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("subProcess1", "subProcess1")
-        .mapActivities("subProcess2", "subProcess2")
-        .mapActivities("userTask1", "userTask2")
-        .mapActivities("userTask2", "userTask1")
-        .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities("subProcess1", "subProcess1").mapActivities("subProcess2", "subProcess2")
+          .mapActivities("userTask1", "userTask2").mapActivities("userTask2", "userTask1").build();
 
       Assert.fail("should fail");
-    }
-    catch (MigrationPlanValidationException e) {
+    } catch (MigrationPlanValidationException e) {
       MigrationPlanValidationReportAssert.assertThat(e.getValidationReport())
-        .hasInstructionFailures("userTask1",
-          "The closest mapped ancestor 'subProcess1' is mapped to scope 'subProcess1' which is not an ancestor of target scope 'userTask2'"
-        )
-        .hasInstructionFailures("userTask2",
-          "The closest mapped ancestor 'subProcess2' is mapped to scope 'subProcess2' which is not an ancestor of target scope 'userTask1'"
-        );
+          .hasInstructionFailures("userTask1",
+              "The closest mapped ancestor 'subProcess1' is mapped to scope 'subProcess1' which is not an ancestor of target scope 'userTask2'")
+          .hasInstructionFailures("userTask2",
+              "The closest mapped ancestor 'subProcess2' is mapped to scope 'subProcess2' which is not an ancestor of target scope 'userTask1'");
     }
   }
 

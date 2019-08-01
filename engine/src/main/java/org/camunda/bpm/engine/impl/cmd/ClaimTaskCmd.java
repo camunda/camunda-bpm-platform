@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
-
 /**
  * @author Joram Barrez
  */
@@ -74,7 +73,8 @@ public class ClaimTaskCmd implements Command<Void>, Serializable {
   }
 
   protected void checkClaimTask(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkTaskWork(task);
     }
   }

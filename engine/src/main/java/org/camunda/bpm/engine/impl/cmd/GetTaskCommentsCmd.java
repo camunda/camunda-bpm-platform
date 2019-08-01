@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.task.Comment;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -31,14 +30,12 @@ public class GetTaskCommentsCmd implements Command<List<Comment>>, Serializable 
 
   private static final long serialVersionUID = 1L;
   protected String taskId;
-  
+
   public GetTaskCommentsCmd(String taskId) {
     this.taskId = taskId;
   }
 
   public List<Comment> execute(CommandContext commandContext) {
-    return commandContext
-      .getCommentManager()
-      .findCommentsByTaskId(taskId);
+    return commandContext.getCommentManager().findCommentsByTaskId(taskId);
   }
 }

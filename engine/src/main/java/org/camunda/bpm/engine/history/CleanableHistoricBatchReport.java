@@ -22,10 +22,12 @@ import org.camunda.bpm.engine.query.Query;
  * Defines a report query for cleanable batches.
  *
  */
-public interface CleanableHistoricBatchReport extends Query<CleanableHistoricBatchReport, CleanableHistoricBatchReportResult> {
+public interface CleanableHistoricBatchReport
+    extends Query<CleanableHistoricBatchReport, CleanableHistoricBatchReportResult> {
 
   /**
-   * Order by finished batch operations amount (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Order by finished batch operations amount (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
    */
   CleanableHistoricBatchReport orderByFinishedBatchOperation();
 

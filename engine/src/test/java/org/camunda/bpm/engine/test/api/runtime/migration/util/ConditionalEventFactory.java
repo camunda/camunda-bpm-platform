@@ -30,12 +30,10 @@ public class ConditionalEventFactory implements BpmnEventFactory {
   protected static final String VAR_CONDITION = "${any=='any'}";
 
   @Override
-  public MigratingBpmnEventTrigger addBoundaryEvent(ProcessEngine engine, BpmnModelInstance modelInstance, String activityId, String boundaryEventId) {
-    ModifiableBpmnModelInstance.wrap(modelInstance)
-      .activityBuilder(activityId)
-      .boundaryEvent(boundaryEventId)
-        .condition(VAR_CONDITION)
-      .done();
+  public MigratingBpmnEventTrigger addBoundaryEvent(ProcessEngine engine,
+      BpmnModelInstance modelInstance, String activityId, String boundaryEventId) {
+    ModifiableBpmnModelInstance.wrap(modelInstance).activityBuilder(activityId)
+        .boundaryEvent(boundaryEventId).condition(VAR_CONDITION).done();
 
     ConditionalEventTrigger trigger = new ConditionalEventTrigger();
     trigger.engine = engine;
@@ -47,16 +45,11 @@ public class ConditionalEventFactory implements BpmnEventFactory {
   }
 
   @Override
-  public MigratingBpmnEventTrigger addEventSubProcess(ProcessEngine engine, BpmnModelInstance modelInstance, String parentId, String subProcessId, String startEventId) {
-    ModifiableBpmnModelInstance.wrap(modelInstance)
-      .addSubProcessTo(parentId)
-      .id(subProcessId)
-      .triggerByEvent()
-      .embeddedSubProcess()
-        .startEvent(startEventId)
-        .condition(VAR_CONDITION)
-      .subProcessDone()
-      .done();
+  public MigratingBpmnEventTrigger addEventSubProcess(ProcessEngine engine,
+      BpmnModelInstance modelInstance, String parentId, String subProcessId, String startEventId) {
+    ModifiableBpmnModelInstance.wrap(modelInstance).addSubProcessTo(parentId).id(subProcessId)
+        .triggerByEvent().embeddedSubProcess().startEvent(startEventId).condition(VAR_CONDITION)
+        .subProcessDone().done();
 
     ConditionalEventTrigger trigger = new ConditionalEventTrigger();
     trigger.engine = engine;
@@ -80,7 +73,8 @@ public class ConditionalEventFactory implements BpmnEventFactory {
     }
 
     @Override
-    public void assertEventTriggerMigrated(MigrationTestRule migrationContext, String targetActivityId) {
+    public void assertEventTriggerMigrated(MigrationTestRule migrationContext,
+        String targetActivityId) {
       migrationContext.assertEventSubscriptionMigrated(activityId, targetActivityId, null);
     }
 

@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.task.Task;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -45,34 +44,37 @@ public class TaskManager extends AbstractManager {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade, boolean skipCustomListeners) {
-    List<TaskEntity> tasks = (List) getDbEntityManager()
-      .createTaskQuery()
-      .processInstanceId(processInstanceId)
-      .list();
+  public void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason,
+      boolean cascade, boolean skipCustomListeners) {
+    List<TaskEntity> tasks = (List) getDbEntityManager().createTaskQuery()
+        .processInstanceId(processInstanceId).list();
 
-    String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
+    String reason = (deleteReason == null || deleteReason.length() == 0)
+        ? TaskEntity.DELETE_REASON_DELETED
+        : deleteReason;
 
-    for (TaskEntity task: tasks) {
+    for (TaskEntity task : tasks) {
       task.delete(reason, cascade, skipCustomListeners);
     }
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void deleteTasksByCaseInstanceId(String caseInstanceId, String deleteReason, boolean cascade) {
-    List<TaskEntity> tasks = (List) getDbEntityManager()
-        .createTaskQuery()
-        .caseInstanceId(caseInstanceId)
-        .list();
+  public void deleteTasksByCaseInstanceId(String caseInstanceId, String deleteReason,
+      boolean cascade) {
+    List<TaskEntity> tasks = (List) getDbEntityManager().createTaskQuery()
+        .caseInstanceId(caseInstanceId).list();
 
-      String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
+    String reason = (deleteReason == null || deleteReason.length() == 0)
+        ? TaskEntity.DELETE_REASON_DELETED
+        : deleteReason;
 
-      for (TaskEntity task: tasks) {
-        task.delete(reason, cascade, false);
-      }
+    for (TaskEntity task : tasks) {
+      task.delete(reason, cascade, false);
+    }
   }
 
-  public void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean skipCustomListeners) {
+  public void deleteTask(TaskEntity task, String deleteReason, boolean cascade,
+      boolean skipCustomListeners) {
     if (!task.isDeleted()) {
       task.setDeleted(true);
 
@@ -80,24 +82,18 @@ public class TaskManager extends AbstractManager {
       String taskId = task.getId();
 
       List<Task> subTasks = findTasksByParentTaskId(taskId);
-      for (Task subTask: subTasks) {
+      for (Task subTask : subTasks) {
         ((TaskEntity) subTask).delete(deleteReason, cascade, skipCustomListeners);
       }
 
       task.deleteIdentityLinks(false);
 
-      commandContext
-        .getVariableInstanceManager()
-        .deleteVariableInstanceByTask(task);
+      commandContext.getVariableInstanceManager().deleteVariableInstanceByTask(task);
 
       if (cascade) {
-        commandContext
-          .getHistoricTaskInstanceManager()
-          .deleteHistoricTaskInstanceById(taskId);
+        commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstanceById(taskId);
       } else {
-        commandContext
-          .getHistoricTaskInstanceManager()
-          .markTaskInstanceEnded(taskId, deleteReason);
+        commandContext.getHistoricTaskInstanceManager().markTaskInstanceEnded(taskId, deleteReason);
         if (TaskEntity.DELETE_REASON_COMPLETED.equals(deleteReason)) {
           task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
         } else {
@@ -110,7 +106,6 @@ public class TaskManager extends AbstractManager {
     }
   }
 
-
   public TaskEntity findTaskById(String id) {
     ensureNotNull("Invalid task id", "id", id);
     return getDbEntityManager().selectById(TaskEntity.class, id);
@@ -122,14 +117,14 @@ public class TaskManager extends AbstractManager {
   }
 
   public TaskEntity findTaskByCaseExecutionId(String caseExecutionId) {
-    return (TaskEntity) getDbEntityManager().selectOne("selectTaskByCaseExecutionId", caseExecutionId);
+    return (TaskEntity) getDbEntityManager().selectOne("selectTaskByCaseExecutionId",
+        caseExecutionId);
   }
 
   @SuppressWarnings("unchecked")
   public List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId) {
     return getDbEntityManager().selectList("selectTasksByProcessInstanceId", processInstanceId);
   }
-
 
   @Deprecated
   public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery, Page page) {
@@ -150,8 +145,10 @@ public class TaskManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbEntityManager().selectListWithRawParameter("selectTaskByNativeQuery", parameterMap, firstResult, maxResults);
+  public List<Task> findTasksByNativeQuery(Map<String, Object> parameterMap, int firstResult,
+      int maxResults) {
+    return getDbEntityManager().selectListWithRawParameter("selectTaskByNativeQuery", parameterMap,
+        firstResult, maxResults);
   }
 
   public long findTaskCountByNativeQuery(Map<String, Object> parameterMap) {
@@ -163,49 +160,60 @@ public class TaskManager extends AbstractManager {
     return getDbEntityManager().selectList("selectTasksByParentTaskId", parentTaskId);
   }
 
-  public void updateTaskSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
+  public void updateTaskSuspensionStateByProcessDefinitionId(String processDefinitionId,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateTaskSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
+  public void updateTaskSuspensionStateByProcessInstanceId(String processInstanceId,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateTaskSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
+  public void updateTaskSuspensionStateByProcessDefinitionKey(String processDefinitionKey,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", false);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateTaskSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
+  public void updateTaskSuspensionStateByProcessDefinitionKeyAndTenantId(
+      String processDefinitionKey, String processDefinitionTenantId,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", true);
     parameters.put("processDefinitionTenantId", processDefinitionTenantId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateTaskSuspensionStateByCaseExecutionId(String caseExecutionId, SuspensionState suspensionState) {
+  public void updateTaskSuspensionStateByCaseExecutionId(String caseExecutionId,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("caseExecutionId", caseExecutionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(TaskEntity.class, "updateTaskSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
 
   }
 
   // helper ///////////////////////////////////////////////////////////
 
   protected void createDefaultAuthorizations(TaskEntity task) {
-    if(isAuthorizationEnabled()) {
+    if (isAuthorizationEnabled()) {
       ResourceAuthorizationProvider provider = getResourceAuthorizationProvider();
       AuthorizationEntity[] authorizations = provider.newTask(task);
       saveDefaultAuthorizations(authorizations);

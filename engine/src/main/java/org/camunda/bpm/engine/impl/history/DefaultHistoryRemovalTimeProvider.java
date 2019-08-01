@@ -31,7 +31,8 @@ import java.util.Date;
  */
 public class DefaultHistoryRemovalTimeProvider implements HistoryRemovalTimeProvider {
 
-  public Date calculateRemovalTime(HistoricProcessInstanceEventEntity historicRootProcessInstance, ProcessDefinition processDefinition) {
+  public Date calculateRemovalTime(HistoricProcessInstanceEventEntity historicRootProcessInstance,
+      ProcessDefinition processDefinition) {
 
     Integer historyTimeToLive = processDefinition.getHistoryTimeToLive();
 
@@ -50,7 +51,8 @@ public class DefaultHistoryRemovalTimeProvider implements HistoryRemovalTimeProv
     return null;
   }
 
-  public Date calculateRemovalTime(HistoricDecisionInstanceEntity historicRootDecisionInstance, DecisionDefinition decisionDefinition) {
+  public Date calculateRemovalTime(HistoricDecisionInstanceEntity historicRootDecisionInstance,
+      DecisionDefinition decisionDefinition) {
 
     Integer historyTimeToLive = decisionDefinition.getHistoryTimeToLive();
 
@@ -91,17 +93,17 @@ public class DefaultHistoryRemovalTimeProvider implements HistoryRemovalTimeProv
   }
 
   protected Integer getTTLByBatchOperation(String batchOperation) {
-    return Context.getCommandContext()
-      .getProcessEngineConfiguration()
-      .getParsedBatchOperationsForHistoryCleanup()
-      .get(batchOperation);
+    return Context.getCommandContext().getProcessEngineConfiguration()
+        .getParsedBatchOperationsForHistoryCleanup().get(batchOperation);
   }
 
-  protected boolean isProcessInstanceRunning(HistoricProcessInstanceEventEntity historicProcessInstance) {
+  protected boolean isProcessInstanceRunning(
+      HistoricProcessInstanceEventEntity historicProcessInstance) {
     return historicProcessInstance.getEndTime() == null;
   }
 
-  protected boolean isProcessInstanceEnded(HistoricProcessInstanceEventEntity historicProcessInstance) {
+  protected boolean isProcessInstanceEnded(
+      HistoricProcessInstanceEventEntity historicProcessInstance) {
     return historicProcessInstance.getEndTime() != null;
   }
 

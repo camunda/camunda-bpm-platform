@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.cfg;
 
-
-
 /**
  * The transaction context is an abstraction for different transaction management strategies
- * existing the Java Ecosystem. Provides transaction lifecycle management and management of transaction listeners.
+ * existing the Java Ecosystem. Provides transaction lifecycle management and management of
+ * transaction listeners.
  *
  * Note: not every Technology or environment may provide a full implementation of this interface.
  *
@@ -39,14 +38,16 @@ public interface TransactionContext {
    */
   void rollback();
 
-
   /**
    * Add a {@link TransactionListener} to the current transaction.
    *
-   * @param transactionState the transaction state for which the {@link TransactionListener} should be added.
-   * @param transactionListener the {@link TransactionListener} to add.
+   * @param transactionState
+   *          the transaction state for which the {@link TransactionListener} should be added.
+   * @param transactionListener
+   *          the {@link TransactionListener} to add.
    */
-  void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener);
+  void addTransactionListener(TransactionState transactionState,
+      TransactionListener transactionListener);
 
   boolean isTransactionActive();
 

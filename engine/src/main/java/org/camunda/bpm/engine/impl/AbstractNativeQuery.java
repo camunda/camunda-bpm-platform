@@ -33,8 +33,8 @@ import org.camunda.bpm.engine.query.NativeQuery;
  *
  * @author Bernd Ruecker (camunda)
  */
-public abstract class AbstractNativeQuery<T extends NativeQuery< ? , ? >, U> implements Command<Object>, NativeQuery<T, U>,
-        Serializable {
+public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U>
+    implements Command<Object>, NativeQuery<T, U>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -97,10 +97,10 @@ public abstract class AbstractNativeQuery<T extends NativeQuery< ? , ? >, U> imp
 
   @SuppressWarnings("unchecked")
   public List<U> listPage(int firstResult, int maxResults) {
-    this.firstResult =firstResult;
+    this.firstResult = firstResult;
     this.maxResults = maxResults;
     this.resultType = ResultType.LIST_PAGE;
-    if (commandExecutor!=null) {
+    if (commandExecutor != null) {
       return (List<U>) commandExecutor.execute(this);
     }
     return executeList(Context.getCommandContext(), getParameterMap(), firstResult, maxResults);
@@ -127,10 +127,10 @@ public abstract class AbstractNativeQuery<T extends NativeQuery< ? , ? >, U> imp
       int firstRow = firstResult + 1;
       parameterMap.put("firstRow", firstRow);
       int lastRow = 0;
-      if(maxResults == Integer.MAX_VALUE) {
+      if (maxResults == Integer.MAX_VALUE) {
         lastRow = maxResults;
       } else {
-       lastRow = firstResult + maxResults + 1;
+        lastRow = firstResult + maxResults + 1;
       }
       parameterMap.put("lastRow", lastRow);
       return executeList(commandContext, parameterMap, firstResult, maxResults);
@@ -141,25 +141,28 @@ public abstract class AbstractNativeQuery<T extends NativeQuery< ? , ? >, U> imp
     }
   }
 
-  public abstract long executeCount(CommandContext commandContext, Map<String, Object> parameterMap);
+  public abstract long executeCount(CommandContext commandContext,
+      Map<String, Object> parameterMap);
 
   /**
    * Executes the actual query to retrieve the list of results.
+   * 
    * @param maxResults
    * @param firstResult
    *
    * @param page
-   *          used if the results must be paged. If null, no paging will be
-   *          applied.
+   *          used if the results must be paged. If null, no paging will be applied.
    */
-  public abstract List<U> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults);
+  public abstract List<U> executeList(CommandContext commandContext,
+      Map<String, Object> parameterMap, int firstResult, int maxResults);
 
   public U executeSingleResult(CommandContext commandContext) {
     List<U> results = executeList(commandContext, getParameterMap(), 0, Integer.MAX_VALUE);
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw new ProcessEngineException("Query return " + results.size() + " results instead of max 1");
+      throw new ProcessEngineException(
+          "Query return " + results.size() + " results instead of max 1");
     }
     return null;
   }

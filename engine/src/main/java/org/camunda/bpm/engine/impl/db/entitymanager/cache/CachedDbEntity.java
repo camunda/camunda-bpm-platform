@@ -51,6 +51,7 @@ public class CachedDbEntity implements Recyclable {
 
   /**
    * Allows checking whether this entity is dirty.
+   * 
    * @return true if the entity is dirty (state has changed since it was put into the cache)
    */
   public boolean isDirty() {
@@ -58,7 +59,8 @@ public class CachedDbEntity implements Recyclable {
   }
 
   public void forceSetDirty() {
-    // set the value of the copy to some value which will always be different from the new entity state.
+    // set the value of the copy to some value which will always be different from the new entity
+    // state.
     this.copy = -1;
   }
 
@@ -67,14 +69,13 @@ public class CachedDbEntity implements Recyclable {
   }
 
   public String toString() {
-    return entityState + " " + dbEntity.getClass().getSimpleName() + "["+dbEntity.getId()+"]";
+    return entityState + " " + dbEntity.getClass().getSimpleName() + "[" + dbEntity.getId() + "]";
   }
 
   public void determineEntityReferences() {
     if (dbEntity instanceof HasDbReferences) {
       flushRelevantEntityReferences = ((HasDbReferences) dbEntity).getReferencedEntityIds();
-    }
-    else {
+    } else {
       flushRelevantEntityReferences = Collections.emptySet();
     }
   }

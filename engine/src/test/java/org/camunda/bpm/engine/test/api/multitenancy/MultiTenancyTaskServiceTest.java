@@ -35,7 +35,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Daniel Meyer
  *
  */
-public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase{
+public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase {
 
   private static final String tenant1 = "the-tenant-1";
   private static final String tenant2 = "the-tenant-2";
@@ -75,8 +75,7 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase{
     try {
       taskService.saveTask(task);
       fail("Expected an exception");
-    }
-    catch(ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertTextPresent("ENGINE-03072 Cannot change tenantId of Task", e.getMessage());
     }
 
@@ -101,8 +100,7 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase{
     try {
       taskService.saveTask(task);
       fail("Expected an exception");
-    }
-    catch(ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertTextPresent("ENGINE-03072 Cannot change tenantId of Task", e.getMessage());
     }
 
@@ -127,9 +125,9 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase{
     try {
       taskService.saveTask(subTask);
       fail("Exception expected.");
-    }
-    catch(ProcessEngineException e) {
-      assertTextPresent("ENGINE-03073 Cannot set different tenantId on subtask than on parent Task", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent("ENGINE-03073 Cannot set different tenantId on subtask than on parent Task",
+          e.getMessage());
     }
     // Finally, delete task
     deleteTasks(task);
@@ -151,9 +149,9 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase{
     try {
       taskService.saveTask(subTask);
       fail("Exception expected.");
-    }
-    catch(ProcessEngineException e) {
-      assertTextPresent("ENGINE-03073 Cannot set different tenantId on subtask than on parent Task", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent("ENGINE-03073 Cannot set different tenantId on subtask than on parent Task",
+          e.getMessage());
     }
     // Finally, delete task
     deleteTasks(task);
@@ -201,55 +199,43 @@ public class MultiTenancyTaskServiceTest extends PluggableProcessEngineTestCase{
   public void testGetIdentityLinkWithTenantIdForCandidateUsers() {
 
     // given
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-    .startEvent()
-    .userTask("task").camundaCandidateUsers("aUserId")
-    .endEvent()
-    .done();
-    
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .userTask("task").camundaCandidateUsers("aUserId").endEvent().done();
+
     deploymentForTenant("tenant", oneTaskProcess);
-    
+
     ProcessInstance tenantProcessInstance = runtimeService.createProcessInstanceByKey("testProcess")
-    .processDefinitionTenantId("tenant")
-    .execute();
-    
-    Task tenantTask = taskService
-        .createTaskQuery()
-        .processInstanceId(tenantProcessInstance.getId())
+        .processDefinitionTenantId("tenant").execute();
+
+    Task tenantTask = taskService.createTaskQuery().processInstanceId(tenantProcessInstance.getId())
         .singleResult();
-    
+
     List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tenantTask.getId());
-    assertEquals(identityLinks.size(),1);
+    assertEquals(identityLinks.size(), 1);
     assertEquals(identityLinks.get(0).getTenantId(), "tenant");
   }
 
   public void testGetIdentityLinkWithTenantIdForCandidateGroup() {
 
     // given
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-    .startEvent()
-    .userTask("task").camundaCandidateGroups("aGroupId")
-    .endEvent()
-    .done();
-    
-    deploymentForTenant("tenant", oneTaskProcess);
-    
-    ProcessInstance tenantProcessInstance = runtimeService.createProcessInstanceByKey("testProcess")
-    .processDefinitionTenantId("tenant")
-    .execute();
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .userTask("task").camundaCandidateGroups("aGroupId").endEvent().done();
 
-    Task tenantTask = taskService
-        .createTaskQuery()
-        .processInstanceId(tenantProcessInstance.getId())
+    deploymentForTenant("tenant", oneTaskProcess);
+
+    ProcessInstance tenantProcessInstance = runtimeService.createProcessInstanceByKey("testProcess")
+        .processDefinitionTenantId("tenant").execute();
+
+    Task tenantTask = taskService.createTaskQuery().processInstanceId(tenantProcessInstance.getId())
         .singleResult();
-    
+
     List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tenantTask.getId());
-    assertEquals(identityLinks.size(),1);
+    assertEquals(identityLinks.size(), 1);
     assertEquals(identityLinks.get(0).getTenantId(), "tenant");
   }
 
   protected void deleteTasks(Task... tasks) {
-    for(Task task : tasks) {
+    for (Task task : tasks) {
       taskService.deleteTask(task.getId(), true);
     }
   }

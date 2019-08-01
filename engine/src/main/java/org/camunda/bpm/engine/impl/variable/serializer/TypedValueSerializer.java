@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * A {@link TypedValueSerializer} persists {@link TypedValue TypedValues} of a given
  * {@link ValueType} to provided {@link ValueFields}.
- *<p>
+ * <p>
  * Replaces the "VariableType" interface in previous versions.
  *
  * @author Daniel Meyer
@@ -34,7 +34,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 public interface TypedValueSerializer<T extends TypedValue> {
 
   /**
-   * The name of this serializer. The name is used when persisting the ValueFields populated by this serializer.
+   * The name of this serializer. The name is used when persisting the ValueFields populated by this
+   * serializer.
    *
    * @return the name of this serializer.
    */
@@ -42,6 +43,7 @@ public interface TypedValueSerializer<T extends TypedValue> {
 
   /**
    * The {@link ValueType VariableType} supported
+   * 
    * @return the VariableType supported
    */
   ValueType getType();
@@ -49,35 +51,42 @@ public interface TypedValueSerializer<T extends TypedValue> {
   /**
    * Serialize a {@link TypedValue} to the {@link ValueFields}.
    *
-   * @param value the {@link TypedValue} to persist
-   * @param valueFields the {@link ValueFields} to which the value should be persisted
+   * @param value
+   *          the {@link TypedValue} to persist
+   * @param valueFields
+   *          the {@link ValueFields} to which the value should be persisted
    */
   void writeValue(T value, ValueFields valueFields);
 
   /**
    * Retrieve a {@link TypedValue} from the provided {@link ValueFields}.
    *
-   * @param valueFields the {@link ValueFields} to retrieve the value from
-   * @param deserializeValue indicates whether a {@link SerializableValue} should be deserialized.
+   * @param valueFields
+   *          the {@link ValueFields} to retrieve the value from
+   * @param deserializeValue
+   *          indicates whether a {@link SerializableValue} should be deserialized.
    *
    * @return the {@link TypedValue}
    */
   T readValue(ValueFields valueFields, boolean deserializeValue);
 
   /**
-   * Used for auto-detecting the value type of a variable.
-   * An implementation must return true if it is able to write values of the provided type.
+   * Used for auto-detecting the value type of a variable. An implementation must return true if it
+   * is able to write values of the provided type.
    *
-   * @param value the value
+   * @param value
+   *          the value
    * @return true if this {@link TypedValueSerializer} is able to handle the provided value
    */
   boolean canHandle(TypedValue value);
 
   /**
-   * Returns a typed value for the provided untyped value. This is used on cases where the user sets an untyped
-   * value which is then detected to be handled by this {@link TypedValueSerializer} (by invocation of {@link #canHandle(TypedValue)}).
+   * Returns a typed value for the provided untyped value. This is used on cases where the user sets
+   * an untyped value which is then detected to be handled by this {@link TypedValueSerializer} (by
+   * invocation of {@link #canHandle(TypedValue)}).
    *
-   * @param untypedValue the untyped value
+   * @param untypedValue
+   *          the untyped value
    * @return the corresponding typed value
    */
   T convertToTypedValue(UntypedValueImpl untypedValue);
@@ -89,8 +98,8 @@ public interface TypedValueSerializer<T extends TypedValue> {
   String getSerializationDataformat();
 
   /**
-   * @return whether values serialized by this serializer can be mutable and
-   * should be re-serialized if changed
+   * @return whether values serialized by this serializer can be mutable and should be re-serialized
+   *         if changed
    */
   boolean isMutableValue(T typedValue);
 

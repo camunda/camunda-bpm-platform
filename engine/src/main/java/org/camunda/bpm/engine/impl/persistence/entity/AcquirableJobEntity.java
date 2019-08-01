@@ -38,7 +38,6 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
 
   protected boolean isExclusive = DEFAULT_EXCLUSIVE;
 
-
   @Override
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
@@ -142,15 +141,9 @@ public class AcquirableJobEntity implements DbEntity, HasDbRevision {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-        + "[id=" + id
-        + ", revision=" + revision
-        + ", lockOwner=" + lockOwner
-        + ", lockExpirationTime=" + lockExpirationTime
-        + ", duedate=" + duedate
-        + ", processInstanceId=" + processInstanceId
-        + ", isExclusive=" + isExclusive
-        + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", revision=" + revision + ", lockOwner="
+        + lockOwner + ", lockExpirationTime=" + lockExpirationTime + ", duedate=" + duedate
+        + ", processInstanceId=" + processInstanceId + ", isExclusive=" + isExclusive + "]";
   }
 
 }

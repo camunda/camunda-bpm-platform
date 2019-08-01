@@ -30,8 +30,8 @@ public class SubmitFormVariablesInvocation extends DelegateInvocation {
   protected VariableMap properties;
   protected VariableScope variableScope;
 
-
-  public SubmitFormVariablesInvocation(FormHandler formHandler, VariableMap properties, VariableScope variableScope) {
+  public SubmitFormVariablesInvocation(FormHandler formHandler, VariableMap properties,
+      VariableScope variableScope) {
     super(null, null);
     this.formHandler = formHandler;
     this.properties = properties;

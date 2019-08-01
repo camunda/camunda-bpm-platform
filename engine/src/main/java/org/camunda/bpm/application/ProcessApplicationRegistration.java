@@ -21,9 +21,10 @@ import java.util.Set;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.repository.Deployment;
 
-
 /**
- * <p>Represents a registration of a process application with a process engine</p>
+ * <p>
+ * Represents a registration of a process application with a process engine
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -41,6 +42,5 @@ public interface ProcessApplicationRegistration {
    * @return the name of the process engine to which the deployment was made
    */
   public String getProcessEngineName();
-
 
 }

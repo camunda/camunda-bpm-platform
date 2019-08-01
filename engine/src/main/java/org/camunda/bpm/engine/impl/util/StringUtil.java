@@ -38,11 +38,10 @@ import org.camunda.bpm.engine.runtime.ProcessElementInstance;
  * @author Sebastian Menski
  */
 public final class StringUtil {
-  
+
   /**
-   * Note: {@link String#length()} counts Unicode supplementary
-   * characters twice, so for a String consisting only of those,
-   * the limit is effectively MAX_LONG_STRING_LENGTH / 2
+   * Note: {@link String#length()} counts Unicode supplementary characters twice, so for a String
+   * consisting only of those, the limit is effectively MAX_LONG_STRING_LENGTH / 2
    */
   public static int DB_MAX_STRING_LENGTH = 666;
 
@@ -52,7 +51,8 @@ public final class StringUtil {
    * Note: In most cases you should check for composite expressions. See
    * {@link #isCompositeExpression(String, ExpressionManager)} for more information.
    *
-   * @param text the text to check
+   * @param text
+   *          the text to check
    * @return true if the text seams to be an expression false otherwise
    */
   public static boolean isExpression(String text) {
@@ -61,12 +61,12 @@ public final class StringUtil {
   }
 
   /**
-   * Checks whether a {@link String} seams to be a composite expression or not. In contrast to an eval expression
-   * is the composite expression also allowed to consist of a combination of literal and eval expressions, e.g.,
-   * "Welcome ${customer.name} to our site".
+   * Checks whether a {@link String} seams to be a composite expression or not. In contrast to an
+   * eval expression is the composite expression also allowed to consist of a combination of literal
+   * and eval expressions, e.g., "Welcome ${customer.name} to our site".
    *
-   * Note: If you just want to allow eval expression, then the expression must always start with "#{" or "${".
-   * Use {@link #isExpression(String)} to conduct these kind of checks.
+   * Note: If you just want to allow eval expression, then the expression must always start with
+   * "#{" or "${". Use {@link #isExpression(String)} to conduct these kind of checks.
    *
    */
   public static boolean isCompositeExpression(String text, ExpressionManager expressionManager) {
@@ -76,11 +76,9 @@ public final class StringUtil {
   public static String[] split(String text, String regex) {
     if (text == null) {
       return null;
-    }
-    else if (regex == null) {
+    } else if (regex == null) {
       return new String[] { text };
-    }
-    else {
+    } else {
       String[] result = text.split(regex);
       for (int i = 0; i < result.length; i++) {
         result[i] = result[i].trim();
@@ -103,12 +101,14 @@ public final class StringUtil {
    * converts a byte array into a string using the current process engines default charset as
    * returned by {@link ProcessEngineConfigurationImpl#getDefaultCharset()}
    *
-   * @param bytes the byte array
+   * @param bytes
+   *          the byte array
    * @return a string representing the bytes
    */
   public static String fromBytes(byte[] bytes) {
     EnsureUtil.ensureActiveCommandContext("StringUtil.fromBytes");
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     return fromBytes(bytes, processEngineConfiguration.getProcessEngine());
   }
 
@@ -116,19 +116,23 @@ public final class StringUtil {
    * converts a byte array into a string using the provided process engine's default charset as
    * returned by {@link ProcessEngineConfigurationImpl#getDefaultCharset()}
    *
-   * @param bytes the byte array
-   * @param processEngine the process engine
+   * @param bytes
+   *          the byte array
+   * @param processEngine
+   *          the process engine
    * @return a string representing the bytes
    */
   public static String fromBytes(byte[] bytes, ProcessEngine processEngine) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine)
+        .getProcessEngineConfiguration();
     Charset charset = processEngineConfiguration.getDefaultCharset();
     return new String(bytes, charset);
   }
 
   public static Reader readerFromBytes(byte[] bytes) {
     EnsureUtil.ensureActiveCommandContext("StringUtil.readerFromBytes");
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 
     return new InputStreamReader(inputStream, processEngineConfiguration.getDefaultCharset());
@@ -136,41 +140,48 @@ public final class StringUtil {
 
   public static Writer writerForStream(OutputStream outStream) {
     EnsureUtil.ensureActiveCommandContext("StringUtil.readerFromBytes");
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
 
     return new OutputStreamWriter(outStream, processEngineConfiguration.getDefaultCharset());
   }
 
-
   /**
    * Gets the bytes from a string using the current process engine's default charset
    *
-   * @param string the string to get the bytes form
+   * @param string
+   *          the string to get the bytes form
    * @return the byte array
    */
   public static byte[] toByteArray(String string) {
     EnsureUtil.ensureActiveCommandContext("StringUtil.toByteArray");
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     return toByteArray(string, processEngineConfiguration.getProcessEngine());
   }
 
   /**
    * Gets the bytes from a string using the provided process engine's default charset
    *
-   * @param string the string to get the bytes form
-   * @param processEngine the process engine to use
+   * @param string
+   *          the string to get the bytes form
+   * @param processEngine
+   *          the process engine to use
    * @return the byte array
    */
   public static byte[] toByteArray(String string, ProcessEngine processEngine) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine)
+        .getProcessEngineConfiguration();
     Charset charset = processEngineConfiguration.getDefaultCharset();
     return string.getBytes(charset);
   }
-  
+
   /**
-   * Trims the input to the {@link #DB_MAX_STRING_LENGTH maxium length allowed} for persistence with our default database schema 
+   * Trims the input to the {@link #DB_MAX_STRING_LENGTH maxium length allowed} for persistence with
+   * our default database schema
    *
-   * @param string the input that might be trimmed if maximum length is exceeded
+   * @param string
+   *          the input that might be trimmed if maximum length is exceeded
    * @return the input, eventually trimmed to {@link #DB_MAX_STRING_LENGTH}
    */
   public static String trimToMaximumLengthAllowed(String string) {
@@ -188,7 +199,8 @@ public final class StringUtil {
     });
   }
 
-  public static String joinProcessElementInstanceIds(Collection<? extends ProcessElementInstance> processElementInstances) {
+  public static String joinProcessElementInstanceIds(
+      Collection<? extends ProcessElementInstance> processElementInstances) {
     final Iterator<? extends ProcessElementInstance> iterator = processElementInstances.iterator();
     return join(new StringIterator<ProcessElementInstance>(iterator) {
       public String next() {

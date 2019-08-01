@@ -72,7 +72,7 @@ public class PasswordPolicyConfigurationTest {
   @Test
   public void testAutoConfigurationDefaultPasswordPolicy() {
     // given
-    
+
     processEngineConfiguration.setEnablePasswordPolicy(true);
 
     // when
@@ -80,7 +80,8 @@ public class PasswordPolicyConfigurationTest {
 
     // then
     assertThat(processEngineConfiguration.isEnablePasswordPolicy(), is(true));
-    assertThat(processEngineConfiguration.getPasswordPolicy(), is(instanceOf(DefaultPasswordPolicyImpl.class)));
+    assertThat(processEngineConfiguration.getPasswordPolicy(),
+        is(instanceOf(DefaultPasswordPolicyImpl.class)));
   }
 
   @Test
@@ -94,6 +95,7 @@ public class PasswordPolicyConfigurationTest {
 
     // then
     assertThat(processEngineConfiguration.isEnablePasswordPolicy(), is(true));
-    assertThat(processEngineConfiguration.getPasswordPolicy(), is(instanceOf(DefaultPasswordPolicyImpl.class)));
+    assertThat(processEngineConfiguration.getPasswordPolicy(),
+        is(instanceOf(DefaultPasswordPolicyImpl.class)));
   }
 }

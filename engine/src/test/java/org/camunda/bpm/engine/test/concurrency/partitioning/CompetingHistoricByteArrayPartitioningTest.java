@@ -41,19 +41,21 @@ public class CompetingHistoricByteArrayPartitioningTest extends AbstractPartitio
   public void testConcurrentFetchAndDelete() {
     // given
     final String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK,
-      Variables.createVariables().putValue(VARIABLE_NAME,
-        Variables.byteArrayValue(VARIABLE_VALUE.getBytes())))
-      .getId();
+        Variables.createVariables().putValue(VARIABLE_NAME,
+            Variables.byteArrayValue(VARIABLE_VALUE.getBytes()))).getId();
 
     final String[] historicByteArrayId = new String[1];
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+        ExecutionEntity execution = commandContext.getExecutionManager()
+            .findExecutionById(processInstanceId);
 
-        VariableInstanceEntity varInstance = (VariableInstanceEntity) execution.getVariableInstance(VARIABLE_NAME);
-        HistoricVariableInstanceEntity historicVariableInstance = commandContext.getHistoricVariableInstanceManager()
-          .findHistoricVariableInstanceByVariableInstanceId(varInstance.getId());
+        VariableInstanceEntity varInstance = (VariableInstanceEntity) execution
+            .getVariableInstance(VARIABLE_NAME);
+        HistoricVariableInstanceEntity historicVariableInstance = commandContext
+            .getHistoricVariableInstanceManager()
+            .findHistoricVariableInstanceByVariableInstanceId(varInstance.getId());
 
         historicByteArrayId[0] = historicVariableInstance.getByteArrayValueId();
 
@@ -61,15 +63,15 @@ public class CompetingHistoricByteArrayPartitioningTest extends AbstractPartitio
       }
     });
 
-    ThreadControl asyncThread = executeControllableCommand(new AsyncThread(processInstanceId, historicByteArrayId[0]));
+    ThreadControl asyncThread = executeControllableCommand(
+        new AsyncThread(processInstanceId, historicByteArrayId[0]));
 
     asyncThread.waitForSync();
 
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        commandContext.getByteArrayManager()
-          .deleteByteArrayById(historicByteArrayId[0]);
+        commandContext.getByteArrayManager().deleteByteArrayById(historicByteArrayId[0]);
 
         return null;
       }
@@ -79,7 +81,8 @@ public class CompetingHistoricByteArrayPartitioningTest extends AbstractPartitio
       public Void execute(CommandContext commandContext) {
 
         // assume
-        assertThat(commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, historicByteArrayId[0]), nullValue());
+        assertThat(commandContext.getDbEntityManager().selectById(ByteArrayEntity.class,
+            historicByteArrayId[0]), nullValue());
 
         return null;
       }
@@ -90,8 +93,11 @@ public class CompetingHistoricByteArrayPartitioningTest extends AbstractPartitio
     asyncThread.waitUntilDone();
 
     // then
-    assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName(), is(VARIABLE_NAME));
-    assertThat(new String((byte[]) runtimeService.createVariableInstanceQuery().singleResult().getValue()), is(ANOTHER_VARIABLE_VALUE));
+    assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName(),
+        is(VARIABLE_NAME));
+    assertThat(
+        new String((byte[]) runtimeService.createVariableInstanceQuery().singleResult().getValue()),
+        is(ANOTHER_VARIABLE_VALUE));
   }
 
   public class AsyncThread extends ControllableCommand<Void> {
@@ -105,13 +111,12 @@ public class CompetingHistoricByteArrayPartitioningTest extends AbstractPartitio
     }
 
     public Void execute(CommandContext commandContext) {
-      commandContext.getDbEntityManager()
-        .selectById(ByteArrayEntity.class, historicByteArrayId); // cache
+      commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, historicByteArrayId); // cache
 
       monitor.sync();
 
       runtimeService.setVariable(processInstanceId, VARIABLE_NAME,
-        Variables.byteArrayValue(ANOTHER_VARIABLE_VALUE.getBytes()));
+          Variables.byteArrayValue(ANOTHER_VARIABLE_VALUE.getBytes()));
 
       return null;
     }

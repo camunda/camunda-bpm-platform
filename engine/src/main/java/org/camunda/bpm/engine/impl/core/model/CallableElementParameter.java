@@ -43,8 +43,7 @@ public class CallableElementParameter {
       String variableName = (String) sourceValueProvider.getValue(variableScope);
 
       return variableScope.getVariableTyped(variableName);
-    }
-    else {
+    } else {
       return sourceValueProvider.getValue(variableScope);
     }
 

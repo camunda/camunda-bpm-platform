@@ -61,13 +61,15 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
 
   protected void assertRetries(List<String> allJobIds, int i) {
     for (String id : allJobIds) {
-      Assert.assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries(), is(i));
+      Assert.assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries(),
+          is(i));
     }
   }
 
   protected List<String> getAllJobIds() {
     ArrayList<String> result = new ArrayList<String>();
-    for (Job job : managementService.createJobQuery().processDefinitionId(sourceDefinition.getId()).list()) {
+    for (Job job : managementService.createJobQuery().processDefinitionId(sourceDefinition.getId())
+        .list()) {
       if (job.getProcessInstanceId() != null) {
         result.add(job.getId());
       }
@@ -85,49 +87,49 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
   @Before
   public void deployProcesses() {
     Deployment deploy = testHelper.deploy(DEFINITION_XML);
-    sourceDefinition = engineRule.getRepositoryService()
-        .createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
-    processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
-    processInstance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    sourceDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery()
+        .deploymentId(deploy.getId()).singleResult();
+    processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
+    processInstance2 = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
   }
-
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-        AuthorizationScenarioWithCount.scenario()
-            .withCount(3)
+        AuthorizationScenarioWithCount
+            .scenario().withCount(3)
             .withAuthorizations(
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
-            )
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ,
+                    Permissions.UPDATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ))
             .failsDueToRequired(
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.UPDATE),
-                grant(Resources.PROCESS_DEFINITION, "exceptionInJobExecution", "userId", Permissions.UPDATE_INSTANCE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", ProcessInstancePermissions.RETRY_JOB),
-                grant(Resources.PROCESS_DEFINITION, "exceptionInJobExecution", "userId", ProcessDefinitionPermissions.RETRY_JOB)
-            ),
-        AuthorizationScenarioWithCount.scenario()
-            .withCount(5)
-            .withAuthorizations(
-                grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_DEFINITION, "exceptionInJobExecution", "userId",
+                    Permissions.UPDATE_INSTANCE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId",
+                    ProcessInstancePermissions.RETRY_JOB),
+                grant(Resources.PROCESS_DEFINITION, "exceptionInJobExecution", "userId",
+                    ProcessDefinitionPermissions.RETRY_JOB)),
+        AuthorizationScenarioWithCount.scenario().withCount(5)
+            .withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
                 grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.ALL),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL)
-            ).succeeds(),
-        AuthorizationScenarioWithCount.scenario()
-            .withCount(5)
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL))
+            .succeeds(),
+        AuthorizationScenarioWithCount.scenario().withCount(5)
+            .withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_INSTANCE,
+                    Permissions.UPDATE_INSTANCE))
+            .succeeds(),
+        AuthorizationScenarioWithCount.scenario().withCount(5)
             .withAuthorizations(
-                grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_INSTANCE, Permissions.UPDATE_INSTANCE)
-            ).succeeds(),
-        AuthorizationScenarioWithCount.scenario()
-            .withCount(5)
-            .withAuthorizations(
-                grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES),
-                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_INSTANCE, Permissions.UPDATE_INSTANCE)
-            ).succeeds()
-    );
+                grant(Resources.BATCH, "*", "userId",
+                    BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES),
+                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_INSTANCE,
+                    Permissions.UPDATE_INSTANCE))
+            .succeeds());
   }
 
   @Test
@@ -189,19 +191,16 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
   }
 
   private void setupAndExecuteProcessListBasedTest() {
-    //given
-    List<String> processInstances = Arrays.asList(new String[]{processInstance.getId(), processInstance2.getId()});
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("Process", sourceDefinition.getKey())
+    // given
+    List<String> processInstances = Arrays
+        .asList(new String[] { processInstance.getId(), processInstance2.getId() });
+    authRule.init(scenario).withUser("userId").bindResource("Process", sourceDefinition.getKey())
         .bindResource("processInstance1", processInstance.getId())
-        .bindResource("processInstance2", processInstance2.getId())
-        .start();
+        .bindResource("processInstance2", processInstance2.getId()).start();
 
     // when
-    batch = managementService.setJobRetriesAsync(
-        processInstances, (ProcessInstanceQuery) null, RETRIES);
+    batch = managementService.setJobRetriesAsync(processInstances, (ProcessInstanceQuery) null,
+        RETRIES);
 
     executeSeedAndBatchJobs();
   }
@@ -214,38 +213,28 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
   }
 
   protected void setupAndExecuteJobsListBasedTest() {
-    //given
+    // given
     List<String> allJobIds = getAllJobIds();
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("Process", sourceDefinition.getKey())
+    authRule.init(scenario).withUser("userId").bindResource("Process", sourceDefinition.getKey())
         .bindResource("processInstance1", processInstance.getId())
-        .bindResource("processInstance2", processInstance2.getId())
-        .start();
+        .bindResource("processInstance2", processInstance2.getId()).start();
 
     // when
-    batch = managementService.setJobRetriesAsync(
-        allJobIds, RETRIES);
+    batch = managementService.setJobRetriesAsync(allJobIds, RETRIES);
 
     executeSeedAndBatchJobs();
   }
 
   protected void setupAndExecuteJobsQueryBasedTest() {
-    //given
+    // given
     JobQuery jobQuery = managementService.createJobQuery();
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("Process", sourceDefinition.getKey())
+    authRule.init(scenario).withUser("userId").bindResource("Process", sourceDefinition.getKey())
         .bindResource("processInstance1", processInstance.getId())
-        .bindResource("processInstance2", processInstance2.getId())
-        .start();
+        .bindResource("processInstance2", processInstance2.getId()).start();
 
     // when
 
-    batch = managementService.setJobRetriesAsync(
-        jobQuery, RETRIES);
+    batch = managementService.setJobRetriesAsync(jobQuery, RETRIES);
 
     executeSeedAndBatchJobs();
   }
@@ -261,8 +250,12 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
       assertEquals("userId", batch.getCreateUserId());
 
       if (testHelper.isHistoryLevelFull()) {
-        assertThat(engineRule.getHistoryService().createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES).count(), is(BATCH_OPERATIONS));
-        HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().list().get(0);
+        assertThat(
+            engineRule.getHistoryService().createUserOperationLogQuery()
+                .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES).count(),
+            is(BATCH_OPERATIONS));
+        HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
+            .list().get(0);
         assertEquals("userId", historicBatch.getCreateUserId());
       }
       assertRetries(getAllJobIds(), 5);

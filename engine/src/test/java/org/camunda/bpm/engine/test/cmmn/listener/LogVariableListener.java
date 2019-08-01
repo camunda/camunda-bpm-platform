@@ -42,6 +42,4 @@ public class LogVariableListener implements CaseVariableListener {
     invocations = new ArrayList<DelegateCaseVariableInstance>();
   }
 
-
-
 }

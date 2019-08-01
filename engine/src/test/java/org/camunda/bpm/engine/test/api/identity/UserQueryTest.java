@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
-
 /**
  * @author Joram Barrez
  */
@@ -91,7 +90,8 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createUserQuery().userId(null).singleResult();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByFirstName() {
@@ -109,7 +109,8 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createUserQuery().userFirstName(null).singleResult();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByFirstNameLike() {
@@ -130,7 +131,8 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createUserQuery().userFirstNameLike(null).singleResult();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByLastName() {
@@ -148,7 +150,8 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createUserQuery().userLastName(null).singleResult();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByLastNameLike() {
@@ -166,7 +169,8 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createUserQuery().userLastNameLike(null).singleResult();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByEmail() {
@@ -181,7 +185,8 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createUserQuery().userEmail(null).singleResult();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByEmailLike() {
@@ -199,7 +204,8 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createUserQuery().userEmailLike(null).singleResult();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQuerySorting() {
@@ -216,9 +222,10 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(3, identityService.createUserQuery().orderByUserLastName().desc().count());
 
     // Combined with criteria
-    UserQuery query = identityService.createUserQuery().userLastNameLike("%ea%").orderByUserFirstName().asc();
+    UserQuery query = identityService.createUserQuery().userLastNameLike("%ea%")
+        .orderByUserFirstName().asc();
     List<User> users = query.list();
-    assertEquals(2,users.size());
+    assertEquals(2, users.size());
     assertEquals("Fozzie", users.get(0).getFirstName());
     assertEquals("Gonzo", users.get(1).getFirstName());
   }
@@ -227,12 +234,14 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createUserQuery().orderByUserId().list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
     try {
       identityService.createUserQuery().orderByUserId().orderByUserEmail().list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByMemberOfGroup() {
@@ -253,7 +262,8 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createUserQuery().memberOfGroup(null).list();
       fail();
-    } catch (ProcessEngineException e) { }
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByMemberOfTenant() {
@@ -273,7 +283,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
 
     if (countExpected == 1) {
       assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
+    } else if (countExpected > 1) {
       verifySingleResultFails(query);
     } else if (countExpected == 0) {
       assertNull(query.singleResult());
@@ -284,14 +294,14 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByIdIn() {
 
     // empty list
     assertTrue(identityService.createUserQuery().userIdIn("a", "b").list().isEmpty());
-
 
     // collect all ids
     List<User> list = identityService.createUserQuery().list();
@@ -304,40 +314,54 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     for (User user : idInList) {
       boolean found = false;
       for (User otherUser : list) {
-        if(otherUser.getId().equals(user.getId())) {
-          found = true; break;
+        if (otherUser.getId().equals(user.getId())) {
+          found = true;
+          break;
         }
       }
-      if(!found) {
-        fail("Expected to find user "+user);
+      if (!found) {
+        fail("Expected to find user " + user);
       }
     }
   }
 
   public void testNativeQuery() {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
-    // just test that the query will be constructed and executed, details are tested in the TaskQueryTest
+    // just test that the query will be constructed and executed, details are tested in the
+    // TaskQueryTest
     assertEquals(tablePrefix + "ACT_ID_USER", managementService.getTableName(UserEntity.class));
 
     long userCount = identityService.createUserQuery().count();
 
-    assertEquals(userCount, identityService.createNativeUserQuery().sql("SELECT * FROM " + managementService.getTableName(UserEntity.class)).list().size());
-    assertEquals(userCount, identityService.createNativeUserQuery().sql("SELECT count(*) FROM " + managementService.getTableName(UserEntity.class)).count());
+    assertEquals(userCount, identityService.createNativeUserQuery()
+        .sql("SELECT * FROM " + managementService.getTableName(UserEntity.class)).list().size());
+    assertEquals(userCount, identityService.createNativeUserQuery()
+        .sql("SELECT count(*) FROM " + managementService.getTableName(UserEntity.class)).count());
   }
 
   public void testNativeQueryOrLike() {
     String searchPattern = "%frog";
 
-    String fromWhereClauses = String.format("FROM %s WHERE FIRST_ LIKE #{searchPattern} OR LAST_ LIKE #{searchPattern} OR EMAIL_ LIKE #{searchPattern}",
+    String fromWhereClauses = String.format(
+        "FROM %s WHERE FIRST_ LIKE #{searchPattern} OR LAST_ LIKE #{searchPattern} OR EMAIL_ LIKE #{searchPattern}",
         managementService.getTableName(UserEntity.class));
 
-    assertEquals(1, identityService.createNativeUserQuery().sql("SELECT * " + fromWhereClauses).parameter("searchPattern", searchPattern).list().size());
-    assertEquals(1, identityService.createNativeUserQuery().sql("SELECT count(*) " + fromWhereClauses).parameter("searchPattern", searchPattern).count());
+    assertEquals(1, identityService.createNativeUserQuery().sql("SELECT * " + fromWhereClauses)
+        .parameter("searchPattern", searchPattern).list().size());
+    assertEquals(1,
+        identityService.createNativeUserQuery().sql("SELECT count(*) " + fromWhereClauses)
+            .parameter("searchPattern", searchPattern).count());
   }
 
   public void testNativeQueryPaging() {
-    assertEquals(2, identityService.createNativeUserQuery().sql("SELECT * FROM " + managementService.getTableName(UserEntity.class)).listPage(1, 2).size());
-    assertEquals(1, identityService.createNativeUserQuery().sql("SELECT * FROM " + managementService.getTableName(UserEntity.class)).listPage(2, 1).size());
+    assertEquals(2,
+        identityService.createNativeUserQuery()
+            .sql("SELECT * FROM " + managementService.getTableName(UserEntity.class)).listPage(1, 2)
+            .size());
+    assertEquals(1,
+        identityService.createNativeUserQuery()
+            .sql("SELECT * FROM " + managementService.getTableName(UserEntity.class)).listPage(2, 1)
+            .size());
   }
 
 }

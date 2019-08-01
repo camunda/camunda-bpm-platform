@@ -21,10 +21,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 public class IncidentLogger extends ProcessEngineLogger {
 
   public void executionNotFound(String executionId) {
-    logWarn(
-        "001",
-        "The execution with id {} does not exist",
-        executionId);
+    logWarn("001", "The execution with id {} does not exist", executionId);
   }
 
 }

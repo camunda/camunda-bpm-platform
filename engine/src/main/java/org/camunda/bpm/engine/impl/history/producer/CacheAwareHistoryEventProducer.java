@@ -27,20 +27,24 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.runtime.Incident;
 
 /**
- * <p>This HistoryEventProducer is aware of the {@link DbEntityManager} cache
- * and works in combination with the {@link DbHistoryEventHandler}.</p>
+ * <p>
+ * This HistoryEventProducer is aware of the {@link DbEntityManager} cache and works in combination
+ * with the {@link DbHistoryEventHandler}.
+ * </p>
  *
  * @author Daniel Meyer
  *
  */
 public class CacheAwareHistoryEventProducer extends DefaultHistoryEventProducer {
 
-   protected HistoricActivityInstanceEventEntity loadActivityInstanceEventEntity(ExecutionEntity execution) {
+  protected HistoricActivityInstanceEventEntity loadActivityInstanceEventEntity(
+      ExecutionEntity execution) {
     final String activityInstanceId = execution.getActivityInstanceId();
 
-    HistoricActivityInstanceEventEntity cachedEntity = findInCache(HistoricActivityInstanceEventEntity.class, activityInstanceId);
+    HistoricActivityInstanceEventEntity cachedEntity = findInCache(
+        HistoricActivityInstanceEventEntity.class, activityInstanceId);
 
-    if(cachedEntity != null) {
+    if (cachedEntity != null) {
       return cachedEntity;
 
     } else {
@@ -50,12 +54,14 @@ public class CacheAwareHistoryEventProducer extends DefaultHistoryEventProducer 
 
   }
 
-  protected HistoricProcessInstanceEventEntity loadProcessInstanceEventEntity(ExecutionEntity execution) {
+  protected HistoricProcessInstanceEventEntity loadProcessInstanceEventEntity(
+      ExecutionEntity execution) {
     final String processInstanceId = execution.getProcessInstanceId();
 
-    HistoricProcessInstanceEventEntity cachedEntity = findInCache(HistoricProcessInstanceEventEntity.class, processInstanceId);
+    HistoricProcessInstanceEventEntity cachedEntity = findInCache(
+        HistoricProcessInstanceEventEntity.class, processInstanceId);
 
-    if(cachedEntity != null) {
+    if (cachedEntity != null) {
       return cachedEntity;
 
     } else {
@@ -68,9 +74,10 @@ public class CacheAwareHistoryEventProducer extends DefaultHistoryEventProducer 
   protected HistoricTaskInstanceEventEntity loadTaskInstanceEvent(DelegateTask task) {
     final String taskId = task.getId();
 
-    HistoricTaskInstanceEventEntity cachedEntity = findInCache(HistoricTaskInstanceEventEntity.class, taskId);
+    HistoricTaskInstanceEventEntity cachedEntity = findInCache(
+        HistoricTaskInstanceEventEntity.class, taskId);
 
-    if(cachedEntity != null) {
+    if (cachedEntity != null) {
       return cachedEntity;
 
     } else {
@@ -82,9 +89,10 @@ public class CacheAwareHistoryEventProducer extends DefaultHistoryEventProducer 
   protected HistoricIncidentEventEntity loadIncidentEvent(Incident incident) {
     String incidentId = incident.getId();
 
-    HistoricIncidentEventEntity cachedEntity = findInCache(HistoricIncidentEventEntity.class, incidentId);
+    HistoricIncidentEventEntity cachedEntity = findInCache(HistoricIncidentEventEntity.class,
+        incidentId);
 
-    if(cachedEntity != null) {
+    if (cachedEntity != null) {
       return cachedEntity;
 
     } else {
@@ -98,7 +106,7 @@ public class CacheAwareHistoryEventProducer extends DefaultHistoryEventProducer 
 
     HistoricBatchEntity cachedEntity = findInCache(HistoricBatchEntity.class, batchId);
 
-    if(cachedEntity != null) {
+    if (cachedEntity != null) {
       return cachedEntity;
 
     } else {
@@ -109,9 +117,7 @@ public class CacheAwareHistoryEventProducer extends DefaultHistoryEventProducer 
 
   /** find a cached entity by primary key */
   protected <T extends HistoryEvent> T findInCache(Class<T> type, String id) {
-    return Context.getCommandContext()
-      .getDbEntityManager()
-      .getCachedEntity(type, id);
+    return Context.getCommandContext().getDbEntityManager().getCachedEntity(type, id);
   }
 
 }

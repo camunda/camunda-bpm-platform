@@ -33,7 +33,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Thorben Lindhauer
  *
  */
-public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmAtomicOperationActivityInstanceStart {
+public class PvmAtomicOperationActivityInitStackNotifyListenerStart
+    extends PvmAtomicOperationActivityInstanceStart {
 
   public String getCanonicalName() {
     return "activity-init-stack-notify-listener-start";
@@ -42,7 +43,7 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmA
   protected ScopeImpl getScope(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
 
-    if (activity!=null) {
+    if (activity != null) {
       return activity;
     } else {
       PvmExecutionImpl parent = execution.getParent();
@@ -68,13 +69,16 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmA
     PvmExecutionImpl propagatingExecution = execution;
     ActivityImpl activity = execution.getActivity();
     if (activity.getActivityBehavior() instanceof ModificationObserverBehavior) {
-      ModificationObserverBehavior behavior = (ModificationObserverBehavior) activity.getActivityBehavior();
-      List<ActivityExecution> concurrentExecutions = behavior.initializeScope(propagatingExecution, 1);
+      ModificationObserverBehavior behavior = (ModificationObserverBehavior) activity
+          .getActivityBehavior();
+      List<ActivityExecution> concurrentExecutions = behavior.initializeScope(propagatingExecution,
+          1);
       propagatingExecution = (PvmExecutionImpl) concurrentExecutions.get(0);
     }
 
     // if the stack has been instantiated
-    if (instantiationStack.getActivities().isEmpty() && instantiationStack.getTargetActivity() != null) {
+    if (instantiationStack.getActivities().isEmpty()
+        && instantiationStack.getTargetActivity() != null) {
       // as if we are entering the target activity instance id via a transition
       propagatingExecution.setActivityInstanceId(null);
 
@@ -83,8 +87,8 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmA
       propagatingExecution.setActivity(instantiationStack.getTargetActivity());
       propagatingExecution.performOperation(ACTIVITY_START_CREATE_SCOPE);
 
-    }
-    else if (instantiationStack.getActivities().isEmpty() && instantiationStack.getTargetTransition() != null) {
+    } else if (instantiationStack.getActivities().isEmpty()
+        && instantiationStack.getTargetTransition() != null) {
       // as if we are entering the target activity instance id via a transition
       propagatingExecution.setActivityInstanceId(null);
 
@@ -94,8 +98,7 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmA
       propagatingExecution.setActivity(transition.getSource());
       propagatingExecution.setTransition((TransitionImpl) transition);
       propagatingExecution.performOperation(TRANSITION_START_NOTIFY_LISTENER_TAKE);
-    }
-    else {
+    } else {
       // else instantiate the activity stack further
       propagatingExecution.setActivity(null);
       propagatingExecution.performOperation(ACTIVITY_INIT_STACK);

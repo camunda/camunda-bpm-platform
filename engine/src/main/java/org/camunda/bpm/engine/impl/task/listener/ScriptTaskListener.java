@@ -36,19 +36,16 @@ public class ScriptTaskListener implements TaskListener {
     this.script = script;
   }
 
-	public void notify(DelegateTask delegateTask) {
+  public void notify(DelegateTask delegateTask) {
     ScriptInvocation invocation = new ScriptInvocation(script, delegateTask);
     try {
-      Context
-        .getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(invocation);
+      Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
       throw new ProcessEngineException(e);
     }
-	}
+  }
 
   public ExecutableScript getScript() {
     return script;

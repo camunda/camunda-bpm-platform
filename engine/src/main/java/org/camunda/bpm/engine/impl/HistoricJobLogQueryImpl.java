@@ -35,7 +35,8 @@ import org.camunda.bpm.engine.impl.util.CompareUtil;
  * @author Roman Smirnov
  *
  */
-public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, HistoricJobLog> implements HistoricJobLogQuery {
+public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, HistoricJobLog>
+    implements HistoricJobLogQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -96,7 +97,8 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   }
 
   public HistoricJobLogQuery jobDefinitionConfiguration(String jobDefinitionConfiguration) {
-    ensureNotNull(NotValidException.class, "jobDefinitionConfiguration", jobDefinitionConfiguration);
+    ensureNotNull(NotValidException.class, "jobDefinitionConfiguration",
+        jobDefinitionConfiguration);
     this.jobDefinitionConfiguration = jobDefinitionConfiguration;
     return this;
   }
@@ -179,8 +181,8 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   @Override
   protected boolean hasExcludingConditions() {
-    return super.hasExcludingConditions()
-      || CompareUtil.areNotInAscendingOrder(jobPriorityHigherThanOrEqual, jobPriorityLowerThanOrEqual);
+    return super.hasExcludingConditions() || CompareUtil
+        .areNotInAscendingOrder(jobPriorityHigherThanOrEqual, jobPriorityLowerThanOrEqual);
   }
 
   // order by //////////////////////////////////////////////
@@ -258,16 +260,12 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getHistoricJobLogManager()
-      .findHistoricJobLogsCountByQueryCriteria(this);
+    return commandContext.getHistoricJobLogManager().findHistoricJobLogsCountByQueryCriteria(this);
   }
 
   public List<HistoricJobLog> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-        .getHistoricJobLogManager()
-        .findHistoricJobLogsByQueryCriteria(this, page);
+    return commandContext.getHistoricJobLogManager().findHistoricJobLogsByQueryCriteria(this, page);
   }
 
   // getter //////////////////////////////////

@@ -49,7 +49,8 @@ public class TestCmmnTransformListener implements CmmnTransformListener {
   public static Set<CmmnActivity> cmmnActivities = new HashSet<CmmnActivity>();
   public static Set<CmmnSentryDeclaration> sentryDeclarations = new HashSet<CmmnSentryDeclaration>();
 
-  public void transformRootElement(Definitions definitions, List<? extends CmmnCaseDefinition> caseDefinitions) {
+  public void transformRootElement(Definitions definitions,
+      List<? extends CmmnCaseDefinition> caseDefinitions) {
     modelElementInstances.add(definitions);
     for (CmmnCaseDefinition caseDefinition : caseDefinitions) {
       CaseDefinitionEntity entity = (CaseDefinitionEntity) caseDefinition;
@@ -62,8 +63,11 @@ public class TestCmmnTransformListener implements CmmnTransformListener {
     cmmnActivities.add(caseDefinition);
   }
 
-  public void transformCasePlanModel(org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel, CmmnActivity caseActivity) {
-    transformCasePlanModel((org.camunda.bpm.model.cmmn.instance.CasePlanModel) casePlanModel, caseActivity);
+  public void transformCasePlanModel(
+      org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel,
+      CmmnActivity caseActivity) {
+    transformCasePlanModel((org.camunda.bpm.model.cmmn.instance.CasePlanModel) casePlanModel,
+        caseActivity);
   }
 
   public void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity activity) {
@@ -77,7 +81,8 @@ public class TestCmmnTransformListener implements CmmnTransformListener {
     cmmnActivities.add(activity);
   }
 
-  public void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity activity) {
+  public void transformProcessTask(PlanItem planItem, ProcessTask processTask,
+      CmmnActivity activity) {
     modelElementInstances.add(planItem);
     modelElementInstances.add(processTask);
     cmmnActivities.add(activity);
@@ -89,7 +94,8 @@ public class TestCmmnTransformListener implements CmmnTransformListener {
     cmmnActivities.add(activity);
   }
 
-  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity activity) {
+  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask,
+      CmmnActivity activity) {
     modelElementInstances.add(planItem);
     modelElementInstances.add(decisionTask);
     cmmnActivities.add(activity);
@@ -113,7 +119,8 @@ public class TestCmmnTransformListener implements CmmnTransformListener {
     cmmnActivities.add(activity);
   }
 
-  public void transformEventListener(PlanItem planItem, EventListener eventListener, CmmnActivity activity) {
+  public void transformEventListener(PlanItem planItem, EventListener eventListener,
+      CmmnActivity activity) {
     modelElementInstances.add(planItem);
     modelElementInstances.add(eventListener);
     cmmnActivities.add(activity);
@@ -127,8 +134,7 @@ public class TestCmmnTransformListener implements CmmnTransformListener {
   protected String getNewName(String name) {
     if (name.endsWith("-modified")) {
       return name + "-again";
-    }
-    else {
+    } else {
       return name + "-modified";
     }
   }
@@ -139,7 +145,8 @@ public class TestCmmnTransformListener implements CmmnTransformListener {
     sentryDeclarations = new HashSet<CmmnSentryDeclaration>();
   }
 
-  public static int numberOfRegistered(Class<? extends CmmnModelElementInstance> modelElementInstanceClass) {
+  public static int numberOfRegistered(
+      Class<? extends CmmnModelElementInstance> modelElementInstanceClass) {
     int count = 0;
     for (CmmnModelElementInstance element : modelElementInstances) {
       if (modelElementInstanceClass.isInstance(element)) {

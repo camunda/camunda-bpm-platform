@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -33,7 +32,7 @@ public class GetAttachmentContentCmd implements Command<InputStream>, Serializab
 
   private static final long serialVersionUID = 1L;
   protected String attachmentId;
-  
+
   public GetAttachmentContentCmd(String attachmentId) {
     this.attachmentId = attachmentId;
   }
@@ -41,15 +40,15 @@ public class GetAttachmentContentCmd implements Command<InputStream>, Serializab
   public InputStream execute(CommandContext commandContext) {
     DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
     AttachmentEntity attachment = dbEntityManger.selectById(AttachmentEntity.class, attachmentId);
-    
+
     String contentId = attachment.getContentId();
-    if (contentId==null) {
+    if (contentId == null) {
       return null;
     }
-    
+
     ByteArrayEntity byteArray = dbEntityManger.selectById(ByteArrayEntity.class, contentId);
     byte[] bytes = byteArray.getBytes();
-    
+
     return new ByteArrayInputStream(bytes);
   }
 

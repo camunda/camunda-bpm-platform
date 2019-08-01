@@ -18,15 +18,13 @@ package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-
-
 /**
  * @author Tom Baeyens
  */
 public class ServiceImpl {
 
   protected CommandExecutor commandExecutor;
-  
+
   public CommandExecutor getCommandExecutor() {
     return commandExecutor;
   }

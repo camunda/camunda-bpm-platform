@@ -42,7 +42,7 @@ public class AddVariablesService implements JavaDelegate {
     variables.put("integerVar", 1234);
     variables.put("longVar", 928374L);
 
-    variables.put("byteVar", new byte[]{12, 32, 34});
+    variables.put("byteVar", new byte[] { 12, 32, 34 });
 
     variables.put("stringVar", "coca-cola");
     variables.put("dateVar", now);

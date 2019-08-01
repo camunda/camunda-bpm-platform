@@ -27,25 +27,19 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 public class CmmnOperationLogger extends ProcessEngineLogger {
 
   public void completingSubCaseError(CmmnExecution execution, Throwable cause) {
-    logError(
-      "001",
-      "Error while completing sub case of case execution '{}'. Reason: '{}'",
-      execution,
-      cause.getMessage(),
-      cause);
+    logError("001", "Error while completing sub case of case execution '{}'. Reason: '{}'",
+        execution, cause.getMessage(), cause);
   }
 
-  public ProcessEngineException completingSubCaseErrorException(CmmnExecution execution, Throwable cause) {
-    return new ProcessEngineException(exceptionMessage(
-      "002",
-      "Error while completing sub case of case execution '{}'.",
-      execution
-    ), cause);
+  public ProcessEngineException completingSubCaseErrorException(CmmnExecution execution,
+      Throwable cause) {
+    return new ProcessEngineException(exceptionMessage("002",
+        "Error while completing sub case of case execution '{}'.", execution), cause);
   }
 
   public BadUserRequestException exceptionCreateCaseInstanceByIdAndTenantId() {
-    return new BadUserRequestException(exceptionMessage(
-        "003", "Cannot specify a tenant-id when create a case instance by case definition id."));
+    return new BadUserRequestException(exceptionMessage("003",
+        "Cannot specify a tenant-id when create a case instance by case definition id."));
   }
 
 }

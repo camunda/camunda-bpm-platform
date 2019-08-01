@@ -35,54 +35,63 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class HistoricExternalTaskLogManager extends AbstractManager {
 
   // select /////////////////////////////////////////////////////////////////
 
-  public HistoricExternalTaskLogEntity findHistoricExternalTaskLogById(String HistoricExternalTaskLogId) {
-    return (HistoricExternalTaskLogEntity) getDbEntityManager().selectOne("selectHistoricExternalTaskLog", HistoricExternalTaskLogId);
+  public HistoricExternalTaskLogEntity findHistoricExternalTaskLogById(
+      String HistoricExternalTaskLogId) {
+    return (HistoricExternalTaskLogEntity) getDbEntityManager()
+        .selectOne("selectHistoricExternalTaskLog", HistoricExternalTaskLogId);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricExternalTaskLog> findHistoricExternalTaskLogsByQueryCriteria(HistoricExternalTaskLogQueryImpl query, Page page) {
+  public List<HistoricExternalTaskLog> findHistoricExternalTaskLogsByQueryCriteria(
+      HistoricExternalTaskLogQueryImpl query, Page page) {
     configureQuery(query);
-    return getDbEntityManager().selectList("selectHistoricExternalTaskLogByQueryCriteria", query, page);
+    return getDbEntityManager().selectList("selectHistoricExternalTaskLogByQueryCriteria", query,
+        page);
   }
 
-  public long findHistoricExternalTaskLogsCountByQueryCriteria(HistoricExternalTaskLogQueryImpl query) {
+  public long findHistoricExternalTaskLogsCountByQueryCriteria(
+      HistoricExternalTaskLogQueryImpl query) {
     configureQuery(query);
-    return (Long) getDbEntityManager().selectOne("selectHistoricExternalTaskLogCountByQueryCriteria", query);
+    return (Long) getDbEntityManager()
+        .selectOne("selectHistoricExternalTaskLogCountByQueryCriteria", query);
   }
 
   // update ///////////////////////////////////////////////////////////////////
 
-  public void addRemovalTimeToExternalTaskLogByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToExternalTaskLogByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricExternalTaskLogEntity.class, "updateExternalTaskLogByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricExternalTaskLogEntity.class,
+        "updateExternalTaskLogByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToExternalTaskLogByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public void addRemovalTimeToExternalTaskLogByProcessInstanceId(String processInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricExternalTaskLogEntity.class, "updateExternalTaskLogByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricExternalTaskLogEntity.class,
+        "updateExternalTaskLogByProcessInstanceId", parameters);
   }
 
   // delete ///////////////////////////////////////////////////////////////////
 
   public void deleteHistoricExternalTaskLogsByProcessInstanceIds(List<String> processInstanceIds) {
     deleteExceptionByteArrayByParameterMap("processInstanceIdIn", processInstanceIds.toArray());
-    getDbEntityManager().deletePreserveOrder(HistoricExternalTaskLogEntity.class, "deleteHistoricExternalTaskLogByProcessInstanceIds", processInstanceIds);
+    getDbEntityManager().deletePreserveOrder(HistoricExternalTaskLogEntity.class,
+        "deleteHistoricExternalTaskLogByProcessInstanceIds", processInstanceIds);
   }
 
-  public DbOperation deleteExternalTaskLogByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteExternalTaskLogByRemovalTime(Date removalTime, int minuteFrom,
+      int minuteTo, int batchSize) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -91,8 +100,8 @@ public class HistoricExternalTaskLogManager extends AbstractManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(HistoricExternalTaskLogEntity.class, "deleteExternalTaskLogByRemovalTime",
+    return getDbEntityManager().deletePreserveOrder(HistoricExternalTaskLogEntity.class,
+        "deleteExternalTaskLogByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
@@ -102,7 +111,8 @@ public class HistoricExternalTaskLogManager extends AbstractManager {
     EnsureUtil.ensureNotNull(key, value);
     Map<String, Object> parameterMap = new HashMap<String, Object>();
     parameterMap.put(key, value);
-    getDbEntityManager().delete(ByteArrayEntity.class, "deleteErrorDetailsByteArraysByIds", parameterMap);
+    getDbEntityManager().delete(ByteArrayEntity.class, "deleteErrorDetailsByteArraysByIds",
+        parameterMap);
   }
 
   // fire history events ///////////////////////////////////////////////////////

@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine;
 
-
 /**
- * <p>Base interface providing access to the process engine's
- * public API services.</p>
+ * <p>
+ * Base interface providing access to the process engine's public API services.
+ * </p>
  *
  * @author Daniel Meyer
  *

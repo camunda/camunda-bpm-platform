@@ -19,13 +19,13 @@ package org.camunda.bpm.engine.impl.pvm.delegate;
 import java.util.List;
 
 /**
- * When a (scope) activity behavior implements this behavior,
- * its scope execution is notified in case of an external modification about the following:
+ * When a (scope) activity behavior implements this behavior, its scope execution is notified in
+ * case of an external modification about the following:
  *
  * <ul>
- *   <li> the scope execution is newly created
- *   <li> a new concurrent execution is created in that scope
- *   <li> a concurrent execution is removed in that scope
+ * <li>the scope execution is newly created
+ * <li>a new concurrent execution is created in that scope
+ * <li>a concurrent execution is removed in that scope
  * </ul>
  *
  * @author Thorben Lindhauer
@@ -33,22 +33,21 @@ import java.util.List;
 public interface ModificationObserverBehavior extends ActivityBehavior {
 
   /**
-   * Implement to customize initialization of the scope. Called with the
-   * scope execution already created. Implementations may set variables, etc.
-   * Implementations should provide return as many executions as there are requested by the argument.
-   * Valid number of instances are >= 0.
+   * Implement to customize initialization of the scope. Called with the scope execution already
+   * created. Implementations may set variables, etc. Implementations should provide return as many
+   * executions as there are requested by the argument. Valid number of instances are >= 0.
    */
   List<ActivityExecution> initializeScope(ActivityExecution scopeExecution, int nrOfInnerInstances);
 
   /**
-   * Returns an execution that can be used to execute an activity within that scope.
-   * May reorganize other executions in that scope (e.g. implement to override the default pruning behavior).
+   * Returns an execution that can be used to execute an activity within that scope. May reorganize
+   * other executions in that scope (e.g. implement to override the default pruning behavior).
    */
   ActivityExecution createInnerInstance(ActivityExecution scopeExecution);
 
   /**
-   * implement to destroy an execution in this scope and handle the scope's reorganization
-   * (e.g. implement to override the default pruning behavior). The argument execution is not yet removed.
+   * implement to destroy an execution in this scope and handle the scope's reorganization (e.g.
+   * implement to override the default pruning behavior). The argument execution is not yet removed.
    */
   void destroyInnerInstance(ActivityExecution concurrentExecution);
 

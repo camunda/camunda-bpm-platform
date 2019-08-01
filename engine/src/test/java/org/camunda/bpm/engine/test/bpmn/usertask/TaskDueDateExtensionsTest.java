@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.joda.time.Period;
 
-
 /**
  * @author Frederik Heremans
  */
@@ -35,49 +34,54 @@ public class TaskDueDateExtensionsTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testDueDateExtension() throws Exception {
-    
+
     Date date = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse("06-07-1986 12:10:00");
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("dateVariable", date);
-    
+
     // Start process-instance, passing date that should be used as dueDate
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
-    
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension",
+        variables);
+
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
+
     assertNotNull(task.getDueDate());
     assertEquals(date, task.getDueDate());
   }
-  
+
   @Deployment
   public void testDueDateStringExtension() throws Exception {
-    
+
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("dateVariable", "1986-07-06T12:10:00");
-    
+
     // Start process-instance, passing date that should be used as dueDate
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
-    
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension",
+        variables);
+
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
+
     assertNotNull(task.getDueDate());
     Date date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse("06-07-1986 12:10:00");
     assertEquals(date, task.getDueDate());
   }
-  
+
   @Deployment
   public void testRelativeDueDate() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("dateVariable", "P2DT2H30M");
-    
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension", variables);
 
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    
-    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dueDateExtension",
+        variables);
+
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
+
     Date dueDate = task.getDueDate();
     assertNotNull(dueDate);
-    
+
     Period period = new Period(task.getCreateTime().getTime(), dueDate.getTime());
     assertEquals(period.getDays(), 2);
     assertEquals(period.getHours(), 2);

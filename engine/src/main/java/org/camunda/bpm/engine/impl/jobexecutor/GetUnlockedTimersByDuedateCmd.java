@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -34,16 +33,13 @@ public class GetUnlockedTimersByDuedateCmd implements Command<List<TimerEntity>>
 
   protected Date duedate;
   protected Page page;
-  
+
   public GetUnlockedTimersByDuedateCmd(Date duedate, Page page) {
-	  this.duedate = duedate;
-	  this.page = page;
+    this.duedate = duedate;
+    this.page = page;
   }
 
   public List<TimerEntity> execute(CommandContext commandContext) {
-    return Context
-      .getCommandContext()
-      .getJobManager()
-      .findUnlockedTimersByDuedate(duedate, page);
+    return Context.getCommandContext().getJobManager().findUnlockedTimersByDuedate(duedate, page);
   }
 }

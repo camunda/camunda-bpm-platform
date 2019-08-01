@@ -29,8 +29,8 @@ public interface PasswordPolicyResult {
   /**
    * Indicator of the overall result of the check.
    * 
-   * @return <code>true</code> if all rules passed, <code>false</code> if at
-   *         least one rule was violated.
+   * @return <code>true</code> if all rules passed, <code>false</code> if at least one rule was
+   *         violated.
    */
   public boolean isValid();
 

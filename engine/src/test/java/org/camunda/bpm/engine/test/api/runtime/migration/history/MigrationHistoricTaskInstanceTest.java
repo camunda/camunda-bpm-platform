@@ -70,37 +70,36 @@ public class MigrationHistoricTaskInstanceTest {
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoryUserTaskInstance() {
-    //given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
-        modify(ProcessModels.ONE_TASK_PROCESS)
-          .changeElementId("Process", "Process2")
-          .changeElementId("userTask", "userTask2"));
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId("Process", "Process2").changeElementId("userTask", "userTask2"));
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "userTask2")
-        .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask2").build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    HistoricTaskInstanceQuery sourceHistoryTaskInstanceQuery =
-        historyService.createHistoricTaskInstanceQuery()
-          .processDefinitionId(sourceProcessDefinition.getId());
-    HistoricTaskInstanceQuery targetHistoryTaskInstanceQuery =
-        historyService.createHistoricTaskInstanceQuery()
-          .processDefinitionId(targetProcessDefinition.getId());
+    HistoricTaskInstanceQuery sourceHistoryTaskInstanceQuery = historyService
+        .createHistoricTaskInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
+    HistoricTaskInstanceQuery targetHistoryTaskInstanceQuery = historyService
+        .createHistoricTaskInstanceQuery().processDefinitionId(targetProcessDefinition.getId());
 
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
 
-    //when
+    // when
     assertEquals(1, sourceHistoryTaskInstanceQuery.count());
     assertEquals(0, targetHistoryTaskInstanceQuery.count());
-    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
-    runtimeService.newMigration(migrationPlan)
-      .processInstanceQuery(sourceProcessInstanceQuery)
-      .execute();
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(sourceProcessDefinition.getId());
+    runtimeService.newMigration(migrationPlan).processInstanceQuery(sourceProcessInstanceQuery)
+        .execute();
 
-    //then
+    // then
     assertEquals(0, sourceHistoryTaskInstanceQuery.count());
     assertEquals(1, targetHistoryTaskInstanceQuery.count());
 
@@ -108,21 +107,25 @@ public class MigrationHistoricTaskInstanceTest {
     assertEquals(targetProcessDefinition.getKey(), instance.getProcessDefinitionKey());
     assertEquals(targetProcessDefinition.getId(), instance.getProcessDefinitionId());
     assertEquals("userTask2", instance.getTaskDefinitionKey());
-    assertEquals(activityInstance.getActivityInstances("userTask")[0].getId(), instance.getActivityInstanceId());
+    assertEquals(activityInstance.getActivityInstances("userTask")[0].getId(),
+        instance.getActivityInstanceId());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateWithSubTask() {
-    //given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     Task task = taskService.createTaskQuery().singleResult();
     Task subTask = taskService.newTask();
@@ -131,8 +134,7 @@ public class MigrationHistoricTaskInstanceTest {
 
     // when
     runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then the historic sub task instance is still the same
     HistoricTaskInstance historicSubTaskAfterMigration = historyService

@@ -50,24 +50,27 @@ public class AssertVariableInstancesDelegate implements JavaDelegate {
     assertEquals(expectedStringValue, execution.getVariableTyped("aStringVariable").getValue());
     assertEquals(ValueType.STRING, execution.getVariableTyped("aStringVariable").getType());
     assertEquals(expectedStringValue, execution.getVariableLocal("aStringVariable"));
-    assertEquals(expectedStringValue, execution.getVariableLocalTyped("aStringVariable").getValue());
+    assertEquals(expectedStringValue,
+        execution.getVariableLocalTyped("aStringVariable").getValue());
     assertEquals(ValueType.STRING, execution.getVariableLocalTyped("aStringVariable").getType());
 
-    SimpleSerializableBean objectValue = (SimpleSerializableBean) execution.getVariable("anObjectValue");
+    SimpleSerializableBean objectValue = (SimpleSerializableBean) execution
+        .getVariable("anObjectValue");
     assertNotNull(objectValue);
     assertEquals(10, objectValue.getIntProperty());
     ObjectValue variableTyped = execution.getVariableTyped("anObjectValue");
     assertEquals(10, variableTyped.getValue(SimpleSerializableBean.class).getIntProperty());
-    assertEquals(Variables.SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
+    assertEquals(Variables.SerializationDataFormats.JAVA.getName(),
+        variableTyped.getSerializationDataFormat());
 
     objectValue = (SimpleSerializableBean) execution.getVariable("anUntypedObjectValue");
     assertNotNull(objectValue);
     assertEquals(30, objectValue.getIntProperty());
     variableTyped = execution.getVariableTyped("anUntypedObjectValue");
     assertEquals(30, variableTyped.getValue(SimpleSerializableBean.class).getIntProperty());
-    assertEquals(Context.getProcessEngineConfiguration().getDefaultSerializationFormat(), variableTyped.getSerializationDataFormat());
+    assertEquals(Context.getProcessEngineConfiguration().getDefaultSerializationFormat(),
+        variableTyped.getSerializationDataFormat());
 
   }
-
 
 }

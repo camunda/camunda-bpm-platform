@@ -28,5 +28,5 @@ public class OkReturningService implements Serializable {
   public String invoke() {
     return "ok";
   }
-  
+
 }

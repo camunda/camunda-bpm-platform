@@ -35,8 +35,6 @@ public class GetFilterCmd implements Command<Filter>, Serializable {
   }
 
   public Filter execute(CommandContext commandContext) {
-    return commandContext
-      .getFilterManager()
-      .findFilterById(filterId);
+    return commandContext.getFilterManager().findFilterById(filterId);
   }
 }

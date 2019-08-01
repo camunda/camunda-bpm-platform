@@ -19,14 +19,15 @@ package org.camunda.bpm.engine.impl.form.engine;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 
-
 /**
  * @author Tom Baeyens
  */
 public interface FormEngine {
 
   String getName();
+
   Object renderStartForm(StartFormData startForm);
+
   Object renderTaskForm(TaskFormData taskForm);
 
 }

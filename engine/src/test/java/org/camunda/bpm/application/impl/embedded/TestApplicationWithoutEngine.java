@@ -23,10 +23,8 @@ import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
  * @author Daniel Meyer
  *
  */
-@ProcessApplication(
-    name="test-app",
-    deploymentDescriptors={"org/camunda/bpm/application/impl/embedded/deployment-without-engine.xml"}
-)
+@ProcessApplication(name = "test-app", deploymentDescriptors = {
+    "org/camunda/bpm/application/impl/embedded/deployment-without-engine.xml" })
 public class TestApplicationWithoutEngine extends EmbeddedProcessApplication {
 
 }

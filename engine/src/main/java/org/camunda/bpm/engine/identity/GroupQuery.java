@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.identity;
 
 import org.camunda.bpm.engine.query.Query;
 
-
 /**
  * Allows to programmatically query for {@link Group}s.
  *
@@ -35,8 +34,10 @@ public interface GroupQuery extends Query<GroupQuery, Group> {
   /** Only select {@link Group}s with the given name. */
   GroupQuery groupName(String groupName);
 
-  /** Only select {@link Group}s where the name matches the given parameter.
-   *  The syntax to use is that of SQL, eg. %activiti%. */
+  /**
+   * Only select {@link Group}s where the name matches the given parameter. The syntax to use is
+   * that of SQL, eg. %activiti%.
+   */
   GroupQuery groupNameLike(String groupNameLike);
 
   /** Only select {@link Group}s which have the given type. */
@@ -51,7 +52,7 @@ public interface GroupQuery extends Query<GroupQuery, Group> {
   /** Only select {@link Group}s that belongs to the given tenant. */
   GroupQuery memberOfTenant(String tenantId);
 
-  //sorting ////////////////////////////////////////////////////////
+  // sorting ////////////////////////////////////////////////////////
 
   /** Order by group id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   GroupQuery orderByGroupId();

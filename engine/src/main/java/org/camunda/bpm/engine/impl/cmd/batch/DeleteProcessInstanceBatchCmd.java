@@ -47,7 +47,9 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
   protected boolean skipCustomListeners;
   protected boolean skipSubprocesses;
 
-  public DeleteProcessInstanceBatchCmd(List<String> processInstances, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses) {
+  public DeleteProcessInstanceBatchCmd(List<String> processInstances,
+      ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners,
+      boolean skipSubprocesses) {
     super();
     this.processInstanceIds = processInstances;
     this.processInstanceQuery = processInstanceQuery;
@@ -82,11 +84,9 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
     List<String> processInstanceIds = collectProcessInstanceIds();
 
     ensureNotEmpty(BadUserRequestException.class, "processInstanceIds", processInstanceIds);
-    checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES);
-    writeUserOperationLog(commandContext,
-        deleteReason,
-        processInstanceIds.size(),
-        true);
+    checkAuthorizations(commandContext,
+        BatchPermissions.CREATE_BATCH_DELETE_RUNNING_PROCESS_INSTANCES);
+    writeUserOperationLog(commandContext, deleteReason, processInstanceIds.size(), true);
 
     BatchEntity batch = createBatch(commandContext, processInstanceIds);
 
@@ -102,31 +102,26 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
   }
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {
-    return new DeleteProcessInstanceBatchConfiguration(processInstanceIds, deleteReason, skipCustomListeners, skipSubprocesses, false);
+    return new DeleteProcessInstanceBatchConfiguration(processInstanceIds, deleteReason,
+        skipCustomListeners, skipSubprocesses, false);
   }
 
-  protected BatchJobHandler<DeleteProcessInstanceBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<DeleteProcessInstanceBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_PROCESS_INSTANCE_DELETION);
+  protected BatchJobHandler<DeleteProcessInstanceBatchConfiguration> getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
+    return (BatchJobHandler<DeleteProcessInstanceBatchConfiguration>) processEngineConfiguration
+        .getBatchHandlers().get(Batch.TYPE_PROCESS_INSTANCE_DELETION);
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext,
-                                       String deleteReason,
-                                       int numInstances,
-                                       boolean async) {
+  protected void writeUserOperationLog(CommandContext commandContext, String deleteReason,
+      int numInstances, boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
-    propertyChanges.add(new PropertyChange("nrOfInstances",
-        null,
-        numInstances));
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
     propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
-    commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
-            null,
-            null,
-            null,
-            propertyChanges);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE, null, null, null, propertyChanges);
   }
 
 }

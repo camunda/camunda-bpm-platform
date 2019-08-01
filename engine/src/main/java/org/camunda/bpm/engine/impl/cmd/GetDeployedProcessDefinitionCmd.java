@@ -40,7 +40,8 @@ public class GetDeployedProcessDefinitionCmd implements Command<ProcessDefinitio
     this.checkReadPermission = checkReadPermission;
   }
 
-  public GetDeployedProcessDefinitionCmd(ProcessInstantiationBuilderImpl instantiationBuilder, boolean checkReadPermission) {
+  public GetDeployedProcessDefinitionCmd(ProcessInstantiationBuilderImpl instantiationBuilder,
+      boolean checkReadPermission) {
     this.processDefinitionId = instantiationBuilder.getProcessDefinitionId();
     this.processDefinitionKey = instantiationBuilder.getProcessDefinitionKey();
     this.processDefinitionTenantId = instantiationBuilder.getProcessDefinitionTenantId();
@@ -51,12 +52,14 @@ public class GetDeployedProcessDefinitionCmd implements Command<ProcessDefinitio
   @Override
   public ProcessDefinitionEntity execute(CommandContext commandContext) {
 
-    ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId, processDefinitionKey);
+    ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId,
+        processDefinitionKey);
 
     ProcessDefinitionEntity processDefinition = find(commandContext);
 
     if (checkReadPermission) {
-      for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+          .getCommandCheckers()) {
         checker.checkReadProcessDefinition(processDefinition);
       }
     }
@@ -65,7 +68,8 @@ public class GetDeployedProcessDefinitionCmd implements Command<ProcessDefinitio
   }
 
   protected ProcessDefinitionEntity find(CommandContext commandContext) {
-    DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
+    DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration()
+        .getDeploymentCache();
 
     if (processDefinitionId != null) {
       return findById(deploymentCache, processDefinitionId);
@@ -75,13 +79,16 @@ public class GetDeployedProcessDefinitionCmd implements Command<ProcessDefinitio
     }
   }
 
-  protected ProcessDefinitionEntity findById(DeploymentCache deploymentCache, String processDefinitionId) {
+  protected ProcessDefinitionEntity findById(DeploymentCache deploymentCache,
+      String processDefinitionId) {
     return deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
   }
 
-  protected ProcessDefinitionEntity findByKey(DeploymentCache deploymentCache, String processDefinitionKey) {
+  protected ProcessDefinitionEntity findByKey(DeploymentCache deploymentCache,
+      String processDefinitionKey) {
     if (isTenantIdSet) {
-      return deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, processDefinitionTenantId);
+      return deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(
+          processDefinitionKey, processDefinitionTenantId);
 
     } else {
       return deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);

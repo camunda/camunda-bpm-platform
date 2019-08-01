@@ -28,7 +28,6 @@ import java.util.Map;
 import org.camunda.bpm.container.impl.deployment.scanning.ClassPathProcessApplicationScanner;
 import org.junit.Test;
 
-
 /**
  * @author Falko Menge
  * @author Daniel Meyer
@@ -39,36 +38,47 @@ public class MultipleClasspathRootsClassPathScannerTest {
   public void testScanClassPath_multipleRoots() throws MalformedURLException {
 
     // define a classloader with multiple roots.
-    URLClassLoader classLoader = new URLClassLoader(
-      new URL[]{
-        new URL("file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFiles/"),
-        new URL("file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFilesRecursive/"),
-        new URL("file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathRecursiveTwoDirectories.jar")
-      });
+    URLClassLoader classLoader = new URLClassLoader(new URL[] { new URL(
+        "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFiles/"),
+        new URL(
+            "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFilesRecursive/"),
+        new URL(
+            "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathRecursiveTwoDirectories.jar") });
 
     ClassPathProcessApplicationScanner scanner = new ClassPathProcessApplicationScanner();
 
     Map<String, byte[]> scanResult = new HashMap<String, byte[]>();
 
-    scanner.scanPaResourceRootPath(classLoader, null, "classpath:directory/",scanResult);
+    scanner.scanPaResourceRootPath(classLoader, null, "classpath:directory/", scanResult);
 
-    assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
-    assertTrue("'testDeployProcessArchive.png' not found", contains(scanResult, "testDeployProcessArchive.png"));
-    assertEquals(2, scanResult.size()); // only finds two files since the resource name of the processes (and diagrams) is the same
+    assertTrue("'testDeployProcessArchive.bpmn20.xml' not found",
+        contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
+    assertTrue("'testDeployProcessArchive.png' not found",
+        contains(scanResult, "testDeployProcessArchive.png"));
+    assertEquals(2, scanResult.size()); // only finds two files since the resource name of the
+                                        // processes (and diagrams) is the same
 
     scanResult.clear();
     scanner.scanPaResourceRootPath(classLoader, null, "directory/", scanResult);
 
-    assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
-    assertTrue("'testDeployProcessArchive.png' not found", contains(scanResult, "testDeployProcessArchive.png"));
-    assertEquals(2, scanResult.size()); // only finds two files since the resource name of the processes (and diagrams) is the same
+    assertTrue("'testDeployProcessArchive.bpmn20.xml' not found",
+        contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
+    assertTrue("'testDeployProcessArchive.png' not found",
+        contains(scanResult, "testDeployProcessArchive.png"));
+    assertEquals(2, scanResult.size()); // only finds two files since the resource name of the
+                                        // processes (and diagrams) is the same
 
     scanResult.clear();
-    scanner.scanPaResourceRootPath(classLoader, new URL("file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFilesRecursive/META-INF/processes.xml"), "pa:directory/", scanResult);
+    scanner.scanPaResourceRootPath(classLoader, new URL(
+        "file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFilesRecursive/META-INF/processes.xml"),
+        "pa:directory/", scanResult);
 
-    assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
-    assertTrue("'testDeployProcessArchive.png' not found", contains(scanResult, "testDeployProcessArchive.png"));
-    assertEquals(2, scanResult.size()); // only finds two files since a PA-local resource root path is provided
+    assertTrue("'testDeployProcessArchive.bpmn20.xml' not found",
+        contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
+    assertTrue("'testDeployProcessArchive.png' not found",
+        contains(scanResult, "testDeployProcessArchive.png"));
+    assertEquals(2, scanResult.size()); // only finds two files since a PA-local resource root path
+                                        // is provided
 
   }
 

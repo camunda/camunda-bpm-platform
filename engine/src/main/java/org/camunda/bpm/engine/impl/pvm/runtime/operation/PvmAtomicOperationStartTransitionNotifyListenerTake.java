@@ -16,12 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-
-
 /**
  * @author Tom Baeyens
  */
-public class PvmAtomicOperationStartTransitionNotifyListenerTake extends AbstractPvmAtomicOperationTransitionNotifyListenerTake {
+public class PvmAtomicOperationStartTransitionNotifyListenerTake
+    extends AbstractPvmAtomicOperationTransitionNotifyListenerTake {
 
   public String getCanonicalName() {
     return "start-transition-notify-listener-take";

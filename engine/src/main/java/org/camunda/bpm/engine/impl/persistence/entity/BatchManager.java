@@ -57,7 +57,8 @@ public class BatchManager extends AbstractManager {
     ListQueryParameterObject queryParameter = new ListQueryParameterObject();
     queryParameter.setParameter(parameters);
 
-    getDbEntityManager().update(BatchEntity.class, "updateBatchSuspensionStateByParameters", queryParameter);
+    getDbEntityManager().update(BatchEntity.class, "updateBatchSuspensionStateByParameters",
+        queryParameter);
   }
 
   protected void configureQuery(BatchQueryImpl batchQuery) {

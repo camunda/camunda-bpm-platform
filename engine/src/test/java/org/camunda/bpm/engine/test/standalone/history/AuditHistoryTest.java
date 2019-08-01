@@ -52,13 +52,13 @@ public class AuditHistoryTest extends ResourceProcessEngineTestCase {
     // then the historic variable instances exist and they have the latest values
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().count());
 
-    HistoricVariableInstance historicStringVariable =
-        historyService.createHistoricVariableInstanceQuery().variableName("aStringVariable").singleResult();
+    HistoricVariableInstance historicStringVariable = historyService
+        .createHistoricVariableInstanceQuery().variableName("aStringVariable").singleResult();
     assertNotNull(historicStringVariable);
     assertEquals(newValue, historicStringVariable.getValue());
 
-    HistoricVariableInstance historicBytesVariable =
-        historyService.createHistoricVariableInstanceQuery().variableName("aBytesVariable").singleResult();
+    HistoricVariableInstance historicBytesVariable = historyService
+        .createHistoricVariableInstanceQuery().variableName("aBytesVariable").singleResult();
     assertNotNull(historicBytesVariable);
     assertTrue(Arrays.equals(newValue.getBytes(), (byte[]) historicBytesVariable.getValue()));
 

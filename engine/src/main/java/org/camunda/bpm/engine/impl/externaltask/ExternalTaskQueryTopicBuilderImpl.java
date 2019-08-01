@@ -47,7 +47,8 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
 
   protected TopicFetchInstruction currentInstruction;
 
-  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor, String workerId, int maxTasks, boolean usePriority) {
+  public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor, String workerId,
+      int maxTasks, boolean usePriority) {
     this.commandExecutor = commandExecutor;
     this.workerId = workerId;
     this.maxTasks = maxTasks;
@@ -57,7 +58,8 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
 
   public List<LockedExternalTask> execute() {
     submitCurrentInstruction();
-    return commandExecutor.execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions, usePriority));
+    return commandExecutor
+        .execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions, usePriority));
   }
 
   public ExternalTaskQueryTopicBuilder topic(String topicName, long lockDuration) {
@@ -80,7 +82,8 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     return this;
   }
 
-  public ExternalTaskQueryTopicBuilder processInstanceVariableEquals(Map<String, Object> variables) {
+  public ExternalTaskQueryTopicBuilder processInstanceVariableEquals(
+      Map<String, Object> variables) {
     currentInstruction.setFilterVariables(variables);
     return this;
   }
@@ -140,6 +143,5 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     currentInstruction.setLocalVariables(true);
     return this;
   }
-
 
 }

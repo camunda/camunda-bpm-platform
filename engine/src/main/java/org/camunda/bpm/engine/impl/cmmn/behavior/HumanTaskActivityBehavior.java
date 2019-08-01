@@ -70,25 +70,19 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
   protected void suspending(CmmnActivityExecution execution) {
     String id = execution.getId();
 
-    Context
-      .getCommandContext()
-      .getTaskManager()
-      .updateTaskSuspensionStateByCaseExecutionId(id, SuspensionState.SUSPENDED);
+    Context.getCommandContext().getTaskManager().updateTaskSuspensionStateByCaseExecutionId(id,
+        SuspensionState.SUSPENDED);
   }
 
   protected void resuming(CmmnActivityExecution execution) {
     String id = execution.getId();
 
-    Context
-      .getCommandContext()
-      .getTaskManager()
-      .updateTaskSuspensionStateByCaseExecutionId(id, SuspensionState.ACTIVE);
+    Context.getCommandContext().getTaskManager().updateTaskSuspensionStateByCaseExecutionId(id,
+        SuspensionState.ACTIVE);
   }
 
   protected TaskEntity getTask(CmmnActivityExecution execution) {
-    return Context
-        .getCommandContext()
-        .getTaskManager()
+    return Context.getCommandContext().getTaskManager()
         .findTaskByCaseExecutionId(execution.getId());
   }
 

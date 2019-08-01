@@ -40,10 +40,8 @@ public class MultiTenancyHistoricActivityInstanceQueryTest extends PluggableProc
 
   @Override
   protected void setUp() {
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .endEvent()
-    .done();
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .endEvent().done();
 
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
@@ -53,37 +51,31 @@ public class MultiTenancyHistoricActivityInstanceQueryTest extends PluggableProc
   }
 
   public void testQueryWithoutTenantId() {
-    HistoricActivityInstanceQuery query = historyService.
-        createHistoricActivityInstanceQuery();
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
 
     assertThat(query.count(), is(4L));
   }
 
   public void testQueryByTenantId() {
-    HistoricActivityInstanceQuery query = historyService
-        .createHistoricActivityInstanceQuery()
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(2L));
 
-    query = historyService
-        .createHistoricActivityInstanceQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = historyService.createHistoricActivityInstanceQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantIds() {
-    HistoricActivityInstanceQuery query = historyService
-        .createHistoricActivityInstanceQuery()
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(4L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    HistoricActivityInstanceQuery query = historyService
-        .createHistoricActivityInstanceQuery()
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -91,8 +83,7 @@ public class MultiTenancyHistoricActivityInstanceQueryTest extends PluggableProc
 
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricActivityInstanceQuery()
-        .tenantIdIn((String) null);
+      historyService.createHistoricActivityInstanceQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -100,10 +91,8 @@ public class MultiTenancyHistoricActivityInstanceQueryTest extends PluggableProc
   }
 
   public void testQuerySortingAsc() {
-    List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
+    List<HistoricActivityInstance> historicActivityInstances = historyService
+        .createHistoricActivityInstanceQuery().orderByTenantId().asc().list();
 
     assertThat(historicActivityInstances.size(), is(4));
     assertThat(historicActivityInstances.get(0).getTenantId(), is(TENANT_ONE));
@@ -113,10 +102,8 @@ public class MultiTenancyHistoricActivityInstanceQueryTest extends PluggableProc
   }
 
   public void testQuerySortingDesc() {
-    List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery()
-        .orderByTenantId()
-        .desc()
-        .list();
+    List<HistoricActivityInstance> historicActivityInstances = historyService
+        .createHistoricActivityInstanceQuery().orderByTenantId().desc().list();
 
     assertThat(historicActivityInstances.size(), is(4));
     assertThat(historicActivityInstances.get(0).getTenantId(), is(TENANT_TWO));
@@ -163,8 +150,7 @@ public class MultiTenancyHistoricActivityInstanceQueryTest extends PluggableProc
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {
     return runtimeService.createProcessInstanceByKey("testProcess")
-        .processDefinitionTenantId(tenant)
-        .execute();
+        .processDefinitionTenantId(tenant).execute();
   }
 
 }

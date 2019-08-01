@@ -27,33 +27,20 @@ import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
 
-
 /**
  * @author Tom Baeyens
  */
 public class PvmScopeWaitStateTest extends PvmTestCase {
 
   /**
-   * +-----+   +----------+   +---+
-   * |start|-->|scopedWait|-->|end|
-   * +-----+   +----------+   +---+
+   * +-----+ +----------+ +---+ |start|-->|scopedWait|-->|end| +-----+ +----------+ +---+
    */
   public void testWaitStateScope() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("scopedWait")
-      .endActivity()
-      .createActivity("scopedWait")
-        .scope()
-        .behavior(new WaitState())
-        .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new End())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("scopedWait").endActivity()
+        .createActivity("scopedWait").scope().behavior(new WaitState()).transition("end")
+        .endActivity().createActivity("end").behavior(new End()).endActivity()
+        .buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();

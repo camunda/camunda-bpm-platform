@@ -33,51 +33,57 @@ public class VariableOrderProperty extends QueryOrderingProperty {
   public VariableOrderProperty(String name, ValueType valueType) {
     super(QueryOrderingProperty.RELATION_VARIABLE, typeToQueryProperty(valueType));
     this.relationConditions = new ArrayList<QueryEntityRelationCondition>();
-    relationConditions.add(new QueryEntityRelationCondition(VariableInstanceQueryProperty.VARIABLE_NAME, name));
+    relationConditions
+        .add(new QueryEntityRelationCondition(VariableInstanceQueryProperty.VARIABLE_NAME, name));
 
     // works only for primitive types
-    relationConditions.add(new QueryEntityRelationCondition(VariableInstanceQueryProperty.VARIABLE_TYPE, valueType.getName()));
+    relationConditions.add(new QueryEntityRelationCondition(
+        VariableInstanceQueryProperty.VARIABLE_TYPE, valueType.getName()));
   }
 
   public VariableOrderProperty() {
   }
 
-  public static VariableOrderProperty forProcessInstanceVariable(String variableName, ValueType valueType) {
+  public static VariableOrderProperty forProcessInstanceVariable(String variableName,
+      ValueType valueType) {
     VariableOrderProperty orderingProperty = new VariableOrderProperty(variableName, valueType);
-    orderingProperty.relationConditions.add(
-        new QueryEntityRelationCondition(VariableInstanceQueryProperty.EXECUTION_ID, TaskQueryProperty.PROCESS_INSTANCE_ID));
+    orderingProperty.relationConditions.add(new QueryEntityRelationCondition(
+        VariableInstanceQueryProperty.EXECUTION_ID, TaskQueryProperty.PROCESS_INSTANCE_ID));
 
     return orderingProperty;
   }
 
-  public static VariableOrderProperty forExecutionVariable(String variableName, ValueType valueType) {
+  public static VariableOrderProperty forExecutionVariable(String variableName,
+      ValueType valueType) {
     VariableOrderProperty orderingProperty = new VariableOrderProperty(variableName, valueType);
-    orderingProperty.relationConditions.add(
-        new QueryEntityRelationCondition(VariableInstanceQueryProperty.EXECUTION_ID, TaskQueryProperty.EXECUTION_ID));
+    orderingProperty.relationConditions.add(new QueryEntityRelationCondition(
+        VariableInstanceQueryProperty.EXECUTION_ID, TaskQueryProperty.EXECUTION_ID));
 
     return orderingProperty;
   }
 
   public static VariableOrderProperty forTaskVariable(String variableName, ValueType valueType) {
     VariableOrderProperty orderingProperty = new VariableOrderProperty(variableName, valueType);
-    orderingProperty.relationConditions.add(
-        new QueryEntityRelationCondition(VariableInstanceQueryProperty.TASK_ID, TaskQueryProperty.TASK_ID));
+    orderingProperty.relationConditions.add(new QueryEntityRelationCondition(
+        VariableInstanceQueryProperty.TASK_ID, TaskQueryProperty.TASK_ID));
 
     return orderingProperty;
   }
 
-  public static VariableOrderProperty forCaseInstanceVariable(String variableName, ValueType valueType) {
+  public static VariableOrderProperty forCaseInstanceVariable(String variableName,
+      ValueType valueType) {
     VariableOrderProperty orderingProperty = new VariableOrderProperty(variableName, valueType);
-    orderingProperty.relationConditions.add(
-        new QueryEntityRelationCondition(VariableInstanceQueryProperty.CASE_EXECUTION_ID, TaskQueryProperty.CASE_INSTANCE_ID));
+    orderingProperty.relationConditions.add(new QueryEntityRelationCondition(
+        VariableInstanceQueryProperty.CASE_EXECUTION_ID, TaskQueryProperty.CASE_INSTANCE_ID));
 
     return orderingProperty;
   }
 
-  public static VariableOrderProperty forCaseExecutionVariable(String variableName, ValueType valueType) {
+  public static VariableOrderProperty forCaseExecutionVariable(String variableName,
+      ValueType valueType) {
     VariableOrderProperty orderingProperty = new VariableOrderProperty(variableName, valueType);
-    orderingProperty.relationConditions.add(
-        new QueryEntityRelationCondition(VariableInstanceQueryProperty.CASE_EXECUTION_ID, TaskQueryProperty.CASE_EXECUTION_ID));
+    orderingProperty.relationConditions.add(new QueryEntityRelationCondition(
+        VariableInstanceQueryProperty.CASE_EXECUTION_ID, TaskQueryProperty.CASE_EXECUTION_ID));
 
     return orderingProperty;
   }

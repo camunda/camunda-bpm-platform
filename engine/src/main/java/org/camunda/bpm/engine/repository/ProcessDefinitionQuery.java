@@ -30,18 +30,18 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, ProcessDefinition> {
 
-  /** Only select process definiton with the given id.  */
+  /** Only select process definiton with the given id. */
   ProcessDefinitionQuery processDefinitionId(String processDefinitionId);
 
-  /** Only select process definiton with the given id.  */
+  /** Only select process definiton with the given id. */
   ProcessDefinitionQuery processDefinitionIdIn(String... ids);
 
   /** Only select process definitions with the given category. */
   ProcessDefinitionQuery processDefinitionCategory(String processDefinitionCategory);
 
   /**
-   * Only select process definitions where the category matches the given parameter.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select process definitions where the category matches the given parameter. The syntax that
+   * should be used is the same as in SQL, eg. %activiti%
    */
   ProcessDefinitionQuery processDefinitionCategoryLike(String processDefinitionCategoryLike);
 
@@ -49,14 +49,13 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionName(String processDefinitionName);
 
   /**
-   * Only select process definitions where the name matches the given parameter.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select process definitions where the name matches the given parameter. The syntax that
+   * should be used is the same as in SQL, eg. %activiti%
    */
   ProcessDefinitionQuery processDefinitionNameLike(String processDefinitionNameLike);
 
   /**
-   * Only select process definitions that are deployed in a deployment with the
-   * given deployment id
+   * Only select process definitions that are deployed in a deployment with the given deployment id
    */
   ProcessDefinitionQuery deploymentId(String deploymentId);
 
@@ -71,38 +70,38 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQueryImpl processDefinitionKeysIn(String... processDefinitionKeys);
 
   /**
-   * Only select process definitions where the key matches the given parameter.
-   * The syntax that should be used is the same as in SQL, eg. %activiti%
+   * Only select process definitions where the key matches the given parameter. The syntax that
+   * should be used is the same as in SQL, eg. %activiti%
    */
   ProcessDefinitionQuery processDefinitionKeyLike(String processDefinitionKeyLike);
 
   /**
-   * Only select process definition with a certain version.
-   * Particulary useful when used in combination with {@link #processDefinitionKey(String)}
+   * Only select process definition with a certain version. Particulary useful when used in
+   * combination with {@link #processDefinitionKey(String)}
    */
   ProcessDefinitionQuery processDefinitionVersion(Integer processDefinitionVersion);
 
   /**
    * <p>
-   * Only select the process definitions which are the latest deployed (ie.
-   * which have the highest version number for the given key).
+   * Only select the process definitions which are the latest deployed (ie. which have the highest
+   * version number for the given key).
    * </p>
    *
    * <p>
-   * Can only be used in combination with {@link #processDefinitionKey(String)}
-   * of {@link #processDefinitionKeyLike(String)}. Can also be used without any
-   * other criteria (ie. query.latest().list()), which will then give all the
-   * latest versions of all the deployed process definitions.
+   * Can only be used in combination with {@link #processDefinitionKey(String)} of
+   * {@link #processDefinitionKeyLike(String)}. Can also be used without any other criteria (ie.
+   * query.latest().list()), which will then give all the latest versions of all the deployed
+   * process definitions.
    * </p>
    *
-   * <p>For multi-tenancy: select the latest deployed process definitions for each
-   * tenant. If a process definition is deployed for multiple tenants then all
-   * process definitions are selected.</p>
+   * <p>
+   * For multi-tenancy: select the latest deployed process definitions for each tenant. If a process
+   * definition is deployed for multiple tenants then all process definitions are selected.
+   * </p>
    *
    * @throws ProcessEngineException
    *           if used in combination with {@link #groupId(string)},
-   *           {@link #processDefinitionVersion(int)} or
-   *           {@link #deploymentId(String)}
+   *           {@link #processDefinitionVersion(int)} or {@link #deploymentId(String)}
    */
   ProcessDefinitionQuery latestVersion();
 
@@ -166,8 +165,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery messageEventSubscription(String messageName);
 
   /**
-   * Selects the single process definition which has a start message event
-   * with the messageName.
+   * Selects the single process definition which has a start message event with the messageName.
    */
   ProcessDefinitionQuery messageEventSubscriptionName(String messageName);
 
@@ -178,8 +176,8 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery withoutTenantId();
 
   /**
-   * Select process definitions which have no tenant id. Can be used in
-   * combination with {@link #tenantIdIn(String...)}.
+   * Select process definitions which have no tenant id. Can be used in combination with
+   * {@link #tenantIdIn(String...)}.
    */
   ProcessDefinitionQuery includeProcessDefinitionsWithoutTenantId();
 
@@ -197,34 +195,49 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
 
   // ordering ////////////////////////////////////////////////////////////
 
-  /** Order by the category of the process definitions (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the category of the process definitions (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   ProcessDefinitionQuery orderByProcessDefinitionCategory();
 
-  /** Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   ProcessDefinitionQuery orderByProcessDefinitionKey();
 
-  /** Order by the id of the process definitions (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the id of the process definitions (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   ProcessDefinitionQuery orderByProcessDefinitionId();
 
-  /** Order by the version of the process definitions (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the version of the process definitions (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   ProcessDefinitionQuery orderByProcessDefinitionVersion();
 
-  /** Order by the name of the process definitions (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the name of the process definitions (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   ProcessDefinitionQuery orderByProcessDefinitionName();
 
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   ProcessDefinitionQuery orderByDeploymentId();
 
-  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of process instances without tenant id is database-specific. */
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of process instances without tenant id is database-specific.
+   */
   ProcessDefinitionQuery orderByTenantId();
 
   /**
    * Order by version tag (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * <strong>Note:</strong> sorting by versionTag is a string based sort.
-   * There is no interpretation of the version which can lead to a sorting like:
-   * v0.1.0 v0.10.0 v0.2.0.
+   * <strong>Note:</strong> sorting by versionTag is a string based sort. There is no interpretation
+   * of the version which can lead to a sorting like: v0.1.0 v0.10.0 v0.2.0.
    */
   ProcessDefinitionQuery orderByVersionTag();
 

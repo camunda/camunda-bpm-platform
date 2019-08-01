@@ -67,8 +67,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 
-
-
 /**
  * @author Tom Baeyens
  */
@@ -189,7 +187,7 @@ public abstract class AbstractManager implements Session {
   protected HistoricIdentityLinkLogManager getHistoricIdentityLinkManager() {
     return getSession(HistoricIdentityLinkLogManager.class);
   }
-  
+
   protected HistoricJobLogManager getHistoricJobLogManager() {
     return getSession(HistoricJobLogManager.class);
   }
@@ -254,7 +252,7 @@ public abstract class AbstractManager implements Session {
     return getSession(AuthorizationManager.class);
   }
 
-  protected void configureQuery(AbstractQuery<?,?> query, Resource resource) {
+  protected void configureQuery(AbstractQuery<?, ?> query, Resource resource) {
     getAuthorizationManager().configureQuery(query, resource);
   }
 
@@ -271,8 +269,7 @@ public abstract class AbstractManager implements Session {
   }
 
   protected ResourceAuthorizationProvider getResourceAuthorizationProvider() {
-    return Context.getProcessEngineConfiguration()
-        .getResourceAuthorizationProvider();
+    return Context.getProcessEngineConfiguration().getResourceAuthorizationProvider();
   }
 
   protected void deleteAuthorizations(Resource resource, String resourceId) {
@@ -280,21 +277,24 @@ public abstract class AbstractManager implements Session {
   }
 
   protected void deleteAuthorizationsForUser(Resource resource, String resourceId, String userId) {
-    getAuthorizationManager().deleteAuthorizationsByResourceIdAndUserId(resource, resourceId, userId);
+    getAuthorizationManager().deleteAuthorizationsByResourceIdAndUserId(resource, resourceId,
+        userId);
   }
 
-  protected void deleteAuthorizationsForGroup(Resource resource, String resourceId, String groupId) {
-    getAuthorizationManager().deleteAuthorizationsByResourceIdAndGroupId(resource, resourceId, groupId);
+  protected void deleteAuthorizationsForGroup(Resource resource, String resourceId,
+      String groupId) {
+    getAuthorizationManager().deleteAuthorizationsByResourceIdAndGroupId(resource, resourceId,
+        groupId);
   }
 
   public void saveDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
-    if(authorizations != null && authorizations.length > 0) {
+    if (authorizations != null && authorizations.length > 0) {
       Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
         public Void call() {
           AuthorizationManager authorizationManager = getAuthorizationManager();
           for (AuthorizationEntity authorization : authorizations) {
 
-            if(authorization.getId() == null) {
+            if (authorization.getId() == null) {
               authorizationManager.insert(authorization);
             } else {
               authorizationManager.update(authorization);
@@ -308,7 +308,7 @@ public abstract class AbstractManager implements Session {
   }
 
   public void deleteDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
-    if(authorizations != null && authorizations.length > 0) {
+    if (authorizations != null && authorizations.length > 0) {
       Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
         public Void call() {
           AuthorizationManager authorizationManager = getAuthorizationManager();

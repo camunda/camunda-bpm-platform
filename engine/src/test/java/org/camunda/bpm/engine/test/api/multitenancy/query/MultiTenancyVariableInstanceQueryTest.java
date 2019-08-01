@@ -38,11 +38,8 @@ public class MultiTenancyVariableInstanceQueryTest extends PluggableProcessEngin
 
   @Override
   protected void setUp() {
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .userTask()
-      .endEvent()
-    .done();
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .userTask().endEvent().done();
 
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
@@ -52,37 +49,31 @@ public class MultiTenancyVariableInstanceQueryTest extends PluggableProcessEngin
   }
 
   public void testQueryWithoutTenantId() {
-    VariableInstanceQuery query = runtimeService.
-        createVariableInstanceQuery();
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
-    VariableInstanceQuery query = runtimeService.
-        createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = runtimeService
-        .createVariableInstanceQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = runtimeService.createVariableInstanceQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    VariableInstanceQuery query = runtimeService.
-        createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    VariableInstanceQuery query = runtimeService.
-        createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -90,8 +81,7 @@ public class MultiTenancyVariableInstanceQueryTest extends PluggableProcessEngin
 
   public void testFailQueryByTenantIdNull() {
     try {
-      runtimeService.createVariableInstanceQuery()
-        .tenantIdIn((String) null);
+      runtimeService.createVariableInstanceQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -100,9 +90,7 @@ public class MultiTenancyVariableInstanceQueryTest extends PluggableProcessEngin
 
   public void testQuerySortingAsc() {
     List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
+        .orderByTenantId().asc().list();
 
     assertThat(variableInstances.size(), is(2));
     assertThat(variableInstances.get(0).getTenantId(), is(TENANT_ONE));
@@ -111,9 +99,7 @@ public class MultiTenancyVariableInstanceQueryTest extends PluggableProcessEngin
 
   public void testQuerySortingDesc() {
     List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery()
-        .orderByTenantId()
-        .desc()
-        .list();
+        .orderByTenantId().desc().list();
 
     assertThat(variableInstances.size(), is(2));
     assertThat(variableInstances.get(0).getTenantId(), is(TENANT_TWO));
@@ -157,15 +143,10 @@ public class MultiTenancyVariableInstanceQueryTest extends PluggableProcessEngin
   }
 
   protected void startProcessInstanceForTenant(String tenant) {
-    String processDefinitionId = repositoryService
-      .createProcessDefinitionQuery()
-      .tenantIdIn(tenant)
-      .singleResult()
-      .getId();
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().tenantIdIn(tenant)
+        .singleResult().getId();
 
-    VariableMap variables = Variables
-        .createVariables()
-        .putValue("var", "test");
+    VariableMap variables = Variables.createVariables().putValue("var", "test");
 
     runtimeService.startProcessInstanceById(processDefinitionId, variables);
   }

@@ -34,11 +34,12 @@ import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 /**
  * The default implementation of the DelegateInterceptor.
- *<p/>
+ * <p/>
  * This implementation has the following features:
  * <ul>
  * <li>it performs context switch into the target process application (if applicable)</li>
- * <li>it checks autorizations if {@link ProcessEngineConfigurationImpl#isAuthorizationEnabledForCustomCode()} is true</li>
+ * <li>it checks autorizations if
+ * {@link ProcessEngineConfigurationImpl#isAuthorizationEnabledForCustomCode()} is true</li>
  * </ul>
  *
  * @author Daniel Meyer
@@ -48,9 +49,11 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
 
   public void handleInvocation(final DelegateInvocation invocation) throws Exception {
 
-    final ProcessApplicationReference processApplication = getProcessApplicationForInvocation(invocation);
+    final ProcessApplicationReference processApplication = getProcessApplicationForInvocation(
+        invocation);
 
-    if (processApplication != null && ProcessApplicationContextUtil.requiresContextSwitch(processApplication)) {
+    if (processApplication != null
+        && ProcessApplicationContextUtil.requiresContextSwitch(processApplication)) {
       Context.executeWithinProcessApplication(new Callable<Void>() {
         @Override
         public Void call() throws Exception {
@@ -58,8 +61,7 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
           return null;
         }
       }, processApplication, new InvocationContext(invocation.getContextExecution()));
-    }
-    else {
+    } else {
       handleInvocationInContext(invocation);
     }
 
@@ -90,20 +92,17 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
           }
 
           invocation.proceed();
-        }
-        finally {
+        } finally {
           if (popExecutionContext) {
             Context.removeExecutionContext();
           }
         }
-      }
-      finally {
+      } finally {
         if (wasUserOperationLogEnabled) {
           commandContext.enableUserOperationLog();
         }
       }
-    }
-    finally {
+    } finally {
       if (wasAuthorizationCheckEnabled) {
         commandContext.enableAuthorizationCheck();
       }
@@ -118,8 +117,7 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
     if (execution instanceof ExecutionEntity) {
       Context.setExecutionContext((ExecutionEntity) execution);
       return true;
-    }
-    else if (execution instanceof CaseExecutionEntity) {
+    } else if (execution instanceof CaseExecutionEntity) {
       Context.setExecutionContext((CaseExecutionEntity) execution);
       return true;
     }
@@ -131,18 +129,18 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
     return coreExecutionContext != null && coreExecutionContext.getExecution() == execution;
   }
 
-  protected ProcessApplicationReference getProcessApplicationForInvocation(final DelegateInvocation invocation) {
+  protected ProcessApplicationReference getProcessApplicationForInvocation(
+      final DelegateInvocation invocation) {
 
     BaseDelegateExecution contextExecution = invocation.getContextExecution();
     ResourceDefinitionEntity contextResource = invocation.getContextResource();
 
     if (contextExecution != null) {
-      return ProcessApplicationContextUtil.getTargetProcessApplication((CoreExecution) contextExecution);
-    }
-    else if (contextResource != null) {
+      return ProcessApplicationContextUtil
+          .getTargetProcessApplication((CoreExecution) contextExecution);
+    } else if (contextResource != null) {
       return ProcessApplicationContextUtil.getTargetProcessApplication(contextResource);
-    }
-    else {
+    } else {
       return null;
     }
   }

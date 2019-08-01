@@ -42,7 +42,7 @@ public class ExceptionUtil {
 
   public static String getExceptionStacktrace(ByteArrayEntity byteArray) {
     String result = null;
-    if(byteArray != null) {
+    if (byteArray != null) {
       result = StringUtil.fromBytes(byteArray.getBytes());
     }
     return result;
@@ -53,24 +53,25 @@ public class ExceptionUtil {
   }
 
   /**
-   * create ByteArrayEntity with specified name and payload and make sure it's
-   * persisted
+   * create ByteArrayEntity with specified name and payload and make sure it's persisted
    *
    * used in Jobs and ExternalTasks
    *
-   * @param name - type\source of the exception
-   * @param byteArray - payload of the exception
-   * @param type - resource type of the exception
+   * @param name
+   *          - type\source of the exception
+   * @param byteArray
+   *          - payload of the exception
+   * @param type
+   *          - resource type of the exception
    * @return persisted entity
    */
-  public static ByteArrayEntity createExceptionByteArray(String name, byte[] byteArray, ResourceType type) {
+  public static ByteArrayEntity createExceptionByteArray(String name, byte[] byteArray,
+      ResourceType type) {
     ByteArrayEntity result = null;
 
     if (byteArray != null) {
       result = new ByteArrayEntity(name, byteArray, type);
-      Context.getCommandContext()
-        .getByteArrayManager()
-        .insertByteArray(result);
+      Context.getCommandContext().getByteArrayManager().insertByteArray(result);
     }
 
     return result;
@@ -78,14 +79,12 @@ public class ExceptionUtil {
 
   public static boolean checkValueTooLongException(ProcessEngineException exception) {
     List<SQLException> sqlExceptionList = findRelatedSqlExceptions(exception);
-    for (SQLException ex: sqlExceptionList) {
-      if (ex.getMessage().contains("too long")
-        || ex.getMessage().contains("too large")
-        || ex.getMessage().contains("TOO LARGE")
-        || ex.getMessage().contains("ORA-01461")
-        || ex.getMessage().contains("ORA-01401")
-        || ex.getMessage().contains("data would be truncated")
-        || ex.getMessage().contains("SQLCODE=-302, SQLSTATE=22001")) {
+    for (SQLException ex : sqlExceptionList) {
+      if (ex.getMessage().contains("too long") || ex.getMessage().contains("too large")
+          || ex.getMessage().contains("TOO LARGE") || ex.getMessage().contains("ORA-01461")
+          || ex.getMessage().contains("ORA-01401")
+          || ex.getMessage().contains("data would be truncated")
+          || ex.getMessage().contains("SQLCODE=-302, SQLSTATE=22001")) {
         return true;
       }
     }
@@ -94,12 +93,11 @@ public class ExceptionUtil {
 
   public static boolean checkConstraintViolationException(ProcessEngineException exception) {
     List<SQLException> sqlExceptionList = findRelatedSqlExceptions(exception);
-    for (SQLException ex: sqlExceptionList) {
-      if (ex.getMessage().contains("constraint")
-        || ex.getMessage().contains("violat")
-        || ex.getMessage().toLowerCase().contains("duplicate")
-        || ex.getMessage().contains("ORA-00001")
-        || ex.getMessage().contains("SQLCODE=-803, SQLSTATE=23505")) {
+    for (SQLException ex : sqlExceptionList) {
+      if (ex.getMessage().contains("constraint") || ex.getMessage().contains("violat")
+          || ex.getMessage().toLowerCase().contains("duplicate")
+          || ex.getMessage().contains("ORA-00001")
+          || ex.getMessage().contains("SQLCODE=-803, SQLSTATE=23505")) {
         return true;
       }
     }
@@ -132,24 +130,24 @@ public class ExceptionUtil {
       if ("23503".equals(exception.getSQLState()) && exception.getErrorCode() == 0) {
         return false;
       } else if (
-        // SqlServer
-        (exception.getMessage().toLowerCase().contains("foreign key constraint")
+      // SqlServer
+      (exception.getMessage().toLowerCase().contains("foreign key constraint")
           || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 547))
-        // MySql, MariaDB & PostgreSQL
-        || (exception.getMessage().toLowerCase().contains("foreign key constraint")
-          // MySql & MariaDB
-          || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1452))
-        // Oracle & H2
-        || (exception.getMessage().toLowerCase().contains("integrity constraint")
-          // Oracle
-          || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 2291)
-          // H2
-          || ("23506".equals(exception.getSQLState()) && exception.getErrorCode() == 23506))
-        // DB2
-        || (exception.getMessage().toLowerCase().contains("sqlstate=23503") && exception.getMessage().toLowerCase().contains("sqlcode=-530"))
-        // DB2 zOS
-        || ("23503".equals(exception.getSQLState()) && exception.getErrorCode() == -530)
-        ) {
+          // MySql, MariaDB & PostgreSQL
+          || (exception.getMessage().toLowerCase().contains("foreign key constraint")
+              // MySql & MariaDB
+              || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1452))
+          // Oracle & H2
+          || (exception.getMessage().toLowerCase().contains("integrity constraint")
+              // Oracle
+              || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 2291)
+              // H2
+              || ("23506".equals(exception.getSQLState()) && exception.getErrorCode() == 23506))
+          // DB2
+          || (exception.getMessage().toLowerCase().contains("sqlstate=23503")
+              && exception.getMessage().toLowerCase().contains("sqlcode=-530"))
+          // DB2 zOS
+          || ("23503".equals(exception.getSQLState()) && exception.getErrorCode() == -530)) {
 
         return true;
       }
@@ -163,17 +161,21 @@ public class ExceptionUtil {
     List<SQLException> relatedSqlExceptions = findRelatedSqlExceptions(cause);
     for (SQLException exception : relatedSqlExceptions) {
       if (
-        // MySQL & MariaDB
-        (exception.getMessage().toLowerCase().contains("act_uniq_variable") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1062)
-        // PostgreSQL
-        || (exception.getMessage().toLowerCase().contains("act_uniq_variable") && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 0)
-        // SqlServer
-        || (exception.getMessage().toLowerCase().contains("act_uniq_variable") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 2601)
-        // Oracle
-        || (exception.getMessage().toLowerCase().contains("act_uniq_variable") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1)
-        // H2
-        || (exception.getMessage().toLowerCase().contains("act_uniq_variable_index_c") && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 23505)
-        ) {
+      // MySQL & MariaDB
+      (exception.getMessage().toLowerCase().contains("act_uniq_variable")
+          && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1062)
+          // PostgreSQL
+          || (exception.getMessage().toLowerCase().contains("act_uniq_variable")
+              && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 0)
+          // SqlServer
+          || (exception.getMessage().toLowerCase().contains("act_uniq_variable")
+              && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 2601)
+          // Oracle
+          || (exception.getMessage().toLowerCase().contains("act_uniq_variable")
+              && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1)
+          // H2
+          || (exception.getMessage().toLowerCase().contains("act_uniq_variable_index_c")
+              && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 23505)) {
         return true;
       }
     }

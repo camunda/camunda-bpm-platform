@@ -73,32 +73,32 @@ public class MigrationHistoricIncidentTest {
   @Test
   public void testMigrateHistoricIncident() {
     // given
-    ProcessDefinition sourceProcess = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcess = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
-      .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY)
-      .changeElementId("userTask", "newUserTask"));
+    ProcessDefinition sourceProcess = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcess = testHelper
+        .deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY)
+            .changeElementId("userTask", "newUserTask"));
 
-    JobDefinition targetJobDefinition =
-        managementService
-          .createJobDefinitionQuery()
-          .processDefinitionId(targetProcess.getId())
-          .singleResult();
+    JobDefinition targetJobDefinition = managementService.createJobDefinitionQuery()
+        .processDefinitionId(targetProcess.getId()).singleResult();
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcess.getId(), targetProcess.getId())
-      .mapActivities("userTask", "newUserTask")
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcess.getId(), targetProcess.getId())
+        .mapActivities("userTask", "newUserTask").build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcess.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcess.getId());
 
     Job job = managementService.createJobQuery().singleResult();
     managementService.setJobRetries(job.getId(), 0);
 
-    HistoricIncident incidentBeforeMigration = historyService.createHistoricIncidentQuery().singleResult();
+    HistoricIncident incidentBeforeMigration = historyService.createHistoricIncidentQuery()
+        .singleResult();
 
     // when
     runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
@@ -112,37 +112,39 @@ public class MigrationHistoricIncidentTest {
 
     // and other properties have not changed
     Assert.assertEquals(incidentBeforeMigration.getCreateTime(), historicIncident.getCreateTime());
-    Assert.assertEquals(incidentBeforeMigration.getProcessInstanceId(), historicIncident.getProcessInstanceId());
+    Assert.assertEquals(incidentBeforeMigration.getProcessInstanceId(),
+        historicIncident.getProcessInstanceId());
 
   }
 
   @Test
   public void testMigrateHistoricIncidentAddScope() {
     // given
-    ProcessDefinition sourceProcess = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcess = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcess = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcess = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcess.getId(), targetProcess.getId())
-      .mapActivities("userTask", "userTask")
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcess.getId(), targetProcess.getId())
+        .mapActivities("userTask", "userTask").build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcess.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcess.getId());
 
     Job job = managementService.createJobQuery().singleResult();
     managementService.setJobRetries(job.getId(), 0);
 
     // when
     runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
 
     HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
     Assert.assertNotNull(historicIncident);
-    Assert.assertEquals(
-        activityInstance.getTransitionInstances("userTask")[0].getExecutionId(),
+    Assert.assertEquals(activityInstance.getTransitionInstances("userTask")[0].getExecutionId(),
         historicIncident.getExecutionId());
   }
 }

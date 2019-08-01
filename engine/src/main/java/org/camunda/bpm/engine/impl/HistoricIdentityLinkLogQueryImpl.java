@@ -26,11 +26,12 @@ import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
- /**
+/**
  * @author Deivarayan Azhagappan
  *
  */
-public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<HistoricIdentityLinkLogQuery, HistoricIdentityLinkLog>
+public class HistoricIdentityLinkLogQueryImpl
+    extends AbstractVariableQueryImpl<HistoricIdentityLinkLogQuery, HistoricIdentityLinkLog>
     implements HistoricIdentityLinkLogQuery {
 
   private static final long serialVersionUID = 1L;
@@ -45,14 +46,14 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
   protected String operationType;
   protected String assignerId;
   protected String[] tenantIds;
-  
+
   public HistoricIdentityLinkLogQueryImpl() {
   }
 
   public HistoricIdentityLinkLogQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
-  
+
   public String getType() {
     return type;
   }
@@ -232,16 +233,14 @@ public class HistoricIdentityLinkLogQueryImpl extends AbstractVariableQueryImpl<
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getHistoricIdentityLinkManager()
-      .findHistoricIdentityLinkLogCountByQueryCriteria(this);
+    return commandContext.getHistoricIdentityLinkManager()
+        .findHistoricIdentityLinkLogCountByQueryCriteria(this);
   }
 
   @Override
   public List<HistoricIdentityLinkLog> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getHistoricIdentityLinkManager()
-      .findHistoricIdentityLinkLogByQueryCriteria(this, page);
+    return commandContext.getHistoricIdentityLinkManager()
+        .findHistoricIdentityLinkLogByQueryCriteria(this, page);
   }
 }

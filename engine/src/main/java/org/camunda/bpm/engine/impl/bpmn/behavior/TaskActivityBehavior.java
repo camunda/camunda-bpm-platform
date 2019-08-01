@@ -19,8 +19,6 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-
-
 /**
  * Parent class for all BPMN 2.0 task types such as ServiceTask, ScriptTask, UserTask, etc.
  *
@@ -38,7 +36,8 @@ public class TaskActivityBehavior extends AbstractBpmnActivityBehavior {
   /**
    * The method which will be called before the execution is performed.
    *
-   * @param execution the execution which is used during execution
+   * @param execution
+   *          the execution which is used during execution
    * @throws Exception
    */
   protected void preExecution(ActivityExecution execution) throws Exception {
@@ -48,7 +47,8 @@ public class TaskActivityBehavior extends AbstractBpmnActivityBehavior {
   /**
    * The method which should be overridden by the sub classes to perform an execution.
    *
-   * @param execution the execution which is used during performing the execution
+   * @param execution
+   *          the execution which is used during performing the execution
    * @throws Exception
    */
   protected void performExecution(ActivityExecution execution) throws Exception {
@@ -58,7 +58,8 @@ public class TaskActivityBehavior extends AbstractBpmnActivityBehavior {
   /**
    * The method which will be called after performing the execution.
    *
-   * @param execution the execution
+   * @param execution
+   *          the execution
    * @throws Exception
    */
   protected void postExecution(ActivityExecution execution) throws Exception {
@@ -68,7 +69,5 @@ public class TaskActivityBehavior extends AbstractBpmnActivityBehavior {
   public void execute(ActivityExecution execution) throws Exception {
     performExecution(execution);
   }
-
-
 
 }

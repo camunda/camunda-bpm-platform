@@ -30,7 +30,8 @@ public class HistoryCleanupBatchTest extends ResourceProcessEngineTestCase {
   @Test
   public void testBatchHistoryTimeToLiveConfiguration() {
 
-    String batchOperationHistoryTimeToLive = processEngineConfiguration.getBatchOperationHistoryTimeToLive();
+    String batchOperationHistoryTimeToLive = processEngineConfiguration
+        .getBatchOperationHistoryTimeToLive();
     assertEquals("P5D", batchOperationHistoryTimeToLive);
 
     Map<String, String> map = processEngineConfiguration.getBatchOperationsForHistoryCleanup();

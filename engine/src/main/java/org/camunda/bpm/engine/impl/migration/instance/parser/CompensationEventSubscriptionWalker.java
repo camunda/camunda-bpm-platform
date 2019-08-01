@@ -28,9 +28,9 @@ import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
- * Ensures that event subscriptions are visited in a top-down fashion, i.e.
- * for a compensation handler in a scope that has an event scope execution, it is guaranteed
- * that first the scope subscription is visited, and then the compensation handler
+ * Ensures that event subscriptions are visited in a top-down fashion, i.e. for a compensation
+ * handler in a scope that has an event scope execution, it is guaranteed that first the scope
+ * subscription is visited, and then the compensation handler
  *
  * @author Thorben Lindhauer
  */
@@ -40,7 +40,8 @@ public class CompensationEventSubscriptionWalker extends ReferenceWalker<EventSu
     super(collectCompensationEventSubscriptions(collection));
   }
 
-  protected static List<EventSubscriptionEntity> collectCompensationEventSubscriptions(Collection<MigratingActivityInstance> activityInstances) {
+  protected static List<EventSubscriptionEntity> collectCompensationEventSubscriptions(
+      Collection<MigratingActivityInstance> activityInstances) {
     List<EventSubscriptionEntity> eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
     for (MigratingActivityInstance activityInstance : activityInstances) {
       if (activityInstance.getSourceScope().isScope()) {
@@ -54,11 +55,11 @@ public class CompensationEventSubscriptionWalker extends ReferenceWalker<EventSu
   @Override
   protected Collection<EventSubscriptionEntity> nextElements() {
     EventSubscriptionEntity eventSubscriptionEntity = getCurrentElement();
-    ExecutionEntity compensatingExecution = CompensationUtil.getCompensatingExecution(eventSubscriptionEntity);
+    ExecutionEntity compensatingExecution = CompensationUtil
+        .getCompensatingExecution(eventSubscriptionEntity);
     if (compensatingExecution != null) {
       return compensatingExecution.getCompensateEventSubscriptions();
-    }
-    else {
+    } else {
       return Collections.emptyList();
     }
   }

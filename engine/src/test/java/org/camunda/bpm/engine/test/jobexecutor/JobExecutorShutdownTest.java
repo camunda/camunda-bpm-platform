@@ -45,30 +45,20 @@ import org.junit.rules.RuleChain;
 public class JobExecutorShutdownTest {
 
   protected static final BpmnModelInstance TWO_ASYNC_TASKS = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .serviceTask("task1")
-      .camundaClass(SyncDelegate.class.getName())
-      .camundaAsyncBefore()
-      .camundaExclusive(true)
-      .serviceTask("task2")
-      .camundaClass(SyncDelegate.class.getName())
-      .camundaAsyncBefore()
-      .camundaExclusive(true)
-      .endEvent()
-      .done();
+      .startEvent().serviceTask("task1").camundaClass(SyncDelegate.class.getName())
+      .camundaAsyncBefore().camundaExclusive(true).serviceTask("task2")
+      .camundaClass(SyncDelegate.class.getName()).camundaAsyncBefore().camundaExclusive(true)
+      .endEvent().done();
 
-  protected static final BpmnModelInstance SINGLE_ASYNC_TASK = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .serviceTask("task1")
-      .camundaClass(SyncDelegate.class.getName())
-      .camundaAsyncBefore()
-      .camundaExclusive(true)
-      .endEvent()
-      .done();
+  protected static final BpmnModelInstance SINGLE_ASYNC_TASK = Bpmn
+      .createExecutableProcess("process").startEvent().serviceTask("task1")
+      .camundaClass(SyncDelegate.class.getName()).camundaAsyncBefore().camundaExclusive(true)
+      .endEvent().done();
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configuration.setJobExecutor(buildControllableJobExecutor());
     }
   };
@@ -90,8 +80,8 @@ public class JobExecutorShutdownTest {
 
   @Before
   public void setUp() throws Exception {
-    jobExecutor = (ControllableJobExecutor)
-        ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration()).getJobExecutor();
+    jobExecutor = (ControllableJobExecutor) ((ProcessEngineConfigurationImpl) engineRule
+        .getProcessEngine().getProcessEngineConfiguration()).getJobExecutor();
     jobExecutor.setMaxJobsPerAcquisition(2);
     acquisitionThread = jobExecutor.getAcquisitionThreadControl();
     executionThread = jobExecutor.getExecutionThreadControl();
@@ -105,10 +95,8 @@ public class JobExecutorShutdownTest {
   @Test
   public void testConcurrentShutdownAndExclusiveFollowUpJob() {
     // given
-    Deployment deployment = engineRule.getRepositoryService()
-        .createDeployment()
-        .addModelInstance("foo.bpmn", TWO_ASYNC_TASKS)
-        .deploy();
+    Deployment deployment = engineRule.getRepositoryService().createDeployment()
+        .addModelInstance("foo.bpmn", TWO_ASYNC_TASKS).deploy();
     engineRule.manageDeployment(deployment);
 
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
@@ -133,10 +121,12 @@ public class JobExecutorShutdownTest {
     executionThread.waitUntilDone();
 
     // then the current job has completed successfully
-    Assert.assertEquals(0, engineRule.getManagementService().createJobQuery().jobId(firstAsyncJob.getId()).count());
+    Assert.assertEquals(0,
+        engineRule.getManagementService().createJobQuery().jobId(firstAsyncJob.getId()).count());
 
     // but the exclusive follow-up job is not executed and is not locked
-    JobEntity secondAsyncJob = (JobEntity) engineRule.getManagementService().createJobQuery().singleResult();
+    JobEntity secondAsyncJob = (JobEntity) engineRule.getManagementService().createJobQuery()
+        .singleResult();
     Assert.assertNotNull(secondAsyncJob);
     Assert.assertFalse(secondAsyncJob.getId().equals(firstAsyncJob.getId()));
     Assert.assertNull(secondAsyncJob.getLockOwner());
@@ -147,10 +137,8 @@ public class JobExecutorShutdownTest {
   @Test
   public void testShutdownAndMultipleLockedJobs() {
     // given
-    Deployment deployment = engineRule.getRepositoryService()
-        .createDeployment()
-        .addModelInstance("foo.bpmn", SINGLE_ASYNC_TASK)
-        .deploy();
+    Deployment deployment = engineRule.getRepositoryService().createDeployment()
+        .addModelInstance("foo.bpmn", SINGLE_ASYNC_TASK).deploy();
     engineRule.manageDeployment(deployment);
 
     // add two jobs by starting two process instances
@@ -172,8 +160,8 @@ public class JobExecutorShutdownTest {
     // jobs must now be locked
     List<Job> lockedJobList = engineRule.getManagementService().createJobQuery().list();
     Assert.assertEquals(2, lockedJobList.size());
-    for(Job job : lockedJobList) {
-      JobEntity jobEntity = (JobEntity)job;
+    for (Job job : lockedJobList) {
+      JobEntity jobEntity = (JobEntity) job;
       Assert.assertNotNull(jobEntity.getLockOwner());
     }
 
@@ -184,13 +172,14 @@ public class JobExecutorShutdownTest {
     executionThread.waitUntilDone();
 
     // check that only one job left, which is not executed nor locked
-    JobEntity jobEntity = (JobEntity) engineRule.getManagementService().createJobQuery().singleResult();
+    JobEntity jobEntity = (JobEntity) engineRule.getManagementService().createJobQuery()
+        .singleResult();
     Assert.assertNotNull(jobEntity);
-    Assert.assertTrue(lockedJobList.get(1).getId().equals(jobEntity.getId()) || lockedJobList.get(0).getId().equals(jobEntity.getId()));
+    Assert.assertTrue(lockedJobList.get(1).getId().equals(jobEntity.getId())
+        || lockedJobList.get(0).getId().equals(jobEntity.getId()));
     Assert.assertNull(jobEntity.getLockOwner());
     Assert.assertNull(jobEntity.getLockExpirationTime());
   }
-
 
   public static class SyncDelegate implements JavaDelegate {
 
@@ -200,6 +189,5 @@ public class JobExecutorShutdownTest {
     }
 
   }
-
 
 }

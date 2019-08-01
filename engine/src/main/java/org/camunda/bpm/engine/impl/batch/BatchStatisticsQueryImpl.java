@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 
-public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery, BatchStatistics> implements BatchStatisticsQuery {
+public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery, BatchStatistics>
+    implements BatchStatisticsQuery {
 
   protected static final long serialVersionUID = 1L;
 
@@ -109,16 +110,12 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getStatisticsManager()
-      .getStatisticsCountGroupedByBatch(this);
+    return commandContext.getStatisticsManager().getStatisticsCountGroupedByBatch(this);
   }
 
   public List<BatchStatistics> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getStatisticsManager()
-      .getStatisticsGroupedByBatch(this, page);
+    return commandContext.getStatisticsManager().getStatisticsGroupedByBatch(this, page);
   }
 
 }

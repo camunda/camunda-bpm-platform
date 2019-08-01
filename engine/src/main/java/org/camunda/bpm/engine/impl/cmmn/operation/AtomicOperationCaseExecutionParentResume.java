@@ -25,7 +25,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionParentResume extends AbstractAtomicOperationCaseExecutionResume {
+public class AtomicOperationCaseExecutionParentResume
+    extends AbstractAtomicOperationCaseExecutionResume {
 
   public String getCanonicalName() {
     return "case-execution-parent-resume";

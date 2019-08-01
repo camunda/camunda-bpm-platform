@@ -39,11 +39,8 @@ public class DisabledJobPrioritizationBpmnTest extends PluggableProcessEngineTes
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
   public void testJobPriority() {
     // when
-    runtimeService
-      .createProcessInstanceByKey("jobPrioProcess")
-      .startBeforeActivity("task1")
-      .startBeforeActivity("task2")
-      .execute();
+    runtimeService.createProcessInstanceByKey("jobPrioProcess").startBeforeActivity("task1")
+        .startBeforeActivity("task2").execute();
 
     // then
     List<Job> jobs = managementService.createJobQuery().list();

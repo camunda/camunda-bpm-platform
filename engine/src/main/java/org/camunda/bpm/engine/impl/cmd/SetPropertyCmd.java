@@ -27,7 +27,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 
 /**
- * <p>Command which can be used for setting the value of a property</p>
+ * <p>
+ * Command which can be used for setting the value of a property
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -48,10 +50,9 @@ public class SetPropertyCmd implements Command<Object> {
 
     final PropertyManager propertyManager = commandContext.getPropertyManager();
 
-    PropertyEntity property = propertyManager
-      .findPropertyById(name);
+    PropertyEntity property = propertyManager.findPropertyById(name);
     String operation = null;
-    if(property != null) {
+    if (property != null) {
       // update
       property.setValue(value);
       operation = UserOperationLogEntry.OPERATION_TYPE_UPDATE;
@@ -61,8 +62,8 @@ public class SetPropertyCmd implements Command<Object> {
       propertyManager.insert(property);
       operation = UserOperationLogEntry.OPERATION_TYPE_CREATE;
     }
-    
-    commandContext.getOperationLogManager().logPropertyOperation(operation, 
+
+    commandContext.getOperationLogManager().logPropertyOperation(operation,
         Collections.singletonList(new PropertyChange("name", null, name)));
 
     return null;

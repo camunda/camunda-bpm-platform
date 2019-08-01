@@ -25,48 +25,48 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Stefan Hentschel
  */
 public class ExclusiveThrowEventTest extends PluggableProcessEngineTestCase {
-  
+
   @Deployment
   public void testNonExclusiveThrowEvent() {
-    // start process 
+    // start process
     runtimeService.startProcessInstanceByKey("exclusive");
     // now there should be 1 non-exclusive job in the database:
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertFalse(((JobEntity)job).isExclusive());
-               
+    assertFalse(((JobEntity) job).isExclusive());
+
     waitForJobExecutorToProcessAllJobs(6000L);
-    
+
     // all the jobs are done
-    assertEquals(0, managementService.createJobQuery().count());      
+    assertEquals(0, managementService.createJobQuery().count());
   }
 
   @Deployment
   public void testExclusiveThrowEvent() {
-    // start process 
+    // start process
     runtimeService.startProcessInstanceByKey("exclusive");
     // now there should be 1 exclusive job in the database:
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertTrue(((JobEntity)job).isExclusive());
-               
+    assertTrue(((JobEntity) job).isExclusive());
+
     waitForJobExecutorToProcessAllJobs(6000L);
-    
+
     // all the jobs are done
-    assertEquals(0, managementService.createJobQuery().count());      
+    assertEquals(0, managementService.createJobQuery().count());
   }
-  
+
   @Deployment
   public void testExclusiveThrowEventConcurrent() {
-    // start process 
+    // start process
     runtimeService.startProcessInstanceByKey("exclusive");
     // now there should be 2 exclusive jobs in the database:
     assertEquals(2, managementService.createJobQuery().count());
-                   
+
     waitForJobExecutorToProcessAllJobs(6000L);
-    
+
     // all the jobs are done
-    assertEquals(0, managementService.createJobQuery().count());      
+    assertEquals(0, managementService.createJobQuery().count());
   }
-  
+
 }

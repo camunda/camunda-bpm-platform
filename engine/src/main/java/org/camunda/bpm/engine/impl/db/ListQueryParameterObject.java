@@ -53,14 +53,14 @@ public class ListQueryParameterObject implements Serializable {
   }
 
   public int getFirstRow() {
-    return firstResult +1;
+    return firstResult + 1;
   }
 
   public int getLastRow() {
-    if(maxResults == Integer.MAX_VALUE) {
+    if (maxResults == Integer.MAX_VALUE) {
       return maxResults;
     }
-    return  firstResult + maxResults + 1;
+    return firstResult + maxResults + 1;
   }
 
   public int getMaxResults() {

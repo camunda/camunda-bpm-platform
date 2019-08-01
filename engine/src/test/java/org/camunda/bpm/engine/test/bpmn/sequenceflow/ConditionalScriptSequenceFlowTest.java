@@ -56,9 +56,8 @@ public class ConditionalScriptSequenceFlowTest extends PluggableProcessEngineTes
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.testScriptResourceExpression.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/sequenceflow/condition-left.groovy"
-  })
+      "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.testScriptResourceExpression.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/sequenceflow/condition-left.groovy" })
   public void testScriptResourceExpression() {
     String[] directions = new String[] { "left", "right" };
     Map<String, Object> variables = new HashMap<String, Object>();

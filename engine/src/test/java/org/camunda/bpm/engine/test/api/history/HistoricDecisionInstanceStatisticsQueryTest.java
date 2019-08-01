@@ -38,7 +38,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-
 /**
  * @author Askar Akhmerov
  */
@@ -77,22 +76,24 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
 
   @Test
   public void testStatisticForRootDecisionEvaluation() throws Exception {
-    //when
+    // when
     decisionService.evaluateDecisionTableByKey(DISH_DECISION)
-        .variables(Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
+        .variables(
+            Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
         .evaluate();
 
     decisionService.evaluateDecisionTableByKey(DISH_DECISION)
-        .variables(Variables.createVariables().putValue(TEMPERATURE, 11).putValue(DAY_TYPE, WEEKEND))
+        .variables(
+            Variables.createVariables().putValue(TEMPERATURE, 11).putValue(DAY_TYPE, WEEKEND))
         .evaluate();
 
-    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
+        .createDecisionRequirementsDefinitionQuery().singleResult();
 
     HistoricDecisionInstanceStatisticsQuery statisticsQuery = historyService
-        .createHistoricDecisionInstanceStatisticsQuery(
-            decisionRequirementsDefinition.getId());
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
 
-    //then
+    // then
     assertThat(statisticsQuery.count(), is(3L));
     assertThat(statisticsQuery.list().size(), is(3));
     assertThat(statisticsQuery.list().get(0).getEvaluations(), is(2));
@@ -101,32 +102,29 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
 
   @Test
   public void testStatisticForRootDecisionWithInstanceConstraintEvaluation() throws Exception {
-    //when
+    // when
     decisionService.evaluateDecisionTableByKey(DISH_DECISION)
-        .variables(Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
+        .variables(
+            Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
         .evaluate();
 
     decisionService.evaluateDecisionTableByKey(DISH_DECISION)
-        .variables(Variables.createVariables().putValue(TEMPERATURE, 11).putValue(DAY_TYPE, WEEKEND))
+        .variables(
+            Variables.createVariables().putValue(TEMPERATURE, 11).putValue(DAY_TYPE, WEEKEND))
         .evaluate();
 
-    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
+        .createDecisionRequirementsDefinitionQuery().singleResult();
 
-
-    String decisionInstanceId = engineRule.getHistoryService()
-        .createHistoricDecisionInstanceQuery()
+    String decisionInstanceId = engineRule.getHistoryService().createHistoricDecisionInstanceQuery()
         .decisionRequirementsDefinitionId(decisionRequirementsDefinition.getId())
-        .rootDecisionInstancesOnly()
-        .list()
-        .get(0)
-        .getId();
+        .rootDecisionInstancesOnly().list().get(0).getId();
 
     HistoricDecisionInstanceStatisticsQuery query = historyService
-        .createHistoricDecisionInstanceStatisticsQuery(
-            decisionRequirementsDefinition.getId())
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId())
         .decisionInstanceId(decisionInstanceId);
 
-    //then
+    // then
     assertThat(query.count(), is(3L));
     assertThat(query.list().size(), is(3));
     assertThat(query.list().get(0).getEvaluations(), is(1));
@@ -135,67 +133,67 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
 
   @Test
   public void testStatisticForRootDecisionWithFakeInstanceConstraintEvaluation() throws Exception {
-    //when
+    // when
     decisionService.evaluateDecisionTableByKey(DISH_DECISION)
-        .variables(Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
+        .variables(
+            Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
         .evaluate();
 
-    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
+        .createDecisionRequirementsDefinitionQuery().singleResult();
 
     HistoricDecisionInstanceStatisticsQuery query = historyService
-        .createHistoricDecisionInstanceStatisticsQuery(
-            decisionRequirementsDefinition.getId())
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId())
         .decisionInstanceId(NON_EXISTING);
 
-    //then
+    // then
     assertThat(query.count(), is(0L));
     assertThat(query.list().size(), is(0));
-
 
   }
 
   @Test
   public void testStatisticForRootDecisionWithNullInstanceConstraintEvaluation() throws Exception {
-    //when
+    // when
     decisionService.evaluateDecisionTableByKey(DISH_DECISION)
-        .variables(Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
+        .variables(
+            Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
         .evaluate();
 
-    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
-    //when
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
+        .createDecisionRequirementsDefinitionQuery().singleResult();
+    // when
     HistoricDecisionInstanceStatisticsQuery query = historyService
-        .createHistoricDecisionInstanceStatisticsQuery(
-            decisionRequirementsDefinition.getId())
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId())
         .decisionInstanceId(null);
 
-    //then
+    // then
     try {
       query.count();
     } catch (NullValueException e) {
-      //expected
+      // expected
     }
 
     try {
       query.list();
     } catch (NullValueException e) {
-      //expected
+      // expected
     }
   }
 
   @Test
   public void testStatisticForChildDecisionEvaluation() throws Exception {
-    //when
+    // when
     decisionService.evaluateDecisionTableByKey("season")
-        .variables(Variables.createVariables().putValue(TEMPERATURE, 21))
-        .evaluate();
+        .variables(Variables.createVariables().putValue(TEMPERATURE, 21)).evaluate();
 
-    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
+        .createDecisionRequirementsDefinitionQuery().singleResult();
 
     HistoricDecisionInstanceStatisticsQuery statisticsQuery = historyService
-        .createHistoricDecisionInstanceStatisticsQuery(
-            decisionRequirementsDefinition.getId());
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
 
-    //then
+    // then
     assertThat(statisticsQuery.count(), is(1L));
     assertThat(statisticsQuery.list().size(), is(1));
     assertThat(statisticsQuery.list().get(0).getEvaluations(), is(1));
@@ -204,28 +202,24 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
 
   @Test
   public void testStatisticConstrainedToOneDRD() throws Exception {
-    //given
+    // given
     testRule.deploy(SCORE_DRG_DMN);
 
-    //when
+    // when
     decisionService.evaluateDecisionTableByKey("score-decision")
-        .variables(Variables.createVariables().putValue("input", "john"))
-        .evaluate();
+        .variables(Variables.createVariables().putValue("input", "john")).evaluate();
 
     decisionService.evaluateDecisionTableByKey("season")
-        .variables(Variables.createVariables().putValue(TEMPERATURE, 21))
-        .evaluate();
+        .variables(Variables.createVariables().putValue(TEMPERATURE, 21)).evaluate();
 
     DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
-        .createDecisionRequirementsDefinitionQuery()
-        .decisionRequirementsDefinitionName("Score")
+        .createDecisionRequirementsDefinitionQuery().decisionRequirementsDefinitionName("Score")
         .singleResult();
 
     HistoricDecisionInstanceStatisticsQuery statisticsQuery = historyService
-        .createHistoricDecisionInstanceStatisticsQuery(
-            decisionRequirementsDefinition.getId());
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
 
-    //then
+    // then
     assertThat(statisticsQuery.count(), is(1L));
     assertThat(statisticsQuery.list().size(), is(1));
     assertThat(statisticsQuery.list().get(0).getEvaluations(), is(1));
@@ -234,42 +228,39 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
 
   @Test
   public void testStatisticDoesNotExistForFakeId() throws Exception {
-    assertThat(
-        "available statistics count of fake",
-        historyService.createHistoricDecisionInstanceStatisticsQuery(
-            NON_EXISTING).count(), is(0L));
+    assertThat("available statistics count of fake",
+        historyService.createHistoricDecisionInstanceStatisticsQuery(NON_EXISTING).count(), is(0L));
 
-    assertThat(
-        "available statistics elements of fake",
-        historyService.createHistoricDecisionInstanceStatisticsQuery(
-            NON_EXISTING).list().size(), is(0));
+    assertThat("available statistics elements of fake",
+        historyService.createHistoricDecisionInstanceStatisticsQuery(NON_EXISTING).list().size(),
+        is(0));
 
   }
 
   @Test
   public void testStatisticThrowsExceptionOnNullConstraintsCount() throws Exception {
-    //expect
+    // expect
     thrown.expect(NullValueException.class);
     historyService.createHistoricDecisionInstanceStatisticsQuery(null).count();
   }
 
   @Test
   public void testStatisticThrowsExceptionOnNullConstraintsList() throws Exception {
-    //expect
+    // expect
     thrown.expect(NullValueException.class);
     historyService.createHistoricDecisionInstanceStatisticsQuery(null).list();
   }
 
   @Test
   public void testStatisticForNotEvaluatedDRD() throws Exception {
-    //when
-    DecisionRequirementsDefinition decisionRequirementsDefinition =
-        repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
+    // when
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
+        .createDecisionRequirementsDefinitionQuery().singleResult();
 
-    HistoricDecisionInstanceStatisticsQuery statisticsQuery = historyService.createHistoricDecisionInstanceStatisticsQuery(
-        decisionRequirementsDefinition.getId());
+    HistoricDecisionInstanceStatisticsQuery statisticsQuery = historyService
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
 
-    //then
+    // then
     assertThat("available statistics count", statisticsQuery.count(), is(0L));
     assertThat("available statistics elements", statisticsQuery.list().size(), is(0));
   }

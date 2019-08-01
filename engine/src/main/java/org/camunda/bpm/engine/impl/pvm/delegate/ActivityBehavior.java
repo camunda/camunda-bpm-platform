@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.pvm.delegate;
 
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  */

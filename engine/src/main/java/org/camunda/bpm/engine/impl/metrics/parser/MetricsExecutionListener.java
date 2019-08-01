@@ -33,9 +33,7 @@ public class MetricsExecutionListener implements ExecutionListener {
   }
 
   public void notify(DelegateExecution execution) throws Exception {
-    Context.getProcessEngineConfiguration()
-      .getMetricsRegistry()
-      .markOccurrence(metricsName);
+    Context.getProcessEngineConfiguration().getMetricsRegistry().markOccurrence(metricsName);
   }
 
 }

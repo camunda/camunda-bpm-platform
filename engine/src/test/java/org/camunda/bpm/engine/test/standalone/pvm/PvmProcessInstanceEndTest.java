@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -31,27 +30,21 @@ public class PvmProcessInstanceEndTest extends PvmTestCase {
 
   public void testSimpleProcessInstanceEnd() {
     EventCollector eventCollector = new EventCollector();
-    
+
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
-      .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("wait")
-      .endActivity()
-      .createActivity("wait")
-        .behavior(new WaitState())
         .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
         .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
-      .endActivity()
-    .buildProcessDefinition();
-    
+        .createActivity("start").initial().behavior(new Automatic()).transition("wait")
+        .endActivity().createActivity("wait").behavior(new WaitState())
+        .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
+        .executionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
+        .endActivity().buildProcessDefinition();
+
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
 
     System.err.println(eventCollector);
-    
+
     processInstance.deleteCascade("test");
 
     System.err.println();

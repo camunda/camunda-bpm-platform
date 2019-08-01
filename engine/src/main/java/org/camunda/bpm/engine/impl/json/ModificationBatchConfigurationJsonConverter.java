@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationComman
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonObject;
 
-public class ModificationBatchConfigurationJsonConverter extends JsonObjectConverter<ModificationBatchConfiguration>{
+public class ModificationBatchConfigurationJsonConverter
+    extends JsonObjectConverter<ModificationBatchConfiguration> {
 
   public static final ModificationBatchConfigurationJsonConverter INSTANCE = new ModificationBatchConfigurationJsonConverter();
   public static final String INSTRUCTIONS = "instructions";
@@ -36,7 +37,8 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
   public JsonObject toJsonObject(ModificationBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
-    JsonUtil.addListField(json, INSTRUCTIONS, ModificationCmdJsonConverter.INSTANCE, configuration.getInstructions());
+    JsonUtil.addListField(json, INSTRUCTIONS, ModificationCmdJsonConverter.INSTANCE,
+        configuration.getInstructions());
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
     JsonUtil.addField(json, PROCESS_DEFINITION_ID, configuration.getProcessDefinitionId());
     JsonUtil.addField(json, SKIP_LISTENERS, configuration.isSkipCustomListeners());
@@ -50,17 +52,13 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
 
     List<String> processInstanceIds = readProcessInstanceIds(json);
     String processDefinitionId = JsonUtil.getString(json, PROCESS_DEFINITION_ID);
-    List<AbstractProcessInstanceModificationCommand> instructions = JsonUtil.asList(JsonUtil.getArray(json, INSTRUCTIONS),
-        ModificationCmdJsonConverter.INSTANCE);
+    List<AbstractProcessInstanceModificationCommand> instructions = JsonUtil
+        .asList(JsonUtil.getArray(json, INSTRUCTIONS), ModificationCmdJsonConverter.INSTANCE);
     boolean skipCustomListeners = JsonUtil.getBoolean(json, SKIP_LISTENERS);
     boolean skipIoMappings = JsonUtil.getBoolean(json, SKIP_IO_MAPPINGS);
 
-    return new ModificationBatchConfiguration(
-        processInstanceIds,
-        processDefinitionId,
-        instructions,
-        skipCustomListeners,
-        skipIoMappings);
+    return new ModificationBatchConfiguration(processInstanceIds, processDefinitionId, instructions,
+        skipCustomListeners, skipIoMappings);
   }
 
   protected List<String> readProcessInstanceIds(JsonObject jsonObject) {

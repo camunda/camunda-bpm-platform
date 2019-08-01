@@ -16,15 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.pvm;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
 public interface ReadOnlyProcessDefinition extends PvmScope {
-  
+
   String getName();
-  
+
   String getDescription();
 
   PvmActivity getInitial();

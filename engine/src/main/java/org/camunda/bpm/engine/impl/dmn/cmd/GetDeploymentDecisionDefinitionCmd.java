@@ -31,7 +31,8 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 /**
  * Gives access to a deployed decision definition instance.
  */
-public class GetDeploymentDecisionDefinitionCmd implements Command<DecisionDefinition>, Serializable {
+public class GetDeploymentDecisionDefinitionCmd
+    implements Command<DecisionDefinition>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String decisionDefinitionId;
@@ -43,9 +44,11 @@ public class GetDeploymentDecisionDefinitionCmd implements Command<DecisionDefin
   public DecisionDefinition execute(CommandContext commandContext) {
     ensureNotNull("decisionDefinitionId", decisionDefinitionId);
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-    DecisionDefinitionEntity decisionDefinition = deploymentCache.findDeployedDecisionDefinitionById(decisionDefinitionId);
+    DecisionDefinitionEntity decisionDefinition = deploymentCache
+        .findDeployedDecisionDefinitionById(decisionDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadDecisionDefinition(decisionDefinition);
     }
 

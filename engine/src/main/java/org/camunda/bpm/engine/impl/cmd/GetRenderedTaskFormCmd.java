@@ -30,11 +30,10 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
-
 /**
  * @author Tom Baeyens
  */
-public class GetRenderedTaskFormCmd  implements Command<Object>, Serializable {
+public class GetRenderedTaskFormCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String taskId;
@@ -45,28 +44,28 @@ public class GetRenderedTaskFormCmd  implements Command<Object>, Serializable {
     this.formEngineName = formEngineName;
   }
 
-
   public Object execute(CommandContext commandContext) {
     TaskManager taskManager = commandContext.getTaskManager();
     TaskEntity task = taskManager.findTaskById(taskId);
     ensureNotNull("Task '" + taskId + "' not found", "task", task);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadTaskVariable(task);
     }
-    ensureNotNull("Task form definition for '" + taskId + "' not found", "task.getTaskDefinition()", task.getTaskDefinition());
+    ensureNotNull("Task form definition for '" + taskId + "' not found", "task.getTaskDefinition()",
+        task.getTaskDefinition());
 
     TaskFormHandler taskFormHandler = task.getTaskDefinition().getTaskFormHandler();
     if (taskFormHandler == null) {
       return null;
     }
 
-    FormEngine formEngine = Context
-      .getProcessEngineConfiguration()
-      .getFormEngines()
-      .get(formEngineName);
+    FormEngine formEngine = Context.getProcessEngineConfiguration().getFormEngines()
+        .get(formEngineName);
 
-    ensureNotNull("No formEngine '" + formEngineName + "' defined process engine configuration", "formEngine", formEngine);
+    ensureNotNull("No formEngine '" + formEngineName + "' defined process engine configuration",
+        "formEngine", formEngine);
 
     TaskFormData taskForm = taskFormHandler.createTaskForm(task);
 

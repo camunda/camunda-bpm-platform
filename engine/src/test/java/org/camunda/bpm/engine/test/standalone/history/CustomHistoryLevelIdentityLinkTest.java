@@ -55,10 +55,10 @@ public class CustomHistoryLevelIdentityLinkTest {
 
   @Parameters
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {
-      new Object[]{ Arrays.asList(HistoryEventTypes.IDENTITY_LINK_ADD) },
-      new Object[]{ Arrays.asList(HistoryEventTypes.IDENTITY_LINK_DELETE, HistoryEventTypes.IDENTITY_LINK_ADD) }
-    });
+    return Arrays.asList(
+        new Object[][] { new Object[] { Arrays.asList(HistoryEventTypes.IDENTITY_LINK_ADD) },
+            new Object[] { Arrays.asList(HistoryEventTypes.IDENTITY_LINK_DELETE,
+                HistoryEventTypes.IDENTITY_LINK_ADD) } });
   }
 
   @Parameter
@@ -67,7 +67,8 @@ public class CustomHistoryLevelIdentityLinkTest {
   CustomHistoryLevelIdentityLink customHisstoryLevelIL = new CustomHistoryLevelIdentityLink();
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl processEngineConfiguration) {
       processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:" + getClass().getSimpleName());
       List<HistoryLevel> levels = new ArrayList<>();
       levels.add(customHisstoryLevelIL);
@@ -82,7 +83,8 @@ public class CustomHistoryLevelIdentityLinkTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected HistoryService historyService;
   protected RuntimeService runtimeService;
@@ -107,10 +109,11 @@ public class CustomHistoryLevelIdentityLinkTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testDeletingIdentityLinkByProcDefId() {
     // Pre test
-    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService
+        .createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given
@@ -126,10 +129,7 @@ public class CustomHistoryLevelIdentityLinkTest {
     assertTrue(historicIdentityLinks.size() > 0);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("oneTaskProcess")
-      .cascade()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("oneTaskProcess").cascade().delete();
 
     // then
     historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
@@ -139,7 +139,8 @@ public class CustomHistoryLevelIdentityLinkTest {
   @Test
   public void testDeletingIdentityLinkByTaskId() {
     // Pre test
-    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService
+        .createHistoricIdentityLinkLogQuery().list();
     assertEquals(historicIdentityLinks.size(), 0);
 
     // given

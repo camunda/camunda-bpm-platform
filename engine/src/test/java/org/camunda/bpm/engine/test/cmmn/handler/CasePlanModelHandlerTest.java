@@ -131,7 +131,8 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     Body body = createElement(conditionExpression, null, Body.class);
     body.setTextContent("${test}");
 
@@ -167,7 +168,8 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
-    ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression1 = createElement(ifPart1, "def",
+        ConditionExpression.class);
     conditionExpression1.setText("${test}");
 
     // set first exitCriteria
@@ -177,7 +179,8 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
-    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
+    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl",
+        ConditionExpression.class);
     conditionExpression2.setText("${test}");
 
     // set second exitCriteria

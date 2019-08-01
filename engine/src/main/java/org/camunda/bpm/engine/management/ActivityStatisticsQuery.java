@@ -18,13 +18,14 @@ package org.camunda.bpm.engine.management;
 
 import org.camunda.bpm.engine.query.Query;
 
-public interface ActivityStatisticsQuery extends Query<ActivityStatisticsQuery, ActivityStatistics> {
+public interface ActivityStatisticsQuery
+    extends Query<ActivityStatisticsQuery, ActivityStatistics> {
 
   /**
    * Include an aggregation of failed jobs in the result.
    */
   ActivityStatisticsQuery includeFailedJobs();
-  
+
   /**
    * Include an aggregation of incidents in the result.
    */

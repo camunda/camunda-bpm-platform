@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 
-
 /**
  * Represents one XML element.
  *
@@ -50,33 +49,35 @@ public class Element {
   protected StringBuilder text = new StringBuilder();
   protected List<Element> elements = new ArrayList<Element>();
 
-  public Element(String uri, String localName, String qName, Attributes attributes, Locator locator) {
+  public Element(String uri, String localName, String qName, Attributes attributes,
+      Locator locator) {
     this.uri = uri;
     this.tagName = (uri == null || uri.equals("")) ? qName : localName;
 
-    if (attributes!=null) {
-      for (int i=0; i<attributes.getLength(); i++) {
+    if (attributes != null) {
+      for (int i = 0; i < attributes.getLength(); i++) {
         String attributeUri = attributes.getURI(i);
-        String name = (attributeUri == null || attributeUri.equals("")) ? attributes.getQName(i) : attributes.getLocalName(i);
+        String name = (attributeUri == null || attributeUri.equals("")) ? attributes.getQName(i)
+            : attributes.getLocalName(i);
         String value = attributes.getValue(i);
         this.attributeMap.put(composeMapKey(attributeUri, name),
-          new Attribute(name, value, attributeUri));
+            new Attribute(name, value, attributeUri));
       }
     }
 
-    if (locator!=null) {
+    if (locator != null) {
       line = locator.getLineNumber();
       column = locator.getColumnNumber();
     }
   }
 
   public List<Element> elements(String tagName) {
-    return elementsNS( (String) null, tagName);
+    return elementsNS((String) null, tagName);
   }
 
   public List<Element> elementsNS(Namespace nameSpace, String tagName) {
     List<Element> elementsNS = elementsNS(nameSpace.getNamespaceUri(), tagName);
-    if(elementsNS.isEmpty() && nameSpace.hasAlternativeUri()){
+    if (elementsNS.isEmpty() && nameSpace.hasAlternativeUri()) {
       elementsNS = elementsNS(nameSpace.getAlternativeUri(), tagName);
     }
     return elementsNS;
@@ -84,10 +85,10 @@ public class Element {
 
   protected List<Element> elementsNS(String nameSpaceUri, String tagName) {
     List<Element> selectedElements = new ArrayList<Element>();
-    for (Element element: elements) {
+    for (Element element : elements) {
       if (tagName.equals(element.getTagName())) {
-        if (nameSpaceUri  == null
-                || ( nameSpaceUri != null && nameSpaceUri.equals(element.getUri()) ) ) {
+        if (nameSpaceUri == null
+            || (nameSpaceUri != null && nameSpaceUri.equals(element.getUri()))) {
           selectedElements.add(element);
         }
       }
@@ -107,7 +108,8 @@ public class Element {
     if (elements.size() == 0) {
       return null;
     } else if (elements.size() > 1) {
-      throw new ProcessEngineException("Parsing exception: multiple elements with tag name " + tagName + " found");
+      throw new ProcessEngineException(
+          "Parsing exception: multiple elements with tag name " + tagName + " found");
     }
     return elements.get(0);
   }
@@ -168,30 +170,33 @@ public class Element {
   }
 
   public String toString() {
-    return "<"+tagName+"...";
+    return "<" + tagName + "...";
   }
-
 
   public String getUri() {
     return uri;
   }
+
   public String getTagName() {
     return tagName;
   }
+
   public int getLine() {
     return line;
   }
+
   public int getColumn() {
     return column;
   }
+
   /**
-   * Due to the nature of SAX parsing, sometimes the characters of an element
-   * are not processed at once. So instead of a setText operation, we need
-   * to have an appendText operation.
+   * Due to the nature of SAX parsing, sometimes the characters of an element are not processed at
+   * once. So instead of a setText operation, we need to have an appendText operation.
    */
   public void appendText(String text) {
     this.text.append(text);
   }
+
   public String getText() {
     return text.toString();
   }

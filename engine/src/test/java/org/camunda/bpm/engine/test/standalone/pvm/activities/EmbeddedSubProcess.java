@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -33,27 +32,28 @@ public class EmbeddedSubProcess implements CompositeActivityBehavior {
 
   public void execute(ActivityExecution execution) throws Exception {
     List<PvmActivity> startActivities = new ArrayList<PvmActivity>();
-    for (PvmActivity activity: execution.getActivity().getActivities()) {
+    for (PvmActivity activity : execution.getActivity().getActivities()) {
       if (activity.getIncomingTransitions().isEmpty()) {
         startActivities.add(activity);
       }
     }
 
-    for (PvmActivity startActivity: startActivities) {
+    for (PvmActivity startActivity : startActivities) {
       execution.executeActivity(startActivity);
     }
   }
 
-  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
+  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution,
+      ActivityExecution endedExecution) {
     endedExecution.remove();
     scopeExecution.tryPruneLastConcurrentChild();
   }
 
   public void complete(ActivityExecution execution) {
     List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
-    if(outgoingTransitions.isEmpty()) {
+    if (outgoingTransitions.isEmpty()) {
       execution.end(true);
-    }else {
+    } else {
       execution.leaveActivityViaTransitions(outgoingTransitions, Collections.EMPTY_LIST);
     }
   }

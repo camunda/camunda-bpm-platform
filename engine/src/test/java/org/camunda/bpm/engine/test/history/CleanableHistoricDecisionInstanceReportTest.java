@@ -71,21 +71,26 @@ public class CleanableHistoricDecisionInstanceReportTest {
   @After
   public void cleanUp() {
 
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().list();
     for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
       historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
     }
   }
 
-  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
-    List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).list();
+  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive,
+      int instanceCount) {
+    List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(key).list();
     assertEquals(1, decisionDefinitions.size());
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), historyTimeToLive);
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(),
+        historyTimeToLive);
 
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, daysInThePast));
 
-    Map<String, Object> variables = Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
+    Map<String, Object> variables = Variables.createVariables().putValue("status", "silver")
+        .putValue("sum", 723);
     for (int i = 0; i < instanceCount; i++) {
       engineRule.getDecisionService().evaluateDecisionByKey(key).variables(variables).evaluate();
     }
@@ -96,7 +101,8 @@ public class CleanableHistoricDecisionInstanceReportTest {
   @Test
   public void testReportComplex() {
     // given
-    testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn", "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn",
+    testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn",
+        "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn",
         "org/camunda/bpm/engine/test/api/dmn/Example.dmn");
     prepareDecisionInstances(DECISION_DEFINITION_KEY, 0, 5, 10);
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
@@ -104,10 +110,16 @@ public class CleanableHistoricDecisionInstanceReportTest {
     prepareDecisionInstances(THIRD_DECISION_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
-    String secondDecisionDefinitionId = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(SECOND_DECISION_DEFINITION_KEY).singleResult().getId();
-    CleanableHistoricDecisionInstanceReportResult secondReportResult = historyService.createCleanableHistoricDecisionInstanceReport().decisionDefinitionIdIn(secondDecisionDefinitionId).singleResult();
-    CleanableHistoricDecisionInstanceReportResult thirdReportResult = historyService.createCleanableHistoricDecisionInstanceReport().decisionDefinitionKeyIn(THIRD_DECISION_DEFINITION_KEY).singleResult();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
+    String secondDecisionDefinitionId = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(SECOND_DECISION_DEFINITION_KEY).singleResult().getId();
+    CleanableHistoricDecisionInstanceReportResult secondReportResult = historyService
+        .createCleanableHistoricDecisionInstanceReport()
+        .decisionDefinitionIdIn(secondDecisionDefinitionId).singleResult();
+    CleanableHistoricDecisionInstanceReportResult thirdReportResult = historyService
+        .createCleanableHistoricDecisionInstanceReport()
+        .decisionDefinitionKeyIn(THIRD_DECISION_DEFINITION_KEY).singleResult();
 
     // then
     assertEquals(4, reportResults.size());
@@ -127,7 +139,8 @@ public class CleanableHistoricDecisionInstanceReportTest {
 
   }
 
-  private void checkResultNumbers(CleanableHistoricDecisionInstanceReportResult result, int expectedCleanable, int expectedFinished) {
+  private void checkResultNumbers(CleanableHistoricDecisionInstanceReportResult result,
+      int expectedCleanable, int expectedFinished) {
     assertEquals(expectedCleanable, result.getCleanableDecisionInstanceCount());
     assertEquals(expectedFinished, result.getFinishedDecisionInstanceCount());
   }
@@ -138,7 +151,8 @@ public class CleanableHistoricDecisionInstanceReportTest {
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
     long count = historyService.createCleanableHistoricDecisionInstanceReport().count();
 
     // then
@@ -155,7 +169,8 @@ public class CleanableHistoricDecisionInstanceReportTest {
     prepareDecisionInstances(DECISION_DEFINITION_KEY, 0, 5, 5);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -169,7 +184,8 @@ public class CleanableHistoricDecisionInstanceReportTest {
     prepareDecisionInstances(DECISION_DEFINITION_KEY, 0, 0, 5);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -183,7 +199,8 @@ public class CleanableHistoricDecisionInstanceReportTest {
     prepareDecisionInstances(DECISION_DEFINITION_KEY, 0, null, 5);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -192,7 +209,8 @@ public class CleanableHistoricDecisionInstanceReportTest {
 
   @Test
   public void testReportByInvalidDecisionDefinitionId() {
-    CleanableHistoricDecisionInstanceReport report = historyService.createCleanableHistoricDecisionInstanceReport();
+    CleanableHistoricDecisionInstanceReport report = historyService
+        .createCleanableHistoricDecisionInstanceReport();
 
     try {
       report.decisionDefinitionIdIn(null);
@@ -211,7 +229,8 @@ public class CleanableHistoricDecisionInstanceReportTest {
 
   @Test
   public void testReportByInvalidDecisionDefinitionKey() {
-    CleanableHistoricDecisionInstanceReport report = historyService.createCleanableHistoricDecisionInstanceReport();
+    CleanableHistoricDecisionInstanceReport report = historyService
+        .createCleanableHistoricDecisionInstanceReport();
 
     try {
       report.decisionDefinitionKeyIn(null);
@@ -231,16 +250,19 @@ public class CleanableHistoricDecisionInstanceReportTest {
   @Test
   public void testReportCompact() {
     // given
-    List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(DECISION_DEFINITION_KEY).list();
+    List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY).list();
     assertEquals(1, decisionDefinitions.size());
 
     // assume
-    List<CleanableHistoricDecisionInstanceReportResult> resultWithZeros = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> resultWithZeros = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
     assertEquals(1, resultWithZeros.size());
     assertEquals(0, resultWithZeros.get(0).getFinishedDecisionInstanceCount());
 
     // when
-    long resultCountWithoutZeros = historyService.createCleanableHistoricDecisionInstanceReport().compact().count();
+    long resultCountWithoutZeros = historyService.createCleanableHistoricDecisionInstanceReport()
+        .compact().count();
 
     // then
     assertEquals(0, resultCountWithoutZeros);
@@ -249,17 +271,15 @@ public class CleanableHistoricDecisionInstanceReportTest {
   @Test
   public void testReportOrderByFinishedAsc() {
     // give
-    testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn", "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn");
+    testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn",
+        "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn");
     prepareDecisionInstances(SECOND_DECISION_DEFINITION_KEY, -6, 5, 6);
     prepareDecisionInstances(THIRD_DECISION_DEFINITION_KEY, -6, 5, 8);
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 4);
 
     // when
     List<CleanableHistoricDecisionInstanceReportResult> reportResult = historyService
-        .createCleanableHistoricDecisionInstanceReport()
-        .orderByFinished()
-        .asc()
-        .list();
+        .createCleanableHistoricDecisionInstanceReport().orderByFinished().asc().list();
 
     // then
     assertEquals(3, reportResult.size());
@@ -271,17 +291,15 @@ public class CleanableHistoricDecisionInstanceReportTest {
   @Test
   public void testReportOrderByFinishedDesc() {
     // give
-    testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn", "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn");
+    testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn",
+        "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn");
     prepareDecisionInstances(SECOND_DECISION_DEFINITION_KEY, -6, 5, 6);
     prepareDecisionInstances(THIRD_DECISION_DEFINITION_KEY, -6, 5, 8);
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 4);
 
     // when
     List<CleanableHistoricDecisionInstanceReportResult> reportResult = historyService
-        .createCleanableHistoricDecisionInstanceReport()
-        .orderByFinished()
-        .desc()
-        .list();
+        .createCleanableHistoricDecisionInstanceReport().orderByFinished().desc().list();
 
     // then
     assertEquals(3, reportResult.size());

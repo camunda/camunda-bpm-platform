@@ -39,7 +39,8 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
 
     assertEquals(2, taskService.createTaskQuery().count());
     // the non-interrupting event subprocess inside the subprocess should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and continue the subprocess
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
@@ -48,28 +49,26 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
   @Deployment
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testThrowEscalationEventFromEventSubprocess() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("embeddedEventSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("embeddedEventSubprocess");
 
     Job job = managementService.createJobQuery().singleResult();
     managementService.executeJob(job.getId());
 
-    assertEquals(0, taskService.createTaskQuery()
-      .processInstanceId(processInstance.getId())
-      .taskName("task in subprocess").count());
-    assertEquals(1, taskService.createTaskQuery()
-      .processInstanceId(processInstance.getId())
-      .taskName("task in process").count());
+    assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .taskName("task in subprocess").count());
+    assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .taskName("task in process").count());
 
     // second timer job shouldn't be available
     job = managementService.createJobQuery().singleResult();
     assertNull(job);
 
     // there should only be one completed Escalation Catch Boundary Event
-    assertEquals(1, historyService.createHistoricActivityInstanceQuery()
-      .processInstanceId(processInstance.getId())
-      .activityId("EscalationCatchBoundaryEvent")
-      .finished()
-      .count());
+    assertEquals(1,
+        historyService.createHistoricActivityInstanceQuery()
+            .processInstanceId(processInstance.getId()).activityId("EscalationCatchBoundaryEvent")
+            .finished().count());
   }
 
   @Deployment
@@ -78,21 +77,25 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event inside the subprocess
 
     assertEquals(2, taskService.createTaskQuery().count());
-    // the non-interrupting event subprocess outside the subprocess should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    // the non-interrupting event subprocess outside the subprocess should catch the escalation
+    // event
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and continue the subprocess
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testCatchEscalationEventFromCallActivity.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testCatchEscalationEventFromCallActivity.bpmn20.xml" })
   public void testCatchEscalationEventFromCallActivity() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
     // when throw an escalation event on called process
 
     assertEquals(2, taskService.createTaskQuery().count());
     // the non-interrupting event subprocess should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and continue the called process
     assertEquals(1, taskService.createTaskQuery().taskName("task after thrown escalation").count());
   }
@@ -103,8 +106,10 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event from top level process
 
     assertEquals(2, taskService.createTaskQuery().count());
-    // the non-interrupting event subprocess on the top level process should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    // the non-interrupting event subprocess on the top level process should catch the escalation
+    // event
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and continue the process
     assertEquals(1, taskService.createTaskQuery().taskName("task after thrown escalation").count());
   }
@@ -115,8 +120,10 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event inside a multi-instance subprocess
 
     assertEquals(10, taskService.createTaskQuery().count());
-    // the non-interrupting event subprocess outside the subprocess should catch every escalation event
-    assertEquals(5, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    // the non-interrupting event subprocess outside the subprocess should catch every escalation
+    // event
+    assertEquals(5,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and continue the subprocess
     assertEquals(5, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
@@ -128,8 +135,10 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
 
     assertEquals(2, taskService.createTaskQuery().count());
     // the non-interrupting event subprocess inside the subprocess should catch the escalation event
-    // (the boundary event on the subprocess should not catch the escalation event since the event subprocess consume this event)
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").count());
+    // (the boundary event on the subprocess should not catch the escalation event since the event
+    // subprocess consume this event)
+    assertEquals(1, taskService.createTaskQuery()
+        .taskName("task after catched escalation inside subprocess").count());
     // and continue the subprocess
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
@@ -141,7 +150,8 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
 
     assertEquals(2, taskService.createTaskQuery().count());
     // the non-interrupting event subprocess with escalationCode=1 should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation 1").count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation 1").count());
     // and continue the subprocess
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
@@ -152,8 +162,10 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event inside the subprocess
 
     assertEquals(2, taskService.createTaskQuery().count());
-    // the non-interrupting event subprocess without escalationCode should catch the escalation event (and all other escalation events)
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    // the non-interrupting event subprocess without escalationCode should catch the escalation
+    // event (and all other escalation events)
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and continue the subprocess
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
@@ -163,20 +175,25 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     runtimeService.startProcessInstanceByKey("escalationProcess");
     // when throw an escalation event inside the subprocess
 
-    // the interrupting event subprocess inside the subprocess should catch the escalation event event and cancel the subprocess
+    // the interrupting event subprocess inside the subprocess should catch the escalation event
+    // event and cancel the subprocess
     assertEquals(1, taskService.createTaskQuery().count());
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testInterruptingEscalationEventSubprocessWithCallActivity.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testInterruptingEscalationEventSubprocessWithCallActivity.bpmn20.xml" })
   public void testInterruptingEscalationEventSubprocessWithCallActivity() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
     // when throw an escalation event on called process
 
-    // the interrupting event subprocess should catch the escalation event and cancel the called process
+    // the interrupting event subprocess should catch the escalation event and cancel the called
+    // process
     assertEquals(1, taskService.createTaskQuery().count());
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
   }
 
   @Deployment
@@ -184,9 +201,11 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     runtimeService.startProcessInstanceByKey("escalationProcess");
     // when throw an escalation event inside the multi-instance subprocess
 
-    // the interrupting event subprocess outside the subprocess should catch the first escalation event and cancel all instances of the subprocess
+    // the interrupting event subprocess outside the subprocess should catch the first escalation
+    // event and cancel all instances of the subprocess
     assertEquals(1, taskService.createTaskQuery().count());
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
   }
 
   @Deployment
@@ -195,7 +214,8 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event inside the subprocess
 
     // the non-interrupting event subprocess inside the subprocess should catch the escalation event
-    Task task = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult();
+    Task task = taskService.createTaskQuery()
+        .taskName("task after catched escalation inside subprocess").singleResult();
     assertNotNull(task);
 
     // when re-throw the escalation event from the escalation event subprocess
@@ -203,7 +223,8 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
 
     assertEquals(2, taskService.createTaskQuery().count());
     // the non-interrupting boundary event on subprocess should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation on boundary event").count());
+    assertEquals(1, taskService.createTaskQuery()
+        .taskName("task after catched escalation on boundary event").count());
     // and continue the process
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
@@ -214,15 +235,18 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event inside the subprocess
 
     // the non-interrupting event subprocess inside the subprocess should catch the escalation event
-    Task task = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult();
+    Task task = taskService.createTaskQuery()
+        .taskName("task after catched escalation inside subprocess").singleResult();
     assertNotNull(task);
 
     // when re-throw the escalation event from the escalation event subprocess
     taskService.complete(task.getId());
 
     assertEquals(2, taskService.createTaskQuery().count());
-    // the non-interrupting boundary event on subprocess without escalationCode should catch the escalation event (and all other escalation events)
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation on boundary event").count());
+    // the non-interrupting boundary event on subprocess without escalationCode should catch the
+    // escalation event (and all other escalation events)
+    assertEquals(1, taskService.createTaskQuery()
+        .taskName("task after catched escalation on boundary event").count());
     // and continue the process
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
@@ -233,7 +257,8 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event inside the subprocess
 
     // the non-interrupting event subprocess inside the subprocess should catch the escalation event
-    Task task = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult();
+    Task task = taskService.createTaskQuery()
+        .taskName("task after catched escalation inside subprocess").singleResult();
     assertNotNull(task);
 
     // when re-throw the escalation event from the escalation event subprocess
@@ -241,7 +266,8 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
 
     assertEquals(2, taskService.createTaskQuery().count());
     // the non-interrupting event subprocess on process level should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation on process level").count());
+    assertEquals(1, taskService.createTaskQuery()
+        .taskName("task after catched escalation on process level").count());
     // and continue the process
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
@@ -252,7 +278,8 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event inside the subprocess
 
     // the non-interrupting event subprocess inside the subprocess should catch the escalation event
-    Task task = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult();
+    Task task = taskService.createTaskQuery()
+        .taskName("task after catched escalation inside subprocess").singleResult();
     assertNotNull(task);
 
     // when re-throw the escalation event from the escalation event subprocess
@@ -269,45 +296,56 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event inside the subprocess
 
     assertEquals(2, taskService.createTaskQuery().count());
-    // the first non-interrupting event subprocess inside the subprocess should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation inside subprocess1").count());
+    // the first non-interrupting event subprocess inside the subprocess should catch the escalation
+    // event
+    assertEquals(1, taskService.createTaskQuery()
+        .taskName("task after catched escalation inside subprocess1").count());
     // and continue the subprocess
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
 
     // when throw a second escalation event from the first event subprocess
-    String taskId = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess1").singleResult().getId();
+    String taskId = taskService.createTaskQuery()
+        .taskName("task after catched escalation inside subprocess1").singleResult().getId();
     taskService.complete(taskId);
 
     assertEquals(2, taskService.createTaskQuery().count());
-    // the second non-interrupting event subprocess inside the subprocess should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation inside subprocess2").count());
+    // the second non-interrupting event subprocess inside the subprocess should catch the
+    // escalation event
+    assertEquals(1, taskService.createTaskQuery()
+        .taskName("task after catched escalation inside subprocess2").count());
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testPropagateOutputVariablesWhileCatchEscalationOnCallActivity.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testPropagateOutputVariablesWhileCatchEscalationOnCallActivity.bpmn20.xml" })
   public void testPropagateOutputVariablesWhileCatchEscalationOnCallActivity() {
-    Map<String,Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
-    String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
+    String processInstanceId = runtimeService
+        .startProcessInstanceByKey("catchEscalationProcess", variables).getId();
     // when throw an escalation event on called process
 
     // the non-interrupting event subprocess should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and set the output variable of the called process to the process
     assertEquals(42, runtimeService.getVariable(processInstanceId, "output"));
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testPropagateOutputVariablesWhileCatchEscalationOnCallActivity.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testPropagateOutputVariablesWhileCatchEscalationOnCallActivity.bpmn20.xml" })
   public void testPropagateOutputVariablesTwoTimes() {
-    Map<String,Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
-    String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
+    String processInstanceId = runtimeService
+        .startProcessInstanceByKey("catchEscalationProcess", variables).getId();
     // when throw an escalation event on called process
 
     // (1) the variables has been passed for the first time (from sub process to super process)
-    Task taskInSuperProcess = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
+    Task taskInSuperProcess = taskService.createTaskQuery()
+        .taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
     assertNotNull(taskInSuperProcess);
     assertEquals(42, runtimeService.getVariable(processInstanceId, "output"));
 
@@ -320,16 +358,19 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     assertEquals(999, runtimeService.getVariable(processInstanceId, "output"));
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testPropagateOutputVariablesWhileCatchInterruptingEscalationOnCallActivity.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testPropagateOutputVariablesWhileCatchInterruptingEscalationOnCallActivity.bpmn20.xml" })
   public void testPropagateOutputVariablesWhileCatchInterruptingEscalationOnCallActivity() {
-    Map<String,Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
-    String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
+    String processInstanceId = runtimeService
+        .startProcessInstanceByKey("catchEscalationProcess", variables).getId();
     // when throw an escalation event on called process
 
     // the interrupting event subprocess should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and set the output variable of the called process to the process
     assertEquals(42, runtimeService.getVariable(processInstanceId, "output"));
   }
@@ -340,11 +381,13 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event inside the subprocess
 
     // the event subprocess should catch the escalation event
-    Task task = taskService.createTaskQuery().taskName("task after catched escalation").singleResult();
+    Task task = taskService.createTaskQuery().taskName("task after catched escalation")
+        .singleResult();
     assertNotNull(task);
 
     // and set the escalationCode of the escalation event to the declared variable
-    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+    assertEquals("escalationCode",
+        runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
   }
 
   @Deployment
@@ -353,71 +396,87 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // when throw an escalation event inside the subprocess
 
     // the event subprocess without escalationCode should catch the escalation event
-    Task task = taskService.createTaskQuery().taskName("task after catched escalation").singleResult();
+    Task task = taskService.createTaskQuery().taskName("task after catched escalation")
+        .singleResult();
     assertNotNull(task);
 
     // and set the escalationCode of the escalation event to the declared variable
-    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+    assertEquals("escalationCode",
+        runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testInterruptingRetrieveEscalationCodeInSuperProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testInterruptingRetrieveEscalationCodeInSuperProcess.bpmn20.xml" })
   public void testInterruptingRetrieveEscalationCodeInSuperProcess() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
 
     // the event subprocess without escalationCode should catch the escalation event
-    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation")
+        .singleResult();
     assertNotNull(task);
 
     // and set the escalationCode of the escalation event to the declared variable
-    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+    assertEquals("escalationCode",
+        runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode.bpmn20.xml" })
   public void testInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
 
     // the event subprocess without escalationCode should catch the escalation event
-    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation")
+        .singleResult();
     assertNotNull(task);
 
     // and set the escalationCode of the escalation event to the declared variable
-    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+    assertEquals("escalationCode",
+        runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingRetrieveEscalationCodeInSuperProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingRetrieveEscalationCodeInSuperProcess.bpmn20.xml" })
   public void testNonInterruptingRetrieveEscalationCodeInSuperProcess() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
 
     // the event subprocess without escalationCode should catch the escalation event
-    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation")
+        .singleResult();
     assertNotNull(task);
 
     // and set the escalationCode of the escalation event to the declared variable
-    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+    assertEquals("escalationCode",
+        runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode.bpmn20.xml" })
   public void testNonInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
 
     // the event subprocess without escalationCode should catch the escalation event
-    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation")
+        .singleResult();
     assertNotNull(task);
 
     // and set the escalationCode of the escalation event to the declared variable
-    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+    assertEquals("escalationCode",
+        runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwice.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwice.bpmn20.xml" })
   public void testNonInterruptingEscalationTriggeredTwiceWithMainTaskCompletedFirst() {
 
     // given
     runtimeService.startProcessInstanceByKey("escalationProcess");
-    Task taskInMainprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInMainprocess").singleResult();
+    Task taskInMainprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInMainprocess")
+        .singleResult();
 
     // when
     taskService.complete(taskInMainprocess.getId());
@@ -426,13 +485,16 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwice.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwice.bpmn20.xml" })
   public void testNonInterruptingEscalationTriggeredTwiceWithSubprocessTaskCompletedFirst() {
 
     // given
     runtimeService.startProcessInstanceByKey("escalationProcess");
-    Task taskInMainprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInMainprocess").singleResult();
-    Task taskInSubprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").singleResult();
+    Task taskInMainprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInMainprocess")
+        .singleResult();
+    Task taskInSubprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess")
+        .singleResult();
 
     // when
     taskService.complete(taskInSubprocess.getId());
@@ -442,28 +504,34 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwiceByIntermediateEvent.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwiceByIntermediateEvent.bpmn20.xml" })
   public void testNonInterruptingEscalationTriggeredTwiceByIntermediateEventWithMainTaskCompletedFirst() {
 
     // given
     runtimeService.startProcessInstanceByKey("escalationProcess");
-    Task taskInMainprocess = taskService.createTaskQuery().taskDefinitionKey("FirstTaskInMainprocess").singleResult();
+    Task taskInMainprocess = taskService.createTaskQuery()
+        .taskDefinitionKey("FirstTaskInMainprocess").singleResult();
 
     // when
     taskService.complete(taskInMainprocess.getId());
 
     // then
     assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("SecondTaskInMainprocess").count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey("SecondTaskInMainprocess").count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwiceByIntermediateEvent.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwiceByIntermediateEvent.bpmn20.xml" })
   public void testNonInterruptingEscalationTriggeredTwiceByIntermediateEventWithSubprocessTaskCompletedFirst() {
 
     // given
     runtimeService.startProcessInstanceByKey("escalationProcess");
-    Task taskInMainprocess = taskService.createTaskQuery().taskDefinitionKey("FirstTaskInMainprocess").singleResult();
-    Task taskInSubprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").singleResult();
+    Task taskInMainprocess = taskService.createTaskQuery()
+        .taskDefinitionKey("FirstTaskInMainprocess").singleResult();
+    Task taskInSubprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess")
+        .singleResult();
 
     // when
     taskService.complete(taskInSubprocess.getId());
@@ -471,7 +539,8 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
 
     // then
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("SecondTaskInMainprocess").count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey("SecondTaskInMainprocess").count());
   }
 
 }

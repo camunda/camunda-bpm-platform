@@ -31,10 +31,8 @@ public class MigrationBatchConfiguration extends BatchConfiguration {
     super(ids);
   }
 
-  public MigrationBatchConfiguration(List<String> ids,
-                                     MigrationPlan migrationPlan,
-                                     boolean isSkipCustomListeners,
-                                     boolean isSkipIoMappings) {
+  public MigrationBatchConfiguration(List<String> ids, MigrationPlan migrationPlan,
+      boolean isSkipCustomListeners, boolean isSkipIoMappings) {
     super(ids);
     this.migrationPlan = migrationPlan;
     this.isSkipCustomListeners = isSkipCustomListeners;
@@ -64,6 +62,5 @@ public class MigrationBatchConfiguration extends BatchConfiguration {
   public void setSkipIoMappings(boolean isSkipIoMappings) {
     this.isSkipIoMappings = isSkipIoMappings;
   }
-
 
 }

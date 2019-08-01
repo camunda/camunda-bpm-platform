@@ -53,18 +53,11 @@ public class MessageStartEventSubscriptionTest {
   private static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   private static final String MESSAGE_EVENT_PROCESS = "singleMessageStartEvent";
 
-  private static final BpmnModelInstance MODEL_WITHOUT_MESSAGE = Bpmn.createExecutableProcess(MESSAGE_EVENT_PROCESS)
-      .startEvent()
-      .userTask()
-      .endEvent()
-      .done();
+  private static final BpmnModelInstance MODEL_WITHOUT_MESSAGE = Bpmn
+      .createExecutableProcess(MESSAGE_EVENT_PROCESS).startEvent().userTask().endEvent().done();
 
   private static final BpmnModelInstance MODEL = Bpmn.createExecutableProcess("another")
-      .startEvent()
-      .message("anotherMessage")
-      .userTask()
-      .endEvent()
-      .done();
+      .startEvent().message("anotherMessage").userTask().endEvent().done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -73,7 +66,7 @@ public class MessageStartEventSubscriptionTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
@@ -89,8 +82,10 @@ public class MessageStartEventSubscriptionTest {
   @Test
   public void testUpdateProcessVersionCancelsSubscriptions() {
     testRule.deploy(SINGLE_MESSAGE_START_EVENT_XML);
-    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery()
+        .list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .list();
 
     assertEquals(1, eventSubscriptions.size());
     assertEquals(1, processDefinitions.size());
@@ -99,8 +94,10 @@ public class MessageStartEventSubscriptionTest {
     testRule.deploy(SINGLE_MESSAGE_START_EVENT_XML);
 
     // then
-    List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
-    List<ProcessDefinition> newProcessDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery()
+        .list();
+    List<ProcessDefinition> newProcessDefinitions = repositoryService.createProcessDefinitionQuery()
+        .list();
 
     assertEquals(1, newEventSubscriptions.size());
     assertEquals(2, newProcessDefinitions.size());
@@ -124,7 +121,8 @@ public class MessageStartEventSubscriptionTest {
   public void testEventSubscriptionAfterDeleteLatestProcessVersion() {
     // given a deployed process
     testRule.deploy(SINGLE_MESSAGE_START_EVENT_XML);
-    ProcessDefinition processDefinitionV1 = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinitionV1 = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     assertNotNull(processDefinitionV1);
 
     // deploy second version of the process
@@ -134,10 +132,12 @@ public class MessageStartEventSubscriptionTest {
     repositoryService.deleteDeployment(deploymentId, true);
 
     // then
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(MESSAGE_EVENT_PROCESS).singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(MESSAGE_EVENT_PROCESS).singleResult();
     assertEquals(processDefinitionV1.getId(), processDefinition.getId());
 
-    EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult();
+    EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) runtimeService
+        .createEventSubscriptionQuery().singleResult();
     assertNotNull(eventSubscription);
     assertEquals(processDefinitionV1.getId(), eventSubscription.getConfiguration());
   }
@@ -151,12 +151,11 @@ public class MessageStartEventSubscriptionTest {
     ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
 
     // delete it
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinition.getId())
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinition.getId()).delete();
 
     // when
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByMessage("newInvoiceMessage");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByMessage("newInvoiceMessage");
 
     // then
     assertFalse(processInstance.isEnded());
@@ -165,13 +164,12 @@ public class MessageStartEventSubscriptionTest {
 
     taskService.complete(task.getId());
 
-    ProcessInstance completedInstance = runtimeService
-        .createProcessInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .singleResult();
+    ProcessInstance completedInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId()).singleResult();
 
     if (completedInstance != null) {
-      throw new AssertionFailedError("Expected finished process instance '" + completedInstance + "' but it was still in the db");
+      throw new AssertionFailedError("Expected finished process instance '" + completedInstance
+          + "' but it was still in the db");
     }
   }
 
@@ -181,28 +179,29 @@ public class MessageStartEventSubscriptionTest {
     testRule.deploy(SINGLE_MESSAGE_START_EVENT_XML);
     // deploy second version of the process
     String deploymentId = testRule.deploy(SINGLE_MESSAGE_START_EVENT_XML).getId();
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
+        .createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
     // delete it
     repositoryService.deleteDeployment(deployment.getId(), true);
 
     // when
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("singleMessageStartEvent");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("singleMessageStartEvent");
 
     assertFalse(processInstance.isEnded());
 
-    Task  task = taskService.createTaskQuery().singleResult();
+    Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
 
     taskService.complete(task.getId());
 
-    ProcessInstance completedInstance = runtimeService
-        .createProcessInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .singleResult();
+    ProcessInstance completedInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId()).singleResult();
 
     if (completedInstance != null) {
-      throw new AssertionFailedError("Expected finished process instance '" + completedInstance + "' but it was still in the db");
+      throw new AssertionFailedError("Expected finished process instance '" + completedInstance
+          + "' but it was still in the db");
     }
   }
 
@@ -213,19 +212,18 @@ public class MessageStartEventSubscriptionTest {
 
     // deploy second version of the process
     String deploymentId = testRule.deploy(SINGLE_MESSAGE_START_EVENT_XML).getId();
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
+        .createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
     // delete it
     repositoryService.deleteDeployment(deployment.getId(), true);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No subscriptions were found during evaluation of the conditional start events.");
+    thrown.expectMessage(
+        "No subscriptions were found during evaluation of the conditional start events.");
 
     // when
-    runtimeService
-      .createConditionEvaluation()
-      .setVariable("foo", 1)
-      .evaluateStartConditions();
+    runtimeService.createConditionEvaluation().setVariable("foo", 1).evaluateStartConditions();
   }
 
   @Test
@@ -236,9 +234,7 @@ public class MessageStartEventSubscriptionTest {
     testRule.deploy(SINGLE_MESSAGE_START_EVENT_XML);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey(MESSAGE_EVENT_PROCESS)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey(MESSAGE_EVENT_PROCESS).delete();
 
     // then
     assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
@@ -264,17 +260,18 @@ public class MessageStartEventSubscriptionTest {
 
     // when
     repositoryService.deleteProcessDefinitions()
-      .byIds(processDefId21,processDefId23,processDefId13,
-          processDefId12,processDefId31)
-      .delete();
+        .byIds(processDefId21, processDefId23, processDefId13, processDefId12, processDefId31)
+        .delete();
 
     // then
     List<EventSubscription> list = runtimeService.createEventSubscriptionQuery().list();
     assertEquals(2, list.size());
     for (EventSubscription eventSubscription : list) {
       EventSubscriptionEntity eventSubscriptionEntity = (EventSubscriptionEntity) eventSubscription;
-      if (!eventSubscriptionEntity.getConfiguration().equals(processDefId11) && !eventSubscriptionEntity.getConfiguration().equals(processDefId22)) {
-        fail("This process definition '" + eventSubscriptionEntity.getConfiguration() + "' and the respective event subscription should not exist.");
+      if (!eventSubscriptionEntity.getConfiguration().equals(processDefId11)
+          && !eventSubscriptionEntity.getConfiguration().equals(processDefId22)) {
+        fail("This process definition '" + eventSubscriptionEntity.getConfiguration()
+            + "' and the respective event subscription should not exist.");
       }
     }
   }
@@ -287,8 +284,7 @@ public class MessageStartEventSubscriptionTest {
     String definitionId3 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-        .byIds(definitionId1, definitionId2, definitionId3)
+    repositoryService.deleteProcessDefinitions().byIds(definitionId1, definitionId2, definitionId3)
         .delete();
 
     // then
@@ -303,8 +299,7 @@ public class MessageStartEventSubscriptionTest {
     String definitionId3 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-        .byIds(definitionId3, definitionId2, definitionId1)
+    repositoryService.deleteProcessDefinitions().byIds(definitionId3, definitionId2, definitionId1)
         .delete();
 
     // then
@@ -319,8 +314,7 @@ public class MessageStartEventSubscriptionTest {
     String definitionId3 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-        .byIds(definitionId1, definitionId2, definitionId3)
+    repositoryService.deleteProcessDefinitions().byIds(definitionId1, definitionId2, definitionId3)
         .delete();
 
     // then
@@ -335,8 +329,7 @@ public class MessageStartEventSubscriptionTest {
     String definitionId3 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-        .byIds(definitionId1, definitionId2, definitionId3)
+    repositoryService.deleteProcessDefinitions().byIds(definitionId1, definitionId2, definitionId3)
         .delete();
 
     // then
@@ -351,8 +344,7 @@ public class MessageStartEventSubscriptionTest {
     String definitionId3 = deployModel(MODEL_WITHOUT_MESSAGE);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-        .byIds(definitionId1, definitionId2, definitionId3)
+    repositoryService.deleteProcessDefinitions().byIds(definitionId1, definitionId2, definitionId3)
         .delete();
 
     // then
@@ -367,13 +359,12 @@ public class MessageStartEventSubscriptionTest {
     String definitionId3 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-        .byIds(definitionId2, definitionId3)
-        .delete();
+    repositoryService.deleteProcessDefinitions().byIds(definitionId2, definitionId3).delete();
 
     // then
     assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
-    assertEquals(definitionId1, repositoryService.createProcessDefinitionQuery().singleResult().getId());
+    assertEquals(definitionId1,
+        repositoryService.createProcessDefinitionQuery().singleResult().getId());
   }
 
   @Test
@@ -384,13 +375,13 @@ public class MessageStartEventSubscriptionTest {
     String definitionId3 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-        .byIds(definitionId2, definitionId3)
-        .delete();
+    repositoryService.deleteProcessDefinitions().byIds(definitionId2, definitionId3).delete();
 
     // then
     assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
-    assertEquals(definitionId1, ((EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult()).getConfiguration());
+    assertEquals(definitionId1,
+        ((EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult())
+            .getConfiguration());
   }
 
   @Test
@@ -401,17 +392,18 @@ public class MessageStartEventSubscriptionTest {
     String definitionId3 = deployModel(MODEL_WITHOUT_MESSAGE);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-        .byIds(definitionId2, definitionId3)
-        .delete();
+    repositoryService.deleteProcessDefinitions().byIds(definitionId2, definitionId3).delete();
 
     // then
     assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
-    assertEquals(definitionId1, ((EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult()).getConfiguration());
+    assertEquals(definitionId1,
+        ((EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult())
+            .getConfiguration());
   }
 
   /**
-   * Tests the case, when no new subscription is needed, as it is not the latest version, that is being deleted.
+   * Tests the case, when no new subscription is needed, as it is not the latest version, that is
+   * being deleted.
    */
   @Test
   public void testDeleteNotLatestVersion() {
@@ -421,13 +413,13 @@ public class MessageStartEventSubscriptionTest {
     String definitionId3 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(definitionId2)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(definitionId2).delete();
 
     // then
     assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
-    assertEquals(definitionId3, ((EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult()).getConfiguration());
+    assertEquals(definitionId3,
+        ((EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult())
+            .getConfiguration());
   }
 
   /**
@@ -438,26 +430,32 @@ public class MessageStartEventSubscriptionTest {
 
     String definitionId1 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML);
     String definitionId2 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML);
-    String definitionId3 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML); //we're deleting version 3, but as version 2 is already deleted, we must subscribe version 1
+    String definitionId3 = deployProcess(SINGLE_MESSAGE_START_EVENT_XML); // we're deleting version
+                                                                          // 3, but as version 2 is
+                                                                          // already deleted, we
+                                                                          // must subscribe version
+                                                                          // 1
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(definitionId2, definitionId3)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(definitionId2, definitionId3).delete();
 
     // then
     assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
-    assertEquals(definitionId1, ((EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult()).getConfiguration());
+    assertEquals(definitionId1,
+        ((EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult())
+            .getConfiguration());
   }
 
   protected String deployProcess(String resourcePath) {
-    List<ProcessDefinition> deployedProcessDefinitions = testRule.deploy(resourcePath).getDeployedProcessDefinitions();
+    List<ProcessDefinition> deployedProcessDefinitions = testRule.deploy(resourcePath)
+        .getDeployedProcessDefinitions();
     assertEquals(1, deployedProcessDefinitions.size());
     return deployedProcessDefinitions.get(0).getId();
   }
 
   protected String deployModel(BpmnModelInstance model) {
-    List<ProcessDefinition> deployedProcessDefinitions = testRule.deploy(model).getDeployedProcessDefinitions();
+    List<ProcessDefinition> deployedProcessDefinitions = testRule.deploy(model)
+        .getDeployedProcessDefinitions();
     assertEquals(1, deployedProcessDefinitions.size());
     String definitionId2 = deployedProcessDefinitions.get(0).getId();
     return definitionId2;

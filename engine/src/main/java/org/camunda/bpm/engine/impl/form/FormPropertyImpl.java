@@ -20,12 +20,11 @@ import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.impl.form.handler.FormPropertyHandler;
 
-
 /**
  * @author Tom Baeyens
  */
 public class FormPropertyImpl implements FormProperty {
-  
+
   protected String id;
   protected String name;
   protected FormType type;
@@ -47,27 +46,27 @@ public class FormPropertyImpl implements FormProperty {
   public String getId() {
     return id;
   }
-  
+
   public String getName() {
     return name;
   }
-  
+
   public FormType getType() {
     return type;
   }
-  
+
   public String getValue() {
     return value;
   }
-  
+
   public boolean isRequired() {
     return isRequired;
   }
-  
+
   public boolean isReadable() {
     return isReadable;
   }
-  
+
   public void setValue(String value) {
     this.value = value;
   }

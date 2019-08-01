@@ -25,12 +25,12 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 
 /**
- * <p>An {@link ExecutionListener} implementation that delegates to a
- * {@link HistoryEventProducer}.
+ * <p>
+ * An {@link ExecutionListener} implementation that delegates to a {@link HistoryEventProducer}.
  *
- * <p>This allows plugging the history as an execution listener into process
- * execution and make sure history events are generated as we move through the
- * process.
+ * <p>
+ * This allows plugging the history as an execution listener into process execution and make sure
+ * history events are generated as we move through the process.
  *
  * @author Daniel Meyer
  *
@@ -48,18 +48,18 @@ public abstract class HistoryExecutionListener implements ExecutionListener {
 
     // get the event handler
     final HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration()
-      .getHistoryEventHandler();
+        .getHistoryEventHandler();
 
     // delegate creation of the history event to the producer
     HistoryEvent historyEvent = createHistoryEvent(execution);
 
-    if(historyEvent != null) {
+    if (historyEvent != null) {
       // pass the event to the handler
       historyEventHandler.handleEvent(historyEvent);
     }
 
   }
-  
+
   protected void ensureHistoryLevelInitialized() {
     if (historyLevel == null) {
       historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();

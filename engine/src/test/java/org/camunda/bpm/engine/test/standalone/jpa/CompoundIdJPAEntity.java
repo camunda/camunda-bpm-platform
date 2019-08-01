@@ -19,13 +19,12 @@ package org.camunda.bpm.engine.test.standalone.jpa;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
-
 /**
  * @author Frederik Heremans
  */
 @Entity
 public class CompoundIdJPAEntity {
-  
+
   @EmbeddedId
   private EmbeddableCompoundId id;
 
@@ -36,9 +35,9 @@ public class CompoundIdJPAEntity {
   public void setId(EmbeddableCompoundId id) {
     this.id = id;
   }
-  
+
   @Override
   public boolean equals(Object obj) {
-    return id.equals(((CompoundIdJPAEntity)obj).getId());
+    return id.equals(((CompoundIdJPAEntity) obj).getId());
   }
 }

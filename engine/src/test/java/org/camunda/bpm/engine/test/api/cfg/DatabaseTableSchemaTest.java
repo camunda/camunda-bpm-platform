@@ -45,16 +45,17 @@ public class DatabaseTableSchemaTest extends TestCase {
   public void testPerformDatabaseSchemaOperationCreateTwice() throws Exception {
 
     // both process engines will be using this datasource.
-    PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(), "org.h2.Driver",
-        "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000", "sa", "");
+    PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(),
+        "org.h2.Driver", "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000", "sa", "");
 
     Connection connection = pooledDataSource.getConnection();
     connection.createStatement().execute("drop schema if exists " + SCHEMA_NAME);
     connection.createStatement().execute("create schema " + SCHEMA_NAME);
     connection.close();
 
-    ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration().setProcessEngineName("DatabaseTablePrefixTest-engine1")
-    // disable auto create/drop schema
+    ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration()
+        .setProcessEngineName("DatabaseTablePrefixTest-engine1")
+        // disable auto create/drop schema
         .setDataSource(pooledDataSource).setDatabaseSchemaUpdate("NO_CHECK");
     config1.setDatabaseTablePrefix(SCHEMA_NAME + ".");
     config1.setDatabaseSchema(SCHEMA_NAME);
@@ -76,17 +77,19 @@ public class DatabaseTableSchemaTest extends TestCase {
   }
 
   public void testTablePresentWithSchemaAndPrefix() throws SQLException {
-    PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(), "org.h2.Driver",
-        "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000", "sa", "");
+    PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(),
+        "org.h2.Driver", "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000", "sa", "");
 
     Connection connection = pooledDataSource.getConnection();
     connection.createStatement().execute("drop schema if exists " + SCHEMA_NAME);
     connection.createStatement().execute("create schema " + SCHEMA_NAME);
-    connection.createStatement().execute("create table " + SCHEMA_NAME + "." + PREFIX_NAME + "SOME_TABLE(id varchar(64));");
+    connection.createStatement()
+        .execute("create table " + SCHEMA_NAME + "." + PREFIX_NAME + "SOME_TABLE(id varchar(64));");
     connection.close();
 
-    ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration().setProcessEngineName("DatabaseTablePrefixTest-engine1")
-    // disable auto create/drop schema
+    ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration()
+        .setProcessEngineName("DatabaseTablePrefixTest-engine1")
+        // disable auto create/drop schema
         .setDataSource(pooledDataSource).setDatabaseSchemaUpdate("NO_CHECK");
     config1.setDatabaseTablePrefix(SCHEMA_NAME + "." + PREFIX_NAME);
     config1.setDatabaseSchema(SCHEMA_NAME);
@@ -94,7 +97,7 @@ public class DatabaseTableSchemaTest extends TestCase {
     ProcessEngine engine = config1.buildProcessEngine();
     CommandExecutor commandExecutor = config1.getCommandExecutorTxRequired();
 
-    commandExecutor.execute(new Command<Void>(){
+    commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
         DbSqlSession sqlSession = commandContext.getSession(DbSqlSession.class);
         assertTrue(sqlSession.isTablePresent("SOME_TABLE"));
@@ -115,7 +118,8 @@ public class DatabaseTableSchemaTest extends TestCase {
       fail("Should throw exception");
     } catch (ProcessEngineException e) {
       // as expected
-      assertTrue(e.getMessage().contains("When setting a schema the prefix has to be schema + '.'"));
+      assertTrue(
+          e.getMessage().contains("When setting a schema the prefix has to be schema + '.'"));
     }
   }
 
@@ -128,7 +132,8 @@ public class DatabaseTableSchemaTest extends TestCase {
       fail("Should throw exception");
     } catch (ProcessEngineException e) {
       // as expected
-      assertTrue(e.getMessage().contains("When setting a schema the prefix has to be schema + '.'"));
+      assertTrue(
+          e.getMessage().contains("When setting a schema the prefix has to be schema + '.'"));
     }
   }
 
@@ -136,7 +141,8 @@ public class DatabaseTableSchemaTest extends TestCase {
 
   // allows to return a process engine configuration which doesn't create a
   // schema when it's build.
-  private static class CustomStandaloneInMemProcessEngineConfiguration extends StandaloneInMemProcessEngineConfiguration {
+  private static class CustomStandaloneInMemProcessEngineConfiguration
+      extends StandaloneInMemProcessEngineConfiguration {
 
     public ProcessEngine buildProcessEngine() {
       init();
@@ -156,7 +162,8 @@ public class DatabaseTableSchemaTest extends TestCase {
   }
 
   private static ProcessEngineConfigurationImpl createCustomProcessEngineConfiguration() {
-    return new CustomStandaloneInMemProcessEngineConfiguration().setHistory(ProcessEngineConfiguration.HISTORY_FULL);
+    return new CustomStandaloneInMemProcessEngineConfiguration()
+        .setHistory(ProcessEngineConfiguration.HISTORY_FULL);
   }
 
 }

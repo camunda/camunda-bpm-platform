@@ -31,7 +31,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  *
  * @author Roman Smirnov
  */
-public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQueryImpl, CaseSentryPartEntity> {
+public class CaseSentryPartQueryImpl
+    extends AbstractQuery<CaseSentryPartQueryImpl, CaseSentryPartEntity> {
 
   private static final long serialVersionUID = 1L;
 
@@ -143,16 +144,13 @@ public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQueryIm
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getCaseSentryPartManager()
-      .findCaseSentryPartCountByQueryCriteria(this);
+    return commandContext.getCaseSentryPartManager().findCaseSentryPartCountByQueryCriteria(this);
   }
 
   public List<CaseSentryPartEntity> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    List<CaseSentryPartEntity> result = commandContext
-      .getCaseSentryPartManager()
-      .findCaseSentryPartByQueryCriteria(this, page);
+    List<CaseSentryPartEntity> result = commandContext.getCaseSentryPartManager()
+        .findCaseSentryPartByQueryCriteria(this, page);
 
     return result;
   }

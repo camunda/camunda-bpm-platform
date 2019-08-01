@@ -58,5 +58,4 @@ public class DbUserQueryImpl extends UserQueryImpl {
     return (DbReadOnlyIdentityServiceProvider) commandContext.getReadOnlyIdentityProvider();
   }
 
-
 }

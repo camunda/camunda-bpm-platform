@@ -24,9 +24,9 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
-
 /**
- * Throws an exception from a nested command; Unlike {@link TweetExceptionHandler}, this handler always throws exceptions.
+ * Throws an exception from a nested command; Unlike {@link TweetExceptionHandler}, this handler
+ * always throws exceptions.
  *
  * @author Thorben Lindhauer
  */
@@ -38,14 +38,16 @@ public class TweetNestedCommandExceptionHandler implements JobHandler<JobHandler
     return TYPE;
   }
 
-  public void execute(JobHandlerConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    Context.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
+  public void execute(JobHandlerConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
+    Context.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new Command<Void>() {
 
-      public Void execute(CommandContext commandContext) {
-        throw new RuntimeException("nested command exception");
-      }
+          public Void execute(CommandContext commandContext) {
+            throw new RuntimeException("nested command exception");
+          }
 
-    });
+        });
   }
 
   @Override

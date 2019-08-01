@@ -92,11 +92,14 @@ public class RedeploymentProcessApplicationTest {
   @Parameters(name = "scenario {index}")
   public static Collection<Object[]> scenarios() {
     return Arrays.asList(new Object[][] {
-      { BPMN_RESOURCE_1, BPMN_RESOURCE_2, "processOne", "processTwo", processDefinitionTestProvider() },
-      { CMMN_RESOURCE_1, CMMN_RESOURCE_2, "oneTaskCase", "twoTaskCase", caseDefinitionTestProvider() },
-      { DMN_RESOURCE_1, DMN_RESOURCE_2, "decision", "score-decision", decisionDefinitionTestProvider() },
-      { DRD_RESOURCE_1, DRD_RESOURCE_2, "score", "dish", decisionRequirementsDefinitionTestProvider() }
-    });
+        { BPMN_RESOURCE_1, BPMN_RESOURCE_2, "processOne", "processTwo",
+            processDefinitionTestProvider() },
+        { CMMN_RESOURCE_1, CMMN_RESOURCE_2, "oneTaskCase", "twoTaskCase",
+            caseDefinitionTestProvider() },
+        { DMN_RESOURCE_1, DMN_RESOURCE_2, "decision", "score-decision",
+            decisionDefinitionTestProvider() },
+        { DRD_RESOURCE_1, DRD_RESOURCE_2, "score", "dish",
+            decisionRequirementsDefinitionTestProvider() } });
   }
 
   @Before
@@ -109,24 +112,18 @@ public class RedeploymentProcessApplicationTest {
   }
 
   @Test
-	public void definitionOnePreviousDeploymentWithPA() {
+  public void definitionOnePreviousDeploymentWithPA() {
     // given
 
     MyEmbeddedProcessApplication application = new MyEmbeddedProcessApplication();
 
     // first deployment
-    Deployment deployment1 = repositoryService
-        .createDeployment(application.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(application.getReference())
+        .name(DEPLOYMENT_NAME).addClasspathResource(resource1).deploy();
 
     // second deployment
-    Deployment deployment2 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     assertEquals(2, testProvider.countDefinitionsByKey(definitionKey1));
 
@@ -140,31 +137,22 @@ public class RedeploymentProcessApplicationTest {
   }
 
   @Test
-	public void definitionTwoPreviousDeploymentWithPA() {
+  public void definitionTwoPreviousDeploymentWithPA() {
     // given
 
     // first deployment
     MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-        .createDeployment(application1.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(application1.getReference())
+        .name(DEPLOYMENT_NAME).addClasspathResource(resource1).deploy();
 
     // second deployment
     MyEmbeddedProcessApplication application2 = new MyEmbeddedProcessApplication();
-    Deployment deployment2 = repositoryService
-        .createDeployment(application2.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment(application2.getReference())
+        .name(DEPLOYMENT_NAME).addClasspathResource(resource1).deploy();
 
     // second deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment3 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     assertEquals(3, testProvider.countDefinitionsByKey(definitionKey1));
 
@@ -179,30 +167,21 @@ public class RedeploymentProcessApplicationTest {
   }
 
   @Test
-	public void definitionTwoPreviousDeploymentFirstDeploymentWithPA() {
+  public void definitionTwoPreviousDeploymentFirstDeploymentWithPA() {
     // given
 
     // first deployment
     MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-        .createDeployment(application1.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(application1.getReference())
+        .name(DEPLOYMENT_NAME).addClasspathResource(resource1).deploy();
 
     // second deployment
-    Deployment deployment2 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).deploy();
 
     // second deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment3 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     assertEquals(3, testProvider.countDefinitionsByKey(definitionKey1));
 
@@ -216,31 +195,22 @@ public class RedeploymentProcessApplicationTest {
   }
 
   @Test
-	public void definitionTwoPreviousDeploymentDeleteSecondDeployment() {
+  public void definitionTwoPreviousDeploymentDeleteSecondDeployment() {
     // given
 
     // first deployment
     MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-        .createDeployment(application1.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(application1.getReference())
+        .name(DEPLOYMENT_NAME).addClasspathResource(resource1).deploy();
 
     // second deployment
     MyEmbeddedProcessApplication application2 = new MyEmbeddedProcessApplication();
-    Deployment deployment2 = repositoryService
-        .createDeployment(application2.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment(application2.getReference())
+        .name(DEPLOYMENT_NAME).addClasspathResource(resource1).deploy();
 
     // second deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment3 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     assertEquals(3, testProvider.countDefinitionsByKey(definitionKey1));
 
@@ -256,31 +226,22 @@ public class RedeploymentProcessApplicationTest {
   }
 
   @Test
-	public void definitionTwoPreviousDeploymentUnregisterSecondPA() {
+  public void definitionTwoPreviousDeploymentUnregisterSecondPA() {
     // given
 
     // first deployment
     MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-        .createDeployment(application1.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(application1.getReference())
+        .name(DEPLOYMENT_NAME).addClasspathResource(resource1).deploy();
 
     // second deployment
     MyEmbeddedProcessApplication application2 = new MyEmbeddedProcessApplication();
-    Deployment deployment2 = repositoryService
-        .createDeployment(application2.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment(application2.getReference())
+        .name(DEPLOYMENT_NAME).addClasspathResource(resource1).deploy();
 
     // second deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment3 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     assertEquals(3, testProvider.countDefinitionsByKey(definitionKey1));
 
@@ -296,31 +257,22 @@ public class RedeploymentProcessApplicationTest {
   }
 
   @Test
-	public void definitionTwoDifferentPreviousDeploymentsWithDifferentPA() {
+  public void definitionTwoDifferentPreviousDeploymentsWithDifferentPA() {
     // given
 
     // first deployment
     MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-        .createDeployment(application1.getReference())
-        .name(DEPLOYMENT_NAME + "-1")
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(application1.getReference())
+        .name(DEPLOYMENT_NAME + "-1").addClasspathResource(resource1).deploy();
 
     // second deployment
     MyEmbeddedProcessApplication application2 = new MyEmbeddedProcessApplication();
-    Deployment deployment2 = repositoryService
-        .createDeployment(application2.getReference())
-        .name(DEPLOYMENT_NAME + "-2")
-        .addClasspathResource(resource2)
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment(application2.getReference())
+        .name(DEPLOYMENT_NAME + "-2").addClasspathResource(resource2).deploy();
 
     // second deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME + "-3")
-        .addDeploymentResources(deployment1.getId())
-        .addDeploymentResources(deployment2.getId())
+    Deployment deployment3 = repositoryService.createDeployment().name(DEPLOYMENT_NAME + "-3")
+        .addDeploymentResources(deployment1.getId()).addDeploymentResources(deployment2.getId())
         .deploy();
 
     assertEquals(2, testProvider.countDefinitionsByKey(definitionKey1));
@@ -347,32 +299,23 @@ public class RedeploymentProcessApplicationTest {
   }
 
   @Test
-	public void definitionTwoPreviousDeploymentsWithDifferentPA() {
+  public void definitionTwoPreviousDeploymentsWithDifferentPA() {
     // given
 
     // first deployment
     MyEmbeddedProcessApplication application1 = new MyEmbeddedProcessApplication();
-    Deployment deployment1 = repositoryService
-      .createDeployment(application1.getReference())
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .addClasspathResource(resource2)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(application1.getReference())
+        .name(DEPLOYMENT_NAME).addClasspathResource(resource1).addClasspathResource(resource2)
+        .deploy();
 
     // second deployment
     MyEmbeddedProcessApplication application2 = new MyEmbeddedProcessApplication();
-    Deployment deployment2 = repositoryService
-        .createDeployment(application2.getReference())
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment(application2.getReference())
+        .name(DEPLOYMENT_NAME).addClasspathResource(resource1).deploy();
 
     // third deployment
-    Deployment deployment3 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment3 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     assertEquals(3, testProvider.countDefinitionsByKey(definitionKey1));
     assertEquals(2, testProvider.countDefinitionsByKey(definitionKey2));
@@ -397,7 +340,7 @@ public class RedeploymentProcessApplicationTest {
     deleteDeployments(deployment1, deployment2, deployment3);
   }
 
-  protected void deleteDeployments(Deployment... deployments){
+  protected void deleteDeployments(Deployment... deployments) {
     for (Deployment deployment : deployments) {
       repositoryService.deleteDeployment(deployment.getId(), true);
       managementService.unregisterProcessApplication(deployment.getId(), false);
@@ -414,12 +357,13 @@ public class RedeploymentProcessApplicationTest {
     return new TestProvider() {
 
       public long countDefinitionsByKey(String definitionKey) {
-        return repositoryService.createProcessDefinitionQuery().processDefinitionKey(definitionKey).count();
+        return repositoryService.createProcessDefinitionQuery().processDefinitionKey(definitionKey)
+            .count();
       }
 
       public void createInstanceByDefinitionKey(String definitionKey) {
-        runtimeService.startProcessInstanceByKey(definitionKey, Variables.createVariables()
-            .putValue("a", 1).putValue("b", 1));
+        runtimeService.startProcessInstanceByKey(definitionKey,
+            Variables.createVariables().putValue("a", 1).putValue("b", 1));
       }
 
     };
@@ -429,7 +373,8 @@ public class RedeploymentProcessApplicationTest {
     return new TestProvider() {
 
       public long countDefinitionsByKey(String definitionKey) {
-        return repositoryService.createCaseDefinitionQuery().caseDefinitionKey(definitionKey).count();
+        return repositoryService.createCaseDefinitionQuery().caseDefinitionKey(definitionKey)
+            .count();
       }
 
       public void createInstanceByDefinitionKey(String definitionKey) {
@@ -443,13 +388,13 @@ public class RedeploymentProcessApplicationTest {
     return new TestProvider() {
 
       public long countDefinitionsByKey(String definitionKey) {
-        return repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(definitionKey).count();
+        return repositoryService.createDecisionDefinitionQuery()
+            .decisionDefinitionKey(definitionKey).count();
       }
 
       public void createInstanceByDefinitionKey(String definitionKey) {
         decisionService.evaluateDecisionTableByKey(definitionKey)
-          .variables(Variables.createVariables().putValue("input", "john"))
-          .evaluate();
+            .variables(Variables.createVariables().putValue("input", "john")).evaluate();
       }
 
     };
@@ -459,16 +404,15 @@ public class RedeploymentProcessApplicationTest {
     return new TestProvider() {
 
       public long countDefinitionsByKey(String definitionKey) {
-        return repositoryService.createDecisionRequirementsDefinitionQuery().decisionRequirementsDefinitionKey(definitionKey).count();
+        return repositoryService.createDecisionRequirementsDefinitionQuery()
+            .decisionRequirementsDefinitionKey(definitionKey).count();
       }
 
       public void createInstanceByDefinitionKey(String definitionKey) {
         decisionService.evaluateDecisionTableByKey(definitionKey + "-decision")
-          .variables(Variables.createVariables()
-              .putValue("temperature", 21)
-              .putValue("dayType", "Weekend")
-              .putValue("input", "John"))
-          .evaluate();
+            .variables(Variables.createVariables().putValue("temperature", 21)
+                .putValue("dayType", "Weekend").putValue("input", "John"))
+            .evaluate();
       }
 
     };

@@ -35,40 +35,61 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   /**
    * Only select the historic detail with the given id.
    *
-   * @param id the historic detail to select
+   * @param id
+   *          the historic detail to select
    * @return the query builder
    */
   HistoricDetailQuery detailId(String id);
 
-  /** Only select historic variable updates with the given process instance.
-   * {@link ProcessInstance} ids and {@link HistoricProcessInstance} ids match. */
+  /**
+   * Only select historic variable updates with the given process instance. {@link ProcessInstance}
+   * ids and {@link HistoricProcessInstance} ids match.
+   */
   HistoricDetailQuery processInstanceId(String processInstanceId);
 
-  /** Only select historic variable updates with the given case instance.
-   * {@link CaseInstance} ids and {@link HistoricCaseInstance} ids match. */
+  /**
+   * Only select historic variable updates with the given case instance. {@link CaseInstance} ids
+   * and {@link HistoricCaseInstance} ids match.
+   */
   HistoricDetailQuery caseInstanceId(String caseInstanceId);
 
-  /** Only select historic variable updates with the given execution.
-   * Note that {@link Execution} ids are not stored in the history as first class citizen,
-   * only process instances are.*/
+  /**
+   * Only select historic variable updates with the given execution. Note that {@link Execution} ids
+   * are not stored in the history as first class citizen, only process instances are.
+   */
   HistoricDetailQuery executionId(String executionId);
 
-  /** Only select historic variable updates with the given case execution.
-   * Note that {@link CaseExecution} ids are not stored in the history as first class citizen,
-   * only case instances are.*/
+  /**
+   * Only select historic variable updates with the given case execution. Note that
+   * {@link CaseExecution} ids are not stored in the history as first class citizen, only case
+   * instances are.
+   */
   HistoricDetailQuery caseExecutionId(String caseExecutionId);
 
-  /** Only select historic variable updates associated to the given {@link HistoricActivityInstance activity instance}.
-   * @deprecated since 5.2, use {@link #activityInstanceId(String)} instead */
+  /**
+   * Only select historic variable updates associated to the given {@link HistoricActivityInstance
+   * activity instance}.
+   * 
+   * @deprecated since 5.2, use {@link #activityInstanceId(String)} instead
+   */
   HistoricDetailQuery activityId(String activityId);
 
-  /** Only select historic variable updates associated to the given {@link HistoricActivityInstance activity instance}. */
+  /**
+   * Only select historic variable updates associated to the given {@link HistoricActivityInstance
+   * activity instance}.
+   */
   HistoricDetailQuery activityInstanceId(String activityInstanceId);
 
-  /** Only select historic variable updates associated to the given {@link HistoricTaskInstance historic task instance}. */
+  /**
+   * Only select historic variable updates associated to the given {@link HistoricTaskInstance
+   * historic task instance}.
+   */
   HistoricDetailQuery taskId(String taskId);
 
-  /** Only select historic variable updates associated to the given {@link HistoricVariableInstance historic variable instance}. */
+  /**
+   * Only select historic variable updates associated to the given {@link HistoricVariableInstance
+   * historic variable instance}.
+   */
   HistoricDetailQuery variableInstanceId(String variableInstanceId);
 
   /** Only select historic process variables which match one of the given variable types. */
@@ -86,24 +107,25 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
 
   /**
    * Disable fetching of byte array and file values. By default, the query will fetch such values.
-   * By calling this method you can prevent the values of (potentially large) blob data chunks to be fetched.
-   *  The variables themselves are nonetheless included in the query result.
+   * By calling this method you can prevent the values of (potentially large) blob data chunks to be
+   * fetched. The variables themselves are nonetheless included in the query result.
    *
    * @return the query builder
    */
   HistoricDetailQuery disableBinaryFetching();
 
   /**
-   * Disable deserialization of variable values that are custom objects. By default, the query
-   * will attempt to deserialize the value of these variables. By calling this method you can
-   * prevent such attempts in environments where their classes are not available.
-   * Independent of this setting, variable serialized values are accessible.
+   * Disable deserialization of variable values that are custom objects. By default, the query will
+   * attempt to deserialize the value of these variables. By calling this method you can prevent
+   * such attempts in environments where their classes are not available. Independent of this
+   * setting, variable serialized values are accessible.
    */
   HistoricDetailQuery disableCustomObjectDeserialization();
 
-  /** Exclude all task-related {@link HistoricDetail}s, so only items which have no
-   * task-id set will be selected. When used together with {@link #taskId(String)}, this
-   * call is ignored task details are NOT excluded.
+  /**
+   * Exclude all task-related {@link HistoricDetail}s, so only items which have no task-id set will
+   * be selected. When used together with {@link #taskId(String)}, this call is ignored task details
+   * are NOT excluded.
    */
   HistoricDetailQuery excludeTaskDetails();
 
@@ -125,8 +147,8 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   HistoricDetailQuery occurredAfter(Date date);
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of historic details without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of historic details without tenant id is database-specific.
    */
   HistoricDetailQuery orderByTenantId();
 
@@ -143,21 +165,27 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   HistoricDetailQuery orderByTime();
 
   /**
-   * <p>Sort the {@link HistoricDetail historic detail events} in the order in which
-   * they occurred and needs to be followed by {@link #asc()} or {@link #desc()}.</p>
+   * <p>
+   * Sort the {@link HistoricDetail historic detail events} in the order in which they occurred and
+   * needs to be followed by {@link #asc()} or {@link #desc()}.
+   * </p>
    *
-   * <p>The set of all {@link HistoricVariableUpdate historic variable update events} is
-   * a <strong>partially ordered set</strong>. Due to this fact {@link HistoricVariableUpdate
-   * historic variable update events} for two different {@link VariableInstance variable
-   * instances} are <strong>incomparable</strong>. So that it is not possible to sort
-   * the {@link HistoricDetail historic variable update events} for two {@link VariableInstance
-   * variable instances} in the order they occurred. Just for one {@link VariableInstance variable
-   * instance} the set of {@link HistoricVariableUpdate historic variable update events} can be
-   * <strong>totally ordered</strong> by using {@link #variableInstanceId(String)} and {@link
-   * #orderPartiallyByOccurrence()} which will return a result set ordered by its occurrence.</p>
+   * <p>
+   * The set of all {@link HistoricVariableUpdate historic variable update events} is a
+   * <strong>partially ordered set</strong>. Due to this fact {@link HistoricVariableUpdate historic
+   * variable update events} for two different {@link VariableInstance variable instances} are
+   * <strong>incomparable</strong>. So that it is not possible to sort the {@link HistoricDetail
+   * historic variable update events} for two {@link VariableInstance variable instances} in the
+   * order they occurred. Just for one {@link VariableInstance variable instance} the set of
+   * {@link HistoricVariableUpdate historic variable update events} can be <strong>totally
+   * ordered</strong> by using {@link #variableInstanceId(String)} and
+   * {@link #orderPartiallyByOccurrence()} which will return a result set ordered by its occurrence.
+   * </p>
    *
-   * <p><strong>For example:</strong><br>
-   * An execution variable <code>myVariable</code> will be updated multiple times:</p>
+   * <p>
+   * <strong>For example:</strong><br>
+   * An execution variable <code>myVariable</code> will be updated multiple times:
+   * </p>
    *
    * <code>
    * runtimeService.setVariable("anExecutionId", "myVariable", 1000);<br>
@@ -166,10 +194,14 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
    * runtimeService.removeVariable("anExecutionId", "myVariable");
    * </code>
    *
-   * <p>As a result there exists four {@link HistoricVariableUpdate historic variable update events}.</p>
+   * <p>
+   * As a result there exists four {@link HistoricVariableUpdate historic variable update events}.
+   * </p>
    *
-   * <p>By using {@link #variableInstanceId(String)} and {@link #orderPartiallyByOccurrence()} it
-   * is possible to sort the events in the order in which they occurred. The following query</p>
+   * <p>
+   * By using {@link #variableInstanceId(String)} and {@link #orderPartiallyByOccurrence()} it is
+   * possible to sort the events in the order in which they occurred. The following query
+   * </p>
    *
    * <code>
    * historyService.createHistoricDetailQuery()<br>
@@ -179,7 +211,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
    * &nbsp;&nbsp;.list()
    * </code>
    *
-   * <p>will return the following totally ordered result set</p>
+   * <p>
+   * will return the following totally ordered result set
+   * </p>
    *
    * <code>
    * [<br>
@@ -190,8 +224,10 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
    * ]
    * </code>
    *
-   * <p><strong>Note:</strong><br>
-   * Please note that a {@link HistoricFormField historic form field event} can occur only once.</p>
+   * <p>
+   * <strong>Note:</strong><br>
+   * Please note that a {@link HistoricFormField historic form field event} can occur only once.
+   * </p>
    *
    * @since 7.3
    */

@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -48,7 +47,8 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
   protected final String businessKey;
   protected VariableMap variables;
 
-  public SubmitStartFormCmd(String processDefinitionId, String businessKey, Map<String, Object> properties) {
+  public SubmitStartFormCmd(String processDefinitionId, String businessKey,
+      Map<String, Object> properties) {
     this.processDefinitionId = processDefinitionId;
     this.businessKey = businessKey;
     this.variables = Variables.fromMap(properties);
@@ -56,12 +56,16 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
 
   @Override
   public ProcessInstance execute(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-    ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
+    ProcessDefinitionEntity processDefinition = deploymentCache
+        .findDeployedProcessDefinitionById(processDefinitionId);
+    ensureNotNull("No process definition found for id = '" + processDefinitionId + "'",
+        "processDefinition", processDefinition);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateProcessInstance(processDefinition);
     }
 
@@ -77,7 +81,8 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
     // see CAM-2828
     if (processDefinition.getInitial().isAsyncBefore()) {
       // avoid firing history events
-      processInstance.setStartContext(new ProcessInstanceStartContext(processInstance.getActivity()));
+      processInstance
+          .setStartContext(new ProcessInstanceStartContext(processInstance.getActivity()));
       FormPropertyHelper.initFormPropertiesOnScope(variables, processInstance);
       processInstance.start();
 
@@ -85,7 +90,6 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
       processInstance.startWithFormProperties(variables);
 
     }
-
 
     return processInstance;
   }

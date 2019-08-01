@@ -23,9 +23,10 @@ import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * Collects executions that execute an activity instance that is a leaf in the activity instance tree.
- * Typically, such executions are also leaves in the execution tree. The exception to this are compensation-throwing
- * executions: Their activities are leaves but they have child executions responsible for compensation handling.
+ * Collects executions that execute an activity instance that is a leaf in the activity instance
+ * tree. Typically, such executions are also leaves in the execution tree. The exception to this are
+ * compensation-throwing executions: Their activities are leaves but they have child executions
+ * responsible for compensation handling.
  *
  * @author Thorben Lindhauer
  *
@@ -35,7 +36,8 @@ public class LeafActivityInstanceExecutionCollector implements TreeVisitor<PvmEx
   protected List<PvmExecutionImpl> leaves = new ArrayList<PvmExecutionImpl>();
 
   public void visit(PvmExecutionImpl obj) {
-    if (obj.getNonEventScopeExecutions().isEmpty() || (obj.getActivity() != null && !LegacyBehavior.hasInvalidIntermediaryActivityId(obj))) {
+    if (obj.getNonEventScopeExecutions().isEmpty()
+        || (obj.getActivity() != null && !LegacyBehavior.hasInvalidIntermediaryActivityId(obj))) {
       leaves.add(obj);
     }
   }

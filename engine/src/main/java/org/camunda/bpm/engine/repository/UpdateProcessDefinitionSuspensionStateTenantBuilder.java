@@ -19,7 +19,8 @@ package org.camunda.bpm.engine.repository;
 /**
  * Fluent builder to update the suspension state of process definitions.
  */
-public interface UpdateProcessDefinitionSuspensionStateTenantBuilder extends UpdateProcessDefinitionSuspensionStateBuilder {
+public interface UpdateProcessDefinitionSuspensionStateTenantBuilder
+    extends UpdateProcessDefinitionSuspensionStateBuilder {
 
   /**
    * Specify that the process definition belongs to no tenant.

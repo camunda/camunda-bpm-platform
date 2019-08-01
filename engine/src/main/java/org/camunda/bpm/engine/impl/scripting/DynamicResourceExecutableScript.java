@@ -23,8 +23,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.util.ResourceUtil;
 
 /**
- * A script which resource path is dynamically determined during the execution.
- * Therefore it has to be executed in the context of an atomic operation.
+ * A script which resource path is dynamically determined during the execution. Therefore it has to
+ * be executed in the context of an atomic operation.
  *
  * @author Sebastian Menski
  */

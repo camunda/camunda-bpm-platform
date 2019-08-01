@@ -195,7 +195,8 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     Body body = createElement(conditionExpression, null, Body.class);
     body.setTextContent("${test}");
 
@@ -230,7 +231,8 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
-    ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression1 = createElement(ifPart1, "def",
+        ConditionExpression.class);
     Body body1 = createElement(conditionExpression1, null, Body.class);
     body1.setTextContent("${test}");
 
@@ -241,7 +243,8 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
-    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
+    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl",
+        ConditionExpression.class);
     Body body2 = createElement(conditionExpression2, null, Body.class);
     body2.setTextContent("${test}");
 
@@ -254,8 +257,10 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     context.setParent(parent);
 
     // transform Sentry
-    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1, context);
-    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2, context);
+    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1,
+        context);
+    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2,
+        context);
 
     // when
     CmmnActivity newActivity = handler.handleElement(planItem, context);
@@ -278,7 +283,8 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     Body body = createElement(conditionExpression, null, Body.class);
     body.setTextContent("${test}");
 
@@ -313,7 +319,8 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
-    ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression1 = createElement(ifPart1, "def",
+        ConditionExpression.class);
     Body body1 = createElement(conditionExpression1, null, Body.class);
     body1.setTextContent("${test}");
 
@@ -324,7 +331,8 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
-    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
+    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl",
+        ConditionExpression.class);
     Body body2 = createElement(conditionExpression2, null, Body.class);
     body2.setTextContent("${test}");
 
@@ -337,8 +345,10 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     context.setParent(parent);
 
     // transform Sentry
-    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1, context);
-    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2, context);
+    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1,
+        context);
+    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2,
+        context);
 
     // when
     CmmnActivity newActivity = handler.handleElement(planItem, context);
@@ -361,7 +371,8 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     Body body = createElement(conditionExpression, null, Body.class);
     body.setTextContent("${test}");
 
@@ -396,8 +407,10 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testManualActivationRule() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
-    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1",
+        ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -411,13 +424,14 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     assertTrue(rule instanceof CaseControlRule);
   }
 
-
   @Test
   public void testManualActivationRuleByDefaultPlanItemControl() {
     // given
     PlanItemControl defaultControl = createElement(stage, "ItemControl_1", DefaultControl.class);
-    ManualActivationRule manualActivationRule = createElement(defaultControl, "ManualActivationRule_1", ManualActivationRule.class);
-    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    ManualActivationRule manualActivationRule = createElement(defaultControl,
+        "ManualActivationRule_1", ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -436,7 +450,8 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
     RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -455,7 +470,8 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
     // given
     PlanItemControl defaultControl = createElement(stage, "ItemControl_1", DefaultControl.class);
     RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -487,8 +503,10 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRule() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -506,8 +524,10 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRuleByDefaultPlanItemControl() {
     // given
     PlanItemControl defaultControl = createElement(stage, "DefaultControl_1", DefaultControl.class);
-    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -525,8 +545,10 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRuleStandardEvents() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -546,8 +568,10 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRuleStandardEventsByDefaultPlanItemControl() {
     // given
     PlanItemControl defaultControl = createElement(stage, "DefaultControl_1", DefaultControl.class);
-    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -567,8 +591,10 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRuleCustomStandardEvents() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     repetitionRule.setCamundaRepeatOnStandardEvent(CaseExecutionListener.DISABLE);
@@ -589,8 +615,10 @@ public class StagePlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRuleCustomStandardEventsByDefaultPlanItemControl() {
     // given
     PlanItemControl defaultControl = createElement(stage, "DefaultControl_1", DefaultControl.class);
-    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     repetitionRule.setCamundaRepeatOnStandardEvent(CaseExecutionListener.DISABLE);

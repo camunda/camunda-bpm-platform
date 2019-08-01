@@ -40,10 +40,7 @@ public class ScriptValueProvider implements ParameterValueProvider {
   public Object getValue(VariableScope variableScope) {
     ScriptInvocation invocation = new ScriptInvocation(script, variableScope);
     try {
-      Context
-      .getProcessEngineConfiguration()
-      .getDelegateInterceptor()
-      .handleInvocation(invocation);
+      Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {

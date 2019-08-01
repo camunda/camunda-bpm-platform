@@ -37,8 +37,8 @@ public class DeleteGroupIdentityLinkCmd extends DeleteIdentityLinkCmd {
 
     PropertyChange propertyChange = new PropertyChange(type, null, groupId);
 
-    commandContext.getOperationLogManager()
-        .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_GROUP_LINK, task, propertyChange);
+    commandContext.getOperationLogManager().logLinkOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_GROUP_LINK, task, propertyChange);
 
     return null;
   }

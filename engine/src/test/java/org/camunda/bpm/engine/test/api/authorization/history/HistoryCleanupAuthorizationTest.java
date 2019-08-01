@@ -63,7 +63,8 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
 
   @Override
   public void tearDown() {
-    processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
+    processEngineConfiguration
+        .setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
 
     super.tearDown();
     clearDatabase();
@@ -71,15 +72,18 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml", "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml",
+      "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
   public void testHistoryCleanupWithAuthorization() {
     // given
     prepareInstances(5, 5, 5);
 
     ClockUtil.setCurrentTime(new Date());
     // when
-    identityService.setAuthentication("user", Collections.singletonList(Groups.CAMUNDA_ADMIN), null);
+    identityService.setAuthentication("user", Collections.singletonList(Groups.CAMUNDA_ADMIN),
+        null);
 
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
 
@@ -90,8 +94,10 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml", "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml",
+      "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
   public void testHistoryCleanupWithoutAuthorization() {
     // given
     prepareInstances(5, 5, 5);
@@ -109,29 +115,38 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  protected void prepareInstances(Integer processInstanceTimeToLive, Integer decisionTimeToLive, Integer caseTimeToLive) {
+  protected void prepareInstances(Integer processInstanceTimeToLive, Integer decisionTimeToLive,
+      Integer caseTimeToLive) {
     // update time to live
     disableAuthorization();
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey("testProcess").list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("testProcess").list();
     assertEquals(1, processDefinitions.size());
-    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitions.get(0).getId(), processInstanceTimeToLive);
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitions.get(0).getId(),
+        processInstanceTimeToLive);
 
-    final List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey("testDecision").list();
+    final List<DecisionDefinition> decisionDefinitions = repositoryService
+        .createDecisionDefinitionQuery().decisionDefinitionKey("testDecision").list();
     assertEquals(1, decisionDefinitions.size());
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), decisionTimeToLive);
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(),
+        decisionTimeToLive);
 
-    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneTaskCase").list();
+    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase").list();
     assertEquals(1, caseDefinitions.size());
-    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitions.get(0).getId(), caseTimeToLive);
+    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitions.get(0).getId(),
+        caseTimeToLive);
 
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, -6));
 
     // create 3 process instances
     List<String> processInstanceIds = new ArrayList<String>();
-    Map<String, Object> variables = Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37));
+    Map<String, Object> variables = Variables.createVariables().putValue("pojo",
+        new TestPojo("okay", 13.37));
     for (int i = 0; i < 3; i++) {
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess",
+          variables);
       processInstanceIds.add(processInstance.getId());
     }
     runtimeService.deleteProcessInstances(processInstanceIds, null, true, true);
@@ -155,7 +170,8 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
   }
 
   protected void assertResult(long expectedInstanceCount) {
-    long count = historyService.createHistoricProcessInstanceQuery().count() + historyService.createHistoricDecisionInstanceQuery().count()
+    long count = historyService.createHistoricProcessInstanceQuery().count()
+        + historyService.createHistoricDecisionInstanceQuery().count()
         + historyService.createHistoricCaseInstanceQuery().count();
     assertEquals(expectedInstanceCount, count);
   }
@@ -181,7 +197,8 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
         }
 
-        List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
+        List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery()
+            .list();
         for (HistoricIncident historicIncident : historicIncidents) {
           commandContext.getDbEntityManager().delete((HistoricIncidentEntity) historicIncident);
         }
@@ -192,17 +209,20 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
       }
     });
 
-    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> historicProcessInstances = historyService
+        .createHistoricProcessInstanceQuery().list();
     for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
       historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
     }
 
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().list();
     for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
       historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
     }
 
-    List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery().list();
+    List<HistoricCaseInstance> historicCaseInstances = historyService
+        .createHistoricCaseInstanceQuery().list();
     for (HistoricCaseInstance historicCaseInstance : historicCaseInstances) {
       historyService.deleteHistoricCaseInstance(historicCaseInstance.getId());
     }

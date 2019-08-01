@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -30,12 +29,11 @@ public class DbSchemaDrop {
 
   public static void main(String[] args) {
     ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngines.getDefaultProcessEngine();
-    CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object> (){
+    CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
-        commandContext
-          .getSession(PersistenceSession.class)
-          .dbSchemaDrop();
+        commandContext.getSession(PersistenceSession.class).dbSchemaDrop();
         return null;
       }
     });

@@ -34,7 +34,7 @@ public class FailingDeploymentOperationStep extends DeploymentOperationStep {
 
   @Override
   public void performOperationStep(DeploymentOperation operationContext) {
-    
+
     throw new RuntimeException("Big time failure.");
 
   }

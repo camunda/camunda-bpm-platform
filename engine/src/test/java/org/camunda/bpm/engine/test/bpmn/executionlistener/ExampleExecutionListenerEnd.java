@@ -21,7 +21,8 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
 
 /**
- * Simple {@link ExecutionListener} that sets a variable on the execution depending on the execution's state.
+ * Simple {@link ExecutionListener} that sets a variable on the execution depending on the
+ * execution's state.
  * 
  * @author Tobias Metzke
  */
@@ -29,7 +30,8 @@ public class ExampleExecutionListenerEnd implements ExecutionListener {
 
   public void notify(DelegateExecution execution) throws Exception {
     boolean instanceEnded = execution.getBpmnModelElementInstance() instanceof EndEvent;
-    boolean instanceCanceled = execution.getProcessInstance() != null && execution.getProcessInstance().isCanceled();
+    boolean instanceCanceled = execution.getProcessInstance() != null
+        && execution.getProcessInstance().isCanceled();
     if (instanceCanceled) {
       execution.setVariable("canceled", true);
     } else if (instanceEnded) {

@@ -25,12 +25,13 @@ import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
- * Represents the conditional event definition corresponding to the
- * ConditionalEvent defined by the BPMN 2.0 spec.
+ * Represents the conditional event definition corresponding to the ConditionalEvent defined by the
+ * BPMN 2.0 spec.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class ConditionalEventDefinition extends EventSubscriptionDeclaration implements Serializable {
+public class ConditionalEventDefinition extends EventSubscriptionDeclaration
+    implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -89,10 +90,9 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
   }
 
   public boolean shouldEvaluateForVariableEvent(VariableEvent event) {
-    return
-    ((variableName == null || event.getVariableInstance().getName().equals(variableName))
-                                          &&
-    ((variableEvents == null || variableEvents.isEmpty()) || variableEvents.contains(event.getEventName())));
+    return ((variableName == null || event.getVariableInstance().getName().equals(variableName))
+        && ((variableEvents == null || variableEvents.isEmpty())
+            || variableEvents.contains(event.getEventName())));
   }
 
   public boolean evaluate(DelegateExecution execution) {
@@ -110,6 +110,7 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
   }
 
   public boolean tryEvaluate(VariableEvent variableEvent, DelegateExecution execution) {
-    return (variableEvent == null || shouldEvaluateForVariableEvent(variableEvent)) && tryEvaluate(execution);
+    return (variableEvent == null || shouldEvaluateForVariableEvent(variableEvent))
+        && tryEvaluate(execution);
   }
 }

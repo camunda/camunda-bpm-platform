@@ -32,7 +32,8 @@ import org.camunda.bpm.engine.impl.util.CompareUtil;
 /**
  * @author Tom Baeyens
  */
-public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricActivityInstanceQuery, HistoricActivityInstance>
+public class HistoricActivityInstanceQueryImpl
+    extends AbstractQuery<HistoricActivityInstanceQuery, HistoricActivityInstance>
     implements HistoricActivityInstanceQuery {
 
   private static final long serialVersionUID = 1L;
@@ -63,17 +64,15 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getHistoricActivityInstanceManager()
-      .findHistoricActivityInstanceCountByQueryCriteria(this);
+    return commandContext.getHistoricActivityInstanceManager()
+        .findHistoricActivityInstanceCountByQueryCriteria(this);
   }
 
   @Override
   public List<HistoricActivityInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getHistoricActivityInstanceManager()
-      .findHistoricActivityInstancesByQueryCriteria(this, page);
+    return commandContext.getHistoricActivityInstanceManager()
+        .findHistoricActivityInstancesByQueryCriteria(this, page);
   }
 
   public HistoricActivityInstanceQueryImpl processInstanceId(String processInstanceId) {
@@ -123,7 +122,8 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
   public HistoricActivityInstanceQueryImpl completeScope() {
     if (activityInstanceState != null) {
-      throw new ProcessEngineException("Already querying for activity instance state <" + activityInstanceState + ">");
+      throw new ProcessEngineException(
+          "Already querying for activity instance state <" + activityInstanceState + ">");
     }
 
     this.activityInstanceState = ActivityInstanceState.SCOPE_COMPLETE;
@@ -132,7 +132,8 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
   public HistoricActivityInstanceQueryImpl canceled() {
     if (activityInstanceState != null) {
-      throw new ProcessEngineException("Already querying for activity instance state <" + activityInstanceState + ">");
+      throw new ProcessEngineException(
+          "Already querying for activity instance state <" + activityInstanceState + ">");
     }
     this.activityInstanceState = ActivityInstanceState.CANCELED;
     return this;
@@ -167,8 +168,8 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions()
-      || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
-      || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore);
+        || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
+        || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore);
   }
 
   // ordering /////////////////////////////////////////////////////////////////
@@ -242,45 +243,59 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public String getExecutionId() {
     return executionId;
   }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   public String getActivityId() {
     return activityId;
   }
+
   public String getActivityName() {
     return activityName;
   }
+
   public String getActivityType() {
     return activityType;
   }
+
   public String getAssignee() {
     return assignee;
   }
+
   public boolean isFinished() {
     return finished;
   }
+
   public boolean isUnfinished() {
     return unfinished;
   }
+
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
+
   public Date getStartedAfter() {
     return startedAfter;
   }
+
   public Date getStartedBefore() {
     return startedBefore;
   }
+
   public Date getFinishedAfter() {
     return finishedAfter;
   }
+
   public Date getFinishedBefore() {
     return finishedBefore;
   }
+
   public ActivityInstanceState getActivityInstanceState() {
     return activityInstanceState;
   }

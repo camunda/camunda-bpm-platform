@@ -30,7 +30,7 @@ public class AssertUtil {
    * Drop milliseconds since older MySQL versions cannot store them
    */
   public static void assertEqualsSecondPrecision(Date expected, Date actual) {
-    Assert.assertEquals("expected " + expected + " but got " + actual,
-        expected.getTime() / 1000L, actual.getTime() / 1000L);
+    Assert.assertEquals("expected " + expected + " but got " + actual, expected.getTime() / 1000L,
+        actual.getTime() / 1000L);
   }
 }

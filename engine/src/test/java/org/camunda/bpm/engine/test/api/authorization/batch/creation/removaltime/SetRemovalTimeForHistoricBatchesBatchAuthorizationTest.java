@@ -38,50 +38,40 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSp
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeForHistoricBatchesBatchAuthorizationTest extends BatchCreationAuthorizationTest {
+public class SetRemovalTimeForHistoricBatchesBatchAuthorizationTest
+    extends BatchCreationAuthorizationTest {
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
         scenario()
             .withAuthorizations(
-              grant(Resources.BATCH, "batchId", "userId", Permissions.READ_HISTORY)
-            )
-            .failsDueToRequired(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)
-            ),
+                grant(Resources.BATCH, "batchId", "userId", Permissions.READ_HISTORY))
+            .failsDueToRequired(grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+                grant(Resources.BATCH, "batchId", "userId",
+                    BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)),
+        scenario().withAuthorizations(grant(Resources.BATCH, "batchId", "userId",
+            Permissions.READ_HISTORY, Permissions.CREATE)),
         scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.READ_HISTORY, Permissions.CREATE)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.READ_HISTORY, BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)
-            ).succeeds()
-    );
+            .withAuthorizations(grant(Resources.BATCH, "batchId", "userId",
+                Permissions.READ_HISTORY, BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME))
+            .succeeds());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldAuthorizeSetRemovalTimeForHistoricBatchesBatch() {
     // given
-    String batchId = engineRule.getHistoryService()
-      .deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstance.getId()), "aDeleteReason").getId();
+    String batchId = engineRule.getHistoryService().deleteHistoricProcessInstancesAsync(
+        Collections.singletonList(processInstance.getId()), "aDeleteReason").getId();
 
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("batchId", "*")
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", "*").start();
 
     HistoricBatchQuery query = historyService.createHistoricBatchQuery().batchId(batchId);
 
     // when
-    historyService.setRemovalTimeToHistoricBatches()
-      .absoluteRemovalTime(new Date())
-      .byQuery(query)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricBatches().absoluteRemovalTime(new Date()).byQuery(query)
+        .executeAsync();
 
     // then
     authRule.assertScenario(scenario);

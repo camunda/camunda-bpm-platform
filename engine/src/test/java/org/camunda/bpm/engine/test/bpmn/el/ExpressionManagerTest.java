@@ -38,7 +38,8 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
     vars.put("aString", "abcdefgh");
     runtimeService.startProcessInstanceByKey("methodExpressionProcess", vars);
 
-    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("methodExpressionProcess").count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("methodExpressionProcess").count());
   }
 
   @Deployment
@@ -46,7 +47,8 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
     Map<String, Object> vars = new HashMap<String, Object>();
 
     vars.put("myVar", new ExecutionTestVariable());
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExecutionAvailableProcess", vars);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("testExecutionAvailableProcess", vars);
 
     // Check of the testMethod has been called with the current execution
     String value = (String) runtimeService.getVariable(processInstance.getId(), "testVar");
@@ -59,7 +61,8 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
     try {
       // Setup authentication
       identityService.setAuthenticatedUserId("frederik");
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testAuthenticatedUserIdAvailableProcess");
+      ProcessInstance processInstance = runtimeService
+          .startProcessInstanceByKey("testAuthenticatedUserIdAvailableProcess");
 
       // Check if the variable that has been set in service-task is the authenticated user
       String value = (String) runtimeService.getVariable(processInstance.getId(), "theUser");
@@ -81,7 +84,8 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
     assertEquals("michael", task.getAssignee());
 
     variables.put("assignee", "johnny");
-    ProcessInstance secondInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    ProcessInstance secondInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        variables);
     task = taskService.createTaskQuery().processInstanceId(secondInstance.getId()).singleResult();
     assertEquals("johnny", task.getAssignee());
   }

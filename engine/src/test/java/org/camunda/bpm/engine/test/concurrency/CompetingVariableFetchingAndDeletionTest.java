@@ -29,43 +29,21 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 /**
- * This test makes sure that if one thread loads a variable
- * of type object, it does not fail with a OLE if the variable is also
- * concurrently deleted.
+ * This test makes sure that if one thread loads a variable of type object, it does not fail with a
+ * OLE if the variable is also concurrently deleted.
  *
- * Some context: this failed if the variable instance entity was first loaded,
- * and, before loading the byte array, both the variable and the byte array were
- * deleted by a concurrent transaction AND that transaction was comitted, before
- * the bytearray was loaded.
- * => loading the byte array returned null which triggered setting to null the
- * byteArrayId value on the VariableInstanceEntity which in turn triggered an
- * update of the variable instance entity itself which failed with OLE because
- * the VariableInstanceEntity was already deleted.
+ * Some context: this failed if the variable instance entity was first loaded, and, before loading
+ * the byte array, both the variable and the byte array were deleted by a concurrent transaction AND
+ * that transaction was comitted, before the bytearray was loaded. => loading the byte array
+ * returned null which triggered setting to null the byteArrayId value on the VariableInstanceEntity
+ * which in turn triggered an update of the variable instance entity itself which failed with OLE
+ * because the VariableInstanceEntity was already deleted.
  *
- * +
- * |
- * |    Test Thread           Async Thread
- * |   +-----------+         +------------+
- * |      start PI
- * |      (with var)               +
- * |         +                     |
- * |         |                     v
- * |         |                 fetch VarInst
- * |         |                 (not byte array)
- * |         |                     +
- * |         v                     |
- * |      delete PI                |
- * |         +                     v
- * |         |                 fetch byte array (=>null)
- * |         |                     +
- * |         |                     |
- * |         |                     v
- * |         |                 flush()
- * |         |                 (this must not perform
- * |         v                 update to VarInst)
- * v  time
-
+ * + | | Test Thread Async Thread | +-----------+ +------------+ | start PI | (with var) + | + | | |
+ * v | | fetch VarInst | | (not byte array) | | + | v | | delete PI | | + v | | fetch byte array
+ * (=>null) | | + | | | | | v | | flush() | | (this must not perform | v update to VarInst) v time
  *
+ * 
  * @author Daniel Meyer
  *
  */
@@ -75,14 +53,11 @@ public class CompetingVariableFetchingAndDeletionTest extends ConcurrencyTestCas
 
   public void testConcurrentFetchAndDelete() {
 
-    deployment(createExecutableProcess("test")
-        .startEvent()
-          .userTask()
-        .endEvent()
-        .done());
+    deployment(createExecutableProcess("test").startEvent().userTask().endEvent().done());
 
     final List<String> listVar = Arrays.asList("a", "b");
-    String pid = runtimeService.startProcessInstanceByKey("test", createVariables().putValue("listVar", listVar)).getId();
+    String pid = runtimeService
+        .startProcessInstanceByKey("test", createVariables().putValue("listVar", listVar)).getId();
 
     // start a controlled Fetch variable command
     asyncThread = executeControllableCommand(new FetchVariableCmd(pid, "listVar"));
@@ -114,15 +89,16 @@ public class CompetingVariableFetchingAndDeletionTest extends ConcurrencyTestCas
     public Void execute(CommandContext commandContext) {
 
       ExecutionEntity execution = commandContext.getExecutionManager()
-        .findExecutionById(executionId);
+          .findExecutionById(executionId);
 
       // fetch the variable instance but not the value (make sure the byte array is lazily fetched)
-      VariableInstanceEntity varInstance = (VariableInstanceEntity) execution.getVariableInstanceLocal(varName);
+      VariableInstanceEntity varInstance = (VariableInstanceEntity) execution
+          .getVariableInstanceLocal(varName);
       String byteArrayValueId = varInstance.getByteArrayValueId();
       assertNotNull("Byte array id is expected to be not null", byteArrayValueId);
 
       CachedDbEntity cachedByteArray = commandContext.getDbEntityManager().getDbEntityCache()
-        .getCachedEntity(ByteArrayEntity.class, byteArrayValueId);
+          .getCachedEntity(ByteArrayEntity.class, byteArrayValueId);
 
       assertNull("Byte array is expected to be not fetched yet / lazily fetched.", cachedByteArray);
 

@@ -30,7 +30,7 @@ public class ExecuteJobHelper {
 
     @Override
     public void exceptionWhileExecutingJob(String jobId, Throwable exception) {
-      
+
       // Default behavior, just log exception
       LOG.exceptionWhileExecutingJob(jobId, exception);
     }
@@ -41,11 +41,13 @@ public class ExecuteJobHelper {
 
     JobFailureCollector jobFailureCollector = new JobFailureCollector(jobId);
 
-    executeJob(jobId, commandExecutor, jobFailureCollector, new ExecuteJobsCmd(jobId, jobFailureCollector));
+    executeJob(jobId, commandExecutor, jobFailureCollector,
+        new ExecuteJobsCmd(jobId, jobFailureCollector));
 
   }
 
-  public static void executeJob(String nextJobId, CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector, Command<Void> cmd) {
+  public static void executeJob(String nextJobId, CommandExecutor commandExecutor,
+      JobFailureCollector jobFailureCollector, Command<Void> cmd) {
     try {
       commandExecutor.execute(cmd);
     } catch (RuntimeException exception) {
@@ -61,14 +63,18 @@ public class ExecuteJobHelper {
     }
   }
 
-  protected static void invokeJobListener(CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {
-    if(jobFailureCollector.getJobId() != null) {
+  protected static void invokeJobListener(CommandExecutor commandExecutor,
+      JobFailureCollector jobFailureCollector) {
+    if (jobFailureCollector.getJobId() != null) {
       if (jobFailureCollector.getFailure() != null) {
-        // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
+        // the failed job listener is responsible for decrementing the retries and logging the
+        // exception to the DB.
 
-        FailedJobListener failedJobListener = createFailedJobListener(commandExecutor, jobFailureCollector.getFailure(), jobFailureCollector.getJobId());
+        FailedJobListener failedJobListener = createFailedJobListener(commandExecutor,
+            jobFailureCollector.getFailure(), jobFailureCollector.getJobId());
 
-        OptimisticLockingException exception = callFailedJobListenerWithRetries(commandExecutor, failedJobListener);
+        OptimisticLockingException exception = callFailedJobListenerWithRetries(commandExecutor,
+            failedJobListener);
         if (exception != null) {
           throw exception;
         }
@@ -85,7 +91,8 @@ public class ExecuteJobHelper {
    *
    * @return exception or null if succeeded
    */
-  private static OptimisticLockingException callFailedJobListenerWithRetries(CommandExecutor commandExecutor, FailedJobListener failedJobListener) {
+  private static OptimisticLockingException callFailedJobListenerWithRetries(
+      CommandExecutor commandExecutor, FailedJobListener failedJobListener) {
     try {
       commandExecutor.execute(failedJobListener);
       return null;
@@ -98,16 +105,18 @@ public class ExecuteJobHelper {
     }
   }
 
-  protected static void handleJobFailure(final String nextJobId, final JobFailureCollector jobFailureCollector, Throwable exception) {
+  protected static void handleJobFailure(final String nextJobId,
+      final JobFailureCollector jobFailureCollector, Throwable exception) {
     jobFailureCollector.setFailure(exception);
   }
 
-
-  protected static FailedJobListener createFailedJobListener(CommandExecutor commandExecutor, Throwable exception, String jobId) {
+  protected static FailedJobListener createFailedJobListener(CommandExecutor commandExecutor,
+      Throwable exception, String jobId) {
     return new FailedJobListener(commandExecutor, jobId, exception);
   }
 
-  protected static SuccessfulJobListener createSuccessfulJobListener(CommandExecutor commandExecutor) {
+  protected static SuccessfulJobListener createSuccessfulJobListener(
+      CommandExecutor commandExecutor) {
     return new SuccessfulJobListener();
   }
 

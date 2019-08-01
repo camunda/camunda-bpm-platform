@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine.impl.digest;
 
 /**
- * <p>{@link PasswordEncryptor} implementation using base64 encoded SHA password hashes</p>
+ * <p>
+ * {@link PasswordEncryptor} implementation using base64 encoded SHA password hashes
+ * </p>
  *
  * @author Daniel Meyer
  *

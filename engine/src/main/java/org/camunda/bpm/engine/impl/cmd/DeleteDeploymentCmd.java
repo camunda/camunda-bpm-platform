@@ -53,7 +53,8 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
 
-  public DeleteDeploymentCmd(String deploymentId, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
+  public DeleteDeploymentCmd(String deploymentId, boolean cascade, boolean skipCustomListeners,
+      boolean skipIoMappings) {
     this.deploymentId = deploymentId;
     this.cascade = cascade;
     this.skipCustomListeners = skipCustomListeners;
@@ -63,25 +64,27 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
   public Void execute(final CommandContext commandContext) {
     ensureNotNull("deploymentId", deploymentId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkDeleteDeployment(deploymentId);
     }
 
     UserOperationLogManager logManager = commandContext.getOperationLogManager();
-    List<PropertyChange> propertyChanges = Arrays.asList(new PropertyChange("cascade", null, cascade));
-    logManager.logDeploymentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, deploymentId, propertyChanges);
+    List<PropertyChange> propertyChanges = Arrays
+        .asList(new PropertyChange("cascade", null, cascade));
+    logManager.logDeploymentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, deploymentId,
+        propertyChanges);
 
-    commandContext
-      .getDeploymentManager()
-      .deleteDeployment(deploymentId, cascade, skipCustomListeners, skipIoMappings);
+    commandContext.getDeploymentManager().deleteDeployment(deploymentId, cascade,
+        skipCustomListeners, skipIoMappings);
 
     ProcessApplicationReference processApplicationReference = Context
-      .getProcessEngineConfiguration()
-      .getProcessApplicationManager()
-      .getProcessApplicationForDeployment(deploymentId);
+        .getProcessEngineConfiguration().getProcessApplicationManager()
+        .getProcessApplicationForDeployment(deploymentId);
 
-    DeleteDeploymentFailListener listener = new DeleteDeploymentFailListener(deploymentId, processApplicationReference,
-      Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew());
+    DeleteDeploymentFailListener listener = new DeleteDeploymentFailListener(deploymentId,
+        processApplicationReference,
+        Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew());
 
     try {
       commandContext.runWithoutAuthorization(new Callable<Void>() {
@@ -93,14 +96,14 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
       });
     } finally {
       try {
-        commandContext.getTransactionContext().addTransactionListener(TransactionState.ROLLED_BACK, listener);
-      }
-      catch (Exception e) {
-        TX_LOG.debugTransactionOperation("Could not register transaction synchronization. Probably the TX has already been rolled back by application code.");
+        commandContext.getTransactionContext().addTransactionListener(TransactionState.ROLLED_BACK,
+            listener);
+      } catch (Exception e) {
+        TX_LOG.debugTransactionOperation(
+            "Could not register transaction synchronization. Probably the TX has already been rolled back by application code.");
         listener.execute(commandContext);
       }
     }
-
 
     return null;
   }

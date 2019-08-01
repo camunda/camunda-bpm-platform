@@ -31,18 +31,21 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 public interface MigrationPlanExecutionBuilder {
 
   /**
-   * @param processInstanceIds the process instance ids to migrate.
+   * @param processInstanceIds
+   *          the process instance ids to migrate.
    */
   MigrationPlanExecutionBuilder processInstanceIds(List<String> processInstanceIds);
 
   /**
-   * @param processInstanceIds the process instance ids to migrate.
+   * @param processInstanceIds
+   *          the process instance ids to migrate.
    */
   MigrationPlanExecutionBuilder processInstanceIds(String... processInstanceIds);
 
   /**
-   * @param processInstanceQuery a query which selects the process instances to migrate.
-   *   Query results are restricted to process instances for which the user has {@link Permissions#READ} permission.
+   * @param processInstanceQuery
+   *          a query which selects the process instances to migrate. Query results are restricted
+   *          to process instances for which the user has {@link Permissions#READ} permission.
    */
   MigrationPlanExecutionBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery);
 
@@ -59,29 +62,35 @@ public interface MigrationPlanExecutionBuilder {
   /**
    * Execute the migration synchronously.
    *
-   * @throws MigratingProcessInstanceValidationException if the migration plan contains
-   *  instructions that are not applicable to any of the process instances
+   * @throws MigratingProcessInstanceValidationException
+   *           if the migration plan contains instructions that are not applicable to any of the
+   *           process instances
    * @throws AuthorizationException
-   *   if the user has not all of the following permissions
-   *   <ul>
-   *      <li>if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or</li>
-   *      <li>no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
-   *   </ul>
+   *           if the user has not all of the following permissions
+   *           <ul>
+   *           <li>if the user has no {@link Permissions#UPDATE} permission on
+   *           {@link Resources#PROCESS_INSTANCE} or</li>
+   *           <li>no {@link Permissions#UPDATE_INSTANCE} permission on
+   *           {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void execute();
 
   /**
-   * Execute the migration asynchronously as batch. The returned batch
-   * can be used to track the progress of the migration.
+   * Execute the migration asynchronously as batch. The returned batch can be used to track the
+   * progress of the migration.
    *
    * @return the batch which executes the migration asynchronously.
    *
    * @throws AuthorizationException
-   *   if the user has not all of the following permissions
-   *   <ul>
-   *     <li>{@link Permissions#MIGRATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION} for source and target</li>
-   *     <li>{@link Permissions#CREATE} or {@link BatchPermissions#CREATE_BATCH_MIGRATE_PROCESS_INSTANCES} permission on {@link Resources#BATCH}</li>
-   *   </ul>
+   *           if the user has not all of the following permissions
+   *           <ul>
+   *           <li>{@link Permissions#MIGRATE_INSTANCE} permission on
+   *           {@link Resources#PROCESS_DEFINITION} for source and target</li>
+   *           <li>{@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_MIGRATE_PROCESS_INSTANCES} permission on
+   *           {@link Resources#BATCH}</li>
+   *           </ul>
    */
   Batch executeAsync();
 }

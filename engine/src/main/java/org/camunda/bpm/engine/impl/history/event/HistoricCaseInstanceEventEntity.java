@@ -47,7 +47,7 @@ public class HistoricCaseInstanceEventEntity extends HistoricScopeInstanceEvent 
   /** the process instance which started this case instance */
   protected String superProcessInstanceId;
 
-  /** id of the tenant which belongs to the case instance  */
+  /** id of the tenant which belongs to the case instance */
   protected String tenantId;
 
   public String getBusinessKey() {
@@ -140,20 +140,12 @@ public class HistoricCaseInstanceEventEntity extends HistoricScopeInstanceEvent 
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-      + "[businessKey=" + businessKey
-      + ", startUserId=" + createUserId
-      + ", superCaseInstanceId=" + superCaseInstanceId
-      + ", superProcessInstanceId=" + superProcessInstanceId
-      + ", durationInMillis=" + durationInMillis
-      + ", createTime=" + startTime
-      + ", closeTime=" + endTime
-      + ", id=" + id
-      + ", eventType=" + eventType
-      + ", caseExecutionId=" + caseExecutionId
-      + ", caseDefinitionId=" + caseDefinitionId
-      + ", caseInstanceId=" + caseInstanceId
-      + ", tenantId=" + tenantId
-      + "]";
+    return this.getClass().getSimpleName() + "[businessKey=" + businessKey + ", startUserId="
+        + createUserId + ", superCaseInstanceId=" + superCaseInstanceId
+        + ", superProcessInstanceId=" + superProcessInstanceId + ", durationInMillis="
+        + durationInMillis + ", createTime=" + startTime + ", closeTime=" + endTime + ", id=" + id
+        + ", eventType=" + eventType + ", caseExecutionId=" + caseExecutionId
+        + ", caseDefinitionId=" + caseDefinitionId + ", caseInstanceId=" + caseInstanceId
+        + ", tenantId=" + tenantId + "]";
   }
 }

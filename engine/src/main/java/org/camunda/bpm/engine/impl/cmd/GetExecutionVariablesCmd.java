@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -41,7 +40,8 @@ public class GetExecutionVariablesCmd implements Command<VariableMap>, Serializa
   protected boolean isLocal;
   protected boolean deserializeValues;
 
-  public GetExecutionVariablesCmd(String executionId, Collection<String> variableNames, boolean isLocal, boolean deserializeValues) {
+  public GetExecutionVariablesCmd(String executionId, Collection<String> variableNames,
+      boolean isLocal, boolean deserializeValues) {
     this.executionId = executionId;
     this.variableNames = variableNames;
     this.isLocal = isLocal;
@@ -51,9 +51,7 @@ public class GetExecutionVariablesCmd implements Command<VariableMap>, Serializa
   public VariableMap execute(CommandContext commandContext) {
     ensureNotNull("executionId", executionId);
 
-    ExecutionEntity execution = commandContext
-      .getExecutionManager()
-      .findExecutionById(executionId);
+    ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(executionId);
 
     ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 
@@ -67,8 +65,10 @@ public class GetExecutionVariablesCmd implements Command<VariableMap>, Serializa
     return executionVariables;
   }
 
-  protected void checkGetExecutionVariables(ExecutionEntity execution, CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+  protected void checkGetExecutionVariables(ExecutionEntity execution,
+      CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessInstanceVariable(execution);
     }
   }

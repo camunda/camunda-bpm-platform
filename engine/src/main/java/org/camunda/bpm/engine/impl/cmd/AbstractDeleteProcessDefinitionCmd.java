@@ -40,25 +40,31 @@ public abstract class AbstractDeleteProcessDefinitionCmd implements Command<Void
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
 
-  protected void deleteProcessDefinitionCmd(CommandContext commandContext, String processDefinitionId, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
+  protected void deleteProcessDefinitionCmd(CommandContext commandContext,
+      String processDefinitionId, boolean cascade, boolean skipCustomListeners,
+      boolean skipIoMappings) {
     ensureNotNull("processDefinitionId", processDefinitionId);
 
     ProcessDefinition processDefinition = commandContext.getProcessDefinitionManager()
-      .findLatestProcessDefinitionById(processDefinitionId);
-    ensureNotNull(NotFoundException.class, "No process definition found with id '" + processDefinitionId + "'",
-      "processDefinition", processDefinition);
+        .findLatestProcessDefinitionById(processDefinitionId);
+    ensureNotNull(NotFoundException.class,
+        "No process definition found with id '" + processDefinitionId + "'", "processDefinition",
+        processDefinition);
 
-    List<CommandChecker> commandCheckers = commandContext.getProcessEngineConfiguration().getCommandCheckers();
-    for (CommandChecker checker: commandCheckers) {
+    List<CommandChecker> commandCheckers = commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers();
+    for (CommandChecker checker : commandCheckers) {
       checker.checkDeleteProcessDefinitionById(processDefinitionId);
     }
 
     UserOperationLogManager userOperationLogManager = commandContext.getOperationLogManager();
-    userOperationLogManager.logProcessDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processDefinitionId,
-      processDefinition.getKey(), new PropertyChange("cascade", false, cascade));
+    userOperationLogManager.logProcessDefinitionOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE, processDefinitionId,
+        processDefinition.getKey(), new PropertyChange("cascade", false, cascade));
 
     ProcessDefinitionManager definitionManager = commandContext.getProcessDefinitionManager();
-    definitionManager.deleteProcessDefinition(processDefinition, processDefinitionId, cascade, cascade, skipCustomListeners, skipIoMappings);
+    definitionManager.deleteProcessDefinition(processDefinition, processDefinitionId, cascade,
+        cascade, skipCustomListeners, skipIoMappings);
   }
 
 }

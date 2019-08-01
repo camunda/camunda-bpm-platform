@@ -50,7 +50,8 @@ public class MigrationPlanAssert {
 
   public MigrationPlanAssert hasSourceProcessDefinitionId(String sourceProcessDefinitionId) {
     isNotNull();
-    assertEquals("The source process definition id does not match", sourceProcessDefinitionId, actual.getSourceProcessDefinitionId());
+    assertEquals("The source process definition id does not match", sourceProcessDefinitionId,
+        actual.getSourceProcessDefinitionId());
 
     return this;
   }
@@ -61,7 +62,8 @@ public class MigrationPlanAssert {
 
   public MigrationPlanAssert hasTargetProcessDefinitionId(String targetProcessDefinitionId) {
     isNotNull();
-    assertEquals("The target process definition id does not match", targetProcessDefinitionId, actual.getTargetProcessDefinitionId());
+    assertEquals("The target process definition id does not match", targetProcessDefinitionId,
+        actual.getTargetProcessDefinitionId());
 
     return this;
   }
@@ -69,7 +71,8 @@ public class MigrationPlanAssert {
   public MigrationPlanAssert hasInstructions(MigrationInstructionAssert... instructionAsserts) {
     isNotNull();
 
-    List<MigrationInstruction> notExpected = new ArrayList<MigrationInstruction>(actual.getInstructions());
+    List<MigrationInstruction> notExpected = new ArrayList<MigrationInstruction>(
+        actual.getInstructions());
     List<MigrationInstructionAssert> notFound = new ArrayList<MigrationInstructionAssert>();
     Collections.addAll(notFound, instructionAsserts);
 
@@ -79,18 +82,22 @@ public class MigrationPlanAssert {
           notFound.remove(instructionAssert);
           notExpected.remove(instruction);
           assertEquals("Target activity ids do not match for instruction " + instruction,
-            instructionAssert.targetActivityId, instruction.getTargetActivityId());
+              instructionAssert.targetActivityId, instruction.getTargetActivityId());
           if (instructionAssert.updateEventTrigger != null) {
-            assertEquals("Expected instruction to update event trigger: " + instructionAssert.updateEventTrigger + " but is: " + instruction.isUpdateEventTrigger(),
-              instructionAssert.updateEventTrigger, instruction.isUpdateEventTrigger());
+            assertEquals(
+                "Expected instruction to update event trigger: "
+                    + instructionAssert.updateEventTrigger + " but is: "
+                    + instruction.isUpdateEventTrigger(),
+                instructionAssert.updateEventTrigger, instruction.isUpdateEventTrigger());
           }
         }
       }
     }
 
-    if (!notExpected.isEmpty() || ! notFound.isEmpty()) {
+    if (!notExpected.isEmpty() || !notFound.isEmpty()) {
       StringBuilder builder = new StringBuilder();
-      builder.append("\nActual migration instructions:\n\t").append(actual.getInstructions()).append("\n");
+      builder.append("\nActual migration instructions:\n\t").append(actual.getInstructions())
+          .append("\n");
       if (!notExpected.isEmpty()) {
         builder.append("Unexpected migration instructions:\n\t").append(notExpected).append("\n");
       }
@@ -107,7 +114,8 @@ public class MigrationPlanAssert {
     isNotNull();
 
     List<MigrationInstruction> instructions = actual.getInstructions();
-    assertTrue("Expected migration plan has no instructions but has: " + instructions, instructions.isEmpty());
+    assertTrue("Expected migration plan has no instructions but has: " + instructions,
+        instructions.isEmpty());
 
     return this;
   }

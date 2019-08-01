@@ -40,11 +40,10 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 /**
- * Represents a test class, which uses parse listeners
- * to delete job definitions for async activities.
- * The parse listeners are called after the bpmn xml was parsed.
- * They set the activity asyncBefore property to false. In this case
- * there should delete some job declarations for the activity which was async before.
+ * Represents a test class, which uses parse listeners to delete job definitions for async
+ * activities. The parse listeners are called after the bpmn xml was parsed. They set the activity
+ * asyncBefore property to false. In this case there should delete some job declarations for the
+ * activity which was async before.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
@@ -55,12 +54,14 @@ public class JobDefinitionDeletionWithParseListenerTest {
    */
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       List<BpmnParseListener> listeners = new ArrayList<BpmnParseListener>();
-      listeners.add(new AbstractBpmnParseListener(){
+      listeners.add(new AbstractBpmnParseListener() {
 
         @Override
-        public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
+        public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope,
+            ActivityImpl activity) {
           activity.setAsyncBefore(false);
         }
       });
@@ -83,29 +84,32 @@ public class JobDefinitionDeletionWithParseListenerTest {
 
   @Test
   public void testDeleteNonExistingJobDefinitionWithParseListener() {
-    //given
+    // given
     String modelFileName = "jobCreationWithinParseListener.bpmn20.xml";
-    InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
-    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
-    //when the asyncBefore is set to false in the parse listener
+    InputStream in = JobDefinitionCreationWithParseListenerTest.class
+        .getResourceAsStream(modelFileName);
+    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment()
+        .addInputStream(modelFileName, in);
+    // when the asyncBefore is set to false in the parse listener
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);
-    //then there exists no job definition
+    // then there exists no job definition
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertNull(query.singleResult());
   }
 
-
   @Test
   public void testDeleteJobDefinitionWithParseListenerAndAsyncInXml() {
-    //given the asyncBefore is set in the xml
+    // given the asyncBefore is set in the xml
     String modelFileName = "jobAsyncBeforeCreationWithinParseListener.bpmn20.xml";
-    InputStream in = JobDefinitionCreationWithParseListenerTest.class.getResourceAsStream(modelFileName);
-    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment().addInputStream(modelFileName, in);
-    //when the asyncBefore is set to false in the parse listener
+    InputStream in = JobDefinitionCreationWithParseListenerTest.class
+        .getResourceAsStream(modelFileName);
+    DeploymentBuilder builder = engineRule.getRepositoryService().createDeployment()
+        .addInputStream(modelFileName, in);
+    // when the asyncBefore is set to false in the parse listener
     Deployment deployment = builder.deploy();
     engineRule.manageDeployment(deployment);
-    //then there exists no job definition
+    // then there exists no job definition
     JobDefinitionQuery query = engineRule.getManagementService().createJobDefinitionQuery();
     assertNull(query.singleResult());
   }

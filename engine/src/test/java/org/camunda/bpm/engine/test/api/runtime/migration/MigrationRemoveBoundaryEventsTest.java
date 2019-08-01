@@ -53,19 +53,15 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveMessageBoundaryEventFromUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
-      .activityBuilder("userTask")
-        .boundaryEvent("boundary").message(MESSAGE_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
+        modify(ProcessModels.ONE_TASK_PROCESS).activityBuilder("userTask").boundaryEvent("boundary")
+            .message(MESSAGE_NAME).userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -81,19 +77,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveMessageBoundaryEventFromScopeUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .activityBuilder("userTask")
-        .boundaryEvent("boundary").message(MESSAGE_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SCOPE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_PROCESS).activityBuilder("userTask")
+            .boundaryEvent("boundary").message(MESSAGE_NAME).userTask(AFTER_BOUNDARY_TASK)
+            .endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SCOPE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -109,20 +102,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveMessageBoundaryEventFromConcurrentUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .activityBuilder("userTask1")
-        .boundaryEvent("boundary").message(MESSAGE_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
+            .activityBuilder("userTask1").boundaryEvent("boundary").message(MESSAGE_NAME)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -139,20 +128,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveMessageBoundaryEventFromConcurrentScopeUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .activityBuilder("userTask1")
-        .boundaryEvent("boundary").message(MESSAGE_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SCOPE_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
+            .activityBuilder("userTask1").boundaryEvent("boundary").message(MESSAGE_NAME)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_SCOPE_TASKS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -169,20 +154,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveMessageBoundaryEventFromSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess")
-        .boundaryEvent("boundary").message(MESSAGE_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").boundaryEvent("boundary").message(MESSAGE_NAME)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -198,20 +179,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveMessageBoundaryEventFromSubProcessWithScopeUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess")
-        .boundaryEvent("boundary").message(MESSAGE_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").boundaryEvent("boundary").message(MESSAGE_NAME)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -227,22 +204,17 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveMessageBoundaryEventFromParallelSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess1")
-        .boundaryEvent("boundary").message(MESSAGE_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess1").boundaryEvent("boundary").message(MESSAGE_NAME)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess1", "subProcess1")
-      .mapActivities("subProcess2", "subProcess2")
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess1", "subProcess1").mapActivities("subProcess2", "subProcess2")
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -259,20 +231,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveMessageBoundaryEventFromUserTaskInSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("userTask")
-        .boundaryEvent("boundary").message(MESSAGE_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS).activityBuilder("userTask")
+            .boundaryEvent("boundary").message(MESSAGE_NAME).userTask(AFTER_BOUNDARY_TASK)
+            .endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -288,19 +256,15 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveSignalBoundaryEventFromUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
-      .activityBuilder("userTask")
-        .boundaryEvent("boundary").signal(SIGNAL_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
+        modify(ProcessModels.ONE_TASK_PROCESS).activityBuilder("userTask").boundaryEvent("boundary")
+            .signal(SIGNAL_NAME).userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -316,19 +280,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveSignalBoundaryEventFromScopeUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .activityBuilder("userTask")
-        .boundaryEvent("boundary").signal(SIGNAL_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SCOPE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_PROCESS).activityBuilder("userTask")
+            .boundaryEvent("boundary").signal(SIGNAL_NAME).userTask(AFTER_BOUNDARY_TASK).endEvent()
+            .done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SCOPE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -344,20 +305,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveSignalBoundaryEventFromConcurrentUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .activityBuilder("userTask1")
-        .boundaryEvent("boundary").signal(SIGNAL_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
+            .activityBuilder("userTask1").boundaryEvent("boundary").signal(SIGNAL_NAME)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -374,20 +331,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveSignalBoundaryEventFromConcurrentScopeUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .activityBuilder("userTask1")
-        .boundaryEvent("boundary").signal(SIGNAL_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SCOPE_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
+            .activityBuilder("userTask1").boundaryEvent("boundary").signal(SIGNAL_NAME)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_SCOPE_TASKS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -404,20 +357,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveSignalBoundaryEventFromSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess")
-        .boundaryEvent("boundary").signal(SIGNAL_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").boundaryEvent("boundary").signal(SIGNAL_NAME)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -433,20 +382,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveSignalBoundaryEventFromSubProcessWithScopeUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess")
-        .boundaryEvent("boundary").signal(SIGNAL_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").boundaryEvent("boundary").signal(SIGNAL_NAME)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -462,22 +407,17 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveSignalBoundaryEventFromParallelSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess1")
-        .boundaryEvent("boundary").signal(SIGNAL_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess1").boundaryEvent("boundary").signal(SIGNAL_NAME)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess1", "subProcess1")
-      .mapActivities("subProcess2", "subProcess2")
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess1", "subProcess1").mapActivities("subProcess2", "subProcess2")
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -494,20 +434,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveSignalBoundaryEventFromUserTaskInSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("userTask")
-        .boundaryEvent("boundary").signal(SIGNAL_NAME)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS).activityBuilder("userTask")
+            .boundaryEvent("boundary").signal(SIGNAL_NAME).userTask(AFTER_BOUNDARY_TASK).endEvent()
+            .done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -523,19 +459,15 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveTimerBoundaryEventFromUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
-      .activityBuilder("userTask")
-        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
+        modify(ProcessModels.ONE_TASK_PROCESS).activityBuilder("userTask").boundaryEvent("boundary")
+            .timerWithDate(TIMER_DATE).userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -551,19 +483,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveTimerBoundaryEventFromScopeUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_PROCESS)
-      .activityBuilder("userTask")
-        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SCOPE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_PROCESS).activityBuilder("userTask")
+            .boundaryEvent("boundary").timerWithDate(TIMER_DATE).userTask(AFTER_BOUNDARY_TASK)
+            .endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SCOPE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -579,20 +508,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveTimerBoundaryEventFromConcurrentUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .activityBuilder("userTask1")
-        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
+            .activityBuilder("userTask1").boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -609,20 +534,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveTimerBoundaryEventFromConcurrentScopeUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
-      .activityBuilder("userTask1")
-        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SCOPE_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_SCOPE_TASKS)
+            .activityBuilder("userTask1").boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_SCOPE_TASKS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -639,20 +560,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveTimerBoundaryEventFromSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess")
-        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -668,20 +585,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveTimerBoundaryEventFromSubProcessWithScopeUserTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess")
-        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -697,22 +610,17 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveTimerBoundaryEventFromParallelSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess1")
-        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess1").boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+            .userTask(AFTER_BOUNDARY_TASK).endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess1", "subProcess1")
-      .mapActivities("subProcess2", "subProcess2")
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess1", "subProcess1").mapActivities("subProcess2", "subProcess2")
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -729,20 +637,16 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveTimerBoundaryEventFromUserTaskInSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("userTask")
-        .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
-        .userTask(AFTER_BOUNDARY_TASK)
-        .endEvent()
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS).activityBuilder("userTask")
+            .boundaryEvent("boundary").timerWithDate(TIMER_DATE).userTask(AFTER_BOUNDARY_TASK)
+            .endEvent().done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -758,22 +662,17 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveMultipleBoundaryEvents() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess")
-        .boundaryEvent("timerBoundary").timerWithDate(TIMER_DATE)
-      .moveToActivity("userTask")
-        .boundaryEvent("messageBoundary").message(MESSAGE_NAME)
-      .moveToActivity("userTask")
-        .boundaryEvent("signalBoundary").signal(SIGNAL_NAME)
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").boundaryEvent("timerBoundary").timerWithDate(TIMER_DATE)
+            .moveToActivity("userTask").boundaryEvent("messageBoundary").message(MESSAGE_NAME)
+            .moveToActivity("userTask").boundaryEvent("signalBoundary").signal(SIGNAL_NAME).done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -791,18 +690,15 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveErrorBoundaryEventFromSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess")
-      .boundaryEvent().error(ERROR_CODE)
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").boundaryEvent().error(ERROR_CODE).done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -815,18 +711,15 @@ public class MigrationRemoveBoundaryEventsTest {
   @Test
   public void testRemoveEscalationBoundaryEventFromSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("subProcess")
-      .boundaryEvent().escalation(ESCALATION_CODE)
-      .done()
-    );
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").boundaryEvent().escalation(ESCALATION_CODE).done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("subProcess", "subProcess").mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -840,19 +733,17 @@ public class MigrationRemoveBoundaryEventsTest {
   public void testRemoveIncidentForJob() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
-      .userTaskBuilder("userTask")
-      .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
-      .serviceTask("failingTask").camundaClass("org.camunda.bpm.engine.test.api.runtime.FailingDelegate")
-      .endEvent()
-      .done();
+        .userTaskBuilder("userTask").boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+        .serviceTask("failingTask")
+        .camundaClass("org.camunda.bpm.engine.test.api.runtime.FailingDelegate").endEvent().done();
     BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId("userTask", "newUserTask")
-      .changeElementId("boundary", "newBoundary");
+        .changeElementId("userTask", "newUserTask").changeElementId("boundary", "newBoundary");
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // a timer job exists
     Job jobBeforeMigration = rule.getManagementService().createJobQuery().singleResult();
@@ -860,19 +751,20 @@ public class MigrationRemoveBoundaryEventsTest {
 
     // if the timer job is triggered the failing delegate fails and an incident is created
     executeJob(jobBeforeMigration);
-    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
+    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery()
+        .singleResult();
     assertEquals("boundary", incidentBeforeMigration.getActivityId());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask", "newUserTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "newUserTask").build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then the incident was removed
-    Job jobAfterMigration = rule.getManagementService().createJobQuery().jobId(jobBeforeMigration.getId()).singleResult();
+    Job jobAfterMigration = rule.getManagementService().createJobQuery()
+        .jobId(jobBeforeMigration.getId()).singleResult();
     assertNull(jobAfterMigration);
 
     assertEquals(0, rule.getRuntimeService().createIncidentQuery().count());
@@ -884,8 +776,7 @@ public class MigrationRemoveBoundaryEventsTest {
     while (job != null && job.getRetries() > 0) {
       try {
         managementService.executeJob(job.getId());
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         // ignore
       }
 

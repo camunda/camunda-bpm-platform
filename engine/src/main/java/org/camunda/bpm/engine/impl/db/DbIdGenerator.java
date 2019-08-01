@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmd.GetNextIdBlockCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -37,7 +36,7 @@ public class DbIdGenerator implements IdGenerator {
   }
 
   public synchronized String getNextId() {
-    if (lastId<nextId) {
+    if (lastId < nextId) {
       getNewBlock();
     }
     long _nextId = nextId++;
@@ -68,8 +67,8 @@ public class DbIdGenerator implements IdGenerator {
   }
 
   /**
-   * Reset inner state so that the generator fetches a new block of IDs from the database
-   * when the next ID generation request is received.
+   * Reset inner state so that the generator fetches a new block of IDs from the database when the
+   * next ID generation request is received.
    */
   public void reset() {
     nextId = 0;

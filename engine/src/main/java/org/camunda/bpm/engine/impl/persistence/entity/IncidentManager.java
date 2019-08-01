@@ -42,7 +42,8 @@ public class IncidentManager extends AbstractManager {
 
   public long findIncidentCountByQueryCriteria(IncidentQueryImpl incidentQuery) {
     configureQuery(incidentQuery);
-    return (Long) getDbEntityManager().selectOne("selectIncidentCountByQueryCriteria", incidentQuery);
+    return (Long) getDbEntityManager().selectOne("selectIncidentCountByQueryCriteria",
+        incidentQuery);
   }
 
   public Incident findIncidentById(String id) {
@@ -54,8 +55,9 @@ public class IncidentManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<Incident> findIncidentByConfigurationAndIncidentType(String configuration, String incidentType) {
-    Map<String,Object> params = new HashMap<String, Object>();
+  public List<Incident> findIncidentByConfigurationAndIncidentType(String configuration,
+      String incidentType) {
+    Map<String, Object> params = new HashMap<String, Object>();
     params.put("configuration", configuration);
     params.put("incidentType", incidentType);
     return getDbEntityManager().selectList("selectIncidentsByConfiguration", params);

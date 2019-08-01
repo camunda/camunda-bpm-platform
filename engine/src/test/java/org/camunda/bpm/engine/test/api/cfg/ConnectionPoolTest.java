@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 
-
 /**
  * @author Joram Barrez
  */
@@ -33,7 +32,8 @@ public class ConnectionPoolTest extends PvmTestCase {
 
   public void testMyBatisConnectionPoolProperlyConfigured() {
     ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/cfg/connection-pool.camunda.cfg.xml");
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/api/cfg/connection-pool.camunda.cfg.xml");
 
     ProcessEngine engine = config.buildProcessEngine();
 
@@ -51,7 +51,8 @@ public class ConnectionPoolTest extends PvmTestCase {
     assertEquals(jdbcStatementTimeout, config.getJdbcStatementTimeout());
 
     // Verify that these properties are correctly set in the MyBatis datasource
-    Configuration sessionFactoryConfiguration = config.getDbSqlSessionFactory().getSqlSessionFactory().getConfiguration();
+    Configuration sessionFactoryConfiguration = config.getDbSqlSessionFactory()
+        .getSqlSessionFactory().getConfiguration();
     DataSource datasource = sessionFactoryConfiguration.getEnvironment().getDataSource();
     assertTrue(datasource instanceof PooledDataSource);
 

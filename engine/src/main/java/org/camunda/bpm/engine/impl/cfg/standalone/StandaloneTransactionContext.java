@@ -45,12 +45,14 @@ public class StandaloneTransactionContext implements TransactionContext {
     this.commandContext = commandContext;
   }
 
-  public void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener) {
-    if (stateTransactionListeners==null) {
+  public void addTransactionListener(TransactionState transactionState,
+      TransactionListener transactionListener) {
+    if (stateTransactionListeners == null) {
       stateTransactionListeners = new HashMap<TransactionState, List<TransactionListener>>();
     }
-    List<TransactionListener> transactionListeners = stateTransactionListeners.get(transactionState);
-    if (transactionListeners==null) {
+    List<TransactionListener> transactionListeners = stateTransactionListeners
+        .get(transactionState);
+    if (transactionListeners == null) {
       transactionListeners = new ArrayList<TransactionListener>();
       stateTransactionListeners.put(transactionState, transactionListeners);
     }
@@ -73,14 +75,15 @@ public class StandaloneTransactionContext implements TransactionContext {
 
   protected void fireTransactionEvent(TransactionState transactionState) {
     this.setLastTransactionState(transactionState);
-    if (stateTransactionListeners==null) {
+    if (stateTransactionListeners == null) {
       return;
     }
-    List<TransactionListener> transactionListeners = stateTransactionListeners.get(transactionState);
-    if (transactionListeners==null) {
+    List<TransactionListener> transactionListeners = stateTransactionListeners
+        .get(transactionState);
+    if (transactionListeners == null) {
       return;
     }
-    for (TransactionListener transactionListener: transactionListeners) {
+    for (TransactionListener transactionListener : transactionListeners) {
       transactionListener.execute(commandContext);
     }
   }
@@ -99,28 +102,25 @@ public class StandaloneTransactionContext implements TransactionContext {
         LOG.debugTransactionOperation("firing event rollback...");
         fireTransactionEvent(TransactionState.ROLLINGBACK);
 
-      }
-      catch (Throwable exception) {
+      } catch (Throwable exception) {
         LOG.exceptionWhileFiringEvent(TransactionState.ROLLINGBACK, exception);
         Context.getCommandInvocationContext().trySetThrowable(exception);
-      }
-      finally {
+      } finally {
         LOG.debugTransactionOperation("rolling back the persistence session...");
         getPersistenceProvider().rollback();
       }
 
-    }
-    catch (Throwable exception) {
+    } catch (Throwable exception) {
       LOG.exceptionWhileFiringEvent(TransactionState.ROLLINGBACK, exception);
       Context.getCommandInvocationContext().trySetThrowable(exception);
-    }
-    finally {
+    } finally {
       LOG.debugFiringEventRolledBack();
       fireTransactionEvent(TransactionState.ROLLED_BACK);
     }
   }
 
   public boolean isTransactionActive() {
-    return !TransactionState.ROLLINGBACK.equals(lastTransactionState) && !TransactionState.ROLLED_BACK.equals(lastTransactionState);
+    return !TransactionState.ROLLINGBACK.equals(lastTransactionState)
+        && !TransactionState.ROLLED_BACK.equals(lastTransactionState);
   }
 }

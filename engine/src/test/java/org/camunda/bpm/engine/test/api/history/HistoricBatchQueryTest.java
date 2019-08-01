@@ -142,7 +142,8 @@ public class HistoricBatchQueryTest {
     helper.migrateProcessInstancesAsync(1);
 
     // when
-    HistoricBatch resultBatch = historyService.createHistoricBatchQuery().batchId(batch1.getId()).singleResult();
+    HistoricBatch resultBatch = historyService.createHistoricBatchQuery().batchId(batch1.getId())
+        .singleResult();
 
     // then
     Assert.assertNotNull(resultBatch);
@@ -154,8 +155,7 @@ public class HistoricBatchQueryTest {
     try {
       historyService.createHistoricBatchQuery().batchId(null).singleResult();
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Batch id is null"));
     }
   }
@@ -194,17 +194,14 @@ public class HistoricBatchQueryTest {
     helper.completeBatch(batch1);
 
     // when
-    HistoricBatch historicBatch = historyService.createHistoricBatchQuery()
-      .completed(true)
-      .singleResult();
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().completed(true)
+        .singleResult();
 
     // then
     assertEquals(batch1.getId(), historicBatch.getId());
 
     // when
-    historicBatch = historyService.createHistoricBatchQuery()
-      .completed(false)
-      .singleResult();
+    historicBatch = historyService.createHistoricBatchQuery().completed(false).singleResult();
 
     // then
     assertEquals(batch2.getId(), historicBatch.getId());
@@ -215,8 +212,7 @@ public class HistoricBatchQueryTest {
     try {
       historyService.createHistoricBatchQuery().type(null).singleResult();
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Type is null"));
     }
   }
@@ -241,7 +237,8 @@ public class HistoricBatchQueryTest {
     helper.migrateProcessInstancesAsync(1);
 
     // when
-    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderById().asc().list();
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderById().asc()
+        .list();
 
     // then
     verifySorting(orderedBatches, historicBatchById());
@@ -254,7 +251,8 @@ public class HistoricBatchQueryTest {
     helper.migrateProcessInstancesAsync(1);
 
     // when
-    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderById().desc().list();
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderById()
+        .desc().list();
 
     // then
     verifySorting(orderedBatches, inverted(historicBatchById()));
@@ -269,7 +267,8 @@ public class HistoricBatchQueryTest {
     helper.migrateProcessInstancesAsync(1);
 
     // when
-    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByStartTime().asc().list();
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery()
+        .orderByStartTime().asc().list();
 
     // then
     verifySorting(orderedBatches, historicBatchByStartTime());
@@ -284,7 +283,8 @@ public class HistoricBatchQueryTest {
     helper.migrateProcessInstancesAsync(1);
 
     // when
-    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByStartTime().desc().list();
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery()
+        .orderByStartTime().desc().list();
 
     // then
     verifySorting(orderedBatches, inverted(historicBatchByStartTime()));
@@ -302,7 +302,8 @@ public class HistoricBatchQueryTest {
     helper.completeBatch(batch2);
 
     // when
-    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByEndTime().asc().list();
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByEndTime()
+        .asc().list();
 
     // then
     verifySorting(orderedBatches, historicBatchByEndTime());
@@ -320,7 +321,8 @@ public class HistoricBatchQueryTest {
     helper.completeBatch(batch2);
 
     // when
-    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByEndTime().desc().list();
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByEndTime()
+        .desc().list();
 
     // then
     verifySorting(orderedBatches, inverted(historicBatchByEndTime()));
@@ -331,10 +333,9 @@ public class HistoricBatchQueryTest {
     try {
       historyService.createHistoricBatchQuery().orderById().singleResult();
       Assert.fail("exception expected");
-    }
-    catch (NotValidException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Invalid query: "
-          + "call asc() or desc() after using orderByXX()"));
+    } catch (NotValidException e) {
+      Assert.assertThat(e.getMessage(), CoreMatchers
+          .containsString("Invalid query: " + "call asc() or desc() after using orderByXX()"));
     }
   }
 
@@ -343,10 +344,9 @@ public class HistoricBatchQueryTest {
     try {
       historyService.createHistoricBatchQuery().asc().singleResult();
       Assert.fail("exception expected");
-    }
-    catch (NotValidException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("You should call any of the orderBy methods "
-          + "first before specifying a direction"));
+    } catch (NotValidException e) {
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString(
+          "You should call any of the orderBy methods " + "first before specifying a direction"));
     }
   }
 }

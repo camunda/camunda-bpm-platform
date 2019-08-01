@@ -35,157 +35,105 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 
-
 /**
  * @author Thorben Lindhauer
  *
  */
 public class ProcessInstanceModificationMultiInstanceTest extends PluggableProcessEngineTestCase {
 
-  public static final String PARALLEL_MULTI_INSTANCE_TASK_PROCESS =
-      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelTasks.bpmn20.xml";
-  public static final String PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS =
-      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelSubprocess.bpmn20.xml";
+  public static final String PARALLEL_MULTI_INSTANCE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelTasks.bpmn20.xml";
+  public static final String PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelSubprocess.bpmn20.xml";
 
-  public static final String SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS =
-      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.sequentialTasks.bpmn20.xml";
-  public static final String SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS =
-      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.sequentialSubprocess.bpmn20.xml";
+  public static final String SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.sequentialTasks.bpmn20.xml";
+  public static final String SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.sequentialSubprocess.bpmn20.xml";
 
-  public static final String PARALLEL_MULTI_INSTANCE_TASK_COMPLETION_CONDITION_PROCESS =
-      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelTasksCompletionCondition.bpmn20.xml";
-  public static final String PARALLEL_MULTI_INSTANCE_SUBPROCESS_COMPLETION_CONDITION_PROCESS =
-      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelSubprocessCompletionCondition.bpmn20.xml";
+  public static final String PARALLEL_MULTI_INSTANCE_TASK_COMPLETION_CONDITION_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelTasksCompletionCondition.bpmn20.xml";
+  public static final String PARALLEL_MULTI_INSTANCE_SUBPROCESS_COMPLETION_CONDITION_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelSubprocessCompletionCondition.bpmn20.xml";
 
-  public static final String NESTED_PARALLEL_MULTI_INSTANCE_TASK_PROCESS =
-      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.nestedParallelTasks.bpmn20.xml";
+  public static final String NESTED_PARALLEL_MULTI_INSTANCE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.nestedParallelTasks.bpmn20.xml";
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
   public void testStartBeforeMultiInstanceBodyParallelTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miTasks#multiInstanceBody")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miTasks#multiInstanceBody").execute();
 
     // then
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginMiBody("miTasks")
-          .activity("miTasks")
-          .activity("miTasks")
-          .activity("miTasks")
-        .endScope()
-        .beginMiBody("miTasks")
-          .activity("miTasks")
-          .activity("miTasks")
-          .activity("miTasks")
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginMiBody("miTasks").activity("miTasks").activity("miTasks").activity("miTasks")
+            .endScope().beginMiBody("miTasks").activity("miTasks").activity("miTasks")
+            .activity("miTasks").done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child("miTasks").concurrent().noScope().up()
-            .child("miTasks").concurrent().noScope().up()
-            .child("miTasks").concurrent().noScope().up().up().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child("miTasks").concurrent().noScope().up()
-            .child("miTasks").concurrent().noScope().up()
-            .child("miTasks").concurrent().noScope().up()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).concurrent()
+        .noScope().child(null).scope().child("miTasks").concurrent().noScope().up().child("miTasks")
+        .concurrent().noScope().up().child("miTasks").concurrent().noScope().up().up().up()
+        .child(null).concurrent().noScope().child(null).scope().child("miTasks").concurrent()
+        .noScope().up().child("miTasks").concurrent().noScope().up().child("miTasks").concurrent()
+        .noScope().up().done());
 
     // and the process is able to complete successfully
-    completeTasksInOrder("miTasks", "miTasks", "miTasks", "miTasks", "miTasks", "miTasks", "afterTask", "afterTask");
+    completeTasksInOrder("miTasks", "miTasks", "miTasks", "miTasks", "miTasks", "miTasks",
+        "afterTask", "afterTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeMultiInstanceBodyParallelSubprocess() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelSubprocess");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miSubProcess#multiInstanceBody")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miSubProcess#multiInstanceBody").execute();
 
     // then
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-        .endScope()
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginMiBody("miSubProcess").beginScope("miSubProcess").activity("subProcessTask")
+            .endScope().beginScope("miSubProcess").activity("subProcessTask").endScope()
+            .beginScope("miSubProcess").activity("subProcessTask").endScope().endScope()
+            .beginMiBody("miSubProcess").beginScope("miSubProcess").activity("subProcessTask")
+            .endScope().beginScope("miSubProcess").activity("subProcessTask").endScope()
+            .beginScope("miSubProcess").activity("subProcessTask").endScope().done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child(null).concurrent().noScope()
-              .child("subProcessTask").scope().up().up()
-            .child(null).concurrent().noScope()
-              .child("subProcessTask").scope().up().up()
-            .child(null).concurrent().noScope()
-              .child("subProcessTask").scope().up().up().up().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child(null).concurrent().noScope()
-              .child("subProcessTask").scope().up().up()
-            .child(null).concurrent().noScope()
-              .child("subProcessTask").scope().up().up()
-            .child(null).concurrent().noScope()
-              .child("subProcessTask").scope()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).concurrent()
+        .noScope().child(null).scope().child(null).concurrent().noScope().child("subProcessTask")
+        .scope().up().up().child(null).concurrent().noScope().child("subProcessTask").scope().up()
+        .up().child(null).concurrent().noScope().child("subProcessTask").scope().up().up().up().up()
+        .child(null).concurrent().noScope().child(null).scope().child(null).concurrent().noScope()
+        .child("subProcessTask").scope().up().up().child(null).concurrent().noScope()
+        .child("subProcessTask").scope().up().up().child(null).concurrent().noScope()
+        .child("subProcessTask").scope().done());
 
     // and the process is able to complete successfully
-    completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask",
-        "subProcessTask", "subProcessTask", "afterTask", "subProcessTask", "afterTask");
+    completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask", "subProcessTask",
+        "subProcessTask", "afterTask", "subProcessTask", "afterTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_COMPLETION_CONDITION_PROCESS)
   public void testStartInnerActivityParallelTasksWithCompletionCondition() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasksCompletionCondition");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelUserTasksCompletionCondition");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miTasks")
-      .startBeforeActivity("miTasks")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miTasks").startBeforeActivity("miTasks").execute();
 
     // then the process is able to complete successfully and respects the completion condition
     completeTasksInOrder("miTasks", "miTasks", "miTasks", "miTasks");
@@ -195,120 +143,95 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_COMPLETION_CONDITION_PROCESS)
   public void testStartInnerActivityParallelSubprocessWithCompletionCondition() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocessCompletionCondition");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelSubprocessCompletionCondition");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miSubProcess")
-      .startBeforeActivity("miSubProcess")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miSubProcess").startBeforeActivity("miSubProcess").execute();
 
     // then the process is able to complete successfully and respects the completion condition
-    completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask",
-        "subProcessTask");
+    completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask", "subProcessTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
   public void testStartBeforeMultiInstanceBodySequentialTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miTasks#multiInstanceBody")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miTasks#multiInstanceBody").execute();
 
     // then
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginMiBody("miTasks")
-          .activity("miTasks")
-        .endScope()
-        .beginMiBody("miTasks")
-          .activity("miTasks")
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginMiBody("miTasks").activity("miTasks").endScope().beginMiBody("miTasks")
+            .activity("miTasks").done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
     assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child(null).concurrent().noScope()
-          .child("miTasks").scope().up().up()
-        .child(null).concurrent().noScope()
-          .child("miTasks").scope()
-      .done()
-      );
+        describeExecutionTree(null).scope().child(null).concurrent().noScope().child("miTasks")
+            .scope().up().up().child(null).concurrent().noScope().child("miTasks").scope().done());
 
     // and the process is able to complete successfully
-    completeTasksInOrder("miTasks", "miTasks", "miTasks", "miTasks", "miTasks", "miTasks", "afterTask", "afterTask");
+    completeTasksInOrder("miTasks", "miTasks", "miTasks", "miTasks", "miTasks", "miTasks",
+        "afterTask", "afterTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeMultiInstanceBodySequentialSubprocess() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialSubprocess");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miSubProcess#multiInstanceBody")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miSubProcess#multiInstanceBody").execute();
 
     // then
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-        .endScope()
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginMiBody("miSubProcess").beginScope("miSubProcess").activity("subProcessTask")
+            .endScope().endScope().beginMiBody("miSubProcess").beginScope("miSubProcess")
+            .activity("subProcessTask").endScope().done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child("subProcessTask").scope().up().up().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child("subProcessTask").scope()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).concurrent()
+        .noScope().child(null).scope().child("subProcessTask").scope().up().up().up().child(null)
+        .concurrent().noScope().child(null).scope().child("subProcessTask").scope().done());
 
     // and the process is able to complete successfully
-    completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask",
-        "subProcessTask", "subProcessTask", "subProcessTask", "afterTask", "afterTask");
+    completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask", "subProcessTask",
+        "subProcessTask", "subProcessTask", "afterTask", "afterTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
   public void testStartBeforeInnerActivityParallelTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miTasks", tree.getActivityInstances("miTasks#multiInstanceBody")[0].getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity(
+        "miTasks", tree.getActivityInstances("miTasks#multiInstanceBody")[0].getId()).execute();
 
     // then the mi variables should be correct
-    List<Execution> leafExecutions = runtimeService.createExecutionQuery().activityId("miTasks").list();
+    List<Execution> leafExecutions = runtimeService.createExecutionQuery().activityId("miTasks")
+        .list();
     assertEquals(4, leafExecutions.size());
     assertVariableSet(leafExecutions, "loopCounter", Arrays.asList(0, 1, 2, 3));
     for (Execution leafExecution : leafExecutions) {
@@ -319,25 +242,17 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the trees should be correct
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginMiBody("miTasks")
-          .activity("miTasks")
-          .activity("miTasks")
-          .activity("miTasks")
-          .activity("miTasks")
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginMiBody("miTasks").activity("miTasks").activity("miTasks").activity("miTasks")
+            .activity("miTasks").done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
     assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child(null).scope()
-          .child("miTasks").concurrent().noScope().up()
-          .child("miTasks").concurrent().noScope().up()
-          .child("miTasks").concurrent().noScope().up()
-          .child("miTasks").concurrent().noScope()
-      .done()
-      );
+        describeExecutionTree(null).scope().child(null).scope().child("miTasks").concurrent()
+            .noScope().up().child("miTasks").concurrent().noScope().up().child("miTasks")
+            .concurrent().noScope().up().child("miTasks").concurrent().noScope().done());
 
     // and the process is able to complete successfully
     completeTasksInOrder("miTasks", "miTasks", "miTasks", "miTasks", "afterTask");
@@ -347,19 +262,21 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityParallelSubprocess() {
     // given the mi body is already instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelSubprocess");
     completeTasksInOrder("beforeTask");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miSubProcess", tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miSubProcess",
+            tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId())
+        .execute();
 
     // then the mi variables should be correct
-    List<Execution> leafExecutions = runtimeService.createExecutionQuery().activityId("subProcessTask").list();
+    List<Execution> leafExecutions = runtimeService.createExecutionQuery()
+        .activityId("subProcessTask").list();
     assertEquals(4, leafExecutions.size());
     assertVariableSet(leafExecutions, "loopCounter", Arrays.asList(0, 1, 2, 3));
     for (Execution leafExecution : leafExecutions) {
@@ -370,59 +287,42 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the trees are correct
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginMiBody("miSubProcess").beginScope("miSubProcess").activity("subProcessTask")
+            .endScope().beginScope("miSubProcess").activity("subProcessTask").endScope()
+            .beginScope("miSubProcess").activity("subProcessTask").endScope()
+            .beginScope("miSubProcess").activity("subProcessTask").endScope().done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child(null).scope()
-          .child(null).concurrent().noScope()
-            .child("subProcessTask").scope().up().up()
-          .child(null).concurrent().noScope()
-            .child("subProcessTask").scope().up().up()
-          .child(null).concurrent().noScope()
-            .child("subProcessTask").scope().up().up()
-          .child(null).concurrent().noScope()
-            .child("subProcessTask").scope()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).scope()
+        .child(null).concurrent().noScope().child("subProcessTask").scope().up().up().child(null)
+        .concurrent().noScope().child("subProcessTask").scope().up().up().child(null).concurrent()
+        .noScope().child("subProcessTask").scope().up().up().child(null).concurrent().noScope()
+        .child("subProcessTask").scope().done());
 
     // and the process is able to complete successfully
-    completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask",
-        "subProcessTask", "afterTask");
+    completeTasksInOrder("subProcessTask", "subProcessTask", "subProcessTask", "subProcessTask",
+        "afterTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodyParallelTasks() {
     // given the mi body is not yet instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelUserTasks");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miTasks")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miTasks").execute();
 
     // then the mi variables should be correct
-    Execution leafExecution = runtimeService.createExecutionQuery().activityId("miTasks").singleResult();
+    Execution leafExecution = runtimeService.createExecutionQuery().activityId("miTasks")
+        .singleResult();
     assertNotNull(leafExecution);
     assertVariable(leafExecution, "loopCounter", 0);
     assertVariable(leafExecution, "nrOfInstances", 1);
@@ -431,43 +331,35 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the tree should be correct
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("beforeTask")
-        .beginMiBody("miTasks")
-          .activity("miTasks")
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("beforeTask").beginMiBody("miTasks").activity("miTasks").done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child("beforeTask").concurrent().noScope().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child("miTasks").concurrent().noScope()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("beforeTask")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child("miTasks").concurrent().noScope().done());
 
     // and the process is able to complete successfully
-    completeTasksInOrder(
-        "miTasks", "afterTask", "beforeTask", "miTasks",
-        "miTasks", "miTasks", "afterTask");
+    completeTasksInOrder("miTasks", "afterTask", "beforeTask", "miTasks", "miTasks", "miTasks",
+        "afterTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodyParallelTasksActivityStatistics() {
     // given the mi body is not yet instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelUserTasks");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miTasks")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miTasks").execute();
 
     // then the activity instance statistics are correct
-    List<ActivityStatistics> statistics = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
+    List<ActivityStatistics> statistics = managementService
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
     assertEquals(2, statistics.size());
 
     ActivityStatistics miTasksStatistics = getStatisticsForActivity(statistics, "miTasks");
@@ -482,18 +374,18 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodyParallelSubprocess() {
     // given the mi body is not yet instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelSubprocess");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("subProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("subProcessTask").execute();
 
     // then the mi variables should be correct
-    Execution leafExecution = runtimeService.createExecutionQuery().activityId("subProcessTask").singleResult();
+    Execution leafExecution = runtimeService.createExecutionQuery().activityId("subProcessTask")
+        .singleResult();
     assertNotNull(leafExecution);
     assertVariable(leafExecution, "loopCounter", 0);
     assertVariable(leafExecution, "nrOfInstances", 1);
@@ -502,29 +394,19 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the tree should be correct
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("beforeTask")
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("beforeTask").beginMiBody("miSubProcess").beginScope("miSubProcess")
+            .activity("subProcessTask").endScope().done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child("beforeTask").concurrent().noScope().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child(null).concurrent().noScope()
-              .child("subProcessTask").scope()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("beforeTask")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child(null).concurrent().noScope().child("subProcessTask").scope().done());
 
     // and the process is able to complete successfully
-    completeTasksInOrder(
-        "subProcessTask", "afterTask", "beforeTask", "subProcessTask",
+    completeTasksInOrder("subProcessTask", "afterTask", "beforeTask", "subProcessTask",
         "subProcessTask", "subProcessTask", "afterTask");
     assertProcessEnded(processInstance.getId());
   }
@@ -532,16 +414,16 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodyParallelSubprocessActivityStatistics() {
     // given the mi body is not yet instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelSubprocess");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("subProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("subProcessTask").execute();
 
     // then the activity instance statistics are correct
-    List<ActivityStatistics> statistics = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
+    List<ActivityStatistics> statistics = managementService
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
     assertEquals(2, statistics.size());
 
     ActivityStatistics miTasksStatistics = getStatisticsForActivity(statistics, "subProcessTask");
@@ -553,22 +435,20 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     assertEquals(1, beforeTaskStatistics.getInstances());
   }
 
-
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodySetNrOfInstancesParallelSubprocess() {
     // given the mi body is not yet instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelSubprocess");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("subProcessTask")
-      .setVariable("nrOfInstances", 3)
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("subProcessTask").setVariable("nrOfInstances", 3).execute();
 
     // then the mi variables should be correct
-    Execution leafExecution = runtimeService.createExecutionQuery().activityId("subProcessTask").singleResult();
+    Execution leafExecution = runtimeService.createExecutionQuery().activityId("subProcessTask")
+        .singleResult();
     assertNotNull(leafExecution);
     assertVariable(leafExecution, "loopCounter", 0);
     assertVariable(leafExecution, "nrOfInstances", 3);
@@ -577,55 +457,44 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the trees should be correct
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("beforeTask")
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("beforeTask").beginMiBody("miSubProcess").beginScope("miSubProcess")
+            .activity("subProcessTask").endScope().done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child("beforeTask").concurrent().noScope().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child(null).concurrent().noScope()
-              .child("subProcessTask").scope()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("beforeTask")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child(null).concurrent().noScope().child("subProcessTask").scope().done());
 
-    // and completing the single active instance completes the mi body (even though nrOfInstances is 3;
+    // and completing the single active instance completes the mi body (even though nrOfInstances is
+    // 3;
     // joining is performed on the number of concurrent executions)
     completeTasksInOrder("subProcessTask");
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("beforeTask")
-        .activity("afterTask")
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("beforeTask").activity("afterTask").done());
 
     // and the remainder of the process completes successfully
-    completeTasksInOrder("beforeTask", "subProcessTask", "afterTask",
-        "subProcessTask", "subProcessTask", "afterTask");
+    completeTasksInOrder("beforeTask", "subProcessTask", "afterTask", "subProcessTask",
+        "subProcessTask", "afterTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
   public void testStartBeforeInnerActivitySequentialTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialUserTasks");
     completeTasksInOrder("beforeTask");
 
     // then creating a second inner instance is not possible
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     try {
-      runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miTasks", tree.getActivityInstances("miTasks#multiInstanceBody")[0].getId())
-      .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity(
+          "miTasks", tree.getActivityInstances("miTasks#multiInstanceBody")[0].getId()).execute();
       fail("expect exception");
     } catch (ProcessEngineException e) {
       assertTextPresent(e.getMessage(), "Concurrent instantiation not possible for activities "
@@ -637,16 +506,17 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivitySequentialSubprocess() {
     // given the mi body is already instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialSubprocess");
     completeTasksInOrder("beforeTask");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startBeforeActivity("miSubProcess", tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId())
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId())
+          .startBeforeActivity("miSubProcess",
+              tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId())
+          .execute();
       fail("expect exception");
     } catch (ProcessEngineException e) {
       assertTextPresent(e.getMessage(), "Concurrent instantiation not possible for activities "
@@ -657,17 +527,17 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodySequentialTasks() {
     // given the mi body is not yet instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialUserTasks");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miTasks")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miTasks").execute();
 
     // then the mi variables should be correct
-    Execution leafExecution = runtimeService.createExecutionQuery().activityId("miTasks").singleResult();
+    Execution leafExecution = runtimeService.createExecutionQuery().activityId("miTasks")
+        .singleResult();
     assertNotNull(leafExecution);
     assertVariable(leafExecution, "loopCounter", 0);
     assertVariable(leafExecution, "nrOfInstances", 1);
@@ -676,41 +546,35 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the trees should be correct
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("beforeTask")
-        .beginMiBody("miTasks")
-          .activity("miTasks")
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("beforeTask").beginMiBody("miTasks").activity("miTasks").done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child("beforeTask").concurrent().noScope().up()
-        .child(null).concurrent().noScope()
-          .child("miTasks").scope()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree)
+        .matches(describeExecutionTree(null).scope().child("beforeTask").concurrent().noScope().up()
+            .child(null).concurrent().noScope().child("miTasks").scope().done());
 
     // and the process is able to complete successfully
-    completeTasksInOrder("miTasks", "afterTask",
-        "beforeTask", "miTasks", "miTasks", "miTasks", "afterTask");
+    completeTasksInOrder("miTasks", "afterTask", "beforeTask", "miTasks", "miTasks", "miTasks",
+        "afterTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodySequentialTasksActivityStatistics() {
     // given the mi body is not yet instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialUserTasks");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("miTasks")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("miTasks").execute();
 
     // then the activity instance statistics are correct
-    List<ActivityStatistics> statistics = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
+    List<ActivityStatistics> statistics = managementService
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
     assertEquals(2, statistics.size());
 
     ActivityStatistics miTasksStatistics = getStatisticsForActivity(statistics, "miTasks");
@@ -722,7 +586,8 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     assertEquals(1, beforeTaskStatistics.getInstances());
   }
 
-  protected ActivityStatistics getStatisticsForActivity(List<ActivityStatistics> statistics, String activityId) {
+  protected ActivityStatistics getStatisticsForActivity(List<ActivityStatistics> statistics,
+      String activityId) {
     for (ActivityStatistics statisticsInstance : statistics) {
       if (statisticsInstance.getId().equals(activityId)) {
         return statisticsInstance;
@@ -734,17 +599,17 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodySequentialSubprocess() {
     // given the mi body is not yet instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialSubprocess");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("subProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("subProcessTask").execute();
 
     // then the mi variables should be correct
-    Execution leafExecution = runtimeService.createExecutionQuery().activityId("subProcessTask").singleResult();
+    Execution leafExecution = runtimeService.createExecutionQuery().activityId("subProcessTask")
+        .singleResult();
     assertNotNull(leafExecution);
     assertVariable(leafExecution, "loopCounter", 0);
     assertVariable(leafExecution, "nrOfInstances", 1);
@@ -753,44 +618,36 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the trees should be correct
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("beforeTask")
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("beforeTask").beginMiBody("miSubProcess").beginScope("miSubProcess")
+            .activity("subProcessTask").endScope().done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child("beforeTask").concurrent().noScope().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child("subProcessTask").scope()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("beforeTask")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child("subProcessTask").scope().done());
 
     // and the process is able to complete successfully
-    completeTasksInOrder("subProcessTask", "afterTask",
-        "beforeTask", "subProcessTask", "subProcessTask", "subProcessTask", "afterTask");
+    completeTasksInOrder("subProcessTask", "afterTask", "beforeTask", "subProcessTask",
+        "subProcessTask", "subProcessTask", "afterTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodySequentialSubprocessActivityStatistics() {
     // given the mi body is not yet instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialSubprocess");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("subProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("subProcessTask").execute();
 
     // then the activity instance statistics are correct
-    List<ActivityStatistics> statistics = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
+    List<ActivityStatistics> statistics = managementService
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
     assertEquals(2, statistics.size());
 
     ActivityStatistics miTasksStatistics = getStatisticsForActivity(statistics, "subProcessTask");
@@ -805,18 +662,17 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodySetNrOfInstancesSequentialSubprocess() {
     // given the mi body is not yet instantiated
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialSubprocess");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("subProcessTask")
-      .setVariable("nrOfInstances", 3)
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("subProcessTask").setVariable("nrOfInstances", 3).execute();
 
     // then the mi variables should be correct
-    Execution leafExecution = runtimeService.createExecutionQuery().activityId("subProcessTask").singleResult();
+    Execution leafExecution = runtimeService.createExecutionQuery().activityId("subProcessTask")
+        .singleResult();
     assertNotNull(leafExecution);
     assertVariable(leafExecution, "loopCounter", 0);
     assertVariable(leafExecution, "nrOfInstances", 3);
@@ -825,38 +681,28 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     // and the trees should be correct
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("beforeTask")
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("beforeTask").beginMiBody("miSubProcess").beginScope("miSubProcess")
+            .activity("subProcessTask").endScope().done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child("beforeTask").concurrent().noScope().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child("subProcessTask").scope()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("beforeTask")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child("subProcessTask").scope().done());
 
     // and two following sequential instances should be created
     completeTasksInOrder("subProcessTask");
 
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("beforeTask")
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("beforeTask").beginMiBody("miSubProcess").beginScope("miSubProcess")
+            .activity("subProcessTask").done());
 
-    leafExecution = runtimeService.createExecutionQuery().activityId("subProcessTask").singleResult();
+    leafExecution = runtimeService.createExecutionQuery().activityId("subProcessTask")
+        .singleResult();
     assertNotNull(leafExecution);
     assertVariable(leafExecution, "loopCounter", 1);
     assertVariable(leafExecution, "nrOfInstances", 3);
@@ -866,22 +712,21 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     completeTasksInOrder("subProcessTask");
 
     // and the remainder of the process completes successfully
-    completeTasksInOrder("subProcessTask", "beforeTask", "subProcessTask",
-        "subProcessTask", "subProcessTask", "afterTask", "afterTask");
+    completeTasksInOrder("subProcessTask", "beforeTask", "subProcessTask", "subProcessTask",
+        "subProcessTask", "afterTask", "afterTask");
     assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
   public void testCancelMultiInstanceBodyParallelTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelAllForActivity("miTasks#multiInstanceBody")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("miTasks#multiInstanceBody").execute();
 
     // then
     assertProcessEnded(processInstance.getId());
@@ -890,14 +735,13 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testCancelMultiInstanceBodyParallelSubprocess() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelSubprocess");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelAllForActivity("miSubProcess#multiInstanceBody")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("miSubProcess#multiInstanceBody").execute();
 
     // then
     assertProcessEnded(processInstance.getId());
@@ -906,14 +750,13 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
   public void testCancelMultiInstanceBodySequentialTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelAllForActivity("miTasks#multiInstanceBody")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("miTasks#multiInstanceBody").execute();
 
     // then
     assertProcessEnded(processInstance.getId());
@@ -922,14 +765,13 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testCancelMultiInstanceBodySequentialSubprocess() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialSubprocess");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelAllForActivity("miSubProcess#multiInstanceBody")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("miSubProcess#multiInstanceBody").execute();
 
     // then
     assertProcessEnded(processInstance.getId());
@@ -938,34 +780,26 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
   public void testCancelInnerActivityParallelTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(tree.getActivityInstances("miTasks")[0].getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(tree.getActivityInstances("miTasks")[0].getId()).execute();
 
     // then
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginMiBody("miTasks")
-          .activity("miTasks")
-          .activity("miTasks")
-        .endScope()
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginMiBody("miTasks").activity("miTasks").activity("miTasks").endScope().done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child(null).scope()
-          .child("miTasks").concurrent().noScope().up()
-          .child("miTasks").concurrent().noScope().up()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree)
+        .matches(describeExecutionTree(null).scope().child(null).scope().child("miTasks")
+            .concurrent().noScope().up().child("miTasks").concurrent().noScope().up().done());
 
     // and the process is able to complete successfully
     completeTasksInOrder("miTasks", "miTasks", "afterTask");
@@ -975,14 +809,13 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
   public void testCancelAllInnerActivityParallelTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelAllForActivity("miTasks")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("miTasks").execute();
 
     // then
     assertProcessEnded(processInstance.getId());
@@ -991,54 +824,46 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = NESTED_PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
   public void testCancelAllInnerActivityNestedParallelTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedMiParallelUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("nestedMiParallelUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelAllForActivity("miTasks")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("miTasks").execute();
 
     // then
     assertProcessEnded(processInstance.getId());
   }
 
   /**
-   * Ensures that the modification cmd does not prune the last concurrent execution
-   * because parallel MI requires this
+   * Ensures that the modification cmd does not prune the last concurrent execution because parallel
+   * MI requires this
    */
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
   public void testCancelInnerActivityParallelTasksAllButOne() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(tree.getActivityInstances("miTasks")[0].getId())
-      .cancelActivityInstance(tree.getActivityInstances("miTasks")[1].getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(tree.getActivityInstances("miTasks")[0].getId())
+        .cancelActivityInstance(tree.getActivityInstances("miTasks")[1].getId()).execute();
 
     // then
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginMiBody("miTasks")
-          .activity("miTasks")
-        .endScope()
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginMiBody("miTasks").activity("miTasks").endScope().done());
 
     // the execution tree should still be in the expected shape
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child(null).scope()
-          .child("miTasks").concurrent().noScope()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).scope()
+        .child("miTasks").concurrent().noScope().done());
 
     // and the process is able to complete successfully
     completeTasksInOrder("miTasks", "afterTask");
@@ -1048,39 +873,27 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testCancelInnerActivityParallelSubprocess() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miParallelSubprocess");
     completeTasksInOrder("beforeTask");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(tree.getActivityInstances("miSubProcess")[0].getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(tree.getActivityInstances("miSubProcess")[0].getId()).execute();
 
     // then
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginMiBody("miSubProcess")
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-          .beginScope("miSubProcess")
-            .activity("subProcessTask")
-          .endScope()
-      .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginMiBody("miSubProcess").beginScope("miSubProcess").activity("subProcessTask")
+            .endScope().beginScope("miSubProcess").activity("subProcessTask").endScope().done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
-    assertThat(executionTree).matches(
-      describeExecutionTree(null).scope()
-        .child(null).scope()
-          .child(null).concurrent().noScope()
-            .child("subProcessTask").scope().up().up()
-          .child(null).concurrent().noScope()
-            .child("subProcessTask").scope().up().up()
-      .done()
-      );
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(),
+        processEngine);
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).scope()
+        .child(null).concurrent().noScope().child("subProcessTask").scope().up().up().child(null)
+        .concurrent().noScope().child("subProcessTask").scope().up().up().done());
 
     // and the process is able to complete successfully
     completeTasksInOrder("subProcessTask", "subProcessTask", "afterTask");
@@ -1090,15 +903,14 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
   public void testCancelInnerActivitySequentialTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(tree.getActivityInstances("miTasks")[0].getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(tree.getActivityInstances("miTasks")[0].getId()).execute();
 
     // then
     assertProcessEnded(processInstance.getId());
@@ -1107,14 +919,13 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
   public void testCancelAllInnerActivitySequentialTasks() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialUserTasks");
     completeTasksInOrder("beforeTask");
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelAllForActivity("miTasks")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("miTasks").execute();
 
     // then
     assertProcessEnded(processInstance.getId());
@@ -1123,15 +934,14 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testCancelInnerActivitySequentialSubprocess() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miSequentialSubprocess");
     completeTasksInOrder("beforeTask");
 
     // when
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(tree.getActivityInstances("miSubProcess")[0].getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(tree.getActivityInstances("miSubProcess")[0].getId()).execute();
 
     // then
     assertProcessEnded(processInstance.getId());
@@ -1146,14 +956,15 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     }
   }
 
-
   protected void assertVariable(Execution execution, String variableName, Object expectedValue) {
     Object variableValue = runtimeService.getVariable(execution.getId(), variableName);
-    assertEquals("Value for variable '" + variableName + "' and " + execution + " "
-        + "does not match.", expectedValue, variableValue);
+    assertEquals(
+        "Value for variable '" + variableName + "' and " + execution + " " + "does not match.",
+        expectedValue, variableValue);
   }
 
-  protected void assertVariableSet(List<Execution> executions, String variableName, List<?> expectedValues) {
+  protected void assertVariableSet(List<Execution> executions, String variableName,
+      List<?> expectedValues) {
     List<Object> actualValues = new ArrayList<Object>();
     for (Execution execution : executions) {
       actualValues.add(runtimeService.getVariable(execution.getId(), variableName));
@@ -1161,9 +972,9 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
 
     for (Object expectedValue : expectedValues) {
       boolean valueFound = actualValues.remove(expectedValue);
-      assertTrue("Expected variable value '" + expectedValue + "' not contained in the list of actual values. "
-          + "Unmatched actual values: " + actualValues,
-          valueFound);
+      assertTrue("Expected variable value '" + expectedValue
+          + "' not contained in the list of actual values. " + "Unmatched actual values: "
+          + actualValues, valueFound);
     }
     assertTrue("There are more actual than expected values.", actualValues.isEmpty());
   }

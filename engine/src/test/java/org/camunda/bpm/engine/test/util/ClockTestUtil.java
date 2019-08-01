@@ -25,7 +25,8 @@ public final class ClockTestUtil {
   /**
    * Increments the current time by the given seconds.
    *
-   * @param seconds the seconds to add to the clock
+   * @param seconds
+   *          the seconds to add to the clock
    * @return the new current time
    */
   public static Date incrementClock(long seconds) {
@@ -35,9 +36,8 @@ public final class ClockTestUtil {
   }
 
   /**
-   * Sets the clock to a date without milliseconds. Older mysql
-   * versions do not support milliseconds. Test which test timestamp
-   * should avoid timestamps with milliseconds.
+   * Sets the clock to a date without milliseconds. Older mysql versions do not support
+   * milliseconds. Test which test timestamp should avoid timestamps with milliseconds.
    *
    * @return the new current time
    */

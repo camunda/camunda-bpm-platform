@@ -40,7 +40,6 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 
-
 /**
  * @author Tom Baeyens
  * @author Deivarayan Azhagappan
@@ -59,18 +58,17 @@ public class DeploymentManager extends AbstractManager {
       getResourceManager().insertResource(resource);
     }
 
-    Context
-      .getProcessEngineConfiguration()
-      .getDeploymentCache()
-      .deploy(deployment);
+    Context.getProcessEngineConfiguration().getDeploymentCache().deploy(deployment);
   }
 
   public void deleteDeployment(String deploymentId, boolean cascade) {
     deleteDeployment(deploymentId, cascade, false, false);
   }
 
-  public void deleteDeployment(String deploymentId, final boolean cascade, final boolean skipCustomListeners, boolean skipIoMappings) {
-    List<ProcessDefinition> processDefinitions = getProcessDefinitionManager().findProcessDefinitionsByDeploymentId(deploymentId);
+  public void deleteDeployment(String deploymentId, final boolean cascade,
+      final boolean skipCustomListeners, boolean skipIoMappings) {
+    List<ProcessDefinition> processDefinitions = getProcessDefinitionManager()
+        .findProcessDefinitionsByDeploymentId(deploymentId);
     if (cascade) {
       // *NOTE*:
       // The process instances of ALL process definitions must be
@@ -91,15 +89,14 @@ public class DeploymentManager extends AbstractManager {
       //
       // Thats why we have to clear up all instances at first, after that
       // we can cleanly remove the process definitions.
-      for (ProcessDefinition processDefinition: processDefinitions) {
+      for (ProcessDefinition processDefinition : processDefinitions) {
         String processDefinitionId = processDefinition.getId();
-        getProcessInstanceManager()
-          .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted deployment", true, skipCustomListeners, skipIoMappings);
+        getProcessInstanceManager().deleteProcessInstancesByProcessDefinition(processDefinitionId,
+            "deleted deployment", true, skipCustomListeners, skipIoMappings);
       }
       // delete historic job logs (for example for timer start event jobs)
       getHistoricJobLogManager().deleteHistoricJobLogsByDeploymentId(deploymentId);
     }
-
 
     for (ProcessDefinition processDefinition : processDefinitions) {
       final String processDefinitionId = processDefinition.getId();
@@ -112,11 +109,7 @@ public class DeploymentManager extends AbstractManager {
       commandContext.runWithoutAuthorization(new Callable<Void>() {
         public Void call() throws Exception {
           DeleteProcessDefinitionsByIdsCmd cmd = new DeleteProcessDefinitionsByIdsCmd(
-              Arrays.asList(processDefinitionId),
-              cascade,
-              false,
-              skipCustomListeners,
-              false);
+              Arrays.asList(processDefinitionId), cascade, false, skipCustomListeners, false);
           cmd.execute(commandContext);
           return null;
         }
@@ -136,54 +129,55 @@ public class DeploymentManager extends AbstractManager {
   }
 
   protected void deleteCaseDeployment(String deploymentId, boolean cascade) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     if (processEngineConfiguration.isCmmnEnabled()) {
-      List<CaseDefinition> caseDefinitions = getCaseDefinitionManager().findCaseDefinitionByDeploymentId(deploymentId);
+      List<CaseDefinition> caseDefinitions = getCaseDefinitionManager()
+          .findCaseDefinitionByDeploymentId(deploymentId);
 
       if (cascade) {
 
         // delete case instances
-        for (CaseDefinition caseDefinition: caseDefinitions) {
+        for (CaseDefinition caseDefinition : caseDefinitions) {
           String caseDefinitionId = caseDefinition.getId();
 
-          getCaseInstanceManager()
-            .deleteCaseInstancesByCaseDefinition(caseDefinitionId, "deleted deployment", true);
+          getCaseInstanceManager().deleteCaseInstancesByCaseDefinition(caseDefinitionId,
+              "deleted deployment", true);
 
         }
       }
 
       // delete case definitions from db
-      getCaseDefinitionManager()
-        .deleteCaseDefinitionsByDeploymentId(deploymentId);
+      getCaseDefinitionManager().deleteCaseDefinitionsByDeploymentId(deploymentId);
 
       for (CaseDefinition caseDefinition : caseDefinitions) {
         String processDefinitionId = caseDefinition.getId();
 
         // remove case definitions from cache:
-        Context
-          .getProcessEngineConfiguration()
-          .getDeploymentCache()
-          .removeCaseDefinition(processDefinitionId);
+        Context.getProcessEngineConfiguration().getDeploymentCache()
+            .removeCaseDefinition(processDefinitionId);
       }
     }
   }
 
   protected void deleteDecisionDeployment(String deploymentId, boolean cascade) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     if (processEngineConfiguration.isDmnEnabled()) {
       DecisionDefinitionManager decisionDefinitionManager = getDecisionDefinitionManager();
-      List<DecisionDefinition> decisionDefinitions = decisionDefinitionManager.findDecisionDefinitionByDeploymentId(deploymentId);
+      List<DecisionDefinition> decisionDefinitions = decisionDefinitionManager
+          .findDecisionDefinitionByDeploymentId(deploymentId);
 
-      if(cascade) {
+      if (cascade) {
         // delete historic decision instances
-        for(DecisionDefinition decisionDefinition : decisionDefinitions) {
-          getHistoricDecisionInstanceManager().deleteHistoricDecisionInstancesByDecisionDefinitionId(decisionDefinition.getId());
+        for (DecisionDefinition decisionDefinition : decisionDefinitions) {
+          getHistoricDecisionInstanceManager()
+              .deleteHistoricDecisionInstancesByDecisionDefinitionId(decisionDefinition.getId());
         }
       }
 
       // delete decision definitions from db
-      decisionDefinitionManager
-        .deleteDecisionDefinitionsByDeploymentId(deploymentId);
+      decisionDefinitionManager.deleteDecisionDefinitionsByDeploymentId(deploymentId);
 
       DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
@@ -191,18 +185,18 @@ public class DeploymentManager extends AbstractManager {
         String decisionDefinitionId = decisionDefinition.getId();
 
         // remove decision definitions from cache:
-        deploymentCache
-          .removeDecisionDefinition(decisionDefinitionId);
+        deploymentCache.removeDecisionDefinition(decisionDefinitionId);
       }
     }
   }
 
   protected void deleteDecisionRequirementDeployment(String deploymentId) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     if (processEngineConfiguration.isDmnEnabled()) {
       DecisionRequirementsDefinitionManager manager = getDecisionRequirementsDefinitionManager();
-      List<DecisionRequirementsDefinition> decisionRequirementsDefinitions =
-          manager.findDecisionRequirementsDefinitionByDeploymentId(deploymentId);
+      List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = manager
+          .findDecisionRequirementsDefinitionByDeploymentId(deploymentId);
 
       // delete decision requirements definitions from db
       manager.deleteDecisionRequirementsDefinitionsByDeploymentId(deploymentId);
@@ -220,7 +214,7 @@ public class DeploymentManager extends AbstractManager {
 
   public DeploymentEntity findLatestDeploymentByName(String deploymentName) {
     List<?> list = getDbEntityManager().selectList("selectDeploymentsByName", deploymentName, 0, 1);
-    if (list!=null && !list.isEmpty()) {
+    if (list != null && !list.isEmpty()) {
       return (DeploymentEntity) list.get(0);
     }
     return null;
@@ -237,13 +231,16 @@ public class DeploymentManager extends AbstractManager {
 
   public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
     configureQuery(deploymentQuery);
-    return (Long) getDbEntityManager().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
+    return (Long) getDbEntityManager().selectOne("selectDeploymentCountByQueryCriteria",
+        deploymentQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page) {
+  public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery,
+      Page page) {
     configureQuery(deploymentQuery);
-    return getDbEntityManager().selectList("selectDeploymentsByQueryCriteria", deploymentQuery, page);
+    return getDbEntityManager().selectList("selectDeploymentsByQueryCriteria", deploymentQuery,
+        page);
   }
 
   @SuppressWarnings("unchecked")
@@ -253,7 +250,8 @@ public class DeploymentManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<String> findDeploymentIdsByProcessInstances(List<String> processInstanceIds) {
-    return getDbEntityManager().selectList("selectDeploymentIdsByProcessInstances", processInstanceIds);
+    return getDbEntityManager().selectList("selectDeploymentIdsByProcessInstances",
+        processInstanceIds);
   }
 
   @Override
@@ -267,7 +265,7 @@ public class DeploymentManager extends AbstractManager {
   // helper /////////////////////////////////////////////////
 
   protected void createDefaultAuthorizations(DeploymentEntity deployment) {
-    if(isAuthorizationEnabled()) {
+    if (isAuthorizationEnabled()) {
       ResourceAuthorizationProvider provider = getResourceAuthorizationProvider();
       AuthorizationEntity[] authorizations = provider.newDeployment(deployment);
       saveDefaultAuthorizations(authorizations);

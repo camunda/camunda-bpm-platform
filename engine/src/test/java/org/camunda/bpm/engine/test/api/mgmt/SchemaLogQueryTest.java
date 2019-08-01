@@ -92,8 +92,10 @@ public class SchemaLogQueryTest {
     populateTable();
 
     // then sorting works
-    verifySorting(managementService.createSchemaLogQuery().orderByTimestamp().asc().list(), schemaLogEntryByTimestamp());
-    verifySorting(managementService.createSchemaLogQuery().orderByTimestamp().desc().list(), inverted(schemaLogEntryByTimestamp()));
+    verifySorting(managementService.createSchemaLogQuery().orderByTimestamp().asc().list(),
+        schemaLogEntryByTimestamp());
+    verifySorting(managementService.createSchemaLogQuery().orderByTimestamp().desc().list(),
+        inverted(schemaLogEntryByTimestamp()));
 
     cleanupTable();
   }
@@ -104,7 +106,8 @@ public class SchemaLogQueryTest {
     populateTable();
 
     // when
-    SchemaLogEntry schemaLogEntry = managementService.createSchemaLogQuery().version("dummyVersion").singleResult();
+    SchemaLogEntry schemaLogEntry = managementService.createSchemaLogQuery().version("dummyVersion")
+        .singleResult();
 
     // then
     assertThat(schemaLogEntry.getId(), is(dummySchemaLogEntry.getId()));
@@ -115,33 +118,37 @@ public class SchemaLogQueryTest {
   }
 
   /**
-   * There should always be an entry with id "0" that has the oldest timestamp
-   * and thus should be at the beginning/end of the list. (according to the
-   * ordering)
+   * There should always be an entry with id "0" that has the oldest timestamp and thus should be at
+   * the beginning/end of the list. (according to the ordering)
    */
   @Test
   public void testSortedPagedQuery() {
     // given (at least) two schema log entries
     populateTable();
-    // in case of tests that upgrade the schema there are more than two entries we want to check the last page.
+    // in case of tests that upgrade the schema there are more than two entries we want to check the
+    // last page.
     int count = (int) managementService.createSchemaLogQuery().count();
 
     // then paging works
     // ascending order
-    List<SchemaLogEntry> schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().asc().listPage(0, 1);
+    List<SchemaLogEntry> schemaLogEntry = managementService.createSchemaLogQuery()
+        .orderByTimestamp().asc().listPage(0, 1);
     assertThat(schemaLogEntry.size(), is(1));
     assertThat(schemaLogEntry.get(0).getId(), is("0"));
 
-    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().asc().listPage(count - 1, 1);
+    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().asc()
+        .listPage(count - 1, 1);
     assertThat(schemaLogEntry.size(), is(1));
     assertThat(schemaLogEntry.get(0).getId(), is(not("0")));
 
     // descending order
-    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(0, 1);
+    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(0,
+        1);
     assertThat(schemaLogEntry.size(), is(1));
     assertThat(schemaLogEntry.get(0).getId(), is(not("0")));
 
-    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(count - 1, 1);
+    schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc()
+        .listPage(count - 1, 1);
     assertThat(schemaLogEntry.size(), is(1));
     assertThat(schemaLogEntry.get(0).getId(), is("0"));
 
@@ -153,7 +160,8 @@ public class SchemaLogQueryTest {
       @Override
       public Void execute(CommandContext commandContext) {
 
-        DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(Context.getProcessEngineConfiguration().getIdGenerator());
+        DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(
+            Context.getProcessEngineConfiguration().getIdGenerator());
         DbEntityManager newEntityManager = dbEntityManagerFactory.openSession();
         newEntityManager.insert(dummySchemaLogEntry);
         newEntityManager.flush();

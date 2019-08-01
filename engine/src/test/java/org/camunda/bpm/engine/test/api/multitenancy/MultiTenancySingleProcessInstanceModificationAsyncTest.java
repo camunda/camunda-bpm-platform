@@ -64,7 +64,7 @@ public class MultiTenancySingleProcessInstanceModificationAsyncTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RepositoryService repositoryService;
@@ -102,22 +102,25 @@ public class MultiTenancySingleProcessInstanceModificationAsyncTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
     String processInstanceId = processInstance.getId();
     String processDefinitionId = processInstance.getProcessDefinitionId();
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionId(processDefinitionId).singleResult();
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
     // when
-    Batch modificationBatch = runtimeService.createProcessInstanceModification(processInstance.getId())
-        .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
-        .executeAsync();
+    Batch modificationBatch = runtimeService
+        .createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "task1")).executeAsync();
     assertNotNull(modificationBatch);
     assertEquals(TENANT_ONE, modificationBatch.getTenantId());
-    Job job = managementService.createJobQuery().jobDefinitionId(modificationBatch.getSeedJobDefinitionId()).singleResult();
+    Job job = managementService.createJobQuery()
+        .jobDefinitionId(modificationBatch.getSeedJobDefinitionId()).singleResult();
     // seed job
     assertEquals(TENANT_ONE, job.getTenantId());
     managementService.executeJob(job.getId());
 
-    for (Job pending : managementService.createJobQuery().jobDefinitionId(modificationBatch.getBatchJobDefinitionId()).list()) {
+    for (Job pending : managementService.createJobQuery()
+        .jobDefinitionId(modificationBatch.getBatchJobDefinitionId()).list()) {
       managementService.executeJob(pending.getId());
       assertEquals(processDefinition.getDeploymentId(), pending.getDeploymentId());
       assertEquals(TENANT_ONE, pending.getTenantId());
@@ -128,9 +131,12 @@ public class MultiTenancySingleProcessInstanceModificationAsyncTest {
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task2").done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("task2").done());
 
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngineConfiguration.getProcessEngine());
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId,
+        processEngineConfiguration.getProcessEngine());
 
     assertThat(executionTree).matches(describeExecutionTree("task2").scope().done());
 
@@ -147,7 +153,8 @@ public class MultiTenancySingleProcessInstanceModificationAsyncTest {
     return null;
   }
 
-  protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance, String activityId) {
+  protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance,
+      String activityId) {
     if (activityId.equals(activityInstance.getActivityId())) {
       return activityInstance;
     }
@@ -172,13 +179,12 @@ public class MultiTenancySingleProcessInstanceModificationAsyncTest {
   }
 
   protected void assertProcessEnded(final String processInstanceId) {
-    ProcessInstance processInstance = runtimeService
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstanceId)
-      .singleResult();
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).singleResult();
 
-    if (processInstance!=null) {
-      throw new AssertionFailedError("Expected finished process instance '"+processInstanceId+"' but it was still in the db");
+    if (processInstance != null) {
+      throw new AssertionFailedError("Expected finished process instance '" + processInstanceId
+          + "' but it was still in the db");
     }
   }
 }

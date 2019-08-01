@@ -43,11 +43,12 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
     runtimeService.startProcessInstanceByKey("catchSignal", variables);
 
     // then
-    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-TestVar").count());
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-TestVar").count());
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchIntermediate.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchIntermediate.bpmn20.xml" })
   public void testSignalCatchIntermediateActsOnEventReceive() {
 
     // given
@@ -59,12 +60,13 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
     runtimeService.signalEventReceived("alert-TestVar");
 
     // then
-    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-TestVar").count());
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-TestVar").count());
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchIntermediate.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalThrowIntermediate.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalThrowIntermediate.bpmn20.xml" })
   public void testSignalThrowCatchIntermediate() {
 
     // given
@@ -73,19 +75,22 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
 
     // when
     runtimeService.startProcessInstanceByKey("catchSignal", variables);
-    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-TestVar").count());
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-TestVar").count());
     runtimeService.startProcessInstanceByKey("throwSignal", variables);
 
     // then
-    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-${var}").count());
-    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-TestVar").count());
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-${var}").count());
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-TestVar").count());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchIntermediate.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalThrowEnd.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalThrowEnd.bpmn20.xml" })
   public void testSignalThrowEndCatchIntermediate() {
 
     // given
@@ -94,42 +99,47 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
 
     // when
     runtimeService.startProcessInstanceByKey("catchSignal", variables);
-    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-TestVar").count());
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-TestVar").count());
     runtimeService.startProcessInstanceByKey("throwEndSignal", variables);
 
     // then
-    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-${var}").count());
-    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-TestVar").count());
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-${var}").count());
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-TestVar").count());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchBoundary.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalThrowIntermediate.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalThrowIntermediate.bpmn20.xml" })
   public void testSignalCatchBoundary() {
 
     // given
     HashMap<String, Object> variables = new HashMap<String, Object>();
     variables.put("var", "TestVar");
     runtimeService.startProcessInstanceByKey("catchSignal", variables);
-    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-TestVar").count());
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-TestVar").count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
 
     // when
     runtimeService.startProcessInstanceByKey("throwSignal", variables);
 
     // then
-    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-TestVar").count());
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-TestVar").count());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalStartEvent.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalStartEvent.bpmn20.xml" })
   public void testSignalStartEvent() {
 
     // given
-    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert-foo").count());
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert-foo").count());
     assertEquals(0, taskService.createTaskQuery().count());
 
     // when
@@ -144,9 +154,11 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
   public void testSignalStartEventInEventSubProcess() {
 
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalStartEventInEventSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("signalStartEventInEventSubProcess");
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
     // check if user task exists
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
@@ -161,18 +173,17 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
     taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
     assertEquals(0, taskQuery.count());
     // check if execution doesn't exist because signal start event is interrupting
-    executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(0, executionQuery.count());
   }
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalStartEvent.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.throwAlertSignalAsync.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.throwAlertSignalAsync.bpmn20.xml" })
   public void testAsyncSignalStartEvent() {
-    ProcessDefinition catchingProcessDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("startBySignal")
-        .singleResult();
+    ProcessDefinition catchingProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("startBySignal").singleResult();
 
     // given a process instance that throws a signal asynchronously
     runtimeService.startProcessInstanceByKey("throwSignalAsync");
@@ -193,7 +204,7 @@ public class SignalEventExpressionNameTest extends PluggableProcessEngineTestCas
   }
 
   @Deployment(resources = {
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchIntermediate.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventExpressionNameTest.testSignalCatchIntermediate.bpmn20.xml" })
   public void testSignalExpressionErrorHandling() {
 
     String expectedErrorMessage = "Unknown property used in expression: alert-${var}. Cannot resolve identifier 'var'";

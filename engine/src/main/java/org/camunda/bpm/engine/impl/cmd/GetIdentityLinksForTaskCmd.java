@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
-
 /**
  * @author Joram Barrez
  * @author Falko Menge
@@ -44,7 +43,7 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
     this.taskId = taskId;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes" })
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public List<IdentityLink> execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
 
@@ -83,7 +82,8 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
   }
 
   protected void checkGetIdentityLink(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadTask(task);
     }
   }

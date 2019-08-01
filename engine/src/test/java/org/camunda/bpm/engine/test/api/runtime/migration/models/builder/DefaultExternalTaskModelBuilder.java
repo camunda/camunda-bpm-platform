@@ -52,7 +52,7 @@ public class DefaultExternalTaskModelBuilder {
     return this;
   }
 
-  public DefaultExternalTaskModelBuilder topic(String topic){
+  public DefaultExternalTaskModelBuilder topic(String topic) {
     this.topic = topic;
     return this;
   }
@@ -63,14 +63,9 @@ public class DefaultExternalTaskModelBuilder {
   }
 
   public BpmnModelInstance build() {
-    return ProcessModels.newModel(processKey)
-      .startEvent()
-      .serviceTask(externalTaskName)
-      .camundaType(externalTaskType)
-      .camundaTopic(topic)
-      .camundaTaskPriority(priority.toString())
-      .endEvent()
-      .done();
+    return ProcessModels.newModel(processKey).startEvent().serviceTask(externalTaskName)
+        .camundaType(externalTaskType).camundaTopic(topic).camundaTaskPriority(priority.toString())
+        .endEvent().done();
   }
 
 }

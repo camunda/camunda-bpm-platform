@@ -27,11 +27,12 @@ import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
  *
  */
 public class ProcessesXmlImpl implements ProcessesXml {
-  
+
   private List<ProcessEngineXml> processEngineXmls;
   private List<ProcessArchiveXml> processArchiveXmls;
-  
-  public ProcessesXmlImpl(List<ProcessEngineXml> processEngineXmls, List<ProcessArchiveXml> processArchiveXmls) {
+
+  public ProcessesXmlImpl(List<ProcessEngineXml> processEngineXmls,
+      List<ProcessArchiveXml> processArchiveXmls) {
     this.processEngineXmls = processEngineXmls;
     this.processArchiveXmls = processArchiveXmls;
   }

@@ -46,40 +46,41 @@ public class CallActivityDelegateMappingTest {
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMapping.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMapping.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMapping() {
-    //given
+    // given
     engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
     TaskQuery taskQuery = engineRule.getTaskService().createTaskQuery();
 
-    //when
+    // when
     Task taskInSubProcess = taskQuery.singleResult();
     assertEquals("Task in subprocess", taskInSubProcess.getName());
 
-    //then check value from input variable
-    Object inputVar = engineRule.getRuntimeService().getVariable(taskInSubProcess.getProcessInstanceId(), "TestInputVar");
+    // then check value from input variable
+    Object inputVar = engineRule.getRuntimeService()
+        .getVariable(taskInSubProcess.getProcessInstanceId(), "TestInputVar");
     assertEquals("inValue", inputVar);
 
-    //when completing the task in the subprocess, finishes the subprocess
+    // when completing the task in the subprocess, finishes the subprocess
     engineRule.getTaskService().complete(taskInSubProcess.getId());
     Task taskAfterSubProcess = taskQuery.singleResult();
     assertEquals("Task after subprocess", taskAfterSubProcess.getName());
 
-    //then check value from output variable
-    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery().singleResult();
-    Object outputVar = engineRule.getRuntimeService().getVariable(processInstance.getId(), "TestOutputVar");
+    // then check value from output variable
+    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery()
+        .singleResult();
+    Object outputVar = engineRule.getRuntimeService().getVariable(processInstance.getId(),
+        "TestOutputVar");
     assertEquals("outValue", outputVar);
   }
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpression.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpression.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingeExpression() {
-    //given
+    // given
 
     Map<Object, Object> vars = engineRule.getProcessEngineConfiguration().getBeans();
     vars.put("expr", new DelegatedVarMapping());
@@ -87,96 +88,98 @@ public class CallActivityDelegateMappingTest {
     engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
     TaskQuery taskQuery = engineRule.getTaskService().createTaskQuery();
 
-    //when
+    // when
     Task taskInSubProcess = taskQuery.singleResult();
     assertEquals("Task in subprocess", taskInSubProcess.getName());
 
-    //then check if variable mapping was executed - check if input variable exist
-    Object inputVar = engineRule.getRuntimeService().getVariable(taskInSubProcess.getProcessInstanceId(), "TestInputVar");
+    // then check if variable mapping was executed - check if input variable exist
+    Object inputVar = engineRule.getRuntimeService()
+        .getVariable(taskInSubProcess.getProcessInstanceId(), "TestInputVar");
     assertEquals("inValue", inputVar);
 
-    //when completing the task in the subprocess, finishes the subprocess
+    // when completing the task in the subprocess, finishes the subprocess
     engineRule.getTaskService().complete(taskInSubProcess.getId());
     Task taskAfterSubProcess = taskQuery.singleResult();
     assertEquals("Task after subprocess", taskAfterSubProcess.getName());
 
-    //then check if variable output mapping was executed - check if output variable exist
-    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery().singleResult();
-    Object outputVar = engineRule.getRuntimeService().getVariable(processInstance.getId(), "TestOutputVar");
+    // then check if variable output mapping was executed - check if output variable exist
+    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery()
+        .singleResult();
+    Object outputVar = engineRule.getRuntimeService().getVariable(processInstance.getId(),
+        "TestOutputVar");
     assertEquals("outValue", outputVar);
   }
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingNotFound.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingNotFound.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingNotFound() {
     try {
       engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
       fail("Execption expected!");
     } catch (ProcessEngineException e) {
-      //Exception while instantiating class 'org.camunda.bpm.engine.test.bpmn.callactivity.NotFoundMapping'
-      assertEquals("ENGINE-09008 Exception while instantiating class 'org.camunda.bpm.engine.test.bpmn.callactivity.NotFoundMapping': ENGINE-09017 Cannot load class 'org.camunda.bpm.engine.test.bpmn.callactivity.NotFoundMapping': org.camunda.bpm.engine.test.bpmn.callactivity.NotFoundMapping",
-              e.getMessage());
+      // Exception while instantiating class
+      // 'org.camunda.bpm.engine.test.bpmn.callactivity.NotFoundMapping'
+      assertEquals(
+          "ENGINE-09008 Exception while instantiating class 'org.camunda.bpm.engine.test.bpmn.callactivity.NotFoundMapping': ENGINE-09017 Cannot load class 'org.camunda.bpm.engine.test.bpmn.callactivity.NotFoundMapping': org.camunda.bpm.engine.test.bpmn.callactivity.NotFoundMapping",
+          e.getMessage());
     }
   }
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionNotFound.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionNotFound.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingeExpressionNotFound() {
     try {
       engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
       fail("Exception expected!");
     } catch (ProcessEngineException pee) {
       assertEquals(
-              "Unknown property used in expression: ${notFound}. Cause: Cannot resolve identifier 'notFound'",
-              pee.getMessage());
+          "Unknown property used in expression: ${notFound}. Cause: Cannot resolve identifier 'notFound'",
+          pee.getMessage());
     }
   }
 
   private void delegateVariableMappingThrowException() {
-    //given
+    // given
     engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
     TaskQuery taskQuery = engineRule.getTaskService().createTaskQuery();
     Task taskBeforeSubProcess = taskQuery.singleResult();
     assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
 
-    //when completing the task continues the process which leads to calling the subprocess
-    //which throws an exception
+    // when completing the task continues the process which leads to calling the subprocess
+    // which throws an exception
     try {
       engineRule.getTaskService().complete(taskBeforeSubProcess.getId());
       fail("Exeption expected!");
-    } catch (ProcessEngineException pee) { //then
-      Assert.assertTrue(pee.getMessage().equalsIgnoreCase("org.camunda.bpm.engine.ProcessEngineException: New process engine exception.")
-              || pee.getMessage().contains("1234"));
+    } catch (ProcessEngineException pee) { // then
+      Assert.assertTrue(pee.getMessage().equalsIgnoreCase(
+          "org.camunda.bpm.engine.ProcessEngineException: New process engine exception.")
+          || pee.getMessage().contains("1234"));
     }
 
-    //then process rollback to user task which is before sub process
-    //not catched by boundary event
+    // then process rollback to user task which is before sub process
+    // not catched by boundary event
     taskBeforeSubProcess = taskQuery.singleResult();
     assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
   }
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingThrowException.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingThrowException.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingThrowException() {
     delegateVariableMappingThrowException();
   }
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionThrowException.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionThrowException.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingeExpressionThrowException() {
-    //given
+    // given
     Map<Object, Object> vars = engineRule.getProcessEngineConfiguration().getBeans();
     vars.put("expr", new DelegateVarMappingThrowException());
     engineRule.getProcessEngineConfiguration().setBeans(vars);
@@ -185,20 +188,18 @@ public class CallActivityDelegateMappingTest {
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingThrowBpmnError.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingThrowBpmnError.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingThrowBpmnError() {
     delegateVariableMappingThrowException();
   }
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionThrowException.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionThrowException.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingeExpressionThrowBpmnError() {
-    //given
+    // given
     Map<Object, Object> vars = engineRule.getProcessEngineConfiguration().getBeans();
     vars.put("expr", new DelegateVarMappingThrowBpmnError());
     engineRule.getProcessEngineConfiguration().setBeans(vars);
@@ -206,7 +207,7 @@ public class CallActivityDelegateMappingTest {
   }
 
   private void delegateVariableMappingThrowExceptionOutput() {
-    //given
+    // given
     engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
     TaskQuery taskQuery = engineRule.getTaskService().createTaskQuery();
     Task taskBeforeSubProcess = taskQuery.singleResult();
@@ -214,38 +215,37 @@ public class CallActivityDelegateMappingTest {
     engineRule.getTaskService().complete(taskBeforeSubProcess.getId());
     Task taskInSubProcess = taskQuery.singleResult();
 
-    //when completing the task continues the process which leads to calling the output mapping
-    //which throws an exception
+    // when completing the task continues the process which leads to calling the output mapping
+    // which throws an exception
     try {
       engineRule.getTaskService().complete(taskInSubProcess.getId());
       fail("Exeption expected!");
-    } catch (ProcessEngineException pee) { //then
-      Assert.assertTrue(pee.getMessage().equalsIgnoreCase("org.camunda.bpm.engine.ProcessEngineException: New process engine exception.")
-              || pee.getMessage().contains("1234"));
+    } catch (ProcessEngineException pee) { // then
+      Assert.assertTrue(pee.getMessage().equalsIgnoreCase(
+          "org.camunda.bpm.engine.ProcessEngineException: New process engine exception.")
+          || pee.getMessage().contains("1234"));
     }
 
-    //then process rollback to user task which is in sub process
-    //not catched by boundary event
+    // then process rollback to user task which is in sub process
+    // not catched by boundary event
     taskInSubProcess = taskQuery.singleResult();
     assertEquals("Task in subprocess", taskInSubProcess.getName());
   }
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingThrowExceptionOutput.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingThrowExceptionOutput.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingThrowExceptionOutput() {
     delegateVariableMappingThrowExceptionOutput();
   }
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionThrowException.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionThrowException.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingeExpressionThrowExceptionOutput() {
-    //given
+    // given
     Map<Object, Object> vars = engineRule.getProcessEngineConfiguration().getBeans();
     vars.put("expr", new DelegateVarMappingThrowExceptionOutput());
     engineRule.getProcessEngineConfiguration().setBeans(vars);
@@ -254,20 +254,18 @@ public class CallActivityDelegateMappingTest {
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingThrowBpmnErrorOutput.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingThrowBpmnErrorOutput.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingThrowBpmnErrorOutput() {
     delegateVariableMappingThrowExceptionOutput();
   }
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionThrowException.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionThrowException.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingeExpressionThrowBpmnErrorOutput() {
-    //given
+    // given
     Map<Object, Object> vars = engineRule.getProcessEngineConfiguration().getBeans();
     vars.put("expr", new DelegateVarMappingThrowBpmnErrorOutput());
     engineRule.getProcessEngineConfiguration().setBeans(vars);
@@ -276,41 +274,42 @@ public class CallActivityDelegateMappingTest {
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallFailingSubProcessWithDelegatedVariableMapping.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/failingSubProcess.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallFailingSubProcessWithDelegatedVariableMapping.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/failingSubProcess.bpmn20.xml" })
   public void testCallFailingSubProcessWithDelegatedVariableMapping() {
-    //given starting process instance with call activity
-    //when call activity execution fails
-    ProcessInstance procInst = engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
+    // given starting process instance with call activity
+    // when call activity execution fails
+    ProcessInstance procInst = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("callSimpleSubProcess");
 
-    //then output mapping should be executed
-    Object outputVar = engineRule.getRuntimeService().getVariable(procInst.getId(), "TestOutputVar");
+    // then output mapping should be executed
+    Object outputVar = engineRule.getRuntimeService().getVariable(procInst.getId(),
+        "TestOutputVar");
     assertEquals("outValue", outputVar);
   }
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSubProcessWithDelegatedVariableMappingAndAsyncServiceTask.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcessWithAsyncService.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSubProcessWithDelegatedVariableMappingAndAsyncServiceTask.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcessWithAsyncService.bpmn20.xml" })
   public void testCallSubProcessWithDelegatedVariableMappingAndAsyncServiceTask() {
-    //given starting process instance with call activity which has asyn service task
-    ProcessInstance superProcInst = engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
+    // given starting process instance with call activity which has asyn service task
+    ProcessInstance superProcInst = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("callSimpleSubProcess");
 
-    ProcessInstance subProcInst = engineRule.getRuntimeService()
-            .createProcessInstanceQuery()
-            .processDefinitionKey("simpleSubProcessWithAsyncService").singleResult();
+    ProcessInstance subProcInst = engineRule.getRuntimeService().createProcessInstanceQuery()
+        .processDefinitionKey("simpleSubProcessWithAsyncService").singleResult();
 
-    //then delegation variable mapping class should also been resolved
-    //input mapping should be executed
+    // then delegation variable mapping class should also been resolved
+    // input mapping should be executed
     Object inVar = engineRule.getRuntimeService().getVariable(subProcInst.getId(), "TestInputVar");
     assertEquals("inValue", inVar);
 
-    //and after finish call activity the ouput mapping is executed
+    // and after finish call activity the ouput mapping is executed
     testHelper.executeAvailableJobs();
 
-    Object outputVar = engineRule.getRuntimeService().getVariable(superProcInst.getId(), "TestOutputVar");
+    Object outputVar = engineRule.getRuntimeService().getVariable(superProcInst.getId(),
+        "TestOutputVar");
     assertEquals("outValue", outputVar);
   }
 

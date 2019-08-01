@@ -42,14 +42,16 @@ public class MigrationPlanValidationReportAssert {
     return this;
   }
 
-  public MigrationPlanValidationReportAssert hasInstructionFailures(String activityId, String... expectedFailures) {
+  public MigrationPlanValidationReportAssert hasInstructionFailures(String activityId,
+      String... expectedFailures) {
     isNotNull();
 
     List<String> failuresFound = new ArrayList<String>();
 
     for (MigrationInstructionValidationReport instructionReport : actual.getInstructionReports()) {
       String sourceActivityId = instructionReport.getMigrationInstruction().getSourceActivityId();
-      if ((activityId == null && sourceActivityId == null) || (activityId != null && activityId.equals(sourceActivityId))) {
+      if ((activityId == null && sourceActivityId == null)
+          || (activityId != null && activityId.equals(sourceActivityId))) {
         failuresFound.addAll(instructionReport.getFailures());
       }
     }
@@ -59,14 +61,16 @@ public class MigrationPlanValidationReportAssert {
       matchers.add(Matchers.containsString(expectedFailure));
     }
 
-    Assert.assertThat("Expected failures for activity id '" + activityId + "':\n" + joinFailures(expectedFailures) +
-      "But found failures:\n" + joinFailures(failuresFound.toArray()),
-      failuresFound, Matchers.containsInAnyOrder(matchers));
+    Assert.assertThat(
+        "Expected failures for activity id '" + activityId + "':\n" + joinFailures(expectedFailures)
+            + "But found failures:\n" + joinFailures(failuresFound.toArray()),
+        failuresFound, Matchers.containsInAnyOrder(matchers));
 
     return this;
   }
 
-  public static MigrationPlanValidationReportAssert assertThat(MigrationPlanValidationReport report) {
+  public static MigrationPlanValidationReportAssert assertThat(
+      MigrationPlanValidationReport report) {
     return new MigrationPlanValidationReportAssert(report);
   }
 

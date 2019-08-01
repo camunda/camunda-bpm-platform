@@ -66,26 +66,28 @@ public class BatchMigrationUserOperationLogTest {
   @Test
   public void testLogCreation() {
     // given
-    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(
-        modify(ProcessModels.ONE_TASK_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    ProcessDefinition sourceProcessDefinition = migrationRule
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
     engineRule.getIdentityService().clearAuthentication();
 
     // then
-    List<UserOperationLogEntry> opLogEntries = engineRule.getHistoryService().createUserOperationLogQuery().list();
+    List<UserOperationLogEntry> opLogEntries = engineRule.getHistoryService()
+        .createUserOperationLogQuery().list();
     Assert.assertEquals(3, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
@@ -116,8 +118,10 @@ public class BatchMigrationUserOperationLogTest {
     Assert.assertNotNull(numInstancesEntry);
     Assert.assertEquals("ProcessInstance", numInstancesEntry.getEntityType());
     Assert.assertEquals("Migrate", numInstancesEntry.getOperationType());
-    Assert.assertEquals(sourceProcessDefinition.getId(), numInstancesEntry.getProcessDefinitionId());
-    Assert.assertEquals(sourceProcessDefinition.getKey(), numInstancesEntry.getProcessDefinitionKey());
+    Assert.assertEquals(sourceProcessDefinition.getId(),
+        numInstancesEntry.getProcessDefinitionId());
+    Assert.assertEquals(sourceProcessDefinition.getKey(),
+        numInstancesEntry.getProcessDefinitionKey());
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
     Assert.assertNull(numInstancesEntry.getOrgValue());
     Assert.assertEquals("1", numInstancesEntry.getNewValue());
@@ -130,19 +134,20 @@ public class BatchMigrationUserOperationLogTest {
   @Test
   public void testNoCreationOnSyncBatchJobExecution() {
     // given
-    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(
-        modify(ProcessModels.ONE_TASK_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    ProcessDefinition sourceProcessDefinition = migrationRule
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
-    Batch batch = engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
+    Batch batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
     batchHelper.executeSeedJob(batch);
 
     // when
@@ -151,25 +156,27 @@ public class BatchMigrationUserOperationLogTest {
     engineRule.getIdentityService().clearAuthentication();
 
     // then
-    Assert.assertEquals(0, engineRule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).count());
+    Assert.assertEquals(0, engineRule.getHistoryService().createUserOperationLogQuery()
+        .entityType(EntityTypes.PROCESS_INSTANCE).count());
   }
 
   @Test
   public void testNoCreationOnJobExecutorBatchJobExecution() {
     // given
-    ProcessDefinition sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = migrationRule.deployAndGetDefinition(
-        modify(ProcessModels.ONE_TASK_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    ProcessDefinition sourceProcessDefinition = migrationRule
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = migrationRule
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
+    engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
 
     // when
     migrationRule.waitForJobExecutorToProcessAllJobs(5000L);

@@ -26,10 +26,12 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  *
  * @author Thorben Lindhauer
  */
-public class CannotRemoveMultiInstanceInnerActivityValidator implements MigrationInstructionValidator {
+public class CannotRemoveMultiInstanceInnerActivityValidator
+    implements MigrationInstructionValidator {
 
   @Override
-  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions,
+  public void validate(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
       MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
 
@@ -37,7 +39,8 @@ public class CannotRemoveMultiInstanceInnerActivityValidator implements Migratio
       ActivityImpl innerActivity = getInnerActivity(sourceActivity);
 
       if (instructions.getInstructionsBySourceScope(innerActivity).isEmpty()) {
-        report.addFailure("Cannot remove the inner activity of a multi-instance body when the body is mapped");
+        report.addFailure(
+            "Cannot remove the inner activity of a multi-instance body when the body is mapped");
       }
     }
   }
@@ -47,7 +50,8 @@ public class CannotRemoveMultiInstanceInnerActivityValidator implements Migratio
   }
 
   protected ActivityImpl getInnerActivity(ActivityImpl multiInstanceBody) {
-    MultiInstanceActivityBehavior activityBehavior = (MultiInstanceActivityBehavior) multiInstanceBody.getActivityBehavior();
+    MultiInstanceActivityBehavior activityBehavior = (MultiInstanceActivityBehavior) multiInstanceBody
+        .getActivityBehavior();
     return activityBehavior.getInnerActivity(multiInstanceBody);
   }
 }

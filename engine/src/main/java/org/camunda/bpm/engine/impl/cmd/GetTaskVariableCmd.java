@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -47,10 +46,7 @@ public class GetTaskVariableCmd implements Command<Object>, Serializable {
     ensureNotNull("taskId", taskId);
     ensureNotNull("variableName", variableName);
 
-    TaskEntity task = Context
-      .getCommandContext()
-      .getTaskManager()
-      .findTaskById(taskId);
+    TaskEntity task = Context.getCommandContext().getTaskManager().findTaskById(taskId);
 
     ensureNotNull("task " + taskId + " doesn't exist", "task", task);
 
@@ -68,7 +64,8 @@ public class GetTaskVariableCmd implements Command<Object>, Serializable {
   }
 
   protected void checkGetTaskVariable(TaskEntity task, CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadTaskVariable(task);
     }
   }

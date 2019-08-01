@@ -18,14 +18,14 @@ package org.camunda.bpm.engine.batch;
 
 /**
  * <p>
- *  Additional statistics for a single batch.
+ * Additional statistics for a single batch.
  * </p>
  *
  * <p>
- *   Contains the number of remaining jobs, completed and failed batch
- *   execution jobs. The following relation between these exists:
+ * Contains the number of remaining jobs, completed and failed batch execution jobs. The following
+ * relation between these exists:
  *
- *   <code>
+ * <code>
  *     batch total jobs = remaining jobs + completed jobs
  *   </code>
  * </p>
@@ -33,16 +33,14 @@ package org.camunda.bpm.engine.batch;
 public interface BatchStatistics extends Batch {
   /**
    * <p>
-   *   The number of remaining batch execution jobs.
-   *   This does include failed batch execution jobs and
-   *   batch execution jobs which still have to be created by the seed job.
+   * The number of remaining batch execution jobs. This does include failed batch execution jobs and
+   * batch execution jobs which still have to be created by the seed job.
    * </p>
    *
    * <p>
-   *   See
-   *   {@link #getTotalJobs()} for the number of all batch execution jobs,
-   *   {@link #getCompletedJobs()} for the number of completed batch execution jobs and
-   *   {@link #getFailedJobs()} for the number of failed batch execution jobs.
+   * See {@link #getTotalJobs()} for the number of all batch execution jobs,
+   * {@link #getCompletedJobs()} for the number of completed batch execution jobs and
+   * {@link #getFailedJobs()} for the number of failed batch execution jobs.
    * </p>
    *
    * @return the number of remaining batch execution jobs
@@ -51,15 +49,14 @@ public interface BatchStatistics extends Batch {
 
   /**
    * <p>
-   *   The number of completed batch execution jobs.
-   *   This does include aborted/deleted batch execution jobs.
+   * The number of completed batch execution jobs. This does include aborted/deleted batch execution
+   * jobs.
    * </p>
    *
    * <p>
-   *   See
-   *   {@link #getTotalJobs()} for the number of all batch execution jobs,
-   *   {@link #getRemainingJobs()} ()} for the number of remaining batch execution jobs and
-   *   {@link #getFailedJobs()} for the number of failed batch execution jobs.
+   * See {@link #getTotalJobs()} for the number of all batch execution jobs,
+   * {@link #getRemainingJobs()} ()} for the number of remaining batch execution jobs and
+   * {@link #getFailedJobs()} for the number of failed batch execution jobs.
    * </p>
    *
    * @return the number of completed batch execution jobs
@@ -68,15 +65,14 @@ public interface BatchStatistics extends Batch {
 
   /**
    * <p>
-   *   The number of failed batch execution jobs.
-   *   This does not include aborted or deleted batch execution jobs.
+   * The number of failed batch execution jobs. This does not include aborted or deleted batch
+   * execution jobs.
    * </p>
    *
    * <p>
-   *   See
-   *   {@link #getTotalJobs()} for the number of all batch execution jobs,
-   *   {@link #getRemainingJobs()} ()} for the number of remaining batch execution jobs and
-   *   {@link #getCompletedJobs()} ()} for the number of completed batch execution jobs.
+   * See {@link #getTotalJobs()} for the number of all batch execution jobs,
+   * {@link #getRemainingJobs()} ()} for the number of remaining batch execution jobs and
+   * {@link #getCompletedJobs()} ()} for the number of completed batch execution jobs.
    * </p>
    *
    * @return the number of failed batch execution jobs

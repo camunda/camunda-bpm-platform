@@ -39,11 +39,9 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
   protected final String DEFINITION_KEY_2 = "oneTaskCase";
   protected final String CASE_TASK_KEY = "PI_CaseTask_1";
 
-
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-  })
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testManualStart() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -53,9 +51,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     assertNull(subCaseInstance);
 
     // when
-    caseService
-        .withCaseExecution(caseTaskId)
-        .manualStart();
+    caseService.withCaseExecution(caseTaskId).manualStart();
 
     // then
     subCaseInstance = queryCaseInstanceByKey(DEFINITION_KEY_2);
@@ -66,10 +62,9 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     assertTrue(caseTask.isActive());
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-  })
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testManualStartWithVariable() {
     // given
     String superCaseInstanceId = createCaseInstance(DEFINITION_KEY).getId();
@@ -79,11 +74,8 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     assertNull(subCaseInstance);
 
     // when
-    caseService
-        .withCaseExecution(caseTaskId)
-        .setVariable("aVariableName", "abc")
-        .setVariable("anotherVariableName", 999)
-        .manualStart();
+    caseService.withCaseExecution(caseTaskId).setVariable("aVariableName", "abc")
+        .setVariable("anotherVariableName", 999).manualStart();
 
     // then
     subCaseInstance = queryCaseInstanceByKey(DEFINITION_KEY_2);
@@ -96,9 +88,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     // the case instance has two variables:
     // - aVariableName
     // - anotherVariableName
-    List<VariableInstance> result = runtimeService
-        .createVariableInstanceQuery()
-        .list();
+    List<VariableInstance> result = runtimeService.createVariableInstanceQuery().list();
 
     assertFalse(result.isEmpty());
     assertEquals(2, result.size());
@@ -107,10 +97,9 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-  })
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testManualStartWithVariables() {
     // given
     String superCaseInstanceId = createCaseInstance(DEFINITION_KEY).getId();
@@ -125,10 +114,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     variables.put("anotherVariableName", 999);
 
     // when
-    caseService
-        .withCaseExecution(caseTaskId)
-        .setVariables(variables)
-        .manualStart();
+    caseService.withCaseExecution(caseTaskId).setVariables(variables).manualStart();
 
     // then
     subCaseInstance = queryCaseInstanceByKey(DEFINITION_KEY_2);
@@ -141,9 +127,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     // the case instance has two variables:
     // - aVariableName
     // - anotherVariableName
-    List<VariableInstance> result = runtimeService
-        .createVariableInstanceQuery()
-        .list();
+    List<VariableInstance> result = runtimeService.createVariableInstanceQuery().list();
 
     assertFalse(result.isEmpty());
     assertEquals(2, result.size());
@@ -152,10 +136,8 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testStart() {
     // given
     createCaseInstance(DEFINITION_KEY).getId();
@@ -172,16 +154,12 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     assertTrue(caseTask.isActive());
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testStartWithVariable() {
     // given
-    String superCaseInstanceId = createCaseInstance(DEFINITION_KEY,
-        Variables.createVariables()
-            .putValue("aVariableName", "abc")
-            .putValue("anotherVariableName", 999)).getId();
+    String superCaseInstanceId = createCaseInstance(DEFINITION_KEY, Variables.createVariables()
+        .putValue("aVariableName", "abc").putValue("anotherVariableName", 999)).getId();
 
     CaseInstance subCaseInstance;
 
@@ -196,9 +174,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     // the case instance has two variables:
     // - aVariableName
     // - anotherVariableName
-    List<VariableInstance> result = runtimeService
-        .createVariableInstanceQuery()
-        .list();
+    List<VariableInstance> result = runtimeService.createVariableInstanceQuery().list();
 
     assertFalse(result.isEmpty());
     assertEquals(2, result.size());
@@ -207,10 +183,8 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testStartWithVariables() {
     // given
     // variables
@@ -233,9 +207,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     // the case instance has two variables:
     // - aVariableName
     // - anotherVariableName
-    List<VariableInstance> result = runtimeService
-        .createVariableInstanceQuery()
-        .list();
+    List<VariableInstance> result = runtimeService.createVariableInstanceQuery().list();
 
     assertFalse(result.isEmpty());
     assertEquals(2, result.size());
@@ -262,10 +234,9 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testManualStartWithLocalVariable() {
     // given
     String superCaseInstanceId = createCaseInstance(DEFINITION_KEY).getId();
@@ -275,11 +246,8 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     assertNull(subCaseInstance);
 
     // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .setVariableLocal("aVariableName", "abc")
-      .setVariableLocal("anotherVariableName", 999)
-      .manualStart();
+    caseService.withCaseExecution(caseTaskId).setVariableLocal("aVariableName", "abc")
+        .setVariableLocal("anotherVariableName", 999).manualStart();
 
     // then
     subCaseInstance = queryCaseInstanceByKey(DEFINITION_KEY_2);
@@ -292,9 +260,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     // the case instance has two variables:
     // - aVariableName
     // - anotherVariableName
-    List<VariableInstance> result = runtimeService
-        .createVariableInstanceQuery()
-        .list();
+    List<VariableInstance> result = runtimeService.createVariableInstanceQuery().list();
 
     assertFalse(result.isEmpty());
     assertEquals(2, result.size());
@@ -317,10 +283,9 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testManualStartWithLocalVariables() {
     // given
     String superCaseInstanceId = createCaseInstance(DEFINITION_KEY).getId();
@@ -336,10 +301,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
     // when
     // activate child case execution
-    caseService
-      .withCaseExecution(caseTaskId)
-      .setVariablesLocal(variables)
-      .manualStart();
+    caseService.withCaseExecution(caseTaskId).setVariablesLocal(variables).manualStart();
 
     // then
     subCaseInstance = queryCaseInstanceByKey(DEFINITION_KEY_2);
@@ -352,9 +314,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     // the case instance has two variables:
     // - aVariableName
     // - anotherVariableName
-    List<VariableInstance> result = runtimeService
-        .createVariableInstanceQuery()
-        .list();
+    List<VariableInstance> result = runtimeService.createVariableInstanceQuery().list();
 
     assertFalse(result.isEmpty());
     assertEquals(2, result.size());
@@ -377,9 +337,8 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn"
-      })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn" })
   public void testReenableAnEnabledCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -390,18 +349,15 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .reenable();
+      caseService.withCaseExecution(caseTaskId).reenable();
       fail("It should not be possible to re-enable an enabled case task.");
     } catch (NotAllowedException e) {
     }
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskAndOneHumanTaskCaseWithManualActivation.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testReenableADisabledCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -410,24 +366,18 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     CaseInstance subCaseInstance = queryCaseInstanceByKey(DEFINITION_KEY_2);
     assertNull(subCaseInstance);
 
-    caseService
-      .withCaseExecution(caseTaskId)
-      .disable();
+    caseService.withCaseExecution(caseTaskId).disable();
 
     // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .reenable();
+    caseService.withCaseExecution(caseTaskId).reenable();
 
     // then
     CaseExecution caseTask = queryCaseExecutionByActivityId(CASE_TASK_KEY);
     assertTrue(caseTask.isEnabled());
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testReenableAnActiveCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -435,15 +385,14 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .reenable();
+      caseService.withCaseExecution(caseTaskId).reenable();
       fail("It should not be possible to re-enable an active case task.");
     } catch (NotAllowedException e) {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskAndOneHumanTaskCaseWithManualActivation.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskAndOneHumanTaskCaseWithManualActivation.cmmn" })
   public void testDisableAnEnabledCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -453,39 +402,32 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     assertNull(subCaseInstance);
 
     // when
-    caseService
-      .withCaseExecution(caseTaskId)
-      .disable();
+    caseService.withCaseExecution(caseTaskId).disable();
 
     // then
     CaseExecution caseTask = queryCaseExecutionByActivityId(CASE_TASK_KEY);
     assertTrue(caseTask.isDisabled());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskAndOneHumanTaskCaseWithManualActivation.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskAndOneHumanTaskCaseWithManualActivation.cmmn" })
   public void testDisableADisabledCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK_KEY).getId();
 
-    caseService
-      .withCaseExecution(caseTaskId)
-      .disable();
+    caseService.withCaseExecution(caseTaskId).disable();
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .disable();
+      caseService.withCaseExecution(caseTaskId).disable();
       fail("It should not be possible to disable a already disabled case task.");
     } catch (NotAllowedException e) {
     }
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testDisableAnActiveCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -493,38 +435,31 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
     // when
     try {
-      caseService
-        .withCaseExecution(caseTaskId)
-        .disable();
+      caseService.withCaseExecution(caseTaskId).disable();
       fail("It should not be possible to disable an active case task.");
     } catch (NotAllowedException e) {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskAndOneHumanTaskCaseWithManualActivation.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskAndOneHumanTaskCaseWithManualActivation.cmmn" })
   public void testManualStartOfADisabledCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK_KEY).getId();
 
-    caseService
-      .withCaseExecution(caseTaskId)
-      .disable();
+    caseService.withCaseExecution(caseTaskId).disable();
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .manualStart();
+      caseService.withCaseExecution(caseTaskId).manualStart();
       fail("It should not be possible to start a disabled case task manually.");
     } catch (NotAllowedException e) {
     }
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testManualStartOfAnActiveCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -532,18 +467,14 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .manualStart();
+      caseService.withCaseExecution(caseTaskId).manualStart();
       fail("It should not be possible to start an already active case task manually.");
     } catch (NotAllowedException e) {
     }
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testComplete() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -551,18 +482,16 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .complete();
-      fail("It should not be possible to complete a case task, while the process instance is still running.");
-    } catch (NotAllowedException e) {}
+      caseService.withCaseExecution(caseTaskId).complete();
+      fail(
+          "It should not be possible to complete a case task, while the process instance is still running.");
+    } catch (NotAllowedException e) {
+    }
 
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCloseCaseInstanceShouldCompleteCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -570,17 +499,13 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
     String humanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     CaseInstance subCaseInstance = queryCaseInstanceByKey(DEFINITION_KEY_2);
     assertTrue(subCaseInstance.isCompleted());
 
     // when
-    caseService
-      .withCaseExecution(subCaseInstance.getId())
-      .close();
+    caseService.withCaseExecution(subCaseInstance.getId()).close();
 
     // then
     CaseExecution caseTask = queryCaseExecutionByActivityId(CASE_TASK_KEY);
@@ -592,7 +517,8 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn" })
   public void testDisableShouldCompleteCaseInstance() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -600,9 +526,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
     // when
 
-    caseService
-      .withCaseExecution(caseTaskId)
-      .disable();
+    caseService.withCaseExecution(caseTaskId).disable();
 
     // then
     CaseExecution caseTask = queryCaseExecutionByActivityId(CASE_TASK_KEY);
@@ -613,7 +537,8 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
     assertTrue(superCaseInstance.isCompleted());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn" })
   public void testCompleteAnEnabledCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -621,33 +546,31 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .complete();
+      caseService.withCaseExecution(caseTaskId).complete();
       fail("Should not be able to complete an enabled case task.");
-    } catch (NotAllowedException e) {}
+    } catch (NotAllowedException e) {
+    }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskAndOneHumanTaskCaseWithManualActivation.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskAndOneHumanTaskCaseWithManualActivation.cmmn" })
   public void testCompleteADisabledCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
     String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK_KEY).getId();
 
-    caseService
-      .withCaseExecution(caseTaskId)
-      .disable();
+    caseService.withCaseExecution(caseTaskId).disable();
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .complete();
+      caseService.withCaseExecution(caseTaskId).complete();
       fail("Should not be able to complete a disabled case task.");
-    } catch (NotAllowedException e) {}
+    } catch (NotAllowedException e) {
+    }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn" })
   public void testClose() {
     // given
     createCaseInstance(DEFINITION_KEY);
@@ -655,9 +578,7 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
     try {
       // when
-      caseService
-        .withCaseExecution(caseTaskId)
-        .close();
+      caseService.withCaseExecution(caseTaskId).close();
       fail("It should not be possible to close a case task.");
     } catch (NotAllowedException e) {
 
@@ -665,91 +586,72 @@ public class CaseServiceCaseTaskTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testTerminate() {
     // given
     createCaseInstance(DEFINITION_KEY);
     CaseExecution caseTaskExecution = queryCaseExecutionByActivityId(CASE_TASK_KEY);
     // when
-    caseService
-      .withCaseExecution(caseTaskExecution.getId())
-      .terminate();
+    caseService.withCaseExecution(caseTaskExecution.getId()).terminate();
 
     caseTaskExecution = queryCaseExecutionByActivityId(CASE_TASK_KEY);
     assertNull(caseTaskExecution);
   }
 
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testTerminateNonFluent() {
     // given
     createCaseInstance(DEFINITION_KEY);
     CaseExecution caseTaskExecution = queryCaseExecutionByActivityId(CASE_TASK_KEY);
 
     // when
-    caseService
-      .terminateCaseExecution(caseTaskExecution.getId());
+    caseService.terminateCaseExecution(caseTaskExecution.getId());
 
     caseTaskExecution = queryCaseExecutionByActivityId(CASE_TASK_KEY);
     assertNull(caseTaskExecution);
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCaseWithManualActivation.cmmn",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-      })
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testTerminateNonActiveCaseTask() {
     // given
     createCaseInstance(DEFINITION_KEY);
     CaseExecution caseTaskExecution = queryCaseExecutionByActivityId(CASE_TASK_KEY);
-    
+
     try {
       // when
-      caseService 
-        .terminateCaseExecution(caseTaskExecution.getId());
+      caseService.terminateCaseExecution(caseTaskExecution.getId());
       fail("It should not be possible to terminate a case task.");
     } catch (NotAllowedException e) {
-      boolean result = e.getMessage().contains("The case execution must be in state 'active' to terminate");
-      assertTrue(result);   
+      boolean result = e.getMessage()
+          .contains("The case execution must be in state 'active' to terminate");
+      assertTrue(result);
     }
   }
-  
+
   protected CaseInstance createCaseInstance(String caseDefinitionKey) {
-    return caseService
-        .withCaseDefinitionByKey(caseDefinitionKey)
-        .create();
+    return caseService.withCaseDefinitionByKey(caseDefinitionKey).create();
   }
 
-  protected CaseInstance createCaseInstance(String caseDefinitionKey, Map<String, Object> variables) {
-    return caseService
-        .withCaseDefinitionByKey(caseDefinitionKey)
-        .setVariables(variables)
-        .create();
+  protected CaseInstance createCaseInstance(String caseDefinitionKey,
+      Map<String, Object> variables) {
+    return caseService.withCaseDefinitionByKey(caseDefinitionKey).setVariables(variables).create();
   }
 
   protected CaseExecution queryCaseExecutionByActivityId(String activityId) {
-    return caseService
-        .createCaseExecutionQuery()
-        .activityId(activityId)
-        .singleResult();
+    return caseService.createCaseExecutionQuery().activityId(activityId).singleResult();
   }
 
   protected CaseInstance queryCaseInstanceByKey(String caseDefinitionKey) {
-    return caseService
-        .createCaseInstanceQuery()
-        .caseDefinitionKey(caseDefinitionKey)
+    return caseService.createCaseInstanceQuery().caseDefinitionKey(caseDefinitionKey)
         .singleResult();
   }
 
   protected Task queryTask() {
-    return taskService
-        .createTaskQuery()
-        .singleResult();
+    return taskService.createTaskQuery().singleResult();
   }
 
 }

@@ -28,10 +28,8 @@ import org.camunda.bpm.engine.impl.javax.el.ELResolver;
  * @author Thorben Lindhauer
  *
  */
-@ProcessApplication(
-    value="called-app",
-    deploymentDescriptors={"org/camunda/bpm/application/impl/el/called-process-app.xml"}
-)
+@ProcessApplication(value = "called-app", deploymentDescriptors = {
+    "org/camunda/bpm/application/impl/el/called-process-app.xml" })
 public class CalledProcessApplication extends EmbeddedProcessApplication {
 
   public static final String STRING_VARIABLE_VALUE = "aVariableValue";

@@ -37,15 +37,8 @@ public class CaseInstanceTest extends PvmTestCase {
 
   /**
    *
-   *   +-----------------+
-   *   | Case1            \
-   *   +-------------------+---+
-   *   |                       |
-   *   |     +-------+         |
-   *   |     |   A   |         |
-   *   |     +-------+         |
-   *   |                       |
-   *   +-----------------------+
+   * +-----------------+ | Case1 \ +-------------------+---+ | | | +-------+ | | | A | | | +-------+
+   * | | | +-----------------------+
    *
    */
   @Test
@@ -54,24 +47,20 @@ public class CaseInstanceTest extends PvmTestCase {
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .listener("create", stateTransitionCollector)
-      .createActivity("A")
-        .listener("create", stateTransitionCollector)
-        .listener("enable", stateTransitionCollector)
+        .listener("create", stateTransitionCollector).createActivity("A")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
         .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-        .behavior(new TaskWaitState())
-      .endActivity()
-      .buildCaseDefinition();
+        .behavior(new TaskWaitState()).endActivity().buildCaseDefinition();
 
     // create a new case instance
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();
     caseInstance.create();
 
     // expected state transitions after creation of a case instance:
-    // ()        --create(Case1)--> active
-    // ()        --create(A)-->     available
-    // available --enable(A)-->     enabled
+    // () --create(Case1)--> active
+    // () --create(A)--> available
+    // available --enable(A)--> enabled
     List<String> expectedStateTransitions = new ArrayList<String>();
     expectedStateTransitions.add("() --create(Case1)--> active");
     expectedStateTransitions.add("() --create(A)--> available");
@@ -112,67 +101,48 @@ public class CaseInstanceTest extends PvmTestCase {
   }
 
   /**
-  *
-  *   +-----------------+
-  *   | Case1            \
-  *   +-------------------+-----------------+
-  *   |                                     |
-  *   |     +------------------------+      |
-  *   |    / X                        \     |
-  *   |   +    +-------+  +-------+    +    |
-  *   |   |    |   A   |  |   B   |    |    |
-  *   |   +    +-------+  +-------+    +    |
-  *   |    \                          /     |
-  *   |     +------------------------+      |
-  *   |                                     |
-  *   +-------------------------------------+
-  *
-  */
+   *
+   * +-----------------+ | Case1 \ +-------------------+-----------------+ | | |
+   * +------------------------+ | | / X \ | | + +-------+ +-------+ + | | | | A | | B | | | | +
+   * +-------+ +-------+ + | | \ / | | +------------------------+ | | |
+   * +-------------------------------------+
+   *
+   */
   @Test
   public void testCaseInstanceWithOneState() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .listener("create", stateTransitionCollector)
-      .createActivity("X")
-        .listener("create", stateTransitionCollector)
-        .listener("enable", stateTransitionCollector)
+        .listener("create", stateTransitionCollector).createActivity("X")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
         .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-        .behavior(new StageActivityBehavior())
-        .createActivity("A")
-          .listener("create", stateTransitionCollector)
-          .listener("enable", stateTransitionCollector)
-          .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-          .behavior(new TaskWaitState())
-        .endActivity()
-        .createActivity("B")
-          .listener("create", stateTransitionCollector)
-          .listener("enable", stateTransitionCollector)
-          .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-          .behavior(new TaskWaitState())
-        .endActivity()
-      .endActivity()
-      .buildCaseDefinition();
+        .behavior(new StageActivityBehavior()).createActivity("A")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
+        .listener("manualStart", stateTransitionCollector)
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .behavior(new TaskWaitState()).endActivity().createActivity("B")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
+        .listener("manualStart", stateTransitionCollector)
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .behavior(new TaskWaitState()).endActivity().endActivity().buildCaseDefinition();
 
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();
     caseInstance.create();
 
     // expected state transitions after the creation of a case instance:
-    // ()        --create(Case1)--> active
-    // ()        --create(X)-->     available
-    // available --enable(X)-->     enabled
-    List<String> expectedStateTransitions = initAndAssertExpectedTransitions(stateTransitionCollector);
+    // () --create(Case1)--> active
+    // () --create(X)--> available
+    // available --enable(X)--> enabled
+    List<String> expectedStateTransitions = initAndAssertExpectedTransitions(
+        stateTransitionCollector);
 
     // clear lists
     emptyCollector(stateTransitionCollector, expectedStateTransitions);
 
     CaseExecutionImpl planItemX = assertCaseXState(caseInstance);
     List<CaseExecutionImpl> childPlanItems;
-
 
     // manual start of x
     planItemX.manualStart();
@@ -181,11 +151,11 @@ public class CaseInstanceTest extends PvmTestCase {
     assertTrue(planItemX.isActive());
 
     // expected state transitions after a manual start of X:
-    // enabled   --manualStart(X)--> active
-    // ()        --create(A)-->      available
-    // available --enable(A)-->      enabled
-    // ()        --create(B)-->      available
-    // available --enable(B)-->      enabled
+    // enabled --manualStart(X)--> active
+    // () --create(A)--> available
+    // available --enable(A)--> enabled
+    // () --create(B)--> available
+    // available --enable(B)--> enabled
     expectedStateTransitions.add("enabled --manualStart(X)--> active");
     expectedStateTransitions.add("() --create(A)--> available");
     expectedStateTransitions.add("available --enable(A)--> enabled");
@@ -216,8 +186,8 @@ public class CaseInstanceTest extends PvmTestCase {
     }
 
     // expected state transitions after the manual starts of A and B:
-    // enabled   --manualStart(A)--> active
-    // enabled   --manualStart(B)--> active
+    // enabled --manualStart(A)--> active
+    // enabled --manualStart(B)--> active
     expectedStateTransitions.add("enabled --manualStart(A)--> active");
     expectedStateTransitions.add("enabled --manualStart(B)--> active");
 
@@ -254,31 +224,21 @@ public class CaseInstanceTest extends PvmTestCase {
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-        .listener("create", stateTransitionCollector)
-          .createActivity("X")
-            .listener("create", stateTransitionCollector)
-            .listener("enable", stateTransitionCollector)
-            .listener("manualStart", stateTransitionCollector)
-            .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-            .behavior(new StageActivityBehavior())
-          .createActivity("A")
-            .listener("create", stateTransitionCollector)
-            .listener("start", stateTransitionCollector)
-            .behavior(new TaskWaitState())
-          .endActivity()
-          .createActivity("B")
-            .listener("create", stateTransitionCollector)
-            .listener("start", stateTransitionCollector)
-            .behavior(new TaskWaitState())
-          .endActivity()
-        .endActivity()
-        .buildCaseDefinition();
+        .listener("create", stateTransitionCollector).createActivity("X")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
+        .listener("manualStart", stateTransitionCollector)
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .behavior(new StageActivityBehavior()).createActivity("A")
+        .listener("create", stateTransitionCollector).listener("start", stateTransitionCollector)
+        .behavior(new TaskWaitState()).endActivity().createActivity("B")
+        .listener("create", stateTransitionCollector).listener("start", stateTransitionCollector)
+        .behavior(new TaskWaitState()).endActivity().endActivity().buildCaseDefinition();
 
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();
     caseInstance.create();
-    List<String> expectedStateTransitions = initAndAssertExpectedTransitions(stateTransitionCollector);
+    List<String> expectedStateTransitions = initAndAssertExpectedTransitions(
+        stateTransitionCollector);
     emptyCollector(stateTransitionCollector, expectedStateTransitions);
-
 
     // clear lists
     CaseExecutionImpl planItemX = assertCaseXState(caseInstance);
@@ -315,17 +275,19 @@ public class CaseInstanceTest extends PvmTestCase {
     }
   }
 
-  protected void emptyCollector(CaseExecutionStateTransitionCollector stateTransitionCollector, List<String> expectedStateTransitions) {
+  protected void emptyCollector(CaseExecutionStateTransitionCollector stateTransitionCollector,
+      List<String> expectedStateTransitions) {
     // clear lists
     expectedStateTransitions.clear();
     stateTransitionCollector.stateTransitions.clear();
   }
 
-  protected List<String> initAndAssertExpectedTransitions(CaseExecutionStateTransitionCollector stateTransitionCollector) {
+  protected List<String> initAndAssertExpectedTransitions(
+      CaseExecutionStateTransitionCollector stateTransitionCollector) {
     // expected state transitions after the creation of a case instance:
-    // ()        --create(Case1)--> active
-    // ()        --create(X)-->     available
-    // available --enable(X)-->     enabled
+    // () --create(Case1)--> active
+    // () --create(X)--> available
+    // available --enable(X)--> enabled
     List<String> expectedStateTransitions = new ArrayList<String>();
     expectedStateTransitions.add("() --create(Case1)--> active");
     expectedStateTransitions.add("() --create(X)--> available");
@@ -335,127 +297,73 @@ public class CaseInstanceTest extends PvmTestCase {
     return expectedStateTransitions;
   }
 
-
   /**
-  *
-  *   +-----------------+
-  *   | Case1            \
-  *   +-------------------+-------------------+
-  *   |                                       |
-  *   |  +-------+                            |
-  *   |  |  A1   |                            |
-  *   |  +-------+                            |
-  *   |                                       |
-  *   |    +------------------------+         |
-  *   |   / X1                       \        |
-  *   |  +    +-------+  +-------+    +       |
-  *   |  |    |  A2   |  |  B1   |    |       |
-  *   |  +    +-------+  +-------+    +       |
-  *   |   \                          /        |
-  *   |    +------------------------+         |
-  *   |                                       |
-  *   |    +-----------------------------+    |
-  *   |   / Y                             \   |
-  *   |  +    +-------+                    +  |
-  *   |  |    |   C   |                    |  |
-  *   |  |    +-------+                    |  |
-  *   |  |                                 |  |
-  *   |  |   +------------------------+    |  |
-  *   |  |  / X2                       \   |  |
-  *   |  | +    +-------+  +-------+    +  |  |
-  *   |  | |    |  A3   |  |  B2   |    |  |  |
-  *   |  | +    +-------+  +-------+    +  |  |
-  *   |  |  \                          /   |  |
-  *   |  +   +------------------------+    +  |
-  *   |   \                               /   |
-  *   |    +-----------------------------+    |
-  *   |                                       |
-  *   +---------------------------------------+
-  *
-  */
+   *
+   * +-----------------+ | Case1 \ +-------------------+-------------------+ | | | +-------+ | | |
+   * A1 | | | +-------+ | | | | +------------------------+ | | / X1 \ | | + +-------+ +-------+ + |
+   * | | | A2 | | B1 | | | | + +-------+ +-------+ + | | \ / | | +------------------------+ | | | |
+   * +-----------------------------+ | | / Y \ | | + +-------+ + | | | | C | | | | | +-------+ | | |
+   * | | | | | +------------------------+ | | | | / X2 \ | | | | + +-------+ +-------+ + | | | | | |
+   * A3 | | B2 | | | | | | + +-------+ +-------+ + | | | | \ / | | | + +------------------------+ +
+   * | | \ / | | +-----------------------------+ | | | +---------------------------------------+
+   *
+   */
   @Test
   public void testStartComplexCaseInstance() {
 
     CaseExecutionStateTransitionCollector stateTransitionCollector = new CaseExecutionStateTransitionCollector();
 
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .listener("create", stateTransitionCollector)
-      .createActivity("A1")
-        .listener("create", stateTransitionCollector)
-        .listener("enable", stateTransitionCollector)
+        .listener("create", stateTransitionCollector).createActivity("A1")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
         .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-        .behavior(new TaskWaitState())
-      .endActivity()
-      .createActivity("X1")
-        .listener("create", stateTransitionCollector)
-        .listener("enable", stateTransitionCollector)
+        .behavior(new TaskWaitState()).endActivity().createActivity("X1")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
         .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-        .behavior(new StageActivityBehavior())
-        .createActivity("A2")
-          .listener("create", stateTransitionCollector)
-          .listener("enable", stateTransitionCollector)
-          .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-          .behavior(new TaskWaitState())
-        .endActivity()
-        .createActivity("B1")
-          .listener("create", stateTransitionCollector)
-          .listener("enable", stateTransitionCollector)
-          .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-          .behavior(new TaskWaitState())
-        .endActivity()
-      .endActivity()
-      .createActivity("Y")
-        .listener("create", stateTransitionCollector)
-        .listener("enable", stateTransitionCollector)
+        .behavior(new StageActivityBehavior()).createActivity("A2")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
         .listener("manualStart", stateTransitionCollector)
         .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-        .behavior(new StageActivityBehavior())
-        .createActivity("C")
-          .listener("create", stateTransitionCollector)
-          .listener("enable", stateTransitionCollector)
-          .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-          .behavior(new TaskWaitState())
-        .endActivity()
-        .createActivity("X2")
-          .listener("create", stateTransitionCollector)
-          .listener("enable", stateTransitionCollector)
-          .listener("manualStart", stateTransitionCollector)
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-          .behavior(new StageActivityBehavior())
-          .createActivity("A3")
-            .listener("create", stateTransitionCollector)
-            .listener("enable", stateTransitionCollector)
-            .listener("manualStart", stateTransitionCollector)
-            .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-            .behavior(new TaskWaitState())
-          .endActivity()
-          .createActivity("B2")
-            .listener("create", stateTransitionCollector)
-            .listener("enable", stateTransitionCollector)
-            .listener("manualStart", stateTransitionCollector)
-            .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-            .behavior(new TaskWaitState())
-          .endActivity()
-        .endActivity()
-      .endActivity()
-      .buildCaseDefinition();
+        .behavior(new TaskWaitState()).endActivity().createActivity("B1")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
+        .listener("manualStart", stateTransitionCollector)
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .behavior(new TaskWaitState()).endActivity().endActivity().createActivity("Y")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
+        .listener("manualStart", stateTransitionCollector)
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .behavior(new StageActivityBehavior()).createActivity("C")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
+        .listener("manualStart", stateTransitionCollector)
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .behavior(new TaskWaitState()).endActivity().createActivity("X2")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
+        .listener("manualStart", stateTransitionCollector)
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .behavior(new StageActivityBehavior()).createActivity("A3")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
+        .listener("manualStart", stateTransitionCollector)
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .behavior(new TaskWaitState()).endActivity().createActivity("B2")
+        .listener("create", stateTransitionCollector).listener("enable", stateTransitionCollector)
+        .listener("manualStart", stateTransitionCollector)
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .behavior(new TaskWaitState()).endActivity().endActivity().endActivity()
+        .buildCaseDefinition();
 
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();
     caseInstance.create();
 
     // expected state transitions after the creation of a case instance:
-    // ()        --create(Case1)--> active
-    // ()        --create(A1)-->    available
-    // available --enable(A1)-->    enabled
-    // ()        --create(X1)-->    available
-    // available --enable(X1)-->    enabled
-    // ()        --create(Y)-->     available
-    // available --enable(Y)-->     enabled
+    // () --create(Case1)--> active
+    // () --create(A1)--> available
+    // available --enable(A1)--> enabled
+    // () --create(X1)--> available
+    // available --enable(X1)--> enabled
+    // () --create(Y)--> available
+    // available --enable(Y)--> enabled
     List<String> expectedStateTransitions = new ArrayList<String>();
     expectedStateTransitions.add("() --create(Case1)--> active");
     expectedStateTransitions.add("() --create(A1)--> available");
@@ -525,11 +433,11 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(2, childPlanItems.size());
 
     // expected state transitions after manual start of X1:
-    // enabled   --manualStart(X1)--> active
-    // ()        --create(A2)-->      available
-    // available --enable(A2)-->      enabled
-    // ()        --create(B1)-->      available
-    // available --enable(B1)-->      enabled
+    // enabled --manualStart(X1)--> active
+    // () --create(A2)--> available
+    // available --enable(A2)--> enabled
+    // () --create(B1)--> available
+    // available --enable(B1)--> enabled
     expectedStateTransitions.add("enabled --manualStart(X1)--> active");
     expectedStateTransitions.add("() --create(A2)--> available");
     expectedStateTransitions.add("available --enable(A2)--> enabled");
@@ -612,11 +520,11 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(2, childPlanItems.size());
 
     // expected state transitions after manual start of Y:
-    // enabled   --manualStart(Y)--> active
-    // ()        --create(C)-->      available
-    // available --enable(C)-->      enabled
-    // ()        --create(X2)-->      available
-    // available --enable(X2)-->      enabled
+    // enabled --manualStart(Y)--> active
+    // () --create(C)--> available
+    // available --enable(C)--> enabled
+    // () --create(X2)--> available
+    // available --enable(X2)--> enabled
     expectedStateTransitions.add("enabled --manualStart(Y)--> active");
     expectedStateTransitions.add("() --create(C)--> available");
     expectedStateTransitions.add("available --enable(C)--> enabled");
@@ -674,11 +582,11 @@ public class CaseInstanceTest extends PvmTestCase {
     assertEquals(2, childPlanItems.size());
 
     // expected state transitions after manual start of X2:
-    // enabled   --manualStart(X2)--> active
-    // ()        --create(A3)-->      available
-    // available --enable(A3)-->      enabled
-    // ()        --create(B2)-->      available
-    // available --enable(B2)-->      enabled
+    // enabled --manualStart(X2)--> active
+    // () --create(A3)--> available
+    // available --enable(A3)--> enabled
+    // () --create(B2)--> available
+    // available --enable(B2)--> enabled
     expectedStateTransitions.add("enabled --manualStart(X2)--> active");
     expectedStateTransitions.add("() --create(A3)--> available");
     expectedStateTransitions.add("available --enable(A3)--> enabled");

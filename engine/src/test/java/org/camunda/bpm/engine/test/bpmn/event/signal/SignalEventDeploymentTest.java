@@ -35,10 +35,10 @@ public class SignalEventDeploymentTest extends PluggableProcessEngineTestCase {
 
   public void testCreateEventSubscriptionOnDeployment() {
     deploymentId = repositoryService.createDeployment()
-        .addClasspathResource(SIGNAL_START_EVENT_PROCESS)
-        .deploy().getId();
+        .addClasspathResource(SIGNAL_START_EVENT_PROCESS).deploy().getId();
 
-    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery()
+        .singleResult();
     assertNotNull(eventSubscription);
 
     assertEquals(EventType.SIGNAL.name(), eventSubscription.getEventType());
@@ -46,28 +46,30 @@ public class SignalEventDeploymentTest extends PluggableProcessEngineTestCase {
     assertEquals("start", eventSubscription.getActivityId());
   }
 
-  public void testUpdateEventSubscriptionOnDeployment(){
+  public void testUpdateEventSubscriptionOnDeployment() {
     deploymentId = repositoryService.createDeployment()
-        .addClasspathResource(SIGNAL_START_EVENT_PROCESS)
-        .deploy().getId();
+        .addClasspathResource(SIGNAL_START_EVENT_PROCESS).deploy().getId();
 
-    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().eventType("signal").singleResult();
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery()
+        .eventType("signal").singleResult();
     assertNotNull(eventSubscription);
     assertEquals("alert", eventSubscription.getEventName());
 
     // deploy a new version of the process with different signal name
     String newDeploymentId = repositoryService.createDeployment()
-        .addClasspathResource(SIGNAL_START_EVENT_PROCESS_NEW_VERSION)
-        .deploy().getId();
+        .addClasspathResource(SIGNAL_START_EVENT_PROCESS_NEW_VERSION).deploy().getId();
 
-    ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().latestVersion().singleResult();
+    ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .latestVersion().singleResult();
     assertEquals(2, newProcessDefinition.getVersion());
 
-    List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery().eventType("signal").list();
+    List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery()
+        .eventType("signal").list();
     // only one event subscription for the new version of the process definition
     assertEquals(1, newEventSubscriptions.size());
 
-    EventSubscriptionEntity newEventSubscription = (EventSubscriptionEntity) newEventSubscriptions.iterator().next();
+    EventSubscriptionEntity newEventSubscription = (EventSubscriptionEntity) newEventSubscriptions
+        .iterator().next();
     assertEquals(newProcessDefinition.getId(), newEventSubscription.getConfiguration());
     assertEquals("abort", newEventSubscription.getEventName());
 
@@ -77,11 +79,12 @@ public class SignalEventDeploymentTest extends PluggableProcessEngineTestCase {
 
   public void testAsyncSignalStartEventDeleteDeploymentWhileAsync() {
     // given a deployment
-    org.camunda.bpm.engine.repository.Deployment deployment =
-        repositoryService.createDeployment()
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml")
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml")
-          .deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(
+            "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml")
+        .addClasspathResource(
+            "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml")
+        .deploy();
 
     // and an active job for asynchronously triggering a signal start event
     runtimeService.startProcessInstanceByKey("throwSignalAsync");

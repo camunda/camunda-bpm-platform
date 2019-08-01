@@ -26,7 +26,8 @@ import java.util.List;
 /**
  * @author Askar Akhmerov
  */
-public class SetJobsRetriesCmd extends AbstractSetJobRetriesCmd implements Command<Void>, Serializable {
+public class SetJobsRetriesCmd extends AbstractSetJobRetriesCmd
+    implements Command<Void>, Serializable {
   protected final List<String> jobIds;
   protected final int retries;
 

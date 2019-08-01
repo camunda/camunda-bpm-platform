@@ -80,7 +80,8 @@ public class BatchPriorityTest {
 
   @After
   public void resetBatchJobsPerSeed() {
-    ProcessEngineConfigurationImpl processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = engineRule
+        .getProcessEngineConfiguration();
     processEngineConfiguration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
     processEngineConfiguration.setBatchJobPriority(defaultBatchJobPriority);
   }
@@ -167,7 +168,8 @@ public class BatchPriorityTest {
     // given
     Batch batch = helper.migrateProcessInstancesAsync(2);
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
-    managementService.setOverridingJobPriorityForJobDefinition(seedJobDefinition.getId(), CUSTOM_PRIORITY);
+    managementService.setOverridingJobPriorityForJobDefinition(seedJobDefinition.getId(),
+        CUSTOM_PRIORITY);
 
     // when
     helper.executeSeedJob(batch);
@@ -184,7 +186,8 @@ public class BatchPriorityTest {
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
 
     // when
-    managementService.setOverridingJobPriorityForJobDefinition(seedJobDefinition.getId(), CUSTOM_PRIORITY, true);
+    managementService.setOverridingJobPriorityForJobDefinition(seedJobDefinition.getId(),
+        CUSTOM_PRIORITY, true);
 
     // then
     Job seedJob = helper.getSeedJob(batch);
@@ -196,7 +199,8 @@ public class BatchPriorityTest {
     // given
     Batch batch = helper.migrateProcessInstancesAsync(1);
     JobDefinition monitorJobDefinition = helper.getMonitorJobDefinition(batch);
-    managementService.setOverridingJobPriorityForJobDefinition(monitorJobDefinition.getId(), CUSTOM_PRIORITY);
+    managementService.setOverridingJobPriorityForJobDefinition(monitorJobDefinition.getId(),
+        CUSTOM_PRIORITY);
 
     // when
     helper.executeSeedJob(batch);
@@ -214,7 +218,8 @@ public class BatchPriorityTest {
     helper.executeSeedJob(batch);
 
     // when
-    managementService.setOverridingJobPriorityForJobDefinition(monitorJobDefinition.getId(), CUSTOM_PRIORITY, true);
+    managementService.setOverridingJobPriorityForJobDefinition(monitorJobDefinition.getId(),
+        CUSTOM_PRIORITY, true);
 
     // then
     Job monitorJob = helper.getMonitorJob(batch);
@@ -226,7 +231,8 @@ public class BatchPriorityTest {
     // given
     Batch batch = helper.migrateProcessInstancesAsync(1);
     JobDefinition executionJobDefinition = helper.getExecutionJobDefinition(batch);
-    managementService.setOverridingJobPriorityForJobDefinition(executionJobDefinition.getId(), CUSTOM_PRIORITY, true);
+    managementService.setOverridingJobPriorityForJobDefinition(executionJobDefinition.getId(),
+        CUSTOM_PRIORITY, true);
 
     // when
     helper.executeSeedJob(batch);
@@ -244,7 +250,8 @@ public class BatchPriorityTest {
     helper.executeSeedJob(batch);
 
     // when
-    managementService.setOverridingJobPriorityForJobDefinition(executionJobDefinition.getId(), CUSTOM_PRIORITY, true);
+    managementService.setOverridingJobPriorityForJobDefinition(executionJobDefinition.getId(),
+        CUSTOM_PRIORITY, true);
 
     // then
     Job executionJob = helper.getExecutionJobs(batch).get(0);
@@ -252,7 +259,6 @@ public class BatchPriorityTest {
   }
 
   protected void setBatchJobPriority(long priority) {
-    engineRule.getProcessEngineConfiguration()
-      .setBatchJobPriority(priority);
+    engineRule.getProcessEngineConfiguration().setBatchJobPriority(priority);
   }
 }

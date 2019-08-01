@@ -31,7 +31,9 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
- * <p>Deployment operation responsible for stopping all process engines started by the deployment.</p>
+ * <p>
+ * Deployment operation responsible for stopping all process engines started by the deployment.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -47,10 +49,13 @@ public class ProcessesXmlStopProcessEnginesStep extends DeploymentOperationStep 
   public void performOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
-    final JmxManagedProcessApplication deployedProcessApplication = serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
+    final AbstractProcessApplication processApplication = operationContext
+        .getAttachment(Attachments.PROCESS_APPLICATION);
+    final JmxManagedProcessApplication deployedProcessApplication = serviceContainer
+        .getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
 
-    ensureNotNull("Cannot find process application with name " + processApplication.getName(), "deployedProcessApplication", deployedProcessApplication);
+    ensureNotNull("Cannot find process application with name " + processApplication.getName(),
+        "deployedProcessApplication", deployedProcessApplication);
 
     List<ProcessesXml> processesXmls = deployedProcessApplication.getProcessesXmls();
     for (ProcessesXml processesXml : processesXmls) {
@@ -59,7 +64,8 @@ public class ProcessesXmlStopProcessEnginesStep extends DeploymentOperationStep 
 
   }
 
-  protected void stopProcessEngines(List<ProcessEngineXml> processEngine, DeploymentOperation operationContext) {
+  protected void stopProcessEngines(List<ProcessEngineXml> processEngine,
+      DeploymentOperation operationContext) {
     for (ProcessEngineXml parsedProcessEngine : processEngine) {
       stopProcessEngine(parsedProcessEngine.getName(), operationContext);
     }
@@ -70,8 +76,7 @@ public class ProcessesXmlStopProcessEnginesStep extends DeploymentOperationStep 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
     try {
       serviceContainer.stopService(ServiceTypes.PROCESS_ENGINE, processEngineName);
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       LOG.exceptionWhileStopping("Process Engine", processEngineName, e);
     }
 

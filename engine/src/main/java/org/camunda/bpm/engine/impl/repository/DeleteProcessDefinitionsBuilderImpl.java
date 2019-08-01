@@ -38,7 +38,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
  * @author Tassilo Weidner
  */
 public class DeleteProcessDefinitionsBuilderImpl implements DeleteProcessDefinitionsBuilder,
-  DeleteProcessDefinitionsSelectBuilder, DeleteProcessDefinitionsTenantBuilder {
+    DeleteProcessDefinitionsSelectBuilder, DeleteProcessDefinitionsTenantBuilder {
 
   private final CommandExecutor commandExecutor;
 
@@ -104,13 +104,17 @@ public class DeleteProcessDefinitionsBuilderImpl implements DeleteProcessDefinit
 
   @Override
   public void delete() {
-    ensureOnlyOneNotNull(NullValueException.class, "'processDefinitionKey' or 'processDefinitionIds' cannot be null", processDefinitionKey, processDefinitionIds);
+    ensureOnlyOneNotNull(NullValueException.class,
+        "'processDefinitionKey' or 'processDefinitionIds' cannot be null", processDefinitionKey,
+        processDefinitionIds);
 
     Command<Void> command;
     if (processDefinitionKey != null) {
-      command = new DeleteProcessDefinitionsByKeyCmd(processDefinitionKey, cascade, skipCustomListeners, skipIoMappings, tenantId, isTenantIdSet);
+      command = new DeleteProcessDefinitionsByKeyCmd(processDefinitionKey, cascade,
+          skipCustomListeners, skipIoMappings, tenantId, isTenantIdSet);
     } else if (processDefinitionIds != null && !processDefinitionIds.isEmpty()) {
-      command = new DeleteProcessDefinitionsByIdsCmd(processDefinitionIds, cascade, skipCustomListeners, skipIoMappings);
+      command = new DeleteProcessDefinitionsByIdsCmd(processDefinitionIds, cascade,
+          skipCustomListeners, skipIoMappings);
     } else {
       return;
     }

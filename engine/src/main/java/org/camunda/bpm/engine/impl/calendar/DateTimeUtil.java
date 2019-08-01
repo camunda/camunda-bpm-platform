@@ -26,13 +26,11 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 /**
- * Utility for {@link DateTime} that uses the JVM timezone
- * for date / time related operations.
+ * Utility for {@link DateTime} that uses the JVM timezone for date / time related operations.
  *
- * This is important as the JVM timezone and the system timezone may
- * differ which leads to different behavior in
- * {@link java.text.SimpleDateFormat} (using JVM default timezone) and
- * JODA time (using system default timezone).
+ * This is important as the JVM timezone and the system timezone may differ which leads to different
+ * behavior in {@link java.text.SimpleDateFormat} (using JVM default timezone) and JODA time (using
+ * system default timezone).
  *
  * @author Nico Rehwaldt
  *
@@ -40,7 +38,8 @@ import org.joda.time.format.ISODateTimeFormat;
  */
 public class DateTimeUtil {
 
-  private static final DateTimeZone JVM_DEFAULT_DATE_TIME_ZONE = DateTimeZone.forTimeZone(TimeZone.getDefault());
+  private static final DateTimeZone JVM_DEFAULT_DATE_TIME_ZONE = DateTimeZone
+      .forTimeZone(TimeZone.getDefault());
 
   private static DateTimeFormatter DATE_TIME_FORMATER;
 

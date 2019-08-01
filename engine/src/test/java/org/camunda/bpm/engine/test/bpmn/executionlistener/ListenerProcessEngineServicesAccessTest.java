@@ -28,7 +28,8 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
  * @author Daniel Meyer
  *
  */
-public class ListenerProcessEngineServicesAccessTest extends AbstractProcessEngineServicesAccessTest {
+public class ListenerProcessEngineServicesAccessTest
+    extends AbstractProcessEngineServicesAccessTest {
 
   protected Class<?> getTestServiceAccessibleClass() {
     return AccessServicesListener.class;
@@ -49,7 +50,8 @@ public class ListenerProcessEngineServicesAccessTest extends AbstractProcessEngi
   protected Task createModelAccessTask(BpmnModelInstance modelInstance, Class<?> delegateClass) {
     ManualTask task = modelInstance.newInstance(ManualTask.class);
     task.setId("manualTask");
-    CamundaExecutionListener executionListener = modelInstance.newInstance(CamundaExecutionListener.class);
+    CamundaExecutionListener executionListener = modelInstance
+        .newInstance(CamundaExecutionListener.class);
     executionListener.setCamundaEvent(ExecutionListener.EVENTNAME_START);
     executionListener.setCamundaClass(delegateClass.getName());
     task.builder().addExtensionElement(executionListener);

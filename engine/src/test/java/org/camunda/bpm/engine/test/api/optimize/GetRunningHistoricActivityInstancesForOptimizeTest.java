@@ -69,11 +69,9 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
   private AuthorizationService authorizationService;
   private TaskService taskService;
 
-
   @Before
   public void init() {
-    ProcessEngineConfigurationImpl config =
-      engineRule.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl config = engineRule.getProcessEngineConfiguration();
     optimizeService = config.getOptimizeService();
     identityService = engineRule.getIdentityService();
     runtimeService = engineRule.getRuntimeService();
@@ -101,19 +99,14 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
   public void getRunningHistoricActivityInstances() {
     // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .name("start")
-      .userTask("userTask")
-      .name("task")
-      .endEvent("endEvent")
-      .name("end")
-      .done();
+        .startEvent("startEvent").name("start").userTask("userTask").name("task")
+        .endEvent("endEvent").name("end").done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    List<HistoricActivityInstance> runningHistoricActivityInstances =
-      optimizeService.getRunningHistoricActivityInstances(pastDate(), null, 10);
+    List<HistoricActivityInstance> runningHistoricActivityInstances = optimizeService
+        .getRunningHistoricActivityInstances(pastDate(), null, 10);
 
     // then
     assertThat(runningHistoricActivityInstances.size(), is(1));
@@ -125,10 +118,7 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
   public void startedAfterParameterWorks() {
     // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .endEvent("endEvent")
-      .done();
+        .startEvent("startEvent").userTask("userTask").endEvent("endEvent").done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
@@ -137,50 +127,46 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
 
     // when
     ClockUtil.setCurrentTime(nowPlus2Seconds);
-    ProcessInstance secondProcessInstance =
-      engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    List<HistoricActivityInstance> runningHistoricActivityInstances =
-      optimizeService.getRunningHistoricActivityInstances(now, null, 10);
+    ProcessInstance secondProcessInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
+    List<HistoricActivityInstance> runningHistoricActivityInstances = optimizeService
+        .getRunningHistoricActivityInstances(now, null, 10);
 
     // then
     assertThat(runningHistoricActivityInstances.size(), is(1));
-    assertThat(runningHistoricActivityInstances.get(0).getProcessInstanceId(), is(secondProcessInstance.getId()));
+    assertThat(runningHistoricActivityInstances.get(0).getProcessInstanceId(),
+        is(secondProcessInstance.getId()));
   }
 
   @Test
   public void startedAtParameterWorks() {
     // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .endEvent("endEvent")
-      .done();
+        .startEvent("startEvent").userTask("userTask").endEvent("endEvent").done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(now);
-    ProcessInstance firstProcessInstance =
-      engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance firstProcessInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
 
     // when
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    List<HistoricActivityInstance> runningHistoricActivityInstances =
-      optimizeService.getRunningHistoricActivityInstances(null, now, 10);
+    List<HistoricActivityInstance> runningHistoricActivityInstances = optimizeService
+        .getRunningHistoricActivityInstances(null, now, 10);
 
     // then
     assertThat(runningHistoricActivityInstances.size(), is(1));
-    assertThat(runningHistoricActivityInstances.get(0).getProcessInstanceId(), is(firstProcessInstance.getId()));
+    assertThat(runningHistoricActivityInstances.get(0).getProcessInstanceId(),
+        is(firstProcessInstance.getId()));
   }
 
   @Test
   public void startedAfterAndStartedAtParameterWorks() {
     // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .endEvent("endEvent")
-      .done();
+        .startEvent("startEvent").userTask("userTask").endEvent("endEvent").done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
@@ -190,8 +176,8 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
     // when
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    List<HistoricActivityInstance> runningHistoricActivityInstances =
-      optimizeService.getRunningHistoricActivityInstances(now, now, 10);
+    List<HistoricActivityInstance> runningHistoricActivityInstances = optimizeService
+        .getRunningHistoricActivityInstances(now, now, 10);
 
     // then
     assertThat(runningHistoricActivityInstances.size(), is(0));
@@ -201,10 +187,7 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
   public void maxResultsParameterWorks() {
     // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .endEvent("endEvent")
-      .done();
+        .startEvent("startEvent").userTask("userTask").endEvent("endEvent").done();
     testHelper.deploy(simpleDefinition);
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
@@ -212,8 +195,8 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
 
     // when
-    List<HistoricActivityInstance> runningHistoricActivityInstances =
-      optimizeService.getRunningHistoricActivityInstances(pastDate(), null, 3);
+    List<HistoricActivityInstance> runningHistoricActivityInstances = optimizeService
+        .getRunningHistoricActivityInstances(pastDate(), null, 3);
 
     // then
     assertThat(runningHistoricActivityInstances.size(), is(3));
@@ -223,30 +206,30 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
   public void resultIsSortedByStartTime() {
     // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .endEvent("endEvent")
-      .done();
+        .startEvent("startEvent").userTask("userTask").endEvent("endEvent").done();
     testHelper.deploy(simpleDefinition);
     ClockUtil.setCurrentTime(new Date());
-    ProcessInstance firstProcessInstance =
-      engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance firstProcessInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
     shiftTimeByOneMinute();
-    ProcessInstance secondProcessInstance =
-      engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance secondProcessInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
     shiftTimeByOneMinute();
-    ProcessInstance thirdProcessInstance =
-      engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance thirdProcessInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
 
     // when
-    List<HistoricActivityInstance> runningHistoricActivityInstances =
-      optimizeService.getRunningHistoricActivityInstances(pastDate(), null, 4);
+    List<HistoricActivityInstance> runningHistoricActivityInstances = optimizeService
+        .getRunningHistoricActivityInstances(pastDate(), null, 4);
 
     // then
     assertThat(runningHistoricActivityInstances.size(), is(3));
-    assertThat(runningHistoricActivityInstances.get(0).getProcessInstanceId(), is(firstProcessInstance.getId()));
-    assertThat(runningHistoricActivityInstances.get(1).getProcessInstanceId(), is(secondProcessInstance.getId()));
-    assertThat(runningHistoricActivityInstances.get(2).getProcessInstanceId(), is(thirdProcessInstance.getId()));
+    assertThat(runningHistoricActivityInstances.get(0).getProcessInstanceId(),
+        is(firstProcessInstance.getId()));
+    assertThat(runningHistoricActivityInstances.get(1).getProcessInstanceId(),
+        is(secondProcessInstance.getId()));
+    assertThat(runningHistoricActivityInstances.get(2).getProcessInstanceId(),
+        is(thirdProcessInstance.getId()));
   }
 
   public void shiftTimeByOneMinute() {
@@ -259,16 +242,13 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
   public void fetchOnlyRunningActivities() {
     // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-      .endEvent()
-      .done();
+        .startEvent("startEvent").userTask("userTask").endEvent().done();
     testHelper.deploy(simpleDefinition);
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
 
     // when
-    List<HistoricActivityInstance> runningHistoricActivityInstances =
-      optimizeService.getRunningHistoricActivityInstances(pastDate(), null, 10);
+    List<HistoricActivityInstance> runningHistoricActivityInstances = optimizeService
+        .getRunningHistoricActivityInstances(pastDate(), null, 10);
 
     // then
     assertThat(runningHistoricActivityInstances.size(), is(1));
@@ -276,8 +256,8 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
 
     // when
     completeAllUserTasks();
-    runningHistoricActivityInstances =
-      optimizeService.getRunningHistoricActivityInstances(pastDate(), null, 10);
+    runningHistoricActivityInstances = optimizeService
+        .getRunningHistoricActivityInstances(pastDate(), null, 10);
 
     // then
     assertThat(runningHistoricActivityInstances.size(), is(0));
@@ -302,7 +282,8 @@ public class GetRunningHistoricActivityInstancesForOptimizeTest {
     identityService.saveUser(user);
   }
 
-  private void assertThatActivitiesHaveAllImportantInformation(HistoricActivityInstance activityInstance) {
+  private void assertThatActivitiesHaveAllImportantInformation(
+      HistoricActivityInstance activityInstance) {
     assertThat(activityInstance, notNullValue());
     assertThat(activityInstance.getActivityName(), is("task"));
     assertThat(activityInstance.getActivityType(), is("userTask"));

@@ -31,7 +31,8 @@ import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 public class CannotAddMultiInstanceBodyValidator implements MigrationInstructionValidator {
 
   @Override
-  public void validate(ValidatingMigrationInstruction instruction, final ValidatingMigrationInstructions instructions,
+  public void validate(ValidatingMigrationInstruction instruction,
+      final ValidatingMigrationInstructions instructions,
       MigrationInstructionValidationReportImpl report) {
     ActivityImpl targetActivity = instruction.getTargetActivity();
 
@@ -48,8 +49,9 @@ public class CannotAddMultiInstanceBodyValidator implements MigrationInstruction
     });
 
     if (miBodyCollector.firstMiBody != null) {
-      report.addFailure("Target activity '" + targetActivity.getId() + "' is a descendant of multi-instance body '" +
-        miBodyCollector.firstMiBody.getId() + "' that is not mapped from the source process definition.");
+      report.addFailure("Target activity '" + targetActivity.getId()
+          + "' is a descendant of multi-instance body '" + miBodyCollector.firstMiBody.getId()
+          + "' that is not mapped from the source process definition.");
     }
   }
 

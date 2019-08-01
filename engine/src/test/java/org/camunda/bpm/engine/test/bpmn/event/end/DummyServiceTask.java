@@ -19,21 +19,21 @@ package org.camunda.bpm.engine.test.bpmn.event.end;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Kristin Polenz
  */
 public class DummyServiceTask implements JavaDelegate {
-  
+
   public static boolean wasExecuted = false;
   public static boolean expressionWasExecuted = false;
   public static boolean delegateExpressionWasExecuted = false;
-  
+
   public void execute(DelegateExecution execution) throws Exception {
-    boolean expressionWasExecuted = (Boolean )execution.getVariable("expressionWasExecuted");
-    boolean delegateExpressionWasExecuted = (Boolean )execution.getVariable("delegateExpressionWasExecuted");
-    boolean wasExecuted = (Boolean )execution.getVariable("wasExecuted");
-    
+    boolean expressionWasExecuted = (Boolean) execution.getVariable("expressionWasExecuted");
+    boolean delegateExpressionWasExecuted = (Boolean) execution
+        .getVariable("delegateExpressionWasExecuted");
+    boolean wasExecuted = (Boolean) execution.getVariable("wasExecuted");
+
     this.expressionWasExecuted = expressionWasExecuted;
     this.delegateExpressionWasExecuted = delegateExpressionWasExecuted;
     this.wasExecuted = wasExecuted;

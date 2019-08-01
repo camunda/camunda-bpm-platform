@@ -37,12 +37,14 @@ import org.camunda.bpm.engine.variable.VariableMap;
  */
 public class MyTaskFormHandler extends MyDelegationService implements TaskFormHandler {
 
-  public void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
+  public void parseConfiguration(Element activityElement, DeploymentEntity deployment,
+      ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
     // do nothing
   }
 
   public void submitFormVariables(VariableMap properties, VariableScope variableScope) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     IdentityService identityService = processEngineConfiguration.getIdentityService();
     RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
 
@@ -51,7 +53,8 @@ public class MyTaskFormHandler extends MyDelegationService implements TaskFormHa
   }
 
   public TaskFormData createTaskForm(TaskEntity task) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     IdentityService identityService = processEngineConfiguration.getIdentityService();
     RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
 

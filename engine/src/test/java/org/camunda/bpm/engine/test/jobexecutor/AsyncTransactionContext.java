@@ -51,6 +51,4 @@ public class AsyncTransactionContext extends StandaloneTransactionContext {
     super.fireTransactionEvent(transactionState);
   }
 
-
-
 }

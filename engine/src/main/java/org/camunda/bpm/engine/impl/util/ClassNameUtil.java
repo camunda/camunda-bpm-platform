@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.util;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -33,9 +32,10 @@ public abstract class ClassNameUtil {
 
   public static String getClassNameWithoutPackage(Class<?> clazz) {
     String unqualifiedClassName = cachedNames.get(clazz);
-    if (unqualifiedClassName==null) {
+    if (unqualifiedClassName == null) {
       String fullyQualifiedClassName = clazz.getName();
-      unqualifiedClassName = fullyQualifiedClassName.substring(fullyQualifiedClassName.lastIndexOf('.')+1);
+      unqualifiedClassName = fullyQualifiedClassName
+          .substring(fullyQualifiedClassName.lastIndexOf('.') + 1);
       cachedNames.put(clazz, unqualifiedClassName);
     }
     return unqualifiedClassName;

@@ -55,7 +55,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml",
         "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml")
-        .getId();
+            .getId();
     super.setUp();
   }
 
@@ -113,7 +113,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     verifyQueryResults(query, 1);
   }
 
-  public void testDeleteHistoricDecisionInstanceWithoutAuthorization(){
+  public void testDeleteHistoricDecisionInstanceWithoutAuthorization() {
     // given
     startProcessInstanceAndEvaluateDecision();
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
@@ -124,8 +124,8 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
       fail("expect authorization exception");
     } catch (AuthorizationException e) {
       // then
-      assertThat(e.getMessage(),
-          is("The user with id 'test' does not have 'DELETE_HISTORY' permission on resource 'testDecision' of type 'DecisionDefinition'."));
+      assertThat(e.getMessage(), is(
+          "The user with id 'test' does not have 'DELETE_HISTORY' permission on resource 'testDecision' of type 'DecisionDefinition'."));
     }
   }
 
@@ -135,7 +135,6 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     createGrantAuthorization(DECISION_DEFINITION, ANY, userId, DELETE_HISTORY);
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
 
-
     // when
     historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionId);
 
@@ -143,7 +142,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     disableAuthorization();
     assertThat(historyService.createHistoricDecisionInstanceQuery().count(), is(0L));
     enableAuthorization();
-}
+  }
 
   public void testDeleteHistoricDecisionInstanceWithDeleteHistoryPermissionOnAnyDecisionDefinition() {
     // given
@@ -167,7 +166,8 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     startProcessInstanceAndEvaluateDecision();
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-    HistoricDecisionInstance historicDecisionInstance = query.includeInputs().includeOutputs().singleResult();
+    HistoricDecisionInstance historicDecisionInstance = query.includeInputs().includeOutputs()
+        .singleResult();
 
     try {
       // when
@@ -175,20 +175,22 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
       fail("expect authorization exception");
     } catch (AuthorizationException e) {
       // then
-      assertThat(e.getMessage(),
-          is("The user with id 'test' does not have 'DELETE_HISTORY' permission on resource 'testDecision' of type 'DecisionDefinition'."));
+      assertThat(e.getMessage(), is(
+          "The user with id 'test' does not have 'DELETE_HISTORY' permission on resource 'testDecision' of type 'DecisionDefinition'."));
     }
   }
 
   public void testDeleteHistoricDecisionInstanceByInstanceIdWithDeleteHistoryPermissionOnDecisionDefinition() {
 
     // given
-    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, DELETE_HISTORY, READ_HISTORY);
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, DELETE_HISTORY,
+        READ_HISTORY);
     startProcessInstanceAndEvaluateDecision();
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
     verifyQueryResults(query, 1);
-    HistoricDecisionInstance historicDecisionInstance = query.includeInputs().includeOutputs().singleResult();
+    HistoricDecisionInstance historicDecisionInstance = query.includeInputs().includeOutputs()
+        .singleResult();
 
     // when
     historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
@@ -202,7 +204,8 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -212,11 +215,14 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     // given
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
 
-    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ, Permissions.READ_HISTORY);
-    createGrantAuthorizationGroup(DECISION_DEFINITION, DECISION_DEFINITION_KEY, groupId, Permissions.READ, Permissions.READ_HISTORY);
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ,
+        Permissions.READ_HISTORY);
+    createGrantAuthorizationGroup(DECISION_DEFINITION, DECISION_DEFINITION_KEY, groupId,
+        Permissions.READ, Permissions.READ_HISTORY);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -228,10 +234,12 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     // given
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
 
-    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ);
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId,
+        Permissions.READ);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -241,10 +249,12 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     // given
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
 
-    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ_HISTORY);
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId,
+        Permissions.READ_HISTORY);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -256,10 +266,12 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     startProcessInstanceByKey(PROCESS_KEY, variables);
   }
 
-  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
+  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive,
+      int instanceCount) {
     DecisionDefinition decisionDefinition = selectDecisionDefinitionByKey(key);
     disableAuthorization();
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), historyTimeToLive);
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(),
+        historyTimeToLive);
     enableAuthorization();
 
     Date oldCurrentTime = ClockUtil.getCurrentTime();

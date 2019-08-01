@@ -26,11 +26,11 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HistoricEntity;
 import org.camunda.bpm.engine.task.Attachment;
 
-
 /**
  * @author Tom Baeyens
  */
-public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, HistoricEntity, Serializable {
+public class AttachmentEntity
+    implements Attachment, DbEntity, HasDbRevision, HistoricEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -57,7 +57,7 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Hi
   }
 
   public int getRevisionNext() {
-    return revision+1;
+    return revision + 1;
   }
 
   public String getId() {
@@ -174,21 +174,11 @@ public class AttachmentEntity implements Attachment, DbEntity, HasDbRevision, Hi
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", revision=" + revision
-           + ", name=" + name
-           + ", description=" + description
-           + ", type=" + type
-           + ", taskId=" + taskId
-           + ", processInstanceId=" + processInstanceId
-           + ", rootProcessInstanceId=" + rootProcessInstanceId
-           + ", removalTime=" + removalTime
-           + ", url=" + url
-           + ", contentId=" + contentId
-           + ", content=" + content
-           + ", tenantId=" + tenantId
-           + ", createTime=" + createTime
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", revision=" + revision + ", name="
+        + name + ", description=" + description + ", type=" + type + ", taskId=" + taskId
+        + ", processInstanceId=" + processInstanceId + ", rootProcessInstanceId="
+        + rootProcessInstanceId + ", removalTime=" + removalTime + ", url=" + url + ", contentId="
+        + contentId + ", content=" + content + ", tenantId=" + tenantId + ", createTime="
+        + createTime + "]";
   }
 }

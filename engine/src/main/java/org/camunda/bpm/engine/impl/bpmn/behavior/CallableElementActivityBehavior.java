@@ -43,9 +43,11 @@ import org.camunda.bpm.engine.variable.VariableMap;
  * @author Roman Smirnov
  *
  */
-public abstract class CallableElementActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
+public abstract class CallableElementActivityBehavior extends AbstractBpmnActivityBehavior
+    implements SubProcessActivityBehavior {
 
-  protected String[] variablesFilter = { NUMBER_OF_INSTANCES, NUMBER_OF_ACTIVE_INSTANCES, NUMBER_OF_COMPLETED_INSTANCES };
+  protected String[] variablesFilter = { NUMBER_OF_INSTANCES, NUMBER_OF_ACTIVE_INSTANCES,
+      NUMBER_OF_COMPLETED_INSTANCES };
 
   protected CallableElement callableElement;
 
@@ -74,9 +76,8 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
     if (instance instanceof DelegateVariableMapping) {
       return (DelegateVariableMapping) instance;
     } else {
-      throw LOG.missingDelegateVariableMappingParentClassException(
-              instance.getClass().getName(),
-              DelegateVariableMapping.class.getName());
+      throw LOG.missingDelegateVariableMappingParentClassException(instance.getClass().getName(),
+          DelegateVariableMapping.class.getName());
     }
   }
 
@@ -86,8 +87,8 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
   }
 
   public Object resolveDelegateClass(final ActivityExecution execution) {
-    ProcessApplicationReference targetProcessApplication
-            = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
+    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil
+        .getTargetProcessApplication((ExecutionEntity) execution);
     if (ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
       return Context.executeWithinProcessApplication(new Callable<Object>() {
 
@@ -130,7 +131,8 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
   }
 
   @Override
-  public void passOutputVariables(final ActivityExecution execution, final VariableScope subInstance) {
+  public void passOutputVariables(final ActivityExecution execution,
+      final VariableScope subInstance) {
     // only data. no control flow available on this execution.
     VariableMap variables = filterVariables(getOutputVariables(subInstance));
     VariableMap localVariables = getOutputVariablesLocal(subInstance);
@@ -220,6 +222,7 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
     return getCallableElement().isVersionBinding();
   }
 
-  protected abstract void startInstance(ActivityExecution execution, VariableMap variables, String businessKey);
+  protected abstract void startInstance(ActivityExecution execution, VariableMap variables,
+      String businessKey);
 
 }

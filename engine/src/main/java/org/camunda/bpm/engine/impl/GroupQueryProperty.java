@@ -19,8 +19,6 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
 
-
-
 /**
  * Contains the possible properties that can be used by the {@link GroupQuery}.
  *

@@ -91,7 +91,8 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
     return this;
   }
 
-  public CaseExecutionCommandBuilder setVariableLocal(String localVariableName, Object localVariableValue) {
+  public CaseExecutionCommandBuilder setVariableLocal(String localVariableName,
+      Object localVariableValue) {
     ensureNotNull(NotValidException.class, "localVariableName", localVariableName);
     ensureVariableShouldNotBeRemoved(localVariableName);
     ensureVariablesLocalInitialized();
@@ -151,7 +152,8 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   protected void ensureVariableShouldNotBeRemoved(String variableName) {
     if ((variableDeletions != null && variableDeletions.contains(variableName))
         || (variableLocalDeletions != null && variableLocalDeletions.contains(variableName))) {
-      throw new NotValidException("Cannot set and remove a variable with the same variable name: '"+variableName+"' within a command.");
+      throw new NotValidException("Cannot set and remove a variable with the same variable name: '"
+          + variableName + "' within a command.");
     }
   }
 
@@ -164,7 +166,8 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
   protected void ensureVariableShouldNotBeSet(String variableName) {
     if ((variables != null && variables.keySet().contains(variableName))
         || (variablesLocal != null && variablesLocal.keySet().contains(variableName))) {
-      throw new NotValidException("Cannot set and remove a variable with the same variable name: '"+variableName+"' within a command.");
+      throw new NotValidException("Cannot set and remove a variable with the same variable name: '"
+          + variableName + "' within a command.");
     }
   }
 
@@ -191,7 +194,6 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
       variableLocalDeletions = new ArrayList<String>();
     }
   }
-
 
   public void execute() {
     CaseExecutionVariableCmd command = new CaseExecutionVariableCmd(this);
@@ -230,7 +232,7 @@ public class CaseExecutionCommandBuilderImpl implements CaseExecutionCommandBuil
 
   protected void executeCommand(Command<?> command) {
     try {
-      if(commandExecutor != null) {
+      if (commandExecutor != null) {
         commandExecutor.execute(command);
       } else {
         command.execute(commandContext);

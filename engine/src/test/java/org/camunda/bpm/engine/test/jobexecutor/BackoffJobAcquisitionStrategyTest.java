@@ -51,15 +51,9 @@ public class BackoffJobAcquisitionStrategyTest {
 
   @Before
   public void setUp() {
-    strategy = new BackoffJobAcquisitionStrategy(
-        BASE_IDLE_WAIT_TIME,
-        IDLE_INCREASE_FACTOR,
-        MAX_IDLE_TIME,
-        BASE_BACKOFF_WAIT_TIME,
-        BACKOFF_INCREASE_FACTOR,
-        MAX_BACKOFF_TIME,
-        DECREASE_THRESHOLD,
-        NUM_JOBS_TO_ACQUIRE);
+    strategy = new BackoffJobAcquisitionStrategy(BASE_IDLE_WAIT_TIME, IDLE_INCREASE_FACTOR,
+        MAX_IDLE_TIME, BASE_BACKOFF_WAIT_TIME, BACKOFF_INCREASE_FACTOR, MAX_BACKOFF_TIME,
+        DECREASE_THRESHOLD, NUM_JOBS_TO_ACQUIRE);
   }
 
   @Test
@@ -108,7 +102,8 @@ public class BackoffJobAcquisitionStrategyTest {
 
     // when receiving a successful acquisition result
     context.reset();
-    context.submitAcquiredJobs(ENGINE_NAME, buildAcquiredJobs(NUM_JOBS_TO_ACQUIRE, NUM_JOBS_TO_ACQUIRE, 0));
+    context.submitAcquiredJobs(ENGINE_NAME,
+        buildAcquiredJobs(NUM_JOBS_TO_ACQUIRE, NUM_JOBS_TO_ACQUIRE, 0));
 
     strategy.reconfigure(context);
 
@@ -131,10 +126,12 @@ public class BackoffJobAcquisitionStrategyTest {
       context.submitRejectedBatch(ENGINE_NAME, acquiredJobs.getJobIdBatches().get(i));
     }
 
-    // then the strategy only attempts to acquire the number of jobs that were successfully submitted
+    // then the strategy only attempts to acquire the number of jobs that were successfully
+    // submitted
     strategy.reconfigure(context);
 
-    Assert.assertEquals(NUM_JOBS_TO_ACQUIRE - numJobsRejected, strategy.getNumJobsToAcquire(ENGINE_NAME));
+    Assert.assertEquals(NUM_JOBS_TO_ACQUIRE - numJobsRejected,
+        strategy.getNumJobsToAcquire(ENGINE_NAME));
 
     // without a timeout
     Assert.assertEquals(0, strategy.getWaitTime());
@@ -158,13 +155,15 @@ public class BackoffJobAcquisitionStrategyTest {
 
     // then there is a slight wait time to avoid constant spinning while
     // no execution resources are available
-    Assert.assertEquals(BackoffJobAcquisitionStrategy.DEFAULT_EXECUTION_SATURATION_WAIT_TIME, strategy.getWaitTime());
+    Assert.assertEquals(BackoffJobAcquisitionStrategy.DEFAULT_EXECUTION_SATURATION_WAIT_TIME,
+        strategy.getWaitTime());
   }
 
   /**
    * numJobsToAcquire >= numJobsAcquired >= numJobsFailedToLock must hold
    */
-  protected AcquiredJobs buildAcquiredJobs(int numJobsToAcquire, int numJobsAcquired, int numJobsFailedToLock) {
+  protected AcquiredJobs buildAcquiredJobs(int numJobsToAcquire, int numJobsAcquired,
+      int numJobsFailedToLock) {
     AcquiredJobs acquiredJobs = new AcquiredJobs(numJobsToAcquire);
     for (int i = 0; i < numJobsAcquired; i++) {
       acquiredJobs.addJobIdBatch(Arrays.asList(Integer.toString(i)));

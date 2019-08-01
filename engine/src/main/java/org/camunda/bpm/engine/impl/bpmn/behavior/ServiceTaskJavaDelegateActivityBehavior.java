@@ -24,11 +24,11 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-
 /**
  * @author Tom Baeyens
  */
-public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavior implements ActivityBehavior, ExecutionListener {
+public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavior
+    implements ActivityBehavior, ExecutionListener {
 
   protected JavaDelegate javaDelegate;
 
@@ -50,8 +50,7 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
   }
 
   public void execute(DelegateExecution execution) throws Exception {
-    Context.getProcessEngineConfiguration()
-      .getDelegateInterceptor()
-      .handleInvocation(new JavaDelegateInvocation(javaDelegate, execution));
+    Context.getProcessEngineConfiguration().getDelegateInterceptor()
+        .handleInvocation(new JavaDelegateInvocation(javaDelegate, execution));
   }
 }

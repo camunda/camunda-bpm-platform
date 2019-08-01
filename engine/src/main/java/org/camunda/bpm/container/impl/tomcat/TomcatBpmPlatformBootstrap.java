@@ -38,7 +38,9 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>Apache Tomcat server listener responsible for deploying the bpm platform.</p>
+ * <p>
+ * Apache Tomcat server listener responsible for deploying the bpm platform.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -55,13 +57,13 @@ public class TomcatBpmPlatformBootstrap implements LifecycleListener {
 
     if (Lifecycle.START_EVENT.equals(event.getType())) {
 
-      // the Apache Tomcat integration uses the Jmx Container for managing process engines and applications.
+      // the Apache Tomcat integration uses the Jmx Container for managing process engines and
+      // applications.
       containerDelegate = (RuntimeContainerDelegateImpl) RuntimeContainerDelegate.INSTANCE.get();
 
       deployBpmPlatform(event);
 
-    }
-    else if (Lifecycle.STOP_EVENT.equals(event.getType())) {
+    } else if (Lifecycle.STOP_EVENT.equals(event.getType())) {
 
       undeployBpmPlatform(event);
 
@@ -74,31 +76,24 @@ public class TomcatBpmPlatformBootstrap implements LifecycleListener {
     final StandardServer server = (StandardServer) event.getSource();
 
     containerDelegate.getServiceContainer().createDeploymentOperation("deploy BPM platform")
-      .addAttachment(TomcatAttachments.SERVER, server)
-      .addStep(new TomcatParseBpmPlatformXmlStep())
-      .addStep(new DiscoverBpmPlatformPluginsStep())
-      .addStep(new StartManagedThreadPoolStep())
-      .addStep(new StartJobExecutorStep())
-      .addStep(new PlatformXmlStartProcessEnginesStep())
-      .execute();
+        .addAttachment(TomcatAttachments.SERVER, server)
+        .addStep(new TomcatParseBpmPlatformXmlStep()).addStep(new DiscoverBpmPlatformPluginsStep())
+        .addStep(new StartManagedThreadPoolStep()).addStep(new StartJobExecutorStep())
+        .addStep(new PlatformXmlStartProcessEnginesStep()).execute();
 
     LOG.camundaBpmPlatformSuccessfullyStarted(server.getServerInfo());
 
   }
-
 
   protected void undeployBpmPlatform(LifecycleEvent event) {
 
     final StandardServer server = (StandardServer) event.getSource();
 
     containerDelegate.getServiceContainer().createUndeploymentOperation("undeploy BPM platform")
-      .addAttachment(TomcatAttachments.SERVER, server)
-      .addStep(new StopJobExecutorStep())
-      .addStep(new StopManagedThreadPoolStep())
-      .addStep(new StopProcessApplicationsStep())
-      .addStep(new StopProcessEnginesStep())
-      .addStep(new UnregisterBpmPlatformPluginsStep())
-      .execute();
+        .addAttachment(TomcatAttachments.SERVER, server).addStep(new StopJobExecutorStep())
+        .addStep(new StopManagedThreadPoolStep()).addStep(new StopProcessApplicationsStep())
+        .addStep(new StopProcessEnginesStep()).addStep(new UnregisterBpmPlatformPluginsStep())
+        .execute();
 
     LOG.camundaBpmPlatformStopped(server.getServerInfo());
   }

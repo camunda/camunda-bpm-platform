@@ -22,7 +22,10 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Annotation for a test method or class to create and delete a deployment around a test method.
  *
- * <p>Usage - Example 1 (method-level annotation):</p>
+ * <p>
+ * Usage - Example 1 (method-level annotation):
+ * </p>
+ * 
  * <pre>
  * package org.example;
  *
@@ -46,7 +49,10 @@ import java.lang.annotation.RetentionPolicy;
  *   }
  * </pre>
  *
- * <p>Usage - Example 2 (class-level annotation):</p>
+ * <p>
+ * Usage - Example 2 (class-level annotation):
+ * </p>
+ * 
  * <pre>
  * package org.example;
  *

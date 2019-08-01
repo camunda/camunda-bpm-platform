@@ -19,8 +19,7 @@ package org.camunda.bpm.engine.runtime;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * A {@link VariableInstance} represents a variable in the execution of
- * a process instance.
+ * A {@link VariableInstance} represents a variable in the execution of a process instance.
  *
  * @author roman.smirnov
  *
@@ -86,13 +85,14 @@ public interface VariableInstance {
 
   /**
    * If the variable value could not be loaded, this returns the error message.
+   * 
    * @return an error message indicating why the variable value could not be loaded.
    */
   String getErrorMessage();
 
   /**
-   * The id of the tenant this variable belongs to. Can be <code>null</code>
-   * if the variable belongs to no single tenant.
+   * The id of the tenant this variable belongs to. Can be <code>null</code> if the variable belongs
+   * to no single tenant.
    */
   String getTenantId();
 

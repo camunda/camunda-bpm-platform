@@ -33,7 +33,7 @@ public class ExclusiveEndEventTest extends PluggableProcessEngineTestCase {
     // now there should be 1 non-exclusive job in the database:
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertFalse(((JobEntity)job).isExclusive());
+    assertFalse(((JobEntity) job).isExclusive());
 
     waitForJobExecutorToProcessAllJobs(6000L);
 
@@ -43,16 +43,16 @@ public class ExclusiveEndEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testExclusiveEndEvent() {
-    // start process 
+    // start process
     runtimeService.startProcessInstanceByKey("exclusive");
     // now there should be 1 exclusive job in the database:
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertTrue(((JobEntity)job).isExclusive());
-               
+    assertTrue(((JobEntity) job).isExclusive());
+
     waitForJobExecutorToProcessAllJobs(6000L);
-    
+
     // all the jobs are done
-    assertEquals(0, managementService.createJobQuery().count());      
+    assertEquals(0, managementService.createJobQuery().count());
   }
 }

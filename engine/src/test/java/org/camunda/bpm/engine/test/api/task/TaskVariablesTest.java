@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -47,7 +46,8 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(taskId, true);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/task/TaskVariablesTest.testTaskExecutionVariables.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/task/TaskVariablesTest.testTaskExecutionVariables.bpmn20.xml" })
   public void testTaskExecutionVariableLongValue() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
 
@@ -96,7 +96,8 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedVariables, taskService.getVariables(taskId));
     assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId));
     assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId, null));
-    assertEquals(expectedVariables, runtimeService.getVariablesLocalTyped(processInstanceId, null, true));
+    assertEquals(expectedVariables,
+        runtimeService.getVariablesLocalTyped(processInstanceId, null, true));
 
     taskService.setVariableLocal(taskId, "budget", "unlimited");
 
@@ -118,7 +119,6 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedVariables, runtimeService.getVariables(processInstanceId));
     assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId));
 
-
     // typed variable API
 
     ArrayList<String> serializableValue = new ArrayList<String>();
@@ -129,7 +129,8 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
     ArrayList<String> serializableValueLocal = new ArrayList<String>();
     serializableValueLocal.add("3");
     serializableValueLocal.add("4");
-    taskService.setVariableLocal(taskId, "objectVariableLocal", objectValue(serializableValueLocal).create());
+    taskService.setVariableLocal(taskId, "objectVariableLocal",
+        objectValue(serializableValueLocal).create());
 
     Object value = taskService.getVariable(taskId, "objectVariable");
     assertEquals(serializableValue, value);
@@ -146,15 +147,15 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
     ObjectValue typedValueLocal = taskService.getVariableLocalTyped(taskId, "objectVariableLocal");
     assertEquals(serializableValueLocal, typedValueLocal.getValue());
 
-    ObjectValue serializedValueLocal = taskService.getVariableLocalTyped(taskId, "objectVariableLocal", false);
+    ObjectValue serializedValueLocal = taskService.getVariableLocalTyped(taskId,
+        "objectVariableLocal", false);
     assertFalse(serializedValueLocal.isDeserialized());
 
     try {
       StringValue val = taskService.getVariableTyped(taskId, "objectVariable");
       fail("expected exception");
-    }
-    catch(ClassCastException e) {
-      //happy path
+    } catch (ClassCastException e) {
+      // happy path
     }
 
   }

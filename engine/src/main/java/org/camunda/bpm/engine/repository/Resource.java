@@ -21,7 +21,6 @@ package org.camunda.bpm.engine.repository;
  */
 public interface Resource {
 
-
   String getId();
 
   String getName();

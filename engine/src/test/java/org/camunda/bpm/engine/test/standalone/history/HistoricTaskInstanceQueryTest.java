@@ -38,109 +38,133 @@ import org.camunda.bpm.engine.variable.Variables;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCase {
 
-
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testProcessVariableValueEqualsNumber() throws Exception {
     // long
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", 123L));
+        Collections.<String, Object> singletonMap("var", 123L));
 
     // non-matching long
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", 12345L));
+        Collections.<String, Object> singletonMap("var", 12345L));
 
     // short
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", (short) 123));
+        Collections.<String, Object> singletonMap("var", (short) 123));
 
     // double
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", 123.0d));
+        Collections.<String, Object> singletonMap("var", 123.0d));
 
     // integer
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", 123));
+        Collections.<String, Object> singletonMap("var", 123));
 
     // untyped null (should not match)
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", null));
+        Collections.<String, Object> singletonMap("var", null));
 
     // typed null (should not match)
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", Variables.longValue(null)));
+        Collections.<String, Object> singletonMap("var", Variables.longValue(null)));
 
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Collections.<String, Object>singletonMap("var", "123"));
+        Collections.<String, Object> singletonMap("var", "123"));
 
-    assertEquals(4, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", Variables.numberValue(123)).count());
-    assertEquals(4, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", Variables.numberValue(123L)).count());
-    assertEquals(4, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", Variables.numberValue(123.0d)).count());
-    assertEquals(4, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", Variables.numberValue((short) 123)).count());
+    assertEquals(4, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueEquals("var", Variables.numberValue(123)).count());
+    assertEquals(4, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueEquals("var", Variables.numberValue(123L)).count());
+    assertEquals(4, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueEquals("var", Variables.numberValue(123.0d)).count());
+    assertEquals(4, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueEquals("var", Variables.numberValue((short) 123)).count());
 
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", Variables.numberValue(null)).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueEquals("var", Variables.numberValue(null)).count());
 
-    assertEquals(8, historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", 999L).count());
-    assertEquals(8, historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var",  (short) 999).count());
-    assertEquals(8, historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", 999).count());
-    assertEquals(8, historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", "999").count());
-    assertEquals(8, historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", false).count());
+    assertEquals(8, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueNotEquals("var", 999L).count());
+    assertEquals(8, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueNotEquals("var", (short) 999).count());
+    assertEquals(8, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueNotEquals("var", 999).count());
+    assertEquals(8, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueNotEquals("var", "999").count());
+    assertEquals(8, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueNotEquals("var", false).count());
 
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testProcessVariableValueLike() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-            Collections.<String, Object>singletonMap("requester", "vahid alizadeh"));
+        Collections.<String, Object> singletonMap("requester", "vahid alizadeh"));
 
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "vahid%").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "%alizadeh").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "%ali%").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueLike("requester", "vahid%").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueLike("requester", "%alizadeh").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueLike("requester", "%ali%").count());
 
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "requester%").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "%ali").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueLike("requester", "requester%").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueLike("requester", "%ali").count());
 
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "vahid").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("nonExistingVar", "string%").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueLike("requester", "vahid").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueLike("nonExistingVar", "string%").count());
 
     // test with null value
     try {
-      historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", null).count();
+      historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", null)
+          .count();
       fail("expected exception");
-    } catch (final ProcessEngineException e) {/*OK*/}
+    } catch (final ProcessEngineException e) {
+      /* OK */}
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testProcessVariableValueGreaterThan() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-            Collections.<String, Object>singletonMap("requestNumber", 123));
+        Collections.<String, Object> singletonMap("requestNumber", 123));
 
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueGreaterThan("requestNumber", 122).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueGreaterThan("requestNumber", 122).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testProcessVariableValueGreaterThanOrEqual() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-            Collections.<String, Object>singletonMap("requestNumber", 123));
+        Collections.<String, Object> singletonMap("requestNumber", 123));
 
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueGreaterThanOrEquals("requestNumber", 122).count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueGreaterThanOrEquals("requestNumber", 123).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueGreaterThanOrEquals("requestNumber", 122).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueGreaterThanOrEquals("requestNumber", 123).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testProcessVariableValueLessThan() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-            Collections.<String, Object>singletonMap("requestNumber", 123));
+        Collections.<String, Object> singletonMap("requestNumber", 123));
 
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLessThan("requestNumber", 124).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueLessThan("requestNumber", 124).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testProcessVariableValueLessThanOrEqual() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
-            Collections.<String, Object>singletonMap("requestNumber", 123));
+        Collections.<String, Object> singletonMap("requestNumber", 123));
 
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLessThanOrEquals("requestNumber", 123).count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLessThanOrEquals("requestNumber", 124).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueLessThanOrEquals("requestNumber", 123).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processVariableValueLessThanOrEquals("requestNumber", 124).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
@@ -165,12 +189,17 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskService.setVariableLocal(tasks.get(6).getId(), "var", Variables.longValue(null));
     taskService.setVariableLocal(tasks.get(7).getId(), "var", "123");
 
-    assertEquals(4, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", Variables.numberValue(123)).count());
-    assertEquals(4, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", Variables.numberValue(123L)).count());
-    assertEquals(4, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", Variables.numberValue(123.0d)).count());
-    assertEquals(4, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", Variables.numberValue((short) 123)).count());
+    assertEquals(4, historyService.createHistoricTaskInstanceQuery()
+        .taskVariableValueEquals("var", Variables.numberValue(123)).count());
+    assertEquals(4, historyService.createHistoricTaskInstanceQuery()
+        .taskVariableValueEquals("var", Variables.numberValue(123L)).count());
+    assertEquals(4, historyService.createHistoricTaskInstanceQuery()
+        .taskVariableValueEquals("var", Variables.numberValue(123.0d)).count());
+    assertEquals(4, historyService.createHistoricTaskInstanceQuery()
+        .taskVariableValueEquals("var", Variables.numberValue((short) 123)).count());
 
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskVariableValueEquals("var", Variables.numberValue(null)).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .taskVariableValueEquals("var", Variables.numberValue(null)).count());
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -189,10 +218,13 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskAssignee.setAssignee("aUserId");
     taskService.saveTask(taskAssignee);
     // query test
-    assertEquals(2, historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("aUserId").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("bUserId").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("invalidUserId").count());
-    taskService.deleteTask("newTask",true);
+    assertEquals(2,
+        historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("aUserId").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("bUserId").count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("invalidUserId").count());
+    taskService.deleteTask("newTask", true);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -208,11 +240,14 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskService.deleteCandidateGroup(taskId, "aGroupId");
     taskService.deleteCandidateGroup(taskId, "bGroupId");
     // query test
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("aGroupId").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("bGroupId").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("invalidGroupId").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("aGroupId").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskInvolvedGroup("bGroupId").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskInvolvedGroup("invalidGroupId").count());
 
-    taskService.deleteTask("newTask",true);
+    taskService.deleteTask("newTask", true);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -230,11 +265,14 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskAssignee.setAssignee("aUserId");
     taskService.saveTask(taskAssignee);
     // query test
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskHadCandidateUser("aUserId").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskHadCandidateUser("bUserId").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskHadCandidateUser("invalidUserId").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskHadCandidateUser("aUserId").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskHadCandidateUser("bUserId").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskHadCandidateUser("invalidUserId").count());
     // delete test
-    taskService.deleteTask("newTask",true);
+    taskService.deleteTask("newTask", true);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -248,10 +286,12 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskService.addCandidateGroup(taskId, "bGroupId");
     taskService.deleteCandidateGroup(taskId, "bGroupId");
     // query test
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskHadCandidateGroup("bGroupId").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskHadCandidateGroup("invalidGroupId").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskHadCandidateGroup("bGroupId").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskHadCandidateGroup("invalidGroupId").count());
     // delete test
-    taskService.deleteTask("newTask",true);
+    taskService.deleteTask("newTask", true);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -286,7 +326,8 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
 
     // then
     assertEquals(historyService.createHistoricTaskInstanceQuery().count(), 2);
-    assertEquals(historyService.createHistoricTaskInstanceQuery().withoutCandidateGroups().count(), 1);
+    assertEquals(historyService.createHistoricTaskInstanceQuery().withoutCandidateGroups().count(),
+        1);
 
     // cleanup
     taskService.deleteTask("newTask", true);
@@ -330,9 +371,9 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     assertEquals(1, query.taskHadCandidateUser("aUserId").count());
     assertEquals(1, query.taskInvolvedUser("aUserId").count());
     // delete task
-    taskService.deleteTask("taskOne",true);
-    taskService.deleteTask("taskTwo",true);
-    taskService.deleteTask("taskThree",true);
+    taskService.deleteTask("taskOne", true);
+    taskService.deleteTask("taskTwo", true);
+    taskService.deleteTask("taskThree", true);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -352,15 +393,16 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
 
     taskService.saveTask(taskThree);
 
-    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskAssigned().list();
+    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
+        .taskAssigned().list();
 
     // then
     assertEquals(list.size(), 2);
 
     // cleanup
-    taskService.deleteTask("taskOne",true);
-    taskService.deleteTask("taskTwo",true);
-    taskService.deleteTask("taskThree",true);
+    taskService.deleteTask("taskOne", true);
+    taskService.deleteTask("taskTwo", true);
+    taskService.deleteTask("taskThree", true);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -380,15 +422,16 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
 
     taskService.saveTask(taskThree);
 
-    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().taskUnassigned().list();
+    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
+        .taskUnassigned().list();
 
     // then
     assertEquals(list.size(), 1);
 
     // cleanup
-    taskService.deleteTask("taskOne",true);
-    taskService.deleteTask("taskTwo",true);
-    taskService.deleteTask("taskThree",true);
+    taskService.deleteTask("taskOne", true);
+    taskService.deleteTask("taskTwo", true);
+    taskService.deleteTask("taskThree", true);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -408,13 +451,13 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskService.complete(taskOne.getId());
 
     List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
-            .finishedBefore(hourAgo.getTime()).list();
+        .finishedBefore(hourAgo.getTime()).list();
 
     // then
     assertEquals(1, list.size());
 
     // cleanup
-    taskService.deleteTask("taskOne",true);
+    taskService.deleteTask("taskOne", true);
     ClockUtil.reset();
   }
 
@@ -435,13 +478,13 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskService.complete(taskOne.getId());
 
     List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
-            .finishedAfter(Calendar.getInstance().getTime()).list();
+        .finishedAfter(Calendar.getInstance().getTime()).list();
 
     // then
     assertEquals(0, list.size());
 
     // cleanup
-    taskService.deleteTask("taskOne",true);
+    taskService.deleteTask("taskOne", true);
 
     ClockUtil.reset();
   }

@@ -34,10 +34,7 @@ public class SetExternalTasksRetriesCmd extends AbstractSetExternalTaskRetriesCm
     EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "externalTaskIds", collectedIds);
 
     int retries = builder.getRetries();
-    writeUserOperationLog(commandContext,
-        retries,
-        collectedIds.size(),
-        false);
+    writeUserOperationLog(commandContext, retries, collectedIds.size(), false);
 
     for (String externalTaskId : collectedIds) {
       new SetExternalTaskRetriesCmd(externalTaskId, retries, false).execute(commandContext);

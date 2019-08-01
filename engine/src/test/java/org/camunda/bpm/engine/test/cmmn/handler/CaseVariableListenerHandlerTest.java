@@ -59,9 +59,12 @@ public class CaseVariableListenerHandlerTest extends CmmnElementHandlerTest {
 
   @Test
   public void testClassDelegateHandling() {
-    ExtensionElements extensionElements = SpecUtil.createElement(modelInstance, caseTask, null, ExtensionElements.class);
-    CamundaVariableListener variableListener = SpecUtil.createElement(modelInstance, extensionElements, null, CamundaVariableListener.class);
-    CamundaField field = SpecUtil.createElement(modelInstance, variableListener, null, CamundaField.class);
+    ExtensionElements extensionElements = SpecUtil.createElement(modelInstance, caseTask, null,
+        ExtensionElements.class);
+    CamundaVariableListener variableListener = SpecUtil.createElement(modelInstance,
+        extensionElements, null, CamundaVariableListener.class);
+    CamundaField field = SpecUtil.createElement(modelInstance, variableListener, null,
+        CamundaField.class);
     field.setCamundaName("fieldName");
     field.setCamundaStringValue("a string value");
 
@@ -70,10 +73,12 @@ public class CaseVariableListenerHandlerTest extends CmmnElementHandlerTest {
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
 
-    List<VariableListener<?>> listeners = activity.getVariableListenersLocal(CaseVariableListener.CREATE);
+    List<VariableListener<?>> listeners = activity
+        .getVariableListenersLocal(CaseVariableListener.CREATE);
     Assert.assertEquals(1, listeners.size());
 
-    ClassDelegateCaseVariableListener listener = (ClassDelegateCaseVariableListener) listeners.get(0);
+    ClassDelegateCaseVariableListener listener = (ClassDelegateCaseVariableListener) listeners
+        .get(0);
     Assert.assertEquals("a.class.Name", listener.getClassName());
     Assert.assertEquals(1, listener.getFieldDeclarations().size());
     Assert.assertEquals("fieldName", listener.getFieldDeclarations().get(0).getName());
@@ -82,24 +87,30 @@ public class CaseVariableListenerHandlerTest extends CmmnElementHandlerTest {
     Expression expressionValue = (Expression) fieldValue;
     assertEquals("a string value", expressionValue.getExpressionText());
 
-    Assert.assertEquals(listener, activity.getVariableListenersLocal(CaseVariableListener.UPDATE).get(0));
-    Assert.assertEquals(listener, activity.getVariableListenersLocal(CaseVariableListener.DELETE).get(0));
+    Assert.assertEquals(listener,
+        activity.getVariableListenersLocal(CaseVariableListener.UPDATE).get(0));
+    Assert.assertEquals(listener,
+        activity.getVariableListenersLocal(CaseVariableListener.DELETE).get(0));
   }
 
   @Test
   public void testDelegateExpressionDelegateHandling() {
-    ExtensionElements extensionElements = SpecUtil.createElement(modelInstance, caseTask, null, ExtensionElements.class);
-    CamundaVariableListener variableListener = SpecUtil.createElement(modelInstance, extensionElements, null, CamundaVariableListener.class);
+    ExtensionElements extensionElements = SpecUtil.createElement(modelInstance, caseTask, null,
+        ExtensionElements.class);
+    CamundaVariableListener variableListener = SpecUtil.createElement(modelInstance,
+        extensionElements, null, CamundaVariableListener.class);
     variableListener.setCamundaDelegateExpression("${expression}");
     variableListener.setCamundaEvent(CaseVariableListener.CREATE);
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
 
-    List<VariableListener<?>> listeners = activity.getVariableListenersLocal(CaseVariableListener.CREATE);
+    List<VariableListener<?>> listeners = activity
+        .getVariableListenersLocal(CaseVariableListener.CREATE);
     Assert.assertEquals(1, listeners.size());
 
-    DelegateExpressionCaseVariableListener listener = (DelegateExpressionCaseVariableListener) listeners.get(0);
+    DelegateExpressionCaseVariableListener listener = (DelegateExpressionCaseVariableListener) listeners
+        .get(0);
     Assert.assertEquals("${expression}", listener.getExpressionText());
 
     Assert.assertEquals(0, activity.getVariableListenersLocal(CaseVariableListener.UPDATE).size());
@@ -108,15 +119,18 @@ public class CaseVariableListenerHandlerTest extends CmmnElementHandlerTest {
 
   @Test
   public void testExpressionDelegateHandling() {
-    ExtensionElements extensionElements = SpecUtil.createElement(modelInstance, caseTask, null, ExtensionElements.class);
-    CamundaVariableListener variableListener = SpecUtil.createElement(modelInstance, extensionElements, null, CamundaVariableListener.class);
+    ExtensionElements extensionElements = SpecUtil.createElement(modelInstance, caseTask, null,
+        ExtensionElements.class);
+    CamundaVariableListener variableListener = SpecUtil.createElement(modelInstance,
+        extensionElements, null, CamundaVariableListener.class);
     variableListener.setCamundaExpression("${expression}");
     variableListener.setCamundaEvent(CaseVariableListener.CREATE);
 
     // when
     CmmnActivity activity = handler.handleElement(planItem, context);
 
-    List<VariableListener<?>> listeners = activity.getVariableListenersLocal(CaseVariableListener.CREATE);
+    List<VariableListener<?>> listeners = activity
+        .getVariableListenersLocal(CaseVariableListener.CREATE);
     Assert.assertEquals(1, listeners.size());
 
     ExpressionCaseVariableListener listener = (ExpressionCaseVariableListener) listeners.get(0);

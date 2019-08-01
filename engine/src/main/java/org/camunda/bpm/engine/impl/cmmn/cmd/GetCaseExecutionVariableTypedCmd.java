@@ -41,7 +41,8 @@ public class GetCaseExecutionVariableTypedCmd implements Command<TypedValue>, Se
   protected boolean isLocal;
   protected boolean deserializeValue;
 
-  public GetCaseExecutionVariableTypedCmd(String caseExecutionId, String variableName, boolean isLocal, boolean deserializeValue) {
+  public GetCaseExecutionVariableTypedCmd(String caseExecutionId, String variableName,
+      boolean isLocal, boolean deserializeValue) {
     this.caseExecutionId = caseExecutionId;
     this.variableName = variableName;
     this.isLocal = isLocal;
@@ -52,13 +53,14 @@ public class GetCaseExecutionVariableTypedCmd implements Command<TypedValue>, Se
     ensureNotNull("caseExecutionId", caseExecutionId);
     ensureNotNull("variableName", variableName);
 
-    CaseExecutionEntity caseExecution = commandContext
-      .getCaseExecutionManager()
-      .findCaseExecutionById(caseExecutionId);
+    CaseExecutionEntity caseExecution = commandContext.getCaseExecutionManager()
+        .findCaseExecutionById(caseExecutionId);
 
-    ensureNotNull(CaseExecutionNotFoundException.class, "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
+    ensureNotNull(CaseExecutionNotFoundException.class,
+        "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadCaseInstance(caseExecution);
     }
 

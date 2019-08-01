@@ -58,10 +58,8 @@ public class JobExecutorAcquireJobsByTypeAndDueDateTest extends AbstractJobExecu
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/jobexecutor/processWithTimerCatch.bpmn20.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/jobexecutor/processWithTimerCatch.bpmn20.xml" })
   public void testTimerAndOldJobsArePreferred() {
     // first start process with timer job
     ProcessInstance timerProcess1 = runtimeService.startProcessInstanceByKey("testProcess");
@@ -75,10 +73,14 @@ public class JobExecutorAcquireJobsByTypeAndDueDateTest extends AbstractJobExecu
     incrementClock(61);
     ProcessInstance asyncProcess2 = runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
 
-    Job timerJob1 = managementService.createJobQuery().processInstanceId(timerProcess1.getId()).singleResult();
-    Job timerJob2 = managementService.createJobQuery().processInstanceId(timerProcess2.getId()).singleResult();
-    Job messageJob1 = managementService.createJobQuery().processInstanceId(asyncProcess1.getId()).singleResult();
-    Job messageJob2 = managementService.createJobQuery().processInstanceId(asyncProcess2.getId()).singleResult();
+    Job timerJob1 = managementService.createJobQuery().processInstanceId(timerProcess1.getId())
+        .singleResult();
+    Job timerJob2 = managementService.createJobQuery().processInstanceId(timerProcess2.getId())
+        .singleResult();
+    Job messageJob1 = managementService.createJobQuery().processInstanceId(asyncProcess1.getId())
+        .singleResult();
+    Job messageJob2 = managementService.createJobQuery().processInstanceId(asyncProcess2.getId())
+        .singleResult();
 
     assertNotNull(timerJob1.getDuedate());
     assertNotNull(timerJob2.getDuedate());

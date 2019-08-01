@@ -24,31 +24,31 @@ import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Tom Baeyens
  */
-public class CreateMembershipCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
+public class CreateMembershipCmd extends AbstractWritableIdentityServiceCmd<Void>
+    implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   String userId;
   String groupId;
-  
+
   public CreateMembershipCmd(String userId, String groupId) {
     this.userId = userId;
     this.groupId = groupId;
   }
-  
+
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("userId", userId);
     ensureNotNull("groupId", groupId);
 
-    IdentityOperationResult operationResult = commandContext
-      .getWritableIdentityProvider()
-      .createMembership(userId, groupId);
+    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider()
+        .createMembership(userId, groupId);
 
-    commandContext.getOperationLogManager().logMembershipOperation(operationResult, userId, groupId, null);
+    commandContext.getOperationLogManager().logMembershipOperation(operationResult, userId, groupId,
+        null);
 
     return null;
   }

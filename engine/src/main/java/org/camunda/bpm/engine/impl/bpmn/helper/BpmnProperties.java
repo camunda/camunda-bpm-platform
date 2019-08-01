@@ -42,30 +42,41 @@ public class BpmnProperties {
 
   public static final PropertyKey<String> TYPE = new PropertyKey<String>("type");
 
-  public static final PropertyListKey<EscalationEventDefinition> ESCALATION_EVENT_DEFINITIONS = new PropertyListKey<EscalationEventDefinition>("escalationEventDefinitions");
+  public static final PropertyListKey<EscalationEventDefinition> ESCALATION_EVENT_DEFINITIONS = new PropertyListKey<EscalationEventDefinition>(
+      "escalationEventDefinitions");
 
-  public static final PropertyListKey<ErrorEventDefinition> ERROR_EVENT_DEFINITIONS = new PropertyListKey<ErrorEventDefinition>("errorEventDefinitions");
-
-  /**
-   * Declaration indexed by activity that is triggered by the event; assumes that there is at most one such declaration per activity.
-   * There is code that relies on this assumption (e.g. when determining which declaration matches a job in the migration logic).
-   */
-  public static final PropertyMapKey<String, TimerDeclarationImpl> TIMER_DECLARATIONS = new PropertyMapKey<String, TimerDeclarationImpl>("timerDeclarations", false);
+  public static final PropertyListKey<ErrorEventDefinition> ERROR_EVENT_DEFINITIONS = new PropertyListKey<ErrorEventDefinition>(
+      "errorEventDefinitions");
 
   /**
-   * Declaration indexed by activity that is triggered by the event; assumes that there is at most one such declaration per activity.
-   * There is code that relies on this assumption (e.g. when determining which declaration matches a job in the migration logic).
+   * Declaration indexed by activity that is triggered by the event; assumes that there is at most
+   * one such declaration per activity. There is code that relies on this assumption (e.g. when
+   * determining which declaration matches a job in the migration logic).
    */
-  public static final PropertyMapKey<String, EventSubscriptionDeclaration> EVENT_SUBSCRIPTION_DECLARATIONS = new PropertyMapKey<String, EventSubscriptionDeclaration>("eventDefinitions", false);
+  public static final PropertyMapKey<String, TimerDeclarationImpl> TIMER_DECLARATIONS = new PropertyMapKey<String, TimerDeclarationImpl>(
+      "timerDeclarations", false);
 
-  public static final PropertyKey<ActivityImpl> COMPENSATION_BOUNDARY_EVENT = new PropertyKey<ActivityImpl>("compensationBoundaryEvent");
+  /**
+   * Declaration indexed by activity that is triggered by the event; assumes that there is at most
+   * one such declaration per activity. There is code that relies on this assumption (e.g. when
+   * determining which declaration matches a job in the migration logic).
+   */
+  public static final PropertyMapKey<String, EventSubscriptionDeclaration> EVENT_SUBSCRIPTION_DECLARATIONS = new PropertyMapKey<String, EventSubscriptionDeclaration>(
+      "eventDefinitions", false);
 
-  public static final PropertyKey<ActivityImpl> INITIAL_ACTIVITY = new PropertyKey<ActivityImpl>("initial");
+  public static final PropertyKey<ActivityImpl> COMPENSATION_BOUNDARY_EVENT = new PropertyKey<ActivityImpl>(
+      "compensationBoundaryEvent");
 
-  public static final PropertyKey<Boolean> TRIGGERED_BY_EVENT = new PropertyKey<Boolean>("triggeredByEvent");
+  public static final PropertyKey<ActivityImpl> INITIAL_ACTIVITY = new PropertyKey<ActivityImpl>(
+      "initial");
 
-  public static final PropertyKey<Boolean> HAS_CONDITIONAL_EVENTS = new PropertyKey<Boolean>(PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
+  public static final PropertyKey<Boolean> TRIGGERED_BY_EVENT = new PropertyKey<Boolean>(
+      "triggeredByEvent");
 
-  public static final PropertyKey<ConditionalEventDefinition> CONDITIONAL_EVENT_DEFINITION = new PropertyKey<ConditionalEventDefinition>("conditionalEventDefinition");
+  public static final PropertyKey<Boolean> HAS_CONDITIONAL_EVENTS = new PropertyKey<Boolean>(
+      PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
+
+  public static final PropertyKey<ConditionalEventDefinition> CONDITIONAL_EVENT_DEFINITION = new PropertyKey<ConditionalEventDefinition>(
+      "conditionalEventDefinition");
 
 }

@@ -25,16 +25,14 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 public class MetricsLogger extends ProcessEngineLogger {
 
   public void couldNotDetermineIp(Exception e) {
-    logWarn(
-        "001", "Could not determine local IP address for generating an engine id", e);
+    logWarn("001", "Could not determine local IP address for generating an engine id", e);
   }
 
   /**
    * @param e
    */
   public void couldNotCollectAndLogMetrics(Exception e) {
-    logWarn(
-        "002", "Could not collect and log metrics", e);
+    logWarn("002", "Could not collect and log metrics", e);
   }
 
 }

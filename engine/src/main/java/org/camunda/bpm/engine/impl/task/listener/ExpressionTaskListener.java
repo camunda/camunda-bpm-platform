@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 
-
 /**
  * @author Joram Barrez
  */
@@ -37,8 +36,8 @@ public class ExpressionTaskListener implements TaskListener {
   }
 
   /**
-   * returns the expression text for this task listener. Comes in handy if you want to
-   * check which listeners you already have.
+   * returns the expression text for this task listener. Comes in handy if you want to check which
+   * listeners you already have.
    */
   public String getExpressionText() {
     return expression.getExpressionText();

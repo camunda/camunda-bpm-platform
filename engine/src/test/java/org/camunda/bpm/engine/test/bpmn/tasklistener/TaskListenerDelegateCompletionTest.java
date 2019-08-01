@@ -71,57 +71,53 @@ public class TaskListenerDelegateCompletionTest {
   @After
   public void cleanUp() {
     if (runtimeService.createProcessInstanceQuery().count() > 0) {
-      runtimeService.deleteProcessInstance(runtimeService.createProcessInstanceQuery().singleResult().getId(),null,true);
+      runtimeService.deleteProcessInstance(
+          runtimeService.createProcessInstanceQuery().singleResult().getId(), null, true);
     }
   }
 
-
   protected static BpmnModelInstance setupProcess(String eventName) {
-    return Bpmn.createExecutableProcess(TASK_LISTENER_PROCESS)
-        .startEvent()
-          .userTask(ACTIVITY_ID)
-          .camundaTaskListenerClass(eventName,COMPLETE_LISTENER)
-        .endEvent()
-        .done();
+    return Bpmn.createExecutableProcess(TASK_LISTENER_PROCESS).startEvent().userTask(ACTIVITY_ID)
+        .camundaTaskListenerClass(eventName, COMPLETE_LISTENER).endEvent().done();
   }
 
   @Test
-  public void testCompletionIsPossibleOnCreation () {
-    //given
+  public void testCompletionIsPossibleOnCreation() {
+    // given
     createProcessWithListener(TaskListener.EVENTNAME_CREATE);
 
-    //when
+    // when
     runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
 
-    //then
+    // then
     Task task = taskService.createTaskQuery().singleResult();
     assertThat(task, is(nullValue()));
   }
 
   @Test
-  public void testCompletionIsPossibleOnAssignment () {
-    //given
+  public void testCompletionIsPossibleOnAssignment() {
+    // given
     createProcessWithListener(TaskListener.EVENTNAME_ASSIGNMENT);
 
-    //when
+    // when
     runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
     Task task = taskService.createTaskQuery().singleResult();
-    taskService.setAssignee(task.getId(),"test assignee");
+    taskService.setAssignee(task.getId(), "test assignee");
 
-    //then
+    // then
     task = taskService.createTaskQuery().singleResult();
     assertThat(task, is(nullValue()));
   }
 
   @Test
-  public void testCompletionIsNotPossibleOnComplete () {
+  public void testCompletionIsNotPossibleOnComplete() {
     // expect
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage(containsString("invalid task state"));
-    //given
+    // given
     createProcessWithListener(TaskListener.EVENTNAME_COMPLETE);
 
-    //when
+    // when
     runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
     Task task = taskService.createTaskQuery().singleResult();
 
@@ -129,17 +125,18 @@ public class TaskListenerDelegateCompletionTest {
   }
 
   @Test
-  public void testCompletionIsNotPossibleOnDelete () {
+  public void testCompletionIsNotPossibleOnDelete() {
     // expect
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage(containsString("invalid task state"));
 
-    //given
+    // given
     createProcessWithListener(TaskListener.EVENTNAME_DELETE);
 
-    //when
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
-    runtimeService.deleteProcessInstance(processInstance.getId(),"test reason");
+    // when
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey(TASK_LISTENER_PROCESS);
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test reason");
   }
 
   protected void createProcessWithListener(String eventName) {

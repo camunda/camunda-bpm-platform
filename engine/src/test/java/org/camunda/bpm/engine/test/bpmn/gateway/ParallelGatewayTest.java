@@ -44,37 +44,42 @@ import org.hamcrest.CoreMatchers;
 public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
 
   /**
-   * Case where there is a parallel gateway that splits into 3 paths of
-   * execution, that are immediately joined, without any wait states in between.
-   * In the end, no executions should be in the database.
+   * Case where there is a parallel gateway that splits into 3 paths of execution, that are
+   * immediately joined, without any wait states in between. In the end, no executions should be in
+   * the database.
    */
   @Deployment
   public void testSplitMergeNoWaitstates() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("forkJoinNoWaitStates");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("forkJoinNoWaitStates");
     assertTrue(processInstance.isEnded());
   }
 
   @Deployment
   public void testUnstructuredConcurrencyTwoForks() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("unstructuredConcurrencyTwoForks");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("unstructuredConcurrencyTwoForks");
     assertTrue(processInstance.isEnded());
   }
 
   @Deployment
   public void testUnstructuredConcurrencyTwoJoins() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("unstructuredConcurrencyTwoJoins");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("unstructuredConcurrencyTwoJoins");
     assertTrue(processInstance.isEnded());
   }
 
   @Deployment
   public void testForkFollowedByOnlyEndEvents() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("forkFollowedByEndEvents");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("forkFollowedByEndEvents");
     assertTrue(processInstance.isEnded());
   }
 
   @Deployment
   public void testNestedForksFollowedByEndEvents() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedForksFollowedByEndEvents");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("nestedForksFollowedByEndEvents");
     assertTrue(processInstance.isEnded());
   }
 
@@ -220,7 +225,8 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
       if (activityInstance.getActivityId().equals("SubProcess_1")) {
         ActivityInstance[] instances = activityInstance.getChildActivityInstances();
         for (ActivityInstance activityInstance2 : instances) {
-          assertThat(activityInstance2.getActivityName(), is(either(equalTo("Inner User Task 1")).or(CoreMatchers.<Object>equalTo("Inner User Task 2"))));
+          assertThat(activityInstance2.getActivityName(), is(either(equalTo("Inner User Task 1"))
+              .or(CoreMatchers.<Object> equalTo("Inner User Task 2"))));
         }
       } else {
         assertThat(activityInstance.getActivityName(), is("Outer User Task"));
@@ -232,11 +238,8 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
   public void testForkJoin() {
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
-    TaskQuery query = taskService
-                        .createTaskQuery()
-                        .processInstanceId(pi.getId())
-                        .orderByTaskName()
-                        .asc();
+    TaskQuery query = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName()
+        .asc();
 
     List<Task> tasks = query.list();
     assertEquals(2, tasks.size());
@@ -259,10 +262,8 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
   public void testUnbalancedForkJoin() {
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("UnbalancedForkJoin");
-    TaskQuery query = taskService.createTaskQuery()
-                                 .processInstanceId(pi.getId())
-                                 .orderByTaskName()
-                                 .asc();
+    TaskQuery query = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName()
+        .asc();
 
     List<Task> tasks = query.list();
     assertEquals(3, tasks.size());
@@ -293,17 +294,9 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
   }
 
   public void testRemoveConcurrentExecutionLocalVariablesOnJoin() {
-    deployment(Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .parallelGateway("fork")
-      .userTask("task1")
-      .parallelGateway("join")
-      .userTask("afterTask")
-      .endEvent()
-      .moveToNode("fork")
-      .userTask("task2")
-      .connectTo("join")
-      .done());
+    deployment(Bpmn.createExecutableProcess("process").startEvent().parallelGateway("fork")
+        .userTask("task1").parallelGateway("join").userTask("afterTask").endEvent()
+        .moveToNode("fork").userTask("task2").connectTo("join").done());
 
     // given
     runtimeService.startProcessInstanceByKey("process");
@@ -326,9 +319,8 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
     // given
     Exception exceptionOccurred = null;
     runtimeService.startProcessInstanceByKey("process");
-    Execution execution = runtimeService.createExecutionQuery()
-      .activityId("service")
-      .singleResult();
+    Execution execution = runtimeService.createExecutionQuery().activityId("service")
+        .singleResult();
 
     // when
     try {
@@ -346,9 +338,8 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
   public void testExplicitParallelGatewayAfterSignalBehavior() {
     // given
     runtimeService.startProcessInstanceByKey("process");
-    Execution execution = runtimeService.createExecutionQuery()
-      .activityId("service")
-      .singleResult();
+    Execution execution = runtimeService.createExecutionQuery().activityId("service")
+        .singleResult();
 
     // when
     runtimeService.signal(execution.getId());

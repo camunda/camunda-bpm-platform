@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
-
 /**
  * @author Joram Barrez
  */
@@ -62,8 +61,8 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     // Special treatment for assignee, group cannot be used an userId may be null
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       if (groupId != null) {
-        throw new ProcessEngineException("Incompatible usage: cannot use ASSIGNEE"
-          + " together with a groupId");
+        throw new ProcessEngineException(
+            "Incompatible usage: cannot use ASSIGNEE" + " together with a groupId");
       }
     } else {
       if (userId == null && groupId == null) {
@@ -81,7 +80,7 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     EnsureUtil.ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     checkAddIdentityLink(task, commandContext);
-    
+
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       task.setAssignee(userId);
     } else if (IdentityLinkType.OWNER.equals(type)) {
@@ -94,7 +93,8 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
   }
 
   protected void checkAddIdentityLink(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkTaskAssign(task);
     }
   }

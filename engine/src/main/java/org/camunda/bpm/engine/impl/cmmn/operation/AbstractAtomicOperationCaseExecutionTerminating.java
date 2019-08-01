@@ -26,7 +26,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Roman Smirnov
  *
  */
-public abstract class AbstractAtomicOperationCaseExecutionTerminating implements CmmnAtomicOperation {
+public abstract class AbstractAtomicOperationCaseExecutionTerminating
+    implements CmmnAtomicOperation {
 
   public void execute(CmmnExecution execution) {
     execution.setCurrentState(getTerminatingState());

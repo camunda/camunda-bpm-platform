@@ -50,7 +50,8 @@ public abstract class Base64EncodedHashDigest {
       return digest.digest();
 
     } catch (UnsupportedEncodingException e) {
-      throw new ProcessEngineException("UnsupportedEncodingException while calculating password digest");
+      throw new ProcessEngineException(
+          "UnsupportedEncodingException while calculating password digest");
     }
   }
 

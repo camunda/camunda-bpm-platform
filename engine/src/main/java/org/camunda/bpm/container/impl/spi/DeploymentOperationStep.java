@@ -17,7 +17,9 @@
 package org.camunda.bpm.container.impl.spi;
 
 /**
- * <p>An atomic step that is part of a composite {@link DeploymentOperation}.</p>
+ * <p>
+ * An atomic step that is part of a composite {@link DeploymentOperation}.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -28,9 +30,8 @@ public abstract class DeploymentOperationStep {
 
   public abstract void performOperationStep(DeploymentOperation operationContext);
 
-  public void cancelOperationStep(DeploymentOperation operationContext){
+  public void cancelOperationStep(DeploymentOperation operationContext) {
     // default behavior is to to nothing if the step fails
   }
-
 
 }

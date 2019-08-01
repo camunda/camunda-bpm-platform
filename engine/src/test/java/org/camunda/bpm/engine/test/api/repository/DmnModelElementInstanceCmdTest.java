@@ -33,11 +33,8 @@ public class DmnModelElementInstanceCmdTest extends PluggableProcessEngineTestCa
 
   @Deployment(resources = "org/camunda/bpm/engine/test/repository/one.dmn")
   public void testRepositoryService() {
-    String decisionDefinitionId = repositoryService
-      .createDecisionDefinitionQuery()
-      .decisionDefinitionKey(DECISION_KEY)
-      .singleResult()
-      .getId();
+    String decisionDefinitionId = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_KEY).singleResult().getId();
 
     DmnModelInstance modelInstance = repositoryService.getDmnModelInstance(decisionDefinitionId);
     assertNotNull(modelInstance);
@@ -45,7 +42,8 @@ public class DmnModelElementInstanceCmdTest extends PluggableProcessEngineTestCa
     Collection<Decision> decisions = modelInstance.getModelElementsByType(Decision.class);
     assertEquals(1, decisions.size());
 
-    Collection<DecisionTable> decisionTables = modelInstance.getModelElementsByType(DecisionTable.class);
+    Collection<DecisionTable> decisionTables = modelInstance
+        .getModelElementsByType(DecisionTable.class);
     assertEquals(1, decisionTables.size());
 
     Collection<Input> inputs = modelInstance.getModelElementsByType(Input.class);

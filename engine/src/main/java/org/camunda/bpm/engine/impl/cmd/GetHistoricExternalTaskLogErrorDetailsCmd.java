@@ -34,13 +34,14 @@ public class GetHistoricExternalTaskLogErrorDetailsCmd implements Command<String
   public String execute(CommandContext commandContext) {
     ensureNotNull("historicExternalTaskLogId", historicExternalTaskLogId);
 
-    HistoricExternalTaskLogEntity event = commandContext
-        .getHistoricExternalTaskLogManager()
+    HistoricExternalTaskLogEntity event = commandContext.getHistoricExternalTaskLogManager()
         .findHistoricExternalTaskLogById(historicExternalTaskLogId);
 
-    ensureNotNull("No historic external task log found with id " + historicExternalTaskLogId, "historicExternalTaskLog", event);
+    ensureNotNull("No historic external task log found with id " + historicExternalTaskLogId,
+        "historicExternalTaskLog", event);
 
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadHistoricExternalTaskLog(event);
     }
 

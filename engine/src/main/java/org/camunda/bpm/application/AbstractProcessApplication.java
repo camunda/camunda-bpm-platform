@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
 
-
 /**
  * @author Daniel Meyer
  */
@@ -97,7 +96,6 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
       }
     }
 
-
     if (name == null || name.length() == 0) {
       name = autodetectProcessApplicationName();
     }
@@ -106,8 +104,8 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   }
 
   /**
-   * Override this method to autodetect an application name in case the
-   * {@link ProcessApplication} annotation was used but without parameter.
+   * Override this method to autodetect an application name in case the {@link ProcessApplication}
+   * annotation was used but without parameter.
    */
   protected abstract String autodetectProcessApplicationName();
 
@@ -127,7 +125,8 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     }
   }
 
-  public <T> T execute(Callable<T> callable, InvocationContext invocationContext) throws ProcessApplicationExecutionException {
+  public <T> T execute(Callable<T> callable, InvocationContext invocationContext)
+      throws ProcessApplicationExecutionException {
     // allows to hook into the invocation
     return execute(callable);
   }
@@ -143,7 +142,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   }
 
   public Map<String, String> getProperties() {
-    return Collections.<String, String>emptyMap();
+    return Collections.<String, String> emptyMap();
   }
 
   public ELResolver getElResolver() {
@@ -170,12 +169,18 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   }
 
   /**
-   * <p>Initializes the process application provided ElResolver. This implementation uses the
-   * Java SE {@link ServiceLoader} facilities for resolving implementations of {@link ProcessApplicationElResolver}.</p>
    * <p>
-   * <p>If you want to provide a custom implementation in your application, place a file named
-   * <code>META-INF/org.camunda.bpm.application.ProcessApplicationElResolver</code> inside your application
-   * which contains the fully qualified classname of your implementation. Or simply override this method.</p>
+   * Initializes the process application provided ElResolver. This implementation uses the Java SE
+   * {@link ServiceLoader} facilities for resolving implementations of
+   * {@link ProcessApplicationElResolver}.
+   * </p>
+   * <p>
+   * <p>
+   * If you want to provide a custom implementation in your application, place a file named
+   * <code>META-INF/org.camunda.bpm.application.ProcessApplicationElResolver</code> inside your
+   * application which contains the fully qualified classname of your implementation. Or simply
+   * override this method.
+   * </p>
    *
    * @return the process application ElResolver.
    */
@@ -227,20 +232,23 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   }
 
   /**
-   * <p>Provides the default Process Engine name to deploy to, if no Process Engine
-   * was defined in <code>processes.xml</code>.</p>
+   * <p>
+   * Provides the default Process Engine name to deploy to, if no Process Engine was defined in
+   * <code>processes.xml</code>.
+   * </p>
    *
-   * @return the default deploy-to Process Engine name.
-   *         The default value is "default".
+   * @return the default deploy-to Process Engine name. The default value is "default".
    */
   public String getDefaultDeployToEngineName() {
     return defaultDeployToEngineName;
   }
 
   /**
-   * <p>Programmatically set the name of the Process Engine to deploy to if no Process Engine
-   * is defined in <code>processes.xml</code>. This allows to circumvent the "default" Process
-   * Engine name and set a custom one.</p>
+   * <p>
+   * Programmatically set the name of the Process Engine to deploy to if no Process Engine is
+   * defined in <code>processes.xml</code>. This allows to circumvent the "default" Process Engine
+   * name and set a custom one.
+   * </p>
    *
    * @param defaultDeployToEngineName
    */

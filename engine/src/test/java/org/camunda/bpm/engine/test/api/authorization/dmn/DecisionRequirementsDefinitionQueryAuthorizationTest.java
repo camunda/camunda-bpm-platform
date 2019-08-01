@@ -73,24 +73,22 @@ public class DecisionRequirementsDefinitionQueryAuthorizationTest {
 
   @Parameters(name = "scenario {index}")
   public static Collection<Object[]> scenarios() {
-    return Arrays.asList(new Object[][] {
-      { scenario()
-          .withoutAuthorizations()
-          .succeeds(), expectedDefinitions() },
-      { scenario()
-          .withAuthorizations(
-           grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ))
-          .succeeds(), expectedDefinitions(DEFINITION_KEY) },
-      { scenario()
-        .withAuthorizations(
-          grant(DECISION_REQUIREMENTS_DEFINITION, ANY, "userId", Permissions.READ))
-        .succeeds(), expectedDefinitions(DEFINITION_KEY, ANOTHER_DEFINITION_KEY) },
-      { scenario()
-          .withAuthorizations(
-            grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ),
-            grant(DECISION_REQUIREMENTS_DEFINITION, ANY, "userId", Permissions.READ))
-          .succeeds(), expectedDefinitions(DEFINITION_KEY, ANOTHER_DEFINITION_KEY) }
-    });
+    return Arrays
+        .asList(
+            new Object[][] {
+                { scenario().withoutAuthorizations().succeeds(), expectedDefinitions() },
+                { scenario().withAuthorizations(grant(
+                    DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ))
+                    .succeeds(), expectedDefinitions(DEFINITION_KEY) },
+                { scenario()
+                    .withAuthorizations(
+                        grant(DECISION_REQUIREMENTS_DEFINITION, ANY, "userId", Permissions.READ))
+                    .succeeds(), expectedDefinitions(DEFINITION_KEY, ANOTHER_DEFINITION_KEY) },
+                { scenario().withAuthorizations(
+                    grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId",
+                        Permissions.READ),
+                    grant(DECISION_REQUIREMENTS_DEFINITION, ANY, "userId", Permissions.READ))
+                    .succeeds(), expectedDefinitions(DEFINITION_KEY, ANOTHER_DEFINITION_KEY) } });
   }
 
   @Before
@@ -109,9 +107,11 @@ public class DecisionRequirementsDefinitionQueryAuthorizationTest {
   public void queryDecisionRequirementsDefinitions() {
 
     // when
-    authRule.init(scenario).withUser("userId").bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
 
-    DecisionRequirementsDefinitionQuery query = engineRule.getRepositoryService().createDecisionRequirementsDefinitionQuery();
+    DecisionRequirementsDefinitionQuery query = engineRule.getRepositoryService()
+        .createDecisionRequirementsDefinitionQuery();
     long count = query.count();
 
     // then

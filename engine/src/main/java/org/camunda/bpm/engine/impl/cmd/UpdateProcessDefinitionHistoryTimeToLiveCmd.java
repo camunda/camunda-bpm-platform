@@ -37,7 +37,8 @@ public class UpdateProcessDefinitionHistoryTimeToLiveCmd implements Command<Void
   protected String processDefinitionId;
   protected Integer historyTimeToLive;
 
-  public UpdateProcessDefinitionHistoryTimeToLiveCmd(String processDefinitionId, Integer historyTimeToLive) {
+  public UpdateProcessDefinitionHistoryTimeToLiveCmd(String processDefinitionId,
+      Integer historyTimeToLive) {
     this.processDefinitionId = processDefinitionId;
     this.historyTimeToLive = historyTimeToLive;
   }
@@ -47,10 +48,12 @@ public class UpdateProcessDefinitionHistoryTimeToLiveCmd implements Command<Void
 
     ensureNotNull(BadUserRequestException.class, "processDefinitionId", processDefinitionId);
     if (historyTimeToLive != null) {
-      ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive", historyTimeToLive, 0);
+      ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive",
+          historyTimeToLive, 0);
     }
 
-    ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+    ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessDefinitionManager()
+        .findLatestProcessDefinitionById(processDefinitionId);
     logUserOperation(commandContext, processDefinitionEntity);
     processDefinitionEntity.setHistoryTimeToLive(historyTimeToLive);
 
@@ -58,16 +61,19 @@ public class UpdateProcessDefinitionHistoryTimeToLiveCmd implements Command<Void
   }
 
   protected void checkAuthorization(CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-        checker.checkUpdateProcessDefinitionById(processDefinitionId);
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
+      checker.checkUpdateProcessDefinitionById(processDefinitionId);
     }
   }
 
-  protected void logUserOperation(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntity) {
-    PropertyChange propertyChange = new PropertyChange("historyTimeToLive", processDefinitionEntity.getHistoryTimeToLive(), historyTimeToLive);
-    commandContext.getOperationLogManager()
-        .logProcessDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE, processDefinitionId, processDefinitionEntity.getKey(),
-            propertyChange);
+  protected void logUserOperation(CommandContext commandContext,
+      ProcessDefinitionEntity processDefinitionEntity) {
+    PropertyChange propertyChange = new PropertyChange("historyTimeToLive",
+        processDefinitionEntity.getHistoryTimeToLive(), historyTimeToLive);
+    commandContext.getOperationLogManager().logProcessDefinitionOperation(
+        UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE, processDefinitionId,
+        processDefinitionEntity.getKey(), propertyChange);
   }
 
 }

@@ -49,33 +49,36 @@ public class MultiTenancyMigrationTest {
   @Test
   public void cannotCreateMigrationPlanBetweenDifferentTenants() {
     // given
-    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO,
+        ProcessModels.ONE_TASK_PROCESS);
 
     // when
     try {
-      engineRule.getRuntimeService().createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
-      .mapEqualActivities()
-      .build();
+      engineRule.getRuntimeService()
+          .createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
+          .mapEqualActivities().build();
       Assert.fail("exception expected");
     } catch (ProcessEngineException e) {
       // then
-      Assert.assertThat(e.getMessage(),
-          CoreMatchers.containsString("Cannot migrate process instances between processes of different tenants ('tenant1' != 'tenant2')"));
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString(
+          "Cannot migrate process instances between processes of different tenants ('tenant1' != 'tenant2')"));
     }
   }
 
   @Test
   public void canCreateMigrationPlanFromTenantToNoTenant() {
     // given
-    ProcessDefinition sharedDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenantDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-
+    ProcessDefinition sharedDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenantDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
     // when
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(tenantDefinition.getId(), sharedDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(tenantDefinition.getId(), sharedDefinition.getId())
+        .mapEqualActivities().build();
 
     // then
     Assert.assertNotNull(migrationPlan);
@@ -84,14 +87,15 @@ public class MultiTenancyMigrationTest {
   @Test
   public void canCreateMigrationPlanFromNoTenantToTenant() {
     // given
-    ProcessDefinition sharedDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenantDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-
+    ProcessDefinition sharedDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenantDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
     // when
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sharedDefinition.getId(), tenantDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sharedDefinition.getId(), tenantDefinition.getId())
+        .mapEqualActivities().build();
 
     // then
     Assert.assertNotNull(migrationPlan);
@@ -100,13 +104,13 @@ public class MultiTenancyMigrationTest {
   @Test
   public void canCreateMigrationPlanForNoTenants() {
     // given
-    ProcessDefinition sharedDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-
+    ProcessDefinition sharedDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     // when
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sharedDefinition.getId(), sharedDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sharedDefinition.getId(), sharedDefinition.getId())
+        .mapEqualActivities().build();
 
     // then
     Assert.assertNotNull(migrationPlan);
@@ -115,19 +119,20 @@ public class MultiTenancyMigrationTest {
   @Test
   public void canMigrateInstanceBetweenSameTenantCase1() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
     // when
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+    engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     assertMigratedTo(processInstance, targetDefinition);
@@ -136,20 +141,21 @@ public class MultiTenancyMigrationTest {
   @Test
   public void cannotMigrateInstanceWithoutTenantIdToDifferentTenant() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
     // when
     try {
-      engineRule.getRuntimeService()
-        .newMigration(migrationPlan)
-        .processInstanceIds(Arrays.asList(processInstance.getId()))
-        .execute();
+      engineRule.getRuntimeService().newMigration(migrationPlan)
+          .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
       Assert.fail("exception expected");
     } catch (ProcessEngineException e) {
       Assert.assertThat(e.getMessage(),
@@ -161,29 +167,30 @@ public class MultiTenancyMigrationTest {
   @Test
   public void canMigrateInstanceWithTenantIdToDefinitionWithoutTenantId() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
     // when
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+    engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     assertMigratedTo(processInstance, targetDefinition);
   }
 
-  protected void assertMigratedTo(ProcessInstance processInstance, ProcessDefinition targetDefinition) {
-    Assert.assertEquals(1, engineRule.getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstance.getId())
-      .processDefinitionId(targetDefinition.getId())
-      .count());
+  protected void assertMigratedTo(ProcessInstance processInstance,
+      ProcessDefinition targetDefinition) {
+    Assert.assertEquals(1,
+        engineRule.getRuntimeService().createProcessInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .processDefinitionId(targetDefinition.getId()).count());
   }
 }

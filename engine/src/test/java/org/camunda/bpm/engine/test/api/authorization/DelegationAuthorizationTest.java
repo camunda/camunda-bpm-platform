@@ -213,7 +213,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
   @Deployment
   public void testCustomActivityBehaviorExecutesQueryAfterUserCompletesTaskAsDelegateExpression() {
     // given
-    processEngineConfiguration.getBeans().put("myBehavior", new MyServiceTaskActivityBehaviorExecuteQuery());
+    processEngineConfiguration.getBeans().put("myBehavior",
+        new MyServiceTaskActivityBehaviorExecuteQuery());
 
     startProcessInstancesByKey(DEFAULT_PROCESS_KEY, 5);
     String taskId = selectAnyTask().getId();
@@ -232,7 +233,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
   @Deployment
   public void testCustomActivityBehaviorExecutesCommandAfterUserCompletesTaskAsDelegateExpression() {
     // given
-    processEngineConfiguration.getBeans().put("myBehavior", new MyServiceTaskActivityBehaviorExecuteCommand());
+    processEngineConfiguration.getBeans().put("myBehavior",
+        new MyServiceTaskActivityBehaviorExecuteCommand());
 
     startProcessInstanceByKey(DEFAULT_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -270,7 +272,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
   @Deployment
   public void testSignallableActivityBehaviorAsDelegateExpression() {
     // given
-    processEngineConfiguration.getBeans().put("activityBehavior", new MyServiceTaskActivityBehaviorExecuteQuery());
+    processEngineConfiguration.getBeans().put("activityBehavior",
+        new MyServiceTaskActivityBehaviorExecuteQuery());
 
     startProcessInstancesByKey(DEFAULT_PROCESS_KEY, 4);
     String processInstanceId = startProcessInstanceByKey(DEFAULT_PROCESS_KEY).getId();
@@ -554,19 +557,14 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
 
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .processInstanceIdIn(processInstanceId);
 
-    VariableInstance variableUser = query
-        .variableName("userId")
-        .singleResult();
+    VariableInstance variableUser = query.variableName("userId").singleResult();
     assertNotNull(variableUser);
     assertEquals(userId, variableUser.getValue());
 
-    VariableInstance variableCount = query
-        .variableName("count")
-        .singleResult();
+    VariableInstance variableCount = query.variableName("count").singleResult();
     assertNotNull(variableCount);
     assertEquals(5l, variableCount.getValue());
 
@@ -586,11 +584,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
 
-    VariableInstance variableUser = runtimeService
-        .createVariableInstanceQuery()
-        .processInstanceIdIn(processInstanceId)
-        .variableName("userId")
-        .singleResult();
+    VariableInstance variableUser = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId).variableName("userId").singleResult();
     assertNotNull(variableUser);
     assertEquals(userId, variableUser.getValue());
 
@@ -616,19 +611,14 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
 
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .processInstanceIdIn(processInstanceId);
 
-    VariableInstance variableUser = query
-        .variableName("userId")
-        .singleResult();
+    VariableInstance variableUser = query.variableName("userId").singleResult();
     assertNotNull(variableUser);
     assertEquals(userId, variableUser.getValue());
 
-    VariableInstance variableCount = query
-        .variableName("count")
-        .singleResult();
+    VariableInstance variableCount = query.variableName("count").singleResult();
     assertNotNull(variableCount);
     assertEquals(5l, variableCount.getValue());
 
@@ -648,11 +638,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
 
-    VariableInstance variableUser = runtimeService
-        .createVariableInstanceQuery()
-        .processInstanceIdIn(processInstanceId)
-        .variableName("userId")
-        .singleResult();
+    VariableInstance variableUser = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId).variableName("userId").singleResult();
     assertNotNull(variableUser);
     assertEquals(userId, variableUser.getValue());
 
@@ -678,19 +665,14 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
 
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .processInstanceIdIn(processInstanceId);
 
-    VariableInstance variableUser = query
-        .variableName("userId")
-        .singleResult();
+    VariableInstance variableUser = query.variableName("userId").singleResult();
     assertNotNull(variableUser);
     assertEquals(userId, variableUser.getValue());
 
-    VariableInstance variableCount = query
-        .variableName("count")
-        .singleResult();
+    VariableInstance variableCount = query.variableName("count").singleResult();
     assertNotNull(variableCount);
     assertEquals(5l, variableCount.getValue());
 
@@ -710,11 +692,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
 
-    VariableInstance variableUser = runtimeService
-        .createVariableInstanceQuery()
-        .processInstanceIdIn(processInstanceId)
-        .variableName("userId")
-        .singleResult();
+    VariableInstance variableUser = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId).variableName("userId").singleResult();
     assertNotNull(variableUser);
     assertEquals(userId, variableUser.getValue());
 
@@ -740,19 +719,14 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
 
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .processInstanceIdIn(processInstanceId);
 
-    VariableInstance variableUser = query
-        .variableName("userId")
-        .singleResult();
+    VariableInstance variableUser = query.variableName("userId").singleResult();
     assertNotNull(variableUser);
     assertEquals(userId, variableUser.getValue());
 
-    VariableInstance variableCount = query
-        .variableName("count")
-        .singleResult();
+    VariableInstance variableCount = query.variableName("count").singleResult();
     assertNotNull(variableCount);
     assertEquals(5l, variableCount.getValue());
 
@@ -772,11 +746,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
 
-    VariableInstance variableUser = runtimeService
-        .createVariableInstanceQuery()
-        .processInstanceIdIn(processInstanceId)
-        .variableName("userId")
-        .singleResult();
+    VariableInstance variableUser = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(processInstanceId).variableName("userId").singleResult();
     assertNotNull(variableUser);
     assertEquals(userId, variableUser.getValue());
 
@@ -802,19 +773,14 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
 
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .processInstanceIdIn(processInstanceId);
 
-    VariableInstance variableUser = query
-        .variableName("userId")
-        .singleResult();
+    VariableInstance variableUser = query.variableName("userId").singleResult();
     assertNotNull(variableUser);
     assertEquals(userId, variableUser.getValue());
 
-    VariableInstance variableCount = query
-        .variableName("count")
-        .singleResult();
+    VariableInstance variableCount = query.variableName("count").singleResult();
     assertNotNull(variableCount);
     assertEquals(5l, variableCount.getValue());
 
@@ -834,19 +800,14 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
 
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .processInstanceIdIn(processInstanceId);
 
-    VariableInstance variableUser = query
-        .variableName("userId")
-        .singleResult();
+    VariableInstance variableUser = query.variableName("userId").singleResult();
     assertNotNull(variableUser);
     assertEquals(userId, variableUser.getValue());
 
-    VariableInstance variableCount = query
-        .variableName("count")
-        .singleResult();
+    VariableInstance variableCount = query.variableName("count").singleResult();
     assertNotNull(variableCount);
     assertEquals(1l, variableCount.getValue());
 
@@ -895,7 +856,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     assertEquals(Long.valueOf(5), MyDelegationService.INSTANCES_COUNT);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/authorization/DelegationAuthorizationTest.testCustomStartFormHandlerExecutesQuery.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/authorization/DelegationAuthorizationTest.testCustomStartFormHandlerExecutesQuery.bpmn20.xml" })
   public void testSubmitCustomStartFormHandlerExecutesQuery() {
     // given
     startProcessInstancesByKey(DEFAULT_PROCESS_KEY, 5);
@@ -914,7 +876,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     assertEquals(Long.valueOf(5), MyDelegationService.INSTANCES_COUNT);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/authorization/DelegationAuthorizationTest.testCustomTaskFormHandlerExecutesQuery.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/authorization/DelegationAuthorizationTest.testCustomTaskFormHandlerExecutesQuery.bpmn20.xml" })
   public void testSubmitCustomTaskFormHandlerExecutesQuery() {
     // given
     startProcessInstancesByKey(DEFAULT_PROCESS_KEY, 5);
@@ -970,7 +933,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     assertEquals(Long.valueOf(5), MyDelegationService.INSTANCES_COUNT);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/authorization/DelegationAuthorizationTest.testJavaDelegateExecutesQueryAfterUserCompletesTask.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/authorization/DelegationAuthorizationTest.testJavaDelegateExecutesQueryAfterUserCompletesTask.bpmn20.xml" })
   public void testPerformAuthorizationCheckByExecutingQuery() {
     // given
     processEngineConfiguration.setAuthorizationEnabledForCustomCode(true);
@@ -989,7 +953,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     assertEquals(Long.valueOf(0), MyDelegationService.INSTANCES_COUNT);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/authorization/DelegationAuthorizationTest.testJavaDelegateExecutesCommandAfterUserCompletesTask.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/authorization/DelegationAuthorizationTest.testJavaDelegateExecutesCommandAfterUserCompletesTask.bpmn20.xml" })
   public void testPerformAuthorizationCheckByExecutingCommand() {
     // given
     processEngineConfiguration.setAuthorizationEnabledForCustomCode(true);
@@ -1001,7 +966,8 @@ public class DelegationAuthorizationTest extends AuthorizationTest {
     try {
       // when
       taskService.complete(taskId);
-      fail("Exception expected: It should not be possible to execute the command inside JavaDelegate");
+      fail(
+          "Exception expected: It should not be possible to execute the command inside JavaDelegate");
     } catch (AuthorizationException e) {
     }
 

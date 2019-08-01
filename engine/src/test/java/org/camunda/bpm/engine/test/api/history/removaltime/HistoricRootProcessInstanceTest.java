@@ -68,104 +68,88 @@ import static org.hamcrest.core.IsNull.nullValue;
 public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
   protected final String CALLED_PROCESS_KEY = "calledProcess";
-  protected final BpmnModelInstance CALLED_PROCESS = Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-    .startEvent()
-      .userTask("userTask").name("userTask")
-      .serviceTask()
-        .camundaAsyncBefore()
-        .camundaClass(FailingDelegate.class.getName())
-    .endEvent().done();
+  protected final BpmnModelInstance CALLED_PROCESS = Bpmn
+      .createExecutableProcess(CALLED_PROCESS_KEY).startEvent().userTask("userTask")
+      .name("userTask").serviceTask().camundaAsyncBefore()
+      .camundaClass(FailingDelegate.class.getName()).endEvent().done();
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
-  protected final BpmnModelInstance CALLING_PROCESS = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-    .startEvent()
-      .callActivity()
-        .calledElement(CALLED_PROCESS_KEY)
-    .endEvent().done();
+  protected final BpmnModelInstance CALLING_PROCESS = Bpmn
+      .createExecutableProcess(CALLING_PROCESS_KEY).startEvent().callActivity()
+      .calledElement(CALLED_PROCESS_KEY).endEvent().done();
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldResolveHistoricDecisionInstance() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-    .startEvent()
-      .businessRuleTask()
-        .camundaDecisionRef("dish-decision")
-    .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY).startEvent()
+        .businessRuleTask().camundaDecisionRef("dish-decision").endEvent().done());
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().list();
 
     // assume
     assertThat(historicDecisionInstances.size(), is(3));
 
     // then
-    assertThat(historicDecisionInstances.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
-    assertThat(historicDecisionInstances.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
-    assertThat(historicDecisionInstances.get(2).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicDecisionInstances.get(0).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
+    assertThat(historicDecisionInstances.get(1).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
+    assertThat(historicDecisionInstances.get(2).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldResolveHistoricDecisionInputInstance() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-    .startEvent()
-      .businessRuleTask()
-        .camundaDecisionRef("dish-decision")
-    .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY).startEvent()
+        .businessRuleTask().camundaDecisionRef("dish-decision").endEvent().done());
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeInputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeInputs()
+        .singleResult();
 
     // assume
     assertThat(historicDecisionInstance, notNullValue());
 
-    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance
+        .getInputs();
 
     // then
-    assertThat(historicDecisionInputInstances.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
-    assertThat(historicDecisionInputInstances.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicDecisionInputInstances.get(0).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
+    assertThat(historicDecisionInputInstances.get(1).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldNotResolveHistoricDecisionInputInstance() {
     // given
 
     // when
-    decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
-      .putValue("temperature", 32)
-      .putValue("dayType", "Weekend"));
+    decisionService.evaluateDecisionTableByKey("dish-decision",
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeInputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeInputs()
+        .singleResult();
 
     // assume
     assertThat(historicDecisionInstance, notNullValue());
 
-    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance
+        .getInputs();
 
     // then
     assertThat(historicDecisionInputInstances.get(0).getRootProcessInstanceId(), nullValue());
@@ -173,58 +157,49 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldResolveHistoricDecisionOutputInstance() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-    .startEvent()
-      .businessRuleTask()
-        .camundaDecisionRef("dish-decision")
-    .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY).startEvent()
+        .businessRuleTask().camundaDecisionRef("dish-decision").endEvent().done());
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeOutputs()
+        .singleResult();
 
     // assume
     assertThat(historicDecisionInstance, notNullValue());
 
-    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance
+        .getOutputs();
 
     // then
-    assertThat(historicDecisionOutputInstances.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicDecisionOutputInstances.get(0).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldNotResolveHistoricDecisionOutputInstance() {
     // given
 
     // when
-    decisionService.evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
-      .putValue("temperature", 32)
-      .putValue("dayType", "Weekend"));
+    decisionService.evaluateDecisionTableByKey("dish-decision",
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeOutputs()
+        .singleResult();
 
     // assume
     assertThat(historicDecisionInstance, notNullValue());
 
-    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance
+        .getOutputs();
 
     // then
     assertThat(historicDecisionOutputInstances.get(0).getRootProcessInstanceId(), nullValue());
@@ -240,15 +215,15 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-      .activeActivityIdIn("userTask")
-      .singleResult();
+    HistoricProcessInstance historicProcessInstance = historyService
+        .createHistoricProcessInstanceQuery().activeActivityIdIn("userTask").singleResult();
 
     // assume
     assertThat(historicProcessInstance, notNullValue());
 
     // then
-    assertThat(historicProcessInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicProcessInstance.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -261,15 +236,15 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
-      .activityId("userTask")
-      .singleResult();
+    HistoricActivityInstance historicActivityInstance = historyService
+        .createHistoricActivityInstanceQuery().activityId("userTask").singleResult();
 
     // assume
     assertThat(historicActivityInstance, notNullValue());
 
     // then
-    assertThat(historicActivityInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicActivityInstance.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -283,14 +258,14 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
-      .taskName("userTask")
-      .singleResult();
+        .taskName("userTask").singleResult();
 
     // assume
     assertThat(historicTaskInstance, notNullValue());
 
     // then
-    assertThat(historicTaskInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicTaskInstance.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -301,7 +276,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     // when
     taskService.saveTask(task);
 
-    HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
+    HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
+        .singleResult();
 
     // assume
     assertThat(historicTaskInstance, notNullValue());
@@ -322,16 +298,18 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("aVariableName", Variables.stringValue("aVariableValue")));
+        Variables.createVariables().putValue("aVariableName",
+            Variables.stringValue("aVariableValue")));
 
-    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricVariableInstance historicVariableInstance = historyService
+        .createHistoricVariableInstanceQuery().singleResult();
 
     // assume
     assertThat(historicVariableInstance, notNullValue());
 
     // then
-    assertThat(historicVariableInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicVariableInstance.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -342,22 +320,24 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     testRule.deploy(CALLED_PROCESS);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("aVariableName", Variables.stringValue("aVariableValue")));
+        Variables.createVariables().putValue("aVariableName",
+            Variables.stringValue("aVariableValue")));
 
     // when
-    runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
+    runtimeService.setVariable(processInstance.getId(), "aVariableName",
+        Variables.stringValue("anotherVariableValue"));
 
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery()
-      .variableUpdates()
-      .list();
+        .variableUpdates().list();
 
     // assume
     assertThat(historicDetails.size(), is(2));
 
     // then
-    assertThat(historicDetails.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
-    assertThat(historicDetails.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicDetails.get(0).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
+    assertThat(historicDetails.get(1).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -374,13 +354,15 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     // when
     ProcessInstance processInstance = formService.submitStartForm(processDefinitionId, properties);
 
-    HistoricDetail historicDetail = historyService.createHistoricDetailQuery().formFields().singleResult();
+    HistoricDetail historicDetail = historyService.createHistoricDetailQuery().formFields()
+        .singleResult();
 
     // assume
     assertThat(historicDetail, notNullValue());
 
     // then
-    assertThat(historicDetail.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicDetail.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -393,16 +375,15 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     managementService.setJobRetries(jobId, 0);
 
     try {
       // when
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
     List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
 
@@ -410,8 +391,10 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     assertThat(historicIncidents.size(), is(2));
 
     // then
-    assertThat(historicIncidents.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
-    assertThat(historicIncidents.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicIncidents.get(0).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
+    assertThat(historicIncidents.get(1).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -421,16 +404,15 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     repositoryService.suspendProcessDefinitionByKey(CALLED_PROCESS_KEY, true, new Date());
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     managementService.setJobRetries(jobId, 0);
 
     try {
       // when
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
     HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
 
@@ -448,27 +430,24 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   @Test
   public void shouldResolveExternalTaskLog() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
-      .startEvent()
-        .serviceTask().camundaExternalTask("anExternalTaskTopic")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess").startEvent().serviceTask()
+        .camundaExternalTask("anExternalTaskTopic").endEvent().done());
 
-    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-        .callActivity()
-          .calledElement("calledProcess")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess").startEvent().callActivity()
+        .calledElement("calledProcess").endEvent().done());
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingProcess");
 
-    HistoricExternalTaskLog ExternalTaskLog = historyService.createHistoricExternalTaskLogQuery().singleResult();
+    HistoricExternalTaskLog ExternalTaskLog = historyService.createHistoricExternalTaskLogQuery()
+        .singleResult();
 
     // assume
     assertThat(ExternalTaskLog, notNullValue());
 
     // then
-    assertThat(ExternalTaskLog.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+    assertThat(ExternalTaskLog.getRootProcessInstanceId(),
+        is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
@@ -481,14 +460,13 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     try {
       // when
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
     List<HistoricJobLog> jobLog = historyService.createHistoricJobLogQuery().list();
 
@@ -496,8 +474,10 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     assertThat(jobLog.size(), is(2));
 
     // then
-    assertThat(jobLog.get(0).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
-    assertThat(jobLog.get(1).getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(jobLog.get(0).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
+    assertThat(jobLog.get(1).getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -531,52 +511,50 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     // when
     identityService.setAuthenticatedUserId("aUserId");
     managementService.setJobRetries(jobId, 65);
     identityService.clearAuthentication();
 
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery()
+        .singleResult();
 
     // assume
     assertThat(userOperationLog, notNullValue());
 
     // then
-    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(userOperationLog.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   public void shouldResolveUserOperationLog_SetExternalTaskRetries() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
-      .startEvent()
-        .serviceTask().camundaExternalTask("anExternalTaskTopic")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess").startEvent().serviceTask()
+        .camundaExternalTask("anExternalTaskTopic").endEvent().done());
 
-    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-        .callActivity()
-          .calledElement("calledProcess")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess").startEvent().callActivity()
+        .calledElement("calledProcess").endEvent().done());
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingProcess");
 
     // when
     identityService.setAuthenticatedUserId("aUserId");
-    externalTaskService.setRetries(externalTaskService.createExternalTaskQuery().singleResult().getId(), 65);
+    externalTaskService
+        .setRetries(externalTaskService.createExternalTaskQuery().singleResult().getId(), 65);
     identityService.clearAuthentication();
 
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery()
+        .singleResult();
 
     // assume
     assertThat(userOperationLog, notNullValue());
 
     // then
-    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(userOperationLog.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -593,13 +571,15 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     taskService.claim(taskService.createTaskQuery().singleResult().getId(), "aUserId");
     identityService.clearAuthentication();
 
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery()
+        .singleResult();
 
     // assume
     assertThat(userOperationLog, notNullValue());
 
     // then
-    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(userOperationLog.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -613,16 +593,20 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     // when
     identityService.setAuthenticatedUserId("aUserId");
-    taskService.createAttachment(null, null, runtimeService.createProcessInstanceQuery().activityIdIn("userTask").singleResult().getId(), null, null, "http://camunda.com");
+    taskService.createAttachment(null, null,
+        runtimeService.createProcessInstanceQuery().activityIdIn("userTask").singleResult().getId(),
+        null, null, "http://camunda.com");
     identityService.clearAuthentication();
 
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery()
+        .singleResult();
 
     // assume
     assertThat(userOperationLog, notNullValue());
 
     // then
-    assertThat(userOperationLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(userOperationLog.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -637,13 +621,15 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     // when
     taskService.addCandidateUser(taskService.createTaskQuery().singleResult().getId(), "aUserId");
 
-    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    HistoricIdentityLinkLog historicIdentityLinkLog = historyService
+        .createHistoricIdentityLinkLogQuery().singleResult();
 
     // assume
     assertThat(historicIdentityLinkLog, notNullValue());
 
     // then
-    assertThat(historicIdentityLinkLog.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(historicIdentityLinkLog.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -655,7 +641,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     // when
     taskService.addCandidateUser(aTask.getId(), "aUserId");
 
-    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    HistoricIdentityLinkLog historicIdentityLinkLog = historyService
+        .createHistoricIdentityLinkLogQuery().singleResult();
 
     // assume
     assertThat(historicIdentityLinkLog, notNullValue());
@@ -677,10 +664,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     // when
     taskService.createComment(null, processInstanceId, "aMessage");
@@ -726,10 +711,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     // when
     taskService.createComment("aNonExistentTaskId", processInstanceId, "aMessage");
@@ -773,7 +756,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     // when
     taskService.createComment(null, "aNonExistentProcessInstanceId", "aMessage");
 
-    Comment comment = taskService.getProcessInstanceComments("aNonExistentProcessInstanceId").get(0);
+    Comment comment = taskService.getProcessInstanceComments("aNonExistentProcessInstanceId")
+        .get(0);
 
     // assume
     assertThat(comment, notNullValue());
@@ -813,13 +797,12 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     // when
-    String attachmentId = taskService.createAttachment(null, null, processInstanceId, null, null, "http://camunda.com").getId();
+    String attachmentId = taskService
+        .createAttachment(null, null, processInstanceId, null, null, "http://camunda.com").getId();
 
     Attachment attachment = taskService.getAttachment(attachmentId);
 
@@ -827,7 +810,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     assertThat(attachment, notNullValue());
 
     // then
-    assertThat(attachment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+    assertThat(attachment.getRootProcessInstanceId(),
+        is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
@@ -842,7 +826,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // when
-    String attachmentId = taskService.createAttachment(null, taskId, null, null, null, "http://camunda.com").getId();
+    String attachmentId = taskService
+        .createAttachment(null, taskId, null, null, null, "http://camunda.com").getId();
 
     Attachment attachment = taskService.getAttachment(attachmentId);
 
@@ -850,7 +835,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     assertThat(attachment, notNullValue());
 
     // then
-    assertThat(attachment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+    assertThat(attachment.getRootProcessInstanceId(),
+        is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
@@ -862,13 +848,13 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     // when
-    String attachmentId = taskService.createAttachment(null, "aWrongTaskId", processInstanceId, null, null, "http://camunda.com").getId();
+    String attachmentId = taskService
+        .createAttachment(null, "aWrongTaskId", processInstanceId, null, null, "http://camunda.com")
+        .getId();
 
     Attachment attachment = taskService.getAttachment(attachmentId);
 
@@ -888,12 +874,12 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String taskId = taskService.createTaskQuery()
-      .singleResult()
-      .getId();
+    String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // when
-    String attachmentId = taskService.createAttachment(null, taskId, "aWrongProcessInstanceId", null, null, "http://camunda.com").getId();
+    String attachmentId = taskService
+        .createAttachment(null, taskId, "aWrongProcessInstanceId", null, null, "http://camunda.com")
+        .getId();
 
     Attachment attachment = taskService.getAttachment(attachmentId);
 
@@ -901,7 +887,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     assertThat(attachment, notNullValue());
 
     // then
-    assertThat(attachment.getRootProcessInstanceId(), is(processInstance.getRootProcessInstanceId()));
+    assertThat(attachment.getRootProcessInstanceId(),
+        is(processInstance.getRootProcessInstanceId()));
   }
 
   @Test
@@ -909,7 +896,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     // given
 
     // when
-    String attachmentId = taskService.createAttachment(null, "aWrongTaskId", null, null, null, "http://camunda.com").getId();
+    String attachmentId = taskService
+        .createAttachment(null, "aWrongTaskId", null, null, null, "http://camunda.com").getId();
 
     Attachment attachment = taskService.getAttachment(attachmentId);
 
@@ -935,7 +923,8 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // when
-    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment(null, taskId, null, null, null, new ByteArrayInputStream("hello world".getBytes()));
+    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment(null, taskId,
+        null, null, null, new ByteArrayInputStream("hello world".getBytes()));
 
     ByteArrayEntity byteArray = findByteArrayById(attachment.getContentId());
 
@@ -956,12 +945,11 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     String calledProcessInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+        .activityIdIn("userTask").singleResult().getId();
 
     // when
-    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment(null, null, calledProcessInstanceId, null, null, new ByteArrayInputStream("hello world".getBytes()));
+    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment(null, null,
+        calledProcessInstanceId, null, null, new ByteArrayInputStream("hello world".getBytes()));
 
     ByteArrayEntity byteArray = findByteArrayById(attachment.getContentId());
 
@@ -982,9 +970,11 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     // when
-    runtimeService.setVariable(processInstance.getId(), "aVariableName", new ByteArrayInputStream("hello world".getBytes()));
+    runtimeService.setVariable(processInstance.getId(), "aVariableName",
+        new ByteArrayInputStream("hello world".getBytes()));
 
-    HistoricVariableInstanceEntity historicVariableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricVariableInstanceEntity historicVariableInstance = (HistoricVariableInstanceEntity) historyService
+        .createHistoricVariableInstanceQuery().singleResult();
 
     ByteArrayEntity byteArray = findByteArrayById(historicVariableInstance.getByteArrayId());
 
@@ -1003,16 +993,15 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     testRule.deploy(CALLED_PROCESS);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("aVariableName", Variables.stringValue("aVariableValue")));
+        Variables.createVariables().putValue("aVariableName",
+            Variables.stringValue("aVariableValue")));
 
     // when
-    runtimeService.setVariable(processInstance.getId(), "aVariableName", new ByteArrayInputStream("hello world".getBytes()));
+    runtimeService.setVariable(processInstance.getId(), "aVariableName",
+        new ByteArrayInputStream("hello world".getBytes()));
 
-    HistoricDetailVariableInstanceUpdateEntity historicDetails = (HistoricDetailVariableInstanceUpdateEntity) historyService.createHistoricDetailQuery()
-      .variableUpdates()
-      .variableTypeIn("Bytes")
-      .singleResult();
+    HistoricDetailVariableInstanceUpdateEntity historicDetails = (HistoricDetailVariableInstanceUpdateEntity) historyService
+        .createHistoricDetailQuery().variableUpdates().variableTypeIn("Bytes").singleResult();
 
     // assume
     ByteArrayEntity byteArray = findByteArrayById(historicDetails.getByteArrayValueId());
@@ -1032,18 +1021,16 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     try {
       // when
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
-    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity) historyService.createHistoricJobLogQuery()
-      .jobExceptionMessage("I'm supposed to fail!")
-      .singleResult();
+    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity) historyService
+        .createHistoricJobLogQuery().jobExceptionMessage("I'm supposed to fail!").singleResult();
 
     // assume
     assertThat(jobLog, notNullValue());
@@ -1057,131 +1044,120 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   @Test
   public void shouldResolveByteArray_ExternalTaskLog() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
-      .startEvent()
-        .serviceTask().camundaExternalTask("aTopicName")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess").startEvent().serviceTask()
+        .camundaExternalTask("aTopicName").endEvent().done());
 
-    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-        .callActivity()
-          .calledElement("calledProcess")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess").startEvent().callActivity()
+        .calledElement("calledProcess").endEvent().done());
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingProcess");
 
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, "aWorkerId")
-      .topic("aTopicName", Integer.MAX_VALUE)
-      .execute();
+        .topic("aTopicName", Integer.MAX_VALUE).execute();
 
     // when
-    externalTaskService.handleFailure(tasks.get(0).getId(), "aWorkerId", null, "errorDetails", 5, 3000L);
+    externalTaskService.handleFailure(tasks.get(0).getId(), "aWorkerId", null, "errorDetails", 5,
+        3000L);
 
-    HistoricExternalTaskLogEntity externalTaskLog = (HistoricExternalTaskLogEntity) historyService.createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .singleResult();
+    HistoricExternalTaskLogEntity externalTaskLog = (HistoricExternalTaskLogEntity) historyService
+        .createHistoricExternalTaskLogQuery().failureLog().singleResult();
 
     // assume
     assertThat(externalTaskLog, notNullValue());
 
-    ByteArrayEntity byteArrayEntity = findByteArrayById(externalTaskLog.getErrorDetailsByteArrayId());
+    ByteArrayEntity byteArrayEntity = findByteArrayById(
+        externalTaskLog.getErrorDetailsByteArrayId());
 
     // then
-    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(byteArrayEntity.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
   public void shouldResolveByteArray_DecisionInput() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .startEvent()
-        .businessRuleTask().camundaDecisionRef("testDecision")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY).startEvent()
+        .businessRuleTask().camundaDecisionRef("testDecision").endEvent().done());
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("pojo", new TestPojo("okay", 13.37)));
+        Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeInputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeInputs()
+        .singleResult();
 
     // assume
     assertThat(historicDecisionInstance, notNullValue());
 
-    HistoricDecisionInputInstanceEntity historicDecisionInputInstanceEntity = (HistoricDecisionInputInstanceEntity) historicDecisionInstance.getInputs().get(0);
+    HistoricDecisionInputInstanceEntity historicDecisionInputInstanceEntity = (HistoricDecisionInputInstanceEntity) historicDecisionInstance
+        .getInputs().get(0);
 
-    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionInputInstanceEntity.getByteArrayValueId());
+    ByteArrayEntity byteArrayEntity = findByteArrayById(
+        historicDecisionInputInstanceEntity.getByteArrayValueId());
 
     // then
-    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(byteArrayEntity.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
   public void shouldResolveByteArray_DecisionOutput() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .startEvent()
-        .businessRuleTask().camundaDecisionRef("testDecision")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY).startEvent()
+        .businessRuleTask().camundaDecisionRef("testDecision").endEvent().done());
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("pojo", new TestPojo("okay", 13.37)));
+        Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeOutputs()
+        .singleResult();
 
     // assume
     assertThat(historicDecisionInstance, notNullValue());
 
-    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0);
+    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance
+        .getOutputs().get(0);
 
-    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
+    ByteArrayEntity byteArrayEntity = findByteArrayById(
+        historicDecisionOutputInstanceEntity.getByteArrayValueId());
 
     // then
-    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(byteArrayEntity.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
   @Deployment
   public void shouldResolveByteArray_DecisionOutputLiteralExpression() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .startEvent()
-        .businessRuleTask().camundaDecisionRef("testDecision")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY).startEvent()
+        .businessRuleTask().camundaDecisionRef("testDecision").endEvent().done());
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("pojo", new TestPojo("okay", 13.37)));
+        Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeOutputs()
+        .singleResult();
 
     // assume
     assertThat(historicDecisionInstance, notNullValue());
 
-    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0);
+    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance
+        .getOutputs().get(0);
 
-    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
+    ByteArrayEntity byteArrayEntity = findByteArrayById(
+        historicDecisionOutputInstanceEntity.getByteArrayValueId());
 
     // then
-    assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(byteArrayEntity.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
 }

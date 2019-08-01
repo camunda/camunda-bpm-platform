@@ -36,12 +36,14 @@ public class ConditionalEventHandler implements EventHandler {
   }
 
   @Override
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, String businessKey, CommandContext commandContext) {
+  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload,
+      Object localPayload, String businessKey, CommandContext commandContext) {
     VariableEvent variableEvent;
     if (payload == null || payload instanceof VariableEvent) {
       variableEvent = (VariableEvent) payload;
     } else {
-      throw new ProcessEngineException("Payload have to be " + VariableEvent.class.getName() + ", to evaluate condition.");
+      throw new ProcessEngineException(
+          "Payload have to be " + VariableEvent.class.getName() + ", to evaluate condition.");
     }
 
     ActivityImpl activity = eventSubscription.getActivity();
@@ -50,7 +52,8 @@ public class ConditionalEventHandler implements EventHandler {
       ConditionalEventBehavior conditionalBehavior = (ConditionalEventBehavior) activityBehavior;
       conditionalBehavior.leaveOnSatisfiedCondition(eventSubscription, variableEvent);
     } else {
-      throw new ProcessEngineException("Conditional Event has not correct behavior: " + activityBehavior);
+      throw new ProcessEngineException(
+          "Conditional Event has not correct behavior: " + activityBehavior);
     }
   }
 

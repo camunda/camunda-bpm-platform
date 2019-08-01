@@ -24,34 +24,33 @@ import org.camunda.bpm.engine.runtime.Incident;
  *
  * @author Tom Baeyens
  */
-public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecutionContext, ProcessEngineServicesAware {
+public interface DelegateExecution
+    extends BaseDelegateExecution, BpmnModelExecutionContext, ProcessEngineServicesAware {
 
   /** Reference to the overall process instance */
   String getProcessInstanceId();
 
   /**
-   * The business key for the process instance this execution is associated
-   * with.
+   * The business key for the process instance this execution is associated with.
    */
   String getProcessBusinessKey();
 
   /**
-   * Configure a business key on the process instance this execution is associated
-   * with.
+   * Configure a business key on the process instance this execution is associated with.
    *
-   * @param businessKey the new business key
+   * @param businessKey
+   *          the new business key
    */
   void setProcessBusinessKey(String businessKey);
 
   /**
-   * The process definition key for the process instance this execution is
-   * associated with.
+   * The process definition key for the process instance this execution is associated with.
    */
   String getProcessDefinitionId();
 
   /**
-   * Gets the id of the parent of this execution. If null, the execution
-   * represents a process-instance.
+   * Gets the id of the parent of this execution. If null, the execution represents a
+   * process-instance.
    */
   String getParentId();
 
@@ -71,8 +70,7 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
   String getActivityInstanceId();
 
   /**
-   * return the Id of the parent activity instance currently executed by this
-   * execution
+   * return the Id of the parent activity instance currently executed by this execution
    */
   String getParentActivityInstanceId();
 
@@ -80,15 +78,15 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
   String getCurrentTransitionId();
 
   /**
-   * Return the process instance execution for this execution. In case this
-   * execution is the process instance execution the method returns itself.
+   * Return the process instance execution for this execution. In case this execution is the process
+   * instance execution the method returns itself.
    */
   DelegateExecution getProcessInstance();
 
   /**
-   * In case this delegate execution is the process instance execution
-   * and this process instance was started by a call activity, this method
-   * returns the execution which executed the call activity in the super process instance.
+   * In case this delegate execution is the process instance execution and this process instance was
+   * started by a call activity, this method returns the execution which executed the call activity
+   * in the super process instance.
    *
    * @return the super execution or null.
    */
@@ -100,26 +98,31 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
   boolean isCanceled();
 
   /**
-   * Return the id of the tenant this execution belongs to. Can be <code>null</code>
-   * if the execution belongs to no single tenant.
+   * Return the id of the tenant this execution belongs to. Can be <code>null</code> if the
+   * execution belongs to no single tenant.
    */
   String getTenantId();
 
   /**
    * Method to store variable in a specific scope identified by activity ID.
    *
-   * @param variableName - name of the variable
-   * @param value - value of the variable
-   * @param activityId - activity ID which is associated with destination execution,
-   *                   if not existing - exception will be thrown
-   * @throws ProcessEngineException if scope with specified activity ID is not found
+   * @param variableName
+   *          - name of the variable
+   * @param value
+   *          - value of the variable
+   * @param activityId
+   *          - activity ID which is associated with destination execution, if not existing -
+   *          exception will be thrown
+   * @throws ProcessEngineException
+   *           if scope with specified activity ID is not found
    */
-  void setVariable (String variableName, Object value, String activityId);
+  void setVariable(String variableName, Object value, String activityId);
 
   /**
    * Create an incident associated with this execution
    *
-   * @param incidentType the type of incident
+   * @param incidentType
+   *          the type of incident
    * @param configuration
    * @return a new incident
    */
@@ -128,7 +131,8 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
   /**
    * Create an incident associated with this execution
    *
-   * @param incidentType the type of incident
+   * @param incidentType
+   *          the type of incident
    * @param configuration
    * @param message
    * @return a new incident

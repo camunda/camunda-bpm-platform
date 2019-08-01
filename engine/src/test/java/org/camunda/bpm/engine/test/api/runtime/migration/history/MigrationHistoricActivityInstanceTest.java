@@ -48,7 +48,6 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationHistoricActivityInstanceTest {
 
-
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
@@ -67,34 +66,33 @@ public class MigrationHistoricActivityInstanceTest {
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoryActivityInstance() {
-    //given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
-        modify(ProcessModels.ONE_TASK_PROCESS)
-          .changeElementId("Process", "Process2")
-          .changeElementId("userTask", "userTask2")
-          .changeElementName("userTask", "new activity name"));
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId("Process", "Process2").changeElementId("userTask", "userTask2")
+            .changeElementName("userTask", "new activity name"));
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "userTask2")
-        .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask2").build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    HistoricActivityInstanceQuery sourceHistoryActivityInstanceQuery =
-        historyService.createHistoricActivityInstanceQuery()
-          .processDefinitionId(sourceProcessDefinition.getId());
-    HistoricActivityInstanceQuery targetHistoryActivityInstanceQuery =
-        historyService.createHistoricActivityInstanceQuery()
-          .processDefinitionId(targetProcessDefinition.getId());
+    HistoricActivityInstanceQuery sourceHistoryActivityInstanceQuery = historyService
+        .createHistoricActivityInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
+    HistoricActivityInstanceQuery targetHistoryActivityInstanceQuery = historyService
+        .createHistoricActivityInstanceQuery().processDefinitionId(targetProcessDefinition.getId());
 
-    //when
+    // when
     assertEquals(2, sourceHistoryActivityInstanceQuery.count());
     assertEquals(0, targetHistoryActivityInstanceQuery.count());
-    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId());
-    runtimeService.newMigration(migrationPlan)
-      .processInstanceQuery(sourceProcessInstanceQuery)
-      .execute();
+    ProcessInstanceQuery sourceProcessInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(sourceProcessDefinition.getId());
+    runtimeService.newMigration(migrationPlan).processInstanceQuery(sourceProcessInstanceQuery)
+        .execute();
 
     // then one instance of the start event still belongs to the source process
     // and one active user task instances is now migrated to the target process
@@ -111,103 +109,93 @@ public class MigrationHistoricActivityInstanceTest {
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoricSubProcessInstance() {
-    //given
-    ProcessDefinition processDefinition = testHelper.deployAndGetDefinition(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
+    // given
+    ProcessDefinition processDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(processDefinition.getId(), processDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(processDefinition.getId());
 
     // when
     rule.getRuntimeService().newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     List<HistoricActivityInstance> historicInstances = historyService
-        .createHistoricActivityInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .unfinished()
-        .orderByActivityId()
-        .asc()
-        .list();
+        .createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId())
+        .unfinished().orderByActivityId().asc().list();
 
     Assert.assertEquals(2, historicInstances.size());
 
     assertMigratedTo(historicInstances.get(0), processDefinition, "subProcess");
     assertMigratedTo(historicInstances.get(1), processDefinition, "userTask");
     assertEquals(processInstance.getId(), historicInstances.get(0).getParentActivityInstanceId());
-    assertEquals(historicInstances.get(0).getId(), historicInstances.get(1).getParentActivityInstanceId());
+    assertEquals(historicInstances.get(0).getId(),
+        historicInstances.get(1).getParentActivityInstanceId());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoricSubProcessRename() {
-    //given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.SUBPROCESS_PROCESS)
-        .changeElementId("subProcess", "newSubProcess"));
+    // given
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(
+        modify(ProcessModels.SUBPROCESS_PROCESS).changeElementId("subProcess", "newSubProcess"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapActivities("subProcess", "newSubProcess")
-        .mapActivities("userTask", "userTask")
-        .build();
+        .mapActivities("subProcess", "newSubProcess").mapActivities("userTask", "userTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
     // when
     rule.getRuntimeService().newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     List<HistoricActivityInstance> historicInstances = historyService
-        .createHistoricActivityInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .unfinished()
-        .orderByActivityId()
-        .asc()
-        .list();
+        .createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId())
+        .unfinished().orderByActivityId().asc().list();
 
     Assert.assertEquals(2, historicInstances.size());
 
     assertMigratedTo(historicInstances.get(0), targetDefinition, "newSubProcess");
     assertMigratedTo(historicInstances.get(1), targetDefinition, "userTask");
     assertEquals(processInstance.getId(), historicInstances.get(0).getParentActivityInstanceId());
-    assertEquals(historicInstances.get(0).getId(), historicInstances.get(1).getParentActivityInstanceId());
+    assertEquals(historicInstances.get(0).getId(),
+        historicInstances.get(1).getParentActivityInstanceId());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testHistoricActivityInstanceBecomeScope() {
-    //given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.SCOPE_TASK_PROCESS);
+    // given
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SCOPE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
     // when
     rule.getRuntimeService().newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     List<HistoricActivityInstance> historicInstances = historyService
-        .createHistoricActivityInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .unfinished()
-        .orderByActivityId()
-        .asc()
-        .list();
+        .createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId())
+        .unfinished().orderByActivityId().asc().list();
 
     Assert.assertEquals(1, historicInstances.size());
 
@@ -218,40 +206,39 @@ public class MigrationHistoricActivityInstanceTest {
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testMigrateHistoricActivityInstanceAddScope() {
-    //given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    // given
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapActivities("userTask", "userTask")
-        .build();
+        .mapActivities("userTask", "userTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
     // when
     rule.getRuntimeService().newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     List<HistoricActivityInstance> historicInstances = historyService
-        .createHistoricActivityInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .unfinished()
-        .orderByActivityId()
-        .asc()
-        .list();
+        .createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId())
+        .unfinished().orderByActivityId().asc().list();
 
     Assert.assertEquals(2, historicInstances.size());
 
     assertMigratedTo(historicInstances.get(0), targetDefinition, "subProcess");
     assertMigratedTo(historicInstances.get(1), targetDefinition, "userTask");
     assertEquals(processInstance.getId(), historicInstances.get(0).getParentActivityInstanceId());
-    assertEquals(historicInstances.get(0).getId(), historicInstances.get(1).getParentActivityInstanceId());
+    assertEquals(historicInstances.get(0).getId(),
+        historicInstances.get(1).getParentActivityInstanceId());
   }
 
-  protected void assertMigratedTo(HistoricActivityInstance activityInstance, ProcessDefinition processDefinition, String activityId) {
+  protected void assertMigratedTo(HistoricActivityInstance activityInstance,
+      ProcessDefinition processDefinition, String activityId) {
     Assert.assertEquals(processDefinition.getId(), activityInstance.getProcessDefinitionId());
     Assert.assertEquals(processDefinition.getKey(), activityInstance.getProcessDefinitionKey());
     Assert.assertEquals(activityId, activityInstance.getActivityId());

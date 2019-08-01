@@ -44,77 +44,60 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
   }
 
   public void testQueryNoTenantIdSet() {
-    DeploymentQuery query = repositoryService
-        .createDeploymentQuery();
+    DeploymentQuery query = repositoryService.createDeploymentQuery();
 
-   assertThat(query.count(), is(3L));
+    assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
-    DeploymentQuery query = repositoryService
-        .createDeploymentQuery()
-        .tenantIdIn(TENANT_ONE);
+    DeploymentQuery query = repositoryService.createDeploymentQuery().tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = repositoryService
-        .createDeploymentQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = repositoryService.createDeploymentQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    DeploymentQuery query = repositoryService
-        .createDeploymentQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO);
+    DeploymentQuery query = repositoryService.createDeploymentQuery().tenantIdIn(TENANT_ONE,
+        TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryWithoutTenantId() {
-    DeploymentQuery query = repositoryService
-        .createDeploymentQuery()
-        .withoutTenantId();
+    DeploymentQuery query = repositoryService.createDeploymentQuery().withoutTenantId();
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIdsIncludeDeploymentsWithoutTenantId() {
-    DeploymentQuery query = repositoryService
-        .createDeploymentQuery()
-        .tenantIdIn(TENANT_ONE)
+    DeploymentQuery query = repositoryService.createDeploymentQuery().tenantIdIn(TENANT_ONE)
         .includeDeploymentsWithoutTenantId();
 
     assertThat(query.count(), is(2L));
 
-    query = repositoryService
-        .createDeploymentQuery()
-        .tenantIdIn(TENANT_TWO)
+    query = repositoryService.createDeploymentQuery().tenantIdIn(TENANT_TWO)
         .includeDeploymentsWithoutTenantId();
 
     assertThat(query.count(), is(2L));
 
-    query = repositoryService
-        .createDeploymentQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
+    query = repositoryService.createDeploymentQuery().tenantIdIn(TENANT_ONE, TENANT_TWO)
         .includeDeploymentsWithoutTenantId();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    DeploymentQuery query = repositoryService
-        .createDeploymentQuery()
-        .tenantIdIn("nonExisting");
+    DeploymentQuery query = repositoryService.createDeploymentQuery().tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
   }
 
   public void testFailQueryByTenantIdNull() {
     try {
-      repositoryService.createDeploymentQuery()
-        .tenantIdIn((String) null);
+      repositoryService.createDeploymentQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -124,10 +107,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
   public void testQuerySortingAsc() {
     // exclude deployments without tenant id because of database-specific ordering
     List<Deployment> deployments = repositoryService.createDeploymentQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc().list();
 
     assertThat(deployments.size(), is(2));
     assertThat(deployments.get(0).getTenantId(), is(TENANT_ONE));
@@ -137,10 +117,7 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
   public void testQuerySortingDesc() {
     // exclude deployments without tenant id because of database-specific ordering
     List<Deployment> deployments = repositoryService.createDeploymentQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .desc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().desc().list();
 
     assertThat(deployments.size(), is(2));
     assertThat(deployments.get(0).getTenantId(), is(TENANT_TWO));
@@ -162,7 +139,8 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     assertThat(query.count(), is(2L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeDeploymentsWithoutTenantId().count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeDeploymentsWithoutTenantId().count(),
+        is(2L));
   }
 
   public void testQueryAuthenticatedTenants() {
@@ -183,6 +161,5 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     assertThat(query.count(), is(3L));
   }
-
 
 }

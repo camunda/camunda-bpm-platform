@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,7 +40,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 /**
  * @author Daniel Meyer
  */
-public class EventSubscriptionEntity implements EventSubscription, DbEntity, HasDbRevision, HasDbReferences, Serializable {
+public class EventSubscriptionEntity
+    implements EventSubscription, DbEntity, HasDbRevision, HasDbReferences, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -65,7 +65,7 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
 
   /////////////////////////////////////////////
 
-  //only for mybatis
+  // only for mybatis
   public EventSubscriptionEntity() {
   }
 
@@ -87,8 +87,9 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
     eventReceived(payload, null, null, processASync);
   }
 
-  public void eventReceived(Object payload, Object payloadLocal, String businessKey, boolean processASync) {
-    if(processASync) {
+  public void eventReceived(Object payload, Object payloadLocal, String businessKey,
+      boolean processASync) {
+    if (processASync) {
       scheduleEventAsync(payload, payloadLocal, businessKey);
     } else {
       processEventSync(payload, payloadLocal, businessKey);
@@ -101,7 +102,8 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
 
   protected void processEventSync(Object payload, Object payloadLocal, String businessKey) {
     EventHandler eventHandler = Context.getProcessEngineConfiguration().getEventHandler(eventType);
-    ensureNotNull("Could not find eventhandler for event of type '" + eventType + "'", "eventHandler", eventHandler);
+    ensureNotNull("Could not find eventhandler for event of type '" + eventType + "'",
+        "eventHandler", eventHandler);
     eventHandler.handleEvent(this, payload, payloadLocal, businessKey, Context.getCommandContext());
   }
 
@@ -112,8 +114,7 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
     if (asyncDeclaration == null) {
       // fallback to sync if we couldn't find a job declaration
       processEventSync(payload, payloadLocal, businessKey);
-    }
-    else {
+    } else {
       MessageEntity message = asyncDeclaration.createJobInstance(this);
       CommandContext commandContext = Context.getCommandContext();
       commandContext.getJobManager().send(message);
@@ -123,26 +124,24 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
   // persistence behavior /////////////////////
 
   public void delete() {
-    Context.getCommandContext()
-      .getEventSubscriptionManager()
-      .deleteEventSubscription(this);
+    Context.getCommandContext().getEventSubscriptionManager().deleteEventSubscription(this);
     removeFromExecution();
   }
 
   public void insert() {
-    Context.getCommandContext()
-      .getEventSubscriptionManager()
-      .insert(this);
+    Context.getCommandContext().getEventSubscriptionManager().insert(this);
     addToExecution();
   }
 
-
-  public static EventSubscriptionEntity createAndInsert(ExecutionEntity executionEntity, EventType eventType, ActivityImpl activity) {
+  public static EventSubscriptionEntity createAndInsert(ExecutionEntity executionEntity,
+      EventType eventType, ActivityImpl activity) {
     return createAndInsert(executionEntity, eventType, activity, null);
   }
 
-  public static EventSubscriptionEntity createAndInsert(ExecutionEntity executionEntity, EventType eventType, ActivityImpl activity, String configuration) {
-    EventSubscriptionEntity eventSubscription = new EventSubscriptionEntity(executionEntity, eventType);
+  public static EventSubscriptionEntity createAndInsert(ExecutionEntity executionEntity,
+      EventType eventType, ActivityImpl activity, String configuration) {
+    EventSubscriptionEntity eventSubscription = new EventSubscriptionEntity(executionEntity,
+        eventType);
     eventSubscription.setActivity(activity);
     eventSubscription.setTenantId(executionEntity.getTenantId());
     eventSubscription.setConfiguration(configuration);
@@ -150,12 +149,12 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
     return eventSubscription;
   }
 
- // referential integrity -> ExecutionEntity ////////////////////////////////////
+  // referential integrity -> ExecutionEntity ////////////////////////////////////
 
   protected void addToExecution() {
     // add reference in execution
     ExecutionEntity execution = getExecution();
-    if(execution != null) {
+    if (execution != null) {
       execution.addEventSubscription(this);
     }
   }
@@ -163,7 +162,7 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
   protected void removeFromExecution() {
     // remove reference in execution
     ExecutionEntity execution = getExecution();
-    if(execution != null) {
+    if (execution != null) {
       execution.removeEventSubscription(this);
     }
   }
@@ -180,21 +179,18 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
   // getters & setters ////////////////////////////
 
   public ExecutionEntity getExecution() {
-    if(execution == null && executionId != null) {
-      execution = Context.getCommandContext()
-              .getExecutionManager()
-              .findExecutionById(executionId);
+    if (execution == null && executionId != null) {
+      execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
     }
     return execution;
   }
 
   public void setExecution(ExecutionEntity execution) {
-    if(execution != null) {
+    if (execution != null) {
       this.execution = execution;
       this.executionId = execution.getId();
       addToExecution();
-    }
-    else {
+    } else {
       removeFromExecution();
       this.executionId = null;
       this.execution = null;
@@ -202,7 +198,7 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
   }
 
   public ActivityImpl getActivity() {
-    if(activity == null && activityId != null) {
+    if (activity == null && activityId != null) {
       ProcessDefinitionImpl processDefinition = getProcessDefinition();
       activity = processDefinition.findActivity(activityId);
     }
@@ -213,20 +209,18 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
     if (executionId != null) {
       ExecutionEntity execution = getExecution();
       return (ProcessDefinitionEntity) execution.getProcessDefinition();
-    }
-    else {
+    } else {
       // this assumes that start event subscriptions have the process definition id
       // as their configuration (which holds for message and signal start events)
       String processDefinitionId = getConfiguration();
-      return Context.getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .findDeployedProcessDefinitionById(processDefinitionId);
+      return Context.getProcessEngineConfiguration().getDeploymentCache()
+          .findDeployedProcessDefinitionById(processDefinitionId);
     }
   }
 
   public void setActivity(ActivityImpl activity) {
     this.activity = activity;
-    if(activity != null) {
+    if (activity != null) {
       this.activityId = activity.getId();
     }
   }
@@ -256,7 +250,7 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
   }
 
   public int getRevisionNext() {
-    return revision +1;
+    return revision + 1;
   }
 
   public boolean isSubscriptionForEventType(EventType eventType) {
@@ -372,17 +366,10 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", eventType=" + eventType
-           + ", eventName=" + eventName
-           + ", executionId=" + executionId
-           + ", processInstanceId=" + processInstanceId
-           + ", activityId=" + activityId
-           + ", tenantId=" + tenantId
-           + ", configuration=" + configuration
-           + ", revision=" + revision
-           + ", created=" + created
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", eventType=" + eventType
+        + ", eventName=" + eventName + ", executionId=" + executionId + ", processInstanceId="
+        + processInstanceId + ", activityId=" + activityId + ", tenantId=" + tenantId
+        + ", configuration=" + configuration + ", revision=" + revision + ", created=" + created
+        + "]";
   }
 }

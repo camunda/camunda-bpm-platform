@@ -32,8 +32,10 @@ public class FormPropertyDefaultValueTest extends PluggableProcessEngineTestCase
 
   @Deployment
   public void testDefaultValue() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormPropertyDefaultValueTest.testDefaultValue");
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("FormPropertyDefaultValueTest.testDefaultValue");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     TaskFormData formData = formService.getTaskFormData(task.getId());
     List<FormProperty> formProperties = formData.getFormProperties();
@@ -59,22 +61,20 @@ public class FormPropertyDefaultValueTest extends PluggableProcessEngineTestCase
     formService.submitTaskFormData(task.getId(), formDataUpdate);
 
     assertEquals(false, runtimeService.getVariable(processInstance.getId(), "booleanProperty"));
-    assertEquals("someString", runtimeService.getVariable(processInstance.getId(), "stringProperty"));
+    assertEquals("someString",
+        runtimeService.getVariable(processInstance.getId(), "stringProperty"));
     assertEquals(42L, runtimeService.getVariable(processInstance.getId(), "longProperty"));
     assertEquals(1L, runtimeService.getVariable(processInstance.getId(), "longExpressionProperty"));
   }
-  
+
   @Deployment
   public void testStartFormDefaultValue() throws Exception {
     String processDefinitionId = repositoryService.createProcessDefinitionQuery()
-      .processDefinitionKey("FormPropertyDefaultValueTest.testDefaultValue")
-      .latestVersion()
-      .singleResult()
-      .getId();
-    
+        .processDefinitionKey("FormPropertyDefaultValueTest.testDefaultValue").latestVersion()
+        .singleResult().getId();
+
     StartFormData startForm = formService.getStartFormData(processDefinitionId);
-    
-    
+
     List<FormProperty> formProperties = startForm.getFormProperties();
     assertEquals(4, formProperties.size());
 
@@ -96,10 +96,12 @@ public class FormPropertyDefaultValueTest extends PluggableProcessEngineTestCase
     Map<String, String> formDataUpdate = new HashMap<String, String>();
     formDataUpdate.put("longExpressionProperty", "1");
     formDataUpdate.put("booleanProperty", "false");
-    ProcessInstance processInstance = formService.submitStartFormData(processDefinitionId, formDataUpdate);
+    ProcessInstance processInstance = formService.submitStartFormData(processDefinitionId,
+        formDataUpdate);
 
     assertEquals(false, runtimeService.getVariable(processInstance.getId(), "booleanProperty"));
-    assertEquals("someString", runtimeService.getVariable(processInstance.getId(), "stringProperty"));
+    assertEquals("someString",
+        runtimeService.getVariable(processInstance.getId(), "stringProperty"));
     assertEquals(42L, runtimeService.getVariable(processInstance.getId(), "longProperty"));
     assertEquals(1L, runtimeService.getVariable(processInstance.getId(), "longExpressionProperty"));
   }

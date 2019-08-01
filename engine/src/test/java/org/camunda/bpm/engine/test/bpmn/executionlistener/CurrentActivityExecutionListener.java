@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 
 /**
- * Simple {@link ExecutionListener} that sets the current activity id and name attributes on the execution.
+ * Simple {@link ExecutionListener} that sets the current activity id and name attributes on the
+ * execution.
  * 
  * @author Tijs Rademakers
  */
@@ -34,7 +35,7 @@ public class CurrentActivityExecutionListener implements ExecutionListener {
   public static class CurrentActivity {
     private final String activityId;
     private final String activityName;
-    
+
     public CurrentActivity(String activityId, String activityName) {
       this.activityId = activityId;
       this.activityName = activityName;
@@ -43,20 +44,21 @@ public class CurrentActivityExecutionListener implements ExecutionListener {
     public String getActivityId() {
       return activityId;
     }
-    
+
     public String getActivityName() {
       return activityName;
     }
   }
-  
+
   public void notify(DelegateExecution execution) throws Exception {
-    currentActivities.add(new CurrentActivity(execution.getCurrentActivityId(), execution.getCurrentActivityName()));
+    currentActivities.add(
+        new CurrentActivity(execution.getCurrentActivityId(), execution.getCurrentActivityName()));
   }
 
   public static List<CurrentActivity> getCurrentActivities() {
     return currentActivities;
   }
-  
+
   public static void clear() {
     currentActivities.clear();
   }

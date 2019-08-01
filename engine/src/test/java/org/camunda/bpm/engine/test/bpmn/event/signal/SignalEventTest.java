@@ -68,7 +68,8 @@ import static org.junit.Assert.fail;
 public class SignalEventTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
       return configuration;
     }
@@ -77,7 +78,8 @@ public class SignalEventTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -107,7 +109,7 @@ public class SignalEventTest {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml" })
   @Test
   public void testSignalCatchIntermediate() {
 
@@ -125,7 +127,7 @@ public class SignalEventTest {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalBoundary.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml" })
   @Test
   public void testSignalCatchBoundary() {
     runtimeService.startProcessInstanceByKey("catchSignal");
@@ -141,7 +143,7 @@ public class SignalEventTest {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalBoundaryWithReceiveTask.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml" })
   @Test
   public void testSignalCatchBoundaryWithVariables() {
     HashMap<String, Object> variables1 = new HashMap<String, Object>();
@@ -157,7 +159,7 @@ public class SignalEventTest {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsynch.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsynch.bpmn20.xml" })
   @Test
   public void testSignalCatchIntermediateAsynch() {
 
@@ -190,7 +192,7 @@ public class SignalEventTest {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchMultipleSignals.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAbortSignal.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAbortSignal.bpmn20.xml" })
   @Test
   public void testSignalCatchDifferentSignals() {
 
@@ -226,7 +228,8 @@ public class SignalEventTest {
   }
 
   private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-    return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutorTxRequired());
+    return new EventSubscriptionQueryImpl(
+        processEngineConfiguration.getCommandExecutorTxRequired());
   }
 
   /**
@@ -237,7 +240,8 @@ public class SignalEventTest {
   public void testNonInterruptingSignal() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingSignalEvent");
 
-    List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId()).list();
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId())
+        .list();
     assertEquals(1, tasks.size());
     Task currentTask = tasks.get(0);
     assertEquals("My User Task", currentTask.getName());
@@ -253,7 +257,8 @@ public class SignalEventTest {
       }
     }
 
-    taskService.complete(taskService.createTaskQuery().taskName("My User Task").singleResult().getId());
+    taskService
+        .complete(taskService.createTaskQuery().taskName("My User Task").singleResult().getId());
 
     tasks = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId()).list();
     assertEquals(1, tasks.size());
@@ -261,15 +266,16 @@ public class SignalEventTest {
     assertEquals("My Second User Task", currentTask.getName());
   }
 
-
   /**
    * TestCase to reproduce Issue ACT-1344
    */
   @Deployment
   @Test
   public void testNonInterruptingSignalWithSubProcess() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingSignalWithSubProcess");
-    List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId()).list();
+    ProcessInstance pi = runtimeService
+        .startProcessInstanceByKey("nonInterruptingSignalWithSubProcess");
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getProcessInstanceId())
+        .list();
     assertEquals(1, tasks.size());
 
     Task currentTask = tasks.get(0);
@@ -305,10 +311,12 @@ public class SignalEventTest {
   @Test
   public void testSignalStartEventInEventSubProcess() {
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalStartEventInEventSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("signalStartEventInEventSubProcess");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
 
     // check if user task exists
@@ -325,7 +333,8 @@ public class SignalEventTest {
     assertEquals(0, taskQuery.count());
 
     // check if execution doesn't exist because signal start event is interrupting
-    executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(0, executionQuery.count());
   }
 
@@ -333,10 +342,12 @@ public class SignalEventTest {
   @Test
   public void testNonInterruptingSignalStartEventInEventSubProcess() {
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterruptingSignalStartEventInEventSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("nonInterruptingSignalStartEventInEventSubProcess");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
 
     // check if user task exists
@@ -353,28 +364,34 @@ public class SignalEventTest {
     assertEquals(1, taskQuery.count());
 
     // check if execution still exists because signal start event is non interrupting
-    executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml" })
   @Test
   public void testSignalStartEvent() {
     // event subscription for signal start event
-    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert").count());
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert").count());
 
     runtimeService.signalEventReceived("alert");
     // the signal should start a new process instance
     assertEquals(1, taskService.createTaskQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml" })
   @Test
   public void testSuspendedProcessWithSignalStartEvent() {
     // event subscription for signal start event
-    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert").count());
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert").count());
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
     runtimeService.signalEventReceived("alert");
@@ -382,12 +399,14 @@ public class SignalEventTest {
     assertEquals(0, taskService.createTaskQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.testOtherSignalStartEvent.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.testOtherSignalStartEvent.bpmn20.xml" })
   @Test
   public void testMultipleProcessesWithSameSignalStartEvent() {
     // event subscriptions for signal start event
-    assertEquals(2, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert").count());
+    assertEquals(2, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert").count());
 
     runtimeService.signalEventReceived("alert");
     // the signal should start new process instances for both process definitions
@@ -396,7 +415,7 @@ public class SignalEventTest {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml" })
   @Test
   public void testStartProcessInstanceBySignalFromIntermediateThrowingSignalEvent() {
     // start a process instance to throw a signal
@@ -407,13 +426,15 @@ public class SignalEventTest {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml" })
   @Test
   public void testIntermediateThrowingSignalEventWithSuspendedSignalStartEvent() {
     // event subscription for signal start event
-    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert").count());
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert").count());
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("startBySignal").singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("startBySignal").singleResult();
     repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
     // start a process instance to throw a signal
@@ -433,7 +454,8 @@ public class SignalEventTest {
     assertEquals(1, taskService.createTaskQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertTwiceAndTerminate.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertTwiceAndTerminate.bpmn20.xml" })
   @Test
   public void testThrowSignalMultipleCancellingReceivers() {
     RecorderExecutionListener.clear();
@@ -441,7 +463,8 @@ public class SignalEventTest {
     runtimeService.startProcessInstanceByKey("catchAlertTwiceAndTerminate");
 
     // event subscription for intermediate signal events
-    assertEquals(2, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert").count());
+    assertEquals(2, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert").count());
 
     // try to send 'alert' signal to both executions
     runtimeService.signalEventReceived("alert");
@@ -455,7 +478,7 @@ public class SignalEventTest {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertTwiceAndTerminate.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml" })
   @Test
   public void testIntermediateThrowSignalMultipleCancellingReceivers() {
     RecorderExecutionListener.clear();
@@ -463,7 +486,8 @@ public class SignalEventTest {
     runtimeService.startProcessInstanceByKey("catchAlertTwiceAndTerminate");
 
     // event subscriptions for intermediate events
-    assertEquals(2, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert").count());
+    assertEquals(2, runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .eventName("alert").count());
 
     // started process instance try to send 'alert' signal to both executions
     runtimeService.startProcessInstanceByKey("throwSignal");
@@ -476,16 +500,14 @@ public class SignalEventTest {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml" })
   @Test
   public void testAsyncSignalStartEventJobProperties() {
     processEngineConfiguration.setEnsureJobDueDateNotNull(false);
 
-    ProcessDefinition catchingProcessDefinition = repositoryService
-      .createProcessDefinitionQuery()
-      .processDefinitionKey("startBySignal")
-      .singleResult();
+    ProcessDefinition catchingProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("startBySignal").singleResult();
 
     // given a process instance that throws a signal asynchronously
     runtimeService.startProcessInstanceByKey("throwSignalAsync");
@@ -510,17 +532,15 @@ public class SignalEventTest {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml" })
   @Test
   public void testAsyncSignalStartEventJobPropertiesDueDateSet() {
     Date testTime = new Date(1457326800000L);
     ClockUtil.setCurrentTime(testTime);
     processEngineConfiguration.setEnsureJobDueDateNotNull(true);
 
-    ProcessDefinition catchingProcessDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("startBySignal")
-        .singleResult();
+    ProcessDefinition catchingProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("startBySignal").singleResult();
 
     // given a process instance that throws a signal asynchronously
     runtimeService.startProcessInstanceByKey("throwSignalAsync");
@@ -545,13 +565,11 @@ public class SignalEventTest {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml" })
   @Test
   public void testAsyncSignalStartEvent() {
-    ProcessDefinition catchingProcessDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("startBySignal")
-        .singleResult();
+    ProcessDefinition catchingProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("startBySignal").singleResult();
 
     // given a process instance that throws a signal asynchronously
     runtimeService.startProcessInstanceByKey("throwSignalAsync");
@@ -600,7 +618,8 @@ public class SignalEventTest {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()),
+        engineRule.getProcessEngine());
 
     // then it is not possible to deserialize the object
     try {
@@ -610,26 +629,24 @@ public class SignalEventTest {
     }
 
     // but it can be set as a variable when delivering a message:
-    runtimeService
-        .signalEventReceived(
-            "alert",
-            Variables.createVariables().putValueTyped("var",
-                Variables
-                    .serializedObjectValue(serializedObject)
-                    .objectTypeName(FailingJavaSerializable.class.getName())
-                    .serializationDataFormat(SerializationDataFormats.JAVA)
-                    .create()));
+    runtimeService.signalEventReceived("alert",
+        Variables.createVariables().putValueTyped("var",
+            Variables.serializedObjectValue(serializedObject)
+                .objectTypeName(FailingJavaSerializable.class.getName())
+                .serializationDataFormat(SerializationDataFormats.JAVA).create()));
 
     // then
     ProcessInstance startedInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertNotNull(startedInstance);
 
-    ObjectValue variableTyped = runtimeService.getVariableTyped(startedInstance.getId(), "var", false);
+    ObjectValue variableTyped = runtimeService.getVariableTyped(startedInstance.getId(), "var",
+        false);
     assertNotNull(variableTyped);
     assertFalse(variableTyped.isDeserialized());
     assertEquals(serializedObject, variableTyped.getValueSerialized());
     assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
-    assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
+    assertEquals(SerializationDataFormats.JAVA.getName(),
+        variableTyped.getSerializationDataFormat());
   }
 
   /**
@@ -637,7 +654,7 @@ public class SignalEventTest {
    */
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalBoundary.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml" })
   @Test
   @Ignore
   public void FAILING_testAsyncSignalBoundary() {
@@ -647,7 +664,7 @@ public class SignalEventTest {
     runtimeService.startProcessInstanceByKey("throwSignalAsync");
 
     Job job = managementService.createJobQuery().singleResult();
-    assertNotNull(job);  // Throws Exception!
+    assertNotNull(job); // Throws Exception!
 
     // when the job is executed
     managementService.executeJob(job.getId());
@@ -655,7 +672,7 @@ public class SignalEventTest {
     // then there is a process instance
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertNotNull(processInstance);
-//    assertEquals(catchingProcessDefinition.getId(), processInstance.getProcessDefinitionId());
+    // assertEquals(catchingProcessDefinition.getId(), processInstance.getProcessDefinitionId());
 
     // and a task
     assertEquals(1, taskService.createTaskQuery().count());
@@ -673,7 +690,7 @@ public class SignalEventTest {
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
 
-    //when job is executed task is created
+    // when job is executed task is created
     managementService.executeJob(job.getId());
 
     Task taskAfter = taskService.createTaskQuery().singleResult();

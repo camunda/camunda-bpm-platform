@@ -60,7 +60,8 @@ public class EventSubscriptionDeclaration implements Serializable {
     this.eventPayload = null;
   }
 
-  public EventSubscriptionDeclaration(Expression eventExpression, EventType eventType, CallableElement eventPayload) {
+  public EventSubscriptionDeclaration(Expression eventExpression, EventType eventType,
+      CallableElement eventPayload) {
     this.eventType = eventType;
     this.eventName = eventExpression;
     this.eventPayload = eventPayload;
@@ -78,11 +79,11 @@ public class EventSubscriptionDeclaration implements Serializable {
    * Returns the name of the event without evaluating the possible expression that it might contain.
    */
   public String getUnresolvedEventName() {
-      return eventName.getExpressionText();
+    return eventName.getExpressionText();
   }
 
   public boolean hasEventName() {
-    return !( eventName == null || "".equalsIgnoreCase(getUnresolvedEventName().trim()) );
+    return !(eventName == null || "".equalsIgnoreCase(getUnresolvedEventName().trim()));
   }
 
   public boolean isEventNameLiteralText() {
@@ -133,7 +134,8 @@ public class EventSubscriptionDeclaration implements Serializable {
     this.jobDeclaration = jobDeclaration;
   }
 
-  public EventSubscriptionEntity createSubscriptionForStartEvent(ProcessDefinitionEntity processDefinition) {
+  public EventSubscriptionEntity createSubscriptionForStartEvent(
+      ProcessDefinitionEntity processDefinition) {
     EventSubscriptionEntity eventSubscriptionEntity = new EventSubscriptionEntity(eventType);
 
     VariableScope scopeForExpression = StartProcessVariableScope.getSharedInstance();
@@ -150,7 +152,8 @@ public class EventSubscriptionDeclaration implements Serializable {
    * Creates and inserts a subscription entity depending on the message type of this declaration.
    */
   public EventSubscriptionEntity createSubscriptionForExecution(ExecutionEntity execution) {
-    EventSubscriptionEntity eventSubscriptionEntity = new EventSubscriptionEntity(execution, eventType);
+    EventSubscriptionEntity eventSubscriptionEntity = new EventSubscriptionEntity(execution,
+        eventType);
 
     String eventName = resolveExpressionOfEventName(execution);
     eventSubscriptionEntity.setEventName(eventName);

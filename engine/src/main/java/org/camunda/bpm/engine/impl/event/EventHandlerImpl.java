@@ -39,27 +39,28 @@ public class EventHandlerImpl implements EventHandler {
     this.eventType = eventType;
   }
 
-  public void handleIntermediateEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, CommandContext commandContext) {
+  public void handleIntermediateEvent(EventSubscriptionEntity eventSubscription, Object payload,
+      Object localPayload, CommandContext commandContext) {
 
     PvmExecutionImpl execution = eventSubscription.getExecution();
     ActivityImpl activity = eventSubscription.getActivity();
 
-    ensureNotNull("Error while sending signal for event subscription '" + eventSubscription.getId() + "': "
-      + "no activity associated with event subscription", "activity", activity);
+    ensureNotNull("Error while sending signal for event subscription '" + eventSubscription.getId()
+        + "': " + "no activity associated with event subscription", "activity", activity);
 
     if (payload instanceof Map) {
-      execution.setVariables((Map<String, Object>)payload);
+      execution.setVariables((Map<String, Object>) payload);
     }
 
     if (localPayload instanceof Map) {
       execution.setVariablesLocal((Map<String, Object>) localPayload);
     }
 
-    if(activity.equals(execution.getActivity())) {
+    if (activity.equals(execution.getActivity())) {
       execution.signal("signal", null);
-    }
-    else {
-      // hack around the fact that the start event is referenced by event subscriptions for event subprocesses
+    } else {
+      // hack around the fact that the start event is referenced by event subscriptions for event
+      // subprocesses
       // and not the subprocess itself
       if (activity.getActivityBehavior() instanceof EventSubProcessStartEventActivityBehavior) {
         activity = (ActivityImpl) activity.getFlowScope();
@@ -70,7 +71,8 @@ public class EventHandlerImpl implements EventHandler {
   }
 
   @Override
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, String businessKey, CommandContext commandContext) {
+  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload,
+      Object localPayload, String businessKey, CommandContext commandContext) {
     handleIntermediateEvent(eventSubscription, payload, localPayload, commandContext);
   }
 

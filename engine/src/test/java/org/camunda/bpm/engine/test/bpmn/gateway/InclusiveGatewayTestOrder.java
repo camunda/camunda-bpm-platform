@@ -19,8 +19,7 @@ package org.camunda.bpm.engine.test.bpmn.gateway;
 import java.io.Serializable;
 
 /**
- * Inclusive Gateway test order was originally stolen from the
- * ExclusiveGatewayTestOrder.
+ * Inclusive Gateway test order was originally stolen from the ExclusiveGatewayTestOrder.
  * 
  * @author Joram Barrez
  * @author Tom Van Buskirk

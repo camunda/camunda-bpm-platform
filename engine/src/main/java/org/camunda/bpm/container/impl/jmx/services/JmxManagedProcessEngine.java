@@ -25,12 +25,15 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 
 /**
- * <p>Represents a process engine managed by the {@link MBeanServiceContainer}</p>
+ * <p>
+ * Represents a process engine managed by the {@link MBeanServiceContainer}
+ * </p>
  *
  * @author Daniel Meyer
  *
  */
-public class JmxManagedProcessEngine implements PlatformService<ProcessEngine>, JmxManagedProcessEngineMBean {
+public class JmxManagedProcessEngine
+    implements PlatformService<ProcessEngine>, JmxManagedProcessEngineMBean {
 
   protected ProcessEngine processEngine;
 

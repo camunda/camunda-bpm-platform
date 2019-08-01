@@ -60,11 +60,9 @@ public class MigrationNestedEventSubProcessTest {
     public abstract void triggerEventSubProcess(MigrationTestRule testHelper);
   }
 
-
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][]{
-      {//message event sub process configuration
+    return Arrays.asList(new Object[][] { { // message event sub process configuration
         new MigrationEventSubProcessTestConfiguration() {
           @Override
           public BpmnModelInstance getSourceProcess() {
@@ -85,105 +83,91 @@ public class MigrationNestedEventSubProcessTest {
           public String toString() {
             return "MigrateMessageEventSubProcess";
           }
-        }},
-      //signal event sub process configuration
-      {new MigrationEventSubProcessTestConfiguration() {
-        @Override
-        public BpmnModelInstance getSourceProcess() {
-          return modify(ProcessModels.SUBPROCESS_PROCESS)
-            .addSubProcessTo(EventSubProcessModels.SUB_PROCESS_ID)
-            .triggerByEvent()
-            .embeddedSubProcess()
-            .startEvent(EVENT_SUB_PROCESS_START_ID).signal(EventSubProcessModels.SIGNAL_NAME)
-            .userTask(EVENT_SUB_PROCESS_TASK_ID)
-            .endEvent()
-            .subProcessDone()
-            .done();
-        }
+        } },
+        // signal event sub process configuration
+        { new MigrationEventSubProcessTestConfiguration() {
+          @Override
+          public BpmnModelInstance getSourceProcess() {
+            return modify(ProcessModels.SUBPROCESS_PROCESS)
+                .addSubProcessTo(EventSubProcessModels.SUB_PROCESS_ID).triggerByEvent()
+                .embeddedSubProcess().startEvent(EVENT_SUB_PROCESS_START_ID)
+                .signal(EventSubProcessModels.SIGNAL_NAME).userTask(EVENT_SUB_PROCESS_TASK_ID)
+                .endEvent().subProcessDone().done();
+          }
 
-        @Override
-        public String getEventName() {
-          return EventSubProcessModels.SIGNAL_NAME;
-        }
+          @Override
+          public String getEventName() {
+            return EventSubProcessModels.SIGNAL_NAME;
+          }
 
-        @Override
-        public void triggerEventSubProcess(MigrationTestRule testHelper) {
-          testHelper.sendSignal(EventSubProcessModels.SIGNAL_NAME);
-        }
+          @Override
+          public void triggerEventSubProcess(MigrationTestRule testHelper) {
+            testHelper.sendSignal(EventSubProcessModels.SIGNAL_NAME);
+          }
 
-        @Override
-        public String toString() {
-          return "MigrateSignalEventSubProcess";
-        }
-      }},
-      //timer event sub process configuration
-      {new MigrationEventSubProcessTestConfiguration() {
-        @Override
-        public BpmnModelInstance getSourceProcess() {
-          return modify(ProcessModels.SUBPROCESS_PROCESS)
-            .addSubProcessTo(EventSubProcessModels.SUB_PROCESS_ID)
-            .triggerByEvent()
-            .embeddedSubProcess()
-            .startEvent(EVENT_SUB_PROCESS_START_ID).timerWithDate(TIMER_DATE)
-            .userTask(EVENT_SUB_PROCESS_TASK_ID)
-            .endEvent()
-            .subProcessDone()
-            .done();
-        }
+          @Override
+          public String toString() {
+            return "MigrateSignalEventSubProcess";
+          }
+        } },
+        // timer event sub process configuration
+        { new MigrationEventSubProcessTestConfiguration() {
+          @Override
+          public BpmnModelInstance getSourceProcess() {
+            return modify(ProcessModels.SUBPROCESS_PROCESS)
+                .addSubProcessTo(EventSubProcessModels.SUB_PROCESS_ID).triggerByEvent()
+                .embeddedSubProcess().startEvent(EVENT_SUB_PROCESS_START_ID)
+                .timerWithDate(TIMER_DATE).userTask(EVENT_SUB_PROCESS_TASK_ID).endEvent()
+                .subProcessDone().done();
+          }
 
-        @Override
-        public void assertMigration(MigrationTestRule testHelper) {
-          testHelper.assertEventSubProcessTimerJobRemoved(EVENT_SUB_PROCESS_START_ID);
-          testHelper.assertEventSubProcessTimerJobCreated(EVENT_SUB_PROCESS_START_ID);
-        }
+          @Override
+          public void assertMigration(MigrationTestRule testHelper) {
+            testHelper.assertEventSubProcessTimerJobRemoved(EVENT_SUB_PROCESS_START_ID);
+            testHelper.assertEventSubProcessTimerJobCreated(EVENT_SUB_PROCESS_START_ID);
+          }
 
-        @Override
-        public String getEventName() {
-          return null;
-        }
+          @Override
+          public String getEventName() {
+            return null;
+          }
 
-        @Override
-        public void triggerEventSubProcess(MigrationTestRule testHelper) {
-          testHelper.triggerTimer();
-        }
+          @Override
+          public void triggerEventSubProcess(MigrationTestRule testHelper) {
+            testHelper.triggerTimer();
+          }
 
-        @Override
-        public String toString() {
-          return "MigrateTimerEventSubProcess";
-        }
-      }},
-      //conditional event sub process configuration
-      {new MigrationEventSubProcessTestConfiguration() {
-        @Override
-        public BpmnModelInstance getSourceProcess() {
-          return modify(ProcessModels.SUBPROCESS_PROCESS)
-            .addSubProcessTo(EventSubProcessModels.SUB_PROCESS_ID)
-            .triggerByEvent()
-            .embeddedSubProcess()
-            .startEvent(EVENT_SUB_PROCESS_START_ID)
-            .condition(EventSubProcessModels.VAR_CONDITION)
-            .userTask(EVENT_SUB_PROCESS_TASK_ID)
-            .endEvent()
-            .subProcessDone()
-            .done();
-        }
+          @Override
+          public String toString() {
+            return "MigrateTimerEventSubProcess";
+          }
+        } },
+        // conditional event sub process configuration
+        { new MigrationEventSubProcessTestConfiguration() {
+          @Override
+          public BpmnModelInstance getSourceProcess() {
+            return modify(ProcessModels.SUBPROCESS_PROCESS)
+                .addSubProcessTo(EventSubProcessModels.SUB_PROCESS_ID).triggerByEvent()
+                .embeddedSubProcess().startEvent(EVENT_SUB_PROCESS_START_ID)
+                .condition(EventSubProcessModels.VAR_CONDITION).userTask(EVENT_SUB_PROCESS_TASK_ID)
+                .endEvent().subProcessDone().done();
+          }
 
-        @Override
-        public String getEventName() {
-          return null;
-        }
+          @Override
+          public String getEventName() {
+            return null;
+          }
 
-        @Override
-        public void triggerEventSubProcess(MigrationTestRule testHelper) {
-          testHelper.setAnyVariable(testHelper.snapshotAfterMigration.getProcessInstanceId());
-        }
+          @Override
+          public void triggerEventSubProcess(MigrationTestRule testHelper) {
+            testHelper.setAnyVariable(testHelper.snapshotAfterMigration.getProcessInstanceId());
+          }
 
-        @Override
-        public String toString() {
-          return "MigrateConditionalEventSubProcess";
-        }
-      }}
-    });
+          @Override
+          public String toString() {
+            return "MigrateConditionalEventSubProcess";
+          }
+        } } });
   }
 
   @Parameterized.Parameter
@@ -198,30 +182,32 @@ public class MigrationNestedEventSubProcessTest {
   @Test
   public void testMapUserTaskSiblingOfEventSubProcess() {
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(configuration.getSourceProcess());
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(configuration.getSourceProcess());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(configuration.getSourceProcess());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(configuration.getSourceProcess());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(USER_TASK_ID, USER_TASK_ID).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child(USER_TASK_ID).scope()
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child(USER_TASK_ID)
+            .scope().done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .beginScope(EventSubProcessModels.SUB_PROCESS_ID)
-        .activity(USER_TASK_ID, testHelper.getSingleActivityInstanceBeforeMigration(USER_TASK_ID).getId())
-        .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(
+            describeActivityInstanceTree(targetProcessDefinition.getId())
+                .beginScope(EventSubProcessModels.SUB_PROCESS_ID)
+                .activity(USER_TASK_ID,
+                    testHelper.getSingleActivityInstanceBeforeMigration(USER_TASK_ID).getId())
+                .done());
 
     configuration.assertMigration(testHelper);
 
@@ -232,18 +218,20 @@ public class MigrationNestedEventSubProcessTest {
 
   @Test
   public void testMapUserTaskSiblingOfEventSubProcessAndTriggerEvent() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(configuration.getSourceProcess());
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(configuration.getSourceProcess());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(configuration.getSourceProcess());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(configuration.getSourceProcess());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(USER_TASK_ID, USER_TASK_ID).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
-    // then it is possible to trigger event sub process and successfully complete the migrated instance
+    // then it is possible to trigger event sub process and successfully complete the migrated
+    // instance
     configuration.triggerEventSubProcess(testHelper);
     testHelper.completeTask(EVENT_SUB_PROCESS_TASK_ID);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());

@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.task.IdentityLink;
 
-
 public class DelegateTaskTestTaskListener implements TaskListener {
 
   public static final String VARNAME_CANDIDATE_USERS = "candidateUsers";

@@ -45,12 +45,12 @@ public class ClassDelegateTaskListener extends ClassDelegate implements TaskList
   public void notify(DelegateTask delegateTask) {
     TaskListener taskListenerInstance = getTaskListenerInstance();
     try {
-      Context.getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(new TaskListenerInvocation(taskListenerInstance, delegateTask));
+      Context.getProcessEngineConfiguration().getDelegateInterceptor()
+          .handleInvocation(new TaskListenerInvocation(taskListenerInstance, delegateTask));
 
-    }catch (Exception e) {
-      throw new ProcessEngineException("Exception while invoking TaskListener: "+e.getMessage(), e);
+    } catch (Exception e) {
+      throw new ProcessEngineException("Exception while invoking TaskListener: " + e.getMessage(),
+          e);
     }
   }
 
@@ -61,7 +61,8 @@ public class ClassDelegateTaskListener extends ClassDelegate implements TaskList
       return (TaskListener) delegateInstance;
 
     } else {
-      throw new ProcessEngineException(delegateInstance.getClass().getName()+" doesn't implement "+TaskListener.class);
+      throw new ProcessEngineException(
+          delegateInstance.getClass().getName() + " doesn't implement " + TaskListener.class);
     }
   }
 

@@ -30,8 +30,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
 /**
- * {@link Deployer} responsible to parse CMMN 1.0 XML files and create the
- * proper {@link CaseDefinitionEntity}s.
+ * {@link Deployer} responsible to parse CMMN 1.0 XML files and create the proper
+ * {@link CaseDefinitionEntity}s.
  *
  * @author Roman Smirnov
  * @author Simon Zambrovski
@@ -39,7 +39,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
  */
 public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntity> {
 
-  public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn11.xml", "cmmn10.xml", "cmmn" };
+  public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn11.xml", "cmmn10.xml",
+      "cmmn" };
 
   protected ExpressionManager expressionManager;
   protected CmmnTransformer transformer;
@@ -50,18 +51,23 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
   }
 
   @Override
-  protected List<CaseDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
+  protected List<CaseDefinitionEntity> transformDefinitions(DeploymentEntity deployment,
+      ResourceEntity resource, Properties properties) {
     return transformer.createTransform().deployment(deployment).resource(resource).transform();
   }
 
   @Override
-  protected CaseDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
-    return getCaseDefinitionManager().findCaseDefinitionByDeploymentAndKey(deploymentId, definitionKey);
+  protected CaseDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId,
+      String definitionKey) {
+    return getCaseDefinitionManager().findCaseDefinitionByDeploymentAndKey(deploymentId,
+        definitionKey);
   }
 
   @Override
-  protected CaseDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
-    return getCaseDefinitionManager().findLatestCaseDefinitionByKeyAndTenantId(definitionKey, tenantId);
+  protected CaseDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey,
+      String tenantId) {
+    return getCaseDefinitionManager().findLatestCaseDefinitionByKeyAndTenantId(definitionKey,
+        tenantId);
   }
 
   @Override
@@ -70,17 +76,20 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
   }
 
   @Override
-  protected void addDefinitionToDeploymentCache(DeploymentCache deploymentCache, CaseDefinitionEntity definition) {
+  protected void addDefinitionToDeploymentCache(DeploymentCache deploymentCache,
+      CaseDefinitionEntity definition) {
     deploymentCache.addCaseDefinition(definition);
   }
 
-  // context ///////////////////////////////////////////////////////////////////////////////////////////
+  // context
+  // ///////////////////////////////////////////////////////////////////////////////////////////
 
   protected CaseDefinitionManager getCaseDefinitionManager() {
     return getCommandContext().getCaseDefinitionManager();
   }
 
-  // getters/setters ///////////////////////////////////////////////////////////////////////////////////
+  // getters/setters
+  // ///////////////////////////////////////////////////////////////////////////////////
 
   public ExpressionManager getExpressionManager() {
     return expressionManager;

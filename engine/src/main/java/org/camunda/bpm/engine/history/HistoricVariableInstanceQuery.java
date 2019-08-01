@@ -18,17 +18,21 @@ package org.camunda.bpm.engine.history;
 
 import org.camunda.bpm.engine.query.Query;
 
-
 /**
  * Programmatic querying for {@link HistoricVariableInstance}s.
  *
  * @author Christian Lipphardt (camunda)
  */
-public interface HistoricVariableInstanceQuery extends Query<HistoricVariableInstanceQuery, HistoricVariableInstance> {
+public interface HistoricVariableInstanceQuery
+    extends Query<HistoricVariableInstanceQuery, HistoricVariableInstance> {
 
-  /** Only select the variable with the given Id
-   * @param the id of the variable to select
-   * @return the query object */
+  /**
+   * Only select the variable with the given Id
+   * 
+   * @param the
+   *          id of the variable to select
+   * @return the query object
+   */
   HistoricVariableInstanceQuery variableId(String id);
 
   /** Only select historic process variables with the given process instance. */
@@ -83,25 +87,25 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
   HistoricVariableInstanceQuery tenantIdIn(String... tenantIds);
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of historic variable instances without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of historic variable instances without tenant id is database-specific.
    */
   HistoricVariableInstanceQuery orderByTenantId();
 
   /**
    * Disable fetching of byte array and file values. By default, the query will fetch such values.
-   * By calling this method you can prevent the values of (potentially large) blob data chunks
-   * to be fetched. The variables themselves are nonetheless included in the query result.
+   * By calling this method you can prevent the values of (potentially large) blob data chunks to be
+   * fetched. The variables themselves are nonetheless included in the query result.
    *
    * @return the query builder
    */
   HistoricVariableInstanceQuery disableBinaryFetching();
 
   /**
-   * Disable deserialization of variable values that are custom objects. By default, the query
-   * will attempt to deserialize the value of these variables. By calling this method you can
-   * prevent such attempts in environments where their classes are not available.
-   * Independent of this setting, variable serialized values are accessible.
+   * Disable deserialization of variable values that are custom objects. By default, the query will
+   * attempt to deserialize the value of these variables. By calling this method you can prevent
+   * such attempts in environments where their classes are not available. Independent of this
+   * setting, variable serialized values are accessible.
    */
   HistoricVariableInstanceQuery disableCustomObjectDeserialization();
 

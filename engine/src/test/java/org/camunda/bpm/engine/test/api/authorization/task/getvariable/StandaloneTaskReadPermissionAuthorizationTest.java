@@ -39,17 +39,8 @@ public class StandaloneTaskReadPermissionAuthorizationTest extends StandaloneTas
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(TASK, "taskId", userId, READ)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "taskId", userId, READ)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "*", userId, READ))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations().failsDueToRequired(grant(TASK, "taskId", userId, READ)),
+        scenario().withAuthorizations(grant(TASK, "taskId", userId, READ)),
+        scenario().withAuthorizations(grant(TASK, "*", userId, READ)).succeeds());
   }
 }

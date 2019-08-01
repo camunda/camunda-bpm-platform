@@ -34,8 +34,7 @@ public abstract class SingleReferenceWalker<T> extends ReferenceWalker<T> {
 
     if (nextElement != null) {
       return Collections.singleton(nextElement);
-    }
-    else {
+    } else {
       return Collections.emptyList();
     }
   }

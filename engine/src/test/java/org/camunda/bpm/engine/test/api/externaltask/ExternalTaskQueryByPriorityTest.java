@@ -39,7 +39,7 @@ public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestC
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
   public void testOrderByPriority() {
     // given five jobs with priorities from 1 to 5
-    //each process has two external tasks - one with priority expression and one without priority
+    // each process has two external tasks - one with priority expression and one without priority
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
 
     for (int i = 0; i < 5; i++) {
@@ -48,14 +48,16 @@ public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestC
     }
 
     // then querying and ordering by priority works
-    verifySortingAndCount(externalTaskService.createExternalTaskQuery().orderByPriority().asc(), 10, externalTaskByPriority());
-    verifySortingAndCount(externalTaskService.createExternalTaskQuery().orderByPriority().desc(), 10, inverted(externalTaskByPriority()));
+    verifySortingAndCount(externalTaskService.createExternalTaskQuery().orderByPriority().asc(), 10,
+        externalTaskByPriority());
+    verifySortingAndCount(externalTaskService.createExternalTaskQuery().orderByPriority().desc(),
+        10, inverted(externalTaskByPriority()));
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
   public void testFilterByExternalTaskPriorityLowerThanOrEquals() {
     // given five jobs with priorities from 1 to 5
-    //each process has two external tasks - one with priority expression and one without priority
+    // each process has two external tasks - one with priority expression and one without priority
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
 
     for (int i = 0; i < 5; i++) {
@@ -65,7 +67,8 @@ public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestC
 
     // when making a external task query and filtering by priority
     // then the correct external tasks are returned
-    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().priorityLowerThanOrEquals(2).list();
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery()
+        .priorityLowerThanOrEquals(2).list();
     assertEquals(8, tasks.size());
 
     for (ExternalTask task : tasks) {
@@ -85,11 +88,13 @@ public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestC
 
     // when making a external task query and filtering by disjunctive external task priority
     // then no external task are returned
-    assertEquals(0, externalTaskService.createExternalTaskQuery().priorityLowerThanOrEquals(2).priorityHigherThanOrEquals(3).count());
-    
+    assertEquals(0, externalTaskService.createExternalTaskQuery().priorityLowerThanOrEquals(2)
+        .priorityHigherThanOrEquals(3).count());
+
     // when making a external task query and filtering by external task priority >= 2 and <= 3
     // then two external task are returned
-    assertEquals(2, externalTaskService.createExternalTaskQuery().priorityHigherThanOrEquals(2).priorityLowerThanOrEquals(3).count());
+    assertEquals(2, externalTaskService.createExternalTaskQuery().priorityHigherThanOrEquals(2)
+        .priorityLowerThanOrEquals(3).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml")
@@ -104,7 +109,8 @@ public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestC
 
     // when making a external task query and filtering by external task priority
     // then the correct external task are returned
-    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().priorityHigherThanOrEquals(2L).list();
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery()
+        .priorityHigherThanOrEquals(2L).list();
     assertEquals(3, tasks.size());
 
     Set<String> processInstanceIds = new HashSet<String>();
@@ -130,10 +136,8 @@ public class ExternalTaskQueryByPriorityTest extends PluggableProcessEngineTestC
 
     // when making a external task query and filtering by external task priority
     // then the correct external task is returned
-    ExternalTask task = externalTaskService.createExternalTaskQuery()
-                                           .priorityHigherThanOrEquals(2L)
-                                           .priorityLowerThanOrEquals(2L)
-                                           .singleResult();
+    ExternalTask task = externalTaskService.createExternalTaskQuery().priorityHigherThanOrEquals(2L)
+        .priorityLowerThanOrEquals(2L).singleResult();
     assertNotNull(task);
     assertEquals(2, task.getPriority());
     assertEquals(instances.get(2).getId(), task.getProcessInstanceId());

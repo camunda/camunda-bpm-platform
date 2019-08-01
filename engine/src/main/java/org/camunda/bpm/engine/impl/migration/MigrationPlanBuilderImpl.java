@@ -30,7 +30,8 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
  * @author Thorben Lindhauer
  *
  */
-public class MigrationPlanBuilderImpl implements MigrationInstructionBuilder, MigrationInstructionsBuilder {
+public class MigrationPlanBuilderImpl
+    implements MigrationInstructionBuilder, MigrationInstructionsBuilder {
 
   protected CommandExecutor commandExecutor;
 
@@ -54,17 +55,16 @@ public class MigrationPlanBuilderImpl implements MigrationInstructionBuilder, Mi
     return this;
   }
 
-  public MigrationInstructionBuilder mapActivities(String sourceActivityId, String targetActivityId) {
-    this.explicitMigrationInstructions.add(
-      new MigrationInstructionImpl(sourceActivityId, targetActivityId)
-    );
+  public MigrationInstructionBuilder mapActivities(String sourceActivityId,
+      String targetActivityId) {
+    this.explicitMigrationInstructions
+        .add(new MigrationInstructionImpl(sourceActivityId, targetActivityId));
     return this;
   }
 
   public MigrationInstructionBuilder updateEventTrigger() {
-    explicitMigrationInstructions
-      .get(explicitMigrationInstructions.size() - 1)
-      .setUpdateEventTrigger(true);
+    explicitMigrationInstructions.get(explicitMigrationInstructions.size() - 1)
+        .setUpdateEventTrigger(true);
     return this;
   }
 

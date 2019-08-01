@@ -29,7 +29,9 @@ import org.camunda.bpm.engine.repository.ResumePreviousBy;
 import junit.framework.TestCase;
 
 /**
- * <p>Testcase verifying the default properties in the empty processes.xml</p>
+ * <p>
+ * Testcase verifying the default properties in the empty processes.xml
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -64,14 +66,15 @@ public class EmptyProcessesXmlTest extends TestCase {
     assertNotNull(isDeleteUponUndeploy);
     assertEquals(Boolean.FALSE.toString(), isDeleteUponUndeploy);
 
-    String isScanForProcessDefinitions = properties.get(ProcessArchiveXml.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS);
+    String isScanForProcessDefinitions = properties
+        .get(ProcessArchiveXml.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS);
     assertNotNull(isScanForProcessDefinitions);
     assertEquals(Boolean.TRUE.toString(), isScanForProcessDefinitions);
 
     String isDeployChangedOnly = properties.get(ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY);
     assertNotNull(isDeployChangedOnly);
     assertEquals(Boolean.FALSE.toString(), isDeployChangedOnly);
-    
+
     String resumePreviousBy = properties.get(ProcessArchiveXml.PROP_RESUME_PREVIOUS_BY);
     assertThat(resumePreviousBy, is(notNullValue()));
     assertThat(resumePreviousBy, is(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY));

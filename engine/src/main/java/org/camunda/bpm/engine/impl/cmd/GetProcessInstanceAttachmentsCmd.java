@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.task.Attachment;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -31,14 +30,13 @@ public class GetProcessInstanceAttachmentsCmd implements Command<List<Attachment
 
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
-  
+
   public GetProcessInstanceAttachmentsCmd(String taskId) {
     this.processInstanceId = taskId;
   }
 
   public List<Attachment> execute(CommandContext commandContext) {
-    return commandContext
-      .getAttachmentManager()
-      .findAttachmentsByProcessInstanceId(processInstanceId);
+    return commandContext.getAttachmentManager()
+        .findAttachmentsByProcessInstanceId(processInstanceId);
   }
 }

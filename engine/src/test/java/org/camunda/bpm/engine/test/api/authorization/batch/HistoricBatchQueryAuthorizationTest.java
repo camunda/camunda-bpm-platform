@@ -67,7 +67,8 @@ public class HistoricBatchQueryAuthorizationTest {
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(authRule).around(testHelper);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(authRule).around(testHelper);
 
   @Rule
   public final ExpectedException thrown = ExpectedException.none();
@@ -83,24 +84,23 @@ public class HistoricBatchQueryAuthorizationTest {
 
   @Before
   public void deployProcessesAndCreateMigrationPlan() {
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance pi = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance pi = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
-    batch1 = engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(pi.getId()))
-      .executeAsync();
+    batch1 = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(pi.getId())).executeAsync();
 
-    batch2 = engineRule.getRuntimeService()
-        .newMigration(migrationPlan)
-        .processInstanceIds(Arrays.asList(pi.getId()))
-        .executeAsync();
+    batch2 = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(pi.getId())).executeAsync();
   }
 
   @After
@@ -128,7 +128,8 @@ public class HistoricBatchQueryAuthorizationTest {
   @Test
   public void testQueryList() {
     // given
-    authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user", Permissions.READ_HISTORY);
+    authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user",
+        Permissions.READ_HISTORY);
 
     // when
     authRule.enableAuthorization("user");
@@ -143,7 +144,8 @@ public class HistoricBatchQueryAuthorizationTest {
   @Test
   public void testQueryCount() {
     // given
-    authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user", Permissions.READ_HISTORY);
+    authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user",
+        Permissions.READ_HISTORY);
 
     // when
     authRule.enableAuthorization("user");
@@ -183,7 +185,8 @@ public class HistoricBatchQueryAuthorizationTest {
   public void testQueryListMultiple() {
     // given
     authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ_HISTORY);
-    authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user", Permissions.READ_HISTORY);
+    authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user",
+        Permissions.READ_HISTORY);
 
     // when
     authRule.enableAuthorization("user");
@@ -202,7 +205,8 @@ public class HistoricBatchQueryAuthorizationTest {
     prepareBatch(migrationOperationsTTL);
 
     authRule.enableAuthorization("user");
-    CleanableHistoricBatchReportResult result = engineRule.getHistoryService().createCleanableHistoricBatchReport().singleResult();
+    CleanableHistoricBatchReportResult result = engineRule.getHistoryService()
+        .createCleanableHistoricBatchReport().singleResult();
     authRule.disableAuthorization();
 
     assertNotNull(result);
@@ -243,28 +247,29 @@ public class HistoricBatchQueryAuthorizationTest {
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
   }
 
-  private void checkResultNumbers(CleanableHistoricBatchReportResult result, int expectedCleanable, int expectedFinished, Integer expectedTTL) {
+  private void checkResultNumbers(CleanableHistoricBatchReportResult result, int expectedCleanable,
+      int expectedFinished, Integer expectedTTL) {
     assertEquals(expectedCleanable, result.getCleanableBatchesCount());
     assertEquals(expectedFinished, result.getFinishedBatchesCount());
     assertEquals(expectedTTL, result.getHistoryTimeToLive());
   }
 
-
   private String createBatch() {
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan plan = engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan plan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance pi = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance pi = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
-     Batch batch = engineRule.getRuntimeService()
-      .newMigration(plan)
-      .processInstanceIds(Arrays.asList(pi.getId()))
-      .executeAsync();
+    Batch batch = engineRule.getRuntimeService().newMigration(plan)
+        .processInstanceIds(Arrays.asList(pi.getId())).executeAsync();
 
-     return batch.getId();
+    return batch.getId();
   }
 }

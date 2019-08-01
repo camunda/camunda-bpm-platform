@@ -17,7 +17,9 @@
 package org.camunda.bpm.application;
 
 /**
- * <p>Object holding information about a deployment made by a process application.</p>
+ * <p>
+ * Object holding information about a deployment made by a process application.
+ * </p>
  *
  * @author Daniel Meyer
  *

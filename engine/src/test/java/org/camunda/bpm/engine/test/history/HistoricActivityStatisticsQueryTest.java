@@ -45,7 +45,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
   public void testNoRunningProcessInstances() {
     String processDefinitionId = getProcessDefinitionId();
 
-    HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId);
     List<HistoricActivityStatistics> statistics = query.list();
 
     assertEquals(0, query.count());
@@ -58,7 +59,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
 
     startProcesses(5);
 
-    HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId);
     List<HistoricActivityStatistics> statistics = query.list();
 
     assertEquals(1, query.count());
@@ -80,7 +82,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
 
     completeProcessInstances();
 
-    HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId);
     List<HistoricActivityStatistics> statistics = query.list();
 
     assertEquals(0, query.count());
@@ -94,9 +97,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     startProcesses(5);
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).orderByActivityId().asc();
 
     List<HistoricActivityStatistics> statistics = query.list();
 
@@ -130,7 +131,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     completeProcessInstances();
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testWithCallActivity.bpmn20.xml",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testWithCallActivity.bpmn20.xml",
       "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.calledProcess.bpmn20.xml" })
   public void testMultipleProcessDefinitions() {
     String processId = getProcessDefinitionId();
@@ -141,9 +143,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     startProcessesByKey(10, "calledProcess");
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processId)
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processId).orderByActivityId().asc();
 
     List<HistoricActivityStatistics> statistics = query.list();
 
@@ -156,10 +156,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals("callActivity", calledActivity.getId());
     assertEquals(5, calledActivity.getInstances());
 
-    query = historyService
-        .createHistoricActivityStatisticsQuery(calledProcessId)
-        .orderByActivityId()
-        .asc();
+    query = historyService.createHistoricActivityStatisticsQuery(calledProcessId)
+        .orderByActivityId().asc();
 
     statistics = query.list();
 
@@ -181,17 +179,15 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     completeProcessInstances();
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByFinished() {
     String processDefinitionId = getProcessDefinitionId();
 
     startProcesses(5);
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished()
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished()
+        .orderByActivityId().asc();
     List<HistoricActivityStatistics> statistics = query.list();
 
     assertEquals(2, query.count());
@@ -212,7 +208,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(0, task.getFinished());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByFinishedAfterFinishingSomeInstances() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -226,10 +222,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     }
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished()
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished()
+        .orderByActivityId().asc();
 
     List<HistoricActivityStatistics> statistics = query.list();
 
@@ -260,7 +254,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     completeProcessInstances();
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testMultipleRunningTasks.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testMultipleRunningTasks.bpmn20.xml")
   public void testQueryByFinishedMultipleRunningTasks() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -272,10 +266,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     }
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished()
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished()
+        .orderByActivityId().asc();
 
     List<HistoricActivityStatistics> statistics = query.list();
 
@@ -348,7 +340,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     completeProcessInstances();
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByCompleteScope() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -357,8 +349,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     completeProcessInstances();
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCompleteScope();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCompleteScope();
     List<HistoricActivityStatistics> statistics = query.list();
 
     assertEquals(1, query.count());
@@ -372,7 +363,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(5, end.getCompleteScope());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByCompleteScopeAfterFinishingSomeInstances() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -386,10 +377,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     }
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCompleteScope()
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCompleteScope()
+        .orderByActivityId().asc();
 
     List<HistoricActivityStatistics> statistics = query.list();
 
@@ -413,7 +402,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     completeProcessInstances();
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testMultipleRunningTasks.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testMultipleRunningTasks.bpmn20.xml")
   public void testQueryByCompleteScopeMultipleRunningTasks() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -425,10 +414,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     }
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCompleteScope()
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCompleteScope()
+        .orderByActivityId().asc();
 
     List<HistoricActivityStatistics> statistics = query.list();
 
@@ -466,7 +453,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     completeProcessInstances();
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByCanceled() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -475,8 +462,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     cancelProcessInstances();
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCanceled();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled();
 
     List<HistoricActivityStatistics> statistics = query.list();
 
@@ -491,7 +477,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(5, task.getCanceled());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByCanceledAfterCancelingSomeInstances() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -506,8 +492,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     startProcesses(2);
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCanceled();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled();
 
     List<HistoricActivityStatistics> statistics = query.list();
 
@@ -524,7 +509,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     completeProcessInstances();
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByCanceledAndFinished() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -547,11 +532,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     startProcesses(2);
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCanceled()
-        .includeFinished()
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled()
+        .includeFinished().orderByActivityId().asc();
     List<HistoricActivityStatistics> statistics = query.list();
 
     assertEquals(3, query.count());
@@ -582,11 +564,11 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(4, task.getFinished());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByCanceledAndFinishedByPeriods() throws ParseException {
     try {
 
-      //start two process instances
+      // start two process instances
       ClockUtil.setCurrentTime(sdf.parse("15.01.2016 12:00:00"));
       startProcesses(2);
 
@@ -597,7 +579,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
         runtimeService.deleteProcessInstance(processInstance.getId(), "test");
       }
 
-      //start two process instances
+      // start two process instances
       ClockUtil.setCurrentTime(sdf.parse("01.02.2016 12:00:00"));
       startProcesses(2);
 
@@ -608,17 +590,19 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
         taskService.complete(task.getId());
       }
 
-      //starte two more process instances
+      // starte two more process instances
       ClockUtil.setCurrentTime(sdf.parse("15.03.2016 12:00:00"));
       startProcesses(2);
 
-      //NOW
+      // NOW
       ClockUtil.setCurrentTime(sdf.parse("25.03.2016 12:00:00"));
 
       String processDefinitionId = getProcessDefinitionId();
-      //check January by started dates
-      HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
-        .startedAfter(sdf.parse("01.01.2016 00:00:00")).startedBefore(sdf.parse("31.01.2016 23:59:59")).orderByActivityId().asc();
+      // check January by started dates
+      HistoricActivityStatisticsQuery query = historyService
+          .createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled()
+          .includeFinished().startedAfter(sdf.parse("01.01.2016 00:00:00"))
+          .startedBefore(sdf.parse("31.01.2016 23:59:59")).orderByActivityId().asc();
       List<HistoricActivityStatistics> statistics = query.list();
 
       assertEquals(2, query.count());
@@ -630,17 +614,19 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
       // task
       assertActivityStatistics(statistics.get(1), "task", 0, 2, 2);
 
-      //check January by finished dates
-      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
-        .finishedAfter(sdf.parse("01.01.2016 00:00:00")).finishedBefore(sdf.parse("31.01.2016 23:59:59")).orderByActivityId().asc();
+      // check January by finished dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId)
+          .includeCanceled().includeFinished().finishedAfter(sdf.parse("01.01.2016 00:00:00"))
+          .finishedBefore(sdf.parse("31.01.2016 23:59:59")).orderByActivityId().asc();
       statistics = query.list();
 
       assertEquals(0, query.count());
       assertEquals(0, statistics.size());
 
-      //check February by started dates
-      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
-        .startedAfter(sdf.parse("01.02.2016 00:00:00")).startedBefore(sdf.parse("28.02.2016 23:59:59")).orderByActivityId().asc();
+      // check February by started dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId)
+          .includeCanceled().includeFinished().startedAfter(sdf.parse("01.02.2016 00:00:00"))
+          .startedBefore(sdf.parse("28.02.2016 23:59:59")).orderByActivityId().asc();
       statistics = query.list();
 
       assertEquals(3, query.count());
@@ -655,9 +641,10 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
       // task
       assertActivityStatistics(statistics.get(2), "task", 0, 0, 2);
 
-      //check February by finished dates
-      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
-        .finishedAfter(sdf.parse("01.02.2016 00:00:00")).finishedBefore(sdf.parse("28.02.2016 23:59:59")).orderByActivityId().asc();
+      // check February by finished dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId)
+          .includeCanceled().includeFinished().finishedAfter(sdf.parse("01.02.2016 00:00:00"))
+          .finishedBefore(sdf.parse("28.02.2016 23:59:59")).orderByActivityId().asc();
       statistics = query.list();
 
       assertEquals(3, query.count());
@@ -672,9 +659,10 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
       // task
       assertActivityStatistics(statistics.get(2), "task", 0, 2, 4);
 
-      //check March by started dates
-      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
-        .startedAfter(sdf.parse("01.03.2016 00:00:00")).orderByActivityId().asc();
+      // check March by started dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId)
+          .includeCanceled().includeFinished().startedAfter(sdf.parse("01.03.2016 00:00:00"))
+          .orderByActivityId().asc();
       statistics = query.list();
 
       assertEquals(2, query.count());
@@ -686,17 +674,19 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
       // task
       assertActivityStatistics(statistics.get(1), "task", 2, 0, 0);
 
-      //check March by finished dates
-      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
-        .finishedAfter(sdf.parse("01.03.2016 00:00:00")).orderByActivityId().asc();
+      // check March by finished dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId)
+          .includeCanceled().includeFinished().finishedAfter(sdf.parse("01.03.2016 00:00:00"))
+          .orderByActivityId().asc();
       statistics = query.list();
 
       assertEquals(0, query.count());
       assertEquals(0, statistics.size());
 
-      //check whole period by started date
-      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
-        .startedAfter(sdf.parse("01.01.2016 00:00:00")).orderByActivityId().asc();
+      // check whole period by started date
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId)
+          .includeCanceled().includeFinished().startedAfter(sdf.parse("01.01.2016 00:00:00"))
+          .orderByActivityId().asc();
       statistics = query.list();
 
       assertEquals(3, query.count());
@@ -717,14 +707,15 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
 
   }
 
-  protected void assertActivityStatistics(HistoricActivityStatistics activity, String activityName, long instances, long canceled, long finished) {
+  protected void assertActivityStatistics(HistoricActivityStatistics activity, String activityName,
+      long instances, long canceled, long finished) {
     assertEquals(activityName, activity.getId());
     assertEquals(instances, activity.getInstances());
     assertEquals(canceled, activity.getCanceled());
     assertEquals(finished, activity.getFinished());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByCanceledAndCompleteScope() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -747,11 +738,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     startProcesses(2);
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCanceled()
-        .includeCompleteScope()
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled()
+        .includeCompleteScope().orderByActivityId().asc();
     List<HistoricActivityStatistics> statistics = query.list();
 
     assertEquals(2, query.count());
@@ -774,7 +762,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(0, task.getCompleteScope());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByFinishedAndCompleteScope() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -797,11 +785,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     startProcesses(2);
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished()
-        .includeCompleteScope()
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished()
+        .includeCompleteScope().orderByActivityId().asc();
     List<HistoricActivityStatistics> statistics = query.list();
 
     assertEquals(3, query.count());
@@ -832,7 +817,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(0, task.getCompleteScope());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByFinishedAndCompleteScopeAndCanceled() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -855,12 +840,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     startProcesses(2);
 
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished()
-        .includeCompleteScope()
-        .includeCanceled()
-        .orderByActivityId()
-        .asc();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished()
+        .includeCompleteScope().includeCanceled().orderByActivityId().asc();
     List<HistoricActivityStatistics> statistics = query.list();
 
     assertEquals(3, query.count());
@@ -894,7 +875,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(0, task.getCompleteScope());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testSorting() {
     String processDefinitionId = getProcessDefinitionId();
 
@@ -910,8 +891,9 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(1, query.orderByActivityId().desc().count());
   }
 
-  @Deployment(resources= {"org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml",
-      "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testAnotherSingleTask.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml",
+      "org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testAnotherSingleTask.bpmn20.xml" })
   public void testDifferentProcessesWithSameActivityId() {
     String processDefinitionId = getProcessDefinitionId();
     String anotherProcessDefinitionId = getProcessDefinitionIdByKey("anotherProcess");
@@ -933,8 +915,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(5, task.getInstances());
 
     // second processDefinition
-    query = historyService
-        .createHistoricActivityStatisticsQuery(anotherProcessDefinitionId);
+    query = historyService.createHistoricActivityStatisticsQuery(anotherProcessDefinitionId);
 
     statistics = query.list();
 
@@ -971,7 +952,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
   }
 
   protected String getProcessDefinitionIdByKey(String key) {
-    return repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).singleResult().getId();
+    return repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).singleResult()
+        .getId();
   }
 
   protected String getProcessDefinitionId() {

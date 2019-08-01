@@ -65,10 +65,9 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncStartEvent");
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-          .transition("startEvent")
-        .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .transition("startEvent").done());
   }
 
   @Deployment
@@ -94,19 +93,16 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testCallActivity-super.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testCallActivity-sub.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testCallActivity-sub.bpmn20.xml" })
   public void testCallActivity() {
     runtimeService.startProcessInstanceByKey("super");
 
-    ProcessInstance pi = runtimeService
-        .createProcessInstanceQuery()
-        .processDefinitionKey("sub")
+    ProcessInstance pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("sub")
         .singleResult();
 
     assertTrue(pi instanceof ExecutionEntity);
 
-    assertEquals("theSubStart", ((ExecutionEntity)pi).getActivityId());
+    assertEquals("theSubStart", ((ExecutionEntity) pi).getActivityId());
 
   }
 
@@ -131,10 +127,8 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-          .beginScope("SubProcess_1")
-            .transition("StartEvent_2")
-        .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("SubProcess_1").transition("StartEvent_2").done());
   }
 }

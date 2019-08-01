@@ -41,12 +41,12 @@ public abstract class CoreActivity extends CoreModelElement {
   /** searches for the activity recursively */
   public CoreActivity findActivity(String activityId) {
     CoreActivity localActivity = getChildActivity(activityId);
-    if (localActivity!=null) {
+    if (localActivity != null) {
       return localActivity;
     }
-    for (CoreActivity activity: getActivities()) {
+    for (CoreActivity activity : getActivities()) {
       CoreActivity nestedActivity = activity.findActivity(activityId);
-      if (nestedActivity!=null) {
+      if (nestedActivity != null) {
         return nestedActivity;
       }
     }
@@ -75,7 +75,7 @@ public abstract class CoreActivity extends CoreModelElement {
   }
 
   public String toString() {
-    return "Activity("+id+")";
+    return "Activity(" + id + ")";
   }
 
 }

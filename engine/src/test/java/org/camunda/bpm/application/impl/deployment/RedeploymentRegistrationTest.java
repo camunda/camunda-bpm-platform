@@ -95,11 +95,14 @@ public class RedeploymentRegistrationTest {
   @Parameters(name = "scenario {index}")
   public static Collection<Object[]> scenarios() {
     return Arrays.asList(new Object[][] {
-      { BPMN_RESOURCE_1, BPMN_RESOURCE_2, "processOne", "processTwo", processDefinitionTestProvider() },
-      { CMMN_RESOURCE_1, CMMN_RESOURCE_2, "oneTaskCase", "twoTaskCase", caseDefinitionTestProvider() },
-      { DMN_RESOURCE_1, DMN_RESOURCE_2, "decision", "score-decision", decisionDefinitionTestProvider() },
-      { DRD_RESOURCE_1, DRD_RESOURCE_2, "score", "dish", decisionRequirementsDefinitionTestProvider() }
-    });
+        { BPMN_RESOURCE_1, BPMN_RESOURCE_2, "processOne", "processTwo",
+            processDefinitionTestProvider() },
+        { CMMN_RESOURCE_1, CMMN_RESOURCE_2, "oneTaskCase", "twoTaskCase",
+            caseDefinitionTestProvider() },
+        { DMN_RESOURCE_1, DMN_RESOURCE_2, "decision", "score-decision",
+            decisionDefinitionTestProvider() },
+        { DRD_RESOURCE_1, DRD_RESOURCE_2, "score", "dish",
+            decisionRequirementsDefinitionTestProvider() } });
   }
 
   @Before
@@ -111,53 +114,38 @@ public class RedeploymentRegistrationTest {
   }
 
   @Test
-	public void registrationNotFoundByDeploymentId() {
+  public void registrationNotFoundByDeploymentId() {
     // given
     ProcessApplicationReference reference = processApplication.getReference();
 
-    Deployment deployment1 = repositoryService
-      .createDeployment(reference)
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(reference).name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).deploy();
 
     assertEquals(reference, getProcessApplicationForDeployment(deployment1.getId()));
 
     // when
-    Deployment deployment2 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     // then
     assertNull(getProcessApplicationForDeployment(deployment2.getId()));
   }
 
   @Test
-	public void registrationNotFoundByDefinition() {
+  public void registrationNotFoundByDefinition() {
     // given
 
     // first deployment
-    Deployment deployment1 = repositoryService
-      .createDeployment()
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).deploy();
 
     // second deployment
-    repositoryService
-      .createDeployment()
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .deploy();
+    repositoryService.createDeployment().name(DEPLOYMENT_NAME).addClasspathResource(resource1)
+        .deploy();
 
     // when
-    repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     String definitionId = getLatestDefinitionIdByKey(definitionKey1);
 
@@ -166,47 +154,35 @@ public class RedeploymentRegistrationTest {
   }
 
   @Test
-	public void registrationFoundByDeploymentId() {
+  public void registrationFoundByDeploymentId() {
     // given
     ProcessApplicationReference reference1 = processApplication.getReference();
 
-    Deployment deployment1 = repositoryService
-      .createDeployment(reference1)
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(reference1).name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).deploy();
 
     assertEquals(reference1, getProcessApplicationForDeployment(deployment1.getId()));
 
     // when
     ProcessApplicationReference reference2 = processApplication.getReference();
 
-    Deployment deployment2 = repositoryService
-        .createDeployment(reference2)
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment(reference2).name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     // then
     assertEquals(reference2, getProcessApplicationForDeployment(deployment2.getId()));
   }
 
   @Test
-	public void registrationFoundFromPreviousDefinition() {
+  public void registrationFoundFromPreviousDefinition() {
     // given
     ProcessApplicationReference reference = processApplication.getReference();
-    Deployment deployment1 = repositoryService
-      .createDeployment(reference)
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(reference).name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).deploy();
 
     // when
-    Deployment deployment2 = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     String definitionId = getLatestDefinitionIdByKey(definitionKey1);
 
@@ -218,22 +194,16 @@ public class RedeploymentRegistrationTest {
   }
 
   @Test
-	public void registrationFoundFromLatestDeployment() {
+  public void registrationFoundFromLatestDeployment() {
     // given
     ProcessApplicationReference reference1 = processApplication.getReference();
-    Deployment deployment1 = repositoryService
-      .createDeployment(reference1)
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(reference1).name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).deploy();
 
     // when
     ProcessApplicationReference reference2 = processApplication.getReference();
-    Deployment deployment2 = repositoryService
-        .createDeployment(reference2)
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment(reference2).name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     String definitionId = getLatestDefinitionIdByKey(definitionKey1);
 
@@ -243,31 +213,21 @@ public class RedeploymentRegistrationTest {
   }
 
   @Test
-	public void registrationFoundOnlyForOneProcessDefinition() {
+  public void registrationFoundOnlyForOneProcessDefinition() {
     // given
 
     // first deployment
-    Deployment deployment1 = repositoryService
-      .createDeployment()
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .addClasspathResource(resource2)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).addClasspathResource(resource2).deploy();
 
     // second deployment
     ProcessApplicationReference reference2 = processApplication.getReference();
-    repositoryService
-        .createDeployment(reference2)
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    repositoryService.createDeployment(reference2).name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).deploy();
 
     // when
-    repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     String firstDefinitionId = getLatestDefinitionIdByKey(definitionKey1);
     String secondDefinitionId = getLatestDefinitionIdByKey(definitionKey2);
@@ -278,32 +238,22 @@ public class RedeploymentRegistrationTest {
   }
 
   @Test
-	public void registrationFoundFromDifferentDeployment() {
+  public void registrationFoundFromDifferentDeployment() {
     // given
 
     // first deployment
     ProcessApplicationReference reference1 = processApplication.getReference();
-    Deployment deployment1 = repositoryService
-      .createDeployment(reference1)
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .addClasspathResource(resource2)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(reference1).name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).addClasspathResource(resource2).deploy();
 
     // second deployment
     ProcessApplicationReference reference2 = processApplication.getReference();
-    repositoryService
-        .createDeployment(reference2)
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
-        .deploy();
+    repositoryService.createDeployment(reference2).name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).deploy();
 
     // when
-    repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     String firstDefinitionId = getLatestDefinitionIdByKey(definitionKey1);
     String secondDefinitionId = getLatestDefinitionIdByKey(definitionKey2);
@@ -314,37 +264,24 @@ public class RedeploymentRegistrationTest {
   }
 
   @Test
-	public void registrationFoundFromSameDeployment() {
+  public void registrationFoundFromSameDeployment() {
     // given
 
     // first deployment
     ProcessApplicationReference reference1 = processApplication.getReference();
-    Deployment deployment1 = repositoryService
-      .createDeployment(reference1)
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .addClasspathResource(resource2)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(reference1).name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).addClasspathResource(resource2).deploy();
 
     // second deployment
-    repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource1)
+    repositoryService.createDeployment().name(DEPLOYMENT_NAME).addClasspathResource(resource1)
         .deploy();
 
-    repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addClasspathResource(resource2)
+    repositoryService.createDeployment().name(DEPLOYMENT_NAME).addClasspathResource(resource2)
         .deploy();
 
     // when
-    repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     String firstDefinitionId = getLatestDefinitionIdByKey(definitionKey1);
     String secondDefinitionId = getLatestDefinitionIdByKey(definitionKey1);
@@ -355,31 +292,22 @@ public class RedeploymentRegistrationTest {
   }
 
   @Test
-	public void registrationFoundFromDifferentDeployments() {
+  public void registrationFoundFromDifferentDeployments() {
     // given
 
     // first deployment
     ProcessApplicationReference reference1 = processApplication.getReference();
-    Deployment deployment1 = repositoryService
-      .createDeployment(reference1)
-      .name(DEPLOYMENT_NAME + "-1")
-      .addClasspathResource(resource1)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment(reference1)
+        .name(DEPLOYMENT_NAME + "-1").addClasspathResource(resource1).deploy();
 
     // second deployment
     ProcessApplicationReference reference2 = processApplication.getReference();
-    repositoryService
-        .createDeployment(reference2)
-        .name(DEPLOYMENT_NAME + "-2")
-        .addClasspathResource(resource2)
-        .deploy();
+    repositoryService.createDeployment(reference2).name(DEPLOYMENT_NAME + "-2")
+        .addClasspathResource(resource2).deploy();
 
     // when
-    repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     String firstDefinitionId = getLatestDefinitionIdByKey(definitionKey1);
     String secondDefinitionId = getLatestDefinitionIdByKey(definitionKey2);
@@ -390,31 +318,22 @@ public class RedeploymentRegistrationTest {
   }
 
   @Test
-	public void registrationNotFoundWhenDeletingDeployment() {
+  public void registrationNotFoundWhenDeletingDeployment() {
     // given
 
     // first deployment
-    Deployment deployment1 = repositoryService
-      .createDeployment()
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).deploy();
 
     // second deployment
     ProcessApplicationReference reference2 = processApplication.getReference();
-    Deployment deployment2 = repositoryService
-        .createDeployment(reference2)
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    Deployment deployment2 = repositoryService.createDeployment(reference2).name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     // when (1)
     // third deployment
-    repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     String firstDefinitionId = getLatestDefinitionIdByKey(definitionKey1);
 
@@ -429,31 +348,22 @@ public class RedeploymentRegistrationTest {
   }
 
   @Test
-	public void registrationFoundAfterDiscardingDeploymentCache() {
+  public void registrationFoundAfterDiscardingDeploymentCache() {
     // given
 
     // first deployment
-    Deployment deployment1 = repositoryService
-      .createDeployment()
-      .name(DEPLOYMENT_NAME)
-      .addClasspathResource(resource1)
-      .deploy();
+    Deployment deployment1 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addClasspathResource(resource1).deploy();
 
     // second deployment
     ProcessApplicationReference reference2 = processApplication.getReference();
-    repositoryService
-        .createDeployment(reference2)
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    repositoryService.createDeployment(reference2).name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     // when (1)
     // third deployment
-    repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addDeploymentResources(deployment1.getId())
-        .deploy();
+    repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId()).deploy();
 
     String firstDefinitionId = getLatestDefinitionIdByKey(definitionKey1);
 
@@ -482,7 +392,8 @@ public class RedeploymentRegistrationTest {
   }
 
   protected ProcessApplicationReference getProcessApplicationForDeployment(String deploymentId) {
-    ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+    ProcessApplicationManager processApplicationManager = processEngineConfiguration
+        .getProcessApplicationManager();
     return processApplicationManager.getProcessApplicationForDeployment(deploymentId);
   }
 
@@ -498,8 +409,8 @@ public class RedeploymentRegistrationTest {
   }
 
   protected ProcessApplicationReference getProcessApplicationForDefinition(String definitionId) {
-    return processEngineConfiguration.getCommandExecutorTxRequired().execute(
-        testProvider.createGetProcessApplicationCommand(definitionId));
+    return processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(testProvider.createGetProcessApplicationCommand(definitionId));
   }
 
   private interface TestProvider {
@@ -512,13 +423,16 @@ public class RedeploymentRegistrationTest {
     return new TestProvider() {
 
       @Override
-      public Command<ProcessApplicationReference> createGetProcessApplicationCommand(final String definitionId) {
+      public Command<ProcessApplicationReference> createGetProcessApplicationCommand(
+          final String definitionId) {
         return new Command<ProcessApplicationReference>() {
 
           public ProcessApplicationReference execute(CommandContext commandContext) {
-            ProcessEngineConfigurationImpl configuration = commandContext.getProcessEngineConfiguration();
+            ProcessEngineConfigurationImpl configuration = commandContext
+                .getProcessEngineConfiguration();
             DeploymentCache deploymentCache = configuration.getDeploymentCache();
-            ProcessDefinitionEntity definition = deploymentCache.findDeployedProcessDefinitionById(definitionId);
+            ProcessDefinitionEntity definition = deploymentCache
+                .findDeployedProcessDefinitionById(definitionId);
             return ProcessApplicationContextUtil.getTargetProcessApplication(definition);
           }
         };
@@ -526,7 +440,8 @@ public class RedeploymentRegistrationTest {
 
       @Override
       public String getLatestDefinitionIdByKey(RepositoryService repositoryService, String key) {
-        return repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).latestVersion().singleResult().getId();
+        return repositoryService.createProcessDefinitionQuery().processDefinitionKey(key)
+            .latestVersion().singleResult().getId();
       }
 
     };
@@ -536,13 +451,16 @@ public class RedeploymentRegistrationTest {
     return new TestProvider() {
 
       @Override
-      public Command<ProcessApplicationReference> createGetProcessApplicationCommand(final String definitionId) {
+      public Command<ProcessApplicationReference> createGetProcessApplicationCommand(
+          final String definitionId) {
         return new Command<ProcessApplicationReference>() {
 
           public ProcessApplicationReference execute(CommandContext commandContext) {
-            ProcessEngineConfigurationImpl configuration = commandContext.getProcessEngineConfiguration();
+            ProcessEngineConfigurationImpl configuration = commandContext
+                .getProcessEngineConfiguration();
             DeploymentCache deploymentCache = configuration.getDeploymentCache();
-            CaseDefinitionEntity definition = deploymentCache.findDeployedCaseDefinitionById(definitionId);
+            CaseDefinitionEntity definition = deploymentCache
+                .findDeployedCaseDefinitionById(definitionId);
             return ProcessApplicationContextUtil.getTargetProcessApplication(definition);
           }
         };
@@ -550,7 +468,8 @@ public class RedeploymentRegistrationTest {
 
       @Override
       public String getLatestDefinitionIdByKey(RepositoryService repositoryService, String key) {
-        return repositoryService.createCaseDefinitionQuery().caseDefinitionKey(key).latestVersion().singleResult().getId();
+        return repositoryService.createCaseDefinitionQuery().caseDefinitionKey(key).latestVersion()
+            .singleResult().getId();
       }
 
     };
@@ -560,13 +479,16 @@ public class RedeploymentRegistrationTest {
     return new TestProvider() {
 
       @Override
-      public Command<ProcessApplicationReference> createGetProcessApplicationCommand(final String definitionId) {
+      public Command<ProcessApplicationReference> createGetProcessApplicationCommand(
+          final String definitionId) {
         return new Command<ProcessApplicationReference>() {
 
           public ProcessApplicationReference execute(CommandContext commandContext) {
-            ProcessEngineConfigurationImpl configuration = commandContext.getProcessEngineConfiguration();
+            ProcessEngineConfigurationImpl configuration = commandContext
+                .getProcessEngineConfiguration();
             DeploymentCache deploymentCache = configuration.getDeploymentCache();
-            DecisionDefinitionEntity definition = deploymentCache.findDeployedDecisionDefinitionById(definitionId);
+            DecisionDefinitionEntity definition = deploymentCache
+                .findDeployedDecisionDefinitionById(definitionId);
             return ProcessApplicationContextUtil.getTargetProcessApplication(definition);
           }
         };
@@ -574,7 +496,8 @@ public class RedeploymentRegistrationTest {
 
       @Override
       public String getLatestDefinitionIdByKey(RepositoryService repositoryService, String key) {
-        return repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).latestVersion().singleResult().getId();
+        return repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key)
+            .latestVersion().singleResult().getId();
       }
 
     };
@@ -584,13 +507,16 @@ public class RedeploymentRegistrationTest {
     return new TestProvider() {
 
       @Override
-      public Command<ProcessApplicationReference> createGetProcessApplicationCommand(final String definitionId) {
+      public Command<ProcessApplicationReference> createGetProcessApplicationCommand(
+          final String definitionId) {
         return new Command<ProcessApplicationReference>() {
 
           public ProcessApplicationReference execute(CommandContext commandContext) {
-            ProcessEngineConfigurationImpl configuration = commandContext.getProcessEngineConfiguration();
+            ProcessEngineConfigurationImpl configuration = commandContext
+                .getProcessEngineConfiguration();
             DeploymentCache deploymentCache = configuration.getDeploymentCache();
-            DecisionRequirementsDefinitionEntity definition = deploymentCache.findDeployedDecisionRequirementsDefinitionById(definitionId);
+            DecisionRequirementsDefinitionEntity definition = deploymentCache
+                .findDeployedDecisionRequirementsDefinitionById(definitionId);
             return ProcessApplicationContextUtil.getTargetProcessApplication(definition);
           }
         };
@@ -598,7 +524,8 @@ public class RedeploymentRegistrationTest {
 
       @Override
       public String getLatestDefinitionIdByKey(RepositoryService repositoryService, String key) {
-        return repositoryService.createDecisionRequirementsDefinitionQuery().decisionRequirementsDefinitionKey(key).latestVersion().singleResult().getId();
+        return repositoryService.createDecisionRequirementsDefinitionQuery()
+            .decisionRequirementsDefinitionKey(key).latestVersion().singleResult().getId();
       }
 
     };

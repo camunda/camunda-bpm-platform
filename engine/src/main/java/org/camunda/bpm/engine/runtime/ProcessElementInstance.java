@@ -17,9 +17,9 @@
 package org.camunda.bpm.engine.runtime;
 
 /**
- * <p>A ProcessElementInstance is an instance of a process construct 
- * such as an Activity (see {@link ActivityInstance}) or a transition 
- * (see {@link TransitionInstance}).
+ * <p>
+ * A ProcessElementInstance is an instance of a process construct such as an Activity (see
+ * {@link ActivityInstance}) or a transition (see {@link TransitionInstance}).
  * 
  * @author Daniel Meyer
  *
@@ -31,10 +31,10 @@ public interface ProcessElementInstance {
 
   /** The id of the parent activity instance. */
   String getParentActivityInstanceId();
-  
+
   /** the process definition id */
   String getProcessDefinitionId();
-  
+
   /** the id of the process instance this process element is part of */
   String getProcessInstanceId();
 

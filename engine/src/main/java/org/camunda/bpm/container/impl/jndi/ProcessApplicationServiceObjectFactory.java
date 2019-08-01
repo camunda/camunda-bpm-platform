@@ -26,7 +26,10 @@ import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessApplicationService;
 
 /**
- * <p>{@link ObjectFactory} that can be used for binding the {@link ProcessApplicationService} into JNDI</p> 
+ * <p>
+ * {@link ObjectFactory} that can be used for binding the {@link ProcessApplicationService} into
+ * JNDI
+ * </p>
  * 
  * @author Roman Smirnov
  * @author Daniel Meyer
@@ -34,7 +37,8 @@ import org.camunda.bpm.ProcessApplicationService;
  */
 public class ProcessApplicationServiceObjectFactory implements ObjectFactory {
 
-  public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception {
+  public Object getObjectInstance(Object obj, Name name, Context nameCtx,
+      Hashtable<?, ?> environment) throws Exception {
     return BpmPlatform.getProcessApplicationService();
   }
 

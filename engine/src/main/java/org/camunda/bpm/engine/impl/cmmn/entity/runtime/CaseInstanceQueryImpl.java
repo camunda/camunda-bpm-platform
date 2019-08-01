@@ -34,7 +34,8 @@ import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
  * @author Roman Smirnov
  *
  */
-public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanceQuery, CaseInstance> implements CaseInstanceQuery {
+public class CaseInstanceQueryImpl extends
+    AbstractVariableQueryImpl<CaseInstanceQuery, CaseInstance> implements CaseInstanceQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -56,7 +57,6 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
   protected Boolean required;
   protected Boolean repeatable;
   protected Boolean repetition;
-
 
   public CaseInstanceQueryImpl() {
   }
@@ -147,7 +147,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     return this;
   }
 
-  //ordering /////////////////////////////////////////////////////////////////
+  // ordering /////////////////////////////////////////////////////////////////
 
   public CaseInstanceQuery orderByCaseInstanceId() {
     orderBy(CaseInstanceQueryProperty.CASE_INSTANCE_ID);
@@ -170,25 +170,21 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     return this;
   }
 
-  //results /////////////////////////////////////////////////////////////////
+  // results /////////////////////////////////////////////////////////////////
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
-      .getCaseExecutionManager()
-      .findCaseInstanceCountByQueryCriteria(this);
+    return commandContext.getCaseExecutionManager().findCaseInstanceCountByQueryCriteria(this);
   }
 
   public List<CaseInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
-      .getCaseExecutionManager()
-      .findCaseInstanceByQueryCriteria(this, page);
+    return commandContext.getCaseExecutionManager().findCaseInstanceByQueryCriteria(this, page);
   }
 
-  //getters /////////////////////////////////////////////////////////////////
+  // getters /////////////////////////////////////////////////////////////////
 
   public String getCaseInstanceId() {
     return caseExecutionId;

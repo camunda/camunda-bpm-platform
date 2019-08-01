@@ -31,23 +31,17 @@ import org.camunda.bpm.model.cmmn.VariableTransition;
  */
 public class SentryInitializationTest extends CmmnProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testOnPart.cmmn" })
   public void testOnPart() {
     // given
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
     // when
-    String caseInstanceId = caseService
-        .withCaseDefinition(caseDefinitionId)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinition(caseDefinitionId).create().getId();
 
     // then
-    List<CaseSentryPartEntity> parts = createCaseSentryPartQuery()
-      .list();
+    List<CaseSentryPartEntity> parts = createCaseSentryPartQuery().list();
 
     assertEquals(1, parts.size());
 
@@ -62,23 +56,17 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertFalse(part.isSatisfied());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testVariableOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testVariableOnPart.cmmn" })
   public void testVariableOnPart() {
     // given
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
     // when
-    String caseInstanceId = caseService
-        .withCaseDefinition(caseDefinitionId)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinition(caseDefinitionId).create().getId();
 
     // then
-    List<CaseSentryPartEntity> parts = createCaseSentryPartQuery()
-      .list();
+    List<CaseSentryPartEntity> parts = createCaseSentryPartQuery().list();
 
     assertEquals(1, parts.size());
 
@@ -93,24 +81,18 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertFalse(part.isSatisfied());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testIfPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testIfPart.cmmn" })
   public void testIfPart() {
     // given
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
     // when
-    String caseInstanceId = caseService
-        .withCaseDefinition(caseDefinitionId)
-        .setVariable("myVar", 0)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinition(caseDefinitionId).setVariable("myVar", 0)
+        .create().getId();
 
     // then
-    List<CaseSentryPartEntity> parts = createCaseSentryPartQuery()
-      .list();
+    List<CaseSentryPartEntity> parts = createCaseSentryPartQuery().list();
 
     assertEquals(1, parts.size());
 
@@ -125,28 +107,21 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertFalse(part.isSatisfied());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testOnPartIfPartAndVariableOnPart.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testOnPartIfPartAndVariableOnPart.cmmn" })
   public void testOnPartIfPartAndVariableOnPart() {
     // given
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
     // when
-    String caseInstanceId = caseService
-        .withCaseDefinition(caseDefinitionId)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinition(caseDefinitionId).create().getId();
 
     // then
     CaseSentryPartQueryImpl query = createCaseSentryPartQuery();
 
     assertEquals(3, query.count());
 
-    CaseSentryPartEntity part = query
-        .type(CmmnSentryDeclaration.IF_PART)
-        .singleResult();
+    CaseSentryPartEntity part = query.type(CmmnSentryDeclaration.IF_PART).singleResult();
 
     assertEquals(caseInstanceId, part.getCaseExecutionId());
     assertEquals(caseInstanceId, part.getCaseInstanceId());
@@ -156,9 +131,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertNull(part.getStandardEvent());
     assertFalse(part.isSatisfied());
 
-    part = query
-        .type(CmmnSentryDeclaration.PLAN_ITEM_ON_PART)
-        .singleResult();
+    part = query.type(CmmnSentryDeclaration.PLAN_ITEM_ON_PART).singleResult();
 
     assertEquals(caseInstanceId, part.getCaseExecutionId());
     assertEquals(caseInstanceId, part.getCaseInstanceId());
@@ -169,7 +142,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertFalse(part.isSatisfied());
 
     part = query.type(CmmnSentryDeclaration.VARIABLE_ON_PART).singleResult();
-    
+
     assertEquals(caseInstanceId, part.getCaseExecutionId());
     assertEquals(caseInstanceId, part.getCaseInstanceId());
     assertEquals("Sentry_1", part.getSentryId());
@@ -179,29 +152,22 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertFalse(part.isSatisfied());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testMultipleSentries.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testMultipleSentries.cmmn" })
   public void testMultipleSentries() {
     // given
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
     // when
-    String caseInstanceId = caseService
-        .withCaseDefinition(caseDefinitionId)
-        .setVariable("myVar", 0)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinition(caseDefinitionId).setVariable("myVar", 0)
+        .create().getId();
 
     // then
     CaseSentryPartQueryImpl query = createCaseSentryPartQuery();
 
     assertEquals(2, query.count());
 
-    CaseSentryPartEntity part = query
-        .sentryId("Sentry_1")
-        .singleResult();
+    CaseSentryPartEntity part = query.sentryId("Sentry_1").singleResult();
 
     assertEquals(caseInstanceId, part.getCaseExecutionId());
     assertEquals(caseInstanceId, part.getCaseInstanceId());
@@ -211,9 +177,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertNull(part.getStandardEvent());
     assertFalse(part.isSatisfied());
 
-    part = query
-        .sentryId("Sentry_2")
-        .singleResult();
+    part = query.sentryId("Sentry_2").singleResult();
 
     assertEquals(caseInstanceId, part.getCaseExecutionId());
     assertEquals(caseInstanceId, part.getCaseInstanceId());
@@ -224,20 +188,15 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertFalse(part.isSatisfied());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testMultipleSentriesWithinStage.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testMultipleSentriesWithinStage.cmmn" })
   public void testMultipleSentriesWithinStage() {
     // given
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
     // when
-    String caseInstanceId = caseService
-        .withCaseDefinition(caseDefinitionId)
-        .setVariable("myVar", 0)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinition(caseDefinitionId).setVariable("myVar", 0)
+        .create().getId();
 
     // then
     CaseSentryPartQueryImpl query = createCaseSentryPartQuery();
@@ -245,18 +204,13 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertEquals(2, query.count());
 
     // when
-    String stageId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_Stage_1")
-        .singleResult()
+    String stageId = caseService.createCaseExecutionQuery().activityId("PI_Stage_1").singleResult()
         .getId();
 
     // then
     assertEquals(2, query.count());
 
-    CaseSentryPartEntity part = query
-        .sentryId("Sentry_1")
-        .singleResult();
+    CaseSentryPartEntity part = query.sentryId("Sentry_1").singleResult();
 
     assertEquals(caseInstanceId, part.getCaseInstanceId());
     assertEquals(stageId, part.getCaseExecutionId());
@@ -266,9 +220,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertNull(part.getStandardEvent());
     assertFalse(part.isSatisfied());
 
-    part = query
-        .sentryId("Sentry_2")
-        .singleResult();
+    part = query.sentryId("Sentry_2").singleResult();
 
     assertEquals(caseInstanceId, part.getCaseInstanceId());
     assertEquals(stageId, part.getCaseExecutionId());

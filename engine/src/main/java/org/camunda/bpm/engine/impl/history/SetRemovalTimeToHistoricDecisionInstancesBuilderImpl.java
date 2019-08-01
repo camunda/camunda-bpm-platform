@@ -33,7 +33,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl implements SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder {
+public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl
+    implements SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder {
 
   protected HistoricDecisionInstanceQuery query;
   protected List<String> ids;
@@ -47,18 +48,20 @@ public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl implements Set
     this.commandExecutor = commandExecutor;
   }
 
-  public SetRemovalTimeToHistoricDecisionInstancesBuilder byQuery(HistoricDecisionInstanceQuery query) {
+  public SetRemovalTimeToHistoricDecisionInstancesBuilder byQuery(
+      HistoricDecisionInstanceQuery query) {
     this.query = query;
     return this;
   }
 
   public SetRemovalTimeToHistoricDecisionInstancesBuilder byIds(String... ids) {
-    this.ids = ids !=  null ? Arrays.asList(ids) : null;
+    this.ids = ids != null ? Arrays.asList(ids) : null;
     return this;
   }
 
   public SetRemovalTimeToHistoricDecisionInstancesBuilder absoluteRemovalTime(Date removalTime) {
-    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive","mode", mode);
+    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive",
+        "mode", mode);
 
     this.mode = Mode.ABSOLUTE_REMOVAL_TIME;
     this.removalTime = removalTime;
@@ -67,14 +70,16 @@ public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl implements Set
 
   @Override
   public SetRemovalTimeToHistoricDecisionInstancesBuilder calculatedRemovalTime() {
-    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive","mode", mode);
+    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive",
+        "mode", mode);
 
     this.mode = Mode.CALCULATED_REMOVAL_TIME;
     return this;
   }
 
   public SetRemovalTimeToHistoricDecisionInstancesBuilder clearedRemovalTime() {
-    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive","mode", mode);
+    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive",
+        "mode", mode);
 
     mode = Mode.CLEARED_REMOVAL_TIME;
     return this;
@@ -106,9 +111,7 @@ public class SetRemovalTimeToHistoricDecisionInstancesBuilderImpl implements Set
   }
 
   public enum Mode {
-    CALCULATED_REMOVAL_TIME,
-    ABSOLUTE_REMOVAL_TIME,
-    CLEARED_REMOVAL_TIME;
+    CALCULATED_REMOVAL_TIME, ABSOLUTE_REMOVAL_TIME, CLEARED_REMOVAL_TIME;
   }
 
   public boolean isHierarchical() {

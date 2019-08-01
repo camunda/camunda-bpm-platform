@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine;
 
-
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
 /**

@@ -17,19 +17,18 @@
 package org.camunda.bpm.engine;
 
 /**
- * Create and destroy artifacts of a given class in a container specific way.
- * This SPI hides differences between CDI, Spring, etc.
- * <br/>
+ * Create and destroy artifacts of a given class in a container specific way. This SPI hides
+ * differences between CDI, Spring, etc. <br/>
  * Samples:
+ * 
  * <pre>
  *     &lt;camunda:taskListener class="org.mypackage.MyListener".../&gt;
  *     or
  *     &lt;serviceTask camunda:class=""org.mypackage.MyJavaDelegate".. /&gt;
  * </pre>
  *
- * The default implementation uses Class.newInstance to create artifacts.
- * The CDI specific version utilizes the BeanManager to resolve the
- * Contextual Instances.
+ * The default implementation uses Class.newInstance to create artifacts. The CDI specific version
+ * utilizes the BeanManager to resolve the Contextual Instances.
  *
  * @since 7.2.0
  * @author <a href="mailto:struberg@yahoo.de">Mark Struberg</a>
@@ -37,7 +36,8 @@ package org.camunda.bpm.engine;
 public interface ArtifactFactory {
   /**
    *
-   * @param clazz of the artifact to create
+   * @param clazz
+   *          of the artifact to create
    * @return the instance of the fullyQualifiedClassName
    */
   public <T> T getArtifact(Class<T> clazz);

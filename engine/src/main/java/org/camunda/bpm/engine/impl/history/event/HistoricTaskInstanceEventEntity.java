@@ -155,29 +155,14 @@ public class HistoricTaskInstanceEventEntity extends HistoricScopeInstanceEvent 
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[taskId" + taskId
-           + ", assignee=" + assignee
-           + ", owner=" + owner
-           + ", name=" + name
-           + ", description=" + description
-           + ", dueDate=" + dueDate
-           + ", followUpDate=" + followUpDate
-           + ", priority=" + priority
-           + ", parentTaskId=" + parentTaskId
-           + ", deleteReason=" + deleteReason
-           + ", taskDefinitionKey=" + taskDefinitionKey
-           + ", durationInMillis=" + durationInMillis
-           + ", startTime=" + startTime
-           + ", endTime=" + endTime
-           + ", id=" + id
-           + ", eventType=" + eventType
-           + ", executionId=" + executionId
-           + ", processDefinitionId=" + processDefinitionId
-           + ", rootProcessInstanceId=" + rootProcessInstanceId
-           + ", processInstanceId=" + processInstanceId
-           + ", activityInstanceId=" + activityInstanceId
-           + ", tenantId=" + tenantId
-           + "]";
+    return this.getClass().getSimpleName() + "[taskId" + taskId + ", assignee=" + assignee
+        + ", owner=" + owner + ", name=" + name + ", description=" + description + ", dueDate="
+        + dueDate + ", followUpDate=" + followUpDate + ", priority=" + priority + ", parentTaskId="
+        + parentTaskId + ", deleteReason=" + deleteReason + ", taskDefinitionKey="
+        + taskDefinitionKey + ", durationInMillis=" + durationInMillis + ", startTime=" + startTime
+        + ", endTime=" + endTime + ", id=" + id + ", eventType=" + eventType + ", executionId="
+        + executionId + ", processDefinitionId=" + processDefinitionId + ", rootProcessInstanceId="
+        + rootProcessInstanceId + ", processInstanceId=" + processInstanceId
+        + ", activityInstanceId=" + activityInstanceId + ", tenantId=" + tenantId + "]";
   }
 }

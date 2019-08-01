@@ -34,8 +34,9 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
- * <p>Testcase verifying support for form matadata provided using
- * custom extension elements in BPMN Xml</p>
+ * <p>
+ * Testcase verifying support for form matadata provided using custom extension elements in BPMN Xml
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -173,7 +174,8 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   public void testFormFieldSubmit() {
 
     // valid submit
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormDataTest.testFormFieldSubmit");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("FormDataTest.testFormFieldSubmit");
     Task task = taskService.createTaskQuery().singleResult();
     Map<String, Object> formValues = new HashMap<String, Object>();
     formValues.put("stringField", "12345");
@@ -221,7 +223,8 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testSubmitFormDataWithEmptyDate() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormDataTest.testSubmitFormDataWithEmptyDate");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("FormDataTest.testSubmitFormDataWithEmptyDate");
     Task task = taskService.createTaskQuery().singleResult();
     Map<String, Object> formValues = new HashMap<String, Object>();
     formValues.put("stringField", "12345");
@@ -236,12 +239,13 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testMissingFormVariables()
-  {
+  public void testMissingFormVariables() {
     // given process definition with defined form varaibles
     // when start process instance with no variables
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("date-form-property-test");
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("date-form-property-test");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     // then taskFormData contains form variables with null as values
     TaskFormData taskFormData = formService.getTaskFormData(task.getId());

@@ -82,7 +82,8 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
     String jobId = commandExecutor.execute(new Command<String>() {
 
       public String execute(CommandContext commandContext) {
-        TimerEntity timer = createTweetTimer("i'm coding a test", new Date(SOME_TIME + (10 * SECOND)));
+        TimerEntity timer = createTweetTimer("i'm coding a test",
+            new Date(SOME_TIME + (10 * SECOND)));
         commandContext.getJobManager().schedule(timer);
         return timer.getId();
       }
@@ -96,7 +97,8 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
     ClockUtil.setCurrentTime(new Date(SOME_TIME + (20 * SECOND)));
 
-    acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(jobExecutor, jobExecutor.getMaxJobsPerAcquisition()));
+    acquiredJobs = commandExecutor
+        .execute(new AcquireJobsCmd(jobExecutor, jobExecutor.getMaxJobsPerAcquisition()));
     jobIdsList = acquiredJobs.getJobIdBatches();
     assertEquals(1, jobIdsList.size());
 
@@ -119,15 +121,12 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        List<HistoricJobLog> historicJobLogs = processEngineConfiguration
-            .getHistoryService()
-            .createHistoricJobLogQuery()
-            .list();
+        List<HistoricJobLog> historicJobLogs = processEngineConfiguration.getHistoryService()
+            .createHistoricJobLogQuery().list();
 
         for (HistoricJobLog historicJobLog : historicJobLogs) {
-          commandContext
-            .getHistoricJobLogManager()
-            .deleteHistoricJobLogById(historicJobLog.getId());
+          commandContext.getHistoricJobLogManager()
+              .deleteHistoricJobLogById(historicJobLog.getId());
         }
 
         return null;

@@ -36,14 +36,14 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
 
   protected DmnDecisionResult results;
 
-  @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Deployment(resources = { TEST_CASE, TEST_DECISION })
   public void testNoOutput() {
     startTestCase("no output");
 
     assertTrue("The decision result 'ruleResult' should be empty", results.isEmpty());
   }
 
-  @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Deployment(resources = { TEST_CASE, TEST_DECISION })
   public void testEmptyOutput() {
     startTestCase("empty output");
 
@@ -53,7 +53,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
     assertNull(decisionOutput.getFirstEntry());
   }
 
-  @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Deployment(resources = { TEST_CASE, TEST_DECISION })
   public void testEmptyMap() {
     startTestCase("empty map");
 
@@ -64,7 +64,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
     }
   }
 
-  @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Deployment(resources = { TEST_CASE, TEST_DECISION })
   public void testSingleEntry() {
     startTestCase("single entry");
 
@@ -73,7 +73,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
     assertEquals(Variables.stringValue("foo"), firstOutput.getFirstEntryTyped());
   }
 
-  @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Deployment(resources = { TEST_CASE, TEST_DECISION })
   public void testMultipleEntries() {
     startTestCase("multiple entries");
 
@@ -85,7 +85,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
     assertEquals(Variables.stringValue("bar"), firstOutput.getEntryTyped("result2"));
   }
 
-  @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Deployment(resources = { TEST_CASE, TEST_DECISION })
   public void testSingleEntryList() {
     startTestCase("single entry list");
 
@@ -97,7 +97,7 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
     }
   }
 
-  @Deployment(resources = { TEST_CASE, TEST_DECISION})
+  @Deployment(resources = { TEST_CASE, TEST_DECISION })
   public void testMultipleEntriesList() {
     startTestCase("multiple entries list");
 
@@ -154,7 +154,8 @@ public class DmnDecisionTaskResultListenerTest extends CmmnProcessEngineTestCase
   }
 
   protected CaseInstance startTestCase(String input) {
-    CaseInstance caseInstance = createCaseInstanceByKey("case", Variables.createVariables().putValue("input", input));
+    CaseInstance caseInstance = createCaseInstanceByKey("case",
+        Variables.createVariables().putValue("input", input));
     results = DecisionResultTestListener.getDecisionResult();
     assertNotNull(results);
     return caseInstance;

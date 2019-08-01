@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.history.event;
 
 import java.util.Date;
+
 /**
  * 
  * @author Deivarayan Azhagappan
@@ -97,7 +98,7 @@ public class HistoricIdentityLinkLogEventEntity extends HistoryEvent {
   public void setAssignerId(String assignerId) {
     this.assignerId = assignerId;
   }
-  
+
   public String getTenantId() {
     return tenantId;
   }

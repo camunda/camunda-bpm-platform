@@ -42,12 +42,14 @@ public class TenantIdProviderCaseInstanceContext {
     this.variables = variables;
   }
 
-  public TenantIdProviderCaseInstanceContext(CaseDefinition caseDefinition, VariableMap variables, DelegateExecution superExecution) {
+  public TenantIdProviderCaseInstanceContext(CaseDefinition caseDefinition, VariableMap variables,
+      DelegateExecution superExecution) {
     this(caseDefinition, variables);
     this.superExecution = superExecution;
   }
 
-  public TenantIdProviderCaseInstanceContext(CaseDefinition caseDefinition, VariableMap variables, DelegateCaseExecution superCaseExecution) {
+  public TenantIdProviderCaseInstanceContext(CaseDefinition caseDefinition, VariableMap variables,
+      DelegateCaseExecution superCaseExecution) {
     this(caseDefinition, variables);
     this.superCaseExecution = superCaseExecution;
   }
@@ -67,16 +69,18 @@ public class TenantIdProviderCaseInstanceContext {
   }
 
   /**
-   * @return the super execution. <code>null</code> if the starting case instance is a root process instance and not started using a call activity.
-   * If the case instance is started using a call activity, this method returns the execution in the super process
-   * instance executing the call activity.
+   * @return the super execution. <code>null</code> if the starting case instance is a root process
+   *         instance and not started using a call activity. If the case instance is started using a
+   *         call activity, this method returns the execution in the super process instance
+   *         executing the call activity.
    */
   public DelegateExecution getSuperExecution() {
     return superExecution;
   }
 
   /**
-   * @return the super case execution. <code>null</code> if the starting case instance is not a sub case instance started using a CMMN case task.
+   * @return the super case execution. <code>null</code> if the starting case instance is not a sub
+   *         case instance started using a CMMN case task.
    */
   public DelegateCaseExecution getSuperCaseExecution() {
     return superCaseExecution;

@@ -85,7 +85,8 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     identityService.setAuthentication("user", null, null);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -99,7 +100,8 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -110,14 +112,15 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
   public void testReportDisabledTenantCheck() {
     // given
     testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
-    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10,TENANT_ONE);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
     testRule.deployForTenant(TENANT_TWO, DMN_MODEL);
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_TWO);
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(2, reportResults.size());
@@ -137,8 +140,10 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     identityService.setAuthentication("user", null, null);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
-    List<CleanableHistoricDecisionInstanceReportResult> reportResultsTwo = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_TWO).list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService
+        .createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsTwo = historyService
+        .createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_TWO).list();
 
     // then
     assertEquals(0, reportResultsOne.size());
@@ -157,8 +162,10 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
-    List<CleanableHistoricDecisionInstanceReportResult> reportResultsTwo = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_TWO).list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService
+        .createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsTwo = historyService
+        .createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_TWO).list();
 
     // then
     assertEquals(1, reportResultsOne.size());
@@ -179,8 +186,10 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     processEngineConfiguration.setTenantCheckEnabled(false);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
-    List<CleanableHistoricDecisionInstanceReportResult> reportResultsTwo = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_TWO).list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService
+        .createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsTwo = historyService
+        .createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_TWO).list();
 
     // then
     assertEquals(1, reportResultsOne.size());
@@ -197,7 +206,8 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, null);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().withoutTenantId().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().withoutTenantId().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -214,8 +224,10 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
 
     // when
-    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().withoutTenantId().list();
-    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricDecisionInstanceReport().withoutTenantId().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService
+        .createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -224,25 +236,32 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     assertEquals(TENANT_ONE, reportResultsOne.get(0).getTenantId());
   }
 
-  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount, String tenantId) {
+  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive,
+      int instanceCount, String tenantId) {
     List<DecisionDefinition> decisionDefinitions = null;
     if (tenantId != null) {
-      decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).tenantIdIn(tenantId).list();
+      decisionDefinitions = repositoryService.createDecisionDefinitionQuery()
+          .decisionDefinitionKey(key).tenantIdIn(tenantId).list();
     } else {
-      decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).withoutTenantId().list();
+      decisionDefinitions = repositoryService.createDecisionDefinitionQuery()
+          .decisionDefinitionKey(key).withoutTenantId().list();
     }
     assertEquals(1, decisionDefinitions.size());
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), historyTimeToLive);
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(),
+        historyTimeToLive);
 
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, daysInThePast));
 
-    Map<String, Object> variables = Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
+    Map<String, Object> variables = Variables.createVariables().putValue("status", "silver")
+        .putValue("sum", 723);
     for (int i = 0; i < instanceCount; i++) {
       if (tenantId != null) {
-        engineRule.getDecisionService().evaluateDecisionByKey(key).decisionDefinitionTenantId(tenantId).variables(variables).evaluate();
+        engineRule.getDecisionService().evaluateDecisionByKey(key)
+            .decisionDefinitionTenantId(tenantId).variables(variables).evaluate();
       } else {
-        engineRule.getDecisionService().evaluateDecisionByKey(key).decisionDefinitionWithoutTenantId().variables(variables).evaluate();
+        engineRule.getDecisionService().evaluateDecisionByKey(key)
+            .decisionDefinitionWithoutTenantId().variables(variables).evaluate();
       }
     }
 

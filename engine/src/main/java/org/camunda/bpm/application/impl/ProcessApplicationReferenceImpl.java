@@ -25,18 +25,19 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>A {@link ProcessApplicationReference} implementation using
- * {@link WeakReference}.</p>
+ * <p>
+ * A {@link ProcessApplicationReference} implementation using {@link WeakReference}.
+ * </p>
  *
- * <p>As long as the process application is deployed, the container or the
- * application will hold a strong reference to the {@link AbstractProcessApplication}
- * object. This class holds a {@link WeakReference}. When the process
- * application is undeployed, the container or application releases all strong
- * references. Since we only pass {@link ProcessApplicationReference
- * ProcessApplicationReferences} to the process engine, it is guaranteed that
- * the {@link AbstractProcessApplication} object can be reclaimed by the garbage
- * collector, even if the undeployment and unregistration should fail for some
- * improbable reason.</p>
+ * <p>
+ * As long as the process application is deployed, the container or the application will hold a
+ * strong reference to the {@link AbstractProcessApplication} object. This class holds a
+ * {@link WeakReference}. When the process application is undeployed, the container or application
+ * releases all strong references. Since we only pass {@link ProcessApplicationReference
+ * ProcessApplicationReferences} to the process engine, it is guaranteed that the
+ * {@link AbstractProcessApplication} object can be reclaimed by the garbage collector, even if the
+ * undeployment and unregistration should fail for some improbable reason.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -59,17 +60,18 @@ public class ProcessApplicationReferenceImpl implements ProcessApplicationRefere
     return name;
   }
 
-  public AbstractProcessApplication getProcessApplication() throws ProcessApplicationUnavailableException {
+  public AbstractProcessApplication getProcessApplication()
+      throws ProcessApplicationUnavailableException {
     AbstractProcessApplication application = processApplication.get();
     if (application == null) {
       throw LOG.processApplicationUnavailableException(name);
-    }
-    else {
+    } else {
       return application;
     }
   }
 
-  public void processEngineStopping(ProcessEngine processEngine) throws ProcessApplicationUnavailableException {
+  public void processEngineStopping(ProcessEngine processEngine)
+      throws ProcessApplicationUnavailableException {
     // do nothing
   }
 

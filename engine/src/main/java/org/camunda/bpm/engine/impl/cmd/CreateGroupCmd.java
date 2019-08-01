@@ -27,23 +27,22 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureWhitelistedResou
 /**
  * @author Tom Baeyens
  */
-public class CreateGroupCmd extends AbstractWritableIdentityServiceCmd<Group> implements Command<Group>, Serializable {
+public class CreateGroupCmd extends AbstractWritableIdentityServiceCmd<Group>
+    implements Command<Group>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   protected String groupId;
-  
+
   public CreateGroupCmd(String groupId) {
     ensureNotNull("groupId", groupId);
     this.groupId = groupId;
   }
-  
+
   protected Group executeCmd(CommandContext commandContext) {
     ensureWhitelistedResourceId(commandContext, "Group", groupId);
 
-    return commandContext
-      .getWritableIdentityProvider()
-      .createNewGroup(groupId);
+    return commandContext.getWritableIdentityProvider().createNewGroup(groupId);
   }
 
 }

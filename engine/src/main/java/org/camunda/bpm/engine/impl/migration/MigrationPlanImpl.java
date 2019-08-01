@@ -64,11 +64,9 @@ public class MigrationPlanImpl implements MigrationPlan {
   }
 
   public String toString() {
-    return "MigrationPlan[" +
-      "sourceProcessDefinitionId='" + sourceProcessDefinitionId + '\'' +
-      ", targetProcessDefinitionId='" + targetProcessDefinitionId + '\'' +
-      ", instructions=" + instructions +
-      ']';
+    return "MigrationPlan[" + "sourceProcessDefinitionId='" + sourceProcessDefinitionId + '\''
+        + ", targetProcessDefinitionId='" + targetProcessDefinitionId + '\'' + ", instructions="
+        + instructions + ']';
   }
 
 }

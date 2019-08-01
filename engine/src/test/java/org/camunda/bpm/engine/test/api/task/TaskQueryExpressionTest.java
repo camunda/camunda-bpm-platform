@@ -94,8 +94,11 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
   }
 
   public void testQueryByAssigneeLikeExpression() {
-    assertCount(taskQuery().taskAssigneeLikeExpression("${'%" + user.getId().substring(2) + "'}"), 2);
-    assertCount(taskQuery().taskAssigneeLikeExpression("${'%" + anotherUser.getId().substring(2) + "'}"), 0);
+    assertCount(taskQuery().taskAssigneeLikeExpression("${'%" + user.getId().substring(2) + "'}"),
+        2);
+    assertCount(
+        taskQuery().taskAssigneeLikeExpression("${'%" + anotherUser.getId().substring(2) + "'}"),
+        0);
 
     setCurrentUser(user);
     assertCount(taskQuery().taskAssigneeLikeExpression("${'%'.concat(currentUser())}"), 2);
@@ -128,12 +131,15 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
 
   public void testQueryByCandidateUserExpression() {
     assertCount(taskQuery().taskCandidateUserExpression("${'" + user.getId() + "'}"), 1);
-    assertCount(taskQuery().taskCandidateUserExpression("${'" + user.getId() + "'}").includeAssignedTasks(), 2);
+    assertCount(
+        taskQuery().taskCandidateUserExpression("${'" + user.getId() + "'}").includeAssignedTasks(),
+        2);
     assertCount(taskQuery().taskCandidateUserExpression("${'" + anotherUser.getId() + "'}"), 0);
 
     setCurrentUser(user);
     assertCount(taskQuery().taskCandidateUserExpression("${currentUser()}"), 1);
-    assertCount(taskQuery().taskCandidateUserExpression("${currentUser()}").includeAssignedTasks(), 2);
+    assertCount(taskQuery().taskCandidateUserExpression("${currentUser()}").includeAssignedTasks(),
+        2);
 
     setCurrentUser(anotherUser);
     assertCount(taskQuery().taskCandidateUserExpression("${currentUser()}"), 0);
@@ -145,7 +151,8 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
 
     setCurrentUser(user);
     assertCount(taskQuery().taskCandidateGroupExpression("${currentUserGroups()[0]}"), 1);
-    assertCount(taskQuery().taskCandidateGroupExpression("${currentUserGroups()[0]}").includeAssignedTasks(), 2);
+    assertCount(taskQuery().taskCandidateGroupExpression("${currentUserGroups()[0]}")
+        .includeAssignedTasks(), 2);
 
     setCurrentUser(anotherUser);
     assertCount(taskQuery().taskCandidateGroupExpression("${currentUserGroups()[0]}"), 0);
@@ -154,7 +161,9 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
   public void testQueryByCandidateGroupsExpression() {
     setCurrentUser(user);
     assertCount(taskQuery().taskCandidateGroupInExpression("${currentUserGroups()}"), 1);
-    assertCount(taskQuery().taskCandidateGroupInExpression("${currentUserGroups()}").includeAssignedTasks(), 2);
+    assertCount(
+        taskQuery().taskCandidateGroupInExpression("${currentUserGroups()}").includeAssignedTasks(),
+        2);
 
     setCurrentUser(anotherUser);
 
@@ -164,8 +173,7 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
     try {
       taskQuery().taskCandidateGroupInExpression("${currentUserGroups()}").count();
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected because currentUserGroups will return null
     }
   }
@@ -307,8 +315,8 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
     createBusinessKeyDeployment(aBusinessKey);
 
     // when
-    TaskQuery taskQuery = taskQuery()
-      .processInstanceBusinessKeyExpression("${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+    TaskQuery taskQuery = taskQuery().processInstanceBusinessKeyExpression(
+        "${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
 
     // then
     assertCount(taskQuery, 1);
@@ -322,8 +330,8 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
     createBusinessKeyDeployment(aBusinessKey);
 
     // when
-    TaskQuery taskQuery = taskQuery()
-      .processInstanceBusinessKeyLikeExpression("${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+    TaskQuery taskQuery = taskQuery().processInstanceBusinessKeyLikeExpression(
+        "${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
 
     // then
     assertCount(taskQuery, 1);
@@ -331,10 +339,7 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
 
   protected void createBusinessKeyDeployment(String aBusinessKey) {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .startEvent().userTask().endEvent().done();
 
     deployment(modelInstance);
 
@@ -349,33 +354,20 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
     Date queryDate = new DateTime(now()).minusYears(1).toDate();
     String testDateExpression = "${now()}";
 
-    TaskQueryImpl taskQuery = (TaskQueryImpl) taskQuery()
-      .taskAssignee(queryString)
-      .taskAssigneeExpression(testStringExpression)
-      .taskAssigneeLike(queryString)
-      .taskAssigneeLikeExpression(testStringExpression)
-      .taskOwnerExpression(queryString)
-      .taskOwnerExpression(expressionString)
-      .taskInvolvedUser(queryString)
-      .taskInvolvedUserExpression(expressionString)
-      .taskCreatedBefore(queryDate)
-      .taskCreatedBeforeExpression(testDateExpression)
-      .taskCreatedOn(queryDate)
-      .taskCreatedOnExpression(testDateExpression)
-      .taskCreatedAfter(queryDate)
-      .taskCreatedAfterExpression(testDateExpression)
-      .dueBefore(queryDate)
-      .dueBeforeExpression(testDateExpression)
-      .dueDate(queryDate)
-      .dueDateExpression(testDateExpression)
-      .dueAfter(queryDate)
-      .dueAfterExpression(testDateExpression)
-      .followUpBefore(queryDate)
-      .followUpBeforeExpression(testDateExpression)
-      .followUpDate(queryDate)
-      .followUpDateExpression(testDateExpression)
-      .followUpAfter(queryDate)
-      .followUpAfterExpression(testDateExpression);
+    TaskQueryImpl taskQuery = (TaskQueryImpl) taskQuery().taskAssignee(queryString)
+        .taskAssigneeExpression(testStringExpression).taskAssigneeLike(queryString)
+        .taskAssigneeLikeExpression(testStringExpression).taskOwnerExpression(queryString)
+        .taskOwnerExpression(expressionString).taskInvolvedUser(queryString)
+        .taskInvolvedUserExpression(expressionString).taskCreatedBefore(queryDate)
+        .taskCreatedBeforeExpression(testDateExpression).taskCreatedOn(queryDate)
+        .taskCreatedOnExpression(testDateExpression).taskCreatedAfter(queryDate)
+        .taskCreatedAfterExpression(testDateExpression).dueBefore(queryDate)
+        .dueBeforeExpression(testDateExpression).dueDate(queryDate)
+        .dueDateExpression(testDateExpression).dueAfter(queryDate)
+        .dueAfterExpression(testDateExpression).followUpBefore(queryDate)
+        .followUpBeforeExpression(testDateExpression).followUpDate(queryDate)
+        .followUpDateExpression(testDateExpression).followUpAfter(queryDate)
+        .followUpAfterExpression(testDateExpression);
 
     // execute query so expression will be evaluated
     taskQuery.count();
@@ -396,18 +388,16 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
 
     // candidates has to be tested separately cause they have to be set exclusively
 
-    taskQuery = (TaskQueryImpl) taskQuery()
-      .taskCandidateGroup(queryString)
-      .taskCandidateGroupExpression(testStringExpression);
+    taskQuery = (TaskQueryImpl) taskQuery().taskCandidateGroup(queryString)
+        .taskCandidateGroupExpression(testStringExpression);
 
     // execute query so expression will be evaluated
     taskQuery.count();
 
     assertEquals(expressionString, taskQuery.getCandidateGroup());
 
-    taskQuery = (TaskQueryImpl) taskQuery()
-      .taskCandidateUser(queryString)
-      .taskCandidateUserExpression(testStringExpression);
+    taskQuery = (TaskQueryImpl) taskQuery().taskCandidateUser(queryString)
+        .taskCandidateUserExpression(testStringExpression);
 
     // execute query so expression will be evaluated
     taskQuery.count();
@@ -418,9 +408,8 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
     List<String> queryList = Arrays.asList("query");
     String testGroupsExpression = "${currentUserGroups()}";
 
-    taskQuery = (TaskQueryImpl) taskQuery()
-      .taskCandidateGroupIn(queryList)
-      .taskCandidateGroupInExpression(testGroupsExpression);
+    taskQuery = (TaskQueryImpl) taskQuery().taskCandidateGroupIn(queryList)
+        .taskCandidateGroupInExpression(testGroupsExpression);
 
     // execute query so expression will be evaluated
     taskQuery.count();
@@ -437,32 +426,19 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
     String testDateExpression = "${now()}";
 
     TaskQueryImpl taskQuery = (TaskQueryImpl) taskQuery()
-      .taskAssigneeExpression(testStringExpression)
-      .taskAssignee(queryString)
-      .taskAssigneeLikeExpression(testStringExpression)
-      .taskAssigneeLike(queryString)
-      .taskOwnerExpression(expressionString)
-      .taskOwner(queryString)
-      .taskInvolvedUserExpression(expressionString)
-      .taskInvolvedUser(queryString)
-      .taskCreatedBeforeExpression(testDateExpression)
-      .taskCreatedBefore(queryDate)
-      .taskCreatedOnExpression(testDateExpression)
-      .taskCreatedOn(queryDate)
-      .taskCreatedAfterExpression(testDateExpression)
-      .taskCreatedAfter(queryDate)
-      .dueBeforeExpression(testDateExpression)
-      .dueBefore(queryDate)
-      .dueDateExpression(testDateExpression)
-      .dueDate(queryDate)
-      .dueAfterExpression(testDateExpression)
-      .dueAfter(queryDate)
-      .followUpBeforeExpression(testDateExpression)
-      .followUpBefore(queryDate)
-      .followUpDateExpression(testDateExpression)
-      .followUpDate(queryDate)
-      .followUpAfterExpression(testDateExpression)
-      .followUpAfter(queryDate);
+        .taskAssigneeExpression(testStringExpression).taskAssignee(queryString)
+        .taskAssigneeLikeExpression(testStringExpression).taskAssigneeLike(queryString)
+        .taskOwnerExpression(expressionString).taskOwner(queryString)
+        .taskInvolvedUserExpression(expressionString).taskInvolvedUser(queryString)
+        .taskCreatedBeforeExpression(testDateExpression).taskCreatedBefore(queryDate)
+        .taskCreatedOnExpression(testDateExpression).taskCreatedOn(queryDate)
+        .taskCreatedAfterExpression(testDateExpression).taskCreatedAfter(queryDate)
+        .dueBeforeExpression(testDateExpression).dueBefore(queryDate)
+        .dueDateExpression(testDateExpression).dueDate(queryDate)
+        .dueAfterExpression(testDateExpression).dueAfter(queryDate)
+        .followUpBeforeExpression(testDateExpression).followUpBefore(queryDate)
+        .followUpDateExpression(testDateExpression).followUpDate(queryDate)
+        .followUpAfterExpression(testDateExpression).followUpAfter(queryDate);
 
     // execute query so expression will be evaluated
     taskQuery.count();
@@ -483,18 +459,16 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
 
     // candidates has to be tested separately cause they have to be set exclusively
 
-    taskQuery = (TaskQueryImpl) taskQuery()
-      .taskCandidateGroupExpression(testStringExpression)
-      .taskCandidateGroup(queryString);
+    taskQuery = (TaskQueryImpl) taskQuery().taskCandidateGroupExpression(testStringExpression)
+        .taskCandidateGroup(queryString);
 
     // execute query so expression will be evaluated
     taskQuery.count();
 
     assertEquals(queryString, taskQuery.getCandidateGroup());
 
-    taskQuery = (TaskQueryImpl) taskQuery()
-      .taskCandidateUserExpression(testStringExpression)
-      .taskCandidateUser(queryString);
+    taskQuery = (TaskQueryImpl) taskQuery().taskCandidateUserExpression(testStringExpression)
+        .taskCandidateUser(queryString);
 
     // execute query so expression will be evaluated
     taskQuery.count();
@@ -505,9 +479,8 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
     List<String> queryList = Arrays.asList("query");
     String testGroupsExpression = "${currentUserGroups()}";
 
-    taskQuery = (TaskQueryImpl) taskQuery()
-      .taskCandidateGroupInExpression(testGroupsExpression)
-      .taskCandidateGroupIn(queryList);
+    taskQuery = (TaskQueryImpl) taskQuery().taskCandidateGroupInExpression(testGroupsExpression)
+        .taskCandidateGroupIn(queryList);
 
     // execute query so expression will be evaluated
     taskQuery.count();
@@ -541,17 +514,10 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
     taskService.saveTask(task4);
 
     // when
-    List<Task> tasks = taskService.createTaskQuery()
-      .taskName("taskForOr")
-      .or()
-        .followUpAfterExpression("${ now() }")
-        .taskAssigneeLikeExpression("${ 'John%' }")
-      .endOr()
-      .or()
-        .taskOwnerExpression("${ 'Luke Optim' }")
-        .dueAfterExpression("${ now() }")
-      .endOr()
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().taskName("taskForOr").or()
+        .followUpAfterExpression("${ now() }").taskAssigneeLikeExpression("${ 'John%' }").endOr()
+        .or().taskOwnerExpression("${ 'Luke Optim' }").dueAfterExpression("${ now() }").endOr()
+        .list();
 
     // then
     assertEquals(2, tasks.size());
@@ -575,7 +541,6 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
 
     identityService.clearAuthentication();
   }
-
 
   protected TaskQuery taskQuery() {
     return taskService.createTaskQuery();
@@ -637,7 +602,8 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
   /**
    * Changes the current time about the given amount in seconds.
    *
-   * @param amount the amount to adjust the current time
+   * @param amount
+   *          the amount to adjust the current time
    */
   protected void adjustTime(int amount) {
     long time = now().getTime() + amount * 1000;

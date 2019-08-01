@@ -25,26 +25,27 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
 public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
 
-  protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
+  protected Collection<? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
+    defaultCommandInterceptorsTxRequired
+        .add(new CommandContextInterceptor(commandContextFactory, this));
     return defaultCommandInterceptorsTxRequired;
   }
 
-  protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
+  protected Collection<? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this, true));
+    defaultCommandInterceptorsTxRequired
+        .add(new CommandContextInterceptor(commandContextFactory, this, true));
     return defaultCommandInterceptorsTxRequired;
   }
 

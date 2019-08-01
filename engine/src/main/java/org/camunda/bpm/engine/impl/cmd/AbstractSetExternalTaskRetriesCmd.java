@@ -51,12 +51,14 @@ public abstract class AbstractSetExternalTaskRetriesCmd<T> implements Command<T>
       collectedProcessInstanceIds.addAll(processInstanceIds);
     }
 
-    ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) builder.getProcessInstanceQuery();
+    ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) builder
+        .getProcessInstanceQuery();
     if (processInstanceQuery != null) {
       collectedProcessInstanceIds.addAll(processInstanceQuery.listIds());
     }
 
-    HistoricProcessInstanceQueryImpl historicProcessInstanceQuery = (HistoricProcessInstanceQueryImpl) builder.getHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQueryImpl historicProcessInstanceQuery = (HistoricProcessInstanceQueryImpl) builder
+        .getHistoricProcessInstanceQuery();
     if (historicProcessInstanceQuery != null) {
       collectedProcessInstanceIds.addAll(historicProcessInstanceQuery.listIds());
     }
@@ -70,11 +72,13 @@ public abstract class AbstractSetExternalTaskRetriesCmd<T> implements Command<T>
 
     List<String> externalTaskIds = builder.getExternalTaskIds();
     if (externalTaskIds != null) {
-      ensureNotContainsNull(BadUserRequestException.class, "External task id cannot be null", "externalTaskIds", externalTaskIds);
+      ensureNotContainsNull(BadUserRequestException.class, "External task id cannot be null",
+          "externalTaskIds", externalTaskIds);
       collectedIds.addAll(externalTaskIds);
     }
 
-    ExternalTaskQueryImpl externalTaskQuery = (ExternalTaskQueryImpl) builder.getExternalTaskQuery();
+    ExternalTaskQueryImpl externalTaskQuery = (ExternalTaskQueryImpl) builder
+        .getExternalTaskQuery();
     if (externalTaskQuery != null) {
       collectedIds.addAll(externalTaskQuery.listIds());
     }
@@ -86,7 +90,8 @@ public abstract class AbstractSetExternalTaskRetriesCmd<T> implements Command<T>
 
         public Void call() throws Exception {
           ExternalTaskQueryImpl query = new ExternalTaskQueryImpl();
-          query.processInstanceIdIn(collectedProcessInstanceIds.toArray(new String[collectedProcessInstanceIds.size()]));
+          query.processInstanceIdIn(
+              collectedProcessInstanceIds.toArray(new String[collectedProcessInstanceIds.size()]));
           collectedIds.addAll(query.listIds());
           return null;
         }
@@ -97,7 +102,8 @@ public abstract class AbstractSetExternalTaskRetriesCmd<T> implements Command<T>
     return new ArrayList<String>(collectedIds);
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext, int retries, int numInstances, boolean async) {
+  protected void writeUserOperationLog(CommandContext commandContext, int retries, int numInstances,
+      boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));

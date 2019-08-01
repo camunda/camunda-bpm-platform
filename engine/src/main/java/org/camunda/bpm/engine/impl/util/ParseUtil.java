@@ -37,6 +37,7 @@ public class ParseUtil {
 
   /**
    * Parse History Time To Live in ISO-8601 format to integer and set into the given entity
+   * 
    * @param historyTimeToLive
    */
   public static Integer parseHistoryTimeToLive(String historyTimeToLive) {
@@ -63,8 +64,7 @@ public class ParseUtil {
     if (text != null && !text.isEmpty()) {
       try {
         result = Integer.parseInt(text);
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ProcessEngineException("Cannot parse " + attributeName + ": " + e.getMessage());
       }
     }
@@ -77,7 +77,8 @@ public class ParseUtil {
     if (retryIntervals != null && !retryIntervals.isEmpty()) {
 
       if (StringUtil.isExpression(retryIntervals)) {
-        ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
+        ExpressionManager expressionManager = Context.getProcessEngineConfiguration()
+            .getExpressionManager();
         Expression expression = expressionManager.createExpression(retryIntervals);
         return new FailedJobRetryConfiguration(expression);
       }

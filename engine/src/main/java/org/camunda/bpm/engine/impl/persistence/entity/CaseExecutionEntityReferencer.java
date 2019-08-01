@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariableSto
  * @author Thorben Lindhauer
  *
  */
-public class CaseExecutionEntityReferencer implements VariableStoreObserver<VariableInstanceEntity> {
+public class CaseExecutionEntityReferencer
+    implements VariableStoreObserver<VariableInstanceEntity> {
 
   protected CaseExecutionEntity caseExecution;
 

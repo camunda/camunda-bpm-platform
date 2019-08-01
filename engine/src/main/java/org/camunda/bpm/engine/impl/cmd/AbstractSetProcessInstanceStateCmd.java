@@ -51,7 +51,8 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
   protected String processDefinitionTenantId;
   protected boolean isProcessDefinitionTenantIdSet = false;
 
-  public AbstractSetProcessInstanceStateCmd(UpdateProcessInstanceSuspensionStateBuilderImpl builder) {
+  public AbstractSetProcessInstanceStateCmd(
+      UpdateProcessInstanceSuspensionStateBuilderImpl builder) {
     super(true, null);
 
     this.processInstanceId = builder.getProcessInstanceId();
@@ -63,15 +64,17 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
 
   @Override
   protected void checkParameters(CommandContext commandContext) {
-    if(processInstanceId == null && processDefinitionId == null && processDefinitionKey == null) {
-      throw new ProcessEngineException("ProcessInstanceId, ProcessDefinitionId nor ProcessDefinitionKey cannot be null.");
+    if (processInstanceId == null && processDefinitionId == null && processDefinitionKey == null) {
+      throw new ProcessEngineException(
+          "ProcessInstanceId, ProcessDefinitionId nor ProcessDefinitionKey cannot be null.");
     }
   }
 
   @Override
   protected void checkAuthorization(CommandContext commandContext) {
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       if (processInstanceId != null) {
         checker.checkUpdateProcessInstanceSuspensionStateById(processInstanceId);
       } else
@@ -81,61 +84,77 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
       } else
 
       if (processDefinitionKey != null) {
-        checker.checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(processDefinitionKey);
+        checker
+            .checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(processDefinitionKey);
       }
     }
   }
 
   @Override
-  protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
+  protected void updateSuspensionState(CommandContext commandContext,
+      SuspensionState suspensionState) {
     ExecutionManager executionManager = commandContext.getExecutionManager();
     TaskManager taskManager = commandContext.getTaskManager();
     ExternalTaskManager externalTaskManager = commandContext.getExternalTaskManager();
 
     if (processInstanceId != null) {
-      executionManager.updateExecutionSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
+      executionManager.updateExecutionSuspensionStateByProcessInstanceId(processInstanceId,
+          suspensionState);
       taskManager.updateTaskSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
-      externalTaskManager.updateExternalTaskSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionStateByProcessInstanceId(processInstanceId,
+          suspensionState);
 
     } else if (processDefinitionId != null) {
-      executionManager.updateExecutionSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
-      taskManager.updateTaskSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
-      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
+      executionManager.updateExecutionSuspensionStateByProcessDefinitionId(processDefinitionId,
+          suspensionState);
+      taskManager.updateTaskSuspensionStateByProcessDefinitionId(processDefinitionId,
+          suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionId(
+          processDefinitionId, suspensionState);
 
     } else if (isProcessDefinitionTenantIdSet) {
-      executionManager.updateExecutionSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
-      taskManager.updateTaskSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
-      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
+      executionManager.updateExecutionSuspensionStateByProcessDefinitionKeyAndTenantId(
+          processDefinitionKey, processDefinitionTenantId, suspensionState);
+      taskManager.updateTaskSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey,
+          processDefinitionTenantId, suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionKeyAndTenantId(
+          processDefinitionKey, processDefinitionTenantId, suspensionState);
 
     } else {
-      executionManager.updateExecutionSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
-      taskManager.updateTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
-      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+      executionManager.updateExecutionSuspensionStateByProcessDefinitionKey(processDefinitionKey,
+          suspensionState);
+      taskManager.updateTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey,
+          suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionKey(
+          processDefinitionKey, suspensionState);
     }
   }
 
   @Override
-  protected void triggerHistoryEvent(CommandContext commandContext){
+  protected void triggerHistoryEvent(CommandContext commandContext) {
     HistoryLevel historyLevel = commandContext.getProcessEngineConfiguration().getHistoryLevel();
     List<ProcessInstance> updatedProcessInstances = obtainProcessInstances(commandContext);
-    //suspension state is not updated synchronously
+    // suspension state is not updated synchronously
     if (getNewSuspensionState() != null && updatedProcessInstances != null) {
-      for (final ProcessInstance processInstance: updatedProcessInstances) {
+      for (final ProcessInstance processInstance : updatedProcessInstances) {
 
-        if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, processInstance)) {
-          HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
-            @Override
-            public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
-              HistoricProcessInstanceEventEntity processInstanceUpdateEvt = (HistoricProcessInstanceEventEntity)
-                  producer.createProcessInstanceUpdateEvt((DelegateExecution) processInstance);
-              if (SuspensionState.SUSPENDED.getStateCode() == getNewSuspensionState().getStateCode()) {
-                processInstanceUpdateEvt.setState(HistoricProcessInstance.STATE_SUSPENDED);
-              } else {
-                processInstanceUpdateEvt.setState(HistoricProcessInstance.STATE_ACTIVE);
-              }
-              return processInstanceUpdateEvt;
-            }
-          });
+        if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE,
+            processInstance)) {
+          HistoryEventProcessor
+              .processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+                @Override
+                public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+                  HistoricProcessInstanceEventEntity processInstanceUpdateEvt = (HistoricProcessInstanceEventEntity) producer
+                      .createProcessInstanceUpdateEvt((DelegateExecution) processInstance);
+                  if (SuspensionState.SUSPENDED.getStateCode() == getNewSuspensionState()
+                      .getStateCode()) {
+                    processInstanceUpdateEvt.setState(HistoricProcessInstance.STATE_SUSPENDED);
+                  } else {
+                    processInstanceUpdateEvt.setState(HistoricProcessInstance.STATE_ACTIVE);
+                  }
+                  return processInstanceUpdateEvt;
+                }
+              });
         }
       }
     }
@@ -158,16 +177,18 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
       query.processDefinitionKey(processDefinitionKey);
     }
     List<ProcessInstance> result = new ArrayList<ProcessInstance>();
-    result.addAll(commandContext.getExecutionManager().findProcessInstancesByQueryCriteria(query,null));
+    result.addAll(
+        commandContext.getExecutionManager().findProcessInstancesByQueryCriteria(query, null));
     return result;
   }
 
   @Override
   protected void logUserOperation(CommandContext commandContext) {
-    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
-    commandContext.getOperationLogManager()
-      .logProcessInstanceOperation(getLogEntryOperation(), processInstanceId, processDefinitionId,
-        processDefinitionKey, Collections.singletonList(propertyChange));
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null,
+        getNewSuspensionState().getName());
+    commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(),
+        processInstanceId, processDefinitionId, processDefinitionKey,
+        Collections.singletonList(propertyChange));
   }
 
   protected UpdateJobSuspensionStateBuilderImpl createJobCommandBuilder() {
@@ -199,6 +220,7 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
     return getNextCommand(jobCommandBuilder);
   }
 
-  protected abstract AbstractSetJobStateCmd getNextCommand(UpdateJobSuspensionStateBuilderImpl jobCommandBuilder);
+  protected abstract AbstractSetJobStateCmd getNextCommand(
+      UpdateJobSuspensionStateBuilderImpl jobCommandBuilder);
 
 }

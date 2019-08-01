@@ -32,20 +32,10 @@ import junit.framework.TestCase;
 public class PvmTest extends TestCase {
 
   public void testPvmWaitState() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("a")
-        .initial()
-        .behavior(new WaitState())
-        .transition("b")
-      .endActivity()
-      .createActivity("b")
-        .behavior(new WaitState())
-        .transition("c")
-      .endActivity()
-      .createActivity("c")
-        .behavior(new WaitState())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("a")
+        .initial().behavior(new WaitState()).transition("b").endActivity().createActivity("b")
+        .behavior(new WaitState()).transition("c").endActivity().createActivity("c")
+        .behavior(new WaitState()).endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -65,20 +55,10 @@ public class PvmTest extends TestCase {
   }
 
   public void testPvmAutomatic() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("a")
-        .initial()
-        .behavior(new Automatic())
-        .transition("b")
-      .endActivity()
-      .createActivity("b")
-        .behavior(new Automatic())
-        .transition("c")
-      .endActivity()
-        .createActivity("c")
-        .behavior(new WaitState())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("a")
+        .initial().behavior(new Automatic()).transition("b").endActivity().createActivity("b")
+        .behavior(new Automatic()).transition("c").endActivity().createActivity("c")
+        .behavior(new WaitState()).endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -87,28 +67,13 @@ public class PvmTest extends TestCase {
   }
 
   public void testPvmDecision() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("checkCredit")
-      .endActivity()
-      .createActivity("checkCredit")
-        .behavior(new Decision())
-        .transition("askDaughterOut", "wow")
-        .transition("takeToGolf", "nice")
-        .transition("ignore", "default")
-      .endActivity()
-      .createActivity("takeToGolf")
-        .behavior(new WaitState())
-      .endActivity()
-      .createActivity("askDaughterOut")
-        .behavior(new WaitState())
-      .endActivity()
-      .createActivity("ignore")
-        .behavior(new WaitState())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("checkCredit").endActivity()
+        .createActivity("checkCredit").behavior(new Decision()).transition("askDaughterOut", "wow")
+        .transition("takeToGolf", "nice").transition("ignore", "default").endActivity()
+        .createActivity("takeToGolf").behavior(new WaitState()).endActivity()
+        .createActivity("askDaughterOut").behavior(new WaitState()).endActivity()
+        .createActivity("ignore").behavior(new WaitState()).endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.setVariable("creditRating", "Aaa-");

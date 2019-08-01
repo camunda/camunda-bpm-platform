@@ -41,19 +41,15 @@ import org.junit.rules.RuleChain;
  */
 public class DelegateExecutionContextTest {
 
-  protected static final BpmnModelInstance DELEGATION_PROCESS = Bpmn.createExecutableProcess("process1")
-          .startEvent()
-          .serviceTask("serviceTask1")
-            .camundaClass(DelegateClass.class.getName())
-          .endEvent()
-          .done();
+  protected static final BpmnModelInstance DELEGATION_PROCESS = Bpmn
+      .createExecutableProcess("process1").startEvent().serviceTask("serviceTask1")
+      .camundaClass(DelegateClass.class.getName()).endEvent().done();
 
-
-  protected static final BpmnModelInstance EXEUCTION_LISTENER_PROCESS = Bpmn.createExecutableProcess("process2")
-          .startEvent()
-            .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, ExecutionListenerImpl.class.getName())
-          .endEvent()
-          .done();
+  protected static final BpmnModelInstance EXEUCTION_LISTENER_PROCESS = Bpmn
+      .createExecutableProcess("process2").startEvent()
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START,
+          ExecutionListenerImpl.class.getName())
+      .endEvent().done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
@@ -66,22 +62,22 @@ public class DelegateExecutionContextTest {
     // given
     ProcessDefinition definition = testHelper.deployAndGetDefinition(DELEGATION_PROCESS);
     // a process instance with a service task and a java delegate
-    ProcessInstance instance = engineRule.getRuntimeService().startProcessInstanceById(definition.getId());
+    ProcessInstance instance = engineRule.getRuntimeService()
+        .startProcessInstanceById(definition.getId());
 
-    //then delegation execution context is no more available
+    // then delegation execution context is no more available
     DelegateExecution execution = DelegateExecutionContext.getCurrentDelegationExecution();
     assertNull(execution);
   }
 
-
   @Test
   public void testDelegateExecutionContextWithExecutionListener() {
-    //given
+    // given
     ProcessDefinition definition = testHelper.deployAndGetDefinition(EXEUCTION_LISTENER_PROCESS);
     // a process instance with a service task and an execution listener
     engineRule.getRuntimeService().startProcessInstanceById(definition.getId());
 
-    //then delegation execution context is no more available
+    // then delegation execution context is no more available
     DelegateExecution execution = DelegateExecutionContext.getCurrentDelegationExecution();
     assertNull(execution);
   }
@@ -103,7 +99,7 @@ public class DelegateExecutionContextTest {
   }
 
   protected static void checkDelegationContext(DelegateExecution execution) {
-    //then delegation execution context is available
+    // then delegation execution context is available
     assertNotNull(DelegateExecutionContext.getCurrentDelegationExecution());
     assertEquals(DelegateExecutionContext.getCurrentDelegationExecution(), execution);
   }

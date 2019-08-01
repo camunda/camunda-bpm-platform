@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +51,8 @@ public class JobAcquisitionBackoffIdleTest {
   protected ThreadControl acquisitionThread;
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       jobExecutor = new ControllableJobExecutor(true);
       jobExecutor.setMaxJobsPerAcquisition(1);
       jobExecutor.setWaitTimeInMillis(BASE_IDLE_WAIT_TIME);
@@ -139,11 +139,11 @@ public class JobAcquisitionBackoffIdleTest {
     jobExecutor.start();
     acquisitionThread.waitForSync();
 
-    //cycle acquistion till max idle time is reached
+    // cycle acquistion till max idle time is reached
     cycleJobAcquisitionToMaxIdleTime();
   }
 
-  protected  void cycleAcquisitionAndAssertAfterJobExecution(JobQuery jobQuery) {
+  protected void cycleAcquisitionAndAssertAfterJobExecution(JobQuery jobQuery) {
     // another cycle of job acquisition after acuqisition idle was reseted
     // => 1 jobs are acquired
     triggerReconfigurationAndNextCycle();
@@ -154,7 +154,8 @@ public class JobAcquisitionBackoffIdleTest {
 
     // and we are in the second state
     assertEquals(1L, engineRule.getTaskService().createTaskQuery().count());
-    Task task = engineRule.getTaskService().createTaskQuery().orderByTaskName().desc().singleResult();
+    Task task = engineRule.getTaskService().createTaskQuery().orderByTaskName().desc()
+        .singleResult();
     assertEquals("Next Task", task.getName());
     // complete the task and end the execution
     engineRule.getTaskService().complete(task.getId());
@@ -171,24 +172,24 @@ public class JobAcquisitionBackoffIdleTest {
     final Date startTime = new Date();
     ProcessInstance procInstance = jobCreationInCycle.createJobAndContinueCycle();
 
-     // After process start, there should be 1 timer created
+    // After process start, there should be 1 timer created
     Task task1 = engineRule.getTaskService().createTaskQuery().singleResult();
     assertEquals("Timer Task", task1.getName());
-    //and one job
-    JobQuery jobQuery = engineRule.getManagementService().createJobQuery().processInstanceId(
-            procInstance.getId());
+    // and one job
+    JobQuery jobQuery = engineRule.getManagementService().createJobQuery()
+        .processInstanceId(procInstance.getId());
     Job job = jobQuery.singleResult();
     assertNotNull(job);
 
     // the hint of the added job resets the idle time
     // => 0 jobs are acquired so we had to wait BASE IDLE TIME
-    //after this time we can acquire the timer
+    // after this time we can acquire the timer
     triggerReconfigurationAndNextCycle();
     assertJobExecutorWaitEvent(BASE_IDLE_WAIT_TIME);
 
-    //time is increased so timer is found
+    // time is increased so timer is found
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + BASE_IDLE_WAIT_TIME));
-    //now we are able to acquire the job
+    // now we are able to acquire the job
     cycleAcquisitionAndAssertAfterJobExecution(jobQuery);
   }
 
@@ -198,19 +199,20 @@ public class JobAcquisitionBackoffIdleTest {
     testIdlingWithHint(new JobCreationInCycle() {
       @Override
       public ProcessInstance createJobAndContinueCycle() {
-        //continue sync before acquire
+        // continue sync before acquire
         acquisitionThread.makeContinueAndWaitForSync();
-        //continue sync after acquire
+        // continue sync after acquire
         acquisitionThread.makeContinueAndWaitForSync();
 
-        //process is started with timer boundary event which should start after 3 seconds
-        ProcessInstance procInstance = engineRule.getRuntimeService().startProcessInstanceByKey("timer-example");
-        //release suspend sync
+        // process is started with timer boundary event which should start after 3 seconds
+        ProcessInstance procInstance = engineRule.getRuntimeService()
+            .startProcessInstanceByKey("timer-example");
+        // release suspend sync
         acquisitionThread.makeContinueAndWaitForSync();
-        //assert max idle time and clear events
+        // assert max idle time and clear events
         assertJobExecutorWaitEvent(MAX_IDLE_WAIT_TIME);
 
-        //trigger continue and assert that new acquisition cycle was triggered right after the hint
+        // trigger continue and assert that new acquisition cycle was triggered right after the hint
         triggerReconfigurationAndNextCycle();
         assertJobExecutorWaitEvent(0);
         return procInstance;
@@ -224,23 +226,23 @@ public class JobAcquisitionBackoffIdleTest {
     testIdlingWithHint(new JobCreationInCycle() {
       @Override
       public ProcessInstance createJobAndContinueCycle() {
-        //continue sync before acquire
+        // continue sync before acquire
         acquisitionThread.makeContinueAndWaitForSync();
 
-        //process is started with timer boundary event which should start after 3 seconds
-        ProcessInstance procInstance = engineRule.getRuntimeService().startProcessInstanceByKey("timer-example");
+        // process is started with timer boundary event which should start after 3 seconds
+        ProcessInstance procInstance = engineRule.getRuntimeService()
+            .startProcessInstanceByKey("timer-example");
 
-        //continue sync after acquire
+        // continue sync after acquire
         acquisitionThread.makeContinueAndWaitForSync();
-        //release suspend sync
+        // release suspend sync
         acquisitionThread.makeContinueAndWaitForSync();
-        //assert max idle time and clear events
+        // assert max idle time and clear events
         assertJobExecutorWaitEvent(0);
         return procInstance;
       }
     });
   }
-
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/JobAcquisitionBackoffIdleTest.testShortTimerOnUserTaskWithExpression.bpmn20.xml")
@@ -248,16 +250,17 @@ public class JobAcquisitionBackoffIdleTest {
     testIdlingWithHint(new JobCreationInCycle() {
       @Override
       public ProcessInstance createJobAndContinueCycle() {
-        //process is started with timer boundary event which should start after 3 seconds
-        ProcessInstance procInstance = engineRule.getRuntimeService().startProcessInstanceByKey("timer-example");
+        // process is started with timer boundary event which should start after 3 seconds
+        ProcessInstance procInstance = engineRule.getRuntimeService()
+            .startProcessInstanceByKey("timer-example");
 
-        //continue sync before acquire
+        // continue sync before acquire
         acquisitionThread.makeContinueAndWaitForSync();
-        //continue sync after acquire
+        // continue sync after acquire
         acquisitionThread.makeContinueAndWaitForSync();
-        //release suspend sync
+        // release suspend sync
         acquisitionThread.makeContinueAndWaitForSync();
-        //assert max idle time and clear events
+        // assert max idle time and clear events
         assertJobExecutorWaitEvent(0);
         return procInstance;
       }

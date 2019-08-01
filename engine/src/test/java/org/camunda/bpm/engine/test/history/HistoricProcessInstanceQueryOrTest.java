@@ -81,10 +81,7 @@ public class HistoricProcessInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set endOr() before or()");
 
-    historyService.createHistoricProcessInstanceQuery()
-      .or()
-      .endOr()
-      .endOr();
+    historyService.createHistoricProcessInstanceQuery().or().endOr().endOr();
   }
 
   @Test
@@ -92,13 +89,7 @@ public class HistoricProcessInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set or() within 'or' query");
 
-    historyService.createHistoricProcessInstanceQuery()
-      .or()
-        .or()
-        .endOr()
-      .endOr()
-      .or()
-      .endOr();
+    historyService.createHistoricProcessInstanceQuery().or().or().endOr().endOr().or().endOr();
   }
 
   @Test
@@ -107,13 +98,11 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
 
     // when
-    historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .orderByProcessInstanceId()
-        .endOr();
+    historyService.createHistoricProcessInstanceQuery().or().orderByProcessInstanceId().endOr();
   }
 
   @Test
@@ -122,13 +111,11 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
 
     // when
-    historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .orderByProcessDefinitionId()
-        .endOr();
+    historyService.createHistoricProcessInstanceQuery().or().orderByProcessDefinitionId().endOr();
   }
 
   @Test
@@ -137,13 +124,11 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
 
     // when
-    historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .orderByProcessDefinitionKey()
-        .endOr();
+    historyService.createHistoricProcessInstanceQuery().or().orderByProcessDefinitionKey().endOr();
   }
 
   @Test
@@ -155,10 +140,7 @@ public class HistoricProcessInstanceQueryOrTest {
     thrown.expectMessage("Invalid query usage: cannot set orderByTenantId() within 'or' query");
 
     // when
-    historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .orderByTenantId()
-        .endOr();
+    historyService.createHistoricProcessInstanceQuery().or().orderByTenantId().endOr();
   }
 
   @Test
@@ -167,12 +149,11 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceDuration() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessInstanceDuration() within 'or' query");
 
     // when
-    historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .orderByProcessInstanceDuration()
+    historyService.createHistoricProcessInstanceQuery().or().orderByProcessInstanceDuration()
         .endOr();
   }
 
@@ -182,12 +163,11 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceStartTime() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessInstanceStartTime() within 'or' query");
 
     // when
-    historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .orderByProcessInstanceStartTime()
+    historyService.createHistoricProcessInstanceQuery().or().orderByProcessInstanceStartTime()
         .endOr();
   }
 
@@ -197,12 +177,11 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceEndTime() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessInstanceEndTime() within 'or' query");
 
     // then
-    historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .orderByProcessInstanceEndTime()
+    historyService.createHistoricProcessInstanceQuery().or().orderByProcessInstanceEndTime()
         .endOr();
   }
 
@@ -212,12 +191,11 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceBusinessKey() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessInstanceBusinessKey() within 'or' query");
 
     // then
-    historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .orderByProcessInstanceBusinessKey()
+    historyService.createHistoricProcessInstanceQuery().or().orderByProcessInstanceBusinessKey()
         .endOr();
   }
 
@@ -227,13 +205,11 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionName() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessDefinitionName() within 'or' query");
 
     // then
-    historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .orderByProcessDefinitionName()
-        .endOr();
+    historyService.createHistoricProcessInstanceQuery().or().orderByProcessDefinitionName().endOr();
   }
 
   @Test
@@ -242,17 +218,16 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionVersion() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessDefinitionVersion() within 'or' query");
 
     // then
-    historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .orderByProcessDefinitionVersion()
+    historyService.createHistoricProcessInstanceQuery().or().orderByProcessDefinitionVersion()
         .endOr();
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnHistoricProcInstWithEmptyOrQuery() {
     // given
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -262,17 +237,15 @@ public class HistoricProcessInstanceQueryOrTest {
     runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
 
     // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-      .or()
-      .endOr()
-      .list();
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().or().endOr().list();
 
     // then
     assertEquals(2, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnHistoricProcInstWithVarValue1OrVarValue2() {
     // given
     Map<String, Object> vars = new HashMap<String, Object>();
@@ -284,59 +257,57 @@ public class HistoricProcessInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
     // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-      .or()
-        .variableValueEquals("stringVar", "abcdef")
-        .variableValueEquals("stringVar", "ghijkl")
-      .endOr()
-      .list();
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().or().variableValueEquals("stringVar", "abcdef")
+        .variableValueEquals("stringVar", "ghijkl").endOr().list();
 
     // then
     assertEquals(2, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnHistoricProcInstWithMultipleOrCriteria() {
     // given
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("stringVar", "abcdef");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        vars);
     runtimeService.setVariable(processInstance2.getProcessInstanceId(), "aVarName", "varValue");
 
     vars = new HashMap<>();
     vars.put("stringVar2", "aaabbbaaa");
-    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        vars);
     runtimeService.setVariable(processInstance3.getProcessInstanceId(), "bVarName", "bTestb");
 
     vars = new HashMap<>();
     vars.put("stringVar2", "cccbbbccc");
-    ProcessInstance processInstance4 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance4 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        vars);
     runtimeService.setVariable(processInstance4.getProcessInstanceId(), "bVarName", "aTesta");
 
     // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-      .or()
-        .variableValueEquals("stringVar", "abcdef")
-        .variableValueLike("stringVar2", "%bbb%")
-        .processInstanceId(processInstance1.getId())
-      .endOr()
-      .list();
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().or().variableValueEquals("stringVar", "abcdef")
+        .variableValueLike("stringVar2", "%bbb%").processInstanceId(processInstance1.getId())
+        .endOr().list();
 
     // then
     assertEquals(4, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnHistoricProcInstFilteredByMultipleOrAndCriteria() {
     // given
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("stringVar", "abcdef");
     vars.put("longVar", 12345L);
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        vars);
 
     vars = new HashMap<>();
     vars.put("stringVar", "ghijkl");
@@ -354,20 +325,17 @@ public class HistoricProcessInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
     // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-      .or()
-        .variableValueEquals("longVar", 56789L)
-        .processInstanceId(processInstance1.getId())
-      .endOr()
-      .variableValueEquals("stringVar", "abcdef")
-      .list();
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().or().variableValueEquals("longVar", 56789L)
+        .processInstanceId(processInstance1.getId()).endOr()
+        .variableValueEquals("stringVar", "abcdef").list();
 
     // then
     assertEquals(2, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnHistoricProcInstFilteredByMultipleOrQueries() {
     // given
     Map<String, Object> vars = new HashMap<>();
@@ -407,32 +375,20 @@ public class HistoricProcessInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
     // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-      .or()
-        .variableValueEquals("stringVar", "abcdef")
-        .variableValueEquals("longVar", 12345L)
-      .endOr()
-      .or()
-        .variableValueEquals("boolVar", true)
-        .variableValueEquals("longVar", 12345L)
-      .endOr()
-      .or()
-        .variableValueEquals("stringVar", "ghijkl")
-        .variableValueEquals("longVar", 56789L)
-      .endOr()
-      .or()
-        .variableValueEquals("stringVar", "ghijkl")
-        .variableValueEquals("boolVar", false)
-        .variableValueEquals("longVar", 56789L)
-      .endOr()
-      .list();
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().or().variableValueEquals("stringVar", "abcdef")
+        .variableValueEquals("longVar", 12345L).endOr().or().variableValueEquals("boolVar", true)
+        .variableValueEquals("longVar", 12345L).endOr().or()
+        .variableValueEquals("stringVar", "ghijkl").variableValueEquals("longVar", 56789L).endOr()
+        .or().variableValueEquals("stringVar", "ghijkl").variableValueEquals("boolVar", false)
+        .variableValueEquals("longVar", 56789L).endOr().list();
 
     // then
     assertEquals(2, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnHistoricProcInstWhereSameCriterionWasAppliedThreeTimesInOneQuery() {
     // given
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -440,20 +396,17 @@ public class HistoricProcessInstanceQueryOrTest {
     ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-      .or()
-        .processInstanceId(processInstance1.getId())
-        .processInstanceId(processInstance2.getId())
-        .processInstanceId(processInstance3.getId())
-      .endOr()
-      .list();
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().or().processInstanceId(processInstance1.getId())
+        .processInstanceId(processInstance2.getId()).processInstanceId(processInstance3.getId())
+        .endOr().list();
 
     // then
     assertEquals(1, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnHistoricProcInstWithVariableValueEqualsOrVariableValueGreaterThan() {
     // given
     Map<String, Object> vars = new HashMap<>();
@@ -469,11 +422,9 @@ public class HistoricProcessInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
     // when
-    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
-      .or()
-        .variableValueEquals("longVar", 12345L)
-        .variableValueGreaterThan("longerVar", 20000L)
-      .endOr();
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().or()
+        .variableValueEquals("longVar", 12345L).variableValueGreaterThan("longerVar", 20000L)
+        .endOr();
 
     // then
     assertEquals(3, query.count());
@@ -483,45 +434,32 @@ public class HistoricProcessInstanceQueryOrTest {
   public void shouldReturnHistoricProcInstWithProcessDefinitionNameOrProcessDefinitionKey() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .name("process1")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .name("process1").startEvent().userTask().endEvent().done();
 
-    String deploymentId = repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy()
-      .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("aProcessDefinition");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("aProcessDefinition");
 
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+    BpmnModelInstance anotherProcessDefinition = Bpmn
+        .createExecutableProcess("anotherProcessDefinition").startEvent().userTask().endEvent()
+        .done();
 
-    deploymentId = repositoryService
-       .createDeployment()
-       .addModelInstance("foo.bpmn", anotherProcessDefinition)
-       .deploy()
-       .getId();
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", anotherProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
     runtimeService.startProcessInstanceByKey("anotherProcessDefinition");
 
     // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-      .or()
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().or()
         .processDefinitionId(processInstance1.getProcessDefinitionId())
-        .processDefinitionKey("anotherProcessDefinition")
-      .endOr()
-      .list();
+        .processDefinitionKey("anotherProcessDefinition").endOr().list();
 
     // then
     assertEquals(2, processInstances.size());
@@ -531,44 +469,30 @@ public class HistoricProcessInstanceQueryOrTest {
   public void shouldReturnHistoricProcInstWithBusinessKeyOrBusinessKeyLike() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .startEvent().userTask().endEvent().done();
 
-    String deploymentId = repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy()
-      .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
     runtimeService.startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
 
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+    BpmnModelInstance anotherProcessDefinition = Bpmn
+        .createExecutableProcess("anotherProcessDefinition").startEvent().userTask().endEvent()
+        .done();
 
-     deploymentId = repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", anotherProcessDefinition)
-      .deploy()
-      .getId();
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", anotherProcessDefinition).deploy().getId();
 
-     deploymentIds.add(deploymentId);
+    deploymentIds.add(deploymentId);
 
     runtimeService.startProcessInstanceByKey("anotherProcessDefinition", "anotherBusinessKey");
 
     // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-      .or()
-        .processInstanceBusinessKey("aBusinessKey")
-        .processInstanceBusinessKeyLike("anotherBusinessKey")
-      .endOr()
-      .list();
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().or().processInstanceBusinessKey("aBusinessKey")
+        .processInstanceBusinessKeyLike("anotherBusinessKey").endOr().list();
 
     // then
     assertEquals(2, processInstances.size());
@@ -578,35 +502,26 @@ public class HistoricProcessInstanceQueryOrTest {
   public void shouldReturnHistoricProcInstWithActivityIdInOrProcInstId() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .startEvent().userTask().endEvent().done();
 
-    String deploymentId = repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy()
-      .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
     ProcessInstance processInstance1 = runtimeService
-      .startProcessInstanceByKey("aProcessDefinition");
+        .startProcessInstanceByKey("aProcessDefinition");
 
     String activityInstanceId = runtimeService.getActivityInstance(processInstance1.getId())
-      .getChildActivityInstances()[0].getActivityId();
+        .getChildActivityInstances()[0].getActivityId();
 
     ProcessInstance processInstance2 = runtimeService
-      .startProcessInstanceByKey("aProcessDefinition");
+        .startProcessInstanceByKey("aProcessDefinition");
 
     // when
-    List<HistoricProcessInstance> tasks = historyService.createHistoricProcessInstanceQuery()
-      .or()
-        .activeActivityIdIn(activityInstanceId)
-        .processInstanceId(processInstance2.getId())
-      .endOr()
-      .list();
+    List<HistoricProcessInstance> tasks = historyService.createHistoricProcessInstanceQuery().or()
+        .activeActivityIdIn(activityInstanceId).processInstanceId(processInstance2.getId()).endOr()
+        .list();
 
     // then
     assertEquals(2, tasks.size());
@@ -616,18 +531,12 @@ public class HistoricProcessInstanceQueryOrTest {
   public void shouldReturnHistoricProcInstByVariableAndActiveProcesses() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("oneTaskProcess")
-        .startEvent()
-          .userTask("testQuerySuspensionStateTask")
-        .endEvent()
-        .done();
+        .startEvent().userTask("testQuerySuspensionStateTask").endEvent().done();
 
-      String deploymentId = repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", aProcessDefinition)
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
-      deploymentIds.add(deploymentId);
+    deploymentIds.add(deploymentId);
 
     // start two process instance and leave them active
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -636,46 +545,41 @@ public class HistoricProcessInstanceQueryOrTest {
     // start one process instance and suspend it
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("foo", 0);
-    ProcessInstance suspendedProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    ProcessInstance suspendedProcessInstance = runtimeService
+        .startProcessInstanceByKey("oneTaskProcess", variables);
     runtimeService.suspendProcessInstanceById(suspendedProcessInstance.getProcessInstanceId());
 
     // assume
-    assertEquals(2, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").active().count());
-    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").suspended().count());
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey("oneTaskProcess").active().count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey("oneTaskProcess").suspended().count());
 
     // then
-    assertEquals(3, historyService.createHistoricProcessInstanceQuery().or().active().variableValueEquals("foo", 0).endOr().list().size());
+    assertEquals(3, historyService.createHistoricProcessInstanceQuery().or().active()
+        .variableValueEquals("foo", 0).endOr().list().size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnByProcessDefinitionKeyOrActivityId() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("process")
-        .startEvent()
-          .userTask("aUserTask")
-        .endEvent()
-        .done();
+    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("aUserTask").endEvent().done();
 
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", aProcessDefinition)
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .activeActivityIdIn("theTask")
-          .processDefinitionKey("process")
-        .endOr()
-        .list();
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().or().activeActivityIdIn("theTask")
+        .processDefinitionKey("process").endOr().list();
 
     // then
     assertThat(processInstances.size()).isEqualTo(2);
@@ -683,23 +587,17 @@ public class HistoricProcessInstanceQueryOrTest {
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnByProcessDefinitionIdOrIncidentType() {
     // given
     String processDefinitionId = runtimeService.startProcessInstanceByKey("oneTaskProcess")
         .getProcessDefinitionId();
 
-    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("process")
-        .startEvent().camundaAsyncBefore()
-          .userTask("aUserTask")
-        .endEvent()
-        .done();
+    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .camundaAsyncBefore().userTask("aUserTask").endEvent().done();
 
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", aProcessDefinition)
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
@@ -710,12 +608,9 @@ public class HistoricProcessInstanceQueryOrTest {
     managementService.setJobRetries(jobId, 0);
 
     // when
-    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
-        .or()
-          .incidentType("failedJob")
-          .processDefinitionId(processDefinitionId)
-        .endOr()
-        .list();
+    List<HistoricProcessInstance> processInstances = historyService
+        .createHistoricProcessInstanceQuery().or().incidentType("failedJob")
+        .processDefinitionId(processDefinitionId).endOr().list();
 
     // then
     assertThat(processInstances.size()).isEqualTo(2);

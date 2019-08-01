@@ -40,8 +40,8 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
- * Please note that if you want to reuse Rule and other fields you should create abstract class
- * and pack it there.
+ * Please note that if you want to reuse Rule and other fields you should create abstract class and
+ * pack it there.
  *
  * @see HandleExternalTaskAuthorizationTest
  *
@@ -65,28 +65,23 @@ public class GetErrorDetailsAuthorizationTest {
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-        scenario()
-            .withoutAuthorizations()
-            .failsDueToRequired(
-                grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.READ),
-                grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.READ_INSTANCE)),
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.READ),
+            grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId",
+                Permissions.READ_INSTANCE)),
         scenario()
             .withAuthorizations(
                 grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.READ))
             .succeeds(),
         scenario()
-            .withAuthorizations(
-                grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.READ))
+            .withAuthorizations(grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.READ))
             .succeeds(),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.READ_INSTANCE))
-            .succeeds(),
+        scenario().withAuthorizations(grant(Resources.PROCESS_DEFINITION, "processDefinitionKey",
+            "userId", Permissions.READ_INSTANCE)).succeeds(),
         scenario()
             .withAuthorizations(
                 grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.READ_INSTANCE))
-            .succeeds()
-    );
+            .succeeds());
   }
 
   @Before
@@ -104,32 +99,29 @@ public class GetErrorDetailsAuthorizationTest {
   public void testCompleteExternalTask() {
 
     // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
-    List<LockedExternalTask> tasks = engineRule.getExternalTaskService()
-        .fetchAndLock(5, "workerId")
-        .topic("externalTaskTopic", 5000L)
-        .execute();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> tasks = engineRule.getExternalTaskService().fetchAndLock(5, "workerId")
+        .topic("externalTaskTopic", 5000L).execute();
 
     LockedExternalTask task = tasks.get(0);
 
-    //preconditions method
-    engineRule.getExternalTaskService().handleFailure(task.getId(),task.getWorkerId(),"anError",ERROR_DETAILS,1,1000L);
+    // preconditions method
+    engineRule.getExternalTaskService().handleFailure(task.getId(), task.getWorkerId(), "anError",
+        ERROR_DETAILS, 1, 1000L);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
+    authRule.init(scenario).withUser("userId")
         .bindResource("processInstanceId", processInstance.getId())
-        .bindResource("processDefinitionKey", "oneExternalTaskProcess")
-        .start();
+        .bindResource("processDefinitionKey", "oneExternalTaskProcess").start();
 
-    //execution method
+    // execution method
     currentDetails = engineRule.getExternalTaskService().getExternalTaskErrorDetails(task.getId());
 
     // then
     if (authRule.assertScenario(scenario)) {
-      //assertion method
-      assertThat(currentDetails,is(ERROR_DETAILS));
+      // assertion method
+      assertThat(currentDetails, is(ERROR_DETAILS));
     }
   }
 

@@ -64,8 +64,10 @@ public class ValidatingMigrationInstructions {
   }
 
   protected void indexInstruction(ValidatingMigrationInstruction instruction) {
-    CollectionUtil.addToMapOfLists(instructionsBySourceScope, instruction.getSourceActivity(), instruction);
-    CollectionUtil.addToMapOfLists(instructionsByTargetScope, instruction.getTargetActivity(), instruction);
+    CollectionUtil.addToMapOfLists(instructionsBySourceScope, instruction.getSourceActivity(),
+        instruction);
+    CollectionUtil.addToMapOfLists(instructionsByTargetScope, instruction.getTargetActivity(),
+        instruction);
   }
 
   public List<ValidatingMigrationInstruction> getInstructions() {
@@ -77,8 +79,7 @@ public class ValidatingMigrationInstructions {
 
     if (instructions == null) {
       return Collections.emptyList();
-    }
-    else {
+    } else {
       return instructions;
     }
   }
@@ -88,8 +89,7 @@ public class ValidatingMigrationInstructions {
 
     if (instructions == null) {
       return Collections.emptyList();
-    }
-    else {
+    } else {
       return instructions;
     }
   }
@@ -130,12 +130,18 @@ public class ValidatingMigrationInstructions {
     return instructionsBySourceScope.containsKey(sourceScope);
   }
 
-  protected boolean isValidInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
-    return !validateInstruction(instruction, instructions, migrationInstructionValidators).hasFailures();
+  protected boolean isValidInstruction(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
+      List<MigrationInstructionValidator> migrationInstructionValidators) {
+    return !validateInstruction(instruction, instructions, migrationInstructionValidators)
+        .hasFailures();
   }
 
-  protected MigrationInstructionValidationReportImpl validateInstruction(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, List<MigrationInstructionValidator> migrationInstructionValidators) {
-    MigrationInstructionValidationReportImpl validationReport = new MigrationInstructionValidationReportImpl(instruction.toMigrationInstruction());
+  protected MigrationInstructionValidationReportImpl validateInstruction(
+      ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions,
+      List<MigrationInstructionValidator> migrationInstructionValidators) {
+    MigrationInstructionValidationReportImpl validationReport = new MigrationInstructionValidationReportImpl(
+        instruction.toMigrationInstruction());
     for (MigrationInstructionValidator migrationInstructionValidator : migrationInstructionValidators) {
       migrationInstructionValidator.validate(instruction, instructions, validationReport);
     }

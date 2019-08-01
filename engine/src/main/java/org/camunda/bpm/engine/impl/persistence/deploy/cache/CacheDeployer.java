@@ -58,7 +58,8 @@ public class CacheDeployer {
     });
   }
 
-  public void deployOnlyGivenResourcesOfDeployment(final DeploymentEntity deployment, String... resourceNames) {
+  public void deployOnlyGivenResourcesOfDeployment(final DeploymentEntity deployment,
+      String... resourceNames) {
     initDeployment(deployment, resourceNames);
     Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
@@ -77,7 +78,8 @@ public class CacheDeployer {
       if (resourceName != null) {
         // with the given resource we prevent the deployment of querying
         // the database which means using all resources that were utilized during the deployment
-        ResourceEntity resource = Context.getCommandContext().getResourceManager().findResourceByDeploymentIdAndResourceName(deployment.getId(), resourceName);
+        ResourceEntity resource = Context.getCommandContext().getResourceManager()
+            .findResourceByDeploymentIdAndResourceName(deployment.getId(), resourceName);
 
         deployment.addResource(resource);
       }

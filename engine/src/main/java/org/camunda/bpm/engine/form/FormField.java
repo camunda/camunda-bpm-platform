@@ -22,7 +22,9 @@ import java.util.Map;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * <p>Represents an individual field in a form.</p>
+ * <p>
+ * Represents an individual field in a form.
+ * </p>
  *
  * @author Michael Siebers
  * @author Daniel Meyer
@@ -31,8 +33,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 public interface FormField {
 
   /**
-   * @return the Id of a form property. Must be unique for a given form.
-   * The id is used for mapping the form field to a process variable.
+   * @return the Id of a form property. Must be unique for a given form. The id is used for mapping
+   *         the form field to a process variable.
    */
   public String getId();
 
@@ -68,9 +70,10 @@ public interface FormField {
   public List<FormFieldValidationConstraint> getValidationConstraints();
 
   /**
-   * @return a {@link Map} of additional properties. This map may be used for adding additional configuration
-   * to a form field. An example may be layout hints such as the size of the rendered form field or information
-   * about an icon to prepend or append to the rendered form field.
+   * @return a {@link Map} of additional properties. This map may be used for adding additional
+   *         configuration to a form field. An example may be layout hints such as the size of the
+   *         rendered form field or information about an icon to prepend or append to the rendered
+   *         form field.
    */
   public Map<String, String> getProperties();
 
@@ -78,5 +81,5 @@ public interface FormField {
    * @return true if field is defined as businessKey, false otherwise
    */
   boolean isBusinessKey();
-  
+
 }

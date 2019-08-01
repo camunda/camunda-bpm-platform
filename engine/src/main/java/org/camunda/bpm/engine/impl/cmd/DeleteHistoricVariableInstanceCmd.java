@@ -44,40 +44,44 @@ public class DeleteHistoricVariableInstanceCmd implements Command<Void>, Seriali
   public DeleteHistoricVariableInstanceCmd(String variableInstanceId) {
     this.variableInstanceId = variableInstanceId;
   }
-  
+
   @Override
   public Void execute(CommandContext commandContext) {
-    ensureNotEmpty(BadUserRequestException.class,"variableInstanceId", variableInstanceId);
+    ensureNotEmpty(BadUserRequestException.class, "variableInstanceId", variableInstanceId);
 
-    HistoricVariableInstanceEntity variable = commandContext.getHistoricVariableInstanceManager().findHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
-    ensureNotNull(NotFoundException.class, "No historic variable instance found with id: " + variableInstanceId, "variable", variable);
-    
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    HistoricVariableInstanceEntity variable = commandContext.getHistoricVariableInstanceManager()
+        .findHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
+    ensureNotNull(NotFoundException.class,
+        "No historic variable instance found with id: " + variableInstanceId, "variable", variable);
+
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkDeleteHistoricVariableInstance(variable);
     }
 
-    commandContext
-      .getHistoricDetailManager()
-      .deleteHistoricDetailsByVariableInstanceId(variableInstanceId);
-    
-    commandContext
-      .getHistoricVariableInstanceManager()
-      .deleteHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
-    
+    commandContext.getHistoricDetailManager()
+        .deleteHistoricDetailsByVariableInstanceId(variableInstanceId);
+
+    commandContext.getHistoricVariableInstanceManager()
+        .deleteHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
+
     // create user operation log
     ResourceDefinitionEntity<?> definition = null;
     try {
       if (variable.getProcessDefinitionId() != null) {
-        definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(variable.getProcessDefinitionId());
+        definition = commandContext.getProcessEngineConfiguration().getDeploymentCache()
+            .findDeployedProcessDefinitionById(variable.getProcessDefinitionId());
       } else if (variable.getCaseDefinitionId() != null) {
-        definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedCaseDefinitionById(variable.getCaseDefinitionId());
+        definition = commandContext.getProcessEngineConfiguration().getDeploymentCache()
+            .findDeployedCaseDefinitionById(variable.getCaseDefinitionId());
       }
     } catch (NullValueException nve) {
       // definition has been deleted already
     }
     commandContext.getOperationLogManager().logHistoricVariableOperation(
-        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, variable, definition, new PropertyChange("name", null, variable.getName()));
-    
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, variable, definition,
+        new PropertyChange("name", null, variable.getName()));
+
     return null;
   }
 }

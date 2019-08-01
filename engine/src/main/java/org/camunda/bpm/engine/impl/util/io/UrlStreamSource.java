@@ -22,14 +22,13 @@ import java.net.URL;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 
-
 /**
  * @author Tom Baeyens
  */
 public class UrlStreamSource implements StreamSource {
 
   URL url;
-  
+
   public UrlStreamSource(URL url) {
     this.url = url;
   }
@@ -38,7 +37,7 @@ public class UrlStreamSource implements StreamSource {
     try {
       return url.openStream();
     } catch (IOException e) {
-      throw new ProcessEngineException("couldn't open url '"+url+"'", e);
+      throw new ProcessEngineException("couldn't open url '" + url + "'", e);
     }
   }
 }

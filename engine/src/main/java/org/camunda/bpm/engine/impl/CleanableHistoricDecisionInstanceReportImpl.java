@@ -28,7 +28,9 @@ import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportRes
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<CleanableHistoricDecisionInstanceReport, CleanableHistoricDecisionInstanceReportResult> implements CleanableHistoricDecisionInstanceReport {
+public class CleanableHistoricDecisionInstanceReportImpl extends
+    AbstractQuery<CleanableHistoricDecisionInstanceReport, CleanableHistoricDecisionInstanceReportResult>
+    implements CleanableHistoricDecisionInstanceReport {
 
   private static final long serialVersionUID = 1L;
 
@@ -47,15 +49,19 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
   }
 
   @Override
-  public CleanableHistoricDecisionInstanceReport decisionDefinitionIdIn(String... decisionDefinitionIds) {
-    ensureNotNull(NotValidException.class, "", "decisionDefinitionIdIn", (Object[]) decisionDefinitionIds);
+  public CleanableHistoricDecisionInstanceReport decisionDefinitionIdIn(
+      String... decisionDefinitionIds) {
+    ensureNotNull(NotValidException.class, "", "decisionDefinitionIdIn",
+        (Object[]) decisionDefinitionIds);
     this.decisionDefinitionIdIn = decisionDefinitionIds;
     return this;
   }
 
   @Override
-  public CleanableHistoricDecisionInstanceReport decisionDefinitionKeyIn(String... decisionDefinitionKeys) {
-    ensureNotNull(NotValidException.class, "", "decisionDefinitionKeyIn", (Object[]) decisionDefinitionKeys);
+  public CleanableHistoricDecisionInstanceReport decisionDefinitionKeyIn(
+      String... decisionDefinitionKeys) {
+    ensureNotNull(NotValidException.class, "", "decisionDefinitionKeyIn",
+        (Object[]) decisionDefinitionKeys);
     this.decisionDefinitionKeyIn = decisionDefinitionKeys;
     return this;
   }
@@ -92,18 +98,17 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
     provideHistoryCleanupStrategy(commandContext);
 
     checkQueryOk();
-    return commandContext
-        .getHistoricDecisionInstanceManager()
+    return commandContext.getHistoricDecisionInstanceManager()
         .findCleanableHistoricDecisionInstancesReportCountByCriteria(this);
   }
 
   @Override
-  public List<CleanableHistoricDecisionInstanceReportResult> executeList(CommandContext commandContext, Page page) {
+  public List<CleanableHistoricDecisionInstanceReportResult> executeList(
+      CommandContext commandContext, Page page) {
     provideHistoryCleanupStrategy(commandContext);
 
     checkQueryOk();
-    return commandContext
-        .getHistoricDecisionInstanceManager()
+    return commandContext.getHistoricDecisionInstanceManager()
         .findCleanableHistoricDecisionInstancesReportByCriteria(this, page);
   }
 
@@ -149,9 +154,10 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
 
   protected void provideHistoryCleanupStrategy(CommandContext commandContext) {
     String historyCleanupStrategy = commandContext.getProcessEngineConfiguration()
-      .getHistoryCleanupStrategy();
+        .getHistoryCleanupStrategy();
 
-    isHistoryCleanupStrategyRemovalTimeBased = HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED.equals(historyCleanupStrategy);
+    isHistoryCleanupStrategyRemovalTimeBased = HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED
+        .equals(historyCleanupStrategy);
   }
 
   public boolean isHistoryCleanupStrategyRemovalTimeBased() {

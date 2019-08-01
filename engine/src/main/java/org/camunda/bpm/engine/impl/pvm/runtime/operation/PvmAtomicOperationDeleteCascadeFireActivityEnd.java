@@ -23,12 +23,12 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOperationActivityInstanceEnd {
+public class PvmAtomicOperationDeleteCascadeFireActivityEnd
+    extends PvmAtomicOperationActivityInstanceEnd {
 
   @Override
   protected PvmExecutionImpl eventNotificationsStarted(PvmExecutionImpl execution) {
@@ -39,7 +39,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
   protected ScopeImpl getScope(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
 
-    if (activity!=null) {
+    if (activity != null) {
       return activity;
     } else {
       // TODO: when can this happen?
@@ -62,7 +62,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
     if (execution.isScope()
         && (executesNonScopeActivity(execution) || isAsyncBeforeActivity(execution))
-        && !CompensationBehavior.executesNonScopeCompensationHandler(execution))  {
+        && !CompensationBehavior.executesNonScopeCompensationHandler(execution)) {
       execution.removeAllTasks();
       // case this is a scope execution and the activity is not a scope
       execution.leaveActivityInstance();
@@ -81,7 +81,8 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
       if (continueRemoval) {
         PvmExecutionImpl propagatingExecution = execution.getParent();
-        if (propagatingExecution != null && !propagatingExecution.isScope() && !propagatingExecution.hasChildren()) {
+        if (propagatingExecution != null && !propagatingExecution.isScope()
+            && !propagatingExecution.hasChildren()) {
           propagatingExecution.remove();
           continueRemoval = !propagatingExecution.isDeleteRoot();
           propagatingExecution = propagatingExecution.getParent();
@@ -90,8 +91,10 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
         if (continueRemoval) {
           if (propagatingExecution != null) {
             // continue deletion with the next scope execution
-            // set activity on parent in case the parent is an inactive scope execution and activity has been set to 'null'.
-            if(propagatingExecution.getActivity() == null && activity != null && activity.getFlowScope() != null) {
+            // set activity on parent in case the parent is an inactive scope execution and activity
+            // has been set to 'null'.
+            if (propagatingExecution.getActivity() == null && activity != null
+                && activity.getFlowScope() != null) {
               propagatingExecution.setActivity(getFlowScopeActivity(activity));
             }
           }
@@ -102,7 +105,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
   protected boolean executesNonScopeActivity(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
-    return activity!=null && !activity.isScope();
+    return activity != null && !activity.isScope();
   }
 
   protected boolean isAsyncBeforeActivity(PvmExecutionImpl execution) {
@@ -112,7 +115,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
   protected ActivityImpl getFlowScopeActivity(PvmActivity activity) {
     ScopeImpl flowScope = activity.getFlowScope();
     ActivityImpl flowScopeActivity = null;
-    if(flowScope.getProcessDefinition() != flowScope) {
+    if (flowScope.getProcessDefinition() != flowScope) {
       flowScopeActivity = (ActivityImpl) flowScope;
     }
     return flowScopeActivity;

@@ -182,7 +182,6 @@ public enum HistoryEventTypes implements HistoryEventType {
    */
   EXTERNAL_TASK_DELETE("external-task", "delete"),
 
-
   /**
    * fired when used operation log is created.
    *

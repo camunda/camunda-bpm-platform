@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -40,15 +39,14 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Daniel Meyer
  * @author Saeid Mirzaei
  */
-public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQuery, ProcessDefinition>
-  implements ProcessDefinitionQuery {
+public class ProcessDefinitionQueryImpl extends
+    AbstractQuery<ProcessDefinitionQuery, ProcessDefinition> implements ProcessDefinitionQuery {
 
   private static final long serialVersionUID = 1L;
   protected String id;
@@ -252,7 +250,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
 
   public ProcessDefinitionQuery includeProcessDefinitionsWithoutTenantId() {
-    this.includeDefinitionsWithoutTenantId  = true;
+    this.includeDefinitionsWithoutTenantId = true;
     return this;
   }
 
@@ -285,7 +283,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
-  //sorting ////////////////////////////////////////////
+  // sorting ////////////////////////////////////////////
 
   public ProcessDefinitionQuery orderByDeploymentId() {
     return orderBy(ProcessDefinitionQueryProperty.DEPLOYMENT_ID);
@@ -319,26 +317,24 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return orderBy(ProcessDefinitionQueryProperty.VERSION_TAG);
   }
 
-  //results ////////////////////////////////////////////
+  // results ////////////////////////////////////////////
 
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getProcessDefinitionManager()
-      .findProcessDefinitionCountByQueryCriteria(this);
+    return commandContext.getProcessDefinitionManager()
+        .findProcessDefinitionCountByQueryCriteria(this);
   }
 
   @Override
   public List<ProcessDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    List<ProcessDefinition> list = commandContext
-      .getProcessDefinitionManager()
-      .findProcessDefinitionsByQueryCriteria(this, page);
+    List<ProcessDefinition> list = commandContext.getProcessDefinitionManager()
+        .findProcessDefinitionsByQueryCriteria(this, page);
 
-    boolean shouldQueryAddBpmnModelInstancesToCache =
-        commandContext.getProcessEngineConfiguration().getEnableFetchProcessDefinitionDescription();
-    if(shouldQueryAddBpmnModelInstancesToCache) {
+    boolean shouldQueryAddBpmnModelInstancesToCache = commandContext.getProcessEngineConfiguration()
+        .getEnableFetchProcessDefinitionDescription();
+    if (shouldQueryAddBpmnModelInstancesToCache) {
       addProcessDefinitionToCacheAndRetrieveDocumentation(list);
     }
 
@@ -352,16 +348,19 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
           .getDeploymentCache()
           .findBpmnModelInstanceForProcessDefinition((ProcessDefinitionEntity) processDefinition);
 
-      ModelElementInstance processElement = bpmnModelInstance.getModelElementById(processDefinition.getKey());
+      ModelElementInstance processElement = bpmnModelInstance
+          .getModelElementById(processDefinition.getKey());
       if (processElement != null) {
-        Collection<Documentation> documentations = processElement.getChildElementsByType(Documentation.class);
+        Collection<Documentation> documentations = processElement
+            .getChildElementsByType(Documentation.class);
         List<String> docStrings = new ArrayList<String>();
         for (Documentation documentation : documentations) {
           docStrings.add(documentation.getTextContent());
         }
 
         ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) processDefinition;
-        processDefinitionEntity.setProperty(BpmnParse.PROPERTYNAME_DOCUMENTATION, BpmnParse.parseDocumentation(docStrings));
+        processDefinitionEntity.setProperty(BpmnParse.PROPERTYNAME_DOCUMENTATION,
+            BpmnParse.parseDocumentation(docStrings));
       }
 
     }
@@ -371,55 +370,70 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public void checkQueryOk() {
     super.checkQueryOk();
 
-    if (latest && ( (id != null) || (version != null) || (deploymentId != null) ) ){
-      throw new ProcessEngineException("Calling latest() can only be used in combination with key(String) and keyLike(String) or name(String) and nameLike(String)");
+    if (latest && ((id != null) || (version != null) || (deploymentId != null))) {
+      throw new ProcessEngineException(
+          "Calling latest() can only be used in combination with key(String) and keyLike(String) or name(String) and nameLike(String)");
     }
   }
 
-  //getters ////////////////////////////////////////////
+  // getters ////////////////////////////////////////////
 
   public String getDeploymentId() {
     return deploymentId;
   }
+
   public String getId() {
     return id;
   }
+
   public String[] getIds() {
     return ids;
   }
+
   public String getName() {
     return name;
   }
+
   public String getNameLike() {
     return nameLike;
   }
+
   public String getKey() {
     return key;
   }
+
   public String getKeyLike() {
     return keyLike;
   }
+
   public Integer getVersion() {
     return version;
   }
+
   public boolean isLatest() {
     return latest;
   }
+
   public String getCategory() {
     return category;
   }
+
   public String getCategoryLike() {
     return categoryLike;
   }
+
   public String getResourceName() {
     return resourceName;
   }
+
   public String getResourceNameLike() {
     return resourceNameLike;
   }
+
   public SuspensionState getSuspensionState() {
     return suspensionState;
   }
+
   public void setSuspensionState(SuspensionState suspensionState) {
     this.suspensionState = suspensionState;
   }
@@ -456,7 +470,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return startablePermissionCheck;
   }
 
-  public void setProcessDefinitionCreatePermissionChecks(List<PermissionCheck> processDefinitionCreatePermissionChecks) {
+  public void setProcessDefinitionCreatePermissionChecks(
+      List<PermissionCheck> processDefinitionCreatePermissionChecks) {
     this.processDefinitionCreatePermissionChecks = processDefinitionCreatePermissionChecks;
   }
 
@@ -464,8 +479,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return processDefinitionCreatePermissionChecks;
   }
 
-  public void addProcessDefinitionCreatePermissionCheck(CompositePermissionCheck processDefinitionCreatePermissionCheck) {
-    processDefinitionCreatePermissionChecks.addAll(processDefinitionCreatePermissionCheck.getAllPermissionChecks());
+  public void addProcessDefinitionCreatePermissionCheck(
+      CompositePermissionCheck processDefinitionCreatePermissionCheck) {
+    processDefinitionCreatePermissionChecks
+        .addAll(processDefinitionCreatePermissionCheck.getAllPermissionChecks());
   }
 
   public ProcessDefinitionQueryImpl startableByUser(String userId) {

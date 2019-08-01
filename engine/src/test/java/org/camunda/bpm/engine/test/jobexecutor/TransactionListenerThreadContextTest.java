@@ -23,8 +23,9 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
- * This test makes sure that if the transaction synchronization / transaction listener ExclusiveJobAddedNotification is
- * executed in a different thread than the Thread which executed the job, the notification still works.
+ * This test makes sure that if the transaction synchronization / transaction listener
+ * ExclusiveJobAddedNotification is executed in a different thread than the Thread which executed
+ * the job, the notification still works.
  *
  * See: https://app.camunda.com/jira/browse/CAM-3684
  *
@@ -38,21 +39,15 @@ public class TransactionListenerThreadContextTest extends ResourceProcessEngineT
   }
 
   public void testTxListenersInvokeAsync() {
-    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-        .camundaAsyncBefore()
-        .camundaAsyncAfter()
-      .endEvent()
-      .done();
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .camundaAsyncBefore().camundaAsyncAfter().endEvent().done();
 
     Deployment deployment = repositoryService.createDeployment()
-      .addModelInstance("testProcess.bpmn", process)
-      .deploy();
+        .addModelInstance("testProcess.bpmn", process).deploy();
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
     waitForJobExecutorToProcessAllJobs(6000);
-
 
     assertProcessEnded(pi.getId());
 

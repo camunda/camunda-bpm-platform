@@ -23,9 +23,7 @@ import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
  * @author Daniel Meyer
  *
  */
-@ProcessApplication(
-    name = TestApplicationWithCustomName.NAME
-)
+@ProcessApplication(name = TestApplicationWithCustomName.NAME)
 public class TestApplicationWithCustomName extends EmbeddedProcessApplication {
 
   public static final String NAME = "foooooooo";

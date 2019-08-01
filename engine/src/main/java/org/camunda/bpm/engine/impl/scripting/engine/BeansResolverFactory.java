@@ -21,7 +21,6 @@ import java.util.Set;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 
-
 /**
  * @author Tom Baeyens
  */

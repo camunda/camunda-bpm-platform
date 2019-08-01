@@ -41,32 +41,21 @@ public class SetJobRetriesBatchAuthorizationTest extends BatchCreationAuthorizat
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+            grant(Resources.BATCH, "batchId", "userId",
+                BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES)),
         scenario()
-            .withoutAuthorizations()
-            .failsDueToRequired(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES)
-            ).succeeds()
-    );
+            .withAuthorizations(grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
+        scenario().withAuthorizations(grant(Resources.BATCH, "batchId", "userId",
+            BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES)).succeeds());
   }
 
   @Test
   public void testBatchSetJobRetriesByJobs() {
-    //given
+    // given
     List<String> jobIds = setupFailedJobs();
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("batchId", "*")
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", "*").start();
 
     // when
 
@@ -78,14 +67,10 @@ public class SetJobRetriesBatchAuthorizationTest extends BatchCreationAuthorizat
 
   @Test
   public void testBatchSetJobRetriesByProcesses() {
-    //given
+    // given
     setupFailedJobs();
     List<String> processInstanceIds = Collections.singletonList(processInstance.getId());
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("batchId", "*")
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", "*").start();
 
     // when
 
@@ -101,9 +86,11 @@ public class SetJobRetriesBatchAuthorizationTest extends BatchCreationAuthorizat
     Deployment deploy = testHelper.deploy(JOB_EXCEPTION_DEFINITION_XML);
     ProcessDefinition sourceDefinition = engineRule.getRepositoryService()
         .createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
-    processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
-    List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+    List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId())
+        .list();
     for (Job job : jobs) {
       jobIds.add(job.getId());
     }

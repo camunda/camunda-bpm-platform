@@ -21,26 +21,26 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 
-
 /**
  * @author Daniel Meyer
  */
-public class WaitStateUndoService extends AbstractBpmnActivityBehavior implements SignallableActivityBehavior {
+public class WaitStateUndoService extends AbstractBpmnActivityBehavior
+    implements SignallableActivityBehavior {
 
   private Expression counterName;
 
   public void execute(ActivityExecution execution) throws Exception {
     String variableName = (String) counterName.getValue(execution);
     Object variable = execution.getVariable(variableName);
-    if(variable == null) {
+    if (variable == null) {
       execution.setVariable(variableName, (Integer) 1);
-    }
-    else  {
-      execution.setVariable(variableName, ((Integer)variable)+1);
+    } else {
+      execution.setVariable(variableName, ((Integer) variable) + 1);
     }
   }
 
-  public void signal(ActivityExecution execution, String signalEvent, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalEvent, Object signalData)
+      throws Exception {
     leave(execution);
   }
 

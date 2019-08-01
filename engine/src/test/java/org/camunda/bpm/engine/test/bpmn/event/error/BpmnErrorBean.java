@@ -29,11 +29,13 @@ public class BpmnErrorBean implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public void throwBpmnError() {
-    throw new BpmnError("23", "This is a business fault, which can be caught by a BPMN Error Event.");
+    throw new BpmnError("23",
+        "This is a business fault, which can be caught by a BPMN Error Event.");
   }
 
   public void throwBpmnException() throws MyBusinessException {
-    throw new MyBusinessException("This is a business exception, which can be caught by a BPMN Error Event.");
+    throw new MyBusinessException(
+        "This is a business exception, which can be caught by a BPMN Error Event.");
   }
 
   public JavaDelegate getDelegate() {

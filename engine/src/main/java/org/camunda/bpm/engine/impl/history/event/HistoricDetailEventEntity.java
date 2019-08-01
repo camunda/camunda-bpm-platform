@@ -20,12 +20,11 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.impl.context.Context;
 
-
 /**
  * @author Daniel Meyer
  *
  */
-public class HistoricDetailEventEntity extends HistoryEvent  {
+public class HistoricDetailEventEntity extends HistoryEvent {
 
   private static final long serialVersionUID = 1L;
 
@@ -86,28 +85,17 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
   }
 
   public void delete() {
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .delete(this);
+    Context.getCommandContext().getDbEntityManager().delete(this);
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[activityInstanceId=" + activityInstanceId
-           + ", taskId=" + taskId
-           + ", timestamp=" + timestamp
-           + ", eventType=" + eventType
-           + ", executionId=" + executionId
-           + ", processDefinitionId=" + processDefinitionId
-           + ", rootProcessInstanceId=" + rootProcessInstanceId
-           + ", removalTime=" + removalTime
-           + ", processInstanceId=" + processInstanceId
-           + ", id=" + id
-           + ", tenantId=" + tenantId
-           + ", userOperationId=" + userOperationId
-           + "]";
+    return this.getClass().getSimpleName() + "[activityInstanceId=" + activityInstanceId
+        + ", taskId=" + taskId + ", timestamp=" + timestamp + ", eventType=" + eventType
+        + ", executionId=" + executionId + ", processDefinitionId=" + processDefinitionId
+        + ", rootProcessInstanceId=" + rootProcessInstanceId + ", removalTime=" + removalTime
+        + ", processInstanceId=" + processInstanceId + ", id=" + id + ", tenantId=" + tenantId
+        + ", userOperationId=" + userOperationId + "]";
   }
 
 }

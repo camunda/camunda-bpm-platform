@@ -20,8 +20,7 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 
 /**
- * A simple provider used to determine custom {@link Permission}s and
- * {@link Resource}s
+ * A simple provider used to determine custom {@link Permission}s and {@link Resource}s
  * 
  * @author Yana.Vasileva
  * @author Tobias Metzke

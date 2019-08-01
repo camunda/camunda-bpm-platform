@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.task.Attachment;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -35,7 +34,8 @@ public class AttachmentManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<Attachment> findAttachmentsByProcessInstanceId(String processInstanceId) {
     checkHistoryEnabled();
-    return getDbEntityManager().selectList("selectAttachmentsByProcessInstanceId", processInstanceId);
+    return getDbEntityManager().selectList("selectAttachmentsByProcessInstanceId",
+        processInstanceId);
   }
 
   @SuppressWarnings("unchecked")
@@ -44,32 +44,35 @@ public class AttachmentManager extends AbstractHistoricManager {
     return getDbEntityManager().selectList("selectAttachmentsByTaskId", taskId);
   }
 
-  public void addRemovalTimeToAttachmentsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToAttachmentsByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(AttachmentEntity.class, "updateAttachmentsByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(AttachmentEntity.class,
+        "updateAttachmentsByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToAttachmentsByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public void addRemovalTimeToAttachmentsByProcessInstanceId(String processInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(AttachmentEntity.class, "updateAttachmentsByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(AttachmentEntity.class,
+        "updateAttachmentsByProcessInstanceId", parameters);
 
   }
 
   @SuppressWarnings("unchecked")
   public void deleteAttachmentsByTaskId(String taskId) {
     checkHistoryEnabled();
-    List<AttachmentEntity> attachments = getDbEntityManager().selectList("selectAttachmentsByTaskId", taskId);
-    for (AttachmentEntity attachment: attachments) {
+    List<AttachmentEntity> attachments = getDbEntityManager()
+        .selectList("selectAttachmentsByTaskId", taskId);
+    for (AttachmentEntity attachment : attachments) {
       String contentId = attachment.getContentId();
-      if (contentId!=null) {
+      if (contentId != null) {
         getByteArrayManager().deleteByteArrayById(contentId);
       }
       getDbEntityManager().delete(attachment);
@@ -95,8 +98,10 @@ public class AttachmentManager extends AbstractHistoricManager {
   }
 
   protected void deleteAttachments(Map<String, Object> parameters) {
-    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByIds", parameters);
-    getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByIds", parameters);
+    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class,
+        "deleteAttachmentByteArraysByIds", parameters);
+    getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByIds",
+        parameters);
   }
 
   public Attachment findAttachmentByTaskIdAndAttachmentId(String taskId, String attachmentId) {
@@ -106,10 +111,12 @@ public class AttachmentManager extends AbstractHistoricManager {
     parameters.put("taskId", taskId);
     parameters.put("id", attachmentId);
 
-    return (AttachmentEntity) getDbEntityManager().selectOne("selectAttachmentByTaskIdAndAttachmentId", parameters);
+    return (AttachmentEntity) getDbEntityManager()
+        .selectOne("selectAttachmentByTaskIdAndAttachmentId", parameters);
   }
 
-  public DbOperation deleteAttachmentsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteAttachmentsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo,
+      int batchSize) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -118,10 +125,8 @@ public class AttachmentManager extends AbstractHistoricManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentsByRemovalTime",
-        new ListQueryParameterObject(parameters, 0, batchSize));
+    return getDbEntityManager().deletePreserveOrder(AttachmentEntity.class,
+        "deleteAttachmentsByRemovalTime", new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
 }
-

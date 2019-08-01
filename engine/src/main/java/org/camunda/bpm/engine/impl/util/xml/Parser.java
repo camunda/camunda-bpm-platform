@@ -19,14 +19,13 @@ package org.camunda.bpm.engine.impl.util.xml;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-
 /**
  * @author Tom Baeyens
  */
 public class Parser {
 
   protected static SAXParserFactory defaultSaxParserFactory = SAXParserFactory.newInstance();
-  
+
   public static final Parser INSTANCE = new Parser();
 
   public Parse createParse() {

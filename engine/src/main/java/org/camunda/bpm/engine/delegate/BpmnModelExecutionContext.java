@@ -22,8 +22,8 @@ import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 
 /**
- * Implemented by classes which provide access to the {@link BpmnModelInstance}
- * and the currently executed {@link FlowElement}.
+ * Implemented by classes which provide access to the {@link BpmnModelInstance} and the currently
+ * executed {@link FlowElement}.
  *
  * @author Daniel Meyer
  * @author Sebastian Menski
@@ -39,12 +39,18 @@ public interface BpmnModelExecutionContext {
   BpmnModelInstance getBpmnModelInstance();
 
   /**
-   * <p>Returns the currently executed Element in the BPMN Model. This method returns a {@link FlowElement} which may be casted
-   * to the concrete type of the Bpmn Model Element currently executed.</p>
+   * <p>
+   * Returns the currently executed Element in the BPMN Model. This method returns a
+   * {@link FlowElement} which may be casted to the concrete type of the Bpmn Model Element
+   * currently executed.
+   * </p>
    *
-   * <p>If called from a Service {@link ExecutionListener}, the method will return the corresponding {@link FlowNode}
-   * for {@link ExecutionListener#EVENTNAME_START} and {@link ExecutionListener#EVENTNAME_END} and the corresponding
-   * {@link SequenceFlow} for {@link ExecutionListener#EVENTNAME_TAKE}.</p>
+   * <p>
+   * If called from a Service {@link ExecutionListener}, the method will return the corresponding
+   * {@link FlowNode} for {@link ExecutionListener#EVENTNAME_START} and
+   * {@link ExecutionListener#EVENTNAME_END} and the corresponding {@link SequenceFlow} for
+   * {@link ExecutionListener#EVENTNAME_TAKE}.
+   * </p>
    *
    * @return the {@link FlowElement} corresponding to the current Bpmn Model Element
    */

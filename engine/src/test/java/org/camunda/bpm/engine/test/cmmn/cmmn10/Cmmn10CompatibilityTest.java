@@ -33,8 +33,8 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRequiredRule.cmmn")
   public void testRequiredRule() {
-    CaseInstance caseInstance =
-        createCaseInstanceByKey("case", Variables.createVariables().putValue("required", true));
+    CaseInstance caseInstance = createCaseInstanceByKey("case",
+        Variables.createVariables().putValue("required", true));
 
     CaseExecution taskExecution = queryCaseExecutionByActivityId("PI_HumanTask_1");
 
@@ -80,9 +80,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
     complete(secondHumanTaskId);
 
     // then
-    CaseExecutionQuery query = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1");
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1");
     assertEquals(2, query.count());
     assertEquals(1, query.available().count());
   }
@@ -98,9 +96,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
     complete(firstHumanTaskId);
 
     // then
-    CaseExecutionQuery query = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1");
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1");
     assertEquals(1, query.count());
     assertEquals(1, query.active().count());
   }
@@ -116,9 +112,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
     disable(firstHumanTaskId);
 
     // then
-    CaseExecutionQuery query = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1");
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1");
     assertEquals(2, query.count());
     assertEquals(1, query.enabled().count());
     assertEquals(1, query.disabled().count());
@@ -176,10 +170,7 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
     assertTrue(queryCaseExecutionById(humanTask2).isAvailable());
 
     // when
-    caseService
-      .withCaseExecution(humanTask1)
-      .setVariable("value", 999)
-      .manualStart();
+    caseService.withCaseExecution(humanTask1).setVariable("value", 999).manualStart();
 
     // then
     assertTrue(queryCaseExecutionById(humanTask2).isEnabled());

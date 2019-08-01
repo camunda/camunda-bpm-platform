@@ -25,13 +25,20 @@ package org.camunda.bpm.engine.delegate;
  */
 public interface BaseDelegateExecution extends VariableScope {
 
-  /** Unique id of this path of execution that can be used as a handle to provide external signals back into the engine after wait states. */
+  /**
+   * Unique id of this path of execution that can be used as a handle to provide external signals
+   * back into the engine after wait states.
+   */
   String getId();
 
-  /** The {@link ExecutionListener#EVENTNAME_START event name} in case this execution is passed in for an {@link ExecutionListener}  */
+  /**
+   * The {@link ExecutionListener#EVENTNAME_START event name} in case this execution is passed in
+   * for an {@link ExecutionListener}
+   */
   String getEventName();
 
-  /** The business key for the root execution (e.g. process instance).
+  /**
+   * The business key for the root execution (e.g. process instance).
    */
   String getBusinessKey();
 

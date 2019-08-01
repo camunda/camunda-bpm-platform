@@ -50,40 +50,48 @@ public class ThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavi
 
     String eventName = signalDefinition.resolveExpressionOfEventName(execution);
     // trigger all event subscriptions for the signal (start and intermediate)
-    List<EventSubscriptionEntity> signalEventSubscriptions =
-        findSignalEventSubscriptions(eventName, execution.getTenantId());
+    List<EventSubscriptionEntity> signalEventSubscriptions = findSignalEventSubscriptions(eventName,
+        execution.getTenantId());
 
     for (EventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
       if (isActiveEventSubscription(signalEventSubscription)) {
-        signalEventSubscription.eventReceived(variableMap, null, businessKey, signalDefinition.isAsync());
+        signalEventSubscription.eventReceived(variableMap, null, businessKey,
+            signalDefinition.isAsync());
       }
     }
     leave(execution);
   }
 
-  protected List<EventSubscriptionEntity> findSignalEventSubscriptions(String signalName, String tenantId) {
-    EventSubscriptionManager eventSubscriptionManager = Context.getCommandContext().getEventSubscriptionManager();
+  protected List<EventSubscriptionEntity> findSignalEventSubscriptions(String signalName,
+      String tenantId) {
+    EventSubscriptionManager eventSubscriptionManager = Context.getCommandContext()
+        .getEventSubscriptionManager();
 
     if (tenantId != null) {
       return eventSubscriptionManager
-          .findSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId(signalName, tenantId);
+          .findSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId(signalName,
+              tenantId);
 
     } else {
       // find event subscriptions without tenant id
-      return eventSubscriptionManager.findSignalEventSubscriptionsByEventNameAndTenantId(signalName, null);
+      return eventSubscriptionManager.findSignalEventSubscriptionsByEventNameAndTenantId(signalName,
+          null);
     }
   }
 
-  protected boolean isActiveEventSubscription(EventSubscriptionEntity signalEventSubscriptionEntity) {
+  protected boolean isActiveEventSubscription(
+      EventSubscriptionEntity signalEventSubscriptionEntity) {
     return isStartEventSubscription(signalEventSubscriptionEntity)
         || isActiveIntermediateEventSubscription(signalEventSubscriptionEntity);
   }
 
-  protected boolean isStartEventSubscription(EventSubscriptionEntity signalEventSubscriptionEntity) {
+  protected boolean isStartEventSubscription(
+      EventSubscriptionEntity signalEventSubscriptionEntity) {
     return signalEventSubscriptionEntity.getExecutionId() == null;
   }
 
-  protected boolean isActiveIntermediateEventSubscription(EventSubscriptionEntity signalEventSubscriptionEntity) {
+  protected boolean isActiveIntermediateEventSubscription(
+      EventSubscriptionEntity signalEventSubscriptionEntity) {
     ExecutionEntity execution = signalEventSubscriptionEntity.getExecution();
     return execution != null && !execution.isEnded() && !execution.isCanceled();
   }

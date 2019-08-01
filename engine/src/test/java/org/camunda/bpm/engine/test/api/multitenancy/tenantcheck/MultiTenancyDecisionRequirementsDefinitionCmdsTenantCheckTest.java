@@ -47,7 +47,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
   protected static final String TENANT_ONE = "tenant1";
 
   protected static final String DRG_DMN = "org/camunda/bpm/engine/test/api/multitenancy/DecisionRequirementsGraph.dmn";
-  
+
   protected static final String DRD_DMN = "org/camunda/bpm/engine/test/api/multitenancy/DecisionRequirementsGraph.png";
 
   protected ProcessEngineRule engineRule = new ProcessEngineRule(true);
@@ -60,7 +60,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected IdentityService identityService;
@@ -74,7 +74,7 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
 
     testRule.deployForTenant(TENANT_ONE, DRG_DMN, DRD_DMN);
     decisionRequirementsDefinitionId = repositoryService.createDecisionRequirementsDefinitionQuery()
-      .singleResult().getId();
+        .singleResult().getId();
   }
 
   @Test
@@ -92,7 +92,8 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
   public void getDecisionRequirementsDefinitionWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    DecisionRequirementsDefinition definition = repositoryService.getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
+    DecisionRequirementsDefinition definition = repositoryService
+        .getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
 
     assertThat(definition.getTenantId(), is(TENANT_ONE));
   }
@@ -102,7 +103,8 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    DecisionRequirementsDefinition definition = repositoryService.getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
+    DecisionRequirementsDefinition definition = repositoryService
+        .getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
 
     assertThat(definition.getTenantId(), is(TENANT_ONE));
   }
@@ -122,7 +124,8 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
   public void getDecisionRequirementsModelWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    InputStream inputStream = repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
+    InputStream inputStream = repositoryService
+        .getDecisionRequirementsModel(decisionRequirementsDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
@@ -132,7 +135,8 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    InputStream inputStream = repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
+    InputStream inputStream = repositoryService
+        .getDecisionRequirementsModel(decisionRequirementsDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
@@ -152,7 +156,8 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
   public void getDecisionDiagramWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    InputStream inputStream = repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+    InputStream inputStream = repositoryService
+        .getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }
@@ -162,7 +167,8 @@ public class MultiTenancyDecisionRequirementsDefinitionCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    InputStream inputStream = repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+    InputStream inputStream = repositoryService
+        .getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
 
     assertThat(inputStream, notNullValue());
   }

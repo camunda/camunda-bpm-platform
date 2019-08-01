@@ -42,12 +42,12 @@ import org.camunda.bpm.engine.impl.util.ExceptionUtil;
  */
 public class BatchDbSqlSession extends DbSqlSession {
 
-
   public BatchDbSqlSession(DbSqlSessionFactory dbSqlSessionFactory) {
     super(dbSqlSessionFactory);
   }
 
-  public BatchDbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection, String catalog, String schema) {
+  public BatchDbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection,
+      String catalog, String schema) {
     super(dbSqlSessionFactory, connection, catalog, schema);
   }
 
@@ -72,13 +72,15 @@ public class BatchDbSqlSession extends DbSqlSession {
     return postProcessBatchSuccess(operations, batchResults);
   }
 
-  protected FlushResult postProcessBatchSuccess(List<DbOperation> operations, List<BatchResult> batchResults) {
+  protected FlushResult postProcessBatchSuccess(List<DbOperation> operations,
+      List<BatchResult> batchResults) {
     Iterator<DbOperation> operationsIt = operations.iterator();
     List<DbOperation> failedOperations = new ArrayList<>();
     for (BatchResult successfulBatch : batchResults) {
       // even if all batches are successful, there can be concurrent modification failures
       // (e.g. 0 rows updated)
-      postProcessJdbcBatchResult(operationsIt, successfulBatch.getUpdateCounts(), null, failedOperations);
+      postProcessJdbcBatchResult(operationsIt, successfulBatch.getUpdateCounts(), null,
+          failedOperations);
     }
 
     // there should be no more operations remaining
@@ -104,7 +106,8 @@ public class BatchDbSqlSession extends DbSqlSession {
     List<DbOperation> failedOperations = new ArrayList<>();
 
     for (BatchResult successfulBatch : successfulBatches) {
-      postProcessJdbcBatchResult(operationsIt, successfulBatch.getUpdateCounts(), null, failedOperations);
+      postProcessJdbcBatchResult(operationsIt, successfulBatch.getUpdateCounts(), null,
+          failedOperations);
     }
 
     int[] failedBatchUpdateCounts = cause.getUpdateCounts();
@@ -115,35 +118,31 @@ public class BatchDbSqlSession extends DbSqlSession {
   }
 
   /**
-   * <p>This method can be called with three cases:
+   * <p>
+   * This method can be called with three cases:
    *
    * <ul>
-   * <li>Case 1: Success. statementResults contains the number of
-   * affected rows for all operations.
-   * <li>Case 2: Failure. statementResults contains the number of
-   * affected rows for all successful operations that were executed
-   * before the failed operation.
-   * <li>Case 3: Failure. statementResults contains the number of
-   * affected rows for all operations of the batch, i.e. further
-   * statements were executed after the first failed statement.
+   * <li>Case 1: Success. statementResults contains the number of affected rows for all operations.
+   * <li>Case 2: Failure. statementResults contains the number of affected rows for all successful
+   * operations that were executed before the failed operation.
+   * <li>Case 3: Failure. statementResults contains the number of affected rows for all operations
+   * of the batch, i.e. further statements were executed after the first failed statement.
    * </ul>
    *
-   * <p>See {@link BatchUpdateException#getUpdateCounts()} for the specification
-   * of cases 2 and 3.
+   * <p>
+   * See {@link BatchUpdateException#getUpdateCounts()} for the specification of cases 2 and 3.
    *
    * @return all failed operations
    */
-  protected void postProcessJdbcBatchResult(
-      Iterator<DbOperation> operationsIt,
-      int[] statementResults,
-      Exception failure,
-      List<DbOperation> failedOperations) {
+  protected void postProcessJdbcBatchResult(Iterator<DbOperation> operationsIt,
+      int[] statementResults, Exception failure, List<DbOperation> failedOperations) {
     boolean failureHandled = false;
 
     for (int i = 0; i < statementResults.length; i++) {
       int statementResult = statementResults[i];
 
-      EnsureUtil.ensureTrue("More batch results than scheduled operations detected. This indicates a bug",
+      EnsureUtil.ensureTrue(
+          "More batch results than scheduled operations detected. This indicates a bug",
           operationsIt.hasNext());
 
       DbOperation operation = operationsIt.next();
@@ -153,16 +152,15 @@ public class BatchDbSqlSession extends DbSqlSession {
       } else if (statementResult == Statement.EXECUTE_FAILED) {
 
         /*
-         * All operations are marked with the root failure exception; this is not quite
-         * correct and leads to the situation that we treat all failed operations in the
-         * same way, whereas they might fail for different reasons.
+         * All operations are marked with the root failure exception; this is not quite correct and
+         * leads to the situation that we treat all failed operations in the same way, whereas they
+         * might fail for different reasons.
          *
-         * More precise would be to use BatchUpdateException#getNextException.
-         * E.g. if we have three failed statements in a batch, #getNextException can be used to
-         * access each operation's individual failure. However, this behavior is not
-         * guaranteed by the java.sql javadocs (it doesn't specify that the number
-         * and order of next exceptions matches the number of failures, unlike for row counts),
-         * so we decided to not rely on it.
+         * More precise would be to use BatchUpdateException#getNextException. E.g. if we have three
+         * failed statements in a batch, #getNextException can be used to access each operation's
+         * individual failure. However, this behavior is not guaranteed by the java.sql javadocs (it
+         * doesn't specify that the number and order of next exceptions matches the number of
+         * failures, unlike for row counts), so we decided to not rely on it.
          */
         postProcessOperationPerformed(operation, 0, failure);
         failureHandled = true;
@@ -179,7 +177,8 @@ public class BatchDbSqlSession extends DbSqlSession {
      * case 2: The next operation is the one that failed
      */
     if (failure != null && !failureHandled) {
-      EnsureUtil.ensureTrue("More batch results than scheduled operations detected. This indicates a bug",
+      EnsureUtil.ensureTrue(
+          "More batch results than scheduled operations detected. This indicates a bug",
           operationsIt.hasNext());
 
       DbOperation failedOperation = operationsIt.next();
@@ -188,31 +187,31 @@ public class BatchDbSqlSession extends DbSqlSession {
     }
   }
 
-  protected void postProcessOperationPerformed(DbOperation operation, int rowsAffected, Exception failure) {
+  protected void postProcessOperationPerformed(DbOperation operation, int rowsAffected,
+      Exception failure) {
 
-    switch(operation.getOperationType()) {
+    switch (operation.getOperationType()) {
 
-      case INSERT:
-        entityInsertPerformed((DbEntityOperation) operation, rowsAffected, failure);
-        break;
+    case INSERT:
+      entityInsertPerformed((DbEntityOperation) operation, rowsAffected, failure);
+      break;
 
-      case DELETE:
-        entityDeletePerformed((DbEntityOperation) operation, rowsAffected, failure);
-        break;
-      case DELETE_BULK:
-        bulkDeletePerformed((DbBulkOperation) operation, rowsAffected, failure);
-        break;
+    case DELETE:
+      entityDeletePerformed((DbEntityOperation) operation, rowsAffected, failure);
+      break;
+    case DELETE_BULK:
+      bulkDeletePerformed((DbBulkOperation) operation, rowsAffected, failure);
+      break;
 
-      case UPDATE:
-        entityUpdatePerformed((DbEntityOperation) operation, rowsAffected, failure);
-        break;
-      case UPDATE_BULK:
-        bulkUpdatePerformed((DbBulkOperation) operation, rowsAffected, failure);
-        break;
+    case UPDATE:
+      entityUpdatePerformed((DbEntityOperation) operation, rowsAffected, failure);
+      break;
+    case UPDATE_BULK:
+      bulkUpdatePerformed((DbBulkOperation) operation, rowsAffected, failure);
+      break;
 
     }
   }
-
 
   @Override
   protected void updateEntity(DbEntityOperation operation) {
@@ -220,7 +219,8 @@ public class BatchDbSqlSession extends DbSqlSession {
     final DbEntity dbEntity = operation.getEntity();
 
     String updateStatement = dbSqlSessionFactory.getUpdateStatement(dbEntity);
-    ensureNotNull("no update statement for " + dbEntity.getClass() + " in the ibatis mapping files", "updateStatement", updateStatement);
+    ensureNotNull("no update statement for " + dbEntity.getClass() + " in the ibatis mapping files",
+        "updateStatement", updateStatement);
 
     LOG.executeDatabaseOperation("UPDATE", dbEntity);
     executeUpdate(updateStatement, dbEntity);
@@ -253,7 +253,8 @@ public class BatchDbSqlSession extends DbSqlSession {
 
     // get statement
     String deleteStatement = dbSqlSessionFactory.getDeleteStatement(dbEntity.getClass());
-    ensureNotNull("no delete statement for " + dbEntity.getClass() + " in the ibatis mapping files", "deleteStatement", deleteStatement);
+    ensureNotNull("no delete statement for " + dbEntity.getClass() + " in the ibatis mapping files",
+        "deleteStatement", deleteStatement);
 
     LOG.executeDatabaseOperation("DELETE", dbEntity);
 

@@ -56,15 +56,18 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
 
   @Override
   protected void checkParameters(CommandContext commandContext) {
-    if(jobId == null && jobDefinitionId == null && processInstanceId == null && processDefinitionId == null && processDefinitionKey == null) {
-      throw new ProcessEngineException("Job id, job definition id, process instance id, process definition id nor process definition key cannot be null");
+    if (jobId == null && jobDefinitionId == null && processInstanceId == null
+        && processDefinitionId == null && processDefinitionKey == null) {
+      throw new ProcessEngineException(
+          "Job id, job definition id, process instance id, process definition id nor process definition key cannot be null");
     }
   }
 
   @Override
   protected void checkAuthorization(CommandContext commandContext) {
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       if (jobId != null) {
 
         JobManager jobManager = commandContext.getJobManager();
@@ -75,8 +78,7 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
           String processInstanceId = job.getProcessInstanceId();
           if (processInstanceId != null) {
             checker.checkUpdateProcessInstanceById(processInstanceId);
-          }
-          else {
+          } else {
             // start timer job is not assigned to a specific process
             // instance, that's why we have to check whether there
             // exists a UPDATE_INSTANCES permission on process definition or
@@ -120,7 +122,8 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
   }
 
   @Override
-  protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
+  protected void updateSuspensionState(CommandContext commandContext,
+      SuspensionState suspensionState) {
     JobManager jobManager = commandContext.getJobManager();
 
     if (jobId != null) {
@@ -133,23 +136,28 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
       jobManager.updateJobSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
 
     } else if (processDefinitionId != null) {
-      jobManager.updateJobSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
+      jobManager.updateJobSuspensionStateByProcessDefinitionId(processDefinitionId,
+          suspensionState);
 
     } else if (processDefinitionKey != null) {
 
       if (!processDefinitionTenantIdSet) {
-        jobManager.updateJobSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+        jobManager.updateJobSuspensionStateByProcessDefinitionKey(processDefinitionKey,
+            suspensionState);
 
       } else {
-        jobManager.updateJobSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
+        jobManager.updateJobSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey,
+            processDefinitionTenantId, suspensionState);
       }
     }
   }
 
   @Override
   protected void logUserOperation(CommandContext commandContext) {
-    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
-    commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), jobId, jobDefinitionId,
-      processInstanceId, processDefinitionId, processDefinitionKey, propertyChange);
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null,
+        getNewSuspensionState().getName());
+    commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), jobId,
+        jobDefinitionId, processInstanceId, processDefinitionId, processDefinitionKey,
+        propertyChange);
   }
 }

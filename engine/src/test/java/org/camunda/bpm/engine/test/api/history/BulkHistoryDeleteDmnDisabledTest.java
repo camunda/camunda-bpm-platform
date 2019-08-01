@@ -43,7 +43,8 @@ import static org.junit.Assert.assertEquals;
 public class BulkHistoryDeleteDmnDisabledTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setDmnEnabled(false);
       return configuration;
     }
@@ -53,7 +54,8 @@ public class BulkHistoryDeleteDmnDisabledTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   private RuntimeService runtimeService;
   private HistoryService historyService;
@@ -67,20 +69,18 @@ public class BulkHistoryDeleteDmnDisabledTest {
 
   @Test
   public void bulkHistoryDeleteWithDisabledDmn() {
-    BpmnModelInstance model = Bpmn.createExecutableProcess("someProcess")
-        .startEvent()
-          .userTask("userTask")
-        .endEvent()
-        .done();
+    BpmnModelInstance model = Bpmn.createExecutableProcess("someProcess").startEvent()
+        .userTask("userTask").endEvent().done();
     testRule.deploy(model);
     List<String> ids = prepareHistoricProcesses("someProcess");
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("someProcess").count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey("someProcess").count());
   }
 
   private List<String> prepareHistoricProcesses(String businessKey) {

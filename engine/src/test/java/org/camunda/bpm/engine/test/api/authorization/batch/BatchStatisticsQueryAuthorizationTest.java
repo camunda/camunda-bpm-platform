@@ -68,18 +68,14 @@ public class BatchStatisticsQueryAuthorizationTest {
   public void deployProcessesAndCreateMigrationPlan() {
     ProcessInstance pi = createMigrationPlan();
 
-    batch1 = engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(pi.getId()))
-      .executeAsync();
+    batch1 = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(pi.getId())).executeAsync();
 
     Job seedJob = engineRule.getManagementService().createJobQuery().singleResult();
     engineRule.getManagementService().executeJob(seedJob.getId());
 
-    batch2 = engineRule.getRuntimeService()
-        .newMigration(migrationPlan)
-        .processInstanceIds(Arrays.asList(pi.getId()))
-        .executeAsync();
+    batch2 = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(pi.getId())).executeAsync();
   }
 
   @After
@@ -103,7 +99,8 @@ public class BatchStatisticsQueryAuthorizationTest {
 
     // when
     authRule.enableAuthorization("user");
-    List<BatchStatistics> batches = engineRule.getManagementService().createBatchStatisticsQuery().list();
+    List<BatchStatistics> batches = engineRule.getManagementService().createBatchStatisticsQuery()
+        .list();
     authRule.disableAuthorization();
 
     // then
@@ -148,7 +145,8 @@ public class BatchStatisticsQueryAuthorizationTest {
 
     // when
     authRule.enableAuthorization("user");
-    List<BatchStatistics> batches = engineRule.getManagementService().createBatchStatisticsQuery().list();
+    List<BatchStatistics> batches = engineRule.getManagementService().createBatchStatisticsQuery()
+        .list();
     authRule.disableAuthorization();
 
     // then
@@ -163,7 +161,8 @@ public class BatchStatisticsQueryAuthorizationTest {
 
     // when
     authRule.enableAuthorization("user");
-    List<BatchStatistics> batches = engineRule.getManagementService().createBatchStatisticsQuery().list();
+    List<BatchStatistics> batches = engineRule.getManagementService().createBatchStatisticsQuery()
+        .list();
     authRule.disableAuthorization();
 
     // then
@@ -177,29 +176,32 @@ public class BatchStatisticsQueryAuthorizationTest {
 
     // when
     authRule.createGrantAuthorization(Resources.BATCH, "*", "userId", Permissions.CREATE);
-    authRule.createGrantAuthorization(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.MIGRATE_INSTANCE);
+    authRule.createGrantAuthorization(Resources.PROCESS_DEFINITION, "*", "userId",
+        Permissions.MIGRATE_INSTANCE);
 
     authRule.enableAuthorization("userId");
-    batch3 = engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(pi.getId()))
-      .executeAsync();
+    batch3 = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(pi.getId())).executeAsync();
     authRule.disableAuthorization();
 
     // then
-    BatchStatistics batchStatistics = engineRule.getManagementService().createBatchStatisticsQuery().batchId(batch3.getId()).singleResult();
+    BatchStatistics batchStatistics = engineRule.getManagementService().createBatchStatisticsQuery()
+        .batchId(batch3.getId()).singleResult();
     assertEquals("userId", batchStatistics.getCreateUserId());
   }
 
   protected ProcessInstance createMigrationPlan() {
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+    migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance pi = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance pi = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
     return pi;
   }
 }

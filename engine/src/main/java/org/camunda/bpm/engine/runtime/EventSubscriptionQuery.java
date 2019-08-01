@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.query.Query;
  *
  * @author Thorben Lindhauer
  */
-public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, EventSubscription>{
+public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, EventSubscription> {
 
   /** Only select subscriptions with the given id. **/
   EventSubscriptionQuery eventSubscriptionId(String id);
@@ -31,9 +31,11 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
   /** Only select subscriptions for events with the given name. **/
   EventSubscriptionQuery eventName(String eventName);
 
-  /** Only select subscriptions for events with the given type. "message" selects message event subscriptions,
-   * "signal" selects signal event subscriptions, "compensation" selects compensation event subscriptions,
-   * "conditional" selects conditional event subscriptions.**/
+  /**
+   * Only select subscriptions for events with the given type. "message" selects message event
+   * subscriptions, "signal" selects signal event subscriptions, "compensation" selects compensation
+   * event subscriptions, "conditional" selects conditional event subscriptions.
+   **/
   EventSubscriptionQuery eventType(String eventType);
 
   /** Only select subscriptions that belong to an execution with the given id. **/
@@ -52,17 +54,20 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
   EventSubscriptionQuery withoutTenantId();
 
   /**
-   * Select subscriptions which have no tenant id. Can be used in combination
-   * with {@link #tenantIdIn(String...)}.
+   * Select subscriptions which have no tenant id. Can be used in combination with
+   * {@link #tenantIdIn(String...)}.
    */
   EventSubscriptionQuery includeEventSubscriptionsWithoutTenantId();
 
-  /** Order by event subscription creation date (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by event subscription creation date (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   EventSubscriptionQuery orderByCreated();
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of subscriptions without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of subscriptions without tenant id is database-specific.
    */
   EventSubscriptionQuery orderByTenantId();
 

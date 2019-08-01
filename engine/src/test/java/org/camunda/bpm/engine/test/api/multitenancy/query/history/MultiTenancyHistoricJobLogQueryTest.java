@@ -35,13 +35,8 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
 
   protected static final BpmnModelInstance BPMN = Bpmn.createExecutableProcess("failingProcess")
-      .startEvent()
-      .serviceTask()
-        .camundaExpression("${failing}")
-        .camundaAsyncBefore()
-        .camundaFailedJobRetryTimeCycle("R1/PT1M")
-      .endEvent()
-      .done();
+      .startEvent().serviceTask().camundaExpression("${failing}").camundaAsyncBefore()
+      .camundaFailedJobRetryTimeCycle("R1/PT1M").endEvent().done();
 
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
@@ -56,37 +51,30 @@ public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineT
   }
 
   public void testQueryWithoutTenantId() {
-    HistoricJobLogQuery query = historyService.
-        createHistoricJobLogQuery();
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
 
     assertThat(query.count(), is(4L));
   }
 
   public void testQueryByTenantId() {
-    HistoricJobLogQuery query = historyService
-        .createHistoricJobLogQuery()
-        .tenantIdIn(TENANT_ONE);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(2L));
 
-    query = historyService
-        .createHistoricJobLogQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = historyService.createHistoricJobLogQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantIds() {
-    HistoricJobLogQuery query = historyService
-        .createHistoricJobLogQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().tenantIdIn(TENANT_ONE,
+        TENANT_TWO);
 
     assertThat(query.count(), is(4L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    HistoricJobLogQuery query = historyService
-        .createHistoricJobLogQuery()
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -94,8 +82,7 @@ public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineT
 
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricJobLogQuery()
-        .tenantIdIn((String) null);
+      historyService.createHistoricJobLogQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -104,9 +91,7 @@ public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineT
 
   public void testQuerySortingAsc() {
     List<HistoricJobLog> historicJobLogs = historyService.createHistoricJobLogQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
+        .orderByTenantId().asc().list();
 
     assertThat(historicJobLogs.size(), is(4));
     assertThat(historicJobLogs.get(0).getTenantId(), is(TENANT_ONE));
@@ -117,9 +102,7 @@ public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineT
 
   public void testQuerySortingDesc() {
     List<HistoricJobLog> historicJobLogs = historyService.createHistoricJobLogQuery()
-        .orderByTenantId()
-        .desc()
-        .list();
+        .orderByTenantId().desc().list();
 
     assertThat(historicJobLogs.size(), is(4));
     assertThat(historicJobLogs.get(0).getTenantId(), is(TENANT_TWO));
@@ -165,7 +148,8 @@ public class MultiTenancyHistoricJobLogQueryTest extends PluggableProcessEngineT
   }
 
   protected void startProcessInstanceAndExecuteFailingJobForTenant(String tenant) {
-    runtimeService.createProcessInstanceByKey("failingProcess").processDefinitionTenantId(tenant).execute();
+    runtimeService.createProcessInstanceByKey("failingProcess").processDefinitionTenantId(tenant)
+        .execute();
 
     executeAvailableJobs();
   }

@@ -43,11 +43,11 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
 /**
- * This class provides utils to verify the sorting of queries of engine entities.
- * Assuming we sort over a property x, there are two valid orderings when some entities
- * have values where x = null: Either, these values precede the overall list, or they trail it.
- * Thus, this class does not use regular comparators but a {@link NullTolerantComparator}
- * that can be used to assert a list of entites in both ways.
+ * This class provides utils to verify the sorting of queries of engine entities. Assuming we sort
+ * over a property x, there are two valid orderings when some entities have values where x = null:
+ * Either, these values precede the overall list, or they trail it. Thus, this class does not use
+ * regular comparators but a {@link NullTolerantComparator} that can be used to assert a list of
+ * entites in both ways.
  *
  * @author Thorben Lindhauer
  *
@@ -74,7 +74,8 @@ public class TestOrderingUtil {
     });
   }
 
-  public static NullTolerantComparator<Execution> executionByProcessDefinitionKey(ProcessEngine processEngine) {
+  public static NullTolerantComparator<Execution> executionByProcessDefinitionKey(
+      ProcessEngine processEngine) {
     final RuntimeService runtimeService = processEngine.getRuntimeService();
     final RepositoryService repositoryService = processEngine.getRepositoryService();
 
@@ -83,17 +84,19 @@ public class TestOrderingUtil {
       public String getProperty(Execution obj) {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
             .processInstanceId(obj.getProcessInstanceId()).singleResult();
-        ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
+        ProcessDefinition processDefinition = repositoryService
+            .getProcessDefinition(processInstance.getProcessDefinitionId());
         return processDefinition.getKey();
       }
     });
   }
 
-  //PROCESS INSTANCE
+  // PROCESS INSTANCE
 
   public static NullTolerantComparator<ProcessInstance> processInstanceByProcessInstanceId() {
     return propertyComparator(new PropertyAccessor<ProcessInstance, String>() {
-      @Override public String getProperty(ProcessInstance obj) {
+      @Override
+      public String getProperty(ProcessInstance obj) {
         return obj.getProcessInstanceId();
       }
     });
@@ -101,7 +104,8 @@ public class TestOrderingUtil {
 
   public static NullTolerantComparator<ProcessInstance> processInstanceByProcessDefinitionId() {
     return propertyComparator(new PropertyAccessor<ProcessInstance, String>() {
-      @Override public String getProperty(ProcessInstance obj) {
+      @Override
+      public String getProperty(ProcessInstance obj) {
         return obj.getProcessDefinitionId();
       }
     });
@@ -109,17 +113,19 @@ public class TestOrderingUtil {
 
   public static NullTolerantComparator<ProcessInstance> processInstanceByBusinessKey() {
     return propertyComparator(new PropertyAccessor<ProcessInstance, String>() {
-      @Override public String getProperty(ProcessInstance obj) {
+      @Override
+      public String getProperty(ProcessInstance obj) {
         return obj.getBusinessKey();
       }
     });
   }
 
-  //HISTORIC PROCESS INSTANCE
+  // HISTORIC PROCESS INSTANCE
 
   public static NullTolerantComparator<HistoricProcessInstance> historicProcessInstanceByProcessDefinitionId() {
     return propertyComparator(new PropertyAccessor<HistoricProcessInstance, String>() {
-      @Override public String getProperty(HistoricProcessInstance obj) {
+      @Override
+      public String getProperty(HistoricProcessInstance obj) {
         return obj.getProcessDefinitionId();
       }
     });
@@ -127,7 +133,8 @@ public class TestOrderingUtil {
 
   public static NullTolerantComparator<HistoricProcessInstance> historicProcessInstanceByProcessDefinitionKey() {
     return propertyComparator(new PropertyAccessor<HistoricProcessInstance, String>() {
-      @Override public String getProperty(HistoricProcessInstance obj) {
+      @Override
+      public String getProperty(HistoricProcessInstance obj) {
         return obj.getProcessDefinitionKey();
       }
     });
@@ -135,7 +142,8 @@ public class TestOrderingUtil {
 
   public static NullTolerantComparator<HistoricProcessInstance> historicProcessInstanceByProcessDefinitionName() {
     return propertyComparator(new PropertyAccessor<HistoricProcessInstance, String>() {
-      @Override public String getProperty(HistoricProcessInstance obj) {
+      @Override
+      public String getProperty(HistoricProcessInstance obj) {
         return obj.getProcessDefinitionName();
       }
     });
@@ -143,7 +151,8 @@ public class TestOrderingUtil {
 
   public static NullTolerantComparator<HistoricProcessInstance> historicProcessInstanceByProcessDefinitionVersion() {
     return propertyComparator(new PropertyAccessor<HistoricProcessInstance, Integer>() {
-      @Override public Integer getProperty(HistoricProcessInstance obj) {
+      @Override
+      public Integer getProperty(HistoricProcessInstance obj) {
         return obj.getProcessDefinitionVersion();
       }
     });
@@ -151,7 +160,8 @@ public class TestOrderingUtil {
 
   public static NullTolerantComparator<HistoricProcessInstance> historicProcessInstanceByProcessInstanceId() {
     return propertyComparator(new PropertyAccessor<HistoricProcessInstance, String>() {
-      @Override public String getProperty(HistoricProcessInstance obj) {
+      @Override
+      public String getProperty(HistoricProcessInstance obj) {
         return obj.getId();
       }
     });
@@ -168,12 +178,14 @@ public class TestOrderingUtil {
     });
   }
 
-  public static NullTolerantComparator<CaseExecution> caseExecutionByDefinitionKey(ProcessEngine processEngine) {
+  public static NullTolerantComparator<CaseExecution> caseExecutionByDefinitionKey(
+      ProcessEngine processEngine) {
     final RepositoryService repositoryService = processEngine.getRepositoryService();
     return propertyComparator(new PropertyAccessor<CaseExecution, String>() {
       @Override
       public String getProperty(CaseExecution obj) {
-        CaseDefinition caseDefinition = repositoryService.getCaseDefinition(obj.getCaseDefinitionId());
+        CaseDefinition caseDefinition = repositoryService
+            .getCaseDefinition(obj.getCaseDefinitionId());
         return caseDefinition.getKey();
       }
     });
@@ -381,13 +393,15 @@ public class TestOrderingUtil {
     });
   }
 
-  public static NullTolerantComparator<HistoricJobLog> historicJobLogByProcessDefinitionKey(ProcessEngine processEngine) {
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByProcessDefinitionKey(
+      ProcessEngine processEngine) {
     final RepositoryService repositoryService = processEngine.getRepositoryService();
 
     return propertyComparator(new PropertyAccessor<HistoricJobLog, String>() {
       @Override
       public String getProperty(HistoricJobLog obj) {
-        ProcessDefinition processDefinition = repositoryService.getProcessDefinition(obj.getProcessDefinitionId());
+        ProcessDefinition processDefinition = repositoryService
+            .getProcessDefinition(obj.getProcessDefinitionId());
         return processDefinition.getKey();
       }
     });
@@ -662,13 +676,15 @@ public class TestOrderingUtil {
     });
   }
 
-  public static NullTolerantComparator<HistoricExternalTaskLog> historicExternalTaskLogByProcessDefinitionKey(ProcessEngine processEngine) {
+  public static NullTolerantComparator<HistoricExternalTaskLog> historicExternalTaskLogByProcessDefinitionKey(
+      ProcessEngine processEngine) {
     final RepositoryService repositoryService = processEngine.getRepositoryService();
 
     return propertyComparator(new PropertyAccessor<HistoricExternalTaskLog, String>() {
       @Override
       public String getProperty(HistoricExternalTaskLog obj) {
-        ProcessDefinition processDefinition = repositoryService.getProcessDefinition(obj.getProcessDefinitionId());
+        ProcessDefinition processDefinition = repositoryService
+            .getProcessDefinition(obj.getProcessDefinitionId());
         return processDefinition.getKey();
       }
     });
@@ -718,11 +734,10 @@ public class TestOrderingUtil {
     P getProperty(T obj);
   }
 
-
   public static <T> NullTolerantComparator<T> inverted(final NullTolerantComparator<T> comparator) {
     return new NullTolerantComparator<T>() {
       public int compare(T o1, T o2) {
-        return - comparator.compare(o1, o2);
+        return -comparator.compare(o1, o2);
       }
 
       public boolean hasNullProperty(T object) {
@@ -731,8 +746,8 @@ public class TestOrderingUtil {
     };
   }
 
-
-  public static <T> NullTolerantComparator<T> hierarchical(final NullTolerantComparator<T> baseComparator,
+  public static <T> NullTolerantComparator<T> hierarchical(
+      final NullTolerantComparator<T> baseComparator,
       final NullTolerantComparator<T>... minorOrderings) {
     return new NullTolerantComparator<T>() {
       public int compare(T o1, T o2, boolean nullPrecedes) {
@@ -791,7 +806,8 @@ public class TestOrderingUtil {
     public abstract boolean hasNullProperty(T object);
   }
 
-  public static <T> void verifySorting(List<T> actualElements, NullTolerantComparator<T> expectedOrdering) {
+  public static <T> void verifySorting(List<T> actualElements,
+      NullTolerantComparator<T> expectedOrdering) {
     // check two orderings: one in which values with null properties are at the front of the list
     boolean leadingNullOrdering = orderingConsistent(actualElements, expectedOrdering, true);
 
@@ -804,7 +820,8 @@ public class TestOrderingUtil {
     TestCase.assertTrue("Ordering not consistent with comparator", trailingNullOrdering);
   }
 
-  public static <T> boolean orderingConsistent(List<T> actualElements, NullTolerantComparator<T> expectedOrdering, boolean nullPrecedes) {
+  public static <T> boolean orderingConsistent(List<T> actualElements,
+      NullTolerantComparator<T> expectedOrdering, boolean nullPrecedes) {
     for (int i = 0; i < actualElements.size() - 1; i++) {
       T currentExecution = actualElements.get(i);
       T nextExecution = actualElements.get(i + 1);
@@ -818,7 +835,8 @@ public class TestOrderingUtil {
     return true;
   }
 
-  public static <T> void verifySortingAndCount(Query<?, T> query, int expectedCount, NullTolerantComparator<T> expectedOrdering) {
+  public static <T> void verifySortingAndCount(Query<?, T> query, int expectedCount,
+      NullTolerantComparator<T> expectedOrdering) {
     List<T> elements = query.list();
     TestCase.assertEquals(expectedCount, elements.size());
 

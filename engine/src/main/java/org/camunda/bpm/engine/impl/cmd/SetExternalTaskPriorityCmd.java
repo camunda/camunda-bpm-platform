@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public class SetExternalTaskPriorityCmd extends ExternalTaskCmd {
-  
+
   /**
    * The priority that should set on the external task.
    */
@@ -42,20 +42,22 @@ public class SetExternalTaskPriorityCmd extends ExternalTaskCmd {
 
   @Override
   protected void execute(ExternalTaskEntity externalTask) {
-    externalTask.setPriority(priority);    
+    externalTask.setPriority(priority);
   }
 
   @Override
   protected void validateInput() {
   }
-  
+
   @Override
   protected String getUserOperationLogOperationType() {
     return UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
   }
-  
+
   @Override
-  protected List<PropertyChange> getUserOperationLogPropertyChanges(ExternalTaskEntity externalTask) {
-    return Collections.singletonList(new PropertyChange("priority", externalTask.getPriority(), priority));
+  protected List<PropertyChange> getUserOperationLogPropertyChanges(
+      ExternalTaskEntity externalTask) {
+    return Collections
+        .singletonList(new PropertyChange("priority", externalTask.getPriority(), priority));
   }
 }

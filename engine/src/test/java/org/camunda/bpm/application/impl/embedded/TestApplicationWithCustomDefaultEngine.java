@@ -22,10 +22,8 @@ import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 /**
  * @author Nikola Koevski
  */
-@ProcessApplication(
-    name="test-app",
-    deploymentDescriptors={"org/camunda/bpm/application/impl/embedded/deployment-to-custom-default-engine.xml"}
-)
+@ProcessApplication(name = "test-app", deploymentDescriptors = {
+    "org/camunda/bpm/application/impl/embedded/deployment-to-custom-default-engine.xml" })
 public class TestApplicationWithCustomDefaultEngine extends EmbeddedProcessApplication {
 
   public TestApplicationWithCustomDefaultEngine() {

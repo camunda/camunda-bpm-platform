@@ -28,10 +28,8 @@ import org.camunda.bpm.engine.impl.javax.el.ELResolver;
  * @author Thorben Lindhauer
  *
  */
-@ProcessApplication(
-    value="calling-app",
-    deploymentDescriptors={"org/camunda/bpm/application/impl/el/calling-process-app.xml"}
-)
+@ProcessApplication(value = "calling-app", deploymentDescriptors = {
+    "org/camunda/bpm/application/impl/el/calling-process-app.xml" })
 public class CallingProcessApplication extends EmbeddedProcessApplication {
 
   protected ELResolver initProcessApplicationElResolver() {

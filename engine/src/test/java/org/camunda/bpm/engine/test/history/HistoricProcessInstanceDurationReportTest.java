@@ -55,17 +55,15 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-      .periodUnit(MONTH)
-      // period: 01 (January)
-      .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
-      .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
-      .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
-      .done();
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
+        // period: 01 (January)
+        .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
+        .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
+        .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
+        .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(MONTH);
 
     // then
@@ -76,8 +74,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(MONTH)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
         // period: 01 (January)
         .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
         .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
@@ -85,8 +82,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(MONTH);
 
     // then
@@ -97,8 +93,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(MONTH)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
         // period: 11 (November)
         .startAndCompleteProcessInstance("process", 2015, 10, 1, 10, 0) // 01.11.2015 10:00
         // period: 12 (December)
@@ -126,8 +121,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(MONTH);
 
     // then
@@ -138,16 +132,14 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(MONTH)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
         // period: 01 (January)
         .startAndCompleteProcessInstance("process", 2015, 1, 1, 10, 0) // 01.01.2015 10:00
         .startAndCompleteProcessInstance("process", 2016, 1, 1, 10, 0) // 01.01.2016 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(MONTH);
 
     // then
@@ -158,15 +150,13 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(QUARTER)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
         // period: 2. quarter
         .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(QUARTER);
 
     // then
@@ -177,16 +167,14 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(QUARTER)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
         // period: 2. quarter
         .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
         .startAndCompleteProcessInstance("process", 2016, 5, 1, 10, 0) // 01.05.2016 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(QUARTER);
 
     // then
@@ -197,8 +185,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(QUARTER)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
         // period: 4. quarter (2015)
         .startAndCompleteProcessInstance("process", 2015, 10, 1, 10, 0) // 01.11.2015 10:00
         .startAndCompleteProcessInstance("process", 2015, 11, 1, 10, 0) // 01.12.2015 10:00
@@ -214,8 +201,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(QUARTER);
 
     // then
@@ -226,16 +212,14 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(QUARTER)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
         // period: 1. quarter
         .startAndCompleteProcessInstance("process", 2015, 1, 1, 10, 0) // 01.01.2015 10:00
         .startAndCompleteProcessInstance("process", 2016, 1, 1, 10, 0) // 01.01.2016 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(QUARTER);
 
     // then
@@ -248,31 +232,29 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     try {
       report.duration(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
   }
 
   public void testReportByStartedBeforeByMonth() {
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-      .periodUnit(MONTH)
-      .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
-      .done();
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
+        .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
+        .done();
 
     // start a second process instance
-    createReportScenario()
-        .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
+    createReportScenario().startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016
+                                                                                         // 10:00
         .done();
 
     Calendar calendar = Calendar.getInstance();
     calendar.set(2016, 0, 16, 0, 0, 0);
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .startedBefore(calendar.getTime())
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .startedBefore(calendar.getTime()).duration(MONTH);
 
     // then
     assertThat(result).matches(assertion);
@@ -282,16 +264,15 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-      .periodUnit(QUARTER)
-      .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
-      .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
-      .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
-      .done();
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
+        .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
+        .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
+        .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
+        .done();
 
     // start a second process instance
-    createReportScenario()
-        .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
+    createReportScenario().startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016
+                                                                                         // 10:00
         .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
         .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
         .done();
@@ -300,10 +281,8 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     calendar.set(2016, 0, 16, 0, 0, 0);
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .startedBefore(calendar.getTime())
-        .duration(QUARTER);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .startedBefore(calendar.getTime()).duration(QUARTER);
 
     // then
     assertThat(result).matches(assertion);
@@ -315,19 +294,19 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     try {
       report.startedBefore(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
   }
 
   public void testReportByStartedAfterByMonth() {
     // given
     deployment(createProcessWithUserTask("process"));
 
-    createReportScenario()
-      .startAndCompleteProcessInstance("process", 2015, 11, 15, 10, 0) // 15.12.2015 10:00
-      .done();
+    createReportScenario().startAndCompleteProcessInstance("process", 2015, 11, 15, 10, 0) // 15.12.2015
+                                                                                           // 10:00
+        .done();
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(MONTH)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
         .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
         .done();
 
@@ -335,10 +314,8 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     calendar.set(2016, 0, 1, 0, 0, 0);
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .startedAfter(calendar.getTime())
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .startedAfter(calendar.getTime()).duration(MONTH);
 
     // then
     assertThat(result).matches(assertion);
@@ -348,12 +325,11 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    createReportScenario()
-      .startAndCompleteProcessInstance("process", 2015, 11, 15, 10, 0) // 15.12.2015 10:00
-      .done();
+    createReportScenario().startAndCompleteProcessInstance("process", 2015, 11, 15, 10, 0) // 15.12.2015
+                                                                                           // 10:00
+        .done();
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(QUARTER)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
         .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
         .done();
 
@@ -361,10 +337,8 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     calendar.set(2016, 0, 1, 0, 0, 0);
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .startedAfter(calendar.getTime())
-        .duration(QUARTER);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .startedAfter(calendar.getTime()).duration(QUARTER);
 
     // then
     assertThat(result).matches(assertion);
@@ -376,21 +350,21 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     try {
       report.startedAfter(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
   }
 
   public void testReportByStartedAfterAndStartedBeforeByMonth() {
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(MONTH)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
         .startAndCompleteProcessInstance("process", 2016, 1, 15, 10, 0) // 15.02.2016 10:00
         .startAndCompleteProcessInstance("process", 2016, 2, 1, 10, 0) // 01.03.2016 10:00
         .done();
 
-    createReportScenario()
-        .startAndCompleteProcessInstance("process", 2016, 3, 15, 10, 0) // 15.04.2016 10:00
+    createReportScenario().startAndCompleteProcessInstance("process", 2016, 3, 15, 10, 0) // 15.04.2016
+                                                                                          // 10:00
         .done();
 
     Calendar calendar = Calendar.getInstance();
@@ -400,11 +374,8 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     Date before = calendar.getTime();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .startedAfter(after)
-        .startedBefore(before)
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .startedAfter(after).startedBefore(before).duration(MONTH);
 
     // then
     assertThat(result).matches(assertion);
@@ -414,14 +385,13 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(QUARTER)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
         .startAndCompleteProcessInstance("process", 2016, 1, 15, 10, 0) // 15.02.2016 10:00
         .startAndCompleteProcessInstance("process", 2016, 2, 1, 10, 0) // 01.03.2016 10:00
         .done();
 
-    createReportScenario()
-        .startAndCompleteProcessInstance("process", 2016, 3, 15, 10, 0) // 15.04.2016 10:00
+    createReportScenario().startAndCompleteProcessInstance("process", 2016, 3, 15, 10, 0) // 15.04.2016
+                                                                                          // 10:00
         .done();
 
     Calendar calendar = Calendar.getInstance();
@@ -431,11 +401,8 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     Date before = calendar.getTime();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .startedAfter(after)
-        .startedBefore(before)
-        .duration(QUARTER);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .startedAfter(after).startedBefore(before).duration(QUARTER);
 
     // then
     assertThat(result).matches(assertion);
@@ -456,11 +423,8 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .startedAfter(hourFromNow.getTime())
-        .startedBefore(hourAgo.getTime())
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .startedAfter(hourFromNow.getTime()).startedBefore(hourAgo.getTime()).duration(MONTH);
 
     // then
     assertEquals(0, result.size());
@@ -470,26 +434,20 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
-    String processDefinitionId1 = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("process1")
-        .singleResult()
-        .getId();
+    String processDefinitionId1 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process1").singleResult().getId();
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(MONTH)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
         .startAndCompleteProcessInstance("process1", 2016, 1, 15, 10, 0) // 15.02.2016 10:00
         .done();
 
-    createReportScenario()
-        .startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016 10:00
+    createReportScenario().startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016
+                                                                                           // 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionIdIn(processDefinitionId1)
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionIdIn(processDefinitionId1).duration(MONTH);
 
     // then
     assertThat(result).matches(assertion);
@@ -499,26 +457,20 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
-    String processDefinitionId1 = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("process1")
-        .singleResult()
-        .getId();
+    String processDefinitionId1 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process1").singleResult().getId();
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(QUARTER)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
         .startAndCompleteProcessInstance("process1", 2016, 1, 15, 10, 0) // 15.02.2016 10:00
         .done();
 
-    createReportScenario()
-        .startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016 10:00
+    createReportScenario().startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016
+                                                                                           // 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionIdIn(processDefinitionId1)
-        .duration(QUARTER);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionIdIn(processDefinitionId1).duration(QUARTER);
 
     // then
     assertThat(result).matches(assertion);
@@ -528,29 +480,20 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
-    String processDefinitionId1 = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("process1")
-        .singleResult()
-        .getId();
+    String processDefinitionId1 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process1").singleResult().getId();
 
-    String processDefinitionId2 = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("process2")
-        .singleResult()
-        .getId();
+    String processDefinitionId2 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process2").singleResult().getId();
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(MONTH)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
         .startAndCompleteProcessInstance("process1", 2016, 1, 15, 10, 0) // 15.02.2016 10:00
         .startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionIdIn(processDefinitionId1, processDefinitionId2)
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionIdIn(processDefinitionId1, processDefinitionId2).duration(MONTH);
 
     // then
     assertThat(result).matches(assertion);
@@ -560,29 +503,20 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
-    String processDefinitionId1 = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("process1")
-        .singleResult()
-        .getId();
+    String processDefinitionId1 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process1").singleResult().getId();
 
-    String processDefinitionId2 = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("process2")
-        .singleResult()
-        .getId();
+    String processDefinitionId2 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process2").singleResult().getId();
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(QUARTER)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
         .startAndCompleteProcessInstance("process1", 2016, 1, 15, 10, 0) // 15.02.2016 10:00
         .startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionIdIn(processDefinitionId1, processDefinitionId2)
-        .duration(QUARTER);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionIdIn(processDefinitionId1, processDefinitionId2).duration(QUARTER);
 
     // then
     assertThat(result).matches(assertion);
@@ -593,31 +527,30 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
 
     try {
       report.processDefinitionIdIn((String) null);
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
 
     try {
       report.processDefinitionIdIn("abc", (String) null, "def");
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
   }
 
   public void testReportByProcessDefinitionKeyByMonth() {
     // given
     deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(MONTH)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
         .startAndCompleteProcessInstance("process1", 2016, 1, 15, 10, 0) // 15.02.2016 10:00
         .done();
 
-    createReportScenario()
-        .startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016 10:00
+    createReportScenario().startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016
+                                                                                           // 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionKeyIn("process1")
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionKeyIn("process1").duration(MONTH);
 
     // then
     assertThat(result).matches(assertion);
@@ -627,20 +560,17 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(QUARTER)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
         .startAndCompleteProcessInstance("process1", 2016, 1, 15, 10, 0) // 15.02.2016 10:00
         .done();
 
-    createReportScenario()
-        .startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016 10:00
+    createReportScenario().startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016
+                                                                                           // 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionKeyIn("process1")
-        .duration(QUARTER);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionKeyIn("process1").duration(QUARTER);
 
     // then
     assertThat(result).matches(assertion);
@@ -650,17 +580,14 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(MONTH)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(MONTH)
         .startAndCompleteProcessInstance("process1", 2016, 1, 15, 10, 0) // 15.02.2016 10:00
         .startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionKeyIn("process1", "process2")
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionKeyIn("process1", "process2").duration(MONTH);
 
     // then
     assertThat(result).matches(assertion);
@@ -670,17 +597,14 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     // given
     deployment(createProcessWithUserTask("process1"), createProcessWithUserTask("process2"));
 
-    DurationReportResultAssertion assertion = createReportScenario()
-        .periodUnit(QUARTER)
+    DurationReportResultAssertion assertion = createReportScenario().periodUnit(QUARTER)
         .startAndCompleteProcessInstance("process1", 2016, 1, 15, 10, 0) // 15.02.2016 10:00
         .startAndCompleteProcessInstance("process2", 2016, 3, 15, 10, 0) // 15.04.2016 10:00
         .done();
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionKeyIn("process1", "process2")
-        .duration(QUARTER);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionKeyIn("process1", "process2").duration(QUARTER);
 
     // then
     assertThat(result).matches(assertion);
@@ -691,19 +615,17 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
 
     try {
       report.processDefinitionKeyIn((String) null);
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
 
     try {
       report.processDefinitionKeyIn("abc", (String) null, "def");
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
   }
 
   protected BpmnModelInstance createProcessWithUserTask(String key) {
-    return Bpmn.createExecutableProcess(key)
-      .startEvent()
-      .userTask()
-      .endEvent()
-    .done();
+    return Bpmn.createExecutableProcess(key).startEvent().userTask().endEvent().done();
   }
 
   protected class DurationReportScenarioBuilder {
@@ -731,7 +653,8 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
       ClockUtil.setCurrentTime(calendar.getTime());
     }
 
-    public DurationReportScenarioBuilder startAndCompleteProcessInstance(String key, int year, int month, int dayOfMonth, int hourOfDay, int minute) {
+    public DurationReportScenarioBuilder startAndCompleteProcessInstance(String key, int year,
+        int month, int dayOfMonth, int hourOfDay, int minute) {
       setCurrentTime(year, month, dayOfMonth, hourOfDay, minute);
 
       ProcessInstance pi = runtimeService.startProcessInstanceByKey(key);
@@ -740,13 +663,11 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
       if (periodUnit == QUARTER) {
         period = month / 3;
       }
-      assertion.addDurationReportResult(period+1, pi.getId());
+      assertion.addDurationReportResult(period + 1, pi.getId());
 
       addToCalendar(Calendar.MONTH, 5);
       addToCalendar(Calendar.SECOND, random.nextInt(60));
-      Task task = taskService.createTaskQuery()
-          .processInstanceId(pi.getId())
-          .singleResult();
+      Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
       taskService.complete(task.getId());
 
       return this;
@@ -763,7 +684,8 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     protected PeriodUnit periodUnit = MONTH;
     protected Map<Integer, Set<String>> periodToProcessInstancesMap = new HashMap<Integer, Set<String>>();
 
-    public DurationReportResultAssertion addDurationReportResult(int period, String processInstanceId) {
+    public DurationReportResultAssertion addDurationReportResult(int period,
+        String processInstanceId) {
       Set<String> processInstances = periodToProcessInstancesMap.get(period);
       if (processInstances == null) {
         processInstances = new HashSet<String>();
@@ -789,10 +711,8 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
         assertNotNull("Unexpected report for period " + period, processInstancesInPeriod);
 
         List<HistoricProcessInstance> historicProcessInstances = historyService
-            .createHistoricProcessInstanceQuery()
-            .processInstanceIds(processInstancesInPeriod)
-            .finished()
-            .list();
+            .createHistoricProcessInstanceQuery().processInstanceIds(processInstancesInPeriod)
+            .finished().list();
 
         long max = 0;
         long min = 0;

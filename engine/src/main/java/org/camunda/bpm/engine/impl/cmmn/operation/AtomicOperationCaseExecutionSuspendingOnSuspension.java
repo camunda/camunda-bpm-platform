@@ -26,7 +26,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionSuspendingOnSuspension extends AbstractAtomicOperationCaseExecutionSuspending {
+public class AtomicOperationCaseExecutionSuspendingOnSuspension
+    extends AbstractAtomicOperationCaseExecutionSuspending {
 
   public String getCanonicalName() {
     return "case-execution-suspending-on-suspension";

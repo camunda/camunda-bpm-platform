@@ -67,9 +67,7 @@ public class HistoricCaseActivityStatisticsQueryTest {
 
     // when
     try {
-      historyService
-        .createHistoricCaseActivityStatisticsQuery(null)
-        .list();
+      historyService.createHistoricCaseActivityStatisticsQuery(null).list();
       fail("It should not be possible to query for statistics by null.");
     } catch (NullValueException exception) {
 
@@ -83,7 +81,8 @@ public class HistoricCaseActivityStatisticsQueryTest {
     String caseDefinitionId = getCaseDefinition().getId();
 
     // when
-    HistoricCaseActivityStatisticsQuery query = historyService.createHistoricCaseActivityStatisticsQuery(caseDefinitionId);
+    HistoricCaseActivityStatisticsQuery query = historyService
+        .createHistoricCaseActivityStatisticsQuery(caseDefinitionId);
 
     // then
     assertEquals(0, query.count());
@@ -99,7 +98,8 @@ public class HistoricCaseActivityStatisticsQueryTest {
     createCaseByKey(5, "oneTaskCase");
 
     // when
-    HistoricCaseActivityStatisticsQuery query = historyService.createHistoricCaseActivityStatisticsQuery(caseDefinitionId);
+    HistoricCaseActivityStatisticsQuery query = historyService
+        .createHistoricCaseActivityStatisticsQuery(caseDefinitionId);
 
     // then
     List<HistoricCaseActivityStatistics> statistics = query.list();
@@ -123,7 +123,8 @@ public class HistoricCaseActivityStatisticsQueryTest {
     terminateByActivity("TERMINATED");
 
     // when
-    HistoricCaseActivityStatisticsQuery query = historyService.createHistoricCaseActivityStatisticsQuery(caseDefinitionId);
+    HistoricCaseActivityStatisticsQuery query = historyService
+        .createHistoricCaseActivityStatisticsQuery(caseDefinitionId);
 
     // then
     List<HistoricCaseActivityStatistics> statistics = query.list();
@@ -140,8 +141,7 @@ public class HistoricCaseActivityStatisticsQueryTest {
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/history/HistoricCaseActivityStatisticsQueryTest.testMultipleTasks.cmmn"
-  })
+      "org/camunda/bpm/engine/test/history/HistoricCaseActivityStatisticsQueryTest.testMultipleTasks.cmmn" })
   public void testStateCount() {
 
     // given
@@ -172,7 +172,8 @@ public class HistoricCaseActivityStatisticsQueryTest {
     disableByActivity("DISABLED");
 
     // when
-    HistoricCaseActivityStatisticsQuery query = historyService.createHistoricCaseActivityStatisticsQuery(caseDefinitionId);
+    HistoricCaseActivityStatisticsQuery query = historyService
+        .createHistoricCaseActivityStatisticsQuery(caseDefinitionId);
 
     // then
     List<HistoricCaseActivityStatistics> statistics = query.list();
@@ -188,10 +189,8 @@ public class HistoricCaseActivityStatisticsQueryTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
-    "org/camunda/bpm/engine/test/history/HistoricCaseActivityStatisticsQueryTest.testMultipleTasks.cmmn"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/history/HistoricCaseActivityStatisticsQueryTest.testMultipleTasks.cmmn" })
   public void testMultipleCaseDefinitions() {
 
     // given
@@ -202,8 +201,10 @@ public class HistoricCaseActivityStatisticsQueryTest {
     createCaseByKey(10, "case");
 
     // when
-    HistoricCaseActivityStatisticsQuery query1 = historyService.createHistoricCaseActivityStatisticsQuery(caseDefinitionId1);
-    HistoricCaseActivityStatisticsQuery query2 = historyService.createHistoricCaseActivityStatisticsQuery(caseDefinitionId2);
+    HistoricCaseActivityStatisticsQuery query1 = historyService
+        .createHistoricCaseActivityStatisticsQuery(caseDefinitionId1);
+    HistoricCaseActivityStatisticsQuery query2 = historyService
+        .createHistoricCaseActivityStatisticsQuery(caseDefinitionId2);
 
     // then
     assertThat(query1.list().size(), is(1));
@@ -213,8 +214,7 @@ public class HistoricCaseActivityStatisticsQueryTest {
 
   @Test
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/history/HistoricCaseActivityStatisticsQueryTest.testMultipleTasks.cmmn"
-  })
+      "org/camunda/bpm/engine/test/history/HistoricCaseActivityStatisticsQueryTest.testMultipleTasks.cmmn" })
   public void testPagination() {
     // given
     String caseDefinitionId = getCaseDefinition().getId();
@@ -223,16 +223,15 @@ public class HistoricCaseActivityStatisticsQueryTest {
 
     // when
     List<HistoricCaseActivityStatistics> statistics = historyService
-        .createHistoricCaseActivityStatisticsQuery(caseDefinitionId)
-        .listPage(2, 1);
+        .createHistoricCaseActivityStatisticsQuery(caseDefinitionId).listPage(2, 1);
 
     // then
     assertThat(statistics.size(), is(1));
     assertThat(statistics.get(0).getId(), is("COMPLETED"));
   }
 
-  protected void assertStatisitcs(HistoricCaseActivityStatistics statistics,
-      String id, long active, long availabe, long completed, long disabled, long enabled, long terminated) {
+  protected void assertStatisitcs(HistoricCaseActivityStatistics statistics, String id, long active,
+      long availabe, long completed, long disabled, long enabled, long terminated) {
     assertThat(statistics.getId(), is(id));
     assertEquals(active, statistics.getActive());
     assertEquals(availabe, statistics.getAvailable());
@@ -257,9 +256,7 @@ public class HistoricCaseActivityStatisticsQueryTest {
   }
 
   protected List<CaseExecution> getCaseExecutionsByActivity(String activityId) {
-    return caseService.createCaseExecutionQuery()
-        .activityId(activityId)
-        .list();
+    return caseService.createCaseExecutionQuery().activityId(activityId).list();
   }
 
   protected void disableByActivity(String activityId) {

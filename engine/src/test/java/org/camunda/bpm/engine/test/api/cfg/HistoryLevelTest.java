@@ -39,7 +39,8 @@ public class HistoryLevelTest {
 
     assertThat(processEngineConfiguration.getHistoryLevels().size(), is(4));
     assertThat(processEngineConfiguration.getHistoryLevel(), is(HistoryLevel.HISTORY_LEVEL_FULL));
-    assertThat(processEngineConfiguration.getHistory(), is(HistoryLevel.HISTORY_LEVEL_FULL.getName()));
+    assertThat(processEngineConfiguration.getHistory(),
+        is(HistoryLevel.HISTORY_LEVEL_FULL.getName()));
   }
 
   @Test
@@ -51,7 +52,8 @@ public class HistoryLevelTest {
 
     assertThat(processEngineConfiguration.getHistoryLevels().size(), is(4));
     assertThat(processEngineConfiguration.getHistoryLevel(), is(HistoryLevel.HISTORY_LEVEL_FULL));
-    assertThat(processEngineConfiguration.getHistory(), is(HistoryLevel.HISTORY_LEVEL_FULL.getName()));
+    assertThat(processEngineConfiguration.getHistory(),
+        is(HistoryLevel.HISTORY_LEVEL_FULL.getName()));
   }
 
   protected ProcessEngineConfigurationImpl createConfig() {
@@ -62,7 +64,8 @@ public class HistoryLevelTest {
     return configuration;
   }
 
-  protected ProcessEngineConfigurationImpl buildProcessEngine(ProcessEngineConfigurationImpl config) {
+  protected ProcessEngineConfigurationImpl buildProcessEngine(
+      ProcessEngineConfigurationImpl config) {
     processEngine = config.buildProcessEngine();
 
     return (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();

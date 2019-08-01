@@ -20,16 +20,15 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Joram Barrez
  */
 public class ToUpperCaseFieldInjected implements JavaDelegate {
-  
+
   private Expression text;
-  
+
   public void execute(DelegateExecution execution) {
-    execution.setVariable("var", ((String)text.getValue(execution)).toUpperCase());
+    execution.setVariable("var", ((String) text.getValue(execution)).toUpperCase());
   }
-  
+
 }

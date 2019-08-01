@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -56,20 +55,15 @@ public class DeleteJobsCmd implements Command<Void> {
 
   public Void execute(CommandContext commandContext) {
     JobEntity jobToDelete = null;
-    for (String jobId: jobIds) {
-      jobToDelete = Context
-        .getCommandContext()
-        .getJobManager()
-        .findJobById(jobId);
+    for (String jobId : jobIds) {
+      jobToDelete = Context.getCommandContext().getJobManager().findJobById(jobId);
 
-      if(jobToDelete != null) {
+      if (jobToDelete != null) {
         // When given job doesn't exist, ignore
         jobToDelete.delete();
 
         if (cascade) {
-          commandContext
-            .getHistoricJobLogManager()
-            .deleteHistoricJobLogByJobId(jobId);
+          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
         }
       }
     }

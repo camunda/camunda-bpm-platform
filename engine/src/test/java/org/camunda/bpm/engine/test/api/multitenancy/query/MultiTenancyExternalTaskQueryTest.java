@@ -36,13 +36,8 @@ public class MultiTenancyExternalTaskQueryTest extends PluggableProcessEngineTes
 
   @Override
   protected void setUp() {
-    BpmnModelInstance process = Bpmn.createExecutableProcess()
-      .startEvent()
-      .serviceTask()
-        .camundaType("external")
-        .camundaTopic("test")
-      .endEvent()
-    .done();
+    BpmnModelInstance process = Bpmn.createExecutableProcess().startEvent().serviceTask()
+        .camundaType("external").camundaTopic("test").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, process);
     deploymentForTenant(TENANT_TWO, process);
@@ -52,37 +47,30 @@ public class MultiTenancyExternalTaskQueryTest extends PluggableProcessEngineTes
   }
 
   public void testQueryWithoutTenantId() {
-    ExternalTaskQuery query = externalTaskService
-        .createExternalTaskQuery();
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
-    ExternalTaskQuery query = externalTaskService
-        .createExternalTaskQuery()
-        .tenantIdIn(TENANT_ONE);
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery().tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = externalTaskService
-        .createExternalTaskQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = externalTaskService.createExternalTaskQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    ExternalTaskQuery query = externalTaskService
-        .createExternalTaskQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO);
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery().tenantIdIn(TENANT_ONE,
+        TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    ExternalTaskQuery query = externalTaskService
-        .createExternalTaskQuery()
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -90,8 +78,7 @@ public class MultiTenancyExternalTaskQueryTest extends PluggableProcessEngineTes
 
   public void testFailQueryByTenantIdNull() {
     try {
-      externalTaskService.createExternalTaskQuery()
-        .tenantIdIn((String) null);
+      externalTaskService.createExternalTaskQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -100,9 +87,7 @@ public class MultiTenancyExternalTaskQueryTest extends PluggableProcessEngineTes
 
   public void testQuerySortingAsc() {
     List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
+        .orderByTenantId().asc().list();
 
     assertThat(externalTasks.size(), is(2));
     assertThat(externalTasks.get(0).getTenantId(), is(TENANT_ONE));
@@ -111,9 +96,7 @@ public class MultiTenancyExternalTaskQueryTest extends PluggableProcessEngineTes
 
   public void testQuerySortingDesc() {
     List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery()
-        .orderByTenantId()
-        .desc()
-        .list();
+        .orderByTenantId().desc().list();
 
     assertThat(externalTasks.size(), is(2));
     assertThat(externalTasks.get(0).getTenantId(), is(TENANT_TWO));
@@ -157,11 +140,8 @@ public class MultiTenancyExternalTaskQueryTest extends PluggableProcessEngineTes
   }
 
   protected void startProcessInstance(String tenant) {
-    String processDefinitionId = repositoryService
-      .createProcessDefinitionQuery()
-      .tenantIdIn(tenant)
-      .singleResult()
-      .getId();
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().tenantIdIn(tenant)
+        .singleResult().getId();
 
     runtimeService.startProcessInstanceById(processDefinitionId);
   }

@@ -75,12 +75,9 @@ public class FilterServiceUserOperationLogTest {
   @Test
   public void testCreateFilter() {
     // given
-    Filter filter = filterService.newTaskFilter()
-        .setName("name")
-        .setOwner("owner")
-        .setQuery(taskService.createTaskQuery())
-        .setProperties(new HashMap<String, Object>());
-    
+    Filter filter = filterService.newTaskFilter().setName("name").setOwner("owner")
+        .setQuery(taskService.createTaskQuery()).setProperties(new HashMap<String, Object>());
+
     // when
     identityService.setAuthenticatedUserId("userId");
     filterService.saveFilter(filter);
@@ -99,13 +96,10 @@ public class FilterServiceUserOperationLogTest {
   @Test
   public void testUpdateFilter() {
     // given
-    Filter filter = filterService.newTaskFilter()
-        .setName("name")
-        .setOwner("owner")
-        .setQuery(taskService.createTaskQuery())
-        .setProperties(new HashMap<String, Object>());
+    Filter filter = filterService.newTaskFilter().setName("name").setOwner("owner")
+        .setQuery(taskService.createTaskQuery()).setProperties(new HashMap<String, Object>());
     filterService.saveFilter(filter);
-    
+
     // when
     identityService.setAuthenticatedUserId("userId");
     filter.setName(filter.getName() + "_new");
@@ -125,13 +119,10 @@ public class FilterServiceUserOperationLogTest {
   @Test
   public void testDeleteFilter() {
     // given
-    Filter filter = filterService.newTaskFilter()
-        .setName("name")
-        .setOwner("owner")
-        .setQuery(taskService.createTaskQuery())
-        .setProperties(new HashMap<String, Object>());
+    Filter filter = filterService.newTaskFilter().setName("name").setOwner("owner")
+        .setQuery(taskService.createTaskQuery()).setProperties(new HashMap<String, Object>());
     filterService.saveFilter(filter);
-    
+
     // when
     identityService.setAuthenticatedUserId("userId");
     filterService.deleteFilter(filter.getId());

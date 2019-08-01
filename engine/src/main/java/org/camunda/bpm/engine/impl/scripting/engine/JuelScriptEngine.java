@@ -48,12 +48,11 @@ import org.camunda.bpm.engine.impl.javax.el.VariableMapper;
 import org.camunda.bpm.engine.impl.juel.SimpleResolver;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
-
 /**
  * ScriptEngine that used JUEL for script evaluation and compilation (JSR-223).
  *
- * Uses EL 1.1 if available, to resolve expressions. Otherwise it reverts to EL
- * 1.0, using {@link ExpressionFactoryResolver}.
+ * Uses EL 1.1 if available, to resolve expressions. Otherwise it reverts to EL 1.0, using
+ * {@link ExpressionFactoryResolver}.
  *
  * @author Frederik Heremans
  */
@@ -94,7 +93,8 @@ public class JuelScriptEngine extends AbstractScriptEngine {
     return new SimpleBindings();
   }
 
-  private Object evaluateExpression(ValueExpression expr, ScriptContext ctx) throws ScriptException {
+  private Object evaluateExpression(ValueExpression expr, ScriptContext ctx)
+      throws ScriptException {
     try {
       return expr.getValue(createElContext(ctx));
     } catch (ELException elexp) {
@@ -128,7 +128,8 @@ public class JuelScriptEngine extends AbstractScriptEngine {
 
   private ValueExpression parse(String script, ScriptContext scriptContext) throws ScriptException {
     try {
-      return expressionFactory.createValueExpression(createElContext(scriptContext), script, Object.class);
+      return expressionFactory.createValueExpression(createElContext(scriptContext), script,
+          Object.class);
     } catch (ELException ele) {
       throw new ScriptException(ele);
     }
@@ -188,7 +189,8 @@ public class JuelScriptEngine extends AbstractScriptEngine {
 
   private static Method getImportMethod() {
     try {
-      return JuelScriptEngine.class.getMethod("importFunctions", new Class[] { ScriptContext.class, String.class, Object.class });
+      return JuelScriptEngine.class.getMethod("importFunctions",
+          new Class[] { ScriptContext.class, String.class, Object.class });
     } catch (Exception exp) {
       // Will never occur
       return null;
@@ -196,9 +198,9 @@ public class JuelScriptEngine extends AbstractScriptEngine {
   }
 
   public static void importFunctions(ScriptContext ctx, String namespace, Object obj) {
-    Class< ? > clazz = null;
+    Class<?> clazz = null;
     if (obj instanceof Class) {
-      clazz = (Class< ? >) obj;
+      clazz = (Class<?>) obj;
     } else if (obj instanceof String) {
       try {
         clazz = ReflectUtil.loadClass((String) obj);
@@ -242,8 +244,7 @@ public class JuelScriptEngine extends AbstractScriptEngine {
   }
 
   /**
-   * ValueMapper that uses the ScriptContext to get variable values or value
-   * expressions.
+   * ValueMapper that uses the ScriptContext to get variable values or value expressions.
    *
    * @author Frederik Heremans
    */

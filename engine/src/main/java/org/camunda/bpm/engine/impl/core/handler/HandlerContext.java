@@ -19,8 +19,10 @@ package org.camunda.bpm.engine.impl.core.handler;
 import org.camunda.bpm.engine.impl.core.model.CoreActivity;
 
 /**
- * <p>An implementation of this context should contain necessary
- * information to be accessed by a {@link ModelElementHandler}.</p>
+ * <p>
+ * An implementation of this context should contain necessary information to be accessed by a
+ * {@link ModelElementHandler}.
+ * </p>
  *
  * @author Roman Smirnov
  *
@@ -28,12 +30,14 @@ import org.camunda.bpm.engine.impl.core.model.CoreActivity;
 public interface HandlerContext {
 
   /**
-   * <p>This method returns an {@link CoreActivity activity}. The
-   * returned activity represents a parent activity, which can
-   * contain {@link CoreActivity activities}.</p>
+   * <p>
+   * This method returns an {@link CoreActivity activity}. The returned activity represents a parent
+   * activity, which can contain {@link CoreActivity activities}.
+   * </p>
    *
-   * <p>The returned activity should be used as a parent activity
-   * for a new {@link CoreActivity activity}.
+   * <p>
+   * The returned activity should be used as a parent activity for a new {@link CoreActivity
+   * activity}.
    *
    * @return a {@link CoreActivity}
    */

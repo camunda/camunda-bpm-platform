@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Roman Smirnov
  *
  */
-public abstract class AbstractAtomicOperationCaseExecutionTerminate extends AbstractCmmnEventAtomicOperation {
+public abstract class AbstractAtomicOperationCaseExecutionTerminate
+    extends AbstractCmmnEventAtomicOperation {
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
     // set current case execution as "TERMINATED"

@@ -32,7 +32,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author Thorben Lindhauer
  * @author Christopher Zell
  */
-public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, ExternalTask> implements ExternalTaskQuery   {
+public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, ExternalTask>
+    implements ExternalTaskQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -137,6 +138,7 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
     this.activityIdIn = activityIdIn;
     return this;
   }
+
   @Override
   public ExternalTaskQuery priorityHigherThanOrEquals(long priority) {
     this.priorityHigherThanOrEquals = priority;
@@ -148,7 +150,6 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
     this.priorityLowerThanOrEquals = priority;
     return this;
   }
-
 
   public ExternalTaskQuery suspended() {
     this.suspensionState = SuspensionState.SUSPENDED;
@@ -172,8 +173,8 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
 
   @Override
   protected boolean hasExcludingConditions() {
-    return super.hasExcludingConditions()
-      || CompareUtil.areNotInAscendingOrder(priorityHigherThanOrEquals, priorityLowerThanOrEquals);
+    return super.hasExcludingConditions() || CompareUtil
+        .areNotInAscendingOrder(priorityHigherThanOrEquals, priorityLowerThanOrEquals);
   }
 
   public ExternalTaskQuery tenantIdIn(String... tenantIds) {
@@ -210,27 +211,22 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   public ExternalTaskQuery orderByPriority() {
     return orderBy(ExternalTaskQueryProperty.PRIORITY);
   }
+
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getExternalTaskManager()
-      .findExternalTaskCountByQueryCriteria(this);
+    return commandContext.getExternalTaskManager().findExternalTaskCountByQueryCriteria(this);
   }
 
   @Override
   public List<ExternalTask> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getExternalTaskManager()
-      .findExternalTasksByQueryCriteria(this);
+    return commandContext.getExternalTaskManager().findExternalTasksByQueryCriteria(this);
   }
 
   public List<String> executeIdsList(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getExternalTaskManager()
-      .findExternalTaskIdsByQueryCriteria(this);
+    return commandContext.getExternalTaskManager().findExternalTaskIdsByQueryCriteria(this);
   }
 
   public String getExternalTaskId() {

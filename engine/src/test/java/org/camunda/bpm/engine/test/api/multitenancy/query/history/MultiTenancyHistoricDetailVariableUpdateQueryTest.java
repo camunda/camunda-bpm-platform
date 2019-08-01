@@ -37,7 +37,8 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class MultiTenancyHistoricDetailVariableUpdateQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyHistoricDetailVariableUpdateQueryTest
+    extends PluggableProcessEngineTestCase {
 
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
@@ -48,11 +49,8 @@ public class MultiTenancyHistoricDetailVariableUpdateQueryTest extends Pluggable
 
   @Override
   protected void setUp() {
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .userTask()
-      .endEvent()
-    .done();
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .userTask().endEvent().done();
 
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
@@ -66,42 +64,31 @@ public class MultiTenancyHistoricDetailVariableUpdateQueryTest extends Pluggable
   }
 
   public void testQueryWithoutTenantId() {
-    HistoricDetailQuery query = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().variableUpdates();
 
     assertThat(query.count(), is(4L));
   }
 
   public void testQueryByTenantId() {
-    HistoricDetailQuery query = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().variableUpdates()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(2L));
 
-    query = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
-        .tenantIdIn(TENANT_TWO);
+    query = historyService.createHistoricDetailQuery().variableUpdates().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantIds() {
-    HistoricDetailQuery query = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().variableUpdates()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(4L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    HistoricDetailQuery query = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().variableUpdates()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -109,9 +96,7 @@ public class MultiTenancyHistoricDetailVariableUpdateQueryTest extends Pluggable
 
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricDetailQuery()
-        .variableUpdates()
-        .tenantIdIn((String) null);
+      historyService.createHistoricDetailQuery().variableUpdates().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -120,10 +105,7 @@ public class MultiTenancyHistoricDetailVariableUpdateQueryTest extends Pluggable
 
   public void testQuerySortingAsc() {
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery()
-        .variableUpdates()
-        .orderByTenantId()
-        .asc()
-        .list();
+        .variableUpdates().orderByTenantId().asc().list();
 
     assertThat(historicDetails.size(), is(4));
     assertThat(historicDetails.get(0).getTenantId(), is(TENANT_ONE));
@@ -134,10 +116,7 @@ public class MultiTenancyHistoricDetailVariableUpdateQueryTest extends Pluggable
 
   public void testQuerySortingDesc() {
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery()
-        .variableUpdates()
-        .orderByTenantId()
-        .desc()
-        .list();
+        .variableUpdates().orderByTenantId().desc().list();
 
     assertThat(historicDetails.size(), is(4));
     assertThat(historicDetails.get(0).getTenantId(), is(TENANT_TWO));
@@ -183,14 +162,13 @@ public class MultiTenancyHistoricDetailVariableUpdateQueryTest extends Pluggable
   }
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant, String var) {
-    return runtimeService.createProcessInstanceByKey("testProcess")
-        .setVariable(VARIABLE_NAME, var)
-        .processDefinitionTenantId(tenant)
-        .execute();
+    return runtimeService.createProcessInstanceByKey("testProcess").setVariable(VARIABLE_NAME, var)
+        .processDefinitionTenantId(tenant).execute();
   }
 
   protected void completeUserTask(ProcessInstance processInstance, String varValue) {
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     assertThat(task, is(notNullValue()));
 
     Map<String, Object> updatedVariables = new HashMap<String, Object>();

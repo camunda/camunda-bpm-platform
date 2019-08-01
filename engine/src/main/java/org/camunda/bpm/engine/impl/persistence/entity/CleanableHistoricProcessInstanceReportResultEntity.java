@@ -18,8 +18,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 
-
-public class CleanableHistoricProcessInstanceReportResultEntity implements CleanableHistoricProcessInstanceReportResult {
+public class CleanableHistoricProcessInstanceReportResultEntity
+    implements CleanableHistoricProcessInstanceReportResult {
 
   protected String processDefinitionId;
   protected String processDefinitionKey;
@@ -95,15 +95,11 @@ public class CleanableHistoricProcessInstanceReportResultEntity implements Clean
   }
 
   public String toString() {
-    return this.getClass().getSimpleName()
-        + "[processDefinitionId = " + processDefinitionId
-        + ", processDefinitionKey = " + processDefinitionKey
-        + ", processDefinitionName = " + processDefinitionName
-        + ", processDefinitionVersion = " + processDefinitionVersion
-        + ", historyTimeToLive = " + historyTimeToLive
-        + ", finishedProcessInstanceCount = " + finishedProcessInstanceCount
-        + ", cleanableProcessInstanceCount = " + cleanableProcessInstanceCount
-        + ", tenantId = " + tenantId
-        + "]";
+    return this.getClass().getSimpleName() + "[processDefinitionId = " + processDefinitionId
+        + ", processDefinitionKey = " + processDefinitionKey + ", processDefinitionName = "
+        + processDefinitionName + ", processDefinitionVersion = " + processDefinitionVersion
+        + ", historyTimeToLive = " + historyTimeToLive + ", finishedProcessInstanceCount = "
+        + finishedProcessInstanceCount + ", cleanableProcessInstanceCount = "
+        + cleanableProcessInstanceCount + ", tenantId = " + tenantId + "]";
   }
 }

@@ -62,7 +62,8 @@ import static org.junit.Assert.fail;
 public class MessageIntermediateEventTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
       return configuration;
     }
@@ -71,7 +72,8 @@ public class MessageIntermediateEventTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -86,7 +88,7 @@ public class MessageIntermediateEventTest {
     taskService = engineRule.getTaskService();
     repositoryService = engineRule.getRepositoryService();
   }
-  
+
   @Deployment
   @Test
   public void testSingleIntermediateMessageEvent() {
@@ -100,15 +102,13 @@ public class MessageIntermediateEventTest {
 
     String messageName = "newInvoiceMessage";
     Execution execution = runtimeService.createExecutionQuery()
-        .messageEventSubscriptionName(messageName)
-        .singleResult();
+        .messageEventSubscriptionName(messageName).singleResult();
 
     assertNotNull(execution);
 
     runtimeService.messageEventReceived(messageName, execution.getId());
 
-    Task task = taskService.createTaskQuery()
-        .singleResult();
+    Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
     taskService.complete(task.getId());
 
@@ -128,22 +128,19 @@ public class MessageIntermediateEventTest {
 
     String messageName = "newInvoiceMessage";
     List<Execution> executions = runtimeService.createExecutionQuery()
-        .messageEventSubscriptionName(messageName)
-        .list();
+        .messageEventSubscriptionName(messageName).list();
 
     assertNotNull(executions);
     assertEquals(2, executions.size());
 
     runtimeService.messageEventReceived(messageName, executions.get(0).getId());
 
-    Task task = taskService.createTaskQuery()
-        .singleResult();
+    Task task = taskService.createTaskQuery().singleResult();
     assertNull(task);
 
     runtimeService.messageEventReceived(messageName, executions.get(1).getId());
 
-    task = taskService.createTaskQuery()
-        .singleResult();
+    task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
 
     taskService.complete(task.getId());
@@ -153,8 +150,8 @@ public class MessageIntermediateEventTest {
   public void testIntermediateMessageEventRedeployment() {
 
     // deploy version 1
-    repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
+    repositoryService.createDeployment().addClasspathResource(
+        "org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
         .deploy();
     // now there is one process deployed
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
@@ -167,8 +164,8 @@ public class MessageIntermediateEventTest {
     assertTrue(activeActivityIds.contains("messageCatch"));
 
     // deploy version 2
-    repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
+    repositoryService.createDeployment().addClasspathResource(
+        "org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
         .deploy();
 
     // now there are two versions deployed:
@@ -181,7 +178,8 @@ public class MessageIntermediateEventTest {
     assertTrue(activeActivityIds.contains("messageCatch"));
 
     // delete both versions:
-    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService
+        .createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
@@ -190,13 +188,13 @@ public class MessageIntermediateEventTest {
   @Test
   public void testEmptyMessageNameFails() {
     try {
-      repositoryService
-          .createDeployment()
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testEmptyMessageNameFails.bpmn20.xml")
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testEmptyMessageNameFails.bpmn20.xml")
           .deploy();
       fail("exception expected");
     } catch (ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("Cannot have a message event subscription with an empty or missing name"));
+      assertTrue(e.getMessage()
+          .contains("Cannot have a message event subscription with an empty or missing name"));
     }
   }
 
@@ -207,14 +205,16 @@ public class MessageIntermediateEventTest {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    EventSubscription messageEventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    EventSubscription messageEventSubscription = runtimeService.createEventSubscriptionQuery()
+        .singleResult();
 
     // when
     FailingJavaSerializable javaSerializable = new FailingJavaSerializable("foo");
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()),
+        engineRule.getProcessEngine());
 
     // then it is not possible to deserialize the object
     try {
@@ -224,24 +224,22 @@ public class MessageIntermediateEventTest {
     }
 
     // but it can be set as a variable when delivering a message:
-    runtimeService
-        .messageEventReceived(
-            "newInvoiceMessage",
-            messageEventSubscription.getExecutionId(),
-            Variables.createVariables().putValueTyped("var",
-                Variables
-                    .serializedObjectValue(serializedObject)
-                    .objectTypeName(FailingJavaSerializable.class.getName())
-                    .serializationDataFormat(SerializationDataFormats.JAVA)
-                    .create()));
+    runtimeService.messageEventReceived("newInvoiceMessage",
+        messageEventSubscription.getExecutionId(),
+        Variables.createVariables().putValueTyped("var",
+            Variables.serializedObjectValue(serializedObject)
+                .objectTypeName(FailingJavaSerializable.class.getName())
+                .serializationDataFormat(SerializationDataFormats.JAVA).create()));
 
     // then
-    ObjectValue variableTyped = runtimeService.getVariableTyped(processInstance.getId(), "var", false);
+    ObjectValue variableTyped = runtimeService.getVariableTyped(processInstance.getId(), "var",
+        false);
     assertNotNull(variableTyped);
     assertFalse(variableTyped.isDeserialized());
     assertEquals(serializedObject, variableTyped.getValueSerialized());
     assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
-    assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
+    assertEquals(SerializationDataFormats.JAVA.getName(),
+        variableTyped.getSerializationDataFormat());
   }
 
   @Deployment
@@ -262,13 +260,11 @@ public class MessageIntermediateEventTest {
     // then
     String messageName = "newInvoiceMessage-bar";
     Execution execution = runtimeService.createExecutionQuery()
-        .messageEventSubscriptionName(messageName)
-        .singleResult();
+        .messageEventSubscriptionName(messageName).singleResult();
     assertNotNull(execution);
 
     runtimeService.messageEventReceived(messageName, execution.getId());
-    Task task = taskService.createTaskQuery()
-        .singleResult();
+    Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
     taskService.complete(task.getId());
   }

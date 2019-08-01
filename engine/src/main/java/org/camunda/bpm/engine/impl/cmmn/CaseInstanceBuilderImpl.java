@@ -55,13 +55,15 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
   protected String caseDefinitionTenantId;
   protected boolean isTenantIdSet = false;
 
-  public CaseInstanceBuilderImpl(CommandExecutor commandExecutor, String caseDefinitionKey, String caseDefinitionId) {
+  public CaseInstanceBuilderImpl(CommandExecutor commandExecutor, String caseDefinitionKey,
+      String caseDefinitionId) {
     this(caseDefinitionKey, caseDefinitionId);
     ensureNotNull("commandExecutor", commandExecutor);
     this.commandExecutor = commandExecutor;
   }
 
-  public CaseInstanceBuilderImpl(CommandContext commandContext, String caseDefinitionKey, String caseDefinitionId) {
+  public CaseInstanceBuilderImpl(CommandContext commandContext, String caseDefinitionKey,
+      String caseDefinitionId) {
     this(caseDefinitionKey, caseDefinitionId);
     ensureNotNull("commandContext", commandContext);
     this.commandContext = commandContext;
@@ -102,8 +104,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     if (variables != null) {
       if (this.variables == null) {
         this.variables = Variables.fromMap(variables);
-      }
-      else {
+      } else {
         this.variables.putAll(variables);
       }
     }
@@ -117,7 +118,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
     try {
       CreateCaseInstanceCmd command = new CreateCaseInstanceCmd(this);
-      if(commandExecutor != null) {
+      if (commandExecutor != null) {
         return commandExecutor.execute(command);
       } else {
         return command.execute(commandContext);

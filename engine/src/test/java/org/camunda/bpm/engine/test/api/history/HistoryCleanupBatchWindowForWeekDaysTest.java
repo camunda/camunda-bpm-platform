@@ -61,7 +61,8 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
   protected int defaultBatchSize;
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setHistoryCleanupBatchSize(20);
       configuration.setHistoryCleanupBatchThreshold(10);
       configuration.setDefaultNumberOfRetries(5);
@@ -85,7 +86,8 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   private HistoryService historyService;
   private ManagementService managementService;
@@ -111,14 +113,21 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
   @Parameterized.Parameters
   public static Collection<Object[]> scenarios() throws ParseException {
     return Arrays.asList(new Object[][] {
-        {  sdf.parse("2018-05-14T10:00:00"), sdf.parse("2018-05-14T22:00:00"), sdf.parse("2018-05-15T01:00:00"), null, null},  //monday
-        {  sdf.parse("2018-05-14T23:00:00"), sdf.parse("2018-05-14T22:00:00"), sdf.parse("2018-05-15T01:00:00"), null, null},  //monday
-        {  sdf.parse("2018-05-15T00:30:00"), sdf.parse("2018-05-14T22:00:00"), sdf.parse("2018-05-15T01:00:00"), null, null},  //tuesday
-        {  sdf.parse("2018-05-15T02:00:00"), sdf.parse("2018-05-15T22:00:00"), sdf.parse("2018-05-15T23:00:00"), null, null},  //tuesday
-        {  sdf.parse("2018-05-15T23:30:00"), sdf.parse("2018-05-16T15:00:00"), sdf.parse("2018-05-16T20:00:00"), null, null},  //tuesday
-        {  sdf.parse("2018-05-16T21:00:00"), sdf.parse("2018-05-18T22:00:00"), sdf.parse("2018-05-19T01:00:00"),
-              sdf.parse("2018-05-17T23:00:00"), sdf.parse("2018-05-18T00:00:00") },                                 //wednesday
-        {  sdf.parse("2018-05-20T09:00:00"), sdf.parse("2018-05-20T10:00:00"), sdf.parse("2018-05-20T20:00:00"), null, null }} ); //sunday
+        { sdf.parse("2018-05-14T10:00:00"), sdf.parse("2018-05-14T22:00:00"),
+            sdf.parse("2018-05-15T01:00:00"), null, null }, // monday
+        { sdf.parse("2018-05-14T23:00:00"), sdf.parse("2018-05-14T22:00:00"),
+            sdf.parse("2018-05-15T01:00:00"), null, null }, // monday
+        { sdf.parse("2018-05-15T00:30:00"), sdf.parse("2018-05-14T22:00:00"),
+            sdf.parse("2018-05-15T01:00:00"), null, null }, // tuesday
+        { sdf.parse("2018-05-15T02:00:00"), sdf.parse("2018-05-15T22:00:00"),
+            sdf.parse("2018-05-15T23:00:00"), null, null }, // tuesday
+        { sdf.parse("2018-05-15T23:30:00"), sdf.parse("2018-05-16T15:00:00"),
+            sdf.parse("2018-05-16T20:00:00"), null, null }, // tuesday
+        { sdf.parse("2018-05-16T21:00:00"), sdf.parse("2018-05-18T22:00:00"),
+            sdf.parse("2018-05-19T01:00:00"), sdf.parse("2018-05-17T23:00:00"),
+            sdf.parse("2018-05-18T00:00:00") }, // wednesday
+        { sdf.parse("2018-05-20T09:00:00"), sdf.parse("2018-05-20T10:00:00"),
+            sdf.parse("2018-05-20T20:00:00"), null, null } }); // sunday
   }
 
   @Before
@@ -135,7 +144,7 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
 
   @After
   public void clearDatabase() {
-    //reset configuration changes
+    // reset configuration changes
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
     processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
@@ -187,7 +196,6 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("00:00");
     processEngineConfiguration.initHistoryCleanup();
 
-
     Job job = historyService.cleanUpHistoryAsync();
 
     if (startDateForCheckWithDefaultValues == null) {
@@ -197,7 +205,8 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
       endDateForCheckWithDefaultValues = endDateForCheck;
     }
 
-    assertFalse(startDateForCheckWithDefaultValues.after(job.getDuedate())); // job due date is not before start date
+    assertFalse(startDateForCheckWithDefaultValues.after(job.getDuedate())); // job due date is not
+                                                                             // before start date
     assertTrue(endDateForCheckWithDefaultValues.after(job.getDuedate()));
 
     ClockUtil.setCurrentTime(DateUtils.addMinutes(endDateForCheckWithDefaultValues, -1));
@@ -223,7 +232,6 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
     processEngineConfiguration.setSaturdayHistoryCleanupBatchWindowEndTime("00:00");
     processEngineConfiguration.initHistoryCleanup();
 
-
     Job job = historyService.cleanUpHistoryAsync();
 
     if (startDateForCheckWithDefaultValues == null) {
@@ -233,7 +241,8 @@ public class HistoryCleanupBatchWindowForWeekDaysTest {
       endDateForCheckWithDefaultValues = endDateForCheck;
     }
 
-    assertFalse(startDateForCheckWithDefaultValues.after(job.getDuedate())); // job due date is not before start date
+    assertFalse(startDateForCheckWithDefaultValues.after(job.getDuedate())); // job due date is not
+                                                                             // before start date
     assertTrue(endDateForCheckWithDefaultValues.after(job.getDuedate()));
 
     ClockUtil.setCurrentTime(DateUtils.addMinutes(endDateForCheckWithDefaultValues, -1));

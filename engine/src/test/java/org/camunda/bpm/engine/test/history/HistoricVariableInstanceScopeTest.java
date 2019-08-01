@@ -43,7 +43,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSetVariableOnProcessInstanceStart() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("testVar", "testValue");
@@ -62,7 +62,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertProcessEnded(pi.getId());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSetVariableLocalOnUserTask() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -71,8 +71,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     taskService.setVariableLocal(task.getId(), "testVar", "testValue");
     ExecutionEntity taskExecution = (ExecutionEntity) runtimeService.createExecutionQuery()
-        .executionId(task.getExecutionId())
-        .singleResult();
+        .executionId(task.getExecutionId()).singleResult();
     assertNotNull(taskExecution);
 
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
@@ -88,7 +87,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertProcessEnded(pi.getId());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSetVariableOnProcessIntanceStartAndSetVariableLocalOnUserTask() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("testVar", "testValue");
@@ -98,7 +97,8 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertNotNull(task);
 
     taskService.setVariableLocal(task.getId(), "testVar", "anotherTestValue");
-    ExecutionEntity taskExecution = (ExecutionEntity) runtimeService.createExecutionQuery().singleResult();
+    ExecutionEntity taskExecution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .singleResult();
     assertNotNull(taskExecution);
 
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
@@ -122,7 +122,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertProcessEnded(pi.getId());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml" })
   public void testSetVariableOnUserTaskInsideSubProcess() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
 
@@ -164,9 +164,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertEquals(1, query.count());
 
     String activityInstanceId = historyService.createHistoricActivityInstanceQuery()
-        .activityId("SubProcess_1")
-        .singleResult()
-        .getId();
+        .activityId("SubProcess_1").singleResult().getId();
 
     HistoricVariableInstance variable = query.singleResult();
     // the variable is in the sub process scope
@@ -184,8 +182,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     taskService.setVariableLocal(task.getId(), "testVar", "testValue");
     ExecutionEntity taskExecution = (ExecutionEntity) runtimeService.createExecutionQuery()
-        .executionId(task.getExecutionId())
-        .singleResult();
+        .executionId(task.getExecutionId()).singleResult();
     assertNotNull(taskExecution);
 
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
@@ -200,7 +197,8 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertProcessEnded(pi.getId());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricVariableInstanceScopeTest.testSetVariableLocalOnTaskInsideParallelBranch.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricVariableInstanceScopeTest.testSetVariableLocalOnTaskInsideParallelBranch.bpmn" })
   public void testSetVariableOnTaskInsideParallelBranch() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
@@ -240,8 +238,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
 
     HistoricActivityInstance serviceTask = historyService.createHistoricActivityInstanceQuery()
-        .activityId("serviceTask1")
-        .singleResult();
+        .activityId("serviceTask1").singleResult();
     assertNotNull(serviceTask);
 
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
@@ -254,15 +251,17 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     assertProcessEnded(pi.getId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testHistoricCaseVariableInstanceQuery() {
     // start case instance with variables
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("foo", "bar");
-    String caseInstanceId =  caseService.createCaseInstanceByKey("oneTaskCase", variables).getId();
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase", variables).getId();
 
-    String caseExecutionId = caseService.createCaseExecutionQuery().activityId("CasePlanModel_1").singleResult().getId();
-    String taskExecutionId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult().getId();
+    String caseExecutionId = caseService.createCaseExecutionQuery().activityId("CasePlanModel_1")
+        .singleResult().getId();
+    String taskExecutionId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // set variable on both executions
     caseService.setVariableLocal(caseExecutionId, "case", "execution");
@@ -273,17 +272,24 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     caseService.setVariableLocal(taskExecutionId, "task", "update");
 
     assertEquals(3, historyService.createHistoricVariableInstanceQuery().count());
-    assertEquals(3, historyService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).count());
-    assertEquals(3, historyService.createHistoricVariableInstanceQuery().caseExecutionIdIn(caseExecutionId, taskExecutionId).count());
-    assertEquals(2, historyService.createHistoricVariableInstanceQuery().caseExecutionIdIn(caseExecutionId).count());
-    assertEquals(1, historyService.createHistoricVariableInstanceQuery().caseExecutionIdIn(taskExecutionId).count());
+    assertEquals(3, historyService.createHistoricVariableInstanceQuery()
+        .caseInstanceId(caseInstanceId).count());
+    assertEquals(3, historyService.createHistoricVariableInstanceQuery()
+        .caseExecutionIdIn(caseExecutionId, taskExecutionId).count());
+    assertEquals(2, historyService.createHistoricVariableInstanceQuery()
+        .caseExecutionIdIn(caseExecutionId).count());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery()
+        .caseExecutionIdIn(taskExecutionId).count());
 
     HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
     if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
       assertEquals(5, historyService.createHistoricDetailQuery().count());
-      assertEquals(5, historyService.createHistoricDetailQuery().caseInstanceId(caseInstanceId).count());
-      assertEquals(3, historyService.createHistoricDetailQuery().caseExecutionId(caseExecutionId).count());
-      assertEquals(2, historyService.createHistoricDetailQuery().caseExecutionId(taskExecutionId).count());
+      assertEquals(5,
+          historyService.createHistoricDetailQuery().caseInstanceId(caseInstanceId).count());
+      assertEquals(3,
+          historyService.createHistoricDetailQuery().caseExecutionId(caseExecutionId).count());
+      assertEquals(2,
+          historyService.createHistoricDetailQuery().caseExecutionId(taskExecutionId).count());
     }
   }
 
@@ -293,178 +299,136 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
     HistoricActivityInstanceQuery activityInstanceQuery = historyService
-        .createHistoricActivityInstanceQuery()
-        .processInstanceId(processInstanceId);
+        .createHistoricActivityInstanceQuery().processInstanceId(processInstanceId);
 
     String theService1Id = activityInstanceQuery.activityId("theService1").singleResult().getId();
     String theService2Id = activityInstanceQuery.activityId("theService2").singleResult().getId();
     String theTaskId = activityInstanceQuery.activityId("theTask").singleResult().getId();
 
     // when (1)
-    HistoricVariableInstance firstVariable = historyService
-      .createHistoricVariableInstanceQuery()
-      .variableName("firstInputVariable")
-      .singleResult();
+    HistoricVariableInstance firstVariable = historyService.createHistoricVariableInstanceQuery()
+        .variableName("firstInputVariable").singleResult();
 
     // then (1)
     assertEquals(theService1Id, firstVariable.getActivityInstanceId());
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      HistoricDetail firstVariableDetail = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
-        .variableInstanceId(firstVariable.getId())
-        .singleResult();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail firstVariableDetail = historyService.createHistoricDetailQuery()
+          .variableUpdates().variableInstanceId(firstVariable.getId()).singleResult();
       assertEquals(theService1Id, firstVariableDetail.getActivityInstanceId());
     }
 
     // when (2)
-    HistoricVariableInstance secondVariable = historyService
-      .createHistoricVariableInstanceQuery()
-      .variableName("secondInputVariable")
-      .singleResult();
+    HistoricVariableInstance secondVariable = historyService.createHistoricVariableInstanceQuery()
+        .variableName("secondInputVariable").singleResult();
 
     // then (2)
     assertEquals(theService2Id, secondVariable.getActivityInstanceId());
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      HistoricDetail secondVariableDetail = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
-        .variableInstanceId(secondVariable.getId())
-        .singleResult();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail secondVariableDetail = historyService.createHistoricDetailQuery()
+          .variableUpdates().variableInstanceId(secondVariable.getId()).singleResult();
       assertEquals(theService2Id, secondVariableDetail.getActivityInstanceId());
     }
 
     // when (3)
-    HistoricVariableInstance thirdVariable = historyService
-      .createHistoricVariableInstanceQuery()
-      .variableName("thirdInputVariable")
-      .singleResult();
+    HistoricVariableInstance thirdVariable = historyService.createHistoricVariableInstanceQuery()
+        .variableName("thirdInputVariable").singleResult();
 
     // then (3)
     assertEquals(theTaskId, thirdVariable.getActivityInstanceId());
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      HistoricDetail thirdVariableDetail = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
-        .variableInstanceId(thirdVariable.getId())
-        .singleResult();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail thirdVariableDetail = historyService.createHistoricDetailQuery()
+          .variableUpdates().variableInstanceId(thirdVariable.getId()).singleResult();
       assertEquals(theTaskId, thirdVariableDetail.getActivityInstanceId());
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCmmnActivityInstanceIdOnCaseInstance() {
 
     // given
     CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
 
-    String taskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String taskExecutionId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    caseService
-      .withCaseExecution(taskExecutionId)
-      .setVariable("foo", "bar")
-      .execute();
+    caseService.withCaseExecution(taskExecutionId).setVariable("foo", "bar").execute();
 
     // then
-    HistoricVariableInstance variable = historyService
-        .createHistoricVariableInstanceQuery()
-        .variableName("foo")
-        .singleResult();
+    HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
+        .variableName("foo").singleResult();
 
     assertNotNull(variable);
     assertEquals(caseInstance.getId(), variable.getActivityInstanceId());
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      HistoricDetail variableDetail = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
-        .variableInstanceId(variable.getId())
-        .singleResult();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail variableDetail = historyService.createHistoricDetailQuery().variableUpdates()
+          .variableInstanceId(variable.getId()).singleResult();
       assertEquals(taskExecutionId, variableDetail.getActivityInstanceId());
     }
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCmmnActivityInstanceIdOnCaseExecution() {
 
     // given
     caseService.createCaseInstanceByKey("oneTaskCase");
 
-    String taskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String taskExecutionId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    caseService
-      .withCaseExecution(taskExecutionId)
-      .setVariableLocal("foo", "bar")
-      .execute();
+    caseService.withCaseExecution(taskExecutionId).setVariableLocal("foo", "bar").execute();
 
     // then
-    HistoricVariableInstance variable = historyService
-        .createHistoricVariableInstanceQuery()
-        .variableName("foo")
-        .singleResult();
+    HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
+        .variableName("foo").singleResult();
 
     assertNotNull(variable);
     assertEquals(taskExecutionId, variable.getActivityInstanceId());
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      HistoricDetail variableDetail = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
-        .variableInstanceId(variable.getId())
-        .singleResult();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail variableDetail = historyService.createHistoricDetailQuery().variableUpdates()
+          .variableInstanceId(variable.getId()).singleResult();
       assertEquals(taskExecutionId, variableDetail.getActivityInstanceId());
     }
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCmmnActivityInstanceIdOnTask() {
 
     // given
     CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
 
-    String taskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String taskExecutionId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
-    Task task = taskService
-        .createTaskQuery()
-        .singleResult();
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
     taskService.setVariable(task.getId(), "foo", "bar");
 
     // then
-    HistoricVariableInstance variable = historyService
-        .createHistoricVariableInstanceQuery()
-        .variableName("foo")
-        .singleResult();
+    HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
+        .variableName("foo").singleResult();
 
     assertNotNull(variable);
     assertEquals(caseInstance.getId(), variable.getActivityInstanceId());
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      HistoricDetail variableDetail = historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
-        .variableInstanceId(variable.getId())
-        .singleResult();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail variableDetail = historyService.createHistoricDetailQuery().variableUpdates()
+          .variableInstanceId(variable.getId()).singleResult();
       assertEquals(taskExecutionId, variableDetail.getActivityInstanceId());
     }
 

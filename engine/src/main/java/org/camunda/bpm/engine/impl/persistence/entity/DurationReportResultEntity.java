@@ -53,13 +53,8 @@ public class DurationReportResultEntity extends ReportResultEntity implements Du
   }
 
   public String toString() {
-    return this.getClass().getSimpleName()
-        + "[period=" + period
-        + ", periodUnit=" + periodUnit
-        + ", minimum=" + minimum
-        + ", maximum=" + maximum
-        + ", average=" + average
-        + "]";
+    return this.getClass().getSimpleName() + "[period=" + period + ", periodUnit=" + periodUnit
+        + ", minimum=" + minimum + ", maximum=" + maximum + ", average=" + average + "]";
   }
 
 }

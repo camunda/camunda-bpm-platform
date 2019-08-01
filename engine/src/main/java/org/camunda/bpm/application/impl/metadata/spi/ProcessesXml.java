@@ -26,7 +26,9 @@ import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.engine.repository.ResumePreviousBy;
 
 /**
- * <p>Java API representation of the {@link ProcessesXml} Metadata.</p>
+ * <p>
+ * Java API representation of the {@link ProcessesXml} Metadata.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -34,17 +36,21 @@ import org.camunda.bpm.engine.repository.ResumePreviousBy;
 public interface ProcessesXml {
 
   /**
-   * @return A {@link List} of {@link ProcessEngineXml} Metadata Items representing process engine configurations.
+   * @return A {@link List} of {@link ProcessEngineXml} Metadata Items representing process engine
+   *         configurations.
    */
   public List<ProcessEngineXml> getProcessEngines();
 
   /**
-   * @return A {@link List} of {@link ProcessArchiveXml} Metadata Items representing process archive deployments.
+   * @return A {@link List} of {@link ProcessArchiveXml} Metadata Items representing process archive
+   *         deployments.
    */
   public List<ProcessArchiveXml> getProcessArchives();
 
   /**
-   * <p>Constant representing the empty processes.xml</p>
+   * <p>
+   * Constant representing the empty processes.xml
+   * </p>
    */
   public final static ProcessesXml EMPTY_PROCESSES_XML = new ProcessesXml() {
 
@@ -59,15 +65,17 @@ public interface ProcessesXml {
       ProcessArchiveXmlImpl pa = new ProcessArchiveXmlImpl();
       processArchives.add(pa);
 
-      pa.setProcessResourceNames(Collections.<String>emptyList());
+      pa.setProcessResourceNames(Collections.<String> emptyList());
 
       // with default properties
       HashMap<String, String> properties = new HashMap<String, String>();
       pa.setProperties(properties);
       properties.put(ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, Boolean.FALSE.toString());
-      properties.put(ProcessArchiveXml.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, Boolean.TRUE.toString());
+      properties.put(ProcessArchiveXml.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS,
+          Boolean.TRUE.toString());
       properties.put(ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY, Boolean.FALSE.toString());
-      properties.put(ProcessArchiveXml.PROP_RESUME_PREVIOUS_BY, ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY);
+      properties.put(ProcessArchiveXml.PROP_RESUME_PREVIOUS_BY,
+          ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY);
 
       return processArchives;
     }

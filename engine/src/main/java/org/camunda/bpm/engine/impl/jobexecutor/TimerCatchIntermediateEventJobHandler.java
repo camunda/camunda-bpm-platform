@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
-
 public class TimerCatchIntermediateEventJobHandler extends TimerEventJobHandler {
 
   public static final String TYPE = "timer-intermediate-transition";
@@ -32,27 +31,28 @@ public class TimerCatchIntermediateEventJobHandler extends TimerEventJobHandler 
     return TYPE;
   }
 
-  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
     String activityId = configuration.getTimerElementKey();
-    ActivityImpl intermediateEventActivity = execution.getProcessDefinition().findActivity(activityId);
+    ActivityImpl intermediateEventActivity = execution.getProcessDefinition()
+        .findActivity(activityId);
 
-    ensureNotNull("Error while firing timer: intermediate event activity " + configuration + " not found", "intermediateEventActivity", intermediateEventActivity);
+    ensureNotNull(
+        "Error while firing timer: intermediate event activity " + configuration + " not found",
+        "intermediateEventActivity", intermediateEventActivity);
 
     try {
-      if(activityId.equals(execution.getActivityId())) {
+      if (activityId.equals(execution.getActivityId())) {
         // Regular Intermediate timer catch
         execution.signal("signal", null);
-      }
-      else {
+      } else {
         // Event based gateway
         execution.executeEventHandlerActivity(intermediateEventActivity);
       }
 
-    }
-    catch (RuntimeException e) {
+    } catch (RuntimeException e) {
       throw e;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new ProcessEngineException("exception during timer execution: " + e.getMessage(), e);
     }
   }

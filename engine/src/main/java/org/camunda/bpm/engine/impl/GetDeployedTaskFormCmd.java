@@ -37,7 +37,8 @@ public class GetDeployedTaskFormCmd extends AbstractGetDeployedFormCmd {
   protected String taskId;
 
   public GetDeployedTaskFormCmd(String taskId) {
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Task id cannot be null", "taskId", taskId);
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Task id cannot be null", "taskId",
+        taskId);
     this.taskId = taskId;
   }
 
@@ -55,7 +56,8 @@ public class GetDeployedTaskFormCmd extends AbstractGetDeployedFormCmd {
   @Override
   protected void checkAuthorization(CommandContext commandContext) {
     TaskEntity taskEntity = commandContext.getTaskManager().findTaskById(taskId);
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadTask(taskEntity);
     }
   }

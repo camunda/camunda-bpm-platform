@@ -25,9 +25,8 @@ public class TenantCheck implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /**
-   * If <code>true</code> then the process engine performs tenant checks to
-   * ensure that the query only access data that belongs to one of the
-   * authenticated tenant ids.
+   * If <code>true</code> then the process engine performs tenant checks to ensure that the query
+   * only access data that belongs to one of the authenticated tenant ids.
    */
   protected boolean isTenantCheckEnabled = true;
 

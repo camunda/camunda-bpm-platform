@@ -31,20 +31,26 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  */
 public abstract class HistoryCleanupHelper {
 
-  private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS = new SimpleDateFormat("yyyy-MM-ddHH:mm");
+  private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS = new SimpleDateFormat(
+      "yyyy-MM-ddHH:mm");
 
-  private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE = new SimpleDateFormat("yyyy-MM-ddHH:mmZ");
+  private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE = new SimpleDateFormat(
+      "yyyy-MM-ddHH:mmZ");
 
-  private static final SimpleDateFormat DATE_FORMAT_WITHOUT_TIME = new SimpleDateFormat("yyyy-MM-dd");
+  private static final SimpleDateFormat DATE_FORMAT_WITHOUT_TIME = new SimpleDateFormat(
+      "yyyy-MM-dd");
 
   /**
    * Checks if given date is within a batch window. Batch window start time is checked inclusively.
+   * 
    * @param date
    * @return
    */
-  public static boolean isWithinBatchWindow(Date date, ProcessEngineConfigurationImpl configuration) {
+  public static boolean isWithinBatchWindow(Date date,
+      ProcessEngineConfigurationImpl configuration) {
     if (configuration.getBatchWindowManager().isBatchWindowConfigured(configuration)) {
-      BatchWindow batchWindow = configuration.getBatchWindowManager().getCurrentOrNextBatchWindow(date, configuration);
+      BatchWindow batchWindow = configuration.getBatchWindowManager()
+          .getCurrentOrNextBatchWindow(date, configuration);
       if (batchWindow == null) {
         return false;
       }
@@ -57,9 +63,9 @@ public abstract class HistoryCleanupHelper {
   public static synchronized Date parseTimeConfiguration(String time) throws ParseException {
     String today = DATE_FORMAT_WITHOUT_TIME.format(ClockUtil.getCurrentTime());
     try {
-      return TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE.parse(today+time);
+      return TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE.parse(today + time);
     } catch (ParseException ex) {
-      return TIME_FORMAT_WITHOUT_SECONDS.parse(today+time);
+      return TIME_FORMAT_WITHOUT_SECONDS.parse(today + time);
     }
   }
 
@@ -68,49 +74,61 @@ public abstract class HistoryCleanupHelper {
   }
 
   /**
-   * Creates next batch object for history cleanup. First searches for historic process instances ready for cleanup. If there is still some place left in batch (configured batch
-   * size was not reached), searches for historic decision instances and also adds them to the batch. Then if there is still some place left in batch, searches for historic case
-   * instances and historic batches - and adds them to the batch.
+   * Creates next batch object for history cleanup. First searches for historic process instances
+   * ready for cleanup. If there is still some place left in batch (configured batch size was not
+   * reached), searches for historic decision instances and also adds them to the batch. Then if
+   * there is still some place left in batch, searches for historic case instances and historic
+   * batches - and adds them to the batch.
    *
    * @param commandContext
    * @return
    */
-  public static void prepareNextBatch(HistoryCleanupBatch historyCleanupBatch, CommandContext commandContext) {
-    final HistoryCleanupJobHandlerConfiguration configuration = historyCleanupBatch.getConfiguration();
+  public static void prepareNextBatch(HistoryCleanupBatch historyCleanupBatch,
+      CommandContext commandContext) {
+    final HistoryCleanupJobHandlerConfiguration configuration = historyCleanupBatch
+        .getConfiguration();
     final Integer batchSize = getHistoryCleanupBatchSize(commandContext);
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext
+        .getProcessEngineConfiguration();
 
-    //add process instance ids
-    final List<String> historicProcessInstanceIds = commandContext.getHistoricProcessInstanceManager()
-        .findHistoricProcessInstanceIdsForCleanup(batchSize, configuration.getMinuteFrom(), configuration.getMinuteTo());
+    // add process instance ids
+    final List<String> historicProcessInstanceIds = commandContext
+        .getHistoricProcessInstanceManager().findHistoricProcessInstanceIdsForCleanup(batchSize,
+            configuration.getMinuteFrom(), configuration.getMinuteTo());
     if (historicProcessInstanceIds.size() > 0) {
       historyCleanupBatch.setHistoricProcessInstanceIds(historicProcessInstanceIds);
     }
 
-    //if batch is not full, add decision instance ids
+    // if batch is not full, add decision instance ids
     if (historyCleanupBatch.size() < batchSize && processEngineConfiguration.isDmnEnabled()) {
-      final List<String> historicDecisionInstanceIds = commandContext.getHistoricDecisionInstanceManager()
-          .findHistoricDecisionInstanceIdsForCleanup(batchSize - historyCleanupBatch.size(), configuration.getMinuteFrom(), configuration.getMinuteTo());
+      final List<String> historicDecisionInstanceIds = commandContext
+          .getHistoricDecisionInstanceManager()
+          .findHistoricDecisionInstanceIdsForCleanup(batchSize - historyCleanupBatch.size(),
+              configuration.getMinuteFrom(), configuration.getMinuteTo());
       if (historicDecisionInstanceIds.size() > 0) {
         historyCleanupBatch.setHistoricDecisionInstanceIds(historicDecisionInstanceIds);
       }
     }
 
-    //if batch is not full, add case instance ids
+    // if batch is not full, add case instance ids
     if (historyCleanupBatch.size() < batchSize && processEngineConfiguration.isCmmnEnabled()) {
       final List<String> historicCaseInstanceIds = commandContext.getHistoricCaseInstanceManager()
-          .findHistoricCaseInstanceIdsForCleanup(batchSize - historyCleanupBatch.size(), configuration.getMinuteFrom(), configuration.getMinuteTo());
+          .findHistoricCaseInstanceIdsForCleanup(batchSize - historyCleanupBatch.size(),
+              configuration.getMinuteFrom(), configuration.getMinuteTo());
       if (historicCaseInstanceIds.size() > 0) {
         historyCleanupBatch.setHistoricCaseInstanceIds(historicCaseInstanceIds);
       }
     }
 
-    //if batch is not full, add batch ids
-    Map<String, Integer> batchOperationsForHistoryCleanup = processEngineConfiguration.getParsedBatchOperationsForHistoryCleanup();
-    if (historyCleanupBatch.size() < batchSize && batchOperationsForHistoryCleanup != null && !batchOperationsForHistoryCleanup.isEmpty()) {
-      List<String> historicBatchIds = commandContext
-          .getHistoricBatchManager()
-          .findHistoricBatchIdsForCleanup(batchSize - historyCleanupBatch.size(), batchOperationsForHistoryCleanup, configuration.getMinuteFrom(), configuration.getMinuteTo());
+    // if batch is not full, add batch ids
+    Map<String, Integer> batchOperationsForHistoryCleanup = processEngineConfiguration
+        .getParsedBatchOperationsForHistoryCleanup();
+    if (historyCleanupBatch.size() < batchSize && batchOperationsForHistoryCleanup != null
+        && !batchOperationsForHistoryCleanup.isEmpty()) {
+      List<String> historicBatchIds = commandContext.getHistoricBatchManager()
+          .findHistoricBatchIdsForCleanup(batchSize - historyCleanupBatch.size(),
+              batchOperationsForHistoryCleanup, configuration.getMinuteFrom(),
+              configuration.getMinuteTo());
       if (historicBatchIds.size() > 0) {
         historyCleanupBatch.setHistoricBatchIds(historicBatchIds);
       }
@@ -129,6 +147,7 @@ public abstract class HistoryCleanupHelper {
   }
 
   public static boolean isBatchWindowConfigured(CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration().getBatchWindowManager().isBatchWindowConfigured(commandContext.getProcessEngineConfiguration());
+    return commandContext.getProcessEngineConfiguration().getBatchWindowManager()
+        .isBatchWindowConfigured(commandContext.getProcessEngineConfiguration());
   }
 }

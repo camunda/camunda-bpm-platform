@@ -73,7 +73,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -113,7 +112,7 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   public void saveUser(User user) {
     saveUser(user, false);
   }
-  
+
   public void saveUser(User user, boolean skipPasswordPolicy) {
     try {
       commandExecutor.execute(new SaveUserCmd(user, skipPasswordPolicy));
@@ -173,7 +172,7 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   public PasswordPolicyResult checkPasswordAgainstPolicy(String password) {
     return checkPasswordAgainstPolicy(getPasswordPolicy(), password);
   }
-  
+
   public PasswordPolicyResult checkPasswordAgainstPolicy(PasswordPolicy policy, String password) {
     EnsureUtil.ensureNotNull("policy", policy);
     EnsureUtil.ensureNotNull("password", password);
@@ -224,17 +223,19 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public void setAuthentication(Authentication auth) {
-    if(auth == null) {
+    if (auth == null) {
       clearAuthentication();
     } else {
       if (auth.getUserId() != null) {
         EnsureUtil.ensureValidIndividualResourceId("Invalid user id provided", auth.getUserId());
       }
       if (auth.getGroupIds() != null) {
-        EnsureUtil.ensureValidIndividualResourceIds("At least one invalid group id provided", auth.getGroupIds());
+        EnsureUtil.ensureValidIndividualResourceIds("At least one invalid group id provided",
+            auth.getGroupIds());
       }
       if (auth.getTenantIds() != null) {
-        EnsureUtil.ensureValidIndividualResourceIds("At least one invalid tenant id provided", auth.getTenantIds());
+        EnsureUtil.ensureValidIndividualResourceIds("At least one invalid tenant id provided",
+            auth.getTenantIds());
       }
 
       currentAuthentication.set(auth);
@@ -262,11 +263,13 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public List<String> getUserInfoKeys(String userId) {
-    return commandExecutor.execute(new GetUserInfoKeysCmd(userId, IdentityInfoEntity.TYPE_USERINFO));
+    return commandExecutor
+        .execute(new GetUserInfoKeysCmd(userId, IdentityInfoEntity.TYPE_USERINFO));
   }
 
   public List<String> getUserAccountNames(String userId) {
-    return commandExecutor.execute(new GetUserInfoKeysCmd(userId, IdentityInfoEntity.TYPE_USERACCOUNT));
+    return commandExecutor
+        .execute(new GetUserInfoKeysCmd(userId, IdentityInfoEntity.TYPE_USERACCOUNT));
   }
 
   public void setUserInfo(String userId, String key, String value) {
@@ -285,8 +288,10 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
     return commandExecutor.execute(new GetUserAccountCmd(userId, userPassword, accountName));
   }
 
-  public void setUserAccount(String userId, String userPassword, String accountName, String accountUsername, String accountPassword, Map<String, String> accountDetails) {
-    commandExecutor.execute(new SetUserInfoCmd(userId, userPassword, accountName, accountUsername, accountPassword, accountDetails));
+  public void setUserAccount(String userId, String userPassword, String accountName,
+      String accountUsername, String accountPassword, Map<String, String> accountDetails) {
+    commandExecutor.execute(new SetUserInfoCmd(userId, userPassword, accountName, accountUsername,
+        accountPassword, accountDetails));
   }
 
   public void createTenantUserMembership(String tenantId, String userId) {

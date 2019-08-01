@@ -23,26 +23,30 @@ import org.camunda.bpm.engine.query.Query;
  * Defines a report query for cleanable case instances.
  *
  */
-public interface CleanableHistoricCaseInstanceReport extends Query<CleanableHistoricCaseInstanceReport, CleanableHistoricCaseInstanceReportResult> {
+public interface CleanableHistoricCaseInstanceReport
+    extends Query<CleanableHistoricCaseInstanceReport, CleanableHistoricCaseInstanceReportResult> {
 
   /**
    * Only takes historic case instances into account for the given case definition ids.
    *
-   * @throws NotValidException if one of the given ids is null
+   * @throws NotValidException
+   *           if one of the given ids is null
    */
   CleanableHistoricCaseInstanceReport caseDefinitionIdIn(String... caseDefinitionIds);
 
   /**
    * Only takes historic case instances into account for the given case definition keys.
    *
-   * @throws NotValidException if one of the given keys is null
+   * @throws NotValidException
+   *           if one of the given keys is null
    */
   CleanableHistoricCaseInstanceReport caseDefinitionKeyIn(String... caseDefinitionKeys);
 
   /**
    * Only select historic case instances with one of the given tenant ids.
    *
-   * @throws NotValidException if one of the given ids is null
+   * @throws NotValidException
+   *           if one of the given ids is null
    */
   CleanableHistoricCaseInstanceReport tenantIdIn(String... tenantIds);
 
@@ -57,7 +61,8 @@ public interface CleanableHistoricCaseInstanceReport extends Query<CleanableHist
   CleanableHistoricCaseInstanceReport compact();
 
   /**
-   * Order by finished case instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Order by finished case instances amount (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
    */
   CleanableHistoricCaseInstanceReport orderByFinished();
 

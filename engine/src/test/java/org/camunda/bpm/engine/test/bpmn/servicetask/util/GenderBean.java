@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.test.bpmn.servicetask.util;
 
 import java.io.Serializable;
 
-
 /**
  * Simple class for testing purposes.
  * 

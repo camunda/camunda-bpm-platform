@@ -36,9 +36,8 @@ public class ImplicitVariableUpdateTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ImplicitVariableUpdateTest.sequence.bpmn20.xml")
   public void testUpdate() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
-        Variables.createVariables()
-          .putValue("listVar", new ArrayList<String>())
-          .putValue("delegate", new UpdateValueDelegate()));
+        Variables.createVariables().putValue("listVar", new ArrayList<String>())
+            .putValue("delegate", new UpdateValueDelegate()));
 
     List<String> list = (List<String>) runtimeService.getVariable(instance.getId(), "listVar");
     assertNotNull(list);
@@ -52,9 +51,8 @@ public class ImplicitVariableUpdateTest extends PluggableProcessEngineTestCase {
     // and when the engine notices it
 
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
-        Variables.createVariables()
-          .putValue("listVar", new ArrayList<String>())
-          .putValue("delegate", new UpdateValueDelegate()));
+        Variables.createVariables().putValue("listVar", new ArrayList<String>())
+            .putValue("delegate", new UpdateValueDelegate()));
 
     List<String> list = (List<String>) runtimeService.getVariable(instance.getId(), "listVar");
     assertNotNull(list);
@@ -65,9 +63,8 @@ public class ImplicitVariableUpdateTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ImplicitVariableUpdateTest.sequence.bpmn20.xml")
   public void testUpdatePreviousValue() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
-        Variables.createVariables()
-          .putValue("listVar", new ArrayList<String>())
-          .putValue("delegate", new ReplaceAndUpdateValueDelegate()));
+        Variables.createVariables().putValue("listVar", new ArrayList<String>())
+            .putValue("delegate", new ReplaceAndUpdateValueDelegate()));
 
     List<String> list = (List<String>) runtimeService.getVariable(instance.getId(), "listVar");
     assertNotNull(list);
@@ -77,9 +74,8 @@ public class ImplicitVariableUpdateTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ImplicitVariableUpdateTest.sequence.bpmn20.xml")
   public void testRemoveAndUpdateValue() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
-        Variables.createVariables()
-          .putValue("listVar", new ArrayList<String>())
-          .putValue("delegate", new RemoveAndUpdateValueDelegate()));
+        Variables.createVariables().putValue("listVar", new ArrayList<String>())
+            .putValue("delegate", new RemoveAndUpdateValueDelegate()));
 
     Object variableValue = runtimeService.getVariable(instance.getId(), "listVar");
     assertNull(variableValue);

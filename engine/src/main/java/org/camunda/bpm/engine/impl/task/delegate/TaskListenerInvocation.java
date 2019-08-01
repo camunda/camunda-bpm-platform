@@ -35,7 +35,8 @@ public class TaskListenerInvocation extends DelegateInvocation {
     this(executionListenerInstance, delegateTask, null);
   }
 
-  public TaskListenerInvocation(TaskListener taskListenerInstance, DelegateTask delegateTask, BaseDelegateExecution contextExecution) {
+  public TaskListenerInvocation(TaskListener taskListenerInstance, DelegateTask delegateTask,
+      BaseDelegateExecution contextExecution) {
     super(contextExecution, null);
     this.taskListenerInstance = taskListenerInstance;
     this.delegateTask = delegateTask;

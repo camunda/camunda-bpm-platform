@@ -40,10 +40,11 @@ import java.util.List;
  */
 public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testProcessInstanceActiveByDefault() {
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
@@ -51,73 +52,77 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testSuspendActivateProcessInstance() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertFalse(processInstance.isSuspended());
 
-    //suspend
+    // suspend
     runtimeService.suspendProcessInstanceById(processInstance.getId());
     processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertTrue(processInstance.isSuspended());
 
-    //activate
+    // activate
     runtimeService.activateProcessInstanceById(processInstance.getId());
     processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertFalse(processInstance.isSuspended());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testSuspendActivateProcessInstanceByProcessDefinitionId() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertFalse(processInstance.isSuspended());
 
-    //suspend
+    // suspend
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
     processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertTrue(processInstance.isSuspended());
 
-    //activate
+    // activate
     runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinition.getId());
     processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertFalse(processInstance.isSuspended());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testSuspendActivateProcessInstanceByProcessDefinitionKey() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertFalse(processInstance.isSuspended());
 
-    //suspend
+    // suspend
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
     processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertTrue(processInstance.isSuspended());
 
-    //activate
+    // activate
     runtimeService.activateProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
     processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertFalse(processInstance.isSuspended());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testActivateAlreadyActiveProcessInstance() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertFalse(processInstance.isSuspended());
 
     try {
-      //activate
+      // activate
       runtimeService.activateProcessInstanceById(processInstance.getId());
       processInstance = runtimeService.createProcessInstanceQuery().singleResult();
       assertFalse(processInstance.isSuspended());
@@ -126,7 +131,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
 
     try {
-      //activate
+      // activate
       runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinition.getId());
       processInstance = runtimeService.createProcessInstanceQuery().singleResult();
       assertFalse(processInstance.isSuspended());
@@ -135,7 +140,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
 
     try {
-      //activate
+      // activate
       runtimeService.activateProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
       processInstance = runtimeService.createProcessInstanceQuery().singleResult();
       assertFalse(processInstance.isSuspended());
@@ -144,9 +149,10 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testSuspendAlreadySuspendedProcessInstance() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
@@ -179,11 +185,10 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources={
-          "org/camunda/bpm/engine/test/api/runtime/superProcessWithMultipleNestedSubProcess.bpmn20.xml",
-          "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
-          "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"
-          })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/superProcessWithMultipleNestedSubProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
   public void testQueryForActiveAndSuspendedProcessInstances() {
     runtimeService.startProcessInstanceByKey("nestedSubProcessQueryTest");
 
@@ -192,27 +197,24 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
 
     ProcessInstance piToSuspend = runtimeService.createProcessInstanceQuery()
-            .processDefinitionKey("nestedSubProcessQueryTest")
-            .singleResult();
+        .processDefinitionKey("nestedSubProcessQueryTest").singleResult();
     runtimeService.suspendProcessInstanceById(piToSuspend.getId());
 
     assertEquals(5, runtimeService.createProcessInstanceQuery().count());
     assertEquals(4, runtimeService.createProcessInstanceQuery().active().count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
 
-    assertEquals(piToSuspend.getId(), runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
+    assertEquals(piToSuspend.getId(),
+        runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/runtime/superProcessWithMultipleNestedSubProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"
-      })
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
   public void testQueryForActiveAndSuspendedProcessInstancesByProcessDefinitionId() {
-    ProcessDefinition processDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("nestedSubProcessQueryTest")
-        .singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("nestedSubProcessQueryTest").singleResult();
 
     runtimeService.startProcessInstanceByKey("nestedSubProcessQueryTest");
 
@@ -221,27 +223,24 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
 
     ProcessInstance piToSuspend = runtimeService.createProcessInstanceQuery()
-            .processDefinitionKey("nestedSubProcessQueryTest")
-            .singleResult();
+        .processDefinitionKey("nestedSubProcessQueryTest").singleResult();
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
 
     assertEquals(5, runtimeService.createProcessInstanceQuery().count());
     assertEquals(4, runtimeService.createProcessInstanceQuery().active().count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
 
-    assertEquals(piToSuspend.getId(), runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
+    assertEquals(piToSuspend.getId(),
+        runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/runtime/superProcessWithMultipleNestedSubProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"
-      })
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
   public void testQueryForActiveAndSuspendedProcessInstancesByProcessDefinitionKey() {
-    ProcessDefinition processDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("nestedSubProcessQueryTest")
-        .singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("nestedSubProcessQueryTest").singleResult();
 
     runtimeService.startProcessInstanceByKey("nestedSubProcessQueryTest");
 
@@ -250,22 +249,23 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
 
     ProcessInstance piToSuspend = runtimeService.createProcessInstanceQuery()
-            .processDefinitionKey("nestedSubProcessQueryTest")
-            .singleResult();
+        .processDefinitionKey("nestedSubProcessQueryTest").singleResult();
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
 
     assertEquals(5, runtimeService.createProcessInstanceQuery().count());
     assertEquals(4, runtimeService.createProcessInstanceQuery().active().count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
 
-    assertEquals(piToSuspend.getId(), runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
+    assertEquals(piToSuspend.getId(),
+        runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testTaskSuspendedAfterProcessInstanceSuspension() {
 
     // Start Process Instance
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
 
@@ -273,7 +273,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     runtimeService.suspendProcessInstanceById(processInstance.getId());
 
     // Assert that the task is now also suspended
-    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .list();
     for (Task task : tasks) {
       assertTrue(task.isSuspended());
     }
@@ -289,20 +290,23 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
   /**
    * See https://app.camunda.com/jira/browse/CAM-9505
    */
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testPreserveCreateTimeOnUpdatedTask() {
     // given
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
 
-    Task taskBeforeSuspension = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Task taskBeforeSuspension = taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId()).singleResult();
     Date createTime = taskBeforeSuspension.getCreateTime();
 
     // when
     runtimeService.suspendProcessInstanceById(processInstance.getId());
 
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     // assume
     assertTrue(task.isSuspended());
@@ -311,11 +315,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(createTime, task.getCreateTime());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testTaskSuspendedAfterProcessInstanceSuspensionByProcessDefinitionId() {
 
     // Start Process Instance
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
 
@@ -323,7 +328,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
 
     // Assert that the task is now also suspended
-    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .list();
     for (Task task : tasks) {
       assertTrue(task.isSuspended());
     }
@@ -336,11 +342,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testTaskSuspendedAfterProcessInstanceSuspensionByProcessDefinitionKey() {
 
     // Start Process Instance
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
 
@@ -348,7 +355,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
 
     // Assert that the task is now also suspended
-    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .list();
     for (Task task : tasks) {
       assertTrue(task.isSuspended());
     }
@@ -361,10 +369,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testTaskQueryAfterProcessInstanceSuspend() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
 
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
@@ -390,9 +400,10 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testTaskQueryAfterProcessInstanceSuspendByProcessDefinitionId() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceById(processDefinition.getId());
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -419,9 +430,10 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testTaskQueryAfterProcessInstanceSuspendByProcessDefinitionKey() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceById(processDefinition.getId());
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -450,17 +462,20 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
   @Deployment
   public void testChildExecutionsSuspendedAfterProcessInstanceSuspend() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testChildExecutionsSuspended");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("testChildExecutionsSuspended");
     runtimeService.suspendProcessInstanceById(processInstance.getId());
 
-    List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+    List<Execution> executions = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId()).list();
     for (Execution execution : executions) {
       assertTrue(execution.isSuspended());
     }
 
     // Activate again
     runtimeService.activateProcessInstanceById(processInstance.getId());
-    executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+    executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId())
+        .list();
     for (Execution execution : executions) {
       assertFalse(execution.isSuspended());
     }
@@ -474,19 +489,25 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testChildExecutionsSuspendedAfterProcessInstanceSuspend.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testChildExecutionsSuspendedAfterProcessInstanceSuspend.bpmn20.xml" })
   public void testChildExecutionsSuspendedAfterProcessInstanceSuspendByProcessDefinitionId() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testChildExecutionsSuspended");
-    runtimeService.suspendProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("testChildExecutionsSuspended");
+    runtimeService
+        .suspendProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
 
-    List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+    List<Execution> executions = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId()).list();
     for (Execution execution : executions) {
       assertTrue(execution.isSuspended());
     }
 
     // Activate again
-    runtimeService.activateProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
-    executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+    runtimeService
+        .activateProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
+    executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId())
+        .list();
     for (Execution execution : executions) {
       assertFalse(execution.isSuspended());
     }
@@ -500,19 +521,23 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testChildExecutionsSuspendedAfterProcessInstanceSuspend.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testChildExecutionsSuspendedAfterProcessInstanceSuspend.bpmn20.xml" })
   public void testChildExecutionsSuspendedAfterProcessInstanceSuspendByProcessDefinitionKey() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testChildExecutionsSuspended");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("testChildExecutionsSuspended");
     runtimeService.suspendProcessInstanceByProcessDefinitionKey("testChildExecutionsSuspended");
 
-    List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+    List<Execution> executions = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId()).list();
     for (Execution execution : executions) {
       assertTrue(execution.isSuspended());
     }
 
     // Activate again
     runtimeService.activateProcessInstanceByProcessDefinitionKey("testChildExecutionsSuspended");
-    executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+    executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId())
+        .list();
     for (Execution execution : executions) {
       assertFalse(execution.isSuspended());
     }
@@ -526,10 +551,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testChangeVariablesAfterProcessInstanceSuspend() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceById(processInstance.getId());
 
     try {
@@ -550,9 +577,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("This should be possible");
     }
 
-
     try {
-      runtimeService.removeVariablesLocal(processInstance.getId(), Arrays.asList("one", "two", "three"));
+      runtimeService.removeVariablesLocal(processInstance.getId(),
+          Arrays.asList("one", "two", "three"));
     } catch (ProcessEngineException e) {
       fail("This should be possible");
     }
@@ -582,11 +609,14 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testChangeVariablesAfterProcessInstanceSuspendByProcessDefinitionId() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    runtimeService.suspendProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    runtimeService
+        .suspendProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
 
     try {
       runtimeService.removeVariable(processInstance.getId(), "someVariable");
@@ -606,9 +636,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("This should be possible");
     }
 
-
     try {
-      runtimeService.removeVariablesLocal(processInstance.getId(), Arrays.asList("one", "two", "three"));
+      runtimeService.removeVariablesLocal(processInstance.getId(),
+          Arrays.asList("one", "two", "three"));
     } catch (ProcessEngineException e) {
       fail("This should be possible");
     }
@@ -638,10 +668,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testChangeVariablesAfterProcessInstanceSuspendByProcessDefinitionKey() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
 
     try {
@@ -663,7 +695,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
 
     try {
-      runtimeService.removeVariablesLocal(processInstance.getId(), Arrays.asList("one", "two", "three"));
+      runtimeService.removeVariablesLocal(processInstance.getId(),
+          Arrays.asList("one", "two", "three"));
     } catch (ProcessEngineException e) {
       fail("This should be possible");
     }
@@ -693,54 +726,68 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSubmitTaskFormFailAfterProcessInstanceSuspend() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceById(processInstance.getId());
 
     try {
-      formService.submitTaskFormData(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId(), new HashMap<String, String>());
+      formService.submitTaskFormData(taskService.createTaskQuery()
+          .processInstanceId(processInstance.getId()).singleResult().getId(),
+          new HashMap<String, String>());
       fail();
-    } catch(SuspendedEntityInteractionException e) {
+    } catch (SuspendedEntityInteractionException e) {
       // This is expected
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSubmitTaskFormFailAfterProcessInstanceSuspendByProcessDefinitionId() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
 
     try {
-      formService.submitTaskFormData(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId(), new HashMap<String, String>());
+      formService.submitTaskFormData(taskService.createTaskQuery()
+          .processInstanceId(processInstance.getId()).singleResult().getId(),
+          new HashMap<String, String>());
       fail();
-    } catch(SuspendedEntityInteractionException e) {
+    } catch (SuspendedEntityInteractionException e) {
       // This is expected
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSubmitTaskFormFailAfterProcessInstanceSuspendByProcessDefinitionKey() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
 
     try {
-      formService.submitTaskFormData(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId(), new HashMap<String, String>());
+      formService.submitTaskFormData(taskService.createTaskQuery()
+          .processInstanceId(processInstance.getId()).singleResult().getId(),
+          new HashMap<String, String>());
       fail();
-    } catch(SuspendedEntityInteractionException e) {
+    } catch (SuspendedEntityInteractionException e) {
       // This is expected
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testProcessInstanceSignalFailAfterSuspend() {
 
     // Suspend process instance
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceById(processInstance.getId());
 
     try {
@@ -762,12 +809,14 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testProcessInstanceSignalFailAfterSuspendByProcessDefinitionId() {
 
     // Suspend process instance
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
 
     try {
@@ -789,12 +838,14 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testProcessInstanceSignalFailAfterSuspendByProcessDefinitionKey() {
 
     // Suspend process instance
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
 
     try {
@@ -818,8 +869,10 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
   @Deployment
   public void testMessageEventReceiveFailAfterSuspend() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceById(processInstance.getId());
     EventSubscription subscription = runtimeService.createEventSubscriptionQuery().singleResult();
 
@@ -832,7 +885,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
 
     try {
-      runtimeService.messageEventReceived("someMessage", subscription.getExecutionId(), new HashMap<String, Object>());
+      runtimeService.messageEventReceived("someMessage", subscription.getExecutionId(),
+          new HashMap<String, Object>());
       fail();
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
@@ -840,9 +894,11 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testMessageEventReceiveFailAfterSuspend.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testMessageEventReceiveFailAfterSuspend.bpmn20.xml" })
   public void testMessageEventReceiveFailAfterSuspendByProcessDefinitionId() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
     EventSubscription subscription = runtimeService.createEventSubscriptionQuery().singleResult();
@@ -856,7 +912,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
 
     try {
-      runtimeService.messageEventReceived("someMessage", subscription.getExecutionId(), new HashMap<String, Object>());
+      runtimeService.messageEventReceived("someMessage", subscription.getExecutionId(),
+          new HashMap<String, Object>());
       fail();
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
@@ -864,9 +921,11 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testMessageEventReceiveFailAfterSuspend.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testMessageEventReceiveFailAfterSuspend.bpmn20.xml" })
   public void testMessageEventReceiveFailAfterSuspendByProcessDefinitionKey() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
     EventSubscription subscription = runtimeService.createEventSubscriptionQuery().singleResult();
@@ -880,7 +939,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
 
     try {
-      runtimeService.messageEventReceived("someMessage", subscription.getExecutionId(), new HashMap<String, Object>());
+      runtimeService.messageEventReceived("someMessage", subscription.getExecutionId(),
+          new HashMap<String, Object>());
       fail();
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
@@ -894,7 +954,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     final String signal = "Some Signal";
 
     // Test if process instance can be completed using the signal
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalSuspendedProcessInstance");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("signalSuspendedProcessInstance");
     runtimeService.signalEventReceived(signal);
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
@@ -917,7 +978,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
 
     try {
-      runtimeService.signalEventReceived(signal, subscription.getExecutionId(), new HashMap<String, Object>());
+      runtimeService.signalEventReceived(signal, subscription.getExecutionId(),
+          new HashMap<String, Object>());
       fail();
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
@@ -930,19 +992,22 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testSignalEventReceivedAfterProcessInstanceSuspended.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testSignalEventReceivedAfterProcessInstanceSuspended.bpmn20.xml" })
   public void testSignalEventReceivedAfterProcessInstanceSuspendedByProcessDefinitionId() {
 
     final String signal = "Some Signal";
 
     // Test if process instance can be completed using the signal
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalSuspendedProcessInstance");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("signalSuspendedProcessInstance");
     runtimeService.signalEventReceived(signal);
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
     // Now test when suspending the process instance: the process instance shouldn't be continued
     processInstance = runtimeService.startProcessInstanceByKey("signalSuspendedProcessInstance");
-    runtimeService.suspendProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
+    runtimeService
+        .suspendProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
     runtimeService.signalEventReceived(signal);
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
 
@@ -959,7 +1024,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
 
     try {
-      runtimeService.signalEventReceived(signal, subscription.getExecutionId(), new HashMap<String, Object>());
+      runtimeService.signalEventReceived(signal, subscription.getExecutionId(),
+          new HashMap<String, Object>());
       fail();
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
@@ -972,21 +1038,21 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testSignalEventReceivedAfterProcessInstanceSuspended.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testSignalEventReceivedAfterProcessInstanceSuspended.bpmn20.xml" })
   public void testSignalEventReceivedAfterProcessInstanceSuspendedByProcessDefinitionKey() {
 
     final String signal = "Some Signal";
 
     // Test if process instance can be completed using the signal
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalSuspendedProcessInstance");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("signalSuspendedProcessInstance");
     runtimeService.signalEventReceived(signal);
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
     // Now test when suspending the process instance: the process instance shouldn't be continued
-    ProcessDefinition processDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("signalSuspendedProcessInstance")
-        .singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("signalSuspendedProcessInstance").singleResult();
 
     processInstance = runtimeService.startProcessInstanceByKey("signalSuspendedProcessInstance");
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
@@ -1006,7 +1072,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
 
     try {
-      runtimeService.signalEventReceived(signal, subscription.getExecutionId(), new HashMap<String, Object>());
+      runtimeService.signalEventReceived(signal, subscription.getExecutionId(),
+          new HashMap<String, Object>());
       fail();
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
@@ -1019,13 +1086,16 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testTaskLifecycleOperationsFailAfterProcessInstanceSuspend() {
 
     // Start a new process instance with one task
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     assertNotNull(task);
 
     // Suspend the process instance
@@ -1046,8 +1116,6 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
-
-
 
     // Adding candidate groups on the task should fail
     try {
@@ -1081,7 +1149,6 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       // This is good
     }
 
-
     // Set an assignee on the task should fail
     try {
       taskService.setAssignee(task.getId(), "mispiggy");
@@ -1101,7 +1168,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     // Removing candidate groups on the task should fail
     try {
       taskService.deleteCandidateGroup(task.getId(), "blahGroup");
-      fail("It is not allowed to remove a candidate group on a task of a suspended process instance");
+      fail(
+          "It is not allowed to remove a candidate group on a task of a suspended process instance");
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
@@ -1109,7 +1177,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     // Removing candidate users on the task should fail
     try {
       taskService.deleteCandidateUser(task.getId(), "blahUser");
-      fail("It is not allowed to remove a candidate user on a task of a suspended process instance");
+      fail(
+          "It is not allowed to remove a candidate user on a task of a suspended process instance");
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
@@ -1117,7 +1186,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     // Removing group identity links on the task should fail
     try {
       taskService.deleteGroupIdentityLink(task.getId(), "blahGroup", IdentityLinkType.CANDIDATE);
-      fail("It is not allowed to remove a candidate user on a task of a suspended process instance");
+      fail(
+          "It is not allowed to remove a candidate user on a task of a suspended process instance");
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
@@ -1132,13 +1202,16 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testTaskLifecycleOperationsFailAfterProcessInstanceSuspendByProcessDefinitionId() {
 
     // Start a new process instance with one task
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     assertNotNull(task);
 
     // Suspend the process instance
@@ -1159,8 +1232,6 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
-
-
 
     // Adding candidate groups on the task should fail
     try {
@@ -1194,7 +1265,6 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       // This is good
     }
 
-
     // Set an assignee on the task should fail
     try {
       taskService.setAssignee(task.getId(), "mispiggy");
@@ -1214,7 +1284,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     // Removing candidate groups on the task should fail
     try {
       taskService.deleteCandidateGroup(task.getId(), "blahGroup");
-      fail("It is not allowed to remove a candidate group on a task of a suspended process instance");
+      fail(
+          "It is not allowed to remove a candidate group on a task of a suspended process instance");
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
@@ -1222,7 +1293,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     // Removing candidate users on the task should fail
     try {
       taskService.deleteCandidateUser(task.getId(), "blahUser");
-      fail("It is not allowed to remove a candidate user on a task of a suspended process instance");
+      fail(
+          "It is not allowed to remove a candidate user on a task of a suspended process instance");
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
@@ -1230,7 +1302,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     // Removing group identity links on the task should fail
     try {
       taskService.deleteGroupIdentityLink(task.getId(), "blahGroup", IdentityLinkType.CANDIDATE);
-      fail("It is not allowed to remove a candidate user on a task of a suspended process instance");
+      fail(
+          "It is not allowed to remove a candidate user on a task of a suspended process instance");
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
@@ -1245,13 +1318,16 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testTaskLifecycleOperationsFailAfterProcessInstanceSuspendByProcessDefinitionKey() {
 
     // Start a new process instance with one task
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     assertNotNull(task);
 
     // Suspend the process instance
@@ -1272,8 +1348,6 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
-
-
 
     // Adding candidate groups on the task should fail
     try {
@@ -1307,7 +1381,6 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       // This is good
     }
 
-
     // Set an assignee on the task should fail
     try {
       taskService.setAssignee(task.getId(), "mispiggy");
@@ -1327,7 +1400,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     // Removing candidate groups on the task should fail
     try {
       taskService.deleteCandidateGroup(task.getId(), "blahGroup");
-      fail("It is not allowed to remove a candidate group on a task of a suspended process instance");
+      fail(
+          "It is not allowed to remove a candidate group on a task of a suspended process instance");
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
@@ -1335,7 +1409,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     // Removing candidate users on the task should fail
     try {
       taskService.deleteCandidateUser(task.getId(), "blahUser");
-      fail("It is not allowed to remove a candidate user on a task of a suspended process instance");
+      fail(
+          "It is not allowed to remove a candidate user on a task of a suspended process instance");
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
@@ -1343,7 +1418,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     // Removing group identity links on the task should fail
     try {
       taskService.deleteGroupIdentityLink(task.getId(), "blahGroup", IdentityLinkType.CANDIDATE);
-      fail("It is not allowed to remove a candidate user on a task of a suspended process instance");
+      fail(
+          "It is not allowed to remove a candidate user on a task of a suspended process instance");
     } catch (SuspendedEntityInteractionException e) {
       // This is good
     }
@@ -1357,11 +1433,14 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSubTaskCreationFailAfterProcessInstanceSuspend() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     runtimeService.suspendProcessInstanceById(processInstance.getId());
 
     Task subTask = taskService.newTask("someTaskId");
@@ -1374,11 +1453,14 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSubTaskCreationFailAfterProcessInstanceSuspendByProcessDefinitionId() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
 
     Task subTask = taskService.newTask("someTaskId");
@@ -1391,11 +1473,14 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSubTaskCreationFailAfterProcessInstanceSuspendByProcessDefinitionKey() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
 
     Task subTask = taskService.newTask("someTaskId");
@@ -1408,13 +1493,16 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testTaskNonLifecycleOperationsSucceedAfterProcessInstanceSuspend() {
 
     // Start a new process instance with one task
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     runtimeService.suspendProcessInstanceById(processInstance.getId());
     assertNotNull(task);
 
@@ -1472,7 +1560,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("should be allowed");
     }
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY
+        .getId()) {
 
       try {
         taskService.createComment(task.getId(), processInstance.getId(), "test comment");
@@ -1481,13 +1570,13 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       }
 
       try {
-        taskService.createAttachment("text", task.getId(), processInstance.getId(), "tesTastName", "testDescription", "http://test.com");
+        taskService.createAttachment("text", task.getId(), processInstance.getId(), "tesTastName",
+            "testDescription", "http://test.com");
       } catch (SuspendedEntityInteractionException e) {
         fail("should be allowed");
       }
 
     }
-
 
     try {
       taskService.setPriority(task.getId(), 99);
@@ -1496,14 +1585,18 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testTaskNonLifecycleOperationsSucceedAfterProcessInstanceSuspendByProcessDefinitionId() {
 
     // Start a new process instance with one task
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-    runtimeService.suspendProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
+    runtimeService
+        .suspendProcessInstanceByProcessDefinitionId(processInstance.getProcessDefinitionId());
     assertNotNull(task);
 
     try {
@@ -1560,7 +1653,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("should be allowed");
     }
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY
+        .getId()) {
 
       try {
         taskService.createComment(task.getId(), processInstance.getId(), "test comment");
@@ -1569,13 +1663,13 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       }
 
       try {
-        taskService.createAttachment("text", task.getId(), processInstance.getId(), "tesTastName", "testDescription", "http://test.com");
+        taskService.createAttachment("text", task.getId(), processInstance.getId(), "tesTastName",
+            "testDescription", "http://test.com");
       } catch (SuspendedEntityInteractionException e) {
         fail("should be allowed");
       }
 
     }
-
 
     try {
       taskService.setPriority(task.getId(), 99);
@@ -1584,13 +1678,16 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testTaskNonLifecycleOperationsSucceedAfterProcessInstanceSuspendByProcessDefinitionKey() {
 
     // Start a new process instance with one task
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
     assertNotNull(task);
 
@@ -1648,7 +1745,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("should be allowed");
     }
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
+    if (processEngineConfiguration.getHistoryLevel().getId() > HistoryLevel.HISTORY_LEVEL_ACTIVITY
+        .getId()) {
 
       try {
         taskService.createComment(task.getId(), processInstance.getId(), "test comment");
@@ -1657,13 +1755,13 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       }
 
       try {
-        taskService.createAttachment("text", task.getId(), processInstance.getId(), "tesTastName", "testDescription", "http://test.com");
+        taskService.createAttachment("text", task.getId(), processInstance.getId(), "tesTastName",
+            "testDescription", "http://test.com");
       } catch (SuspendedEntityInteractionException e) {
         fail("should be allowed");
       }
 
     }
-
 
     try {
       taskService.setPriority(task.getId(), 99);
@@ -1678,15 +1776,19 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
 
-    // Suspending the process instance should also stop the execution of jobs for that process instance
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    // Suspending the process instance should also stop the execution of jobs for that process
+    // instance
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     assertEquals(1, managementService.createJobQuery().count());
     runtimeService.suspendProcessInstanceById(processInstance.getId());
     assertEquals(1, managementService.createJobQuery().count());
 
     // The jobs should not be executed now
-    ClockUtil.setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on 5 minutes
+    ClockUtil.setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on
+                                                                          // 5 minutes
     assertEquals(0, managementService.createJobQuery().executable().count());
 
     // Activation of the process instance should now allow for job execution
@@ -1697,21 +1799,25 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testJobNotExecutedAfterProcessInstanceSuspend.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testJobNotExecutedAfterProcessInstanceSuspend.bpmn20.xml" })
   public void testJobNotExecutedAfterProcessInstanceSuspendByProcessDefinitionId() {
 
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
 
-    // Suspending the process instance should also stop the execution of jobs for that process instance
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    // Suspending the process instance should also stop the execution of jobs for that process
+    // instance
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceById(processDefinition.getId());
     assertEquals(1, managementService.createJobQuery().count());
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
     assertEquals(1, managementService.createJobQuery().count());
 
     // The jobs should not be executed now
-    ClockUtil.setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on 5 minutes
+    ClockUtil.setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on
+                                                                          // 5 minutes
     assertEquals(0, managementService.createJobQuery().executable().count());
 
     // Activation of the process instance should now allow for job execution
@@ -1722,21 +1828,25 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testJobNotExecutedAfterProcessInstanceSuspend.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.testJobNotExecutedAfterProcessInstanceSuspend.bpmn20.xml" })
   public void testJobNotExecutedAfterProcessInstanceSuspendByProcessDefinitionKey() {
 
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
 
-    // Suspending the process instance should also stop the execution of jobs for that process instance
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    // Suspending the process instance should also stop the execution of jobs for that process
+    // instance
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceById(processDefinition.getId());
     assertEquals(1, managementService.createJobQuery().count());
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
     assertEquals(1, managementService.createJobQuery().count());
 
     // The jobs should not be executed now
-    ClockUtil.setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on 5 minutes
+    ClockUtil.setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on
+                                                                          // 5 minutes
     assertEquals(0, managementService.createJobQuery().executable().count());
 
     // Activation of the process instance should now allow for job execution
@@ -1747,8 +1857,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
   public void testCallActivityReturnAfterProcessInstanceSuspend() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callSimpleProcess");
     runtimeService.suspendProcessInstanceById(instance.getId());
@@ -1769,8 +1880,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
   public void testCallActivityReturnAfterProcessInstanceSuspendByProcessDefinitionId() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callSimpleProcess");
     runtimeService.suspendProcessInstanceByProcessDefinitionId(instance.getProcessDefinitionId());
@@ -1791,13 +1903,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
   public void testCallActivityReturnAfterProcessInstanceSuspendByProcessDefinitionKey() {
-    ProcessDefinition processDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("callSimpleProcess")
-        .singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("callSimpleProcess").singleResult();
 
     runtimeService.startProcessInstanceByKey("callSimpleProcess");
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
@@ -1818,8 +1929,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
   public void testMICallActivityReturnAfterProcessInstanceSuspend() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callMISimpleProcess");
     runtimeService.suspendProcessInstanceById(instance.getId());
@@ -1850,8 +1962,9 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
   public void testMICallActivityReturnAfterProcessInstanceSuspendByProcessDefinitionId() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callMISimpleProcess");
     runtimeService.suspendProcessInstanceByProcessDefinitionId(instance.getProcessDefinitionId());
@@ -1882,13 +1995,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
   public void testMICallActivityReturnAfterProcessInstanceSuspendByProcessDefinitionKey() {
-    ProcessDefinition processDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("callMISimpleProcess")
-        .singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("callMISimpleProcess").singleResult();
     runtimeService.startProcessInstanceByKey("callMISimpleProcess");
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
 
@@ -1918,11 +2030,12 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testStartBeforeActivityForSuspendProcessInstance() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
-    //start process instance
+    // start process instance
     runtimeService.startProcessInstanceById(processDefinition.getId());
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
 
@@ -1931,18 +2044,20 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
     // try to start before activity for suspended processDefinition
     try {
-      runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("theTask").execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId())
+          .startBeforeActivity("theTask").execute();
       fail("Exception is expected but not thrown");
-    } catch(SuspendedEntityInteractionException e) {
+    } catch (SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testStartAfterActivityForSuspendProcessInstance() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
-    //start process instance
+    // start process instance
     runtimeService.startProcessInstanceById(processDefinition.getId());
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
 
@@ -1951,19 +2066,23 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
     // try to start after activity for suspended processDefinition
     try {
-      runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("theTask").execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId())
+          .startAfterActivity("theTask").execute();
       fail("Exception is expected but not thrown");
-    } catch(SuspendedEntityInteractionException e) {
+    } catch (SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   public void testSuspensionByIdCascadesToExternalTasks() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     ExternalTask task1 = externalTaskService.createExternalTaskQuery()
         .processInstanceId(processInstance1.getId()).singleResult();
@@ -1991,19 +2110,23 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertFalse(task1.isSuspended());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   public void testSuspensionByProcessDefinitionIdCascadesToExternalTasks() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     ExternalTask task1 = externalTaskService.createExternalTaskQuery()
         .processInstanceId(processInstance1.getId()).singleResult();
     assertFalse(task1.isSuspended());
 
     // when the process instance is suspended
-    runtimeService.suspendProcessInstanceByProcessDefinitionId(processInstance1.getProcessDefinitionId());
+    runtimeService
+        .suspendProcessInstanceByProcessDefinitionId(processInstance1.getProcessDefinitionId());
 
     // then the task is suspended
     task1 = externalTaskService.createExternalTaskQuery()
@@ -2016,7 +2139,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertFalse(task2.isSuspended());
 
     // when it is activated again
-    runtimeService.activateProcessInstanceByProcessDefinitionId(processInstance1.getProcessDefinitionId());
+    runtimeService
+        .activateProcessInstanceByProcessDefinitionId(processInstance1.getProcessDefinitionId());
 
     // then the task is activated too
     task1 = externalTaskService.createExternalTaskQuery()
@@ -2024,12 +2148,15 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertFalse(task1.isSuspended());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   public void testSuspensionByProcessDefinitionKeyCascadesToExternalTasks() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     ExternalTask task1 = externalTaskService.createExternalTaskQuery()
         .processInstanceId(processInstance1.getId()).singleResult();
@@ -2057,62 +2184,55 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertFalse(task1.isSuspended());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testSuspendAndActivateProcessInstanceByIdUsingBuilder() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertFalse(processInstance.isSuspended());
 
-    //suspend
-    runtimeService
-      .updateProcessInstanceSuspensionState()
-      .byProcessInstanceId(processInstance.getId())
-      .suspend();
+    // suspend
+    runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceId(processInstance.getId()).suspend();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
     assertEquals(0, query.active().count());
     assertEquals(1, query.suspended().count());
 
-    //activate
-    runtimeService
-      .updateProcessInstanceSuspensionState()
-      .byProcessInstanceId(processInstance.getId())
-      .activate();
+    // activate
+    runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceId(processInstance.getId()).activate();
 
     assertEquals(1, query.active().count());
     assertEquals(0, query.suspended().count());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testSuspendAndActivateProcessInstanceByProcessDefinitionIdUsingBuilder() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
     assertEquals(1, query.active().count());
     assertEquals(0, query.suspended().count());
 
-    //suspend
-    runtimeService
-      .updateProcessInstanceSuspensionState()
-      .byProcessDefinitionId(processDefinition.getId())
-      .suspend();
+    // suspend
+    runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessDefinitionId(processDefinition.getId()).suspend();
 
     assertEquals(0, query.active().count());
     assertEquals(1, query.suspended().count());
 
-    //activate
-    runtimeService
-      .updateProcessInstanceSuspensionState()
-      .byProcessDefinitionId(processDefinition.getId())
-      .activate();
+    // activate
+    runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessDefinitionId(processDefinition.getId()).activate();
 
     assertEquals(1, query.active().count());
     assertEquals(0, query.suspended().count());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testSuspendAndActivateProcessInstanceByProcessDefinitionKeyUsingBuilder() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -2120,20 +2240,16 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(1, query.active().count());
     assertEquals(0, query.suspended().count());
 
-    //suspend
-    runtimeService
-      .updateProcessInstanceSuspensionState()
-      .byProcessDefinitionKey("oneTaskProcess")
-      .suspend();
+    // suspend
+    runtimeService.updateProcessInstanceSuspensionState().byProcessDefinitionKey("oneTaskProcess")
+        .suspend();
 
     assertEquals(0, query.active().count());
     assertEquals(1, query.suspended().count());
 
-    //activate
-    runtimeService
-      .updateProcessInstanceSuspensionState()
-      .byProcessDefinitionKey("oneTaskProcess")
-      .activate();
+    // activate
+    runtimeService.updateProcessInstanceSuspensionState().byProcessDefinitionKey("oneTaskProcess")
+        .activate();
 
     assertEquals(1, query.active().count());
     assertEquals(0, query.suspended().count());
@@ -2146,7 +2262,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
     String id = instance.getProcessInstanceId();
 
-    //when
+    // when
     runtimeService.suspendProcessInstanceById(id);
     Job job = managementService.createJobQuery().processInstanceId(id).singleResult();
 

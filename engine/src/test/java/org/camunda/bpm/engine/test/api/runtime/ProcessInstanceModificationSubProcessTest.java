@@ -77,61 +77,43 @@ public class ProcessInstanceModificationSubProcessTest {
   @Test
   public void shouldHaveEqualParentActivityInstanceId() {
     // given
-    testHelper.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
-        .subProcess("subprocess").embeddedSubProcess()
-          .startEvent()
-            .scriptTask("scriptTaskInSubprocess")
-              .scriptFormat("groovy")
-              .scriptText("throw new org.camunda.bpm.engine.delegate.BpmnError(\"anErrorCode\");")
-            .userTask()
-          .endEvent()
-        .subProcessDone()
-      .endEvent()
-      .moveToActivity("subprocess")
-        .boundaryEvent("boundary").error("anErrorCode")
-          .userTask("userTaskAfterBoundaryEvent")
+    testHelper.deploy(Bpmn.createExecutableProcess("process").startEvent().subProcess("subprocess")
+        .embeddedSubProcess().startEvent().scriptTask("scriptTaskInSubprocess")
+        .scriptFormat("groovy")
+        .scriptText("throw new org.camunda.bpm.engine.delegate.BpmnError(\"anErrorCode\");")
+        .userTask().endEvent().subProcessDone().endEvent().moveToActivity("subprocess")
+        .boundaryEvent("boundary").error("anErrorCode").userTask("userTaskAfterBoundaryEvent")
         .endEvent().done());
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     // when
     runtimeService.createModification(processInstance.getProcessDefinitionId())
-      .startAfterActivity("scriptTaskInSubprocess")
-      .processInstanceIds(processInstance.getId())
-      .execute();
+        .startAfterActivity("scriptTaskInSubprocess").processInstanceIds(processInstance.getId())
+        .execute();
 
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId())
-      .getActivityInstances("subprocess")[0];
+        .getActivityInstances("subprocess")[0];
 
-    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
-      .activityId("subprocess")
-      .unfinished()
-      .singleResult();
+    HistoricActivityInstance historicActivityInstance = historyService
+        .createHistoricActivityInstanceQuery().activityId("subprocess").unfinished().singleResult();
 
     // assume
     assertNotNull(activityInstance);
     assertNotNull(historicActivityInstance);
 
     // then
-    assertEquals(historicActivityInstance.getParentActivityInstanceId(), activityInstance.getParentActivityInstanceId());
+    assertEquals(historicActivityInstance.getParentActivityInstanceId(),
+        activityInstance.getParentActivityInstanceId());
   }
 
   @Test
   public void shouldCompleteParentProcess() {
-    final BpmnModelInstance parentProcessInstance =
-      Bpmn.createExecutableProcess("parentProcess")
-        .startEvent()
-          .callActivity("callActivity").calledElement("subprocess")
-        .endEvent()
-        .done();
+    final BpmnModelInstance parentProcessInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().callActivity("callActivity").calledElement("subprocess").endEvent().done();
 
-    final BpmnModelInstance subprocessInstance =
-      Bpmn.createExecutableProcess("subprocess")
-        .startEvent()
-          .userTask("userTask")
-        .endEvent("subEnd")
-        .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcessInstance, subprocessInstance);
 
@@ -140,15 +122,13 @@ public class ProcessInstanceModificationSubProcessTest {
 
     assertNotNull(taskService.createTaskQuery().taskName("userTask").singleResult());
 
-    final ProcessInstance subprocess = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").singleResult();
+    final ProcessInstance subprocess = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess").singleResult();
     assertNotNull(subprocess);
 
     // when I do process instance modification
-    runtimeService.createProcessInstanceModification(
-      subprocess.getProcessInstanceId())
-      .cancelAllForActivity("userTask")
-      .startAfterActivity("userTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(subprocess.getProcessInstanceId())
+        .cancelAllForActivity("userTask").startAfterActivity("userTask").execute();
 
     // then the process should be finished
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
@@ -156,20 +136,12 @@ public class ProcessInstanceModificationSubProcessTest {
 
   @Test
   public void shouldContinueParentProcess() {
-    final BpmnModelInstance parentProcessInstance =
-      Bpmn.createExecutableProcess("parentProcess")
-        .startEvent()
-        .callActivity("callActivity").calledElement("subprocess")
-        .userTask()
-        .endEvent()
+    final BpmnModelInstance parentProcessInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().callActivity("callActivity").calledElement("subprocess").userTask().endEvent()
         .done();
 
-    final BpmnModelInstance subprocessInstance =
-      Bpmn.createExecutableProcess("subprocess")
-        .startEvent()
-          .userTask("userTask")
-        .endEvent("subEnd")
-        .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcessInstance, subprocessInstance);
 
@@ -178,15 +150,13 @@ public class ProcessInstanceModificationSubProcessTest {
 
     assertNotNull(taskService.createTaskQuery().taskName("userTask").singleResult());
 
-    final ProcessInstance subprocess = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").singleResult();
+    final ProcessInstance subprocess = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess").singleResult();
     assertNotNull(subprocess);
 
     // when I do process instance modification
-    runtimeService.createProcessInstanceModification(
-      subprocess.getProcessInstanceId())
-      .cancelAllForActivity("userTask")
-      .startAfterActivity("userTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(subprocess.getProcessInstanceId())
+        .cancelAllForActivity("userTask").startAfterActivity("userTask").execute();
 
     // then the parent process instance is still active
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
@@ -198,43 +168,31 @@ public class ProcessInstanceModificationSubProcessTest {
   @Test
   public void shouldCompleteParentProcessWithParallelGateway() {
 
-    final BpmnModelInstance modelInstance =
-      Bpmn.createExecutableProcess("parentProcess").startEvent()
-        .parallelGateway()
-          .serviceTask("doNothingServiceTask").camundaExpression("${true}")
-        .moveToLastGateway()
-          .callActivity("callActivity").calledElement("subprocess")
-        .parallelGateway("mergingParallelGateway")
-      .endEvent()
-      .done();
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().parallelGateway().serviceTask("doNothingServiceTask")
+        .camundaExpression("${true}").moveToLastGateway().callActivity("callActivity")
+        .calledElement("subprocess").parallelGateway("mergingParallelGateway").endEvent().done();
 
-    final BpmnModelInstance parentProcessInstance =
-      modify(modelInstance)
+    final BpmnModelInstance parentProcessInstance = modify(modelInstance)
         .flowNodeBuilder("doNothingServiceTask").connectTo("mergingParallelGateway").done();
 
-    final BpmnModelInstance subprocessInstance =
-        Bpmn.createExecutableProcess("subprocess")
-          .startEvent()
-            .userTask("userTask")
-          .endEvent("subEnd")
-          .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcessInstance, subprocessInstance);
 
     // given I start the process, which waits at user task in subprocess
     runtimeService.startProcessInstanceByKey("parentProcess");
 
-    final ProcessInstance subprocess = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").singleResult();
+    final ProcessInstance subprocess = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess").singleResult();
     assertNotNull(subprocess);
 
     assertNotNull(taskService.createTaskQuery().taskName("userTask").singleResult());
 
     // when I do process instance modification
-    runtimeService.createProcessInstanceModification(
-      subprocess.getProcessInstanceId())
-      .cancelAllForActivity("userTask")
-      .startAfterActivity("userTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(subprocess.getProcessInstanceId())
+        .cancelAllForActivity("userTask").startAfterActivity("userTask").execute();
 
     // then the process should be finished
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
@@ -244,44 +202,32 @@ public class ProcessInstanceModificationSubProcessTest {
   @Test
   public void shouldContinueParentProcessWithParallelGateway() {
 
-    final BpmnModelInstance modelInstance =
-      Bpmn.createExecutableProcess("parentProcess").startEvent()
-        .parallelGateway()
-          .serviceTask("doNothingServiceTask").camundaExpression("${true}")
-        .moveToLastGateway()
-          .callActivity("callActivity").calledElement("subprocess")
-        .parallelGateway("mergingParallelGateway")
-        .userTask()
-      .endEvent()
-      .done();
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().parallelGateway().serviceTask("doNothingServiceTask")
+        .camundaExpression("${true}").moveToLastGateway().callActivity("callActivity")
+        .calledElement("subprocess").parallelGateway("mergingParallelGateway").userTask().endEvent()
+        .done();
 
-    final BpmnModelInstance parentProcessInstance =
-      modify(modelInstance)
+    final BpmnModelInstance parentProcessInstance = modify(modelInstance)
         .flowNodeBuilder("doNothingServiceTask").connectTo("mergingParallelGateway").done();
 
-    final BpmnModelInstance subprocessInstance =
-        Bpmn.createExecutableProcess("subprocess")
-          .startEvent()
-            .userTask("userTask")
-          .endEvent("subEnd")
-          .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcessInstance, subprocessInstance);
 
     // given I start the process, which waits at user task in subprocess
     ProcessInstance parentPI = runtimeService.startProcessInstanceByKey("parentProcess");
 
-    final ProcessInstance subprocess = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").singleResult();
+    final ProcessInstance subprocess = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess").singleResult();
     assertNotNull(subprocess);
 
     assertNotNull(taskService.createTaskQuery().taskName("userTask").singleResult());
 
     // when I do process instance modification
-    runtimeService.createProcessInstanceModification(
-      subprocess.getProcessInstanceId())
-      .cancelAllForActivity("userTask")
-      .startAfterActivity("userTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(subprocess.getProcessInstanceId())
+        .cancelAllForActivity("userTask").startAfterActivity("userTask").execute();
 
     // then the parent process instance is still active
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
@@ -294,36 +240,27 @@ public class ProcessInstanceModificationSubProcessTest {
   @Test
   public void shouldCompleteParentProcessWithMultiInstance() {
 
-    final BpmnModelInstance parentProcessInstance =
-      Bpmn.createExecutableProcess("parentProcess")
-        .startEvent()
-          .callActivity("callActivity").calledElement("subprocess")
-            .multiInstance().cardinality("3").multiInstanceDone()
-        .endEvent()
-        .done();
+    final BpmnModelInstance parentProcessInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().callActivity("callActivity").calledElement("subprocess").multiInstance()
+        .cardinality("3").multiInstanceDone().endEvent().done();
 
-    final BpmnModelInstance subprocessInstance =
-      Bpmn.createExecutableProcess("subprocess")
-        .startEvent()
-          .userTask("userTask")
-        .endEvent("subEnd")
-        .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcessInstance, subprocessInstance);
-    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("subprocess").singleResult().getId();
+    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("subprocess").singleResult().getId();
 
     // given I start the process, which waits at user task inside multiinstance subprocess
     runtimeService.startProcessInstanceByKey("parentProcess");
 
-    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").list();
+    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess").list();
     assertEquals(3, subprocesses.size());
 
     // when I do process instance modification
-    runtimeService.createModification(subprocessPrDefId)
-      .cancelAllForActivity("userTask")
-      .startAfterActivity("userTask")
-      .processInstanceIds(collectIds(subprocesses))
-      .execute();
+    runtimeService.createModification(subprocessPrDefId).cancelAllForActivity("userTask")
+        .startAfterActivity("userTask").processInstanceIds(collectIds(subprocesses)).execute();
 
     // then the process should be finished
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
@@ -333,37 +270,27 @@ public class ProcessInstanceModificationSubProcessTest {
   @Test
   public void shouldContinueParentProcessWithMultiInstance() {
 
-    final BpmnModelInstance parentProcessInstance =
-      Bpmn.createExecutableProcess("parentProcess")
-        .startEvent()
-          .callActivity("callActivity").calledElement("subprocess")
-            .multiInstance().cardinality("3").multiInstanceDone()
-        .userTask()
-        .endEvent()
-        .done();
+    final BpmnModelInstance parentProcessInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().callActivity("callActivity").calledElement("subprocess").multiInstance()
+        .cardinality("3").multiInstanceDone().userTask().endEvent().done();
 
-    final BpmnModelInstance subprocessInstance =
-      Bpmn.createExecutableProcess("subprocess")
-        .startEvent()
-          .userTask("userTask")
-        .endEvent("subEnd")
-        .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcessInstance, subprocessInstance);
-    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("subprocess").singleResult().getId();
+    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("subprocess").singleResult().getId();
 
     // given I start the process, which waits at user task inside multiinstance subprocess
     ProcessInstance parentPI = runtimeService.startProcessInstanceByKey("parentProcess");
 
-    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").list();
+    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess").list();
     assertEquals(3, subprocesses.size());
 
     // when I do process instance modification
-    runtimeService.createModification(subprocessPrDefId)
-      .cancelAllForActivity("userTask")
-      .startAfterActivity("userTask")
-      .processInstanceIds(collectIds(subprocesses))
-      .execute();
+    runtimeService.createModification(subprocessPrDefId).cancelAllForActivity("userTask")
+        .startAfterActivity("userTask").processInstanceIds(collectIds(subprocesses)).execute();
 
     // then the parent process instance is still active
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
@@ -376,44 +303,28 @@ public class ProcessInstanceModificationSubProcessTest {
   @Test
   public void shouldCompleteParentProcessWithMultiInstanceInsideEmbeddedSubProcess() {
 
-    final BpmnModelInstance parentProcessInstance =
-        Bpmn.createExecutableProcess("parentProcess")
-          .startEvent()
-          .subProcess()
-            .embeddedSubProcess()
-              .startEvent()
-              .callActivity("callActivity")
-                .calledElement("subprocess")
-                .multiInstance()
-                .cardinality("3")
-                .multiInstanceDone()
-              .endEvent()
-          .subProcessDone()
-          .endEvent()
-          .done();
+    final BpmnModelInstance parentProcessInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().subProcess().embeddedSubProcess().startEvent().callActivity("callActivity")
+        .calledElement("subprocess").multiInstance().cardinality("3").multiInstanceDone().endEvent()
+        .subProcessDone().endEvent().done();
 
-    final BpmnModelInstance subprocessInstance =
-      Bpmn.createExecutableProcess("subprocess")
-        .startEvent()
-          .userTask("userTask")
-        .endEvent("subEnd")
-        .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcessInstance, subprocessInstance);
-    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("subprocess").singleResult().getId();
+    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("subprocess").singleResult().getId();
 
     // given I start the process, which waits at user task inside multiinstance subprocess
     runtimeService.startProcessInstanceByKey("parentProcess");
 
-    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").list();
+    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess").list();
     assertEquals(3, subprocesses.size());
 
     // when I do process instance modification
-    runtimeService.createModification(subprocessPrDefId)
-      .cancelAllForActivity("userTask")
-      .startAfterActivity("userTask")
-      .processInstanceIds(collectIds(subprocesses))
-      .execute();
+    runtimeService.createModification(subprocessPrDefId).cancelAllForActivity("userTask")
+        .startAfterActivity("userTask").processInstanceIds(collectIds(subprocesses)).execute();
 
     // then the process should be finished
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
@@ -422,45 +333,28 @@ public class ProcessInstanceModificationSubProcessTest {
   @Test
   public void shouldContinueParentProcessWithMultiInstanceInsideEmbeddedSubProcess() {
 
-    final BpmnModelInstance parentProcessInstance =
-        Bpmn.createExecutableProcess("parentProcess")
-          .startEvent()
-          .subProcess()
-            .embeddedSubProcess()
-              .startEvent()
-              .callActivity("callActivity")
-                .calledElement("subprocess")
-                .multiInstance()
-                .cardinality("3")
-                .multiInstanceDone()
-              .endEvent()
-          .subProcessDone()
-          .userTask()
-          .endEvent()
-          .done();
+    final BpmnModelInstance parentProcessInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().subProcess().embeddedSubProcess().startEvent().callActivity("callActivity")
+        .calledElement("subprocess").multiInstance().cardinality("3").multiInstanceDone().endEvent()
+        .subProcessDone().userTask().endEvent().done();
 
-    final BpmnModelInstance subprocessInstance =
-      Bpmn.createExecutableProcess("subprocess")
-        .startEvent()
-          .userTask("userTask")
-        .endEvent("subEnd")
-        .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcessInstance, subprocessInstance);
-    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("subprocess").singleResult().getId();
+    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("subprocess").singleResult().getId();
 
     // given I start the process, which waits at user task inside multiinstance subprocess
     ProcessInstance parentPI = runtimeService.startProcessInstanceByKey("parentProcess");
 
-    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").list();
+    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess").list();
     assertEquals(3, subprocesses.size());
 
     // when I do process instance modification
-    runtimeService.createModification(subprocessPrDefId)
-      .cancelAllForActivity("userTask")
-      .startAfterActivity("userTask")
-      .processInstanceIds(collectIds(subprocesses))
-      .execute();
+    runtimeService.createModification(subprocessPrDefId).cancelAllForActivity("userTask")
+        .startAfterActivity("userTask").processInstanceIds(collectIds(subprocesses)).execute();
 
     // then the parent process instance is still active
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
@@ -472,44 +366,28 @@ public class ProcessInstanceModificationSubProcessTest {
   @Test
   public void shouldCompleteParentProcessWithMultiInstanceEmbeddedSubProcess() {
 
-    final BpmnModelInstance parentProcessInstance =
-        Bpmn.createExecutableProcess("parentProcess")
-          .startEvent()
-          .subProcess()
-            .embeddedSubProcess()
-              .startEvent()
-              .callActivity("callActivity")
-                .calledElement("subprocess")
-              .endEvent()
-          .subProcessDone()
-          .multiInstance()
-          .cardinality("3")
-          .multiInstanceDone()
-          .endEvent()
-          .done();
+    final BpmnModelInstance parentProcessInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().subProcess().embeddedSubProcess().startEvent().callActivity("callActivity")
+        .calledElement("subprocess").endEvent().subProcessDone().multiInstance().cardinality("3")
+        .multiInstanceDone().endEvent().done();
 
-    final BpmnModelInstance subprocessInstance =
-      Bpmn.createExecutableProcess("subprocess")
-        .startEvent()
-          .userTask("userTask")
-        .endEvent("subEnd")
-        .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcessInstance, subprocessInstance);
-    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("subprocess").singleResult().getId();
+    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("subprocess").singleResult().getId();
 
     // given I start the process, which waits at user task inside multiinstance subprocess
     runtimeService.startProcessInstanceByKey("parentProcess");
 
-    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").list();
+    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess").list();
     assertEquals(3, subprocesses.size());
 
     // when I do process instance modification
-    runtimeService.createModification(subprocessPrDefId)
-      .cancelAllForActivity("userTask")
-      .startAfterActivity("userTask")
-      .processInstanceIds(collectIds(subprocesses))
-      .execute();
+    runtimeService.createModification(subprocessPrDefId).cancelAllForActivity("userTask")
+        .startAfterActivity("userTask").processInstanceIds(collectIds(subprocesses)).execute();
 
     // then the process should be finished
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
@@ -518,45 +396,28 @@ public class ProcessInstanceModificationSubProcessTest {
   @Test
   public void shouldContinueParentProcessWithMultiInstanceEmbeddedSubProcess() {
 
-    final BpmnModelInstance parentProcessInstance =
-        Bpmn.createExecutableProcess("parentProcess")
-          .startEvent()
-          .subProcess()
-            .embeddedSubProcess()
-              .startEvent()
-              .callActivity("callActivity")
-                .calledElement("subprocess")
-              .endEvent()
-          .subProcessDone()
-            .multiInstance()
-            .cardinality("3")
-            .multiInstanceDone()
-          .userTask()
-          .endEvent()
-          .done();
+    final BpmnModelInstance parentProcessInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().subProcess().embeddedSubProcess().startEvent().callActivity("callActivity")
+        .calledElement("subprocess").endEvent().subProcessDone().multiInstance().cardinality("3")
+        .multiInstanceDone().userTask().endEvent().done();
 
-    final BpmnModelInstance subprocessInstance =
-      Bpmn.createExecutableProcess("subprocess")
-        .startEvent()
-          .userTask("userTask")
-        .endEvent("subEnd")
-        .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcessInstance, subprocessInstance);
-    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("subprocess").singleResult().getId();
+    final String subprocessPrDefId = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("subprocess").singleResult().getId();
 
     // given I start the process, which waits at user task inside multiinstance subprocess
     ProcessInstance parentPI = runtimeService.startProcessInstanceByKey("parentProcess");
 
-    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").list();
+    final List<ProcessInstance> subprocesses = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess").list();
     assertEquals(3, subprocesses.size());
 
     // when I do process instance modification
-    runtimeService.createModification(subprocessPrDefId)
-      .cancelAllForActivity("userTask")
-      .startAfterActivity("userTask")
-      .processInstanceIds(collectIds(subprocesses))
-      .execute();
+    runtimeService.createModification(subprocessPrDefId).cancelAllForActivity("userTask")
+        .startAfterActivity("userTask").processInstanceIds(collectIds(subprocesses)).execute();
 
     // then the parent process instance is still active
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
@@ -567,44 +428,29 @@ public class ProcessInstanceModificationSubProcessTest {
 
   @Test
   public void shouldCancelParentProcessWithMultiInstanceCallActivity() {
-    BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess")
-      .startEvent()
-      .callActivity("callActivity")
-        .calledElement("subprocess")
-        .multiInstance()
-        .cardinality("3")
-        .multiInstanceDone()
-      .endEvent()
-      .userTask()
-      .endEvent()
-      .done();
+    BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess").startEvent()
+        .callActivity("callActivity").calledElement("subprocess").multiInstance().cardinality("3")
+        .multiInstanceDone().endEvent().userTask().endEvent().done();
 
-    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subprocess")
-      .startEvent()
-        .userTask("userTask")
-      .endEvent("subEnd")
-      .done();
+    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subprocess").startEvent()
+        .userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcess, subProcess);
     ProcessDefinition subProcessDefinition = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("subprocess")
-        .singleResult();
+        .processDefinitionKey("subprocess").singleResult();
 
     // given
     runtimeService.startProcessInstanceByKey("parentProcess");
 
     // assume
     List<ProcessInstance> subProcessInstances = runtimeService.createProcessInstanceQuery()
-        .processDefinitionKey("subprocess")
-        .list();
+        .processDefinitionKey("subprocess").list();
     assertEquals(3, subProcessInstances.size());
 
     // when
-    runtimeService.createModification(subProcessDefinition.getId())
-      .startAfterActivity("userTask")
-      .cancelAllForActivity("userTask")
-      .processInstanceIds(collectIds(subProcessInstances))
-      .execute();
+    runtimeService.createModification(subProcessDefinition.getId()).startAfterActivity("userTask")
+        .cancelAllForActivity("userTask").processInstanceIds(collectIds(subProcessInstances))
+        .execute();
 
     // then
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
@@ -612,107 +458,70 @@ public class ProcessInstanceModificationSubProcessTest {
 
   @Test
   public void shouldCancelParentProcessWithCallActivityInMultiInstanceEmbeddedSubprocess() {
-    BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess")
-      .startEvent()
-      .subProcess()
-        .embeddedSubProcess()
-        .startEvent()
-        .callActivity("callActivity")
-          .calledElement("subprocess")
-        .endEvent()
-      .subProcessDone()
-        .multiInstance()
-        .cardinality("3")
-        .multiInstanceDone()
-      .endEvent()
-      .userTask()
-      .endEvent()
-      .done();
+    BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess").startEvent()
+        .subProcess().embeddedSubProcess().startEvent().callActivity("callActivity")
+        .calledElement("subprocess").endEvent().subProcessDone().multiInstance().cardinality("3")
+        .multiInstanceDone().endEvent().userTask().endEvent().done();
 
-    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subprocess")
-      .startEvent()
-        .userTask("userTask")
-      .endEvent("subEnd")
-      .done();
+    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subprocess").startEvent()
+        .userTask("userTask").endEvent("subEnd").done();
 
     testHelper.deploy(parentProcess, subProcess);
     ProcessDefinition subProcessDefinition = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("subprocess")
-        .singleResult();
+        .processDefinitionKey("subprocess").singleResult();
 
     // given
     runtimeService.startProcessInstanceByKey("parentProcess");
 
     // assume
     List<ProcessInstance> subProcessInstances = runtimeService.createProcessInstanceQuery()
-        .processDefinitionKey("subprocess")
-        .list();
+        .processDefinitionKey("subprocess").list();
     assertEquals(3, subProcessInstances.size());
 
     // when
-    runtimeService.createModification(subProcessDefinition.getId())
-      .startAfterActivity("userTask")
-      .cancelAllForActivity("userTask")
-      .processInstanceIds(collectIds(subProcessInstances))
-      .execute();
+    runtimeService.createModification(subProcessDefinition.getId()).startAfterActivity("userTask")
+        .cancelAllForActivity("userTask").processInstanceIds(collectIds(subProcessInstances))
+        .execute();
 
     // then
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
   }
 
   @Test
-  public void shouldCancelConcurrentExecutionInCallingProcess()
-  {
+  public void shouldCancelConcurrentExecutionInCallingProcess() {
     // given
-    final BpmnModelInstance parentProcessInstance =
-        Bpmn.createExecutableProcess("parentProcess")
-          .startEvent()
-          .parallelGateway("split")
-            .callActivity("callActivity").calledElement("subprocess")
-            .endEvent()
-          .moveToLastGateway()
-            .userTask("parentUserTask")
-            .endEvent()
-          .done();
+    final BpmnModelInstance parentProcessInstance = Bpmn.createExecutableProcess("parentProcess")
+        .startEvent().parallelGateway("split").callActivity("callActivity")
+        .calledElement("subprocess").endEvent().moveToLastGateway().userTask("parentUserTask")
+        .endEvent().done();
 
-      final BpmnModelInstance subprocessInstance =
-        Bpmn.createExecutableProcess("subprocess")
-          .startEvent()
-            .userTask("childUserTask")
-          .endEvent("subEnd")
-          .done();
+    final BpmnModelInstance subprocessInstance = Bpmn.createExecutableProcess("subprocess")
+        .startEvent().userTask("childUserTask").endEvent("subEnd").done();
 
-      testHelper.deploy(parentProcessInstance, subprocessInstance);
+    testHelper.deploy(parentProcessInstance, subprocessInstance);
 
-      ProcessInstance callingInstance = runtimeService.startProcessInstanceByKey("parentProcess");
-      ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery()
-          .superProcessInstanceId(callingInstance.getId()).singleResult();
+    ProcessInstance callingInstance = runtimeService.startProcessInstanceByKey("parentProcess");
+    ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery()
+        .superProcessInstanceId(callingInstance.getId()).singleResult();
 
-      // when
-      runtimeService
-        .createProcessInstanceModification(calledInstance.getId())
-        .cancelAllForActivity("childUserTask")
-        .execute();
+    // when
+    runtimeService.createProcessInstanceModification(calledInstance.getId())
+        .cancelAllForActivity("childUserTask").execute();
 
-      // then
-      ProcessInstance calledInstanceAfterModification = runtimeService
-          .createProcessInstanceQuery()
-          .processInstanceId(calledInstance.getId())
-          .singleResult();
+    // then
+    ProcessInstance calledInstanceAfterModification = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(calledInstance.getId()).singleResult();
 
-      Assert.assertNull(calledInstanceAfterModification);
+    Assert.assertNull(calledInstanceAfterModification);
 
-      ExecutionTree executionTree = ExecutionTree.forExecution(callingInstance.getId(), rule.getProcessEngine());
-      assertThat(executionTree)
-        .matches(
-          describeExecutionTree("parentUserTask").scope()
-        .done());
+    ExecutionTree executionTree = ExecutionTree.forExecution(callingInstance.getId(),
+        rule.getProcessEngine());
+    assertThat(executionTree).matches(describeExecutionTree("parentUserTask").scope().done());
   }
-
 
   private List<String> collectIds(List<ProcessInstance> processInstances) {
     List<String> supbrocessIds = new ArrayList<String>();
-    for (ProcessInstance processInstance: processInstances) {
+    for (ProcessInstance processInstance : processInstances) {
       supbrocessIds.add(processInstance.getId());
     }
     return supbrocessIds;

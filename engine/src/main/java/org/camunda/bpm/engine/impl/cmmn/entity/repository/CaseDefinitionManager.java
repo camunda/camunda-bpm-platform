@@ -33,7 +33,8 @@ import java.util.Map;
  * @author Roman Smirnov
  *
  */
-public class CaseDefinitionManager extends AbstractManager implements AbstractResourceDefinitionManager<CaseDefinitionEntity> {
+public class CaseDefinitionManager extends AbstractManager
+    implements AbstractResourceDefinitionManager<CaseDefinitionEntity> {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -42,7 +43,8 @@ public class CaseDefinitionManager extends AbstractManager implements AbstractRe
   }
 
   public void deleteCaseDefinitionsByDeploymentId(String deploymentId) {
-    getDbEntityManager().delete(CaseDefinitionEntity.class, "deleteCaseDefinitionsByDeploymentId", deploymentId);
+    getDbEntityManager().delete(CaseDefinitionEntity.class, "deleteCaseDefinitionsByDeploymentId",
+        deploymentId);
   }
 
   public CaseDefinitionEntity findCaseDefinitionById(String caseDefinitionId) {
@@ -52,13 +54,15 @@ public class CaseDefinitionManager extends AbstractManager implements AbstractRe
   /**
    * @return the latest version of the case definition with the given key (from any tenant)
    *
-   * @throws ProcessEngineException if more than one tenant has a case definition with the given key
+   * @throws ProcessEngineException
+   *           if more than one tenant has a case definition with the given key
    *
    * @see #findLatestCaseDefinitionByKeyAndTenantId(String, String)
    */
   public CaseDefinitionEntity findLatestCaseDefinitionByKey(String caseDefinitionKey) {
     @SuppressWarnings("unchecked")
-    List<CaseDefinitionEntity> caseDefinitions = getDbEntityManager().selectList("selectLatestCaseDefinitionByKey", configureParameterizedQuery(caseDefinitionKey));
+    List<CaseDefinitionEntity> caseDefinitions = getDbEntityManager().selectList(
+        "selectLatestCaseDefinitionByKey", configureParameterizedQuery(caseDefinitionKey));
 
     if (caseDefinitions.isEmpty()) {
       return null;
@@ -76,34 +80,42 @@ public class CaseDefinitionManager extends AbstractManager implements AbstractRe
    *
    * @see #findLatestCaseDefinitionByKeyAndTenantId(String, String)
    */
-  public CaseDefinitionEntity findLatestCaseDefinitionByKeyAndTenantId(String caseDefinitionKey, String tenantId) {
+  public CaseDefinitionEntity findLatestCaseDefinitionByKeyAndTenantId(String caseDefinitionKey,
+      String tenantId) {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("caseDefinitionKey", caseDefinitionKey);
     parameters.put("tenantId", tenantId);
 
     if (tenantId == null) {
-      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyWithoutTenantId", parameters);
+      return (CaseDefinitionEntity) getDbEntityManager()
+          .selectOne("selectLatestCaseDefinitionByKeyWithoutTenantId", parameters);
     } else {
-      return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectLatestCaseDefinitionByKeyAndTenantId", parameters);
+      return (CaseDefinitionEntity) getDbEntityManager()
+          .selectOne("selectLatestCaseDefinitionByKeyAndTenantId", parameters);
     }
   }
 
-  public CaseDefinitionEntity findCaseDefinitionByKeyVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
+  public CaseDefinitionEntity findCaseDefinitionByKeyVersionAndTenantId(String caseDefinitionKey,
+      Integer caseDefinitionVersion, String tenantId) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("caseDefinitionVersion", caseDefinitionVersion);
     parameters.put("caseDefinitionKey", caseDefinitionKey);
     parameters.put("tenantId", tenantId);
-    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByKeyVersionAndTenantId", parameters);
+    return (CaseDefinitionEntity) getDbEntityManager()
+        .selectOne("selectCaseDefinitionByKeyVersionAndTenantId", parameters);
   }
 
-  public CaseDefinitionEntity findCaseDefinitionByDeploymentAndKey(String deploymentId, String caseDefinitionKey) {
+  public CaseDefinitionEntity findCaseDefinitionByDeploymentAndKey(String deploymentId,
+      String caseDefinitionKey) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("deploymentId", deploymentId);
     parameters.put("caseDefinitionKey", caseDefinitionKey);
-    return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByDeploymentAndKey", parameters);
+    return (CaseDefinitionEntity) getDbEntityManager()
+        .selectOne("selectCaseDefinitionByDeploymentAndKey", parameters);
   }
 
-  public String findPreviousCaseDefinitionId(String caseDefinitionKey, Integer version, String tenantId) {
+  public String findPreviousCaseDefinitionId(String caseDefinitionKey, Integer version,
+      String tenantId) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("key", caseDefinitionKey);
     params.put("version", version);
@@ -112,14 +124,17 @@ public class CaseDefinitionManager extends AbstractManager implements AbstractRe
   }
 
   @SuppressWarnings("unchecked")
-  public List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery, Page page) {
+  public List<CaseDefinition> findCaseDefinitionsByQueryCriteria(
+      CaseDefinitionQueryImpl caseDefinitionQuery, Page page) {
     configureCaseDefinitionQuery(caseDefinitionQuery);
-    return getDbEntityManager().selectList("selectCaseDefinitionsByQueryCriteria", caseDefinitionQuery, page);
+    return getDbEntityManager().selectList("selectCaseDefinitionsByQueryCriteria",
+        caseDefinitionQuery, page);
   }
 
   public long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery) {
     configureCaseDefinitionQuery(caseDefinitionQuery);
-    return (Long) getDbEntityManager().selectOne("selectCaseDefinitionCountByQueryCriteria", caseDefinitionQuery);
+    return (Long) getDbEntityManager().selectOne("selectCaseDefinitionCountByQueryCriteria",
+        caseDefinitionQuery);
   }
 
   @SuppressWarnings("unchecked")
@@ -151,22 +166,27 @@ public class CaseDefinitionManager extends AbstractManager implements AbstractRe
   }
 
   @Override
-  public CaseDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
+  public CaseDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey,
+      String tenantId) {
     return findLatestCaseDefinitionByKeyAndTenantId(definitionKey, tenantId);
   }
 
   @Override
-  public CaseDefinitionEntity findDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId) {
-    throw new UnsupportedOperationException("Currently finding case definition by version tag and tenant is not implemented.");
+  public CaseDefinitionEntity findDefinitionByKeyVersionTagAndTenantId(String definitionKey,
+      String definitionVersionTag, String tenantId) {
+    throw new UnsupportedOperationException(
+        "Currently finding case definition by version tag and tenant is not implemented.");
   }
 
   @Override
-  public CaseDefinitionEntity findDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId) {
+  public CaseDefinitionEntity findDefinitionByKeyVersionAndTenantId(String definitionKey,
+      Integer definitionVersion, String tenantId) {
     return findCaseDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId);
   }
 
   @Override
-  public CaseDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
+  public CaseDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId,
+      String definitionKey) {
     return findCaseDefinitionByDeploymentAndKey(deploymentId, definitionKey);
   }
 }

@@ -16,10 +16,11 @@
  */
 package org.camunda.bpm.engine.exception.cmmn;
 
-
 /**
- * <p>This is exception is thrown when a state transition on a case execution
- * is not possible. For example: an 'enabled' case execution cannot be completed.</p>
+ * <p>
+ * This is exception is thrown when a state transition on a case execution is not possible. For
+ * example: an 'enabled' case execution cannot be completed.
+ * </p>
  *
  * @author Roman Smirnov
  *

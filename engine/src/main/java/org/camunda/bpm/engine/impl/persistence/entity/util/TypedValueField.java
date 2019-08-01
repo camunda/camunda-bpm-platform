@@ -42,8 +42,8 @@ import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * A field what provide a typed version of a value. It can
- * be used in an entity which implements {@link ValueFields}.
+ * A field what provide a typed version of a value. It can be used in an entity which implements
+ * {@link ValueFields}.
  *
  * @author Philipp Ossler
  */
@@ -83,9 +83,10 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
   }
 
   public TypedValue getTypedValue(boolean deserializeValue) {
-    if (cachedValue != null && cachedValue instanceof SerializableValue && Context.getCommandContext() != null) {
+    if (cachedValue != null && cachedValue instanceof SerializableValue
+        && Context.getCommandContext() != null) {
       SerializableValue serializableValue = (SerializableValue) cachedValue;
-      if(deserializeValue && !serializableValue.isDeserialized()) {
+      if (deserializeValue && !serializableValue.isDeserialized()) {
         // clear cached value in case it is not deserialized and user requests deserialized value
         cachedValue = null;
       }
@@ -114,7 +115,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
         Context.getProcessEngineConfiguration().getFallbackSerializerFactory());
     serializerName = serializer.getName();
 
-    if(value instanceof UntypedValueImpl) {
+    if (value instanceof UntypedValueImpl) {
       // type has been detected
       value = serializer.convertToTypedValue((UntypedValueImpl) value);
     }
@@ -140,7 +141,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   @SuppressWarnings("unchecked")
   protected boolean isMutableValue(TypedValue value) {
-    return((TypedValueSerializer<TypedValue>) getSerializer()).isMutableValue(value);
+    return ((TypedValueSerializer<TypedValue>) getSerializer()).isMutableValue(value);
   }
 
   protected boolean isValuedImplicitlyUpdated() {
@@ -202,13 +203,13 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   public static VariableSerializers getSerializers() {
     if (Context.getCommandContext() != null) {
-      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration().getVariableSerializers();
+      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration()
+          .getVariableSerializers();
       VariableSerializers paSerializers = getCurrentPaSerializers();
 
       if (paSerializers != null) {
         return variableSerializers.join(paSerializers);
-      }
-      else {
+      } else {
         return variableSerializers;
       }
     } else {
@@ -218,37 +219,36 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   public static TypedValueSerializer<?> getFallbackSerializer(String serializerName) {
     if (Context.getProcessEngineConfiguration() != null) {
-      VariableSerializerFactory fallbackSerializerFactory = Context.getProcessEngineConfiguration().getFallbackSerializerFactory();
+      VariableSerializerFactory fallbackSerializerFactory = Context.getProcessEngineConfiguration()
+          .getFallbackSerializerFactory();
       if (fallbackSerializerFactory != null) {
         return fallbackSerializerFactory.getSerializer(serializerName);
-      }
-      else {
+      } else {
         return null;
       }
-    }
-    else {
+    } else {
       throw LOG.serializerOutOfContextException();
     }
   }
 
   protected static VariableSerializers getCurrentPaSerializers() {
     if (Context.getCurrentProcessApplication() != null) {
-      ProcessApplicationReference processApplicationReference = Context.getCurrentProcessApplication();
+      ProcessApplicationReference processApplicationReference = Context
+          .getCurrentProcessApplication();
       try {
-        ProcessApplicationInterface processApplicationInterface = processApplicationReference.getProcessApplication();
+        ProcessApplicationInterface processApplicationInterface = processApplicationReference
+            .getProcessApplication();
 
         ProcessApplicationInterface rawPa = processApplicationInterface.getRawObject();
         if (rawPa instanceof AbstractProcessApplication) {
           return ((AbstractProcessApplication) rawPa).getVariableSerializers();
-        }
-        else {
+        } else {
           return null;
         }
       } catch (ProcessApplicationUnavailableException e) {
         throw LOG.cannotDeterminePaDataformats(e);
       }
-    }
-    else {
+    } else {
       return null;
     }
   }

@@ -24,15 +24,20 @@ import java.util.concurrent.TimeUnit;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>This is a simple implementation of the {@link JobExecutor} using self-managed
- * threads for performing background work.</p>
+ * <p>
+ * This is a simple implementation of the {@link JobExecutor} using self-managed threads for
+ * performing background work.
+ * </p>
  *
- * <p>This implementation uses a {@link ThreadPoolExecutor} backed by a queue to which
- * work is submitted.</p>
+ * <p>
+ * This implementation uses a {@link ThreadPoolExecutor} backed by a queue to which work is
+ * submitted.
+ * </p>
  *
- * <p><em>NOTE: use this class in environments in which self-management of threads
- * is permitted. Consider using a different thread-management strategy in
- * J(2)EE-Environments.</em></p>
+ * <p>
+ * <em>NOTE: use this class in environments in which self-management of threads is permitted.
+ * Consider using a different thread-management strategy in J(2)EE-Environments.</em>
+ * </p>
  *
  * @author Daniel Meyer
  */
@@ -46,9 +51,10 @@ public class DefaultJobExecutor extends ThreadPoolJobExecutor {
 
   protected void startExecutingJobs() {
 
-    if (threadPoolExecutor==null || threadPoolExecutor.isShutdown()) {
+    if (threadPoolExecutor == null || threadPoolExecutor.isShutdown()) {
       BlockingQueue<Runnable> threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
-      threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 0L, TimeUnit.MILLISECONDS, threadPoolQueue);
+      threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 0L,
+          TimeUnit.MILLISECONDS, threadPoolQueue);
       threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
     }
 
@@ -64,7 +70,7 @@ public class DefaultJobExecutor extends ThreadPoolJobExecutor {
 
     // Waits for 1 minute to finish all currently executing jobs
     try {
-      if(!threadPoolExecutor.awaitTermination(60L, TimeUnit.SECONDS)) {
+      if (!threadPoolExecutor.awaitTermination(60L, TimeUnit.SECONDS)) {
         LOG.timeoutDuringShutdown();
       }
     } catch (InterruptedException e) {
@@ -99,4 +105,3 @@ public class DefaultJobExecutor extends ThreadPoolJobExecutor {
   }
 
 }
-

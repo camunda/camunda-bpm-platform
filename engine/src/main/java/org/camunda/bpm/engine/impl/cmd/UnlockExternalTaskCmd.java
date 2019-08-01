@@ -28,7 +28,7 @@ public class UnlockExternalTaskCmd extends ExternalTaskCmd {
   public UnlockExternalTaskCmd(String externalTaskId) {
     super(externalTaskId);
   }
-  
+
   @Override
   protected void validateInput() {
   }
@@ -37,7 +37,7 @@ public class UnlockExternalTaskCmd extends ExternalTaskCmd {
   protected void execute(ExternalTaskEntity externalTask) {
     externalTask.unlock();
   }
-  
+
   @Override
   protected String getUserOperationLogOperationType() {
     return UserOperationLogEntry.OPERATION_TYPE_UNLOCK;

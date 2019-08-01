@@ -27,7 +27,8 @@ import java.util.List;
  *
  * @author Askar Akhmerov
  */
-public class DeleteProcessInstanceBatchConfigurationJsonConverter extends JsonObjectConverter<DeleteProcessInstanceBatchConfiguration> {
+public class DeleteProcessInstanceBatchConfigurationJsonConverter
+    extends JsonObjectConverter<DeleteProcessInstanceBatchConfiguration> {
   public static final DeleteProcessInstanceBatchConfigurationJsonConverter INSTANCE = new DeleteProcessInstanceBatchConfigurationJsonConverter();
 
   public static final String DELETE_REASON = "deleteReason";
@@ -48,8 +49,10 @@ public class DeleteProcessInstanceBatchConfigurationJsonConverter extends JsonOb
   }
 
   public DeleteProcessInstanceBatchConfiguration toObject(JsonObject json) {
-    DeleteProcessInstanceBatchConfiguration configuration =
-      new DeleteProcessInstanceBatchConfiguration(readProcessInstanceIds(json), null, JsonUtil.getBoolean(json, SKIP_CUSTOM_LISTENERS), JsonUtil.getBoolean(json, SKIP_SUBPROCESSES), JsonUtil.getBoolean(json, FAIL_IF_NOT_EXISTS));
+    DeleteProcessInstanceBatchConfiguration configuration = new DeleteProcessInstanceBatchConfiguration(
+        readProcessInstanceIds(json), null, JsonUtil.getBoolean(json, SKIP_CUSTOM_LISTENERS),
+        JsonUtil.getBoolean(json, SKIP_SUBPROCESSES),
+        JsonUtil.getBoolean(json, FAIL_IF_NOT_EXISTS));
 
     String deleteReason = JsonUtil.getString(json, DELETE_REASON);
     if (deleteReason != null && !deleteReason.isEmpty()) {

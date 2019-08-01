@@ -40,7 +40,8 @@ public class CasePlanModelHandler extends StageItemHandler {
     return CASE_PLAN_MODEL_EVENTS;
   }
 
-  public void initializeExitCriterias(CasePlanModel casePlanModel, CmmnActivity activity, CmmnHandlerContext context) {
+  public void initializeExitCriterias(CasePlanModel casePlanModel, CmmnActivity activity,
+      CmmnHandlerContext context) {
     Collection<Sentry> exitCriterias = casePlanModel.getExitCriteria();
     for (Sentry sentry : exitCriterias) {
       String sentryId = sentry.getId();

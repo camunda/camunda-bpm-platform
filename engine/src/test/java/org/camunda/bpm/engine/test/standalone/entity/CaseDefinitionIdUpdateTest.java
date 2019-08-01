@@ -32,8 +32,10 @@ public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
 
   public void testUpdateCaseDefinitionIdInTask() {
     // given
-    final CaseDefinitionEntity caseDefinitionEntity1 = prepareCaseDefinition(UUID.randomUUID().toString());
-    final CaseDefinitionEntity caseDefinitionEntity2 = prepareCaseDefinition(UUID.randomUUID().toString());
+    final CaseDefinitionEntity caseDefinitionEntity1 = prepareCaseDefinition(
+        UUID.randomUUID().toString());
+    final CaseDefinitionEntity caseDefinitionEntity2 = prepareCaseDefinition(
+        UUID.randomUUID().toString());
 
     final TaskEntity task = new TaskEntity();
     task.setId(UUID.randomUUID().toString());
@@ -61,8 +63,10 @@ public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
 
   public void testUpdateCaseDefinitionIdInCaseExecutionEntity() {
     // given
-    final CaseDefinitionEntity caseDefinitionEntity1 = prepareCaseDefinition(UUID.randomUUID().toString());
-    final CaseDefinitionEntity caseDefinitionEntity2 = prepareCaseDefinition(UUID.randomUUID().toString());
+    final CaseDefinitionEntity caseDefinitionEntity1 = prepareCaseDefinition(
+        UUID.randomUUID().toString());
+    final CaseDefinitionEntity caseDefinitionEntity2 = prepareCaseDefinition(
+        UUID.randomUUID().toString());
 
     final CaseExecutionEntity caseExecutionEntity = prepareCaseExecution(caseDefinitionEntity1);
 
@@ -81,7 +85,8 @@ public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
     update(createdCaseExecution);
 
     // then
-    final CaseExecutionEntity updatedCaseExecution = findCaseExecution(createdCaseExecution.getId());
+    final CaseExecutionEntity updatedCaseExecution = findCaseExecution(
+        createdCaseExecution.getId());
     assertThat(updatedCaseExecution.getCaseDefinitionId()).isEqualTo(caseDefinitionEntity2.getId());
 
     deleteCaseExecution(updatedCaseExecution);
@@ -106,22 +111,24 @@ public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
   }
 
   private CaseExecutionEntity findCaseExecution(final String id) {
-    return processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(new Command<CaseExecutionEntity>() {
-      @Override
-      public CaseExecutionEntity execute(CommandContext commandContext) {
-        return commandContext.getCaseExecutionManager().findCaseExecutionById(id);
-      }
-    });
+    return processEngineConfiguration.getCommandExecutorTxRequiresNew()
+        .execute(new Command<CaseExecutionEntity>() {
+          @Override
+          public CaseExecutionEntity execute(CommandContext commandContext) {
+            return commandContext.getCaseExecutionManager().findCaseExecutionById(id);
+          }
+        });
   }
 
   private Void deleteCaseExecution(final CaseExecutionEntity caseExecutionEntity) {
-    return processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(new Command<Void>() {
-      @Override
-      public Void execute(CommandContext commandContext) {
-        commandContext.getCaseExecutionManager().deleteCaseExecution(caseExecutionEntity);
-        return null;
-      }
-    });
+    return processEngineConfiguration.getCommandExecutorTxRequiresNew()
+        .execute(new Command<Void>() {
+          @Override
+          public Void execute(CommandContext commandContext) {
+            commandContext.getCaseExecutionManager().deleteCaseExecution(caseExecutionEntity);
+            return null;
+          }
+        });
   }
 
   private void createCaseExecution(final CaseExecutionEntity caseExecutionEntity) {
@@ -155,13 +162,15 @@ public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
   }
 
   private Void deleteCaseDefinition(final CaseDefinitionEntity caseDefinitionEntity) {
-    return processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(new Command<Void>() {
-      @Override
-      public Void execute(CommandContext commandContext) {
-        commandContext.getCaseDefinitionManager().deleteCaseDefinitionsByDeploymentId(caseDefinitionEntity.getDeploymentId());
-        return null;
-      }
-    });
+    return processEngineConfiguration.getCommandExecutorTxRequiresNew()
+        .execute(new Command<Void>() {
+          @Override
+          public Void execute(CommandContext commandContext) {
+            commandContext.getCaseDefinitionManager()
+                .deleteCaseDefinitionsByDeploymentId(caseDefinitionEntity.getDeploymentId());
+            return null;
+          }
+        });
   }
 
   private void createTask(final TaskEntity taskEntity) {
@@ -185,11 +194,12 @@ public class CaseDefinitionIdUpdateTest extends PluggableProcessEngineTestCase {
   }
 
   private TaskEntity findTask(final String id) {
-    return processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(new Command<TaskEntity>() {
-      @Override
-      public TaskEntity execute(CommandContext commandContext) {
-        return commandContext.getTaskManager().findTaskById(id);
-      }
-    });
+    return processEngineConfiguration.getCommandExecutorTxRequiresNew()
+        .execute(new Command<TaskEntity>() {
+          @Override
+          public TaskEntity execute(CommandContext commandContext) {
+            return commandContext.getTaskManager().findTaskById(id);
+          }
+        });
   }
 }

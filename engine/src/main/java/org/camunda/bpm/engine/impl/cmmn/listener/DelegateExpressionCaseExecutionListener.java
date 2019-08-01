@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.delegate.CaseExecutionListenerInvocation;
 import org.camunda.bpm.engine.impl.context.Context;
 
-
 /**
  * @author Roman Smirnov
  */
@@ -37,7 +36,8 @@ public class DelegateExpressionCaseExecutionListener implements CaseExecutionLis
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;
 
-  public DelegateExpressionCaseExecutionListener(Expression expression, List<FieldDeclaration> fieldDeclarations) {
+  public DelegateExpressionCaseExecutionListener(Expression expression,
+      List<FieldDeclaration> fieldDeclarations) {
     this.expression = expression;
     this.fieldDeclarations = fieldDeclarations;
   }
@@ -50,19 +50,17 @@ public class DelegateExpressionCaseExecutionListener implements CaseExecutionLis
 
     if (delegate instanceof CaseExecutionListener) {
       CaseExecutionListener listenerInstance = (CaseExecutionListener) delegate;
-      Context
-        .getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(new CaseExecutionListenerInvocation(listenerInstance, caseExecution));
+      Context.getProcessEngineConfiguration().getDelegateInterceptor()
+          .handleInvocation(new CaseExecutionListenerInvocation(listenerInstance, caseExecution));
     } else {
       throw new ProcessEngineException("Delegate expression " + expression
-              + " did not resolve to an implementation of " + CaseExecutionListener.class);
+          + " did not resolve to an implementation of " + CaseExecutionListener.class);
     }
   }
 
   /**
-   * returns the expression text for this execution listener. Comes in handy if you want to
-   * check which listeners you already have.
+   * returns the expression text for this execution listener. Comes in handy if you want to check
+   * which listeners you already have.
    */
   public String getExpressionText() {
     return expression.getExpressionText();

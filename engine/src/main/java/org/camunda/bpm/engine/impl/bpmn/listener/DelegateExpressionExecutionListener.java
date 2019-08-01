@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.bpmn.delegate.JavaDelegateInvocation;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 
-
 /**
  * @author Joram Barrez
  */
@@ -42,7 +41,8 @@ public class DelegateExpressionExecutionListener implements ExecutionListener {
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;
 
-  public DelegateExpressionExecutionListener(Expression expression, List<FieldDeclaration> fieldDeclarations) {
+  public DelegateExpressionExecutionListener(Expression expression,
+      List<FieldDeclaration> fieldDeclarations) {
     this.expression = expression;
     this.fieldDeclarations = fieldDeclarations;
   }
@@ -54,21 +54,20 @@ public class DelegateExpressionExecutionListener implements ExecutionListener {
     applyFieldDeclaration(fieldDeclarations, delegate);
 
     if (delegate instanceof ExecutionListener) {
-      Context.getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(new ExecutionListenerInvocation((ExecutionListener) delegate, execution));
+      Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(
+          new ExecutionListenerInvocation((ExecutionListener) delegate, execution));
     } else if (delegate instanceof JavaDelegate) {
-      Context.getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
+      Context.getProcessEngineConfiguration().getDelegateInterceptor()
+          .handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
     } else {
-      throw LOG.resolveDelegateExpressionException(expression, ExecutionListener.class, JavaDelegate.class);
+      throw LOG.resolveDelegateExpressionException(expression, ExecutionListener.class,
+          JavaDelegate.class);
     }
   }
 
   /**
-   * returns the expression text for this execution listener. Comes in handy if you want to
-   * check which listeners you already have.
+   * returns the expression text for this execution listener. Comes in handy if you want to check
+   * which listeners you already have.
    */
   public String getExpressionText() {
     return expression.getExpressionText();

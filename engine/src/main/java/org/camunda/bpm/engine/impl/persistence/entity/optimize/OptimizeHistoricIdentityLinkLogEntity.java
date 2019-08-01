@@ -20,15 +20,15 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEnt
 
 public class OptimizeHistoricIdentityLinkLogEntity extends HistoricIdentityLinkLogEntity {
 
-	protected String processInstanceId;
+  protected String processInstanceId;
 
-	@Override
-	public String getProcessInstanceId() {
-		return processInstanceId;
-	}
+  @Override
+  public String getProcessInstanceId() {
+    return processInstanceId;
+  }
 
-	@Override
-	public void setProcessInstanceId(String processInstanceId) {
-		this.processInstanceId = processInstanceId;
-	}
+  @Override
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
+  }
 }

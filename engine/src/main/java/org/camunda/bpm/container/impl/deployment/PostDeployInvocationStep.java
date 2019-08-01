@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.container.impl.deployment;
 
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -29,8 +28,10 @@ import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>Operation step responsible for invoking the {@literal @}{@link PostDeploy} method of a
- * ProcessApplication class.</p>
+ * <p>
+ * Operation step responsible for invoking the {@literal @}{@link PostDeploy} method of a
+ * ProcessApplication class.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -47,13 +48,14 @@ public class PostDeployInvocationStep extends DeploymentOperationStep {
 
   public void performOperationStep(DeploymentOperation operationContext) {
 
-    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
+    final AbstractProcessApplication processApplication = operationContext
+        .getAttachment(Attachments.PROCESS_APPLICATION);
     final String paName = processApplication.getName();
 
     Class<? extends AbstractProcessApplication> paClass = processApplication.getClass();
     Method postDeployMethod = InjectionUtil.detectAnnotatedMethod(paClass, PostDeploy.class);
 
-    if(postDeployMethod == null) {
+    if (postDeployMethod == null) {
       LOG.debugPaLifecycleMethodNotFound(CALLBACK_NAME, paName);
       return;
     }
@@ -66,20 +68,16 @@ public class PostDeployInvocationStep extends DeploymentOperationStep {
     try {
       // perform the actual invocation
       postDeployMethod.invoke(processApplication, injections);
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       throw LOG.exceptionWhileInvokingPaLifecycleCallback(CALLBACK_NAME, paName, e);
 
-    }
-    catch (IllegalAccessException e) {
+    } catch (IllegalAccessException e) {
       throw LOG.exceptionWhileInvokingPaLifecycleCallback(CALLBACK_NAME, paName, e);
-    }
-    catch (InvocationTargetException e) {
+    } catch (InvocationTargetException e) {
       Throwable cause = e.getCause();
-      if(cause instanceof RuntimeException) {
+      if (cause instanceof RuntimeException) {
         throw (RuntimeException) cause;
-      }
-      else {
+      } else {
         throw LOG.exceptionWhileInvokingPaLifecycleCallback(CALLBACK_NAME, paName, e);
       }
     }

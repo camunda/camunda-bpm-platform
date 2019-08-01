@@ -39,9 +39,11 @@ public class DeploymentAutoHistoryTest {
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setJdbcUrl("jdbc:h2:mem:DeploymentTest-HistoryLevelAuto;DB_CLOSE_DELAY=1000");
-      configuration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
+      configuration
+          .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
       configuration.setHistoryLevel(null);
       configuration.setHistory(ProcessEngineConfiguration.HISTORY_AUTO);
       return configuration;
@@ -53,16 +55,15 @@ public class DeploymentAutoHistoryTest {
 
   @Test
   public void shouldCreateDeployment() {
-     BpmnModelInstance instance = Bpmn.createExecutableProcess("process").startEvent().endEvent().done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process").startEvent().endEvent()
+        .done();
 
-     DeploymentWithDefinitions deployment = engineRule.getRepositoryService()
-         .createDeployment()
-         .addModelInstance("foo.bpmn", instance)
-         .deployWithResult();
+    DeploymentWithDefinitions deployment = engineRule.getRepositoryService().createDeployment()
+        .addModelInstance("foo.bpmn", instance).deployWithResult();
 
-     long count = engineRule.getRepositoryService().createDeploymentQuery().count();
-     assertEquals(1, count);
-     engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
+    long count = engineRule.getRepositoryService().createDeploymentQuery().count();
+    assertEquals(1, count);
+    engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
   }
 
 }

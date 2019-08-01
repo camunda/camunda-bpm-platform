@@ -30,7 +30,8 @@ import org.camunda.bpm.engine.query.QueryProperty;
  * @author Miklas Boskamp
  *
  */
-public class SchemaLogQueryImpl extends AbstractQuery<SchemaLogQuery, SchemaLogEntry> implements SchemaLogQuery {
+public class SchemaLogQueryImpl extends AbstractQuery<SchemaLogQuery, SchemaLogEntry>
+    implements SchemaLogQuery {
 
   private static final long serialVersionUID = 1L;
   private static final QueryProperty TIMESTAMP_PROPERTY = new QueryPropertyImpl("TIMESTAMP_");

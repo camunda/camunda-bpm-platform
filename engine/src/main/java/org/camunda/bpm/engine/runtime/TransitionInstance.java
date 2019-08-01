@@ -17,15 +17,16 @@
 package org.camunda.bpm.engine.runtime;
 
 /**
- * <p>A transition instance represents an execution token that
- * has just completed a transition (sequence flow in BPMN) or is about
- * to take an outgoing transition. This happens before starting or after
- * leaving an activity. The execution token
- * is not actually executing the activity that this instance points to
- * which is why the corresponding activity instance does not exist.</p>
+ * <p>
+ * A transition instance represents an execution token that has just completed a transition
+ * (sequence flow in BPMN) or is about to take an outgoing transition. This happens before starting
+ * or after leaving an activity. The execution token is not actually executing the activity that
+ * this instance points to which is why the corresponding activity instance does not exist.
+ * </p>
  *
- * <p>Transition instances are the result of
- * asynchronous continuations, asyncBefore or asyncAfter.</p>
+ * <p>
+ * Transition instances are the result of asynchronous continuations, asyncBefore or asyncAfter.
+ * </p>
  *
  * @author Daniel Meyer
  * @author Thorben Lindhauer
@@ -36,8 +37,8 @@ public interface TransitionInstance extends ProcessElementInstance {
   /**
    * returns the id of the target activity
    *
-   * @deprecated a transition instances represents a transition <b>to</b> or <b>from</b>
-   *  an activity; use {@link #getActivityId()} instead.
+   * @deprecated a transition instances represents a transition <b>to</b> or <b>from</b> an
+   *             activity; use {@link #getActivityId()} instead.
    */
   @Deprecated
   String getTargetActivityId();
@@ -47,15 +48,15 @@ public interface TransitionInstance extends ProcessElementInstance {
    */
   String getActivityId();
 
-  /** returns the id of of the execution that is
-   * executing this transition instance */
+  /**
+   * returns the id of of the execution that is executing this transition instance
+   */
   String getExecutionId();
 
   /**
-   * returns the type of the activity a transition is made from/to.
-   * Corresponds to BPMN element name in XML (e.g. 'userTask').
-   * The type of the root activity instance (the one corresponding to the process instance)
-   * is 'processDefinition'.
+   * returns the type of the activity a transition is made from/to. Corresponds to BPMN element name
+   * in XML (e.g. 'userTask'). The type of the root activity instance (the one corresponding to the
+   * process instance) is 'processDefinition'.
    */
   String getActivityType();
 

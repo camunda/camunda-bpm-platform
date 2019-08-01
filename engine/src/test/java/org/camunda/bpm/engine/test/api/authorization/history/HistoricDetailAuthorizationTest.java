@@ -128,7 +128,8 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 1);
   }
 
-  // historic variable update query (multiple process instances) ///////////////////////////////////////////
+  // historic variable update query (multiple process instances)
+  // ///////////////////////////////////////////
 
   public void testVariableUpdateQueryWithoutAuthorization() {
     // given
@@ -382,7 +383,8 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 1);
   }
 
-  // historic variable update query (multiple process instances) ///////////////////////////////////////////
+  // historic variable update query (multiple process instances)
+  // ///////////////////////////////////////////
 
   public void testFormFieldQueryWithoutAuthorization() {
     // given
@@ -629,7 +631,8 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 7);
 
     disableAuthorization();
-    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
+        .list();
     for (HistoricProcessInstance instance : instances) {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }

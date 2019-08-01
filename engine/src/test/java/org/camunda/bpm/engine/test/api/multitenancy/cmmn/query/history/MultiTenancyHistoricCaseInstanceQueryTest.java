@@ -50,45 +50,38 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
   }
 
   public void testQueryNoTenantIdSet() {
-    HistoricCaseInstanceQuery query = historyService
-        .createHistoricCaseInstanceQuery();
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
-    HistoricCaseInstanceQuery query = historyService
-        .createHistoricCaseInstanceQuery()
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = historyService
-        .createHistoricCaseInstanceQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = historyService.createHistoricCaseInstanceQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    HistoricCaseInstanceQuery query = historyService
-        .createHistoricCaseInstanceQuery()
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByInstancesWithoutTenantId() {
-    HistoricCaseInstanceQuery query = historyService
-        .createHistoricCaseInstanceQuery()
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery()
         .withoutTenantId();
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    HistoricCaseInstanceQuery query = historyService
-        .createHistoricCaseInstanceQuery()
+    HistoricCaseInstanceQuery query = historyService.createHistoricCaseInstanceQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -96,8 +89,7 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
 
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricCaseInstanceQuery()
-        .tenantIdIn((String) null);
+      historyService.createHistoricCaseInstanceQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -106,11 +98,9 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
 
   public void testQuerySortingAsc() {
     // exclude historic case instances without tenant id because of database-specific ordering
-    List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc()
-        .list();
+    List<HistoricCaseInstance> historicCaseInstances = historyService
+        .createHistoricCaseInstanceQuery().tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId()
+        .asc().list();
 
     assertThat(historicCaseInstances.size(), is(2));
     assertThat(historicCaseInstances.get(0).getTenantId(), is(TENANT_ONE));
@@ -119,11 +109,9 @@ public class MultiTenancyHistoricCaseInstanceQueryTest extends PluggableProcessE
 
   public void testQuerySortingDesc() {
     // exclude historic case instances without tenant id because of database-specific ordering
-    List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .desc()
-        .list();
+    List<HistoricCaseInstance> historicCaseInstances = historyService
+        .createHistoricCaseInstanceQuery().tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId()
+        .desc().list();
 
     assertThat(historicCaseInstances.size(), is(2));
     assertThat(historicCaseInstances.get(0).getTenantId(), is(TENANT_TWO));

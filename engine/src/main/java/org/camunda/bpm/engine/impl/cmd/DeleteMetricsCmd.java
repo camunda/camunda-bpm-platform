@@ -44,14 +44,11 @@ public class DeleteMetricsCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     writeUserOperationLog(commandContext);
-    
-    if(timestamp == null && reporter == null) {
-      commandContext.getMeterLogManager()
-       .deleteAll();
-    }
-    else {
-      commandContext.getMeterLogManager()
-       .deleteByTimestampAndReporter(timestamp, reporter);
+
+    if (timestamp == null && reporter == null) {
+      commandContext.getMeterLogManager().deleteAll();
+    } else {
+      commandContext.getMeterLogManager().deleteByTimestampAndReporter(timestamp, reporter);
     }
     return null;
   }
@@ -67,8 +64,8 @@ public class DeleteMetricsCmd implements Command<Void>, Serializable {
     if (propertyChanges.isEmpty()) {
       propertyChanges.add(PropertyChange.EMPTY_CHANGE);
     }
-    commandContext.getOperationLogManager().logMetricsOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
-        propertyChanges);
+    commandContext.getOperationLogManager()
+        .logMetricsOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, propertyChanges);
   }
 
 }

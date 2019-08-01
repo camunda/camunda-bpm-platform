@@ -29,8 +29,10 @@ import org.camunda.bpm.engine.management.Metrics;
  */
 public class MetricsBpmnParseListener extends AbstractBpmnParseListener {
 
-  public static MetricsExecutionListener ACTIVITY_INSTANCE_START_COUNTER = new MetricsExecutionListener(Metrics.ACTIVTY_INSTANCE_START);
-  public static MetricsExecutionListener ACTIVITY_INSTANCE_END_COUNTER = new MetricsExecutionListener(Metrics.ACTIVTY_INSTANCE_END);
+  public static MetricsExecutionListener ACTIVITY_INSTANCE_START_COUNTER = new MetricsExecutionListener(
+      Metrics.ACTIVTY_INSTANCE_START);
+  public static MetricsExecutionListener ACTIVITY_INSTANCE_END_COUNTER = new MetricsExecutionListener(
+      Metrics.ACTIVTY_INSTANCE_END);
 
   protected void addListeners(ActivityImpl activity) {
     activity.addBuiltInListener(ExecutionListener.EVENTNAME_START, ACTIVITY_INSTANCE_START_COUNTER);
@@ -41,15 +43,18 @@ public class MetricsBpmnParseListener extends AbstractBpmnParseListener {
     addListeners(activity);
   }
 
-  public void parseExclusiveGateway(Element exclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseExclusiveGateway(Element exclusiveGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addListeners(activity);
   }
 
-  public void parseInclusiveGateway(Element inclusiveGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseInclusiveGateway(Element inclusiveGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addListeners(activity);
   }
 
-  public void parseParallelGateway(Element parallelGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseParallelGateway(Element parallelGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addListeners(activity);
   }
 
@@ -61,7 +66,8 @@ public class MetricsBpmnParseListener extends AbstractBpmnParseListener {
     addListeners(activity);
   }
 
-  public void parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addListeners(activity);
   }
 
@@ -85,7 +91,8 @@ public class MetricsBpmnParseListener extends AbstractBpmnParseListener {
     addListeners(activity);
   }
 
-  public void parseCallActivity(Element callActivityElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseCallActivity(Element callActivityElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addListeners(activity);
   }
 
@@ -97,7 +104,8 @@ public class MetricsBpmnParseListener extends AbstractBpmnParseListener {
     addListeners(activity);
   }
 
-  public void parseEventBasedGateway(Element eventBasedGwElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseEventBasedGateway(Element eventBasedGwElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addListeners(activity);
   }
 
@@ -105,19 +113,23 @@ public class MetricsBpmnParseListener extends AbstractBpmnParseListener {
     addListeners(activity);
   }
 
-  public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addListeners(activity);
   }
 
-  public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope,
+      ActivityImpl activity) {
     addListeners(activity);
   }
 
-  public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl activity) {
+  public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement,
+      ActivityImpl activity) {
     addListeners(activity);
   }
 
-  public void parseMultiInstanceLoopCharacteristics(Element activityElement, Element multiInstanceLoopCharacteristicsElement, ActivityImpl activity) {
+  public void parseMultiInstanceLoopCharacteristics(Element activityElement,
+      Element multiInstanceLoopCharacteristicsElement, ActivityImpl activity) {
     addListeners(activity);
   }
 }

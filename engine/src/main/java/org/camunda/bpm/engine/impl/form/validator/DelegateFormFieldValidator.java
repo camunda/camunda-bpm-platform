@@ -29,9 +29,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
- * {@link FormFieldValidator} delegating to a custom, user-provided validator implementation.
- * The implementation is resolved either using a fully qualified classname of a Java Class
- * or using a java delegate implementation.
+ * {@link FormFieldValidator} delegating to a custom, user-provided validator implementation. The
+ * implementation is resolved either using a fully qualified classname of a Java Class or using a
+ * java delegate implementation.
  *
  * @author Daniel Meyer
  */
@@ -52,12 +52,14 @@ public class DelegateFormFieldValidator implements FormFieldValidator {
   }
 
   @Override
-  public boolean validate(final Object submittedValue, final FormFieldValidatorContext validatorContext) {
+  public boolean validate(final Object submittedValue,
+      final FormFieldValidatorContext validatorContext) {
 
     final DelegateExecution execution = validatorContext.getExecution();
 
-    if(shouldPerformPaContextSwitch(validatorContext.getExecution())) {
-      ProcessApplicationReference processApplicationReference = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
+    if (shouldPerformPaContextSwitch(validatorContext.getExecution())) {
+      ProcessApplicationReference processApplicationReference = ProcessApplicationContextUtil
+          .getTargetProcessApplication((ExecutionEntity) execution);
 
       return Context.executeWithinProcessApplication(new Callable<Boolean>() {
         public Boolean call() throws Exception {
@@ -73,10 +75,11 @@ public class DelegateFormFieldValidator implements FormFieldValidator {
   }
 
   protected boolean shouldPerformPaContextSwitch(DelegateExecution execution) {
-    if(execution == null) {
+    if (execution == null) {
       return false;
     } else {
-      ProcessApplicationReference targetPa = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
+      ProcessApplicationReference targetPa = ProcessApplicationContextUtil
+          .getTargetProcessApplication((ExecutionEntity) execution);
       return targetPa != null && !targetPa.equals(Context.getCurrentProcessApplication());
     }
   }
@@ -84,34 +87,34 @@ public class DelegateFormFieldValidator implements FormFieldValidator {
   protected boolean doValidate(Object submittedValue, FormFieldValidatorContext validatorContext) {
     FormFieldValidator validator;
 
-    if(clazz != null) {
+    if (clazz != null) {
       // resolve validator using Fully Qualified Classname
       Object validatorObject = ReflectUtil.instantiate(clazz);
-      if(validatorObject instanceof FormFieldValidator) {
+      if (validatorObject instanceof FormFieldValidator) {
         validator = (FormFieldValidator) validatorObject;
 
       } else {
-        throw new ProcessEngineException("Validator class '"+clazz+"' is not an instance of "+ FormFieldValidator.class.getName());
+        throw new ProcessEngineException("Validator class '" + clazz + "' is not an instance of "
+            + FormFieldValidator.class.getName());
 
       }
     } else {
-      //resolve validator using expression
+      // resolve validator using expression
       Object validatorObject = delegateExpression.getValue(validatorContext.getExecution());
       if (validatorObject instanceof FormFieldValidator) {
         validator = (FormFieldValidator) validatorObject;
 
       } else {
-        throw new ProcessEngineException("Validator expression '"+delegateExpression+"' does not resolve to instance of "+ FormFieldValidator.class.getName());
+        throw new ProcessEngineException("Validator expression '" + delegateExpression
+            + "' does not resolve to instance of " + FormFieldValidator.class.getName());
 
       }
     }
 
-    FormFieldValidatorInvocation invocation = new FormFieldValidatorInvocation(validator, submittedValue, validatorContext);
+    FormFieldValidatorInvocation invocation = new FormFieldValidatorInvocation(validator,
+        submittedValue, validatorContext);
     try {
-      Context
-        .getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(invocation);
+      Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {

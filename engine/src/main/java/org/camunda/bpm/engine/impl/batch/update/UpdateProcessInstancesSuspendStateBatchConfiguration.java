@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 
 public class UpdateProcessInstancesSuspendStateBatchConfiguration extends BatchConfiguration {
 
-
   protected final boolean suspended;
 
   public UpdateProcessInstancesSuspendStateBatchConfiguration(List<String> ids, boolean suspended) {
@@ -29,7 +28,7 @@ public class UpdateProcessInstancesSuspendStateBatchConfiguration extends BatchC
     this.suspended = suspended;
   }
 
-  boolean getSuspended(){
+  boolean getSuspended() {
     return suspended;
   }
 

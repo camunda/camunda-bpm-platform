@@ -47,7 +47,8 @@ public class RecorderExecutionListener implements ExecutionListener, Serializabl
     private final boolean canceled;
     private final String executionId;
 
-    public RecordedEvent(String activityId, String activityName, String eventName, String parameter, String activityInstanceId, String transitionId, boolean canceled, String executionId) {
+    public RecordedEvent(String activityId, String activityName, String eventName, String parameter,
+        String activityInstanceId, String transitionId, boolean canceled, String executionId) {
       this.activityId = activityId;
       this.activityName = activityName;
       this.parameter = parameter;
@@ -66,11 +67,9 @@ public class RecorderExecutionListener implements ExecutionListener, Serializabl
       return eventName;
     }
 
-
     public String getActivityName() {
       return activityName;
     }
-
 
     public String getParameter() {
       return parameter;
@@ -84,36 +83,31 @@ public class RecorderExecutionListener implements ExecutionListener, Serializabl
       return transitionId;
     }
 
-    public boolean isCanceled(){
+    public boolean isCanceled() {
       return canceled;
     }
 
-    public String getExecutionId(){
+    public String getExecutionId() {
       return executionId;
     }
   }
 
   public void notify(DelegateExecution execution) throws Exception {
-    ExecutionEntity executionCasted = ((ExecutionEntity)execution);
+    ExecutionEntity executionCasted = ((ExecutionEntity) execution);
     String parameterValue = null;
     if (parameter != null) {
-      parameterValue = (String)parameter.getValue(execution);
+      parameterValue = (String) parameter.getValue(execution);
     }
 
     String activityName = null;
     if (executionCasted.getActivity() != null) {
-      activityName = executionCasted.getActivity().getProperties().get(new PropertyKey<String>("name"));
+      activityName = executionCasted.getActivity().getProperties()
+          .get(new PropertyKey<String>("name"));
     }
 
-    recordedEvents.add( new RecordedEvent(
-                    executionCasted.getActivityId(),
-                    activityName,
-                    execution.getEventName(),
-                    parameterValue,
-                    execution.getActivityInstanceId(),
-                    execution.getCurrentTransitionId(),
-                    execution.isCanceled(),
-                    execution.getId()));
+    recordedEvents.add(new RecordedEvent(executionCasted.getActivityId(), activityName,
+        execution.getEventName(), parameterValue, execution.getActivityInstanceId(),
+        execution.getCurrentTransitionId(), execution.isCanceled(), execution.getId()));
   }
 
   public static void clear() {
@@ -123,6 +117,5 @@ public class RecorderExecutionListener implements ExecutionListener, Serializabl
   public static List<RecordedEvent> getRecordedEvents() {
     return recordedEvents;
   }
-
 
 }

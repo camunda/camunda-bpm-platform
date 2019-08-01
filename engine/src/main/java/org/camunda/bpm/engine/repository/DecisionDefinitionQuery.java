@@ -18,91 +18,102 @@ package org.camunda.bpm.engine.repository;
 
 import org.camunda.bpm.engine.query.Query;
 
-public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, DecisionDefinition> {
+public interface DecisionDefinitionQuery
+    extends Query<DecisionDefinitionQuery, DecisionDefinition> {
 
   /**
    * Only select decision definition with the given id.
    *
-   * @param decisionDefinitionId the id of the decision definition
+   * @param decisionDefinitionId
+   *          the id of the decision definition
    */
   DecisionDefinitionQuery decisionDefinitionId(String decisionDefinitionId);
 
   /**
    * Only select decision definitions with the given ids.
    *
-   * @param ids list of decision definition ids
+   * @param ids
+   *          list of decision definition ids
    */
   DecisionDefinitionQuery decisionDefinitionIdIn(String... ids);
 
   /**
    * Only select decision definitions with the given category.
    *
-   * @param decisionDefinitionCategory the category of the decision definition
+   * @param decisionDefinitionCategory
+   *          the category of the decision definition
    */
   DecisionDefinitionQuery decisionDefinitionCategory(String decisionDefinitionCategory);
 
   /**
-   * Only select decision definitions where the category matches the given parameter.
-   * The syntax that should be used is the same as in SQL, eg. %category%
+   * Only select decision definitions where the category matches the given parameter. The syntax
+   * that should be used is the same as in SQL, eg. %category%
    *
-   * @param decisionDefinitionCategoryLike the pattern to match the decision definition category
+   * @param decisionDefinitionCategoryLike
+   *          the pattern to match the decision definition category
    */
   DecisionDefinitionQuery decisionDefinitionCategoryLike(String decisionDefinitionCategoryLike);
 
   /**
    * Only select decision definitions with the given name.
    *
-   * @param decisionDefinitionName the name of the decision definition
+   * @param decisionDefinitionName
+   *          the name of the decision definition
    */
   DecisionDefinitionQuery decisionDefinitionName(String decisionDefinitionName);
 
   /**
    * Only select decision definition with the given key.
    *
-   * @param decisionDefinitionKey the key of the decision definition
+   * @param decisionDefinitionKey
+   *          the key of the decision definition
    */
   DecisionDefinitionQuery decisionDefinitionKey(String decisionDefinitionKey);
 
   /**
-   * Only select decision definitions where the key matches the given parameter.
-   * The syntax that should be used is the same as in SQL, eg. %key%
+   * Only select decision definitions where the key matches the given parameter. The syntax that
+   * should be used is the same as in SQL, eg. %key%
    *
-   * @param decisionDefinitionKeyLike the pattern to match the decision definition key
+   * @param decisionDefinitionKeyLike
+   *          the pattern to match the decision definition key
    */
   DecisionDefinitionQuery decisionDefinitionKeyLike(String decisionDefinitionKeyLike);
 
   /**
-   * Only select decision definitions where the name matches the given parameter.
-   * The syntax that should be used is the same as in SQL, eg. %name%
+   * Only select decision definitions where the name matches the given parameter. The syntax that
+   * should be used is the same as in SQL, eg. %name%
    *
-   * @param decisionDefinitionNameLike the pattern to match the decision definition name
+   * @param decisionDefinitionNameLike
+   *          the pattern to match the decision definition name
    */
   DecisionDefinitionQuery decisionDefinitionNameLike(String decisionDefinitionNameLike);
 
   /**
-   * Only select decision definitions that are deployed in a deployment with the
-   * given deployment id.
+   * Only select decision definitions that are deployed in a deployment with the given deployment
+   * id.
    *
-   * @param deploymentId the id of the deployment
+   * @param deploymentId
+   *          the id of the deployment
    */
   DecisionDefinitionQuery deploymentId(String deploymentId);
 
   /**
-   * Only select decision definition with a certain version.
-   * Particularly useful when used in combination with {@link #decisionDefinitionKey(String)}
+   * Only select decision definition with a certain version. Particularly useful when used in
+   * combination with {@link #decisionDefinitionKey(String)}
    *
-   * @param decisionDefinitionVersion the version of the decision definition
+   * @param decisionDefinitionVersion
+   *          the version of the decision definition
    */
   DecisionDefinitionQuery decisionDefinitionVersion(Integer decisionDefinitionVersion);
 
   /**
-   * Only select the decision definitions which are the latest deployed
-   * (ie. which have the highest version number for the given key).
+   * Only select the decision definitions which are the latest deployed (ie. which have the highest
+   * version number for the given key).
    *
-   * Can only be used in combination with {@link #decisionDefinitionKey(String)}
-   * or {@link #decisionDefinitionKeyLike(String)}. Can also be used without any
-   * other criteria (ie. query.latest().list()), which will then give all the
-   * latest versions of all the deployed decision definitions.
+   * Can only be used in combination with {@link #decisionDefinitionKey(String)} or
+   * {@link #decisionDefinitionKeyLike(String)}. Can also be used without any other criteria (ie.
+   * query.latest().list()), which will then give all the latest versions of all the deployed
+   * decision definitions.
    *
    */
   DecisionDefinitionQuery latestVersion();
@@ -110,31 +121,38 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
   /**
    * Only select decision definition with the given resource name.
    *
-   * @param resourceName the name of the resource
+   * @param resourceName
+   *          the name of the resource
    */
   DecisionDefinitionQuery decisionDefinitionResourceName(String resourceName);
 
   /**
-   * Only select decision definition with a resource name like the given.
-   * The syntax that should be used is the same as in SQL, eg. %resourceName%
+   * Only select decision definition with a resource name like the given. The syntax that should be
+   * used is the same as in SQL, eg. %resourceName%
    *
-   * @param resourceNameLike the pattern to match the resource name
+   * @param resourceNameLike
+   *          the pattern to match the resource name
    */
   DecisionDefinitionQuery decisionDefinitionResourceNameLike(String resourceNameLike);
 
   /**
-   * Only select decision definitions which belongs to a decision requirements definition with the given id.
+   * Only select decision definitions which belongs to a decision requirements definition with the
+   * given id.
    *
-   * @param decisionRequirementsDefinitionId id of the related decision requirements definition
+   * @param decisionRequirementsDefinitionId
+   *          id of the related decision requirements definition
    */
   DecisionDefinitionQuery decisionRequirementsDefinitionId(String decisionRequirementsDefinitionId);
 
   /**
-   * Only select decision definitions which belongs to a decision requirements definition with the given key.
+   * Only select decision definitions which belongs to a decision requirements definition with the
+   * given key.
    *
-   * @param decisionRequirementsDefinitionKey key of the related decision requirements definition
+   * @param decisionRequirementsDefinitionKey
+   *          key of the related decision requirements definition
    */
-  DecisionDefinitionQuery decisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey);
+  DecisionDefinitionQuery decisionRequirementsDefinitionKey(
+      String decisionRequirementsDefinitionKey);
 
   /**
    * Only select decision definitions which belongs to no decision requirements definition.
@@ -148,8 +166,8 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
   DecisionDefinitionQuery withoutTenantId();
 
   /**
-   * Select decision definitions which have no tenant id. Can be used in
-   * combination with {@link #tenantIdIn(String...)}.
+   * Select decision definitions which have no tenant id. Can be used in combination with
+   * {@link #tenantIdIn(String...)}.
    */
   DecisionDefinitionQuery includeDecisionDefinitionsWithoutTenantId();
 
@@ -165,40 +183,51 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
 
   // ordering ////////////////////////////////////////////////////////////
 
-  /** Order by the category of the decision definitions (needs to be followed by
-   * {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the category of the decision definitions (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   DecisionDefinitionQuery orderByDecisionDefinitionCategory();
 
-  /** Order by decision definition key (needs to be followed by {@link #asc()} or
-   * {@link #desc()}). */
+  /**
+   * Order by decision definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   DecisionDefinitionQuery orderByDecisionDefinitionKey();
 
-  /** Order by the id of the decision definitions (needs to be followed by
-   * {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the id of the decision definitions (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   DecisionDefinitionQuery orderByDecisionDefinitionId();
 
-  /** Order by the version of the decision definitions (needs to be followed
-   * by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the version of the decision definitions (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   DecisionDefinitionQuery orderByDecisionDefinitionVersion();
 
-  /** Order by the name of the decision definitions (needs to be followed by
-   * {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the name of the decision definitions (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   DecisionDefinitionQuery orderByDecisionDefinitionName();
 
-  /** Order by deployment id (needs to be followed by {@link #asc()}
-   * or {@link #desc()}). */
+  /**
+   * Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   DecisionDefinitionQuery orderByDeploymentId();
 
-  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of decision definitions without tenant id is database-specific. */
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of decision definitions without tenant id is database-specific.
+   */
   DecisionDefinitionQuery orderByTenantId();
 
   /**
    * Order by version tag (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * <strong>Note:</strong> sorting by versionTag is a string based sort.
-   * There is no interpretation of the version which can lead to a sorting like:
-   * v0.1.0 v0.10.0 v0.2.0.
+   * <strong>Note:</strong> sorting by versionTag is a string based sort. There is no interpretation
+   * of the version which can lead to a sorting like: v0.1.0 v0.10.0 v0.2.0.
    */
   DecisionDefinitionQuery orderByVersionTag();
 

@@ -26,10 +26,9 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
 /**
- * Variable type capable of storing reference to JPA-entities. Only JPA-Entities which
- * are configured by annotations are supported. Use of compound primary keys is not supported.
+ * Variable type capable of storing reference to JPA-entities. Only JPA-Entities which are
+ * configured by annotations are supported. Use of compound primary keys is not supported.
  *
  * @author Frederik Heremans
  * @author Daniel Meyer
@@ -52,8 +51,7 @@ public class JPAVariableSerializer extends AbstractTypedValueSerializer<ObjectVa
   protected boolean canWriteValue(TypedValue value) {
     if (isDeserializedObjectValue(value) || value instanceof UntypedValueImpl) {
       return value.getValue() == null || mappings.isJPAEntity(value.getValue());
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -67,11 +65,11 @@ public class JPAVariableSerializer extends AbstractTypedValueSerializer<ObjectVa
   }
 
   public void writeValue(ObjectValue objectValue, ValueFields valueFields) {
-    EntityManagerSession entityManagerSession = Context
-      .getCommandContext()
-      .getSession(EntityManagerSession.class);
+    EntityManagerSession entityManagerSession = Context.getCommandContext()
+        .getSession(EntityManagerSession.class);
     if (entityManagerSession == null) {
-      throw new ProcessEngineException("Cannot set JPA variable: " + EntityManagerSession.class + " not configured");
+      throw new ProcessEngineException(
+          "Cannot set JPA variable: " + EntityManagerSession.class + " not configured");
     } else {
       // Before we set the value we must flush all pending changes from the entitymanager
       // If we don't do this, in some cases the primary key will not yet be set in the object
@@ -80,7 +78,7 @@ public class JPAVariableSerializer extends AbstractTypedValueSerializer<ObjectVa
     }
 
     Object value = objectValue.getValue();
-    if(value != null) {
+    if (value != null) {
       String className = mappings.getJPAClassString(value);
       String idString = mappings.getJPAIdString(value);
       valueFields.setTextValue(className);
@@ -92,8 +90,9 @@ public class JPAVariableSerializer extends AbstractTypedValueSerializer<ObjectVa
   }
 
   public ObjectValue readValue(ValueFields valueFields, boolean deserializeObjectValue) {
-    if(valueFields.getTextValue() != null && valueFields.getTextValue2() != null) {
-      Object jpaEntity = mappings.getJPAEntity(valueFields.getTextValue(), valueFields.getTextValue2());
+    if (valueFields.getTextValue() != null && valueFields.getTextValue2() != null) {
+      Object jpaEntity = mappings.getJPAEntity(valueFields.getTextValue(),
+          valueFields.getTextValue2());
       return Variables.objectValue(jpaEntity).create();
     }
     return Variables.objectValue(null).create();

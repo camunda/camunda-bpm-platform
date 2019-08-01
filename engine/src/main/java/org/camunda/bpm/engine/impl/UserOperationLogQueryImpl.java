@@ -26,11 +26,11 @@ import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-
 /**
  * @author Danny Gräf
  */
-public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQuery, UserOperationLogEntry> implements UserOperationLogQuery {
+public class UserOperationLogQueryImpl extends
+    AbstractQuery<UserOperationLogQuery, UserOperationLogEntry> implements UserOperationLogQuery {
 
   private static final long serialVersionUID = 1L;
   protected String deploymentId;
@@ -113,7 +113,6 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     return this;
   }
 
-
   public UserOperationLogQuery taskId(String taskId) {
     ensureNotNull("taskId", taskId);
     this.taskId = taskId;
@@ -149,7 +148,7 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     this.operationId = operationId;
     return this;
   }
-  
+
   public UserOperationLogQuery externalTaskId(String externalTaskId) {
     ensureNotNull("externalTaskId", externalTaskId);
     this.externalTaskId = externalTaskId;
@@ -179,13 +178,13 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     this.entityTypes = entityTypes;
     return this;
   }
-  
+
   public UserOperationLogQuery category(String category) {
     ensureNotNull("category", category);
     this.category = category;
     return this;
   }
-  
+
   public UserOperationLogQuery categoryIn(String... categories) {
     ensureNotNull("categories", (Object[]) categories);
     this.categories = categories;
@@ -208,20 +207,18 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getOperationLogManager()
-      .findOperationLogEntryCountByQueryCriteria(this);
+    return commandContext.getOperationLogManager().findOperationLogEntryCountByQueryCriteria(this);
   }
 
   public List<UserOperationLogEntry> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-        .getOperationLogManager()
-        .findOperationLogEntriesByQueryCriteria(this, page);
+    return commandContext.getOperationLogManager().findOperationLogEntriesByQueryCriteria(this,
+        page);
   }
 
   @Override
   protected boolean hasExcludingConditions() {
-    return super.hasExcludingConditions() || CompareUtil.areNotInAscendingOrder(timestampAfter, timestampBefore);
+    return super.hasExcludingConditions()
+        || CompareUtil.areNotInAscendingOrder(timestampAfter, timestampBefore);
   }
 }

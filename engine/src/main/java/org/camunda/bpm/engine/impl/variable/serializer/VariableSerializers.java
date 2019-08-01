@@ -32,34 +32,40 @@ public interface VariableSerializers {
   /**
    * Selects the {@link TypedValueSerializer} which should be used for persisting a VariableValue.
    *
-   * @param value the value to persist
-   * @param fallBackSerializerFactory a factory to build a fallback serializer in case no suiting serializer
-   *   can be determined. If this factory is not able to build serializer either, an exception is thrown. May be null
-   * @return the VariableValueserializer selected for persisting the value or 'null' in case no serializer can be found
+   * @param value
+   *          the value to persist
+   * @param fallBackSerializerFactory
+   *          a factory to build a fallback serializer in case no suiting serializer can be
+   *          determined. If this factory is not able to build serializer either, an exception is
+   *          thrown. May be null
+   * @return the VariableValueserializer selected for persisting the value or 'null' in case no
+   *         serializer can be found
    */
   @SuppressWarnings("rawtypes")
-  public TypedValueSerializer findSerializerForValue(TypedValue value, VariableSerializerFactory fallBackSerializerFactory);
+  public TypedValueSerializer findSerializerForValue(TypedValue value,
+      VariableSerializerFactory fallBackSerializerFactory);
 
   /**
-   * Same as calling {@link VariableSerializers#findSerializerForValue(TypedValue, VariableSerializerFactory)}
-   * with no fallback serializer factory.
+   * Same as calling
+   * {@link VariableSerializers#findSerializerForValue(TypedValue, VariableSerializerFactory)} with
+   * no fallback serializer factory.
    */
   @SuppressWarnings("rawtypes")
   public TypedValueSerializer findSerializerForValue(TypedValue value);
 
   /**
    *
-   * @return the serializer for the given serializerName name.
-   * Returns null if no type was found with the name.
+   * @return the serializer for the given serializerName name. Returns null if no type was found
+   *         with the name.
    */
   public TypedValueSerializer<?> getSerializerByName(String serializerName);
 
   public VariableSerializers addSerializer(TypedValueSerializer<?> serializer);
 
   /**
-   * Add type at the given index. The index is used when finding a serializer for a VariableValue. When
-   * different serializers can store a specific variable value, the one with the smallest
-   * index will be used.
+   * Add type at the given index. The index is used when finding a serializer for a VariableValue.
+   * When different serializers can store a specific variable value, the one with the smallest index
+   * will be used.
    */
   public VariableSerializers addSerializer(TypedValueSerializer<?> serializer, int index);
 
@@ -70,8 +76,8 @@ public interface VariableSerializers {
   public int getSerializerIndexByName(String serializerName);
 
   /**
-   * Merges two {@link VariableSerializers} instances into one. Implementations may apply
-   * different merging strategies.
+   * Merges two {@link VariableSerializers} instances into one. Implementations may apply different
+   * merging strategies.
    */
   public VariableSerializers join(VariableSerializers other);
 

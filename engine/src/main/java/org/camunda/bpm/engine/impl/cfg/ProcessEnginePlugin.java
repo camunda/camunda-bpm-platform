@@ -19,35 +19,45 @@ package org.camunda.bpm.engine.impl.cfg;
 import org.camunda.bpm.engine.ProcessEngine;
 
 /**
- * <p>A process engine plugin allows customizing the process engine</p>
+ * <p>
+ * A process engine plugin allows customizing the process engine
+ * </p>
  * 
  * @author Daniel Meyer
  *
  */
 public interface ProcessEnginePlugin {
-  
+
   /**
-   * <p>Invoked before the process engine configuration is initialized.</p>
+   * <p>
+   * Invoked before the process engine configuration is initialized.
+   * </p>
    * 
-   * @param processEngineConfiguration the process engine configuation
+   * @param processEngineConfiguration
+   *          the process engine configuation
    * 
    */
   void preInit(ProcessEngineConfigurationImpl processEngineConfiguration);
-  
+
   /**
-   * <p>Invoked after the process engine configuration is initialized.
-   * and before the process engine is built.</p>
+   * <p>
+   * Invoked after the process engine configuration is initialized. and before the process engine is
+   * built.
+   * </p>
    * 
-   * @param processEngineConfiguration the process engine configuation
+   * @param processEngineConfiguration
+   *          the process engine configuation
    * 
    */
   void postInit(ProcessEngineConfigurationImpl processEngineConfiguration);
-  
+
   /**
-   * <p>Invoked after the process engine has been built.</p>
+   * <p>
+   * Invoked after the process engine has been built.
+   * </p>
    * 
    * @param processEngine
    */
   void postProcessEngineBuild(ProcessEngine processEngine);
-  
+
 }

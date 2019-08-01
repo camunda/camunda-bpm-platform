@@ -21,20 +21,20 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 import java.io.Serializable;
 
-
 /**
  * @author Joram Barrez
  */
-public class DeleteProcessInstanceCmd extends AbstractDeleteProcessInstanceCmd implements Command<Void>, Serializable {
+public class DeleteProcessInstanceCmd extends AbstractDeleteProcessInstanceCmd
+    implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
   protected boolean skipIoMappings;
   protected boolean skipSubprocesses;
 
-
-  public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated,
-      boolean skipIoMappings, boolean skipSubprocesses, boolean failIfNotExists) {
+  public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason,
+      boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings,
+      boolean skipSubprocesses, boolean failIfNotExists) {
     this.processInstanceId = processInstanceId;
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
@@ -45,7 +45,8 @@ public class DeleteProcessInstanceCmd extends AbstractDeleteProcessInstanceCmd i
   }
 
   public Void execute(CommandContext commandContext) {
-    deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses);
+    deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners,
+        externallyTerminated, skipIoMappings, skipSubprocesses);
 
     return null;
   }

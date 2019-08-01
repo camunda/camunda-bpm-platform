@@ -80,10 +80,7 @@ public class BatchMigrationHistoryTest {
 
   @Parameterized.Parameters(name = "Job DueDate is set: {0}")
   public static Collection<Object[]> scenarios() throws ParseException {
-    return Arrays.asList(new Object[][] {
-      { false, null },
-      { true, START_DATE }
-    });
+    return Arrays.asList(new Object[][] { { false, null }, { true, START_DATE } });
   }
 
   @Rule
@@ -437,6 +434,5 @@ public class BatchMigrationHistoryTest {
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
   }
-
 
 }

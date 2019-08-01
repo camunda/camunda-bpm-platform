@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 public class SameEventTypeValidator implements MigrationInstructionValidator {
 
   @Override
-  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions,
+  public void validate(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
       MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
     ActivityImpl targetActivity = instruction.getTargetActivity();
@@ -39,7 +40,8 @@ public class SameEventTypeValidator implements MigrationInstructionValidator {
       String targetType = targetActivity.getProperties().get(BpmnProperties.TYPE);
 
       if (!sourceType.equals(targetType)) {
-        report.addFailure("Events are not of the same type (" + sourceType + " != " + targetType + ")");
+        report.addFailure(
+            "Events are not of the same type (" + sourceType + " != " + targetType + ")");
       }
     }
   }

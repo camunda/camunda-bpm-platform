@@ -46,7 +46,8 @@ public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
     return definition;
   }
 
-  protected void initializeActivity(Case element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeActivity(Case element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     CaseDefinitionEntity definition = (CaseDefinitionEntity) activity;
 
     Deployment deployment = context.getDeployment();
@@ -55,7 +56,8 @@ public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
     definition.setName(element.getName());
     definition.setDeploymentId(deployment.getId());
     definition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
-    definition.setHistoryTimeToLive(ParseUtil.parseHistoryTimeToLive(element.getCamundaHistoryTimeToLiveString()));
+    definition.setHistoryTimeToLive(
+        ParseUtil.parseHistoryTimeToLive(element.getCamundaHistoryTimeToLiveString()));
     CmmnModelInstance model = context.getModel();
 
     Definitions definitions = model.getDefinitions();

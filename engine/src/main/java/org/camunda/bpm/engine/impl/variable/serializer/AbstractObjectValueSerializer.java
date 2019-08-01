@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.variable.value.ObjectValue;
  * @author Daniel Meyer
  *
  */
-public abstract class AbstractObjectValueSerializer extends AbstractSerializableValueSerializer<ObjectValue> {
+public abstract class AbstractObjectValueSerializer
+    extends AbstractSerializableValueSerializer<ObjectValue> {
 
   public AbstractObjectValueSerializer(String serializationDataFormat) {
     super(ValueType.OBJECT, serializationDataFormat);
@@ -40,7 +41,8 @@ public abstract class AbstractObjectValueSerializer extends AbstractSerializable
     return Variables.objectValue(untypedValue.getValue(), untypedValue.isTransient()).create();
   }
 
-  protected void writeToValueFields(ObjectValue value, ValueFields valueFields, byte[] serializedValue) {
+  protected void writeToValueFields(ObjectValue value, ValueFields valueFields,
+      byte[] serializedValue) {
     String objectTypeName = getObjectTypeName(value, valueFields);
     valueFields.setByteArrayValue(serializedValue);
     valueFields.setTextValue2(objectTypeName);
@@ -50,7 +52,8 @@ public abstract class AbstractObjectValueSerializer extends AbstractSerializable
     String objectTypeName = value.getObjectTypeName();
 
     if (objectTypeName == null && !value.isDeserialized() && value.getValueSerialized() != null) {
-      throw new ProcessEngineException("Cannot write serialized value for variable '" + valueFields.getName() + "': no 'objectTypeName' provided for non-null value.");
+      throw new ProcessEngineException("Cannot write serialized value for variable '"
+          + valueFields.getName() + "': no 'objectTypeName' provided for non-null value.");
     }
 
     // update type name if the object is deserialized
@@ -63,21 +66,24 @@ public abstract class AbstractObjectValueSerializer extends AbstractSerializable
 
   protected void updateTypedValue(ObjectValue value, String serializedStringValue) {
     String objectTypeName = getObjectTypeName(value, null);
-    ObjectValueImpl objectValue =(ObjectValueImpl) value;
+    ObjectValueImpl objectValue = (ObjectValueImpl) value;
     objectValue.setObjectTypeName(objectTypeName);
     objectValue.setSerializedValue(serializedStringValue);
     objectValue.setSerializationDataFormat(serializationDataFormat);
   }
 
-  protected ObjectValue createDeserializedValue(Object deserializedObject, String serializedStringValue, ValueFields valueFields) {
+  protected ObjectValue createDeserializedValue(Object deserializedObject,
+      String serializedStringValue, ValueFields valueFields) {
     String objectTypeName = readObjectNameFromFields(valueFields);
-    return new ObjectValueImpl(deserializedObject, serializedStringValue, serializationDataFormat, objectTypeName, true);
+    return new ObjectValueImpl(deserializedObject, serializedStringValue, serializationDataFormat,
+        objectTypeName, true);
   }
 
-
-  protected ObjectValue createSerializedValue(String serializedStringValue, ValueFields valueFields) {
+  protected ObjectValue createSerializedValue(String serializedStringValue,
+      ValueFields valueFields) {
     String objectTypeName = readObjectNameFromFields(valueFields);
-    return new ObjectValueImpl(null, serializedStringValue, serializationDataFormat, objectTypeName, false);
+    return new ObjectValueImpl(null, serializedStringValue, serializationDataFormat, objectTypeName,
+        false);
   }
 
   protected String readObjectNameFromFields(ValueFields valueFields) {
@@ -93,22 +99,26 @@ public abstract class AbstractObjectValueSerializer extends AbstractSerializable
   /**
    * Returns the type name for the deserialized object.
    *
-   * @param deserializedObject. Guaranteed not to be null
+   * @param deserializedObject.
+   *          Guaranteed not to be null
    * @return the type name fot the object.
    */
   protected abstract String getTypeNameForDeserialized(Object deserializedObject);
 
   /**
-   * Implementations must return a byte[] representation of the provided object.
-   * The object is guaranteed not to be null.
+   * Implementations must return a byte[] representation of the provided object. The object is
+   * guaranteed not to be null.
    *
-   * @param deserializedObject the object to serialize
+   * @param deserializedObject
+   *          the object to serialize
    * @return the byte array value of the object
-   * @throws exception in case the object cannot be serialized
+   * @throws exception
+   *           in case the object cannot be serialized
    */
   protected abstract byte[] serializeToByteArray(Object deserializedObject) throws Exception;
 
-  protected Object deserializeFromByteArray(byte[] object, ValueFields valueFields) throws Exception {
+  protected Object deserializeFromByteArray(byte[] object, ValueFields valueFields)
+      throws Exception {
     String objectTypeName = readObjectNameFromFields(valueFields);
     return deserializeFromByteArray(object, objectTypeName);
   }
@@ -116,12 +126,16 @@ public abstract class AbstractObjectValueSerializer extends AbstractSerializable
   /**
    * Deserialize the object from a byte array.
    *
-   * @param object the object to deserialize
-   * @param objectTypeName the type name of the object to deserialize
+   * @param object
+   *          the object to deserialize
+   * @param objectTypeName
+   *          the type name of the object to deserialize
    * @return the deserialized object
-   * @throws exception in case the object cannot be deserialized
+   * @throws exception
+   *           in case the object cannot be deserialized
    */
-  protected abstract Object deserializeFromByteArray(byte[] object, String objectTypeName) throws Exception;
+  protected abstract Object deserializeFromByteArray(byte[] object, String objectTypeName)
+      throws Exception;
 
   /**
    * Return true if the serialization is text based. Return false otherwise

@@ -20,7 +20,6 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -32,8 +31,8 @@ public class MembershipEntity implements Serializable, DbEntity {
   protected GroupEntity group;
 
   /**
-   * To handle a MemberhipEntity in the cache, an id is necessary.
-   * Even though it is not going to be persisted in the database.
+   * To handle a MemberhipEntity in the cache, an id is necessary. Even though it is not going to be
+   * persisted in the database.
    */
   protected String id;
 
@@ -41,10 +40,12 @@ public class MembershipEntity implements Serializable, DbEntity {
     // membership is not updatable
     return MembershipEntity.class;
   }
+
   public String getId() {
     // For the sake of Entity caching the id is necessary
     return id;
   }
+
   public void setId(String id) {
     // For the sake of Entity caching the id is necessary
     this.id = id;
@@ -53,31 +54,31 @@ public class MembershipEntity implements Serializable, DbEntity {
   public UserEntity getUser() {
     return user;
   }
+
   public void setUser(UserEntity user) {
     this.user = user;
   }
+
   public GroupEntity getGroup() {
     return group;
   }
+
   public void setGroup(GroupEntity group) {
     this.group = group;
   }
 
   // required for mybatis
-  public String getUserId(){
-	  return user.getId();
+  public String getUserId() {
+    return user.getId();
   }
 
   // required for mybatis
-  public String getGroupId(){
-	  return group.getId();
+  public String getGroupId() {
+    return group.getId();
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[user=" + user
-           + ", group=" + group
-           + "]";
+    return this.getClass().getSimpleName() + "[user=" + user + ", group=" + group + "]";
   }
 }

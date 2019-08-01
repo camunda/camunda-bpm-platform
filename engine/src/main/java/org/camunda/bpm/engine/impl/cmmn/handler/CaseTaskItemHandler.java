@@ -36,25 +36,29 @@ public class CaseTaskItemHandler extends ProcessOrCaseTaskItemHandler {
     return (CaseTask) super.getDefinition(element);
   }
 
-  protected String getDefinitionKey(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getDefinitionKey(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     CaseTask definition = getDefinition(element);
 
     return definition.getCase();
   }
 
-  protected String getBinding(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getBinding(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     CaseTask definition = getDefinition(element);
 
     return definition.getCamundaCaseBinding();
   }
 
-  protected String getVersion(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getVersion(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     CaseTask definition = getDefinition(element);
 
     return definition.getCamundaCaseVersion();
   }
 
-  protected String getTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected String getTenantId(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     CaseTask definition = getDefinition(element);
 
     return definition.getCamundaCaseTenantId();

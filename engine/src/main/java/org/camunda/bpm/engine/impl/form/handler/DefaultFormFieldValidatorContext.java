@@ -35,8 +35,8 @@ public class DefaultFormFieldValidatorContext implements FormFieldValidatorConte
   protected VariableMap submittedValues;
   protected FormFieldHandler formFieldHandler;
 
-  public DefaultFormFieldValidatorContext(VariableScope variableScope, String configuration, VariableMap submittedValues,
-    FormFieldHandler formFieldHandler) {
+  public DefaultFormFieldValidatorContext(VariableScope variableScope, String configuration,
+      VariableMap submittedValues, FormFieldHandler formFieldHandler) {
     super();
     this.variableScope = variableScope;
     this.configuration = configuration;
@@ -49,13 +49,11 @@ public class DefaultFormFieldValidatorContext implements FormFieldValidatorConte
   }
 
   public DelegateExecution getExecution() {
-    if(variableScope instanceof DelegateExecution) {
+    if (variableScope instanceof DelegateExecution) {
       return (DelegateExecution) variableScope;
-    }
-    else if(variableScope instanceof TaskEntity){
+    } else if (variableScope instanceof TaskEntity) {
       return ((TaskEntity) variableScope).getExecution();
-    }
-    else {
+    } else {
       return null;
     }
   }

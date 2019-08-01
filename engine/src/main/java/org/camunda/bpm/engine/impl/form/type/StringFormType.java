@@ -20,8 +20,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
-
 /**
  * @author Tom Baeyens
  */
@@ -34,15 +32,13 @@ public class StringFormType extends SimpleFormFieldType {
   }
 
   public TypedValue convertValue(TypedValue propertyValue) {
-    if(propertyValue instanceof StringValue) {
+    if (propertyValue instanceof StringValue) {
       return propertyValue;
-    }
-    else {
+    } else {
       Object value = propertyValue.getValue();
-      if(value == null) {
+      if (value == null) {
         return Variables.stringValue(null, propertyValue.isTransient());
-      }
-      else {
+      } else {
         return Variables.stringValue(value.toString(), propertyValue.isTransient());
       }
     }

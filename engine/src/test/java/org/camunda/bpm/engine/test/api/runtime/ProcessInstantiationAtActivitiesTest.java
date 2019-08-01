@@ -54,10 +54,8 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testSingleActivityInstantiation() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .startBeforeActivity("task1")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .startBeforeActivity("task1").execute();
 
     // then
     assertNotNull(instance);
@@ -66,9 +64,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     assertNotNull(updatedTree);
 
     assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .activity("task1")
-      .done());
+        describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task1").done());
 
     // and it is possible to end the process
     completeTasksInOrder("task1");
@@ -78,13 +74,12 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testSingleActivityInstantiationById() {
     // given
-    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult()
+        .getId();
 
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceById(processDefinitionId)
-      .startBeforeActivity("task1")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceById(processDefinitionId)
+        .startBeforeActivity("task1").execute();
 
     // then
     assertNotNull(instance);
@@ -93,9 +88,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     assertNotNull(updatedTree);
 
     assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .activity("task1")
-      .done());
+        describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task1").done());
 
     // and it is possible to end the process
     completeTasksInOrder("task1");
@@ -105,11 +98,8 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testSingleActivityInstantiationSetBusinessKey() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .businessKey("businessKey")
-      .startBeforeActivity("task1")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .businessKey("businessKey").startBeforeActivity("task1").execute();
 
     // then
     assertNotNull(instance);
@@ -119,11 +109,8 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testSingleActivityInstantiationSetCaseInstanceId() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .caseInstanceId("caseInstanceId")
-      .startBeforeActivity("task1")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .caseInstanceId("caseInstanceId").startBeforeActivity("task1").execute();
 
     // then
     assertNotNull(instance);
@@ -133,10 +120,8 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testStartEventInstantiation() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .startBeforeActivity("theStart")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .startBeforeActivity("theStart").execute();
 
     // then
     assertNotNull(instance);
@@ -145,9 +130,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     assertNotNull(updatedTree);
 
     assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .activity("task1")
-      .done());
+        describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task1").done());
 
     // and it is possible to end the process
     completeTasksInOrder("task1");
@@ -157,11 +140,8 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testStartEventInstantiationWithVariables() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .startBeforeActivity("theStart")
-      .setVariable("aVariable", "aValue")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .startBeforeActivity("theStart").setVariable("aVariable", "aValue").execute();
 
     // then
     assertNotNull(instance);
@@ -173,14 +153,13 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   public void testStartWithInvalidInitialActivity() {
     try {
       // when
-      runtimeService
-          .createProcessInstanceByKey("exclusiveGateway")
-          .startBeforeActivity("someNonExistingActivity")
-          .execute();
+      runtimeService.createProcessInstanceByKey("exclusiveGateway")
+          .startBeforeActivity("someNonExistingActivity").execute();
       fail("should not succeed");
     } catch (NotValidException e) {
       // then
-      assertTextPresentIgnoreCase("element 'someNonExistingActivity' does not exist in process ", e.getMessage());
+      assertTextPresentIgnoreCase("element 'someNonExistingActivity' does not exist in process ",
+          e.getMessage());
     }
   }
 
@@ -188,12 +167,9 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   public void testMultipleActivitiesInstantiation() {
 
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .startBeforeActivity("task1")
-      .startBeforeActivity("task2")
-      .startBeforeActivity("task1")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .startBeforeActivity("task1").startBeforeActivity("task2").startBeforeActivity("task1")
+        .execute();
 
     // then
     assertNotNull(instance);
@@ -201,12 +177,9 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     ActivityInstance updatedTree = runtimeService.getActivityInstance(instance.getId());
     assertNotNull(updatedTree);
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task2")
-        .activity("task1")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId())
+            .activity("task1").activity("task2").activity("task1").done());
 
     // and it is possible to end the process
     completeTasksInOrder("task1", "task2", "task1");
@@ -216,23 +189,21 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testMultipleActivitiesInstantiationWithVariables() {
     // when
-    runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .startBeforeActivity("task1")
-        .setVariableLocal("aVar1", "aValue1")
-      .startBeforeActivity("task2")
-        .setVariableLocal("aVar2", "aValue2")
-      .execute();
+    runtimeService.createProcessInstanceByKey("exclusiveGateway").startBeforeActivity("task1")
+        .setVariableLocal("aVar1", "aValue1").startBeforeActivity("task2")
+        .setVariableLocal("aVar2", "aValue2").execute();
 
     // then
     // variables for task2's execution
-    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2").singleResult();
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2")
+        .singleResult();
     assertNotNull(task2Execution);
     assertNull(runtimeService.getVariableLocal(task2Execution.getId(), "aVar1"));
     assertEquals("aValue2", runtimeService.getVariableLocal(task2Execution.getId(), "aVar2"));
 
     // variables for task1's execution
-    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1")
+        .singleResult();
     assertNotNull(task1Execution);
 
     assertNull(runtimeService.getVariableLocal(task1Execution.getId(), "aVar2"));
@@ -246,12 +217,9 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = SUBPROCESS_PROCESS)
   public void testNestedActivitiesInstantiation() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("subprocess")
-      .startBeforeActivity("innerTask")
-      .startBeforeActivity("outerTask")
-      .startBeforeActivity("innerTask")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("subprocess")
+        .startBeforeActivity("innerTask").startBeforeActivity("outerTask")
+        .startBeforeActivity("innerTask").execute();
 
     // then
     assertNotNull(instance);
@@ -260,12 +228,8 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     assertNotNull(updatedTree);
 
     assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .activity("outerTask")
-        .beginScope("subProcess")
-          .activity("innerTask")
-          .activity("innerTask")
-      .done());
+        describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("outerTask")
+            .beginScope("subProcess").activity("innerTask").activity("innerTask").done());
 
     // and it is possible to end the process
     completeTasksInOrder("innerTask", "innerTask", "outerTask", "innerTask");
@@ -274,14 +238,16 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
 
   public void testStartNonExistingProcessDefinition() {
     try {
-      runtimeService.createProcessInstanceById("I don't exist").startBeforeActivity("start").execute();
+      runtimeService.createProcessInstanceById("I don't exist").startBeforeActivity("start")
+          .execute();
       fail("exception expected");
     } catch (ProcessEngineException e) {
       assertTextPresent("no deployed process definition found with id", e.getMessage());
     }
 
     try {
-      runtimeService.createProcessInstanceByKey("I don't exist either").startBeforeActivity("start").execute();
+      runtimeService.createProcessInstanceByKey("I don't exist either").startBeforeActivity("start")
+          .execute();
       fail("exception expected");
     } catch (ProcessEngineException e) {
       assertTextPresent("no processes deployed with key", e.getMessage());
@@ -309,20 +275,16 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     RecorderExecutionListener.clear();
 
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("listenerProcess")
-      .startBeforeActivity("innerTask")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("listenerProcess")
+        .startBeforeActivity("innerTask").execute();
 
     // then
     ActivityInstance updatedTree = runtimeService.getActivityInstance(instance.getId());
     assertNotNull(updatedTree);
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .beginScope("subProcess")
-          .activity("innerTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId())
+            .beginScope("subProcess").activity("innerTask").done());
 
     List<RecordedEvent> events = RecorderExecutionListener.getRecordedEvents();
     assertEquals(3, events.size());
@@ -346,20 +308,16 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     RecorderExecutionListener.clear();
 
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("listenerProcess")
-      .startBeforeActivity("innerTask")
-      .execute(true, true);
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("listenerProcess")
+        .startBeforeActivity("innerTask").execute(true, true);
 
     // then
     ActivityInstance updatedTree = runtimeService.getActivityInstance(instance.getId());
     assertNotNull(updatedTree);
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .beginScope("subProcess")
-          .activity("innerTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId())
+            .beginScope("subProcess").activity("innerTask").done());
 
     List<RecordedEvent> events = RecorderExecutionListener.getRecordedEvents();
     assertEquals(0, events.size());
@@ -368,17 +326,16 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = IO_PROCESS)
   public void testIoMappingInvocation() {
     // when
-    runtimeService
-      .createProcessInstanceByKey("ioProcess")
-      .startBeforeActivity("innerTask")
-      .execute();
+    runtimeService.createProcessInstanceByKey("ioProcess").startBeforeActivity("innerTask")
+        .execute();
 
     // then no io mappings have been executed
     List<VariableInstance> variables = runtimeService.createVariableInstanceQuery()
         .orderByVariableName().asc().list();
     assertEquals(2, variables.size());
 
-    Execution innerTaskExecution = runtimeService.createExecutionQuery().activityId("innerTask").singleResult();
+    Execution innerTaskExecution = runtimeService.createExecutionQuery().activityId("innerTask")
+        .singleResult();
     VariableInstance innerTaskVariable = variables.get(0);
     assertEquals("innerTaskVariable", innerTaskVariable.getName());
     assertEquals("innerTaskValue", innerTaskVariable.getValue());
@@ -387,16 +344,15 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     VariableInstance subProcessVariable = variables.get(1);
     assertEquals("subProcessVariable", subProcessVariable.getName());
     assertEquals("subProcessValue", subProcessVariable.getValue());
-    assertEquals(((ExecutionEntity) innerTaskExecution).getParentId(), subProcessVariable.getExecutionId());
+    assertEquals(((ExecutionEntity) innerTaskExecution).getParentId(),
+        subProcessVariable.getExecutionId());
   }
 
   @Deployment(resources = IO_PROCESS)
   public void testSkipIoMappingInvocation() {
     // when
-    runtimeService
-      .createProcessInstanceByKey("ioProcess")
-      .startBeforeActivity("innerTask")
-      .execute(true, true);
+    runtimeService.createProcessInstanceByKey("ioProcess").startBeforeActivity("innerTask")
+        .execute(true, true);
 
     // then no io mappings have been executed
     assertEquals(0, runtimeService.createVariableInstanceQuery().count());
@@ -405,14 +361,11 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = SUBPROCESS_PROCESS)
   public void testSetProcessInstanceVariable() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("subprocess")
-      .setVariable("aVariable1", "aValue1")
-      .setVariableLocal("aVariable2", "aValue2")
-      .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
-      .setVariablesLocal(Variables.createVariables().putValue("aVariable4", "aValue4"))
-      .startBeforeActivity("innerTask")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("subprocess")
+        .setVariable("aVariable1", "aValue1").setVariableLocal("aVariable2", "aValue2")
+        .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
+        .setVariablesLocal(Variables.createVariables().putValue("aVariable4", "aValue4"))
+        .startBeforeActivity("innerTask").execute();
 
     // then
     List<VariableInstance> variables = runtimeService.createVariableInstanceQuery()
@@ -440,10 +393,8 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   @Deployment(resources = ASYNC_PROCESS)
   public void testStartAsyncTask() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .startBeforeActivity("task2")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .startBeforeActivity("task2").execute();
 
     // then
     assertNotNull(instance);
@@ -452,9 +403,7 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     assertNotNull(updatedTree);
 
     assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .transition("task2")
-      .done());
+        describeActivityInstanceTree(instance.getProcessDefinitionId()).transition("task2").done());
 
     // and it is possible to end the process
     Job job = managementService.createJobQuery().singleResult();
@@ -470,12 +419,9 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     RecorderExecutionListener.clear();
 
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("syncProcess")
-      .startBeforeActivity("syncTask")
-      .startBeforeActivity("syncTask")
-      .startBeforeActivity("syncTask")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("syncProcess")
+        .startBeforeActivity("syncTask").startBeforeActivity("syncTask")
+        .startBeforeActivity("syncTask").execute();
 
     // then the request was successful even though the process instance has already ended
     assertNotNull(instance);
@@ -518,10 +464,8 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     identityService.setAuthenticatedUserId("kermit");
 
     // when
-    ProcessInstance instance = runtimeService
-        .createProcessInstanceByKey("initiatorProcess")
-        .startBeforeActivity("task")
-        .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("initiatorProcess")
+        .startBeforeActivity("task").execute();
 
     // then
     String initiator = (String) runtimeService.getVariable(instance.getId(), "initiator");

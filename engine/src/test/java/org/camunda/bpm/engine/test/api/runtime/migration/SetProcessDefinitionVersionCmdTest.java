@@ -39,7 +39,6 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 
-
 /**
  * @author Falko Menge
  */
@@ -68,28 +67,34 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
       new SetProcessDefinitionVersionCmd(null, 23);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process instance id is mandatory: processInstanceId is null", ae.getMessage());
+      assertTextPresent("The process instance id is mandatory: processInstanceId is null",
+          ae.getMessage());
     }
 
     try {
       new SetProcessDefinitionVersionCmd("", 23);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process instance id is mandatory: processInstanceId is empty", ae.getMessage());
+      assertTextPresent("The process instance id is mandatory: processInstanceId is empty",
+          ae.getMessage());
     }
 
     try {
       new SetProcessDefinitionVersionCmd("42", null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process definition version is mandatory: processDefinitionVersion is null", ae.getMessage());
+      assertTextPresent(
+          "The process definition version is mandatory: processDefinitionVersion is null",
+          ae.getMessage());
     }
 
     try {
       new SetProcessDefinitionVersionCmd("42", -1);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process definition version must be positive: processDefinitionVersion is not greater than 0", ae.getMessage());
+      assertTextPresent(
+          "The process definition version must be positive: processDefinitionVersion is not greater than 0",
+          ae.getMessage());
     }
   }
 
@@ -103,25 +108,28 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     }
   }
 
-  @Deployment(resources = {TEST_PROCESS_WITH_PARALLEL_GATEWAY})
+  @Deployment(resources = { TEST_PROCESS_WITH_PARALLEL_GATEWAY })
   public void testSetProcessDefinitionVersionPIIsSubExecution() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
 
-    Execution execution = runtimeService.createExecutionQuery()
-      .activityId("receivePayment")
-      .singleResult();
+    Execution execution = runtimeService.createExecutionQuery().activityId("receivePayment")
+        .singleResult();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    SetProcessDefinitionVersionCmd command = new SetProcessDefinitionVersionCmd(execution.getId(), 1);
+    SetProcessDefinitionVersionCmd command = new SetProcessDefinitionVersionCmd(execution.getId(),
+        1);
     try {
       commandExecutor.execute(command);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("A process instance id is required, but the provided id '"+execution.getId()+"' points to a child execution of process instance '"+pi.getId()+"'. Please invoke the "+command.getClass().getSimpleName()+" with a root execution id.", ae.getMessage());
+      assertTextPresent("A process instance id is required, but the provided id '"
+          + execution.getId() + "' points to a child execution of process instance '" + pi.getId()
+          + "'. Please invoke the " + command.getClass().getSimpleName()
+          + " with a root execution id.", ae.getMessage());
     }
   }
 
-  @Deployment(resources = {TEST_PROCESS})
+  @Deployment(resources = { TEST_PROCESS })
   public void testSetProcessDefinitionVersionNonExistingPD() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
@@ -131,36 +139,37 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
       commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 23));
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("no processes deployed with key = 'receiveTask', version = '23'", ae.getMessage());
+      assertTextPresent("no processes deployed with key = 'receiveTask', version = '23'",
+          ae.getMessage());
     }
   }
 
-  @Deployment(resources = {TEST_PROCESS})
+  @Deployment(resources = { TEST_PROCESS })
   public void testSetProcessDefinitionVersionActivityMissing() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
 
     // check that receive task has been reached
-    Execution execution = runtimeService.createExecutionQuery()
-      .activityId("waitState1")
-      .singleResult();
+    Execution execution = runtimeService.createExecutionQuery().activityId("waitState1")
+        .singleResult();
     assertNotNull(execution);
 
     // deploy new version of the process definition
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS_ACTIVITY_MISSING)
-      .deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS_ACTIVITY_MISSING).deploy();
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
     // migrate process instance to new process definition version
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    SetProcessDefinitionVersionCmd setProcessDefinitionVersionCmd = new SetProcessDefinitionVersionCmd(pi.getId(), 2);
+    SetProcessDefinitionVersionCmd setProcessDefinitionVersionCmd = new SetProcessDefinitionVersionCmd(
+        pi.getId(), 2);
     try {
       commandExecutor.execute(setProcessDefinitionVersionCmd);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The new process definition (key = 'receiveTask') does not contain the current activity (id = 'waitState1') of the process instance (id = '", ae.getMessage());
+      assertTextPresent(
+          "The new process definition (key = 'receiveTask') does not contain the current activity (id = 'waitState1') of the process instance (id = '",
+          ae.getMessage());
     }
 
     // undeploy "manually" deployed process definition
@@ -173,17 +182,13 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
 
     // check that receive task has been reached
-    Execution execution = runtimeService.createExecutionQuery()
-      .processInstanceId(pi.getId())
-      .activityId("waitState1")
-      .singleResult();
+    Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId())
+        .activityId("waitState1").singleResult();
     assertNotNull(execution);
 
     // deploy new version of the process definition
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS)
-      .deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS).deploy();
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
     // migrate process instance to new process definition version
@@ -194,31 +199,25 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     runtimeService.signal(execution.getId());
 
     // check that the instance now uses the new process definition version
-    ProcessDefinition newProcessDefinition = repositoryService
-      .createProcessDefinitionQuery()
-      .processDefinitionVersion(2)
-      .singleResult();
-    pi = runtimeService
-      .createProcessInstanceQuery()
-      .processInstanceId(pi.getId())
-      .singleResult();
+    ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionVersion(2).singleResult();
+    pi = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult();
     assertEquals(newProcessDefinition.getId(), pi.getProcessDefinitionId());
 
     // check history
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      HistoricProcessInstance historicPI = historyService
-        .createHistoricProcessInstanceQuery()
-        .processInstanceId(pi.getId())
-        .singleResult();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      HistoricProcessInstance historicPI = historyService.createHistoricProcessInstanceQuery()
+          .processInstanceId(pi.getId()).singleResult();
 
-//      assertEquals(newProcessDefinition.getId(), historicPI.getProcessDefinitionId());
+      // assertEquals(newProcessDefinition.getId(), historicPI.getProcessDefinitionId());
     }
 
     // undeploy "manually" deployed process definition
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
-  @Deployment(resources = {TEST_PROCESS_WITH_PARALLEL_GATEWAY})
+  @Deployment(resources = { TEST_PROCESS_WITH_PARALLEL_GATEWAY })
   public void testSetProcessDefinitionVersionSubExecutions() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
@@ -227,10 +226,8 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     assertEquals(2, taskService.createTaskQuery().count());
 
     // deploy new version of the process definition
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS_WITH_PARALLEL_GATEWAY)
-      .deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS_WITH_PARALLEL_GATEWAY).deploy();
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
     // migrate process instance to new process definition version
@@ -238,40 +235,34 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
 
     // check that all executions of the instance now use the new process definition version
-    ProcessDefinition newProcessDefinition = repositoryService
-      .createProcessDefinitionQuery()
-      .processDefinitionVersion(2)
-      .singleResult();
-    List<Execution> executions = runtimeService
-      .createExecutionQuery()
-      .processInstanceId(pi.getId())
-      .list();
+    ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionVersion(2).singleResult();
+    List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(pi.getId())
+        .list();
     for (Execution execution : executions) {
-      assertEquals(newProcessDefinition.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+      assertEquals(newProcessDefinition.getId(),
+          ((ExecutionEntity) execution).getProcessDefinitionId());
     }
 
     // undeploy "manually" deployed process definition
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
-  @Deployment(resources = {TEST_PROCESS_CALL_ACTIVITY})
+  @Deployment(resources = { TEST_PROCESS_CALL_ACTIVITY })
   public void testSetProcessDefinitionVersionWithCallActivity() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("parentProcess");
 
     // check that receive task has been reached
-    Execution execution = runtimeService.createExecutionQuery()
-      .activityId("waitState1")
-      .processDefinitionKey("childProcess")
-      .singleResult();
+    Execution execution = runtimeService.createExecutionQuery().activityId("waitState1")
+        .processDefinitionKey("childProcess").singleResult();
     assertNotNull(execution);
 
     // deploy new version of the process definition
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS_CALL_ACTIVITY)
-      .deploy();
-    assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("parentProcess").count());
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS_CALL_ACTIVITY).deploy();
+    assertEquals(2, repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("parentProcess").count());
 
     // migrate process instance to new process definition version
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -281,57 +272,59 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     runtimeService.signal(execution.getId());
 
     // should be finished now
-    assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count());
+    assertEquals(0,
+        runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count());
 
     // undeploy "manually" deployed process definition
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
-  @Deployment(resources = {TEST_PROCESS_USER_TASK_V1})
+  @Deployment(resources = { TEST_PROCESS_USER_TASK_V1 })
   public void testSetProcessDefinitionVersionWithWithTask() {
     try {
-    // start process instance
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("userTask");
+      // start process instance
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("userTask");
 
-    // check that user task has been reached
-    assertEquals(1, taskService.createTaskQuery().processInstanceId(pi.getId()).count());
+      // check that user task has been reached
+      assertEquals(1, taskService.createTaskQuery().processInstanceId(pi.getId()).count());
 
-    // deploy new version of the process definition
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS_USER_TASK_V2)
-      .deploy();
-    assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").count());
+      // deploy new version of the process definition
+      org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+          .addClasspathResource(TEST_PROCESS_USER_TASK_V2).deploy();
+      assertEquals(2, repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("userTask").count());
 
-    ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").processDefinitionVersion(2).singleResult();
+      ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("userTask").processDefinitionVersion(2).singleResult();
 
-    // migrate process instance to new process definition version
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
+      // migrate process instance to new process definition version
+      processEngineConfiguration.getCommandExecutorTxRequired()
+          .execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
 
-    // check UserTask
-    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-    assertEquals(newProcessDefinition.getId(), task.getProcessDefinitionId());
-    assertEquals("testFormKey", formService.getTaskFormData(task.getId()).getFormKey());
+      // check UserTask
+      Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+      assertEquals(newProcessDefinition.getId(), task.getProcessDefinitionId());
+      assertEquals("testFormKey", formService.getTaskFormData(task.getId()).getFormKey());
 
-    // continue
-    taskService.complete(task.getId());
+      // continue
+      taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+      assertProcessEnded(pi.getId());
 
-    // undeploy "manually" deployed process definition
-    repositoryService.deleteDeployment(deployment.getId(), true);
-    }
-    catch (Exception ex) {
-     ex.printStackTrace();
+      // undeploy "manually" deployed process definition
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    } catch (Exception ex) {
+      ex.printStackTrace();
     }
   }
 
   @Deployment(resources = TEST_PROCESS_SERVICE_TASK_V1)
   public void testSetProcessDefinitionVersionWithFollowUpTask() {
-    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult()
+        .getId();
 
-    String secondDeploymentId =
-        repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_SERVICE_TASK_V2).deploy().getId();
+    String secondDeploymentId = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS_SERVICE_TASK_V2).deploy().getId();
 
     runtimeService.startProcessInstanceById(processDefinitionId);
 
@@ -343,29 +336,30 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
 
     Task followUpTask = taskService.createTaskQuery().singleResult();
 
-    assertNotNull("Should have migrated to the new version and immediately executed the correct follow-up activity",
+    assertNotNull(
+        "Should have migrated to the new version and immediately executed the correct follow-up activity",
         followUpTask);
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
   }
 
-  @Deployment(resources = {TEST_PROCESS_WITH_MULTIPLE_PARENTS})
-  public void testSetProcessDefinitionVersionWithMultipleParents(){
+  @Deployment(resources = { TEST_PROCESS_WITH_MULTIPLE_PARENTS })
+  public void testSetProcessDefinitionVersionWithMultipleParents() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("multipleJoins");
 
     // check that the user tasks have been reached
     assertEquals(2, taskService.createTaskQuery().count());
 
-    //finish task1
+    // finish task1
     Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
     taskService.complete(task.getId());
 
-    //we have reached task4
+    // we have reached task4
     task = taskService.createTaskQuery().taskDefinitionKey("task4").singleResult();
     assertNotNull(task);
 
-    //The timer job has been created
+    // The timer job has been created
     Job job = managementService.createJobQuery().executionId(task.getExecutionId()).singleResult();
     assertNotNull(job);
 
@@ -373,10 +367,8 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     assertEquals(2, taskService.createTaskQuery().count());
 
     // deploy new version of the process definition
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS_WITH_MULTIPLE_PARENTS)
-      .deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS_WITH_MULTIPLE_PARENTS).deploy();
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
 
     // migrate process instance to new process definition version
@@ -384,20 +376,17 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
 
     // check that all executions of the instance now use the new process definition version
-    ProcessDefinition newProcessDefinition = repositoryService
-      .createProcessDefinitionQuery()
-      .processDefinitionVersion(2)
-      .singleResult();
-    List<Execution> executions = runtimeService
-      .createExecutionQuery()
-      .processInstanceId(pi.getId())
-      .list();
+    ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionVersion(2).singleResult();
+    List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(pi.getId())
+        .list();
     for (Execution execution : executions) {
-    	assertEquals(newProcessDefinition.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+      assertEquals(newProcessDefinition.getId(),
+          ((ExecutionEntity) execution).getProcessDefinitionId());
     }
 
     // undeploy "manually" deployed process definition
-  	repositoryService.deleteDeployment(deployment.getId(), true);
+    repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
   @Deployment(resources = TEST_PROCESS_ONE_JOB)
@@ -410,13 +399,11 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     assertNotNull(job);
 
     // and a second deployment of the process
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS_ONE_JOB)
-      .deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS_ONE_JOB).deploy();
 
-    ProcessDefinition newDefinition =
-        repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+    ProcessDefinition newDefinition = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(deployment.getId()).singleResult();
     assertNotNull(newDefinition);
 
     // when the process instance is migrated
@@ -430,8 +417,8 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     assertEquals(newDefinition.getId(), migratedJob.getProcessDefinitionId());
     assertEquals(deployment.getId(), migratedJob.getDeploymentId());
 
-    JobDefinition newJobDefinition = managementService
-        .createJobDefinitionQuery().processDefinitionId(newDefinition.getId()).singleResult();
+    JobDefinition newJobDefinition = managementService.createJobDefinitionQuery()
+        .processDefinitionId(newDefinition.getId()).singleResult();
     assertNotNull(newJobDefinition);
     assertEquals(newJobDefinition.getId(), migratedJob.getJobDefinitionId());
 
@@ -449,30 +436,25 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     Job asyncAfterJob = managementService.createJobQuery().singleResult();
 
     // and a process instance with an before after job
-    ProcessInstance asyncBeforeInstance = runtimeService.startProcessInstanceByKey("twoJobsProcess");
+    ProcessInstance asyncBeforeInstance = runtimeService
+        .startProcessInstanceByKey("twoJobsProcess");
     Job asyncBeforeJob = managementService.createJobQuery()
         .processInstanceId(asyncBeforeInstance.getId()).singleResult();
 
     // and a second deployment of the process
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS_TWO_JOBS)
-      .deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS_TWO_JOBS).deploy();
 
-    ProcessDefinition newDefinition =
-        repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+    ProcessDefinition newDefinition = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(deployment.getId()).singleResult();
     assertNotNull(newDefinition);
 
-    JobDefinition asnycBeforeJobDefinition =
-        managementService.createJobDefinitionQuery()
-          .jobConfiguration(MessageJobDeclaration.ASYNC_BEFORE)
-          .processDefinitionId(newDefinition.getId())
-          .singleResult();
-    JobDefinition asnycAfterJobDefinition =
-        managementService.createJobDefinitionQuery()
-          .jobConfiguration(MessageJobDeclaration.ASYNC_AFTER)
-          .processDefinitionId(newDefinition.getId())
-          .singleResult();
+    JobDefinition asnycBeforeJobDefinition = managementService.createJobDefinitionQuery()
+        .jobConfiguration(MessageJobDeclaration.ASYNC_BEFORE)
+        .processDefinitionId(newDefinition.getId()).singleResult();
+    JobDefinition asnycAfterJobDefinition = managementService.createJobDefinitionQuery()
+        .jobConfiguration(MessageJobDeclaration.ASYNC_AFTER)
+        .processDefinitionId(newDefinition.getId()).singleResult();
 
     assertNotNull(asnycBeforeJobDefinition);
     assertNotNull(asnycAfterJobDefinition);
@@ -501,8 +483,8 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   @Deployment(resources = TEST_PROCESS_ONE_JOB)
   public void testSetProcessDefinitionVersionMigrateIncident() {
     // given a process instance
-    ProcessInstance instance =
-        runtimeService.startProcessInstanceByKey("oneJobProcess", Variables.createVariables().putValue("shouldFail", true));
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneJobProcess",
+        Variables.createVariables().putValue("shouldFail", true));
 
     // with a failed job
     executeAvailableJobs();
@@ -512,13 +494,11 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     assertNotNull(incident);
 
     // and a second deployment of the process
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS_ONE_JOB)
-      .deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS_ONE_JOB).deploy();
 
-    ProcessDefinition newDefinition =
-        repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+    ProcessDefinition newDefinition = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(deployment.getId()).singleResult();
     assertNotNull(newDefinition);
 
     // when the process instance is migrated
@@ -541,8 +521,8 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   @Deployment(resources = TEST_PROCESS_ONE_JOB)
   public void testPreserveTimestampOnUpdatedIncident() {
     // given
-    ProcessInstance instance =
-        runtimeService.startProcessInstanceByKey("oneJobProcess", Variables.createVariables().putValue("shouldFail", true));
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneJobProcess",
+        Variables.createVariables().putValue("shouldFail", true));
 
     executeAvailableJobs();
 
@@ -551,13 +531,11 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
 
     Date timestamp = incident.getIncidentTimestamp();
 
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS_ONE_JOB)
-      .deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS_ONE_JOB).deploy();
 
-    ProcessDefinition newDefinition =
-        repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+    ProcessDefinition newDefinition = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(deployment.getId()).singleResult();
     assertNotNull(newDefinition);
 
     // when
@@ -576,17 +554,14 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   @Deployment(resources = TEST_PROCESS_ATTACHED_TIMER)
   public void testSetProcessDefinitionVersionAttachedTimer() {
     // given a process instance
-    ProcessInstance instance =
-        runtimeService.startProcessInstanceByKey("attachedTimer");
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("attachedTimer");
 
     // and a second deployment of the process
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(TEST_PROCESS_ATTACHED_TIMER)
-      .deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(TEST_PROCESS_ATTACHED_TIMER).deploy();
 
-    ProcessDefinition newDefinition =
-        repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+    ProcessDefinition newDefinition = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(deployment.getId()).singleResult();
     assertNotNull(newDefinition);
 
     // when the process instance is migrated
@@ -606,43 +581,35 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
 
     // Deployments
     org.camunda.bpm.engine.repository.Deployment firstDeployment = repositoryService
-        .createDeployment()
-        .addClasspathResource(resource)
-        .deploy();
+        .createDeployment().addClasspathResource(resource).deploy();
 
     org.camunda.bpm.engine.repository.Deployment secondDeployment = repositoryService
-        .createDeployment()
-        .addClasspathResource(resource)
-        .deploy();
+        .createDeployment().addClasspathResource(resource).deploy();
 
     // Process definitions
-    ProcessDefinition processDefinitionV1 = repositoryService
-        .createProcessDefinitionQuery()
-        .deploymentId(firstDeployment.getId())
-        .singleResult();
+    ProcessDefinition processDefinitionV1 = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(firstDeployment.getId()).singleResult();
 
-    ProcessDefinition processDefinitionV2 = repositoryService
-        .createProcessDefinitionQuery()
-        .deploymentId(secondDeployment.getId())
-        .singleResult();
+    ProcessDefinition processDefinitionV2 = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(secondDeployment.getId()).singleResult();
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinitionV1.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinitionV1.getId());
 
     // when
     setProcessDefinitionVersion(processInstance.getId(), 2);
 
     // then
-    ProcessInstance processInstanceAfterMigration = runtimeService
-        .createProcessInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .singleResult();
-    assertEquals(processDefinitionV2.getId(), processInstanceAfterMigration.getProcessDefinitionId());
+    ProcessInstance processInstanceAfterMigration = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(processDefinitionV2.getId(),
+        processInstanceAfterMigration.getProcessDefinitionId());
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       HistoricProcessInstance historicProcessInstance = historyService
-          .createHistoricProcessInstanceQuery()
-          .processInstanceId(processInstance.getId())
+          .createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId())
           .singleResult();
       assertEquals(processDefinitionV2.getId(), historicProcessInstance.getProcessDefinitionId());
     }
@@ -660,45 +627,35 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
 
       // Deployments
       org.camunda.bpm.engine.repository.Deployment firstDeployment = repositoryService
-          .createDeployment()
-          .addClasspathResource(resource)
-          .deploy();
+          .createDeployment().addClasspathResource(resource).deploy();
 
       org.camunda.bpm.engine.repository.Deployment secondDeployment = repositoryService
-          .createDeployment()
-          .addClasspathResource(resource)
-          .deploy();
+          .createDeployment().addClasspathResource(resource).deploy();
 
       // Process definitions
-      ProcessDefinition processDefinitionV1 = repositoryService
-          .createProcessDefinitionQuery()
-          .deploymentId(firstDeployment.getId())
-          .singleResult();
+      ProcessDefinition processDefinitionV1 = repositoryService.createProcessDefinitionQuery()
+          .deploymentId(firstDeployment.getId()).singleResult();
 
-      ProcessDefinition processDefinitionV2 = repositoryService
-          .createProcessDefinitionQuery()
-          .deploymentId(secondDeployment.getId())
-          .singleResult();
+      ProcessDefinition processDefinitionV2 = repositoryService.createProcessDefinitionQuery()
+          .deploymentId(secondDeployment.getId()).singleResult();
 
       // start process instance
-      ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinitionV1.getId());
+      ProcessInstance processInstance = runtimeService
+          .startProcessInstanceById(processDefinitionV1.getId());
 
       // when
       setProcessDefinitionVersion(processInstance.getId(), 2);
 
       // then
-      ProcessInstance processInstanceAfterMigration = runtimeService
-          .createProcessInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .singleResult();
-      assertEquals(processDefinitionV2.getId(), processInstanceAfterMigration.getProcessDefinitionId());
+      ProcessInstance processInstanceAfterMigration = runtimeService.createProcessInstanceQuery()
+          .processInstanceId(processInstance.getId()).singleResult();
+      assertEquals(processDefinitionV2.getId(),
+          processInstanceAfterMigration.getProcessDefinitionId());
 
       if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
-        List<UserOperationLogEntry> userOperations = historyService
-            .createUserOperationLogQuery()
+        List<UserOperationLogEntry> userOperations = historyService.createUserOperationLogQuery()
             .processInstanceId(processInstance.getId())
-            .operationType(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE)
-            .list();
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE).list();
 
         assertEquals(1, userOperations.size());
 
@@ -716,8 +673,10 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     }
   }
 
-  protected void setProcessDefinitionVersion(String processInstanceId, int newProcessDefinitionVersion) {
+  protected void setProcessDefinitionVersion(String processInstanceId,
+      int newProcessDefinitionVersion) {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
-    commandExecutor.execute(new SetProcessDefinitionVersionCmd(processInstanceId, newProcessDefinitionVersion));
+    commandExecutor.execute(
+        new SetProcessDefinitionVersionCmd(processInstanceId, newProcessDefinitionVersion));
   }
 }

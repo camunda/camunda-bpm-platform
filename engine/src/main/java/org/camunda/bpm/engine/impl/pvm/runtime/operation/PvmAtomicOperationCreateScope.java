@@ -50,7 +50,6 @@ public abstract class PvmAtomicOperationCreateScope implements PvmAtomicOperatio
       propagatingExecution = execution;
     }
 
-
     scopeCreated(propagatingExecution);
   }
 

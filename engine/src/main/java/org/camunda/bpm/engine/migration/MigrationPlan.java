@@ -19,12 +19,15 @@ package org.camunda.bpm.engine.migration;
 import java.util.List;
 
 /**
- * <p>Specifies how process instances from one process definition (the <i>source process definition</i>)
- * should be migrated to another process definition (the <i>target process definition</i>).
+ * <p>
+ * Specifies how process instances from one process definition (the <i>source process
+ * definition</i>) should be migrated to another process definition (the <i>target process
+ * definition</i>).
  *
- * <p>A migration plan consists of a number of {@link MigrationInstruction}s that tell which
- *   activity maps to which. The set of instructions is complete, i.e. the migration logic does not perform
- *   migration steps that are not given by the instructions
+ * <p>
+ * A migration plan consists of a number of {@link MigrationInstruction}s that tell which activity
+ * maps to which. The set of instructions is complete, i.e. the migration logic does not perform
+ * migration steps that are not given by the instructions
  *
  * @author Thorben Lindhauer
  */

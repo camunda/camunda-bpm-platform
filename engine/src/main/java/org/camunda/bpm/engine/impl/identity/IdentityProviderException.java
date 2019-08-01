@@ -19,7 +19,9 @@ package org.camunda.bpm.engine.impl.identity;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
- * <p>Marks an exception triggered inside an identity provider implementation</p>
+ * <p>
+ * Marks an exception triggered inside an identity provider implementation
+ * </p>
  * 
  * @author Daniel Meyer
  *
@@ -27,14 +29,13 @@ import org.camunda.bpm.engine.ProcessEngineException;
 public class IdentityProviderException extends ProcessEngineException {
 
   private static final long serialVersionUID = 1L;
-  
+
   public IdentityProviderException(String message) {
     super(message);
   }
-  
+
   public IdentityProviderException(String message, Throwable cause) {
     super(message, cause);
   }
-
 
 }

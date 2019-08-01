@@ -52,11 +52,11 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
   public Void execute(CommandContext commandContext) {
     ensureNotNull(NotValidException.class, "jobDefinitionId", jobDefinitionId);
 
-    JobDefinitionEntity jobDefinition = commandContext.getJobDefinitionManager().findById(jobDefinitionId);
+    JobDefinitionEntity jobDefinition = commandContext.getJobDefinitionManager()
+        .findById(jobDefinitionId);
 
     ensureNotNull(NotFoundException.class,
-        "Job definition with id '" + jobDefinitionId + "' does not exist",
-        "jobDefinition",
+        "Job definition with id '" + jobDefinitionId + "' does not exist", "jobDefinition",
         jobDefinition);
 
     checkUpdateProcess(commandContext, jobDefinition);
@@ -77,11 +77,13 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
     return null;
   }
 
-  protected void checkUpdateProcess(CommandContext commandContext, JobDefinitionEntity jobDefinition) {
+  protected void checkUpdateProcess(CommandContext commandContext,
+      JobDefinitionEntity jobDefinition) {
 
     String processDefinitionId = jobDefinition.getProcessDefinitionId();
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateProcessDefinitionById(processDefinitionId);
 
       if (cascade) {
@@ -90,33 +92,30 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
     }
   }
 
-  protected void createJobDefinitionOperationLogEntry(UserOperationLogContext opLogContext, Long previousPriority,
-      JobDefinitionEntity jobDefinition) {
+  protected void createJobDefinitionOperationLogEntry(UserOperationLogContext opLogContext,
+      Long previousPriority, JobDefinitionEntity jobDefinition) {
 
-    PropertyChange propertyChange = new PropertyChange(
-        JOB_DEFINITION_OVERRIDING_PRIORITY, previousPriority, jobDefinition.getOverridingJobPriority());
+    PropertyChange propertyChange = new PropertyChange(JOB_DEFINITION_OVERRIDING_PRIORITY,
+        previousPriority, jobDefinition.getOverridingJobPriority());
 
     UserOperationLogContextEntry entry = UserOperationLogContextEntryBuilder
         .entry(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY, EntityTypes.JOB_DEFINITION)
-        .inContextOf(jobDefinition)
-        .propertyChanges(propertyChange)
-        .category(UserOperationLogEntry.CATEGORY_OPERATOR)
-        .create();
+        .inContextOf(jobDefinition).propertyChanges(propertyChange)
+        .category(UserOperationLogEntry.CATEGORY_OPERATOR).create();
 
     opLogContext.addEntry(entry);
   }
 
-  protected void createCascadeJobsOperationLogEntry(UserOperationLogContext opLogContext, JobDefinitionEntity jobDefinition) {
+  protected void createCascadeJobsOperationLogEntry(UserOperationLogContext opLogContext,
+      JobDefinitionEntity jobDefinition) {
     // old value is unknown
-    PropertyChange propertyChange = new PropertyChange(
-        SetJobPriorityCmd.JOB_PRIORITY_PROPERTY, null, jobDefinition.getOverridingJobPriority());
+    PropertyChange propertyChange = new PropertyChange(SetJobPriorityCmd.JOB_PRIORITY_PROPERTY,
+        null, jobDefinition.getOverridingJobPriority());
 
     UserOperationLogContextEntry entry = UserOperationLogContextEntryBuilder
         .entry(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY, EntityTypes.JOB)
-        .inContextOf(jobDefinition)
-        .propertyChanges(propertyChange)
-        .category(UserOperationLogEntry.CATEGORY_OPERATOR)
-        .create();
+        .inContextOf(jobDefinition).propertyChanges(propertyChange)
+        .category(UserOperationLogEntry.CATEGORY_OPERATOR).create();
 
     opLogContext.addEntry(entry);
   }

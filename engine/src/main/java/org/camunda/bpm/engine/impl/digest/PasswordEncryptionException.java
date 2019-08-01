@@ -19,12 +19,15 @@ package org.camunda.bpm.engine.impl.digest;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
- * <p>Exception thrown during the encryption process.</p>
+ * <p>
+ * Exception thrown during the encryption process.
+ * </p>
  *
- * <p><strong>Possible reasons:</strong>
+ * <p>
+ * <strong>Possible reasons:</strong>
  * <ul>
- *  <li>several hashing algorithms with the same prefix are added</li>
- *  <li>cannot resolve the hash algorithm prefix from a given encrypted password</li>
+ * <li>several hashing algorithms with the same prefix are added</li>
+ * <li>cannot resolve the hash algorithm prefix from a given encrypted password</li>
  * </ul>
  * </p>
  *

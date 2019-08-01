@@ -22,7 +22,8 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 
-public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverter<MigrationBatchConfiguration> {
+public class MigrationBatchConfigurationJsonConverter
+    extends JsonObjectConverter<MigrationBatchConfiguration> {
 
   public static final MigrationBatchConfigurationJsonConverter INSTANCE = new MigrationBatchConfigurationJsonConverter();
 
@@ -34,7 +35,8 @@ public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverte
   public JsonObject toJsonObject(MigrationBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
-    JsonUtil.addField(json, MIGRATION_PLAN, MigrationPlanJsonConverter.INSTANCE, configuration.getMigrationPlan());
+    JsonUtil.addField(json, MIGRATION_PLAN, MigrationPlanJsonConverter.INSTANCE,
+        configuration.getMigrationPlan());
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
     JsonUtil.addField(json, SKIP_LISTENERS, configuration.isSkipCustomListeners());
     JsonUtil.addField(json, SKIP_IO_MAPPINGS, configuration.isSkipIoMappings());
@@ -43,9 +45,11 @@ public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverte
   }
 
   public MigrationBatchConfiguration toObject(JsonObject json) {
-    MigrationBatchConfiguration configuration = new MigrationBatchConfiguration(readProcessInstanceIds(json));
+    MigrationBatchConfiguration configuration = new MigrationBatchConfiguration(
+        readProcessInstanceIds(json));
 
-    configuration.setMigrationPlan(JsonUtil.asJavaObject(JsonUtil.getObject(json, MIGRATION_PLAN), MigrationPlanJsonConverter.INSTANCE));
+    configuration.setMigrationPlan(JsonUtil.asJavaObject(JsonUtil.getObject(json, MIGRATION_PLAN),
+        MigrationPlanJsonConverter.INSTANCE));
     configuration.setSkipCustomListeners(JsonUtil.getBoolean(json, SKIP_LISTENERS));
     configuration.setSkipIoMappings(JsonUtil.getBoolean(json, SKIP_IO_MAPPINGS));
 
@@ -55,6 +59,5 @@ public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverte
   protected List<String> readProcessInstanceIds(JsonObject jsonObject) {
     return JsonUtil.asStringList(JsonUtil.getArray(jsonObject, PROCESS_INSTANCE_IDS));
   }
-
 
 }

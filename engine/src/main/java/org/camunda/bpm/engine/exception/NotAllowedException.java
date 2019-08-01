@@ -19,7 +19,9 @@ package org.camunda.bpm.engine.exception;
 import org.camunda.bpm.engine.BadUserRequestException;
 
 /**
- * <p>This exception is thrown, if an operation is not allowed to be executed.</p>
+ * <p>
+ * This exception is thrown, if an operation is not allowed to be executed.
+ * </p>
  *
  * @author Roman Smirnov
  *

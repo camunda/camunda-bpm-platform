@@ -21,9 +21,10 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * Cancel scope operation performed when an execution starts at an {@link ActivityImpl#isCancelActivity()}
- * activity. This is used when an execution is set to the activity without entering it through a transition.
- * See {@link PvmAtomicOperationCancelActivity} for more details on "cancel scope" behavior.
+ * Cancel scope operation performed when an execution starts at an
+ * {@link ActivityImpl#isCancelActivity()} activity. This is used when an execution is set to the
+ * activity without entering it through a transition. See {@link PvmAtomicOperationCancelActivity}
+ * for more details on "cancel scope" behavior.
  *
  * @author Daniel Meyer
  * @author Roman Smirnov

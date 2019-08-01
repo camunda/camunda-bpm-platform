@@ -72,7 +72,8 @@ public class JobAcquisitionContext {
    */
   public boolean areAllEnginesIdle() {
     for (AcquiredJobs acquiredJobs : acquiredJobsByEngine.values()) {
-      int jobsAcquired = acquiredJobs.getJobIdBatches().size() + acquiredJobs.getNumberOfJobsFailedToLock();
+      int jobsAcquired = acquiredJobs.getJobIdBatches().size()
+          + acquiredJobs.getNumberOfJobsFailedToLock();
 
       if (jobsAcquired >= acquiredJobs.getNumberOfJobsAttemptedToAcquire()) {
         return false;
@@ -107,6 +108,7 @@ public class JobAcquisitionContext {
 
   /**
    * Jobs that were acquired in the current acquisition cycle.
+   * 
    * @return
    */
   public Map<String, AcquiredJobs> getAcquiredJobsByEngine() {
@@ -114,18 +116,17 @@ public class JobAcquisitionContext {
   }
 
   /**
-   * Jobs that were rejected from execution in the acquisition cycle
-   * due to lacking execution resources.
-   * With an execution thread pool, these jobs could not be submitted due to
-   * saturation of the underlying job queue.
+   * Jobs that were rejected from execution in the acquisition cycle due to lacking execution
+   * resources. With an execution thread pool, these jobs could not be submitted due to saturation
+   * of the underlying job queue.
    */
   public Map<String, List<List<String>>> getRejectedJobsByEngine() {
     return rejectedJobBatchesByEngine;
   }
 
   /**
-   * Jobs that have been acquired in previous cycles and are supposed to
-   * be re-submitted for execution
+   * Jobs that have been acquired in previous cycles and are supposed to be re-submitted for
+   * execution
    */
   public Map<String, List<List<String>>> getAdditionalJobsByEngine() {
     return additionalJobBatchesByEngine;

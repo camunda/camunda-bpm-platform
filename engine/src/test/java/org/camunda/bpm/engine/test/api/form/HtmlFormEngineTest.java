@@ -50,59 +50,51 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
   public void testHtmlElementWriter() {
 
-    String htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName"))
-      .endElement()
-      .getHtmlString();
+    String htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName")).endElement()
+        .getHtmlString();
     assertHtmlEquals("<someTagName></someTagName>", htmlString);
 
-    htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName", true))
-      .endElement()
-      .getHtmlString();
+    htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName", true)).endElement()
+        .getHtmlString();
     assertHtmlEquals("<someTagName />", htmlString);
 
-    htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName", true).attribute("someAttr", "someAttrValue"))
-      .endElement()
-      .getHtmlString();
+    htmlString = new HtmlDocumentBuilder(
+        new HtmlElementWriter("someTagName", true).attribute("someAttr", "someAttrValue"))
+            .endElement().getHtmlString();
     assertHtmlEquals("<someTagName someAttr=\"someAttrValue\" />", htmlString);
 
-    htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName").attribute("someAttr", "someAttrValue"))
-      .endElement()
-      .getHtmlString();
+    htmlString = new HtmlDocumentBuilder(
+        new HtmlElementWriter("someTagName").attribute("someAttr", "someAttrValue")).endElement()
+            .getHtmlString();
     assertHtmlEquals("<someTagName someAttr=\"someAttrValue\"></someTagName>", htmlString);
 
-    htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName").attribute("someAttr", null))
-      .endElement()
-      .getHtmlString();
+    htmlString = new HtmlDocumentBuilder(
+        new HtmlElementWriter("someTagName").attribute("someAttr", null)).endElement()
+            .getHtmlString();
     assertHtmlEquals("<someTagName someAttr></someTagName>", htmlString);
 
-    htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName").textContent("someTextContent"))
-      .endElement()
-      .getHtmlString();
+    htmlString = new HtmlDocumentBuilder(
+        new HtmlElementWriter("someTagName").textContent("someTextContent")).endElement()
+            .getHtmlString();
     assertHtmlEquals("<someTagName>someTextContent</someTagName>", htmlString);
 
-    htmlString = new HtmlDocumentBuilder(
-        new HtmlElementWriter("someTagName"))
-          .startElement(new HtmlElementWriter("someChildTag"))
-          .endElement()
-        .endElement()
-    .getHtmlString();
+    htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName"))
+        .startElement(new HtmlElementWriter("someChildTag")).endElement().endElement()
+        .getHtmlString();
     assertHtmlEquals("<someTagName><someChildTag></someChildTag></someTagName>", htmlString);
 
-    htmlString = new HtmlDocumentBuilder(
-        new HtmlElementWriter("someTagName"))
-          .startElement(new HtmlElementWriter("someChildTag").textContent("someTextContent"))
-          .endElement()
-        .endElement()
-    .getHtmlString();
-    assertHtmlEquals("<someTagName><someChildTag>someTextContent</someChildTag></someTagName>", htmlString);
+    htmlString = new HtmlDocumentBuilder(new HtmlElementWriter("someTagName"))
+        .startElement(new HtmlElementWriter("someChildTag").textContent("someTextContent"))
+        .endElement().endElement().getHtmlString();
+    assertHtmlEquals("<someTagName><someChildTag>someTextContent</someChildTag></someTagName>",
+        htmlString);
 
     htmlString = new HtmlDocumentBuilder(
         new HtmlElementWriter("someTagName").textContent("someTextContent"))
-          .startElement(new HtmlElementWriter("someChildTag"))
-          .endElement()
-        .endElement()
-    .getHtmlString();
-    assertHtmlEquals("<someTagName><someChildTag></someChildTag>someTextContent</someTagName>", htmlString);
+            .startElement(new HtmlElementWriter("someChildTag")).endElement().endElement()
+            .getHtmlString();
+    assertHtmlEquals("<someTagName><someChildTag></someChildTag>someTextContent</someTagName>",
+        htmlString);
 
     // invalid usage
 
@@ -117,7 +109,8 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testRenderEmptyStartForm() {
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
     assertNull(formService.getRenderedStartForm(processDefinition.getId()));
 
@@ -126,11 +119,13 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testRenderStartForm() {
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
     String renderedForm = (String) formService.getRenderedStartForm(processDefinition.getId());
 
-    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderStartForm.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString(
+        "org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderStartForm.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -141,12 +136,12 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
     runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testRenderEnumField");
 
-    Task t = taskService.createTaskQuery()
-      .singleResult();
+    Task t = taskService.createTaskQuery().singleResult();
 
     String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
 
-    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderEnumField.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString(
+        "org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderEnumField.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -157,12 +152,12 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
     runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testRenderTaskForm");
 
-    Task t = taskService.createTaskQuery()
-      .singleResult();
+    Task t = taskService.createTaskQuery().singleResult();
 
     String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
 
-    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderTaskForm.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString(
+        "org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderTaskForm.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -171,10 +166,12 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testRenderDateField() {
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     String renderedForm = (String) formService.getRenderedStartForm(processDefinition.getId());
 
-    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderDateField.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString(
+        "org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderDateField.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -183,10 +180,12 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testRenderDateFieldWithPattern() {
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     String renderedForm = (String) formService.getRenderedStartForm(processDefinition.getId());
 
-    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderDateFieldWithPattern.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString(
+        "org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testRenderDateFieldWithPattern.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -197,12 +196,12 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
 
     runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupport");
 
-    Task t = taskService.createTaskQuery()
-      .singleResult();
+    Task t = taskService.createTaskQuery().singleResult();
 
     String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
 
-    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupport.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString(
+        "org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupport.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -211,14 +210,15 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testLegacyFormPropertySupportReadOnly() {
 
-    runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupportReadOnly");
+    runtimeService
+        .startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupportReadOnly");
 
-    Task t = taskService.createTaskQuery()
-      .singleResult();
+    Task t = taskService.createTaskQuery().singleResult();
 
     String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
 
-    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupportReadOnly.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString(
+        "org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupportReadOnly.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -227,14 +227,15 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testLegacyFormPropertySupportRequired() {
 
-    runtimeService.startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupportRequired");
+    runtimeService
+        .startProcessInstanceByKey("HtmlFormEngineTest.testLegacyFormPropertySupportRequired");
 
-    Task t = taskService.createTaskQuery()
-      .singleResult();
+    Task t = taskService.createTaskQuery().singleResult();
 
     String renderedForm = (String) formService.getRenderedTaskForm(t.getId());
 
-    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupportRequired.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString(
+        "org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testLegacyFormPropertySupportRequired.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 
@@ -243,11 +244,13 @@ public class HtmlFormEngineTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testBusinessKey() {
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
     String renderedForm = (String) formService.getRenderedStartForm(processDefinition.getId());
 
-    String expectedForm = IoUtil.readClasspathResourceAsString("org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testBusinessKey.html");
+    String expectedForm = IoUtil.readClasspathResourceAsString(
+        "org/camunda/bpm/engine/test/api/form/HtmlFormEngineTest.testBusinessKey.html");
 
     assertHtmlEquals(expectedForm, renderedForm);
 

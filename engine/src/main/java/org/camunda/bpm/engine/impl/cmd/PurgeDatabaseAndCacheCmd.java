@@ -35,10 +35,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Purges the database and the deployment cache.
- * That means that each entity will be removed from the database and from the cache.
- * The command returns a purge report. That report contains information of the
- * deleted rows for each table and the values from the cache which are removed.
+ * Purges the database and the deployment cache. That means that each entity will be removed from
+ * the database and from the cache. The command returns a purge report. That report contains
+ * information of the deleted rows for each table and the values from the cache which are removed.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
@@ -49,10 +48,8 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
   protected static final String TABLE_NAME = "tableName";
   protected static final String EMPTY_STRING = "";
 
-  public static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-    "ACT_GE_PROPERTY",
-    "ACT_GE_SCHEMA_LOG"
-  );
+  public static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays
+      .asList("ACT_GE_PROPERTY", "ACT_GE_SCHEMA_LOG");
 
   @Override
   public PurgeReport execute(CommandContext commandContext) {
@@ -63,7 +60,8 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
     purgeReport.setDatabasePurgeReport(databasePurgeReport);
 
     // purge the deployment cache
-    DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
+    DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration()
+        .getDeploymentCache();
     CachePurgeReport cachePurgeReport = deploymentCache.purgeCache();
     purgeReport.setCachePurgeReport(cachePurgeReport);
 
@@ -77,9 +75,10 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
     // The flag will be reset by the DBEntityManager after flush.
     dbEntityManager.setIgnoreForeignKeysForNextFlush(true);
     List<String> tablesNames = dbEntityManager.getTableNamesPresentInDatabase();
-    String databaseTablePrefix = commandContext.getProcessEngineConfiguration().getDatabaseTablePrefix().trim();
+    String databaseTablePrefix = commandContext.getProcessEngineConfiguration()
+        .getDatabaseTablePrefix().trim();
 
-    //for each table
+    // for each table
     DatabasePurgeReport databasePurgeReport = new DatabasePurgeReport();
     for (String tableName : tablesNames) {
       String tableNameWithoutPrefix = tableName.replace(databaseTablePrefix, EMPTY_STRING);
@@ -93,18 +92,18 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
         if (count > 0) {
           databasePurgeReport.addPurgeInformation(tableName, count);
           // Get corresponding entity classes for the table, which contains data
-          List<Class<? extends DbEntity>> entities = commandContext.getTableDataManager().getEntities(tableName);
+          List<Class<? extends DbEntity>> entities = commandContext.getTableDataManager()
+              .getEntities(tableName);
 
           if (entities.isEmpty()) {
             throw new ProcessEngineException("No mapped implementation of "
-                                            + DbEntity.class.getName()
-                                            + " was found for: "
-                                            + tableName);
+                + DbEntity.class.getName() + " was found for: " + tableName);
           }
 
           // Delete the table data as bulk operation with the first entity
           Class<? extends DbEntity> entity = entities.get(0);
-          DbBulkOperation deleteBulkOp = new DbBulkOperation(DbOperationType.DELETE_BULK, entity, DELETE_TABLE_DATA, param);
+          DbBulkOperation deleteBulkOp = new DbBulkOperation(DbOperationType.DELETE_BULK, entity,
+              DELETE_TABLE_DATA, param);
           dbEntityManager.getDbOperationManager().addOperation(deleteBulkOp);
         }
       }

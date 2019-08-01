@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.repository.ResourceTypes;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-
 /**
  * @author Daniel Meyer
  * @author Tom Baeyens
@@ -37,7 +36,6 @@ public class SetUserPictureCmd implements Command<Void>, Serializable {
   protected String userId;
   protected Picture picture;
 
-
   public SetUserPictureCmd(String userId, Picture picture) {
     this.userId = userId;
     this.picture = picture;
@@ -47,13 +45,12 @@ public class SetUserPictureCmd implements Command<Void>, Serializable {
     ensureNotNull("userId", userId);
 
     IdentityInfoEntity pictureInfo = commandContext.getIdentityInfoManager()
-      .findUserInfoByUserIdAndKey(userId, "picture");
+        .findUserInfoByUserIdAndKey(userId, "picture");
 
     if (pictureInfo != null) {
       String byteArrayId = pictureInfo.getValue();
       if (byteArrayId != null) {
-        commandContext.getByteArrayManager()
-          .deleteByteArrayById(byteArrayId);
+        commandContext.getByteArrayManager().deleteByteArrayById(byteArrayId);
       }
 
     } else {
@@ -63,10 +60,10 @@ public class SetUserPictureCmd implements Command<Void>, Serializable {
       commandContext.getDbEntityManager().insert(pictureInfo);
     }
 
-    ByteArrayEntity byteArrayEntity = new ByteArrayEntity(picture.getMimeType(), picture.getBytes(), ResourceTypes.REPOSITORY);
+    ByteArrayEntity byteArrayEntity = new ByteArrayEntity(picture.getMimeType(), picture.getBytes(),
+        ResourceTypes.REPOSITORY);
 
-    commandContext.getByteArrayManager()
-      .insertByteArray(byteArrayEntity);
+    commandContext.getByteArrayManager().insertByteArray(byteArrayEntity);
 
     pictureInfo.setValue(byteArrayEntity.getId());
 

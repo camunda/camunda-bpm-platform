@@ -47,9 +47,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
   }
 
   protected void saveFilter(String name, String owner) {
-    Filter filter = filterService.newTaskFilter()
-      .setName(name)
-      .setOwner(owner);
+    Filter filter = filterService.newTaskFilter().setName(name).setOwner(owner);
     filterService.saveFilter(filter);
     filterIds.add(filter.getId());
   }
@@ -68,8 +66,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.singleResult();
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
   }
@@ -90,8 +87,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     try {
       filterService.createFilterQuery().filterId(null);
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
   }
@@ -101,8 +97,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.singleResult();
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
     assertEquals(4, query.list().size());
@@ -118,8 +113,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     try {
       filterService.createFilterQuery().filterResourceType(null);
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
   }
@@ -147,8 +141,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     try {
       filterService.createFilterQuery().filterName(null);
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
   }
@@ -169,8 +162,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     try {
       filterService.createFilterQuery().filterOwner(null);
       fail("Exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
   }
@@ -206,26 +198,23 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
             hasProperty("id", equalTo(sortedIds.get(2))),
             hasProperty("id", equalTo(sortedIds.get(3)))));
 
-    assertEquals(4, filterService.createFilterQuery().orderByFilterResourceType().asc().list().size());
+    assertEquals(4,
+        filterService.createFilterQuery().orderByFilterResourceType().asc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterResourceType().asc().list(),
         contains(hasProperty("resourceType", equalTo(EntityTypes.TASK)),
-          hasProperty("resourceType", equalTo(EntityTypes.TASK)),
-          hasProperty("resourceType", equalTo(EntityTypes.TASK)),
-          hasProperty("resourceType", equalTo(EntityTypes.TASK))));
+            hasProperty("resourceType", equalTo(EntityTypes.TASK)),
+            hasProperty("resourceType", equalTo(EntityTypes.TASK)),
+            hasProperty("resourceType", equalTo(EntityTypes.TASK))));
 
     assertEquals(4, filterService.createFilterQuery().orderByFilterName().asc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterName().asc().list(),
-        contains(hasProperty("name", equalTo("a")),
-            hasProperty("name", equalTo("b")),
-            hasProperty("name", equalTo("c_")),
-            hasProperty("name", equalTo("d"))));
+        contains(hasProperty("name", equalTo("a")), hasProperty("name", equalTo("b")),
+            hasProperty("name", equalTo("c_")), hasProperty("name", equalTo("d"))));
 
     assertEquals(4, filterService.createFilterQuery().orderByFilterOwner().asc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterOwner().asc().list(),
-        contains(hasProperty("owner", equalTo("a")),
-            hasProperty("owner", equalTo("b")),
-            hasProperty("owner", equalTo("c")),
-            hasProperty("owner", equalTo("d"))));
+        contains(hasProperty("owner", equalTo("a")), hasProperty("owner", equalTo("b")),
+            hasProperty("owner", equalTo("c")), hasProperty("owner", equalTo("d"))));
 
     assertEquals(4, filterService.createFilterQuery().orderByFilterId().desc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterId().desc().list(),
@@ -234,56 +223,74 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
             hasProperty("id", equalTo(sortedIds.get(1))),
             hasProperty("id", equalTo(sortedIds.get(0)))));
 
-    assertEquals(4, filterService.createFilterQuery().orderByFilterResourceType().desc().list().size());
+    assertEquals(4,
+        filterService.createFilterQuery().orderByFilterResourceType().desc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterResourceType().desc().list(),
-      contains(hasProperty("resourceType", equalTo(EntityTypes.TASK)),
-        hasProperty("resourceType", equalTo(EntityTypes.TASK)),
-        hasProperty("resourceType", equalTo(EntityTypes.TASK)),
-        hasProperty("resourceType", equalTo(EntityTypes.TASK))));
+        contains(hasProperty("resourceType", equalTo(EntityTypes.TASK)),
+            hasProperty("resourceType", equalTo(EntityTypes.TASK)),
+            hasProperty("resourceType", equalTo(EntityTypes.TASK)),
+            hasProperty("resourceType", equalTo(EntityTypes.TASK))));
 
     assertEquals(4, filterService.createFilterQuery().orderByFilterName().desc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterName().desc().list(),
-        contains(hasProperty("name", equalTo("d")),
-            hasProperty("name", equalTo("c_")),
-            hasProperty("name", equalTo("b")),
-            hasProperty("name", equalTo("a"))));
+        contains(hasProperty("name", equalTo("d")), hasProperty("name", equalTo("c_")),
+            hasProperty("name", equalTo("b")), hasProperty("name", equalTo("a"))));
 
     assertEquals(4, filterService.createFilterQuery().orderByFilterOwner().desc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterOwner().desc().list(),
-        contains(hasProperty("name", equalTo("d")),
-            hasProperty("name", equalTo("c_")),
-            hasProperty("name", equalTo("b")),
-            hasProperty("name", equalTo("a"))));
+        contains(hasProperty("name", equalTo("d")), hasProperty("name", equalTo("c_")),
+            hasProperty("name", equalTo("b")), hasProperty("name", equalTo("a"))));
 
-    assertEquals(1, filterService.createFilterQuery().orderByFilterId().filterName("a").asc().list().size());
-    assertEquals(1, filterService.createFilterQuery().orderByFilterId().filterName("a").desc().list().size());
+    assertEquals(1,
+        filterService.createFilterQuery().orderByFilterId().filterName("a").asc().list().size());
+    assertEquals(1,
+        filterService.createFilterQuery().orderByFilterId().filterName("a").desc().list().size());
   }
 
   public void testNativeQuery() {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
     assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(Filter.class));
     assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(FilterEntity.class));
-    assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class)).list().size());
-    assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Filter.class)).count());
+    assertEquals(4, taskService.createNativeTaskQuery()
+        .sql("SELECT * FROM " + managementService.getTableName(Filter.class)).list().size());
+    assertEquals(4, taskService.createNativeTaskQuery()
+        .sql("SELECT count(*) FROM " + managementService.getTableName(Filter.class)).count());
 
-    assertEquals(16, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + tablePrefix + "ACT_RU_FILTER F1, " + tablePrefix + "ACT_RU_FILTER F2").count());
+    assertEquals(16, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + tablePrefix
+        + "ACT_RU_FILTER F1, " + tablePrefix + "ACT_RU_FILTER F2").count());
 
     // select with distinct
-    assertEquals(4, taskService.createNativeTaskQuery().sql("SELECT F1.* FROM "+ tablePrefix + "ACT_RU_FILTER F1").list().size());
+    assertEquals(4, taskService.createNativeTaskQuery()
+        .sql("SELECT F1.* FROM " + tablePrefix + "ACT_RU_FILTER F1").list().size());
 
-    assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = 'a'").count());
-    assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = 'a'").list().size());
+    assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM "
+        + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = 'a'").count());
+    assertEquals(1,
+        taskService
+            .createNativeTaskQuery().sql("SELECT * FROM "
+                + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = 'a'")
+            .list().size());
 
     // use parameters
-    assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = #{filterName}").parameter("filterName", "a").count());
+    assertEquals(1,
+        taskService
+            .createNativeTaskQuery().sql("SELECT count(*) FROM "
+                + managementService.getTableName(Filter.class) + " F WHERE F.NAME_ = #{filterName}")
+            .parameter("filterName", "a").count());
   }
 
   public void testNativeQueryPaging() {
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
     assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(Filter.class));
     assertEquals(tablePrefix + "ACT_RU_FILTER", managementService.getTableName(FilterEntity.class));
-    assertEquals(3, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class)).listPage(0, 3).size());
-    assertEquals(2, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Filter.class)).listPage(2, 2).size());
+    assertEquals(3,
+        taskService.createNativeTaskQuery()
+            .sql("SELECT * FROM " + managementService.getTableName(Filter.class)).listPage(0, 3)
+            .size());
+    assertEquals(2,
+        taskService.createNativeTaskQuery()
+            .sql("SELECT * FROM " + managementService.getTableName(Filter.class)).listPage(2, 2)
+            .size());
   }
 
 }

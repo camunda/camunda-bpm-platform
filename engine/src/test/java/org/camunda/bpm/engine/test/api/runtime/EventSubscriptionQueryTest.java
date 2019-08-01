@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 
-
 /**
  * @author Daniel Meyer
  */
@@ -44,8 +43,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
     createExampleEventSubscriptions();
 
     List<EventSubscription> list = runtimeService.createEventSubscriptionQuery()
-        .eventName("messageName2")
-        .list();
+        .eventName("messageName2").list();
     assertEquals(1, list.size());
 
     EventSubscription eventSubscription = list.get(0);
@@ -71,13 +69,10 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
     createExampleEventSubscriptions();
 
     List<EventSubscription> list = runtimeService.createEventSubscriptionQuery()
-      .eventName("messageName")
-      .list();
+        .eventName("messageName").list();
     assertEquals(2, list.size());
 
-    list = runtimeService.createEventSubscriptionQuery()
-      .eventName("messageName2")
-      .list();
+    list = runtimeService.createEventSubscriptionQuery().eventName("messageName2").list();
     assertEquals(1, list.size());
 
     try {
@@ -94,14 +89,11 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
 
     createExampleEventSubscriptions();
 
-    List<EventSubscription> list = runtimeService.createEventSubscriptionQuery()
-      .eventType("signal")
-      .list();
+    List<EventSubscription> list = runtimeService.createEventSubscriptionQuery().eventType("signal")
+        .list();
     assertEquals(1, list.size());
 
-    list = runtimeService.createEventSubscriptionQuery()
-      .eventType("message")
-      .list();
+    list = runtimeService.createEventSubscriptionQuery().eventType("message").list();
     assertEquals(2, list.size());
 
     try {
@@ -119,14 +111,11 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
     createExampleEventSubscriptions();
 
     List<EventSubscription> list = runtimeService.createEventSubscriptionQuery()
-      .activityId("someOtherActivity")
-      .list();
+        .activityId("someOtherActivity").list();
     assertEquals(1, list.size());
 
-    list = runtimeService.createEventSubscriptionQuery()
-      .activityId("someActivity")
-      .eventType("message")
-      .list();
+    list = runtimeService.createEventSubscriptionQuery().activityId("someActivity")
+        .eventType("message").list();
     assertEquals(2, list.size());
 
     try {
@@ -148,19 +137,15 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
 
     // test query by process instance id
     EventSubscription subscription = runtimeService.createEventSubscriptionQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId()).singleResult();
     assertNotNull(subscription);
 
     Execution executionWaitingForSignal = runtimeService.createExecutionQuery()
-      .activityId("signalEvent")
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .activityId("signalEvent").processInstanceId(processInstance.getId()).singleResult();
 
     // test query by execution id
     EventSubscription signalSubscription = runtimeService.createEventSubscriptionQuery()
-      .executionId(executionWaitingForSignal.getId())
-      .singleResult();
+        .executionId(executionWaitingForSignal.getId()).singleResult();
     assertNotNull(signalSubscription);
 
     assertEquals(signalSubscription, subscription);
@@ -177,11 +162,14 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQuerySorting() {
     createExampleEventSubscriptions();
-    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().orderByCreated().asc().list();
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery()
+        .orderByCreated().asc().list();
     Assert.assertEquals(3, eventSubscriptions.size());
 
-    Assert.assertTrue(eventSubscriptions.get(0).getCreated().compareTo(eventSubscriptions.get(1).getCreated()) < 0);
-    Assert.assertTrue(eventSubscriptions.get(1).getCreated().compareTo(eventSubscriptions.get(2).getCreated()) < 0);
+    Assert.assertTrue(eventSubscriptions.get(0).getCreated()
+        .compareTo(eventSubscriptions.get(1).getCreated()) < 0);
+    Assert.assertTrue(eventSubscriptions.get(1).getCreated()
+        .compareTo(eventSubscriptions.get(2).getCreated()) < 0);
 
     cleanDb();
   }
@@ -197,40 +185,43 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
     long eventSubscriptionCount = runtimeService.createEventSubscriptionQuery().count();
     assertEquals(2, eventSubscriptionCount);
 
-    EventSubscription messageEvent = runtimeService.createEventSubscriptionQuery().eventType("message").singleResult();
+    EventSubscription messageEvent = runtimeService.createEventSubscriptionQuery()
+        .eventType("message").singleResult();
     assertEquals(message, messageEvent.getEventName());
 
-    EventSubscription compensationEvent = runtimeService.createEventSubscriptionQuery().eventType("compensate").singleResult();
+    EventSubscription compensationEvent = runtimeService.createEventSubscriptionQuery()
+        .eventType("compensate").singleResult();
     assertNull(compensationEvent.getEventName());
 
-    runtimeService.createMessageCorrelation(message).processInstanceId(processInstance.getId()).correlate();
+    runtimeService.createMessageCorrelation(message).processInstanceId(processInstance.getId())
+        .correlate();
 
     assertProcessEnded(processInstance.getId());
   }
 
-
   protected void createExampleEventSubscriptions() {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-    .execute(new Command<Void>() {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
         Calendar calendar = new GregorianCalendar();
 
-
-        EventSubscriptionEntity messageEventSubscriptionEntity1 = new EventSubscriptionEntity(EventType.MESSAGE);
+        EventSubscriptionEntity messageEventSubscriptionEntity1 = new EventSubscriptionEntity(
+            EventType.MESSAGE);
         messageEventSubscriptionEntity1.setEventName("messageName");
         messageEventSubscriptionEntity1.setActivityId("someActivity");
         calendar.set(2001, 1, 1);
         messageEventSubscriptionEntity1.setCreated(calendar.getTime());
         messageEventSubscriptionEntity1.insert();
 
-        EventSubscriptionEntity messageEventSubscriptionEntity2 = new EventSubscriptionEntity(EventType.MESSAGE);
+        EventSubscriptionEntity messageEventSubscriptionEntity2 = new EventSubscriptionEntity(
+            EventType.MESSAGE);
         messageEventSubscriptionEntity2.setEventName("messageName");
         messageEventSubscriptionEntity2.setActivityId("someActivity");
         calendar.set(2000, 1, 1);
         messageEventSubscriptionEntity2.setCreated(calendar.getTime());
         messageEventSubscriptionEntity2.insert();
 
-        EventSubscriptionEntity signalEventSubscriptionEntity3 = new EventSubscriptionEntity(EventType.SIGNAL);
+        EventSubscriptionEntity signalEventSubscriptionEntity3 = new EventSubscriptionEntity(
+            EventType.SIGNAL);
         signalEventSubscriptionEntity3.setEventName("messageName2");
         signalEventSubscriptionEntity3.setActivityId("someOtherActivity");
         calendar.set(2002, 1, 1);
@@ -243,8 +234,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
   }
 
   protected void cleanDb() {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-    .execute(new Command<Void>() {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
         final List<EventSubscription> subscriptions = new EventSubscriptionQueryImpl().list();
         for (EventSubscription eventSubscriptionEntity : subscriptions) {
@@ -255,6 +245,5 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
     });
 
   }
-
 
 }

@@ -59,7 +59,6 @@ public class ExecutionTreeStructureAssertion implements ExecutionTreeAssertion {
       return false;
     }
 
-
     // match is scope
     if (expectedIsScope != null && !expectedIsScope.equals(tree.isScope())) {
       return false;
@@ -78,7 +77,8 @@ public class ExecutionTreeStructureAssertion implements ExecutionTreeAssertion {
       return false;
     }
 
-    List<ExecutionTreeStructureAssertion> unmatchedChildAssertions = new ArrayList<ExecutionTreeStructureAssertion>(childAssertions);
+    List<ExecutionTreeStructureAssertion> unmatchedChildAssertions = new ArrayList<ExecutionTreeStructureAssertion>(
+        childAssertions);
     for (ExecutionTree child : tree.getExecutions()) {
       for (ExecutionTreeStructureAssertion childAssertion : unmatchedChildAssertions) {
         if (childAssertion.matches(child)) {
@@ -107,7 +107,8 @@ public class ExecutionTreeStructureAssertion implements ExecutionTreeAssertion {
     }
   }
 
-  public static void describe(ExecutionTreeStructureAssertion assertion, String prefix, StringBuilder errorBuilder) {
+  public static void describe(ExecutionTreeStructureAssertion assertion, String prefix,
+      StringBuilder errorBuilder) {
     errorBuilder.append(prefix);
     errorBuilder.append(assertion);
     errorBuilder.append("\n");

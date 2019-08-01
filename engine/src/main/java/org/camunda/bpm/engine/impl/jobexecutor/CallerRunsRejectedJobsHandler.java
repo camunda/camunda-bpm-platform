@@ -26,7 +26,8 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
  */
 public class CallerRunsRejectedJobsHandler implements RejectedJobsHandler {
 
-  public void jobsRejected(List<String> jobIds, ProcessEngineImpl processEngine, JobExecutor jobExecutor) {
+  public void jobsRejected(List<String> jobIds, ProcessEngineImpl processEngine,
+      JobExecutor jobExecutor) {
     jobExecutor.getExecuteJobsRunnable(jobIds, processEngine).run();
   }
 

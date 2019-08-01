@@ -54,16 +54,15 @@ public class JobDefinitionRedeploymentTest {
 
   @Parameters(name = "{index}: process definition = {0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] { 
-        { "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testTimerStartEvent.bpmn20.xml" },
+    return Arrays.asList(new Object[][] { {
+        "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testTimerStartEvent.bpmn20.xml" },
         { "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testTimerBoundaryEvent.bpmn20.xml" },
         { "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testMultipleTimerBoundaryEvents.bpmn20.xml" },
         { "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testEventBasedGateway.bpmn20.xml" },
         { "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testTimerIntermediateEvent.bpmn20.xml" },
         { "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuation.bpmn20.xml" },
         { "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuationOfMultiInstance.bpmn20.xml" },
-        { "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuationOfActivityWrappedInMultiInstance.bpmn20.xml" } 
-    });
+        { "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuationOfActivityWrappedInMultiInstance.bpmn20.xml" } });
   }
 
   @Parameter
@@ -78,11 +77,12 @@ public class JobDefinitionRedeploymentTest {
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
-  public void initServices() {    
+  public void initServices() {
     managementService = rule.getManagementService();
     repositoryService = rule.getRepositoryService();
     runtimeService = rule.getRuntimeService();
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) rule.getProcessEngine().getProcessEngineConfiguration();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) rule.getProcessEngine()
+        .getProcessEngineConfiguration();
   }
 
   @Test
@@ -93,11 +93,10 @@ public class JobDefinitionRedeploymentTest {
 
     // initial deployment
     String deploymentId = repositoryService.createDeployment()
-                            .addClasspathResource(processDefinitionResource)
-                            .deploy()
-                            .getId();
+        .addClasspathResource(processDefinitionResource).deploy().getId();
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     assertNotNull(processDefinition);
 
     // this parses the process and created the Job definitions:

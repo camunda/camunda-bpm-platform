@@ -33,7 +33,6 @@ public class MessageCorrelationResultImpl implements MessageCorrelationResultWit
   protected ProcessInstance processInstance;
   protected VariableMap variables;
 
-
   public MessageCorrelationResultImpl(CorrelationHandlerResult handlerResult) {
     this.execution = handlerResult.getExecution();
     this.resultType = handlerResult.getResultType();

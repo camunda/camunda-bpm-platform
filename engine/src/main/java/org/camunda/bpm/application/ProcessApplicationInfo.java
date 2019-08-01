@@ -22,7 +22,9 @@ import java.util.Map;
 import org.camunda.bpm.ProcessApplicationService;
 
 /**
- * <p>Object holding information about a deployed Process Application</p>
+ * <p>
+ * Object holding information about a deployed Process Application
+ * </p>
  * 
  * @author Daniel Meyer
  * 
@@ -30,9 +32,9 @@ import org.camunda.bpm.ProcessApplicationService;
  *
  */
 public interface ProcessApplicationInfo {
-  
+
   /** constant for the servlet context path property */
-  public final static String PROP_SERVLET_CONTEXT_PATH = "servletContextPath";  
+  public final static String PROP_SERVLET_CONTEXT_PATH = "servletContextPath";
 
   /**
    * @return the name of the process application
@@ -40,20 +42,22 @@ public interface ProcessApplicationInfo {
   public String getName();
 
   /**
-   * @return a list of {@link ProcessApplicationDeploymentInfo} objects that
-   *         provide information about the deployments made by the process
-   *         application to the process engine(s).
+   * @return a list of {@link ProcessApplicationDeploymentInfo} objects that provide information
+   *         about the deployments made by the process application to the process engine(s).
    */
   public List<ProcessApplicationDeploymentInfo> getDeploymentInfo();
-  
+
   /**
-   * <p>Provides access to a list of process application-provided properties.</p>
+   * <p>
+   * Provides access to a list of process application-provided properties.
+   * </p>
    * 
-   * <p>This class provides a set of constants for commonly-used properties</p>
+   * <p>
+   * This class provides a set of constants for commonly-used properties
+   * </p>
    * 
    * @see ProcessApplicationInfo#PROP_SERVLET_CONTEXT_PATH
    */
   public Map<String, String> getProperties();
-  
 
 }

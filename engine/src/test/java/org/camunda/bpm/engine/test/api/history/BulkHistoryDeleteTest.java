@@ -126,59 +126,63 @@ public class BulkHistoryDeleteTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupHistoryTaskIdentityLink() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
     List<Task> taskList = taskService.createTaskQuery().list();
     taskService.addUserIdentityLink(taskList.get(0).getId(), "someUser", IdentityLinkType.ASSIGNEE);
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey(ONE_TASK_PROCESS).count());
     assertEquals(0, historyService.createHistoricIdentityLinkLogQuery().count());
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupHistoryActivityInstances() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey(ONE_TASK_PROCESS).count());
     assertEquals(0, historyService.createHistoricActivityInstanceQuery().count());
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupTaskAttachmentWithContent() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
 
     List<Task> taskList = taskService.createTaskQuery().list();
 
     String taskWithAttachmentId = taskList.get(0).getId();
     createTaskAttachmentWithContent(taskWithAttachmentId);
-    //remember contentId
-    final String contentId = findAttachmentContentId(taskService.getTaskAttachments(taskWithAttachmentId));
+    // remember contentId
+    final String contentId = findAttachmentContentId(
+        taskService.getTaskAttachments(taskWithAttachmentId));
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey(ONE_TASK_PROCESS).count());
     assertEquals(0, taskService.getTaskAttachments(taskWithAttachmentId).size());
-    //check that attachment content was removed
+    // check that attachment content was removed
     verifyByteArraysWereRemoved(contentId);
   }
 
@@ -190,29 +194,32 @@ public class BulkHistoryDeleteTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupProcessInstanceAttachmentWithContent() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
 
     String processInstanceWithAttachmentId = ids.get(0);
     createProcessInstanceAttachmentWithContent(processInstanceWithAttachmentId);
-    //remember contentId
-    final String contentId = findAttachmentContentId(taskService.getProcessInstanceAttachments(processInstanceWithAttachmentId));
+    // remember contentId
+    final String contentId = findAttachmentContentId(
+        taskService.getProcessInstanceAttachments(processInstanceWithAttachmentId));
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
-    assertEquals(0, taskService.getProcessInstanceAttachments(processInstanceWithAttachmentId).size());
-    //check that attachment content was removed
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertEquals(0,
+        taskService.getProcessInstanceAttachments(processInstanceWithAttachmentId).size());
+    // check that attachment content was removed
     verifyByteArraysWereRemoved(contentId);
   }
 
   private void createProcessInstanceAttachmentWithContent(String processInstanceId) {
-    taskService
-        .createAttachment("web page", null, processInstanceId, "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+    taskService.createAttachment("web page", null, processInstanceId, "weatherforcast",
+        "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
 
     List<Attachment> taskAttachments = taskService.getProcessInstanceAttachments(processInstanceId);
     assertEquals(1, taskAttachments.size());
@@ -220,7 +227,8 @@ public class BulkHistoryDeleteTest {
   }
 
   private void createTaskAttachmentWithContent(String taskId) {
-    taskService.createAttachment("web page", taskId, null, "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+    taskService.createAttachment("web page", taskId, null, "weatherforcast",
+        "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
 
     List<Attachment> taskAttachments = taskService.getTaskAttachments(taskId);
     assertEquals(1, taskAttachments.size());
@@ -230,7 +238,7 @@ public class BulkHistoryDeleteTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupTaskComment() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
 
     List<Task> taskList = taskService.createTaskQuery().list();
@@ -240,18 +248,19 @@ public class BulkHistoryDeleteTest {
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey(ONE_TASK_PROCESS).count());
     assertEquals(0, taskService.getTaskComments(taskWithCommentId).size());
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupProcessInstanceComment() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
 
     String processInstanceWithCommentId = ids.get(0);
@@ -259,19 +268,19 @@ public class BulkHistoryDeleteTest {
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey(ONE_TASK_PROCESS).count());
     assertEquals(0, taskService.getProcessInstanceComments(processInstanceWithCommentId).size());
   }
 
   @Test
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupHistoricVariableInstancesAndHistoricDetails() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
 
     List<Task> taskList = taskService.createTaskQuery().list();
@@ -280,11 +289,12 @@ public class BulkHistoryDeleteTest {
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey(ONE_TASK_PROCESS).count());
     assertEquals(0, historyService.createHistoricDetailQuery().count());
     assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
   }
@@ -292,7 +302,7 @@ public class BulkHistoryDeleteTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupHistoryTaskForm() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
 
     List<Task> taskList = taskService.createTaskQuery().list();
@@ -303,11 +313,12 @@ public class BulkHistoryDeleteTest {
       runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), null);
     }
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey(ONE_TASK_PROCESS).count());
     assertEquals(0, historyService.createHistoricDetailQuery().count());
     assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
   }
@@ -315,52 +326,58 @@ public class BulkHistoryDeleteTest {
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testCleanupHistoricExternalTaskLog() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses("oneExternalTaskProcess");
 
     String workerId = "aWrokerId";
-    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(1, workerId).topic("externalTaskTopic", 10000L).execute();
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(1, workerId)
+        .topic("externalTaskTopic", 10000L).execute();
 
-    externalTaskService.handleFailure(tasks.get(0).getId(), workerId, "errorMessage", "exceptionStackTrace", 5, 3000L);
+    externalTaskService.handleFailure(tasks.get(0).getId(), workerId, "errorMessage",
+        "exceptionStackTrace", 5, 3000L);
 
-    //remember errorDetailsByteArrayId
+    // remember errorDetailsByteArrayId
     final String errorDetailsByteArrayId = findErrorDetailsByteArrayId("errorMessage");
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey(ONE_TASK_PROCESS).count());
     assertEquals(0, historyService.createHistoricExternalTaskLogQuery().count());
-    //check that ByteArray was removed
+    // check that ByteArray was removed
     verifyByteArraysWereRemoved(errorDetailsByteArrayId);
   }
 
   private String findErrorDetailsByteArrayId(String errorMessage) {
-    final List<HistoricExternalTaskLog> historicExternalTaskLogs = historyService.createHistoricExternalTaskLogQuery().errorMessage(errorMessage).list();
+    final List<HistoricExternalTaskLog> historicExternalTaskLogs = historyService
+        .createHistoricExternalTaskLogQuery().errorMessage(errorMessage).list();
     assertEquals(1, historicExternalTaskLogs.size());
 
-    return ((HistoricExternalTaskLogEntity) historicExternalTaskLogs.get(0)).getErrorDetailsByteArrayId();
+    return ((HistoricExternalTaskLogEntity) historicExternalTaskLogs.get(0))
+        .getErrorDetailsByteArrayId();
   }
 
   @Test
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
   public void testCleanupHistoricIncidents() {
-    //given
+    // given
     List<String> ids = prepareHistoricProcesses("failingProcess");
 
     testRule.executeAvailableJobs();
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("failingProcess").count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey("failingProcess").count());
     assertEquals(0, historyService.createHistoricIncidentQuery().count());
 
   }
@@ -369,7 +386,7 @@ public class BulkHistoryDeleteTest {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
   public void testCleanupHistoricJobLogs() {
-    //given
+    // given
     List<String> ids = prepareHistoricProcesses("failingProcess", null, 1);
 
     testRule.executeAvailableJobs();
@@ -378,11 +395,12 @@ public class BulkHistoryDeleteTest {
 
     List<String> byteArrayIds = findExceptionByteArrayIds();
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("failingProcess").count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey("failingProcess").count());
     assertEquals(0, historyService.createHistoricJobLogQuery().count());
 
     verifyByteArraysWereRemoved(byteArrayIds.toArray(new String[] {}));
@@ -401,16 +419,19 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
   public void testCleanupHistoryDecisionData() {
-    //given
-    List<String> ids = prepareHistoricProcesses("testProcess", Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
+    // given
+    List<String> ids = prepareHistoricProcesses("testProcess",
+        Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
-    //remember input and output ids
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().list();
+    // remember input and output ids
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().list();
     final List<String> inputIds = new ArrayList<String>();
     final List<String> inputByteArrayIds = new ArrayList<String>();
     collectHistoricDecisionInputIds(historicDecisionInstances, inputIds, inputByteArrayIds);
@@ -419,20 +440,18 @@ public class BulkHistoryDeleteTest {
     final List<String> outputByteArrayIds = new ArrayList<String>();
     collectHistoricDecisionOutputIds(historicDecisionInstances, outputIds, outputByteArrayIds);
 
-    //when
+    // when
     historyService.deleteHistoricDecisionInstancesBulk(extractIds(historicDecisionInstances));
 
-    //then
+    // then
     assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
 
-    //check that decision inputs and outputs were removed
+    // check that decision inputs and outputs were removed
     assertDataDeleted(inputIds, inputByteArrayIds, outputIds, outputByteArrayIds);
 
-
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
-      .operationType(OPERATION_TYPE_DELETE_HISTORY)
-      .property("nrOfInstances")
-      .list();
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+        .createUserOperationLogQuery().operationType(OPERATION_TYPE_DELETE_HISTORY)
+        .property("nrOfInstances").list();
 
     assertEquals(1, userOperationLogEntries.size());
 
@@ -442,50 +461,59 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
   public void testCleanupFakeHistoryDecisionData() {
-    //given
+    // given
     List<String> ids = Arrays.asList("aFake");
 
-    //when
+    // when
     historyService.deleteHistoricDecisionInstancesBulk(ids);
 
-    //then expect no exception
+    // then expect no exception
     assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
   }
 
-  void assertDataDeleted(final List<String> inputIds, final List<String> inputByteArrayIds, final List<String> outputIds,
-    final List<String> outputByteArrayIds) {
-    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        for (String inputId : inputIds) {
-          assertNull(commandContext.getDbEntityManager().selectById(HistoricDecisionInputInstanceEntity.class, inputId));
-        }
-        for (String inputByteArrayId : inputByteArrayIds) {
-          assertNull(commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, inputByteArrayId));
-        }
-        for (String outputId : outputIds) {
-          assertNull(commandContext.getDbEntityManager().selectById(HistoricDecisionOutputInstanceEntity.class, outputId));
-        }
-        for (String outputByteArrayId : outputByteArrayIds) {
-          assertNull(commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, outputByteArrayId));
-        }
-        return null;
-      }
-    });
+  void assertDataDeleted(final List<String> inputIds, final List<String> inputByteArrayIds,
+      final List<String> outputIds, final List<String> outputByteArrayIds) {
+    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new Command<Void>() {
+          public Void execute(CommandContext commandContext) {
+            for (String inputId : inputIds) {
+              assertNull(commandContext.getDbEntityManager()
+                  .selectById(HistoricDecisionInputInstanceEntity.class, inputId));
+            }
+            for (String inputByteArrayId : inputByteArrayIds) {
+              assertNull(commandContext.getDbEntityManager().selectById(ByteArrayEntity.class,
+                  inputByteArrayId));
+            }
+            for (String outputId : outputIds) {
+              assertNull(commandContext.getDbEntityManager()
+                  .selectById(HistoricDecisionOutputInstanceEntity.class, outputId));
+            }
+            for (String outputByteArrayId : outputByteArrayIds) {
+              assertNull(commandContext.getDbEntityManager().selectById(ByteArrayEntity.class,
+                  outputByteArrayId));
+            }
+            return null;
+          }
+        });
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
   public void testCleanupHistoryStandaloneDecisionData() {
-    //given
+    // given
     for (int i = 0; i < 5; i++) {
-      engineRule.getDecisionService().evaluateDecisionByKey("testDecision").variables(Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37))).evaluate();
+      engineRule.getDecisionService().evaluateDecisionByKey("testDecision")
+          .variables(Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)))
+          .evaluate();
     }
 
-    //remember input and output ids
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().list();
+    // remember input and output ids
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().list();
     final List<String> inputIds = new ArrayList<String>();
     final List<String> inputByteArrayIds = new ArrayList<String>();
     collectHistoricDecisionInputIds(historicDecisionInstances, inputIds, inputByteArrayIds);
@@ -496,21 +524,22 @@ public class BulkHistoryDeleteTest {
 
     List<String> decisionInstanceIds = extractIds(historicDecisionInstances);
 
-    //when
+    // when
     historyService.deleteHistoricDecisionInstancesBulk(decisionInstanceIds);
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("testProcess").count());
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+        .processDefinitionKey("testProcess").count());
     assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
 
-    //check that decision inputs and outputs were removed
+    // check that decision inputs and outputs were removed
     assertDataDeleted(inputIds, inputByteArrayIds, outputIds, outputByteArrayIds);
 
   }
 
   private List<String> extractIds(List<HistoricDecisionInstance> historicDecisionInstances) {
     List<String> decisionInstanceIds = new ArrayList<String>();
-    for (HistoricDecisionInstance historicDecisionInstance: historicDecisionInstances) {
+    for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
       decisionInstanceIds.add(historicDecisionInstance.getId());
     }
     return decisionInstanceIds;
@@ -519,7 +548,7 @@ public class BulkHistoryDeleteTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupHistoryEmptyProcessIdsException() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
@@ -540,7 +569,7 @@ public class BulkHistoryDeleteTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupHistoryProcessesNotFinishedException() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
     runtimeService.deleteProcessInstances(ids.subList(1, ids.size()), null, true, true);
 
@@ -552,11 +581,15 @@ public class BulkHistoryDeleteTest {
 
   }
 
-  private void collectHistoricDecisionInputIds(List<HistoricDecisionInstance> historicDecisionInstances, List<String> historicDecisionInputIds, List<String> inputByteArrayIds) {
+  private void collectHistoricDecisionInputIds(
+      List<HistoricDecisionInstance> historicDecisionInstances,
+      List<String> historicDecisionInputIds, List<String> inputByteArrayIds) {
     for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
-      for (HistoricDecisionInputInstance inputInstanceEntity : historicDecisionInstance.getInputs()) {
+      for (HistoricDecisionInputInstance inputInstanceEntity : historicDecisionInstance
+          .getInputs()) {
         historicDecisionInputIds.add(inputInstanceEntity.getId());
-        final String byteArrayValueId = ((HistoricDecisionInputInstanceEntity) inputInstanceEntity).getByteArrayValueId();
+        final String byteArrayValueId = ((HistoricDecisionInputInstanceEntity) inputInstanceEntity)
+            .getByteArrayValueId();
         if (byteArrayValueId != null) {
           inputByteArrayIds.add(byteArrayValueId);
         }
@@ -565,11 +598,15 @@ public class BulkHistoryDeleteTest {
     assertEquals(PROCESS_INSTANCE_COUNT, historicDecisionInputIds.size());
   }
 
-  private void collectHistoricDecisionOutputIds(List<HistoricDecisionInstance> historicDecisionInstances, List<String> historicDecisionOutputIds, List<String> outputByteArrayId) {
+  private void collectHistoricDecisionOutputIds(
+      List<HistoricDecisionInstance> historicDecisionInstances,
+      List<String> historicDecisionOutputIds, List<String> outputByteArrayId) {
     for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
-      for (HistoricDecisionOutputInstance outputInstanceEntity : historicDecisionInstance.getOutputs()) {
+      for (HistoricDecisionOutputInstance outputInstanceEntity : historicDecisionInstance
+          .getOutputs()) {
         historicDecisionOutputIds.add(outputInstanceEntity.getId());
-        final String byteArrayValueId = ((HistoricDecisionOutputInstanceEntity) outputInstanceEntity).getByteArrayValueId();
+        final String byteArrayValueId = ((HistoricDecisionOutputInstanceEntity) outputInstanceEntity)
+            .getByteArrayValueId();
         if (byteArrayValueId != null) {
           outputByteArrayId.add(byteArrayValueId);
         }
@@ -590,11 +627,13 @@ public class BulkHistoryDeleteTest {
     return prepareHistoricProcesses(businessKey, variables, PROCESS_INSTANCE_COUNT);
   }
 
-  private List<String> prepareHistoricProcesses(String businessKey, VariableMap variables, Integer processInstanceCount) {
+  private List<String> prepareHistoricProcesses(String businessKey, VariableMap variables,
+      Integer processInstanceCount) {
     List<String> processInstanceIds = new ArrayList<String>();
 
     for (int i = 0; i < processInstanceCount; i++) {
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(businessKey, variables);
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(businessKey,
+          variables);
       processInstanceIds.add(processInstance.getId());
     }
 
@@ -602,19 +641,20 @@ public class BulkHistoryDeleteTest {
   }
 
   private void verifyByteArraysWereRemoved(final String... errorDetailsByteArrayIds) {
-    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        for (String errorDetailsByteArrayId : errorDetailsByteArrayIds) {
-          assertNull(commandContext.getDbEntityManager().selectOne("selectByteArray", errorDetailsByteArrayId));
-        }
-        return null;
-      }
-    });
+    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new Command<Void>() {
+          public Void execute(CommandContext commandContext) {
+            for (String errorDetailsByteArrayId : errorDetailsByteArrayIds) {
+              assertNull(commandContext.getDbEntityManager().selectOne("selectByteArray",
+                  errorDetailsByteArrayId));
+            }
+            return null;
+          }
+        });
   }
 
   private VariableMap getVariables() {
-    return Variables.createVariables()
-        .putValue("aVariableName", "aVariableValue")
+    return Variables.createVariables().putValue("aVariableName", "aVariableValue")
         .putValue("pojoVariableName", new TestPojo("someValue", 111.));
   }
 
@@ -627,7 +667,8 @@ public class BulkHistoryDeleteTest {
     List<String> caseInstanceIds = prepareHistoricCaseInstance(instanceCount);
 
     // assume
-    List<HistoricCaseInstance> caseInstanceList = historyService.createHistoricCaseInstanceQuery().list();
+    List<HistoricCaseInstance> caseInstanceList = historyService.createHistoricCaseInstanceQuery()
+        .list();
     assertEquals(instanceCount, caseInstanceList.size());
 
     // when
@@ -647,7 +688,8 @@ public class BulkHistoryDeleteTest {
     terminateAndCloseCaseInstance(caseInstanceId, null);
 
     // assume
-    List<HistoricCaseActivityInstance> activityInstances = historyService.createHistoricCaseActivityInstanceQuery().list();
+    List<HistoricCaseActivityInstance> activityInstances = historyService
+        .createHistoricCaseActivityInstanceQuery().list();
     assertEquals(1, activityInstances.size());
 
     // when
@@ -667,7 +709,8 @@ public class BulkHistoryDeleteTest {
     terminateAndCloseCaseInstance(caseInstanceId, null);
 
     // assume
-    List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+    List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery()
+        .list();
     assertEquals(1, taskInstances.size());
 
     // when
@@ -714,7 +757,6 @@ public class BulkHistoryDeleteTest {
     taskService.setVariable(task.getId(), "goo", 9);
     taskService.setVariable(task.getId(), "boo", new TestPojo("foo", 321.0));
 
-
     // assume
     List<HistoricDetail> detailsList = historyService.createHistoricDetailQuery().list();
     assertEquals(3, detailsList.size());
@@ -747,7 +789,8 @@ public class BulkHistoryDeleteTest {
     historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstanceId));
 
     // then
-    List<HistoricIdentityLinkLog> historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().list();
+    List<HistoricIdentityLinkLog> historicIdentityLinkLog = historyService
+        .createHistoricIdentityLinkLogQuery().list();
     assertEquals(0, historicIdentityLinkLog.size());
   }
 
@@ -760,7 +803,8 @@ public class BulkHistoryDeleteTest {
 
     Task task = taskService.createTaskQuery().singleResult();
     String taskId = task.getId();
-    taskService.createAttachment("foo", taskId, null, "something", null, new ByteArrayInputStream("someContent".getBytes()));
+    taskService.createAttachment("foo", taskId, null, "something", null,
+        new ByteArrayInputStream("someContent".getBytes()));
 
     // assume
     List<Attachment> attachments = taskService.getTaskAttachments(taskId);
@@ -785,7 +829,8 @@ public class BulkHistoryDeleteTest {
     String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
 
     Task task = taskService.createTaskQuery().singleResult();
-    taskService.createAttachment("foo", task.getId(), null, "something", null, "http://camunda.org");
+    taskService.createAttachment("foo", task.getId(), null, "something", null,
+        "http://camunda.org");
 
     // assume
     List<Attachment> attachments = taskService.getTaskAttachments(task.getId());
@@ -809,12 +854,14 @@ public class BulkHistoryDeleteTest {
     int instanceCount = 10;
     for (int i = 0; i < instanceCount; i++) {
       VariableMap variables = Variables.createVariables();
-      CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase", variables.putValue("name" + i, "theValue"));
+      CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase",
+          variables.putValue("name" + i, "theValue"));
       caseInstanceIds.add(caseInstance.getId());
       terminateAndCloseCaseInstance(caseInstance.getId(), variables);
     }
     // assume
-    List<HistoricVariableInstance> variablesInstances = historyService.createHistoricVariableInstanceQuery().list();
+    List<HistoricVariableInstance> variablesInstances = historyService
+        .createHistoricVariableInstanceQuery().list();
     assertEquals(instanceCount, variablesInstances.size());
 
     // when
@@ -831,12 +878,14 @@ public class BulkHistoryDeleteTest {
     // given
     // create case instances
     VariableMap variables = Variables.createVariables();
-    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase", variables.putValue("pojo", new TestPojo("okay", 13.37)));
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase",
+        variables.putValue("pojo", new TestPojo("okay", 13.37)));
 
     caseService.setVariable(caseInstance.getId(), "pojo", "theValue");
 
     // assume
-    List<HistoricVariableInstance> variablesInstances = historyService.createHistoricVariableInstanceQuery().list();
+    List<HistoricVariableInstance> variablesInstances = historyService
+        .createHistoricVariableInstanceQuery().list();
     assertEquals(1, variablesInstances.size());
     List<HistoricDetail> detailsList = historyService.createHistoricDetailQuery().list();
     assertEquals(2, detailsList.size());
@@ -858,21 +907,26 @@ public class BulkHistoryDeleteTest {
     // given
     // create case instances
     String variableNameCase1 = "varName1";
-    CaseInstance caseInstance1 = caseService.createCaseInstanceByKey("oneTaskCase", Variables.createVariables().putValue(variableNameCase1, "value1"));
-    CaseInstance caseInstance2 = caseService.createCaseInstanceByKey("oneTaskCase", Variables.createVariables().putValue("varName2", "value2"));
+    CaseInstance caseInstance1 = caseService.createCaseInstanceByKey("oneTaskCase",
+        Variables.createVariables().putValue(variableNameCase1, "value1"));
+    CaseInstance caseInstance2 = caseService.createCaseInstanceByKey("oneTaskCase",
+        Variables.createVariables().putValue("varName2", "value2"));
 
     caseService.setVariable(caseInstance1.getId(), variableNameCase1, "theValue");
 
     // assume
     List<HistoricDetail> detailsList = historyService.createHistoricDetailQuery().list();
     assertEquals(3, detailsList.size());
-    caseService.terminateCaseExecution(caseInstance1.getId(), caseService.getVariables(caseInstance1.getId()));
-    caseService.terminateCaseExecution(caseInstance2.getId(), caseService.getVariables(caseInstance2.getId()));
+    caseService.terminateCaseExecution(caseInstance1.getId(),
+        caseService.getVariables(caseInstance1.getId()));
+    caseService.terminateCaseExecution(caseInstance2.getId(),
+        caseService.getVariables(caseInstance2.getId()));
     caseService.closeCaseInstance(caseInstance1.getId());
     caseService.closeCaseInstance(caseInstance2.getId());
 
     // when
-    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance1.getId(), caseInstance2.getId()));
+    historyService.deleteHistoricCaseInstancesBulk(
+        Arrays.asList(caseInstance1.getId(), caseInstance2.getId()));
 
     // then
     detailsList = historyService.createHistoricDetailQuery().list();
@@ -888,7 +942,8 @@ public class BulkHistoryDeleteTest {
     List<String> caseInstanceIds = prepareHistoricCaseInstance(instanceCount);
 
     // assume
-    List<HistoricCaseInstance> caseInstanceList = historyService.createHistoricCaseInstanceQuery().list();
+    List<HistoricCaseInstance> caseInstanceList = historyService.createHistoricCaseInstanceQuery()
+        .list();
     assertEquals(instanceCount, caseInstanceList.size());
 
     // when
@@ -897,8 +952,10 @@ public class BulkHistoryDeleteTest {
     identityService.clearAuthentication();
 
     // then
-    assertEquals(1, historyService.createUserOperationLogQuery().operationType(OPERATION_TYPE_DELETE_HISTORY).count());
-    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().operationType(OPERATION_TYPE_DELETE_HISTORY).singleResult();
+    assertEquals(1, historyService.createUserOperationLogQuery()
+        .operationType(OPERATION_TYPE_DELETE_HISTORY).count());
+    UserOperationLogEntry entry = historyService.createUserOperationLogQuery()
+        .operationType(OPERATION_TYPE_DELETE_HISTORY).singleResult();
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, entry.getCategory());
     assertEquals(EntityTypes.CASE_INSTANCE, entry.getEntityType());
     assertEquals(OPERATION_TYPE_DELETE_HISTORY, entry.getOperationType());
@@ -920,9 +977,9 @@ public class BulkHistoryDeleteTest {
   }
 
   private void terminateAndCloseCaseInstance(String caseInstanceId, Map<String, Object> variables) {
-    if (variables==null) {
+    if (variables == null) {
       caseService.terminateCaseExecution(caseInstanceId, variables);
-    }else {
+    } else {
       caseService.terminateCaseExecution(caseInstanceId);
     }
     caseService.closeCaseInstance(caseInstanceId);

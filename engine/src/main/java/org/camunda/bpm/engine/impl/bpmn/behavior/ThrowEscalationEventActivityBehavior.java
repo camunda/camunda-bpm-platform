@@ -50,8 +50,10 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
   public void execute(ActivityExecution execution) throws Exception {
     final PvmActivity currentActivity = execution.getActivity();
 
-    final EscalationEventDefinitionFinder escalationEventDefinitionFinder = new EscalationEventDefinitionFinder(escalation.getEscalationCode(), currentActivity);
-    ActivityExecutionMappingCollector activityExecutionMappingCollector = new ActivityExecutionMappingCollector(execution);
+    final EscalationEventDefinitionFinder escalationEventDefinitionFinder = new EscalationEventDefinitionFinder(
+        escalation.getEscalationCode(), currentActivity);
+    ActivityExecutionMappingCollector activityExecutionMappingCollector = new ActivityExecutionMappingCollector(
+        execution);
 
     ActivityExecutionHierarchyWalker walker = new ActivityExecutionHierarchyWalker(execution);
     walker.addScopePreVisitor(escalationEventDefinitionFinder);
@@ -62,11 +64,13 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
 
       @Override
       public boolean isFulfilled(ActivityExecutionTuple element) {
-        return escalationEventDefinitionFinder.getEscalationEventDefinition() != null || element == null;
+        return escalationEventDefinitionFinder.getEscalationEventDefinition() != null
+            || element == null;
       }
     });
 
-    EscalationEventDefinition escalationEventDefinition = escalationEventDefinitionFinder.getEscalationEventDefinition();
+    EscalationEventDefinition escalationEventDefinition = escalationEventDefinitionFinder
+        .getEscalationEventDefinition();
     if (escalationEventDefinition != null) {
       executeEscalationHandler(escalationEventDefinition, activityExecutionMappingCollector);
     }
@@ -76,14 +80,17 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
     }
   }
 
-  protected void executeEscalationHandler(EscalationEventDefinition escalationEventDefinition, ActivityExecutionMappingCollector activityExecutionMappingCollector) {
+  protected void executeEscalationHandler(EscalationEventDefinition escalationEventDefinition,
+      ActivityExecutionMappingCollector activityExecutionMappingCollector) {
 
     PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
     PvmScope escalationScope = getScopeForEscalation(escalationEventDefinition);
-    ActivityExecution escalationExecution = activityExecutionMappingCollector.getExecutionForScope(escalationScope);
+    ActivityExecution escalationExecution = activityExecutionMappingCollector
+        .getExecutionForScope(escalationScope);
 
     if (escalationEventDefinition.getEscalationCodeVariable() != null) {
-      escalationExecution.setVariable(escalationEventDefinition.getEscalationCodeVariable(), escalation.getEscalationCode());
+      escalationExecution.setVariable(escalationEventDefinition.getEscalationCodeVariable(),
+          escalation.getEscalationCode());
     }
 
     escalationExecution.executeActivity(escalationHandler);
@@ -98,12 +105,15 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
     }
   }
 
-  protected void leaveExecution(ActivityExecution execution, final PvmActivity currentActivity, EscalationEventDefinition escalationEventDefinition) {
+  protected void leaveExecution(ActivityExecution execution, final PvmActivity currentActivity,
+      EscalationEventDefinition escalationEventDefinition) {
 
     // execution tree could have been expanded by triggering a non-interrupting event
     ExecutionEntity replacingExecution = ((ExecutionEntity) execution).getReplacedBy();
 
-    ExecutionEntity leavingExecution = (ExecutionEntity) (replacingExecution != null ? replacingExecution : execution);
+    ExecutionEntity leavingExecution = (ExecutionEntity) (replacingExecution != null
+        ? replacingExecution
+        : execution);
     leave(leavingExecution);
   }
 
@@ -114,34 +124,42 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
     protected final String escalationCode;
     protected final PvmActivity throwEscalationActivity;
 
-    public EscalationEventDefinitionFinder(String escalationCode, PvmActivity throwEscalationActivity) {
+    public EscalationEventDefinitionFinder(String escalationCode,
+        PvmActivity throwEscalationActivity) {
       this.escalationCode = escalationCode;
       this.throwEscalationActivity = throwEscalationActivity;
     }
 
     @Override
     public void visit(PvmScope scope) {
-      List<EscalationEventDefinition> escalationEventDefinitions = scope.getProperties().get(BpmnProperties.ESCALATION_EVENT_DEFINITIONS);
-      this.escalationEventDefinition = findMatchingEscalationEventDefinition(escalationEventDefinitions);
+      List<EscalationEventDefinition> escalationEventDefinitions = scope.getProperties()
+          .get(BpmnProperties.ESCALATION_EVENT_DEFINITIONS);
+      this.escalationEventDefinition = findMatchingEscalationEventDefinition(
+          escalationEventDefinitions);
     }
 
-    protected EscalationEventDefinition findMatchingEscalationEventDefinition(List<EscalationEventDefinition> escalationEventDefinitions) {
+    protected EscalationEventDefinition findMatchingEscalationEventDefinition(
+        List<EscalationEventDefinition> escalationEventDefinitions) {
       for (EscalationEventDefinition escalationEventDefinition : escalationEventDefinitions) {
-        if (isMatchingEscalationCode(escalationEventDefinition) && !isReThrowingEscalationEventSubprocess(escalationEventDefinition)) {
+        if (isMatchingEscalationCode(escalationEventDefinition)
+            && !isReThrowingEscalationEventSubprocess(escalationEventDefinition)) {
           return escalationEventDefinition;
         }
       }
       return null;
     }
 
-    protected boolean isMatchingEscalationCode(EscalationEventDefinition escalationEventDefinition) {
+    protected boolean isMatchingEscalationCode(
+        EscalationEventDefinition escalationEventDefinition) {
       String escalationCode = escalationEventDefinition.getEscalationCode();
       return escalationCode == null || escalationCode.equals(this.escalationCode);
     }
 
-    protected boolean isReThrowingEscalationEventSubprocess(EscalationEventDefinition escalationEventDefinition) {
+    protected boolean isReThrowingEscalationEventSubprocess(
+        EscalationEventDefinition escalationEventDefinition) {
       PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
-      return escalationHandler.isSubProcessScope() && escalationHandler.equals(throwEscalationActivity.getFlowScope());
+      return escalationHandler.isSubProcessScope()
+          && escalationHandler.equals(throwEscalationActivity.getFlowScope());
     }
 
     public EscalationEventDefinition getEscalationEventDefinition() {

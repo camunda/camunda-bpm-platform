@@ -40,14 +40,17 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     createAuthorization("user1", null, resource1, "resource1-1", TestPermissions.ACCESS);
     createAuthorization("user1", null, resource2, "resource2-1", TestPermissions.DELETE);
     createAuthorization("user2", null, resource1, "resource1-2");
-    createAuthorization("user3", null, resource2, "resource2-1", TestPermissions.READ, TestPermissions.UPDATE);
+    createAuthorization("user3", null, resource2, "resource2-1", TestPermissions.READ,
+        TestPermissions.UPDATE);
 
     createAuthorization(null, "group1", resource1, "resource1-1");
     createAuthorization(null, "group1", resource1, "resource1-2", TestPermissions.UPDATE);
-    createAuthorization(null, "group2", resource2, "resource2-2", TestPermissions.READ, TestPermissions.UPDATE);
+    createAuthorization(null, "group2", resource2, "resource2-2", TestPermissions.READ,
+        TestPermissions.UPDATE);
     createAuthorization(null, "group3", resource2, "resource2-3", TestPermissions.DELETE);
 
   }
+
   protected void tearDown() throws Exception {
     List<Authorization> list = authorizationService.createAuthorizationQuery().list();
     for (Authorization authorization : list) {
@@ -56,9 +59,11 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     super.tearDown();
   }
 
-  protected void createAuthorization(String userId, String groupId, Resource resourceType, String resourceId, Permission... permissions) {
+  protected void createAuthorization(String userId, String groupId, Resource resourceType,
+      String resourceId, Permission... permissions) {
 
-    Authorization authorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    Authorization authorization = authorizationService
+        .createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
     authorization.setUserId(userId);
     authorization.setGroupId(groupId);
     authorization.setResource(resourceType);
@@ -81,43 +86,64 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(2, authorizationService.createAuthorizationQuery().userIdIn("user1").count());
     assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn("user2").count());
     assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn("user3").count());
-    assertEquals(3, authorizationService.createAuthorizationQuery().userIdIn("user1", "user2").count());
-    assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn("non-existing").count());
+    assertEquals(3,
+        authorizationService.createAuthorizationQuery().userIdIn("user1", "user2").count());
+    assertEquals(0,
+        authorizationService.createAuthorizationQuery().userIdIn("non-existing").count());
 
     // query by group id
     assertEquals(2, authorizationService.createAuthorizationQuery().groupIdIn("group1").count());
     assertEquals(1, authorizationService.createAuthorizationQuery().groupIdIn("group2").count());
     assertEquals(1, authorizationService.createAuthorizationQuery().groupIdIn("group3").count());
-    assertEquals(3, authorizationService.createAuthorizationQuery().groupIdIn("group1", "group2").count());
-    assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("non-existing").count());
+    assertEquals(3,
+        authorizationService.createAuthorizationQuery().groupIdIn("group1", "group2").count());
+    assertEquals(0,
+        authorizationService.createAuthorizationQuery().groupIdIn("non-existing").count());
 
     // query by resource type
-    assertEquals(4, authorizationService.createAuthorizationQuery().resourceType(resource1).count());
-    assertEquals(0, authorizationService.createAuthorizationQuery().resourceType(nonExisting).count());
-    assertEquals(4, authorizationService.createAuthorizationQuery().resourceType(resource1.resourceType()).count());
-    assertEquals(0, authorizationService.createAuthorizationQuery().resourceType(nonExisting.resourceType()).count());
+    assertEquals(4,
+        authorizationService.createAuthorizationQuery().resourceType(resource1).count());
+    assertEquals(0,
+        authorizationService.createAuthorizationQuery().resourceType(nonExisting).count());
+    assertEquals(4, authorizationService.createAuthorizationQuery()
+        .resourceType(resource1.resourceType()).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery()
+        .resourceType(nonExisting.resourceType()).count());
 
     // query by resource id
-    assertEquals(2, authorizationService.createAuthorizationQuery().resourceId("resource1-2").count());
-    assertEquals(0, authorizationService.createAuthorizationQuery().resourceId("non-existing").count());
+    assertEquals(2,
+        authorizationService.createAuthorizationQuery().resourceId("resource1-2").count());
+    assertEquals(0,
+        authorizationService.createAuthorizationQuery().resourceId("non-existing").count());
 
     // query by permission
-    assertEquals(1, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.ACCESS).count());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.DELETE).count());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.READ).count());
-    assertEquals(3, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.UPDATE).count());
+    assertEquals(1, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.ACCESS).count());
+    assertEquals(2, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.DELETE).count());
+    assertEquals(2, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.READ).count());
+    assertEquals(3, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.UPDATE).count());
     // multiple permissions at the same time
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.READ).hasPermission(TestPermissions.UPDATE).count());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.UPDATE).hasPermission(TestPermissions.READ).count());
-    assertEquals(0, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.READ).hasPermission(TestPermissions.ACCESS).count());
+    assertEquals(2, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.READ).hasPermission(TestPermissions.UPDATE).count());
+    assertEquals(2, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.UPDATE).hasPermission(TestPermissions.READ).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.READ).hasPermission(TestPermissions.ACCESS).count());
 
     // user id & resource type
-    assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn("user1").resourceType(resource1).count());
-    assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn("user1").resourceType(nonExisting).count());
+    assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn("user1")
+        .resourceType(resource1).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn("user1")
+        .resourceType(nonExisting).count());
 
     // group id & resource type
-    assertEquals(1, authorizationService.createAuthorizationQuery().groupIdIn("group2").resourceType(resource2).count());
-    assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("group1").resourceType(nonExisting).count());
+    assertEquals(1, authorizationService.createAuthorizationQuery().groupIdIn("group2")
+        .resourceType(resource2).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("group1")
+        .resourceType(nonExisting).count());
   }
 
   public void testValidQueryLists() {
@@ -127,44 +153,69 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     Resource nonExisting = new NonExistingResource("non-existing", 102);
 
     // query by user id
-    assertEquals(2, authorizationService.createAuthorizationQuery().userIdIn("user1").list().size());
-    assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn("user2").list().size());
-    assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn("user3").list().size());
-    assertEquals(3, authorizationService.createAuthorizationQuery().userIdIn("user1", "user2").list().size());
-    assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn("non-existing").list().size());
+    assertEquals(2,
+        authorizationService.createAuthorizationQuery().userIdIn("user1").list().size());
+    assertEquals(1,
+        authorizationService.createAuthorizationQuery().userIdIn("user2").list().size());
+    assertEquals(1,
+        authorizationService.createAuthorizationQuery().userIdIn("user3").list().size());
+    assertEquals(3,
+        authorizationService.createAuthorizationQuery().userIdIn("user1", "user2").list().size());
+    assertEquals(0,
+        authorizationService.createAuthorizationQuery().userIdIn("non-existing").list().size());
 
     // query by group id
-    assertEquals(2, authorizationService.createAuthorizationQuery().groupIdIn("group1").list().size());
-    assertEquals(1, authorizationService.createAuthorizationQuery().groupIdIn("group2").list().size());
-    assertEquals(1, authorizationService.createAuthorizationQuery().groupIdIn("group3").list().size());
-    assertEquals(3, authorizationService.createAuthorizationQuery().groupIdIn("group1", "group2").list().size());
-    assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("non-existing").list().size());
+    assertEquals(2,
+        authorizationService.createAuthorizationQuery().groupIdIn("group1").list().size());
+    assertEquals(1,
+        authorizationService.createAuthorizationQuery().groupIdIn("group2").list().size());
+    assertEquals(1,
+        authorizationService.createAuthorizationQuery().groupIdIn("group3").list().size());
+    assertEquals(3, authorizationService.createAuthorizationQuery().groupIdIn("group1", "group2")
+        .list().size());
+    assertEquals(0,
+        authorizationService.createAuthorizationQuery().groupIdIn("non-existing").list().size());
 
     // query by resource type
-    assertEquals(4, authorizationService.createAuthorizationQuery().resourceType(resource1).list().size());
-    assertEquals(0, authorizationService.createAuthorizationQuery().resourceType(nonExisting).list().size());
+    assertEquals(4,
+        authorizationService.createAuthorizationQuery().resourceType(resource1).list().size());
+    assertEquals(0,
+        authorizationService.createAuthorizationQuery().resourceType(nonExisting).list().size());
 
     // query by resource id
-    assertEquals(2, authorizationService.createAuthorizationQuery().resourceId("resource1-2").list().size());
-    assertEquals(0, authorizationService.createAuthorizationQuery().resourceId("non-existing").list().size());
+    assertEquals(2,
+        authorizationService.createAuthorizationQuery().resourceId("resource1-2").list().size());
+    assertEquals(0,
+        authorizationService.createAuthorizationQuery().resourceId("non-existing").list().size());
 
     // query by permission
-    assertEquals(1, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.ACCESS).list().size());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.DELETE).list().size());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.READ).list().size());
-    assertEquals(3, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.UPDATE).list().size());
+    assertEquals(1, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.ACCESS).list().size());
+    assertEquals(2, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.DELETE).list().size());
+    assertEquals(2, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.READ).list().size());
+    assertEquals(3, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.UPDATE).list().size());
     // multiple permissions at the same time
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.READ).hasPermission(TestPermissions.UPDATE).list().size());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.UPDATE).hasPermission(TestPermissions.READ).list().size());
-    assertEquals(0, authorizationService.createAuthorizationQuery().hasPermission(TestPermissions.READ).hasPermission(TestPermissions.ACCESS).list().size());
+    assertEquals(2, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.READ).hasPermission(TestPermissions.UPDATE).list().size());
+    assertEquals(2, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.UPDATE).hasPermission(TestPermissions.READ).list().size());
+    assertEquals(0, authorizationService.createAuthorizationQuery()
+        .hasPermission(TestPermissions.READ).hasPermission(TestPermissions.ACCESS).list().size());
 
     // user id & resource type
-    assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn("user1").resourceType(resource1).list().size());
-    assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn("user1").resourceType(nonExisting).list().size());
+    assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn("user1")
+        .resourceType(resource1).list().size());
+    assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn("user1")
+        .resourceType(nonExisting).list().size());
 
     // group id & resource type
-    assertEquals(1, authorizationService.createAuthorizationQuery().groupIdIn("group2").resourceType(resource2).list().size());
-    assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("group1").resourceType(nonExisting).list().size());
+    assertEquals(1, authorizationService.createAuthorizationQuery().groupIdIn("group2")
+        .resourceType(resource2).list().size());
+    assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("group1")
+        .resourceType(nonExisting).list().size());
   }
 
   public void testOrderByQueries() {
@@ -172,7 +223,8 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     Resource resource1 = TestResource.RESOURCE1;
     Resource resource2 = TestResource.RESOURCE2;
 
-    List<Authorization> list = authorizationService.createAuthorizationQuery().orderByResourceType().asc().list();
+    List<Authorization> list = authorizationService.createAuthorizationQuery().orderByResourceType()
+        .asc().list();
     assertEquals(resource1.resourceType(), list.get(0).getResourceType());
     assertEquals(resource1.resourceType(), list.get(1).getResourceType());
     assertEquals(resource1.resourceType(), list.get(2).getResourceType());
@@ -218,29 +270,35 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     try {
       authorizationService.createAuthorizationQuery().orderByResourceType().list();
       fail("Exception expected");
-    } catch(ProcessEngineException e) {
-      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()",
+          e.getMessage());
     }
 
     try {
       authorizationService.createAuthorizationQuery().orderByResourceId().list();
       fail("Exception expected");
-    } catch(ProcessEngineException e) {
-      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()",
+          e.getMessage());
     }
 
     try {
-      authorizationService.createAuthorizationQuery().orderByResourceId().orderByResourceType().list();
+      authorizationService.createAuthorizationQuery().orderByResourceId().orderByResourceType()
+          .list();
       fail("Exception expected");
-    } catch(ProcessEngineException e) {
-      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()",
+          e.getMessage());
     }
 
     try {
-      authorizationService.createAuthorizationQuery().orderByResourceType().orderByResourceId().list();
+      authorizationService.createAuthorizationQuery().orderByResourceType().orderByResourceId()
+          .list();
       fail("Exception expected");
-    } catch(ProcessEngineException e) {
-      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()",
+          e.getMessage());
     }
   }
 
@@ -250,14 +308,16 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
 
     try {
       authorizationService.createAuthorizationQuery().groupIdIn("a").userIdIn("b").count();
-    } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot query for user and group authorizations at the same time.", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot query for user and group authorizations at the same time.",
+          e.getMessage());
     }
 
     try {
       authorizationService.createAuthorizationQuery().userIdIn("b").groupIdIn("a").count();
-    } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot query for user and group authorizations at the same time.", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot query for user and group authorizations at the same time.",
+          e.getMessage());
     }
 
   }

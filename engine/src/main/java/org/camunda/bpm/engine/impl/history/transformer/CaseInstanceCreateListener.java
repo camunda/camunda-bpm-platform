@@ -32,10 +32,10 @@ public class CaseInstanceCreateListener extends HistoryCaseExecutionListener {
 
   protected HistoryEvent createHistoryEvent(DelegateCaseExecution caseExecution) {
     ensureHistoryLevelInitialized();
-    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_INSTANCE_CREATE, caseExecution)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_INSTANCE_CREATE,
+        caseExecution)) {
       return eventProducer.createCaseInstanceCreateEvt(caseExecution);
-    }
-    else {
+    } else {
       return null;
     }
   }

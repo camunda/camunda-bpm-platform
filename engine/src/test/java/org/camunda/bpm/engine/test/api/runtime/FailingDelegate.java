@@ -28,8 +28,8 @@ public class FailingDelegate implements JavaDelegate {
   public void execute(DelegateExecution execution) throws Exception {
 
     Boolean fail = (Boolean) execution.getVariable("fail");
-    String message = execution.hasVariable("message") ?
-        (String) execution.getVariable("message") : EXCEPTION_MESSAGE;
+    String message = execution.hasVariable("message") ? (String) execution.getVariable("message")
+        : EXCEPTION_MESSAGE;
 
     if (fail == null || fail == true) {
       throw new ProcessEngineException(message);

@@ -33,29 +33,33 @@ import org.camunda.bpm.engine.impl.cmd.SaveAuthorizationCmd;
  *
  */
 public class AuthorizationServiceImpl extends ServiceImpl implements AuthorizationService {
-  
+
   public AuthorizationQuery createAuthorizationQuery() {
     return new AuthorizationQueryImpl(commandExecutor);
   }
-  
+
   public Authorization createNewAuthorization(int type) {
     return commandExecutor.execute(new CreateAuthorizationCommand(type));
   }
-  
+
   public Authorization saveAuthorization(Authorization authorization) {
     return commandExecutor.execute(new SaveAuthorizationCmd(authorization));
   }
-  
+
   public void deleteAuthorization(String authorizationId) {
-    commandExecutor.execute(new DeleteAuthorizationCmd(authorizationId));    
+    commandExecutor.execute(new DeleteAuthorizationCmd(authorizationId));
   }
 
-  public boolean isUserAuthorized(String userId, List<String> groupIds, Permission permission, Resource resource) {
-    return commandExecutor.execute(new AuthorizationCheckCmd(userId, groupIds, permission, resource, null));
+  public boolean isUserAuthorized(String userId, List<String> groupIds, Permission permission,
+      Resource resource) {
+    return commandExecutor
+        .execute(new AuthorizationCheckCmd(userId, groupIds, permission, resource, null));
   }
 
-  public boolean isUserAuthorized(String userId, List<String> groupIds, Permission permission, Resource resource, String resourceId) {
-    return commandExecutor.execute(new AuthorizationCheckCmd(userId, groupIds, permission, resource, resourceId));
+  public boolean isUserAuthorized(String userId, List<String> groupIds, Permission permission,
+      Resource resource, String resourceId) {
+    return commandExecutor
+        .execute(new AuthorizationCheckCmd(userId, groupIds, permission, resource, resourceId));
   }
-  
+
 }

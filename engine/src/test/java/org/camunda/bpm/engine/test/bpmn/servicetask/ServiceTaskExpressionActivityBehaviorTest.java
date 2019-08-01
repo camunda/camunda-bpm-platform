@@ -34,21 +34,21 @@ import org.camunda.bpm.engine.test.Deployment;
 public class ServiceTaskExpressionActivityBehaviorTest extends PluggableProcessEngineTestCase {
 
   @Deployment
-  public void testExceptionThrownBySecondScopeServiceTaskIsNotHandled(){
+  public void testExceptionThrownBySecondScopeServiceTaskIsNotHandled() {
     Map<Object, Object> beans = processEngineConfiguration.getBeans();
     beans.put("dummyServiceTask", new DummyServiceTask());
     processEngineConfiguration.setBeans(beans);
 
-    try{
-      runtimeService.startProcessInstanceByKey("process", Collections.<String, Object>singletonMap("count", 0));
+    try {
+      runtimeService.startProcessInstanceByKey("process",
+          Collections.<String, Object> singletonMap("count", 0));
       fail();
       // the EL resolver will wrap the actual exception inside a process engine exception
     }
-    //since the NVE extends the ProcessEngineException we have to handle it separately
-    catch(NullValueException nve){
+    // since the NVE extends the ProcessEngineException we have to handle it separately
+    catch (NullValueException nve) {
       fail("Shouldn't have received NullValueException");
-    }
-    catch(ProcessEngineException e){
+    } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Invalid format"));
     }
   }

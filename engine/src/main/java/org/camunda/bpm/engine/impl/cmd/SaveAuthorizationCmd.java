@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
  *
  */
 public class SaveAuthorizationCmd implements Command<Authorization> {
-  
+
   protected AuthorizationEntity authorization;
 
   public SaveAuthorizationCmd(Authorization authorization) {
@@ -40,28 +40,32 @@ public class SaveAuthorizationCmd implements Command<Authorization> {
   }
 
   protected void validate() {
-    ensureOnlyOneNotNull("Authorization must either have a 'userId' or a 'groupId'.", authorization.getUserId(), authorization.getGroupId());
-    ensureNotNull("Authorization 'resourceType' cannot be null.", "authorization.getResource()", authorization.getResource());
+    ensureOnlyOneNotNull("Authorization must either have a 'userId' or a 'groupId'.",
+        authorization.getUserId(), authorization.getGroupId());
+    ensureNotNull("Authorization 'resourceType' cannot be null.", "authorization.getResource()",
+        authorization.getResource());
   }
-  
+
   public Authorization execute(CommandContext commandContext) {
-    
+
     final AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
 
     authorizationManager.validateResourceCompatibility(authorization);
 
     String operationType = null;
     AuthorizationEntity previousValues = null;
-    if(authorization.getId() == null) {
+    if (authorization.getId() == null) {
       authorizationManager.insert(authorization);
       operationType = UserOperationLogEntry.OPERATION_TYPE_CREATE;
     } else {
-      previousValues = commandContext.getDbEntityManager().selectById(AuthorizationEntity.class, authorization.getId());
+      previousValues = commandContext.getDbEntityManager().selectById(AuthorizationEntity.class,
+          authorization.getId());
       authorizationManager.update(authorization);
       operationType = UserOperationLogEntry.OPERATION_TYPE_UPDATE;
     }
-    commandContext.getOperationLogManager().logAuthorizationOperation(operationType, authorization, previousValues);
-    
+    commandContext.getOperationLogManager().logAuthorizationOperation(operationType, authorization,
+        previousValues);
+
     return authorization;
   }
 

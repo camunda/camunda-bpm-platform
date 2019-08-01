@@ -28,44 +28,32 @@ public class VersionTagTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testParsingVersionTag() {
-    ProcessDefinition process = repositoryService
-      .createProcessDefinitionQuery()
-      .orderByProcessDefinitionId()
-      .asc()
-      .singleResult();
+    ProcessDefinition process = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionId().asc().singleResult();
 
     assertEquals("ver_tag_1", process.getVersionTag());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml" })
   public void testParsingNullVersionTag() {
-    ProcessDefinition process = repositoryService
-      .createProcessDefinitionQuery()
-      .orderByProcessDefinitionId()
-      .asc()
-      .singleResult();
+    ProcessDefinition process = repositoryService.createProcessDefinitionQuery()
+        .orderByProcessDefinitionId().asc().singleResult();
 
     assertEquals(null, process.getVersionTag());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/versionTag.dmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/repository/versionTag.dmn" })
   public void testParsingVersionTagDecisionDefinition() {
-    DecisionDefinition decision = repositoryService
-    .createDecisionDefinitionQuery()
-    .orderByDecisionDefinitionVersion()
-    .asc()
-    .singleResult();
+    DecisionDefinition decision = repositoryService.createDecisionDefinitionQuery()
+        .orderByDecisionDefinitionVersion().asc().singleResult();
 
     assertEquals("1.0.0", decision.getVersionTag());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/noVersionTag.dmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/repository/noVersionTag.dmn" })
   public void testParsingNullVersionTagDecisionDefinition() {
-    DecisionDefinition decision = repositoryService
-      .createDecisionDefinitionQuery()
-    .orderByDecisionDefinitionVersion()
-    .asc()
-    .singleResult();
+    DecisionDefinition decision = repositoryService.createDecisionDefinitionQuery()
+        .orderByDecisionDefinitionVersion().asc().singleResult();
 
     assertEquals(null, decision.getVersionTag());
   }

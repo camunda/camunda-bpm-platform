@@ -30,7 +30,8 @@ import org.junit.Ignore;
  */
 public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
 
-  protected static class ControllableCompleteTaskCommand extends ConcurrencyTestCase.ControllableCommand<Void> {
+  protected static class ControllableCompleteTaskCommand
+      extends ConcurrencyTestCase.ControllableCommand<Void> {
 
     protected String taskId;
 
@@ -41,18 +42,19 @@ public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
     }
 
     public Void execute(CommandContext commandContext) {
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync(); // thread will block here until makeContinue() is called form main thread
 
       new CompleteTaskCmd(taskId, null).execute(commandContext);
 
-      monitor.sync();  // thread will block here until waitUntilDone() is called form main thread
+      monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
 
       return null;
     }
 
   }
 
-  public class ControllableSetTaskVariablesCommand extends ConcurrencyTestCase.ControllableCommand<Void> {
+  public class ControllableSetTaskVariablesCommand
+      extends ConcurrencyTestCase.ControllableCommand<Void> {
 
     protected String taskId;
 
@@ -60,17 +62,18 @@ public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
 
     protected Exception exception;
 
-    public ControllableSetTaskVariablesCommand(String taskId,  Map<String, ? extends Object> variables) {
+    public ControllableSetTaskVariablesCommand(String taskId,
+        Map<String, ? extends Object> variables) {
       this.taskId = taskId;
       this.variables = variables;
     }
 
     public Void execute(CommandContext commandContext) {
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync(); // thread will block here until makeContinue() is called form main thread
 
       new SetTaskVariablesCmd(taskId, variables, true).execute(commandContext);
 
-      monitor.sync();  // thread will block here until waitUntilDone() is called form main thread
+      monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
 
       return null;
     }
@@ -82,34 +85,37 @@ public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
 
     final String taskId = taskService.createTaskQuery().singleResult().getId();
 
-    ConcurrencyTestCase.ThreadControl thread1 = executeControllableCommand(new ControllableSetTaskVariablesCommand(taskId, Variables.createVariables().putValue("var", "value")));
+    ConcurrencyTestCase.ThreadControl thread1 = executeControllableCommand(
+        new ControllableSetTaskVariablesCommand(taskId,
+            Variables.createVariables().putValue("var", "value")));
     thread1.reportInterrupts();
     thread1.waitForSync();
 
-    ConcurrencyTestCase.ThreadControl thread2 = executeControllableCommand(new ControllableCompleteTaskCommand(taskId));
+    ConcurrencyTestCase.ThreadControl thread2 = executeControllableCommand(
+        new ControllableCompleteTaskCommand(taskId));
     thread2.reportInterrupts();
     thread2.waitForSync();
 
-    //set task variable, but not commit transaction
+    // set task variable, but not commit transaction
     thread1.makeContinue();
     thread1.waitForSync();
 
-    //complete task -> task is removed, execution is removed
+    // complete task -> task is removed, execution is removed
     thread2.makeContinue();
     thread2.waitForSync();
 
-    //commit transaction with task variable
+    // commit transaction with task variable
     thread1.makeContinue();
     thread1.waitUntilDone();
 
-    //try to commit task completion
+    // try to commit task completion
     thread2.makeContinue();
     thread2.waitUntilDone();
 
-    //variable was persisted
+    // variable was persisted
     assertEquals(1, runtimeService.createVariableInstanceQuery().taskIdIn(taskId).count());
 
-    //task was not removed
+    // task was not removed
     assertNotNull(thread2.exception);
     assertEquals(1, taskService.createTaskQuery().taskId(taskId).count());
 

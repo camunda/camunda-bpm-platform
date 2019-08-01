@@ -52,14 +52,14 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
 
     if (loopCounter == nrOfInstances || completionConditionSatisfied(scopeExecution)) {
       leave(scopeExecution);
-    }
-    else {
+    } else {
       PvmActivity innerActivity = getInnerActivity(scopeExecution.getActivity());
       performInstance(scopeExecution, innerActivity, loopCounter);
     }
   }
 
-  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
+  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution,
+      ActivityExecution endedExecution) {
     // cannot happen
   }
 
@@ -68,9 +68,11 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
     setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, 0);
   }
 
-  public List<ActivityExecution> initializeScope(ActivityExecution scopeExecution, int nrOfInstances) {
+  public List<ActivityExecution> initializeScope(ActivityExecution scopeExecution,
+      int nrOfInstances) {
     if (nrOfInstances > 1) {
-      LOG.unsupportedConcurrencyException(scopeExecution.toString(), this.getClass().getSimpleName());
+      LOG.unsupportedConcurrencyException(scopeExecution.toString(),
+          this.getClass().getSimpleName());
     }
 
     List<ActivityExecution> executions = new ArrayList<ActivityExecution>();
@@ -89,10 +91,11 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
   @Override
   public ActivityExecution createInnerInstance(ActivityExecution scopeExecution) {
 
-    if (hasLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) && getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) > 0) {
-      throw LOG.unsupportedConcurrencyException(scopeExecution.toString(), this.getClass().getSimpleName());
-    }
-    else {
+    if (hasLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES)
+        && getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) > 0) {
+      throw LOG.unsupportedConcurrencyException(scopeExecution.toString(),
+          this.getClass().getSimpleName());
+    } else {
       int nrOfInstances = getLoopVariable(scopeExecution, NUMBER_OF_INSTANCES);
 
       setLoopVariable(scopeExecution, LOOP_COUNTER, nrOfInstances);

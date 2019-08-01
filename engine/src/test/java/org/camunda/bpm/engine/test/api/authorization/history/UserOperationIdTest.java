@@ -48,7 +48,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Tests the operationId field in historic tables, which helps to correlate records from different tables.
+ * Tests the operationId field in historic tables, which helps to correlate records from different
+ * tables.
  *
  * @author Svetlana Dorokhova
  *
@@ -84,7 +85,7 @@ public class UserOperationIdTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testResolveTaskOperationId() {
     // given
     identityService.setAuthenticatedUserId("demo");
@@ -94,17 +95,16 @@ public class UserOperationIdTest {
     // when
     taskService.resolveTask(taskId, getVariables());
 
-    //then
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
-        .operationType(UserOperationLogEntry.OPERATION_TYPE_RESOLVE)
-        .taskId(taskId)
-        .list();
+    // then
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+        .createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_RESOLVE)
+        .taskId(taskId).list();
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
     verifySameOperationId(userOperationLogEntries, historicDetails);
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSubmitTaskFormOperationId() {
     // given
     identityService.setAuthenticatedUserId("demo");
@@ -114,17 +114,16 @@ public class UserOperationIdTest {
     // when
     formService.submitTaskForm(taskId, getVariables());
 
-    //then
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
-        .operationType(UserOperationLogEntry.OPERATION_TYPE_COMPLETE)
-        .taskId(taskId)
-        .list();
+    // then
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+        .createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_COMPLETE)
+        .taskId(taskId).list();
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
     verifySameOperationId(userOperationLogEntries, historicDetails);
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testSetTaskVariablesOperationId() {
     // given
     identityService.setAuthenticatedUserId("demo");
@@ -134,17 +133,16 @@ public class UserOperationIdTest {
     // when
     taskService.setVariables(taskId, getVariables());
 
-    //then
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
-        .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE)
-        .taskId(taskId)
-        .list();
+    // then
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+        .createUserOperationLogQuery()
+        .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).taskId(taskId).list();
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
     verifySameOperationId(userOperationLogEntries, historicDetails);
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testWithoutAuthentication() {
     // given
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
@@ -153,15 +151,14 @@ public class UserOperationIdTest {
     // when
     taskService.resolveTask(taskId, getVariables());
 
-    //then
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
-        .taskId(taskId)
-        .list();
+    // then
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+        .createUserOperationLogQuery().taskId(taskId).list();
     assertEquals(0, userOperationLogEntries.size());
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
     assertTrue(historicDetails.size() > 0);
-    //history detail records must have null userOperationId as user operation log was not created
-    for (HistoricDetail historicDetail: historicDetails) {
+    // history detail records must have null userOperationId as user operation log was not created
+    for (HistoricDetail historicDetail : historicDetails) {
       assertNull(historicDetail.getUserOperationId());
     }
   }
@@ -169,13 +166,9 @@ public class UserOperationIdTest {
   @Test
   public void testSetTaskVariablesInServiceTask() {
     // given
-    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_KEY)
-        .startEvent()
-        .userTask()
-        .serviceTask()
-          .camundaExpression("${execution.setVariable('foo', 'bar')}")
-        .endEvent()
-        .done();
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_KEY).startEvent()
+        .userTask().serviceTask().camundaExpression("${execution.setVariable('foo', 'bar')}")
+        .endEvent().done();
     testRule.deploy(bpmnModelInstance);
 
     identityService.setAuthenticatedUserId("demo");
@@ -185,14 +178,15 @@ public class UserOperationIdTest {
     // when
     taskService.complete(task.getId());
 
-    //then
+    // then
     HistoricDetail historicDetail = historyService.createHistoricDetailQuery().singleResult();
-    // no user operation log id is set for this update, as it is not written as part of the user operation
+    // no user operation log id is set for this update, as it is not written as part of the user
+    // operation
     assertNull(historicDetail.getUserOperationId());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testStartProcessOperationId() {
     // given
     identityService.setAuthenticatedUserId("demo");
@@ -200,11 +194,10 @@ public class UserOperationIdTest {
     // when
     ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_KEY, getVariables());
 
-    //then
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
-        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
-        .processInstanceId(pi.getId())
-        .list();
+    // then
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+        .createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+        .processInstanceId(pi.getId()).list();
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
 
     assertFalse(userOperationLogEntries.isEmpty());
@@ -213,22 +206,19 @@ public class UserOperationIdTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testStartProcessAtActivityOperationId() {
     // given
     identityService.setAuthenticatedUserId("demo");
 
     // when
     ProcessInstance pi = runtimeService.createProcessInstanceByKey(PROCESS_KEY)
-            .startBeforeActivity("theTask")
-            .setVariables(getVariables())
-            .execute();
+        .startBeforeActivity("theTask").setVariables(getVariables()).execute();
 
-    //then
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
-        .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
-        .processInstanceId(pi.getId())
-        .list();
+    // then
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+        .createUserOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE)
+        .processInstanceId(pi.getId()).list();
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
 
     assertFalse(userOperationLogEntries.isEmpty());
@@ -236,22 +226,24 @@ public class UserOperationIdTest {
     verifySameOperationId(userOperationLogEntries, historicDetails);
   }
 
-  private void verifySameOperationId(List<UserOperationLogEntry> userOperationLogEntries, List<HistoricDetail> historicDetails) {
+  private void verifySameOperationId(List<UserOperationLogEntry> userOperationLogEntries,
+      List<HistoricDetail> historicDetails) {
     assertTrue("Operation log entry must exist", userOperationLogEntries.size() > 0);
     String operationId = userOperationLogEntries.get(0).getOperationId();
     assertNotNull(operationId);
     assertTrue("Some historic details are expected to be present", historicDetails.size() > 0);
-    for (UserOperationLogEntry userOperationLogEntry: userOperationLogEntries) {
-      assertEquals("OperationIds must be the same", operationId, userOperationLogEntry.getOperationId());
+    for (UserOperationLogEntry userOperationLogEntry : userOperationLogEntries) {
+      assertEquals("OperationIds must be the same", operationId,
+          userOperationLogEntry.getOperationId());
     }
     for (HistoricDetail historicDetail : historicDetails) {
-      assertEquals("OperationIds must be the same", operationId, historicDetail.getUserOperationId());
+      assertEquals("OperationIds must be the same", operationId,
+          historicDetail.getUserOperationId());
     }
   }
 
   protected VariableMap getVariables() {
-    return Variables.createVariables()
-        .putValue("aVariableName", "aVariableValue")
+    return Variables.createVariables().putValue("aVariableName", "aVariableValue")
         .putValue("anotherVariableName", "anotherVariableValue");
   }
 

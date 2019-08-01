@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNull;
 
 import java.util.List;
@@ -39,7 +38,8 @@ import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResultImpl;
  * @author Michael Scholz
  * @author Christopher Zell
  */
-public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd implements Command<MessageCorrelationResultImpl> {
+public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd
+    implements Command<MessageCorrelationResultImpl> {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -50,42 +50,53 @@ public class CorrelateMessageCmd extends AbstractCorrelateMessageCmd implements 
    *
    * @param messageCorrelationBuilderImpl
    */
-  public CorrelateMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl, boolean collectVariables, boolean deserializeVariableValues, boolean startMessageOnly) {
+  public CorrelateMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl,
+      boolean collectVariables, boolean deserializeVariableValues, boolean startMessageOnly) {
     super(messageCorrelationBuilderImpl, collectVariables, deserializeVariableValues);
     this.startMessageOnly = startMessageOnly;
   }
 
   public MessageCorrelationResultImpl execute(final CommandContext commandContext) {
     ensureAtLeastOneNotNull(
-        "At least one of the following correlation criteria has to be present: " + "messageName, businessKey, correlationKeys, processInstanceId", messageName,
-        builder.getBusinessKey(), builder.getCorrelationProcessInstanceVariables(), builder.getProcessInstanceId());
+        "At least one of the following correlation criteria has to be present: "
+            + "messageName, businessKey, correlationKeys, processInstanceId",
+        messageName, builder.getBusinessKey(), builder.getCorrelationProcessInstanceVariables(),
+        builder.getProcessInstanceId());
 
-    final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
+    final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration()
+        .getCorrelationHandler();
     final CorrelationSet correlationSet = new CorrelationSet(builder);
 
     CorrelationHandlerResult correlationResult = null;
     if (startMessageOnly) {
-      List<CorrelationHandlerResult> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<CorrelationHandlerResult>>() {
-        public List<CorrelationHandlerResult> call() throws Exception {
-          return correlationHandler.correlateStartMessages(commandContext, messageName, correlationSet);
-        }
-      });
+      List<CorrelationHandlerResult> correlationResults = commandContext
+          .runWithoutAuthorization(new Callable<List<CorrelationHandlerResult>>() {
+            public List<CorrelationHandlerResult> call() throws Exception {
+              return correlationHandler.correlateStartMessages(commandContext, messageName,
+                  correlationSet);
+            }
+          });
       if (correlationResults.isEmpty()) {
-        throw new MismatchingMessageCorrelationException(messageName, "No process definition matches the parameters");
+        throw new MismatchingMessageCorrelationException(messageName,
+            "No process definition matches the parameters");
       } else if (correlationResults.size() > 1) {
-        throw LOG.exceptionCorrelateMessageToSingleProcessDefinition(messageName, correlationResults.size(), correlationSet);
+        throw LOG.exceptionCorrelateMessageToSingleProcessDefinition(messageName,
+            correlationResults.size(), correlationSet);
       } else {
         correlationResult = correlationResults.get(0);
       }
     } else {
-      correlationResult = commandContext.runWithoutAuthorization(new Callable<CorrelationHandlerResult>() {
-        public CorrelationHandlerResult call() throws Exception {
-          return correlationHandler.correlateMessage(commandContext, messageName, correlationSet);
-        }
-      });
+      correlationResult = commandContext
+          .runWithoutAuthorization(new Callable<CorrelationHandlerResult>() {
+            public CorrelationHandlerResult call() throws Exception {
+              return correlationHandler.correlateMessage(commandContext, messageName,
+                  correlationSet);
+            }
+          });
 
       if (correlationResult == null) {
-        throw new MismatchingMessageCorrelationException(messageName, "No process definition or execution matches the parameters");
+        throw new MismatchingMessageCorrelationException(messageName,
+            "No process definition or execution matches the parameters");
       }
     }
 

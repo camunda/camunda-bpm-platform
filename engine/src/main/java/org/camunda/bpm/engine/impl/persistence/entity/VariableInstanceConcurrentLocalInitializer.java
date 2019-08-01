@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycle
  *
  */
 public class VariableInstanceConcurrentLocalInitializer
-  implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
+    implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
 
   protected ExecutionEntity execution;
 
@@ -34,7 +34,8 @@ public class VariableInstanceConcurrentLocalInitializer
 
   @Override
   public void onCreate(VariableInstanceEntity variableInstance, AbstractVariableScope sourceScope) {
-    variableInstance.setConcurrentLocal(!execution.isScope() || execution.isExecutingScopeLeafActivity());
+    variableInstance
+        .setConcurrentLocal(!execution.isScope() || execution.isExecutingScopeLeafActivity());
   }
 
   @Override

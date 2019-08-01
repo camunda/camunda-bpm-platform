@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-
 /**
  * @author Joram Barrez
  * @author Falko Menge
@@ -36,13 +35,16 @@ public class ErrorEndEventActivityBehavior extends AbstractBpmnActivityBehavior 
   }
 
   public void execute(ActivityExecution execution) throws Exception {
-    String errorMessageValue = errorMessageExpression != null ? (String) errorMessageExpression.getValue(execution) : null;
+    String errorMessageValue = errorMessageExpression != null
+        ? (String) errorMessageExpression.getValue(execution)
+        : null;
     BpmnExceptionHandler.propagateError(errorCode, errorMessageValue, null, execution);
   }
 
   public String getErrorCode() {
     return errorCode;
   }
+
   public void setErrorCode(String errorCode) {
     this.errorCode = errorCode;
   }

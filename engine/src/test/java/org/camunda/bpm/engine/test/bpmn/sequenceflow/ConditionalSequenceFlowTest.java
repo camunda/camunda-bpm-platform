@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  * @author Joram Barrez
  * @author Falko Menge (camunda)
@@ -37,10 +36,7 @@ public class ConditionalSequenceFlowTest extends PluggableProcessEngineTestCase 
     Map<String, Object> variables = CollectionUtil.singletonMap("input", "right");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("condSeqFlowUelExpr", variables);
 
-    Task task = taskService
-      .createTaskQuery()
-      .processInstanceId(pi.getId())
-      .singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
     assertNotNull(task);
     assertEquals("task right", task.getName());
@@ -51,28 +47,28 @@ public class ConditionalSequenceFlowTest extends PluggableProcessEngineTestCase 
     // An order of price 150 is a standard order (goes through an UEL value expression)
     ConditionalSequenceFlowTestOrder order = new ConditionalSequenceFlowTestOrder(150);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("uelExpressions",
-            CollectionUtil.singletonMap("order",  order));
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        CollectionUtil.singletonMap("order", order));
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     assertEquals("Standard service", task.getName());
 
     // While an order of 300, gives us a premium service (goes through an UEL method expression)
     order = new ConditionalSequenceFlowTestOrder(300);
     processInstance = runtimeService.startProcessInstanceByKey("uelExpressions",
-            CollectionUtil.singletonMap("order",  order));
+        CollectionUtil.singletonMap("order", order));
     task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertEquals("Premium service", task.getName());
 
   }
 
   /**
-   * Test that Conditional Sequence Flows throw an exception, if no condition
-   * evaluates to true.
+   * Test that Conditional Sequence Flows throw an exception, if no condition evaluates to true.
    *
-   * BPMN 2.0.1 p. 427 (PDF 457):
-   * "Multiple outgoing Sequence Flows with conditions behaves as an inclusive split."
+   * BPMN 2.0.1 p. 427 (PDF 457): "Multiple outgoing Sequence Flows with conditions behaves as an
+   * inclusive split."
    *
-   * BPMN 2.0.1 p. 436 (PDF 466):
-   * "The inclusive gateway throws an exception in case all conditions evaluate to false and a default flow has not been specified."
+   * BPMN 2.0.1 p. 436 (PDF 466): "The inclusive gateway throws an exception in case all conditions
+   * evaluate to false and a default flow has not been specified."
    *
    * @see https://app.camunda.com/jira/browse/CAM-1773
    */
@@ -83,7 +79,9 @@ public class ConditionalSequenceFlowTest extends PluggableProcessEngineTestCase 
       runtimeService.startProcessInstanceByKey("condSeqFlowUelExpr", variables);
       fail("Expected ProcessEngineException");
     } catch (ProcessEngineException e) {
-      assertTextPresent("No conditional sequence flow leaving the Flow Node 'theStart' could be selected for continuing the process", e.getMessage());
+      assertTextPresent(
+          "No conditional sequence flow leaving the Flow Node 'theStart' could be selected for continuing the process",
+          e.getMessage());
     }
   }
 

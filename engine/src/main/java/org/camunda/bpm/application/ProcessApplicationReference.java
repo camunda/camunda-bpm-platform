@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.application;
 
-
 /**
  * A reference to a process application.
  * 
@@ -38,6 +37,7 @@ public interface ProcessApplicationReference {
    * @throws ProcessApplicationUnavailableException
    *           if the process application is unavailable
    */
-  public ProcessApplicationInterface getProcessApplication() throws ProcessApplicationUnavailableException;
+  public ProcessApplicationInterface getProcessApplication()
+      throws ProcessApplicationUnavailableException;
 
 }

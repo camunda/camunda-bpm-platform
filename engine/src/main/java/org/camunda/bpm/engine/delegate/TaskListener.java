@@ -17,9 +17,11 @@
 package org.camunda.bpm.engine.delegate;
 
 /**
- * Listener interface implemented by user code which wants to be notified when a property of a task changes.
+ * Listener interface implemented by user code which wants to be notified when a property of a task
+ * changes.
  *
- * <p>The following Task Events are supported:
+ * <p>
+ * The following Task Events are supported:
  * <ul>
  * <li>{@link #EVENTNAME_CREATE}</li>
  * <li>{@link #EVENTNAME_ASSIGNMENT}</li>

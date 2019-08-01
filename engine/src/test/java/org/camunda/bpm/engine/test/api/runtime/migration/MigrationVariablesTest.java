@@ -59,7 +59,8 @@ import org.junit.rules.RuleChain;
 public class MigrationVariablesTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
       return configuration;
     }
@@ -67,29 +68,18 @@ public class MigrationVariablesTest {
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule(bootstrapRule);
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
-  protected static final BpmnModelInstance ONE_BOUNDARY_TASK = ModifiableBpmnModelInstance.modify(ProcessModels.ONE_TASK_PROCESS)
-      .activityBuilder("userTask")
-      .boundaryEvent()
-      .message("Message")
-      .done();
+  protected static final BpmnModelInstance ONE_BOUNDARY_TASK = ModifiableBpmnModelInstance
+      .modify(ProcessModels.ONE_TASK_PROCESS).activityBuilder("userTask").boundaryEvent()
+      .message("Message").done();
 
-  protected static final BpmnModelInstance CONCURRENT_BOUNDARY_TASKS = ModifiableBpmnModelInstance.modify(ProcessModels.PARALLEL_GATEWAY_PROCESS)
-      .activityBuilder("userTask1")
-      .boundaryEvent()
-      .message("Message")
-      .moveToActivity("userTask2")
-      .boundaryEvent()
-      .message("Message")
-      .done();
+  protected static final BpmnModelInstance CONCURRENT_BOUNDARY_TASKS = ModifiableBpmnModelInstance
+      .modify(ProcessModels.PARALLEL_GATEWAY_PROCESS).activityBuilder("userTask1").boundaryEvent()
+      .message("Message").moveToActivity("userTask2").boundaryEvent().message("Message").done();
 
-  protected static final BpmnModelInstance SUBPROCESS_CONCURRENT_BOUNDARY_TASKS = ModifiableBpmnModelInstance.modify(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS)
-      .activityBuilder("userTask1")
-      .boundaryEvent()
-      .message("Message")
-      .moveToActivity("userTask2")
-      .boundaryEvent()
-      .message("Message")
-      .done();
+  protected static final BpmnModelInstance SUBPROCESS_CONCURRENT_BOUNDARY_TASKS = ModifiableBpmnModelInstance
+      .modify(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS).activityBuilder("userTask1")
+      .boundaryEvent().message("Message").moveToActivity("userTask2").boundaryEvent()
+      .message("Message").done();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(rule).around(testHelper);
@@ -106,17 +96,19 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtScopeExecutionInScopeActivity() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ONE_BOUNDARY_TASK);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ONE_BOUNDARY_TASK);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ONE_BOUNDARY_TASK);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ONE_BOUNDARY_TASK);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
     ExecutionTree scopeExecution = executionTreeBeforeMigration.getExecutions().get(0);
 
@@ -135,17 +127,19 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtConcurrentExecutionInScopeActivity() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
     ExecutionTree concurrentExecution = executionTreeBeforeMigration.getExecutions().get(0);
 
@@ -164,15 +158,17 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtScopeExecutionInNonScopeActivity() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = runtimeService
-        .startProcessInstanceById(sourceProcessDefinition.getId(), Variables.createVariables().putValue("foo", 42));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(
+        sourceProcessDefinition.getId(), Variables.createVariables().putValue("foo", 42));
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -187,17 +183,19 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtConcurrentExecutionInNonScopeActivity() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
     ExecutionTree concurrentExecution = executionTreeBeforeMigration.getExecutions().get(0);
 
@@ -216,24 +214,23 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtConcurrentExecutionInScopeActivityAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(SUBPROCESS_CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(SUBPROCESS_CONCURRENT_BOUNDARY_TASKS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree userTask1CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask1")
-        .get(0)
-        .getParent();
+    ExecutionTree userTask1CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask1").get(0).getParent();
 
     runtimeService.setVariableLocal(userTask1CCExecutionBefore.getId(), "foo", 42);
 
@@ -243,39 +240,39 @@ public class MigrationVariablesTest {
     // then
     VariableInstance beforeMigration = testHelper.snapshotBeforeMigration.getSingleVariable("foo");
 
-    ExecutionTree userTask1CCExecutionAfter  = testHelper.snapshotAfterMigration.getExecutionTree()
-        .getLeafExecutions("userTask1")
-        .get(0)
-        .getParent();
+    ExecutionTree userTask1CCExecutionAfter = testHelper.snapshotAfterMigration.getExecutionTree()
+        .getLeafExecutions("userTask1").get(0).getParent();
 
     Assert.assertEquals(1, testHelper.snapshotAfterMigration.getVariables().size());
-    ActivityInstance subProcessInstance = testHelper.getSingleActivityInstanceAfterMigration("subProcess");
-    // for variables at concurrent executions that are parent of a leaf-scope-execution, the activity instance is
+    ActivityInstance subProcessInstance = testHelper
+        .getSingleActivityInstanceAfterMigration("subProcess");
+    // for variables at concurrent executions that are parent of a leaf-scope-execution, the
+    // activity instance is
     // the activity instance id of the parent activity instance (which is probably a bug)
-    testHelper.assertVariableMigratedToExecution(beforeMigration, userTask1CCExecutionAfter.getId(), subProcessInstance.getId());
+    testHelper.assertVariableMigratedToExecution(beforeMigration, userTask1CCExecutionAfter.getId(),
+        subProcessInstance.getId());
   }
 
   @Test
   public void testVariableAtConcurrentExecutionInScopeActivityRemoveParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(SUBPROCESS_CONCURRENT_BOUNDARY_TASKS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(SUBPROCESS_CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree userTask1CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask1")
-        .get(0)
-        .getParent();
+    ExecutionTree userTask1CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask1").get(0).getParent();
 
     runtimeService.setVariableLocal(userTask1CCExecutionBefore.getId(), "foo", 42);
 
@@ -285,37 +282,37 @@ public class MigrationVariablesTest {
     // then
     VariableInstance beforeMigration = testHelper.snapshotBeforeMigration.getSingleVariable("foo");
 
-    ExecutionTree userTask1CCExecutionAfter  = testHelper.snapshotAfterMigration.getExecutionTree()
-        .getLeafExecutions("userTask1")
-        .get(0)
-        .getParent();
+    ExecutionTree userTask1CCExecutionAfter = testHelper.snapshotAfterMigration.getExecutionTree()
+        .getLeafExecutions("userTask1").get(0).getParent();
 
     Assert.assertEquals(1, testHelper.snapshotAfterMigration.getVariables().size());
-    // for variables at concurrent executions that are parent of a leaf-scope-execution, the activity instance is
+    // for variables at concurrent executions that are parent of a leaf-scope-execution, the
+    // activity instance is
     // the activity instance id of the parent activity instance (which is probably a bug)
-    testHelper.assertVariableMigratedToExecution(beforeMigration, userTask1CCExecutionAfter.getId(), processInstance.getId());
+    testHelper.assertVariableMigratedToExecution(beforeMigration, userTask1CCExecutionAfter.getId(),
+        processInstance.getId());
   }
 
   @Test
   public void testVariableAtConcurrentExecutionInNonScopeActivityAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree userTask1CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask1")
-        .get(0);
+    ExecutionTree userTask1CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask1").get(0);
 
     runtimeService.setVariableLocal(userTask1CCExecutionBefore.getId(), "foo", 42);
 
@@ -325,34 +322,34 @@ public class MigrationVariablesTest {
     // then
     VariableInstance beforeMigration = testHelper.snapshotBeforeMigration.getSingleVariable("foo");
 
-    ExecutionTree userTask1CCExecutionAfter  = testHelper.snapshotAfterMigration.getExecutionTree()
-        .getLeafExecutions("userTask1")
-        .get(0);
+    ExecutionTree userTask1CCExecutionAfter = testHelper.snapshotAfterMigration.getExecutionTree()
+        .getLeafExecutions("userTask1").get(0);
 
     Assert.assertEquals(1, testHelper.snapshotAfterMigration.getVariables().size());
-    testHelper.assertVariableMigratedToExecution(beforeMigration, userTask1CCExecutionAfter.getId());
+    testHelper.assertVariableMigratedToExecution(beforeMigration,
+        userTask1CCExecutionAfter.getId());
   }
 
   @Test
   public void testVariableAtConcurrentExecutionInNonScopeActivityRemoveParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree userTask1CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask1")
-        .get(0);
+    ExecutionTree userTask1CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask1").get(0);
 
     runtimeService.setVariableLocal(userTask1CCExecutionBefore.getId(), "foo", 42);
 
@@ -362,28 +359,30 @@ public class MigrationVariablesTest {
     // then
     VariableInstance beforeMigration = testHelper.snapshotBeforeMigration.getSingleVariable("foo");
 
-    ExecutionTree userTask1CCExecutionAfter  = testHelper.snapshotAfterMigration.getExecutionTree()
-        .getLeafExecutions("userTask1")
-        .get(0);
+    ExecutionTree userTask1CCExecutionAfter = testHelper.snapshotAfterMigration.getExecutionTree()
+        .getLeafExecutions("userTask1").get(0);
 
     Assert.assertEquals(1, testHelper.snapshotAfterMigration.getVariables().size());
-    testHelper.assertVariableMigratedToExecution(beforeMigration, userTask1CCExecutionAfter.getId());
+    testHelper.assertVariableMigratedToExecution(beforeMigration,
+        userTask1CCExecutionAfter.getId());
   }
 
   @Test
   public void testVariableAtScopeExecutionInScopeActivityAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ONE_BOUNDARY_TASK);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(SUBPROCESS_CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ONE_BOUNDARY_TASK);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(SUBPROCESS_CONCURRENT_BOUNDARY_TASKS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask", "userTask1")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask1").build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
     ExecutionTree scopeExecution = executionTreeBeforeMigration.getExecutions().get(0);
 
@@ -402,14 +401,17 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     Task task = taskService.createTaskQuery().singleResult();
     taskService.setVariableLocal(task.getId(), "foo", 42);
@@ -427,15 +429,17 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtTaskAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
     taskService.setVariableLocal(task.getId(), "foo", 42);
@@ -446,9 +450,8 @@ public class MigrationVariablesTest {
     // then
     VariableInstance beforeMigration = testHelper.snapshotBeforeMigration.getSingleVariable("foo");
 
-    ExecutionTree userTask1ExecutionAfter  = testHelper.snapshotAfterMigration.getExecutionTree()
-        .getLeafExecutions("userTask1")
-        .get(0);
+    ExecutionTree userTask1ExecutionAfter = testHelper.snapshotAfterMigration.getExecutionTree()
+        .getLeafExecutions("userTask1").get(0);
 
     Assert.assertEquals(1, testHelper.snapshotAfterMigration.getVariables().size());
     testHelper.assertVariableMigratedToExecution(beforeMigration, userTask1ExecutionAfter.getId());
@@ -457,15 +460,17 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtTaskAndConcurrentExecutionAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
     taskService.setVariableLocal(task.getId(), "foo", 42);
@@ -475,30 +480,33 @@ public class MigrationVariablesTest {
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    VariableInstance taskVarBeforeMigration = testHelper.snapshotBeforeMigration.getSingleTaskVariable(task.getId(), "foo");
+    VariableInstance taskVarBeforeMigration = testHelper.snapshotBeforeMigration
+        .getSingleTaskVariable(task.getId(), "foo");
 
-    ExecutionTree userTask1ExecutionAfter  = testHelper.snapshotAfterMigration.getExecutionTree()
-        .getLeafExecutions("userTask1")
-        .get(0);
+    ExecutionTree userTask1ExecutionAfter = testHelper.snapshotAfterMigration.getExecutionTree()
+        .getLeafExecutions("userTask1").get(0);
 
     Assert.assertEquals(2, testHelper.snapshotAfterMigration.getVariables().size());
-    testHelper.assertVariableMigratedToExecution(taskVarBeforeMigration, userTask1ExecutionAfter.getId());
+    testHelper.assertVariableMigratedToExecution(taskVarBeforeMigration,
+        userTask1ExecutionAfter.getId());
   }
 
   @Test
   public void testVariableAtScopeExecutionBecomeNonScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ONE_BOUNDARY_TASK);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ONE_BOUNDARY_TASK);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
     ExecutionTree scopeExecution = executionTreeBeforeMigration.getExecutions().get(0);
 
@@ -514,12 +522,11 @@ public class MigrationVariablesTest {
     testHelper.assertVariableMigratedToExecution(beforeMigration, processInstance.getId());
 
     // and the variable is concurrent local, i.e. expands on tree expansion
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("userTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("userTask").execute();
 
-    VariableInstance variableAfterExpansion = runtimeService.createVariableInstanceQuery().singleResult();
+    VariableInstance variableAfterExpansion = runtimeService.createVariableInstanceQuery()
+        .singleResult();
     Assert.assertNotNull(variableAfterExpansion);
     Assert.assertNotSame(processInstance.getId(), variableAfterExpansion.getExecutionId());
 
@@ -528,19 +535,22 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtConcurrentExecutionBecomeScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_SCOPE_TASKS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_SCOPE_TASKS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree concurrentExecution = executionTreeBeforeMigration.getLeafExecutions("userTask1").get(0);
+    ExecutionTree concurrentExecution = executionTreeBeforeMigration.getLeafExecutions("userTask1")
+        .get(0);
 
     runtimeService.setVariableLocal(concurrentExecution.getId(), "foo", 42);
 
@@ -549,11 +559,8 @@ public class MigrationVariablesTest {
 
     // then
     VariableInstance beforeMigration = testHelper.snapshotBeforeMigration.getSingleVariable("foo");
-    ExecutionTree userTask1CCExecution = testHelper.snapshotAfterMigration
-      .getExecutionTree()
-      .getLeafExecutions("userTask1")
-      .get(0)
-      .getParent();
+    ExecutionTree userTask1CCExecution = testHelper.snapshotAfterMigration.getExecutionTree()
+        .getLeafExecutions("userTask1").get(0).getParent();
 
     Assert.assertEquals(1, testHelper.snapshotAfterMigration.getVariables().size());
     testHelper.assertVariableMigratedToExecution(beforeMigration, userTask1CCExecution.getId());
@@ -562,19 +569,22 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtConcurrentAndScopeExecutionBecomeNonScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CONCURRENT_BOUNDARY_TASKS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree scopeExecution = executionTreeBeforeMigration.getLeafExecutions("userTask1").get(0);
+    ExecutionTree scopeExecution = executionTreeBeforeMigration.getLeafExecutions("userTask1")
+        .get(0);
     ExecutionTree concurrentExecution = scopeExecution.getParent();
 
     runtimeService.setVariableLocal(scopeExecution.getId(), "foo", 42);
@@ -584,29 +594,32 @@ public class MigrationVariablesTest {
     try {
       testHelper.migrateProcessInstance(migrationPlan, processInstance);
       Assert.fail("expected exception");
-    }
-    catch (ProcessEngineException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("The variable 'foo' exists in both, this scope"
-          + " and concurrent local in the parent scope. Migrating to a non-scope activity would overwrite one of them."));
+    } catch (ProcessEngineException e) {
+      Assert.assertThat(e.getMessage(),
+          CoreMatchers.containsString("The variable 'foo' exists in both, this scope"
+              + " and concurrent local in the parent scope. Migrating to a non-scope activity would overwrite one of them."));
     }
   }
 
   @Test
   public void testVariableAtParentScopeExecutionAndScopeExecutionBecomeNonScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ONE_BOUNDARY_TASK);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ONE_BOUNDARY_TASK);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree scopeExecution = executionTreeBeforeMigration.getLeafExecutions("userTask").get(0);
+    ExecutionTree scopeExecution = executionTreeBeforeMigration.getLeafExecutions("userTask")
+        .get(0);
 
     runtimeService.setVariableLocal(scopeExecution.getId(), "foo", "userTaskScopeValue");
     runtimeService.setVariableLocal(processInstance.getId(), "foo", "processScopeValue");
@@ -625,25 +638,25 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtConcurrentExecutionAddParentScopeBecomeNonConcurrent() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
-        modify(ProcessModels.PARALLEL_TASK_AND_SUBPROCESS_PROCESS)
-        .activityBuilder("subProcess")
-        .camundaInputParameter("foo", "subProcessValue")
-        .done());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_TASK_AND_SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").camundaInputParameter("foo", "subProcessValue").done());
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree task1CcExecution = executionTreeBeforeMigration.getLeafExecutions("userTask1").get(0);
-    ExecutionTree task2CcExecution = executionTreeBeforeMigration.getLeafExecutions("userTask2").get(0);
+    ExecutionTree task1CcExecution = executionTreeBeforeMigration.getLeafExecutions("userTask1")
+        .get(0);
+    ExecutionTree task2CcExecution = executionTreeBeforeMigration.getLeafExecutions("userTask2")
+        .get(0);
 
     runtimeService.setVariableLocal(task1CcExecution.getId(), "foo", "task1Value");
     runtimeService.setVariableLocal(task2CcExecution.getId(), "foo", "task2Value");
@@ -666,29 +679,26 @@ public class MigrationVariablesTest {
   @Test
   public void testAddScopeWithInputMappingAndVariableOnConcurrentExecutions() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
-        modify(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS)
-          .activityBuilder("subProcess").camundaInputParameter("foo", "inputOutputValue").done()
-      );
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS)
+            .activityBuilder("subProcess").camundaInputParameter("foo", "inputOutputValue").done());
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree userTask1CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask1")
-        .get(0);
-    ExecutionTree userTask2CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask2")
-        .get(0);
+    ExecutionTree userTask1CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask1").get(0);
+    ExecutionTree userTask2CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask2").get(0);
 
     runtimeService.setVariableLocal(userTask1CCExecutionBefore.getId(), "foo", "customValue");
     runtimeService.setVariableLocal(userTask2CCExecutionBefore.getId(), "foo", "customValue");
@@ -696,7 +706,8 @@ public class MigrationVariablesTest {
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
-    // then the scope variable instance has been overwritten during compaction (conform to prior behavior);
+    // then the scope variable instance has been overwritten during compaction (conform to prior
+    // behavior);
     // although this is tested here, changing this behavior may be ok in the future
     Collection<VariableInstance> variables = testHelper.snapshotAfterMigration.getVariables();
     Assert.assertEquals(2, variables.size());
@@ -705,62 +716,67 @@ public class MigrationVariablesTest {
       Assert.assertEquals("customValue", variable.getValue());
     }
 
-    ExecutionTree subProcessExecution  = testHelper.snapshotAfterMigration.getExecutionTree()
-        .getLeafExecutions("userTask2")
-        .get(0)
-        .getParent();
+    ExecutionTree subProcessExecution = testHelper.snapshotAfterMigration.getExecutionTree()
+        .getLeafExecutions("userTask2").get(0).getParent();
 
-    Assert.assertNotNull(testHelper.snapshotAfterMigration.getSingleVariable(subProcessExecution.getId(), "foo"));
+    Assert.assertNotNull(
+        testHelper.snapshotAfterMigration.getSingleVariable(subProcessExecution.getId(), "foo"));
   }
 
   @Test
   public void testVariableAtScopeAndConcurrentExecutionAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree userTask1CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask1")
-        .get(0);
-    ExecutionTree userTask2CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask2")
-        .get(0);
+    ExecutionTree userTask1CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask1").get(0);
+    ExecutionTree userTask2CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask2").get(0);
 
     runtimeService.setVariableLocal(processInstance.getId(), "foo", "processInstanceValue");
     runtimeService.setVariableLocal(userTask1CCExecutionBefore.getId(), "foo", "task1Value");
     runtimeService.setVariableLocal(userTask2CCExecutionBefore.getId(), "foo", "task2Value");
 
-    VariableInstance processScopeVariable = runtimeService.createVariableInstanceQuery().variableValueEquals("foo", "processInstanceValue").singleResult();
-    VariableInstance task1Variable = runtimeService.createVariableInstanceQuery().variableValueEquals("foo", "task1Value").singleResult();
-    VariableInstance task2Variable = runtimeService.createVariableInstanceQuery().variableValueEquals("foo", "task2Value").singleResult();
+    VariableInstance processScopeVariable = runtimeService.createVariableInstanceQuery()
+        .variableValueEquals("foo", "processInstanceValue").singleResult();
+    VariableInstance task1Variable = runtimeService.createVariableInstanceQuery()
+        .variableValueEquals("foo", "task1Value").singleResult();
+    VariableInstance task2Variable = runtimeService.createVariableInstanceQuery()
+        .variableValueEquals("foo", "task2Value").singleResult();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
-    // then the scope variable instance has been overwritten during compaction (conform to prior behavior);
+    // then the scope variable instance has been overwritten during compaction (conform to prior
+    // behavior);
     // although this is tested here, changing this behavior may be ok in the future
     Assert.assertEquals(3, testHelper.snapshotAfterMigration.getVariables().size());
 
-    VariableInstance processScopeVariableAfterMigration = testHelper.snapshotAfterMigration.getVariable(processScopeVariable.getId());
+    VariableInstance processScopeVariableAfterMigration = testHelper.snapshotAfterMigration
+        .getVariable(processScopeVariable.getId());
     Assert.assertNotNull(processScopeVariableAfterMigration);
     Assert.assertEquals("processInstanceValue", processScopeVariableAfterMigration.getValue());
 
-    VariableInstance task1VariableAfterMigration = testHelper.snapshotAfterMigration.getVariable(task1Variable.getId());
+    VariableInstance task1VariableAfterMigration = testHelper.snapshotAfterMigration
+        .getVariable(task1Variable.getId());
     Assert.assertNotNull(task1VariableAfterMigration);
     Assert.assertEquals("task1Value", task1VariableAfterMigration.getValue());
 
-    VariableInstance task2VariableAfterMigration = testHelper.snapshotAfterMigration.getVariable(task2Variable.getId());
+    VariableInstance task2VariableAfterMigration = testHelper.snapshotAfterMigration
+        .getVariable(task2Variable.getId());
     Assert.assertNotNull(task2VariableAfterMigration);
     Assert.assertEquals("task2Value", task2VariableAfterMigration.getValue());
 
@@ -769,48 +785,52 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtScopeAndConcurrentExecutionRemoveParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask1", "userTask1").mapActivities("userTask2", "userTask2").build();
 
     ProcessInstance processInstance = runtimeService
         .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ExecutionTree executionTreeBeforeMigration =
-        ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    ExecutionTree executionTreeBeforeMigration = ExecutionTree.forExecution(processInstance.getId(),
+        rule.getProcessEngine());
 
-    ExecutionTree userTask1CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask1")
-        .get(0);
-    ExecutionTree userTask2CCExecutionBefore  = executionTreeBeforeMigration
-        .getLeafExecutions("userTask2")
-        .get(0);
-    ExecutionTree subProcessExecution  = userTask1CCExecutionBefore.getParent();
+    ExecutionTree userTask1CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask1").get(0);
+    ExecutionTree userTask2CCExecutionBefore = executionTreeBeforeMigration
+        .getLeafExecutions("userTask2").get(0);
+    ExecutionTree subProcessExecution = userTask1CCExecutionBefore.getParent();
 
     runtimeService.setVariableLocal(subProcessExecution.getId(), "foo", "subProcessValue");
     runtimeService.setVariableLocal(userTask1CCExecutionBefore.getId(), "foo", "task1Value");
     runtimeService.setVariableLocal(userTask2CCExecutionBefore.getId(), "foo", "task2Value");
 
-    VariableInstance task1Variable = runtimeService.createVariableInstanceQuery().variableValueEquals("foo", "task1Value").singleResult();
-    VariableInstance task2Variable = runtimeService.createVariableInstanceQuery().variableValueEquals("foo", "task2Value").singleResult();
+    VariableInstance task1Variable = runtimeService.createVariableInstanceQuery()
+        .variableValueEquals("foo", "task1Value").singleResult();
+    VariableInstance task2Variable = runtimeService.createVariableInstanceQuery()
+        .variableValueEquals("foo", "task2Value").singleResult();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
-    // then the scope variable instance has been overwritten during compaction (conform to prior behavior);
+    // then the scope variable instance has been overwritten during compaction (conform to prior
+    // behavior);
     // although this is tested here, changing this behavior may be ok in the future
     Collection<VariableInstance> variables = testHelper.snapshotAfterMigration.getVariables();
     Assert.assertEquals(2, variables.size());
 
-    VariableInstance task1VariableAfterMigration = testHelper.snapshotAfterMigration.getVariable(task1Variable.getId());
+    VariableInstance task1VariableAfterMigration = testHelper.snapshotAfterMigration
+        .getVariable(task1Variable.getId());
     Assert.assertNotNull(task1VariableAfterMigration);
     Assert.assertEquals("task1Value", task1VariableAfterMigration.getValue());
 
-    VariableInstance task2VariableAfterMigration = testHelper.snapshotAfterMigration.getVariable(task2Variable.getId());
+    VariableInstance task2VariableAfterMigration = testHelper.snapshotAfterMigration
+        .getVariable(task2Variable.getId());
     Assert.assertNotNull(task2VariableAfterMigration);
     Assert.assertEquals("task2Value", task2VariableAfterMigration.getValue());
 
@@ -819,22 +839,23 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtConcurrentExecutionInTransition() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
     ProcessInstance processInstance = rule.getRuntimeService()
-        .createProcessInstanceById(sourceProcessDefinition.getId())
-        .startBeforeActivity("userTask")
-        .startBeforeActivity("userTask")
-        .execute();
+        .createProcessInstanceById(sourceProcessDefinition.getId()).startBeforeActivity("userTask")
+        .startBeforeActivity("userTask").execute();
 
-    Execution concurrentExecution = runtimeService.createExecutionQuery().activityId("userTask").list().get(0);
-    Job jobForExecution = rule.getManagementService().createJobQuery().executionId(concurrentExecution.getId()).singleResult();
+    Execution concurrentExecution = runtimeService.createExecutionQuery().activityId("userTask")
+        .list().get(0);
+    Job jobForExecution = rule.getManagementService().createJobQuery()
+        .executionId(concurrentExecution.getId()).singleResult();
 
     runtimeService.setVariableLocal(concurrentExecution.getId(), "var", "value");
 
@@ -842,7 +863,8 @@ public class MigrationVariablesTest {
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    Job jobAfterMigration = rule.getManagementService().createJobQuery().jobId(jobForExecution.getId()).singleResult();
+    Job jobAfterMigration = rule.getManagementService().createJobQuery()
+        .jobId(jobForExecution.getId()).singleResult();
 
     testHelper.assertVariableMigratedToExecution(
         testHelper.snapshotBeforeMigration.getSingleVariable("var"),
@@ -852,22 +874,23 @@ public class MigrationVariablesTest {
   @Test
   public void testVariableAtConcurrentExecutionInTransitionAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "userTask")
-        .build();
+        .mapActivities("userTask", "userTask").build();
 
     ProcessInstance processInstance = rule.getRuntimeService()
-        .createProcessInstanceById(sourceProcessDefinition.getId())
-        .startBeforeActivity("userTask")
-        .startBeforeActivity("userTask")
-        .execute();
+        .createProcessInstanceById(sourceProcessDefinition.getId()).startBeforeActivity("userTask")
+        .startBeforeActivity("userTask").execute();
 
-    Execution concurrentExecution = runtimeService.createExecutionQuery().activityId("userTask").list().get(0);
-    Job jobForExecution = rule.getManagementService().createJobQuery().executionId(concurrentExecution.getId()).singleResult();
+    Execution concurrentExecution = runtimeService.createExecutionQuery().activityId("userTask")
+        .list().get(0);
+    Job jobForExecution = rule.getManagementService().createJobQuery()
+        .executionId(concurrentExecution.getId()).singleResult();
 
     runtimeService.setVariableLocal(concurrentExecution.getId(), "var", "value");
 
@@ -875,7 +898,8 @@ public class MigrationVariablesTest {
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    Job jobAfterMigration = rule.getManagementService().createJobQuery().jobId(jobForExecution.getId()).singleResult();
+    Job jobAfterMigration = rule.getManagementService().createJobQuery()
+        .jobId(jobForExecution.getId()).singleResult();
 
     testHelper.assertVariableMigratedToExecution(
         testHelper.snapshotBeforeMigration.getSingleVariable("var"),
@@ -883,35 +907,32 @@ public class MigrationVariablesTest {
   }
 
   @Test
-  public void testCanMigrateWithObjectVariableThatFailsOnDeserialization()
-  {
+  public void testCanMigrateWithObjectVariableThatFailsOnDeserialization() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("userTask", "userTask")
-        .build();
+        .mapActivities("userTask", "userTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ObjectValue objectValue = Variables
-      .serializedObjectValue("does/not/deserialize")
-      .serializationDataFormat(SerializationDataFormats.JAVA)
-      .objectTypeName("and.this.is.a.nonexisting.Class")
-      .create();
+    ObjectValue objectValue = Variables.serializedObjectValue("does/not/deserialize")
+        .serializationDataFormat(SerializationDataFormats.JAVA)
+        .objectTypeName("and.this.is.a.nonexisting.Class").create();
 
-    runtimeService.setVariable(
-        processInstance.getId(),
-        "var",
-        objectValue);
+    runtimeService.setVariable(processInstance.getId(), "var", objectValue);
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    ObjectValue migratedValue = runtimeService.getVariableTyped(processInstance.getId(), "var", false);
+    ObjectValue migratedValue = runtimeService.getVariableTyped(processInstance.getId(), "var",
+        false);
     Assert.assertEquals(objectValue.getValueSerialized(), migratedValue.getValueSerialized());
     Assert.assertEquals(objectValue.getObjectTypeName(), migratedValue.getObjectTypeName());
   }

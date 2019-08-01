@@ -24,7 +24,6 @@ import org.junit.Test;
 
 public class AbstractHistoryLevelTest {
 
-
   public static class MyHistoryLevel extends AbstractHistoryLevel {
 
     @Override
@@ -45,6 +44,7 @@ public class AbstractHistoryLevelTest {
 
   @Test
   public void ensureCorrectToString() {
-    Assert.assertThat(new MyHistoryLevel().toString(), CoreMatchers.is("MyHistoryLevel(name=myName, id=4711)"));
+    Assert.assertThat(new MyHistoryLevel().toString(),
+        CoreMatchers.is("MyHistoryLevel(name=myName, id=4711)"));
   }
 }

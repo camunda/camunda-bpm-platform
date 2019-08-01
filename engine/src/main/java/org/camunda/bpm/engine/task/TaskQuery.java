@@ -32,11 +32,10 @@ import org.camunda.bpm.engine.variable.type.ValueType;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public interface TaskQuery extends Query<TaskQuery, Task>{
+public interface TaskQuery extends Query<TaskQuery, Task> {
 
   /**
-   * Only select tasks with the given task id (in practice, there will be
-   * maximum one of this kind)
+   * Only select tasks with the given task id (in practice, there will be maximum one of this kind)
    */
   TaskQuery taskId(String taskId);
 
@@ -46,19 +45,25 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks with a name not matching the given name */
   TaskQuery taskNameNotEqual(String name);
 
-  /** Only select tasks with a name matching the parameter.
-   *  The syntax is that of SQL: for example usage: nameLike(%camunda%)*/
+  /**
+   * Only select tasks with a name matching the parameter. The syntax is that of SQL: for example
+   * usage: nameLike(%camunda%)
+   */
   TaskQuery taskNameLike(String nameLike);
 
-  /** Only select tasks with a name not matching the parameter.
-   *  The syntax is that of SQL: for example usage: nameNotLike(%camunda%)*/
+  /**
+   * Only select tasks with a name not matching the parameter. The syntax is that of SQL: for
+   * example usage: nameNotLike(%camunda%)
+   */
   TaskQuery taskNameNotLike(String nameNotLike);
 
   /** Only select tasks with the given description. */
   TaskQuery taskDescription(String description);
 
-  /** Only select tasks with a description matching the parameter .
-   *  The syntax is that of SQL: for example usage: descriptionLike(%camunda%)*/
+  /**
+   * Only select tasks with a description matching the parameter . The syntax is that of SQL: for
+   * example usage: descriptionLike(%camunda%)
+   */
   TaskQuery taskDescriptionLike(String descriptionLike);
 
   /** Only select tasks with the given priority. */
@@ -74,33 +79,43 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery taskAssignee(String assignee);
 
   /**
-   *  <p>Only select tasks which are assigned to the user described by the given expression.</p>
+   * <p>
+   * Only select tasks which are assigned to the user described by the given expression.
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery taskAssigneeExpression(String assigneeExpression);
 
-  /** Only select tasks which are matching the given user.
-   *  The syntax is that of SQL: for example usage: nameLike(%camunda%)*/
+  /**
+   * Only select tasks which are matching the given user. The syntax is that of SQL: for example
+   * usage: nameLike(%camunda%)
+   */
   TaskQuery taskAssigneeLike(String assignee);
 
   /**
-   * <p>Only select tasks which are assigned to the user described by the given expression.
-   *  The syntax is that of SQL: for example usage: taskAssigneeLikeExpression("${'%test%'}")</p>
+   * <p>
+   * Only select tasks which are assigned to the user described by the given expression. The syntax
+   * is that of SQL: for example usage: taskAssigneeLikeExpression("${'%test%'}")
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery taskAssigneeLikeExpression(String assigneeLikeExpression);
 
@@ -111,15 +126,19 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery taskOwner(String owner);
 
   /**
-   * <p>Only select tasks for which the described user by the given expression is the owner.</p>
+   * <p>
+   * Only select tasks for which the described user by the given expression is the owner.
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery taskOwnerExpression(String ownerExpression);
 
@@ -140,25 +159,27 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * Only select tasks for which the given user or one of his groups is a candidate.
    *
    * <p>
-   * Per default it only selects tasks which are not already assigned
-   * to a user. To also include assigned task in the result specify
-   * {@link #includeAssignedTasks()} in your query.
+   * Per default it only selects tasks which are not already assigned to a user. To also include
+   * assigned task in the result specify {@link #includeAssignedTasks()} in your query.
    * </p>
    *
    * @throws ProcessEngineException
-   *   <ul><li>When query is executed and {@link #taskCandidateGroup(String)} or
-   *     {@link #taskCandidateGroupIn(List)} has been executed on the "and query" instance.
-   *     No exception is thrown when query is executed and {@link #taskCandidateGroup(String)} or
-   *     {@link #taskCandidateGroupIn(List)} has been executed on the "or query" instance.
-   *   <li>When passed user is <code>null</code>.
-   *   </ul>
+   *           <ul>
+   *           <li>When query is executed and {@link #taskCandidateGroup(String)} or
+   *           {@link #taskCandidateGroupIn(List)} has been executed on the "and query" instance. No
+   *           exception is thrown when query is executed and {@link #taskCandidateGroup(String)} or
+   *           {@link #taskCandidateGroupIn(List)} has been executed on the "or query" instance.
+   *           <li>When passed user is <code>null</code>.
+   *           </ul>
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    *
    */
   TaskQuery taskCandidateUser(String candidateUser);
@@ -167,23 +188,25 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * Only select tasks for which the described user by the given expression is a candidate.
    *
    * <p>
-   * Per default it only selects tasks which are not already assigned
-   * to a user. To also include assigned task in the result specify
-   * {@link #includeAssignedTasks()} in your query.
+   * Per default it only selects tasks which are not already assigned to a user. To also include
+   * assigned task in the result specify {@link #includeAssignedTasks()} in your query.
    * </p>
    *
    * @throws ProcessEngineException
-   *   <ul><li>When query is executed and {@link #taskCandidateGroup(String)} or
-   *     {@link #taskCandidateGroupIn(List)} has been executed on the query instance.
-   *   <li>When passed user is <code>null</code>.
-   *   </ul>
+   *           <ul>
+   *           <li>When query is executed and {@link #taskCandidateGroup(String)} or
+   *           {@link #taskCandidateGroupIn(List)} has been executed on the query instance.
+   *           <li>When passed user is <code>null</code>.
+   *           </ul>
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery taskCandidateUserExpression(String candidateUserExpression);
 
@@ -191,86 +214,99 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery taskInvolvedUser(String involvedUser);
 
   /**
-   * <p>Only select tasks for which there exist an {@link IdentityLink} with the
-   * described user by the given expression</p>
+   * <p>
+   * Only select tasks for which there exist an {@link IdentityLink} with the described user by the
+   * given expression
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery taskInvolvedUserExpression(String involvedUserExpression);
 
   /**
    * Only select tasks which have a candidate group
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
    */
   TaskQuery withCandidateGroups();
 
   /**
    * Only select tasks which have no candidate group
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
    */
   TaskQuery withoutCandidateGroups();
 
   /**
    * Only select tasks which have a candidate user
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
    */
   TaskQuery withCandidateUsers();
 
   /**
    * Only select tasks which have no candidate user
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
    */
   TaskQuery withoutCandidateUsers();
 
   /**
-   *  Only select tasks for which users in the given group are candidates.
+   * Only select tasks for which users in the given group are candidates.
    *
    * <p>
-   * Per default it only selects tasks which are not already assigned
-   * to a user. To also include assigned task in the result specify
-   * {@link #includeAssignedTasks()} in your query.
+   * Per default it only selects tasks which are not already assigned to a user. To also include
+   * assigned task in the result specify {@link #includeAssignedTasks()} in your query.
    * </p>
    *
    * @throws ProcessEngineException
-   *   <ul><li>When query is executed and {@link #taskCandidateUser(String)} or
-   *     {@link #taskCandidateGroupIn(List)} has been executed on the "and query" instance.</li>
-   *   No exception is thrown when query is executed and {@link #taskCandidateUser(String)} or
-   *   {@link #taskCandidateGroupIn(List)} has been executed on the "or query" instance.</li>
-   *   <li>When passed group is <code>null</code>.</li></ul>
+   *           <ul>
+   *           <li>When query is executed and {@link #taskCandidateUser(String)} or
+   *           {@link #taskCandidateGroupIn(List)} has been executed on the "and query"
+   *           instance.</li> No exception is thrown when query is executed and
+   *           {@link #taskCandidateUser(String)} or {@link #taskCandidateGroupIn(List)} has been
+   *           executed on the "or query" instance.</li>
+   *           <li>When passed group is <code>null</code>.</li>
+   *           </ul>
    */
   TaskQuery taskCandidateGroup(String candidateGroup);
 
   /**
-   * Only select tasks for which users in the described group by the given expression are candidates.
+   * Only select tasks for which users in the described group by the given expression are
+   * candidates.
    *
    * <p>
-   * Per default it only selects tasks which are not already assigned
-   * to a user. To also include assigned task in the result specify
-   * {@link #includeAssignedTasks()} in your query.
+   * Per default it only selects tasks which are not already assigned to a user. To also include
+   * assigned task in the result specify {@link #includeAssignedTasks()} in your query.
    * </p>
    *
    * @throws ProcessEngineException
-   *   <ul><li>When query is executed and {@link #taskCandidateUser(String)} or
-   *     {@link #taskCandidateGroupIn(List)} has been executed on the query instance.
-   *   <li>When passed group is <code>null</code>.
-   *   </ul>
+   *           <ul>
+   *           <li>When query is executed and {@link #taskCandidateUser(String)} or
+   *           {@link #taskCandidateGroupIn(List)} has been executed on the query instance.
+   *           <li>When passed group is <code>null</code>.
+   *           </ul>
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery taskCandidateGroupExpression(String candidateGroupExpression);
 
@@ -278,52 +314,58 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * Only select tasks for which the 'candidateGroup' is one of the given groups.
    *
    * <p>
-   * Per default it only selects tasks which are not already assigned
-   * to a user. To also include assigned task in the result specify
-   * {@link #includeAssignedTasks()} in your query.
+   * Per default it only selects tasks which are not already assigned to a user. To also include
+   * assigned task in the result specify {@link #includeAssignedTasks()} in your query.
    * </p>
    *
    * @throws ProcessEngineException
-   *   <ul><li>When query is executed and {@link #taskCandidateGroup(String)} or
-   *     {@link #taskCandidateUser(String)} has been executed on the "and query" instance.</li>
-   *   No exception is thrown when query is executed and {@link #taskCandidateGroup(String)} or
-   *   {@link #taskCandidateUser(String)} has been executed on the "or query" instance.</li>
-   *   <li>When passed group list is empty or <code>null</code>.</li></ul>
+   *           <ul>
+   *           <li>When query is executed and {@link #taskCandidateGroup(String)} or
+   *           {@link #taskCandidateUser(String)} has been executed on the "and query"
+   *           instance.</li> No exception is thrown when query is executed and
+   *           {@link #taskCandidateGroup(String)} or {@link #taskCandidateUser(String)} has been
+   *           executed on the "or query" instance.</li>
+   *           <li>When passed group list is empty or <code>null</code>.</li>
+   *           </ul>
    */
   TaskQuery taskCandidateGroupIn(List<String> candidateGroups);
 
   /**
-   * Only select tasks for which the 'candidateGroup' is one of the described groups of the given expression.
+   * Only select tasks for which the 'candidateGroup' is one of the described groups of the given
+   * expression.
    *
    * <p>
-   * Per default it only selects tasks which are not already assigned
-   * to a user. To also include assigned task in the result specify
-   * {@link #includeAssignedTasks()} in your query.
+   * Per default it only selects tasks which are not already assigned to a user. To also include
+   * assigned task in the result specify {@link #includeAssignedTasks()} in your query.
    * </p>
    *
    * @throws ProcessEngineException
-   *   <ul><li>When query is executed and {@link #taskCandidateGroup(String)} or
-   *     {@link #taskCandidateUser(String)} has been executed on the query instance.
-   *   <li>When passed group list is empty or <code>null</code>.</ul>
+   *           <ul>
+   *           <li>When query is executed and {@link #taskCandidateGroup(String)} or
+   *           {@link #taskCandidateUser(String)} has been executed on the query instance.
+   *           <li>When passed group list is empty or <code>null</code>.
+   *           </ul>
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery taskCandidateGroupInExpression(String candidateGroupsExpression);
 
   /**
    * Select both assigned and not assigned tasks for candidate user or group queries.
    * <p>
-   * By default {@link #taskCandidateUser(String)}, {@link #taskCandidateGroup(String)}
-   * and {@link #taskCandidateGroupIn(List)} queries only select not assigned tasks.
+   * By default {@link #taskCandidateUser(String)}, {@link #taskCandidateGroup(String)} and
+   * {@link #taskCandidateGroupIn(List)} queries only select not assigned tasks.
    * </p>
    *
    * @throws ProcessEngineException
-   *    When no candidate user or group(s) are specified beforehand
+   *           When no candidate user or group(s) are specified beforehand
    */
   TaskQuery includeAssignedTasks();
 
@@ -333,7 +375,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks for the given process instance business key */
   TaskQuery processInstanceBusinessKey(String processInstanceBusinessKey);
 
-  /** Only select tasks for the given process instance business key described by the given expression */
+  /**
+   * Only select tasks for the given process instance business key described by the given expression
+   */
   TaskQuery processInstanceBusinessKeyExpression(String processInstanceBusinessKeyExpression);
 
   /**
@@ -341,12 +385,17 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys);
 
-  /** Only select tasks matching the given process instance business key.
-   *  The syntax is that of SQL: for example usage: nameLike(%camunda%)*/
+  /**
+   * Only select tasks matching the given process instance business key. The syntax is that of SQL:
+   * for example usage: nameLike(%camunda%)
+   */
   TaskQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey);
 
-  /** Only select tasks matching the given process instance business key described by the given expression.
-   *  The syntax is that of SQL: for example usage: processInstanceBusinessKeyLikeExpression("${ '%camunda%' }")*/
+  /**
+   * Only select tasks matching the given process instance business key described by the given
+   * expression. The syntax is that of SQL: for example usage:
+   * processInstanceBusinessKeyLikeExpression("${ '%camunda%' }")
+   */
   TaskQuery processInstanceBusinessKeyLikeExpression(String processInstanceBusinessKeyExpression);
 
   /** Only select tasks for the given execution. */
@@ -377,17 +426,15 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery excludeSubtasks();
 
   /**
-   * Only select tasks with the given taskDefinitionKey.
-   * The task definition key is the id of the userTask:
-   * &lt;userTask id="xxx" .../&gt;
+   * Only select tasks with the given taskDefinitionKey. The task definition key is the id of the
+   * userTask: &lt;userTask id="xxx" .../&gt;
    **/
   TaskQuery taskDefinitionKey(String key);
 
   /**
-   * Only select tasks with a taskDefinitionKey that match the given parameter.
-   *  The syntax is that of SQL: for example usage: taskDefinitionKeyLike("%camunda%").
-   * The task definition key is the id of the userTask:
-   * &lt;userTask id="xxx" .../&gt;
+   * Only select tasks with a taskDefinitionKey that match the given parameter. The syntax is that
+   * of SQL: for example usage: taskDefinitionKeyLike("%camunda%"). The task definition key is the
+   * id of the userTask: &lt;userTask id="xxx" .../&gt;
    **/
   TaskQuery taskDefinitionKeyLike(String keyLike);
 
@@ -405,247 +452,253 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks for the given case instance business key */
   TaskQuery caseInstanceBusinessKey(String caseInstanceBusinessKey);
 
-  /** Only select tasks matching the given case instance business key.
-   *  The syntax is that of SQL: for example usage: nameLike(%aBusinessKey%)*/
+  /**
+   * Only select tasks matching the given case instance business key. The syntax is that of SQL: for
+   * example usage: nameLike(%aBusinessKey%)
+   */
   TaskQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike);
 
   /** Only select tasks for the given case execution. */
   TaskQuery caseExecutionId(String caseExecutionId);
 
   /**
-   * Only select tasks which are part of a case instance which has the given
-   * case definition key.
+   * Only select tasks which are part of a case instance which has the given case definition key.
    */
   TaskQuery caseDefinitionKey(String caseDefinitionKey);
 
   /**
-   * Only select tasks which are part of a case instance which has the given
-   * case definition id.
+   * Only select tasks which are part of a case instance which has the given case definition id.
    */
   TaskQuery caseDefinitionId(String caseDefinitionId);
 
   /**
-   * Only select tasks which are part of a case instance which has the given
-   * case definition name.
+   * Only select tasks which are part of a case instance which has the given case definition name.
    */
   TaskQuery caseDefinitionName(String caseDefinitionName);
 
   /**
-   * Only select tasks which are part of a case instance which case definition
-   * name is like the given parameter.
-   * The syntax is that of SQL: for example usage: nameLike(%processDefinitionName%)*/
+   * Only select tasks which are part of a case instance which case definition name is like the
+   * given parameter. The syntax is that of SQL: for example usage:
+   * nameLike(%processDefinitionName%)
+   */
   TaskQuery caseDefinitionNameLike(String caseDefinitionNameLike);
 
   /**
-   * All queries for task-, process- and case-variables will match the variable names in a case-insensitive way.
+   * All queries for task-, process- and case-variables will match the variable names in a
+   * case-insensitive way.
    */
   TaskQuery matchVariableNamesIgnoreCase();
 
   /**
-   * All queries for task-, process- and case-variables will match the variable values in a case-insensitive way.
+   * All queries for task-, process- and case-variables will match the variable values in a
+   * case-insensitive way.
    */
   TaskQuery matchVariableValuesIgnoreCase();
 
   /**
-   * Only select tasks which have a local task variable with the given name
-   * set to the given value.
+   * Only select tasks which have a local task variable with the given name set to the given value.
    */
   TaskQuery taskVariableValueEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which have a local task variable with the given name, but
-   * with a different value than the passed value.
-   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
-   * are not supported.
+   * Only select tasks which have a local task variable with the given name, but with a different
+   * value than the passed value. Byte-arrays and {@link Serializable} objects (which are not
+   * primitive type wrappers) are not supported.
    */
   TaskQuery taskVariableValueNotEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which have a local task variable with the given name
-   * matching the given value.
-   * The syntax is that of SQL: for example usage: valueLike(%value%)
+   * Only select tasks which have a local task variable with the given name matching the given
+   * value. The syntax is that of SQL: for example usage: valueLike(%value%)
    */
   TaskQuery taskVariableValueLike(String variableName, String variableValue);
 
   /**
-   * Only select tasks which have a local task variable with the given name
-   * and a value greater than the given one.
+   * Only select tasks which have a local task variable with the given name and a value greater than
+   * the given one.
    */
   TaskQuery taskVariableValueGreaterThan(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which have a local task variable with the given name
-   * and a value greater than or equal to the given one.
+   * Only select tasks which have a local task variable with the given name and a value greater than
+   * or equal to the given one.
    */
   TaskQuery taskVariableValueGreaterThanOrEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which have a local task variable with the given name
-   * and a value less than the given one.
+   * Only select tasks which have a local task variable with the given name and a value less than
+   * the given one.
    */
   TaskQuery taskVariableValueLessThan(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which have a local task variable with the given name
-   * and a value less than or equal to the given one.
+   * Only select tasks which have a local task variable with the given name and a value less than or
+   * equal to the given one.
    */
   TaskQuery taskVariableValueLessThanOrEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which have are part of a process that have a variable
-   * with the given name set to the given value.
+   * Only select tasks which have are part of a process that have a variable with the given name set
+   * to the given value.
    */
   TaskQuery processVariableValueEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which have a variable with the given name, but
-   * with a different value than the passed value.
-   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
-   * are not supported.
+   * Only select tasks which have a variable with the given name, but with a different value than
+   * the passed value. Byte-arrays and {@link Serializable} objects (which are not primitive type
+   * wrappers) are not supported.
    */
   TaskQuery processVariableValueNotEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a process that have a variable
-   * with the given name and matching the given value.
-   * The syntax is that of SQL: for example usage: valueLike(%value%)*/
+   * Only select tasks which are part of a process that have a variable with the given name and
+   * matching the given value. The syntax is that of SQL: for example usage: valueLike(%value%)
+   */
   TaskQuery processVariableValueLike(String variableName, String variableValue);
 
   /**
-   * Only select tasks which are part of a process that have a variable
-   * with the given name and a value greater than the given one.
+   * Only select tasks which are part of a process that have a variable with the given name and a
+   * value greater than the given one.
    */
   TaskQuery processVariableValueGreaterThan(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a process that have a variable
-   * with the given name and a value greater than or equal to the given one.
+   * Only select tasks which are part of a process that have a variable with the given name and a
+   * value greater than or equal to the given one.
    */
   TaskQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a process that have a variable
-   * with the given name and a value less than the given one.
+   * Only select tasks which are part of a process that have a variable with the given name and a
+   * value less than the given one.
    */
   TaskQuery processVariableValueLessThan(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a process that have a variable
-   * with the given name and a value greater than or equal to the given one.
+   * Only select tasks which are part of a process that have a variable with the given name and a
+   * value greater than or equal to the given one.
    */
   TaskQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a case instance that have a variable
-   * with the given name set to the given value. The type of variable is determined based
-   * on the value, using types configured in {@link ProcessEngineConfiguration#getVariableSerializers()}.
+   * Only select tasks which are part of a case instance that have a variable with the given name
+   * set to the given value. The type of variable is determined based on the value, using types
+   * configured in {@link ProcessEngineConfiguration#getVariableSerializers()}.
    *
-   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
-   * are not supported.
+   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not
+   * supported.
    *
-   * @param name name of the variable, cannot be null.
+   * @param name
+   *          name of the variable, cannot be null.
    */
   TaskQuery caseInstanceVariableValueEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a case instance that have a variable
-   * with the given name, but with a different value than the passed value. The
-   * type of variable is determined based on the value, using types configured
-   * in {@link ProcessEngineConfiguration#getVariableSerializers()}.
+   * Only select tasks which are part of a case instance that have a variable with the given name,
+   * but with a different value than the passed value. The type of variable is determined based on
+   * the value, using types configured in
+   * {@link ProcessEngineConfiguration#getVariableSerializers()}.
    *
-   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
-   * are not supported.
+   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not
+   * supported.
    *
-   * @param name name of the variable, cannot be null.
+   * @param name
+   *          name of the variable, cannot be null.
    */
   TaskQuery caseInstanceVariableValueNotEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a case instance that have a variable value
-   * like the given value.
+   * Only select tasks which are part of a case instance that have a variable value like the given
+   * value.
    *
    * This be used on string variables only.
    *
-   * @param name variable name, cannot be null.
+   * @param name
+   *          variable name, cannot be null.
    *
-   * @param value variable value. The string can include the
-   * wildcard character '%' to express like-strategy:
-   * starts with (string%), ends with (%string) or contains (%string%).
+   * @param value
+   *          variable value. The string can include the wildcard character '%' to express
+   *          like-strategy: starts with (string%), ends with (%string) or contains (%string%).
    */
   TaskQuery caseInstanceVariableValueLike(String variableName, String variableValue);
 
   /**
-   * Only select tasks which are part of a case instance that have a variable
-   * with the given name and a variable value greater than the passed value.
+   * Only select tasks which are part of a case instance that have a variable with the given name
+   * and a variable value greater than the passed value.
    *
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name
+   *          variable name, cannot be null.
    */
   TaskQuery caseInstanceVariableValueGreaterThan(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a case instance that have a
-   * variable value greater than or equal to the passed value.
+   * Only select tasks which are part of a case instance that have a variable value greater than or
+   * equal to the passed value.
    *
-   * Booleans, Byte-arrays and {@link Serializable} objects (which
-   * are not primitive type wrappers) are not supported.
+   * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
+   * are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name
+   *          variable name, cannot be null.
    */
   TaskQuery caseInstanceVariableValueGreaterThanOrEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a case instance that have a variable
-   * value less than the passed value.
+   * Only select tasks which are part of a case instance that have a variable value less than the
+   * passed value.
    *
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name
+   *          variable name, cannot be null.
    */
   TaskQuery caseInstanceVariableValueLessThan(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a case instance that have a variable
-   * value less than or equal to the passed value.
+   * Only select tasks which are part of a case instance that have a variable value less than or
+   * equal to the passed value.
    *
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
    *
-   * @param name variable name, cannot be null.
+   * @param name
+   *          variable name, cannot be null.
    */
   TaskQuery caseInstanceVariableValueLessThanOrEquals(String variableName, Object variableValue);
 
   /**
-   * Only select tasks which are part of a process instance which has the given
-   * process definition key.
+   * Only select tasks which are part of a process instance which has the given process definition
+   * key.
    */
   TaskQuery processDefinitionKey(String processDefinitionKey);
 
   /**
-   * Only select tasks which are part of a process instance which has one of the
-   * given process definition keys.
+   * Only select tasks which are part of a process instance which has one of the given process
+   * definition keys.
    */
   TaskQuery processDefinitionKeyIn(String... processDefinitionKeys);
 
   /**
-   * Only select tasks which are part of a process instance which has the given
-   * process definition id.
+   * Only select tasks which are part of a process instance which has the given process definition
+   * id.
    */
   TaskQuery processDefinitionId(String processDefinitionId);
 
   /**
-   * Only select tasks which are part of a process instance which has the given
-   * process definition name.
+   * Only select tasks which are part of a process instance which has the given process definition
+   * name.
    */
   TaskQuery processDefinitionName(String processDefinitionName);
 
   /**
-   * Only select tasks which are part of a process instance which process definition
-   * name  is like the given parameter.
-   * The syntax is that of SQL: for example usage: nameLike(%processDefinitionName%)*/
+   * Only select tasks which are part of a process instance which process definition name is like
+   * the given parameter. The syntax is that of SQL: for example usage:
+   * nameLike(%processDefinitionName%)
+   */
   TaskQuery processDefinitionNameLike(String processDefinitionName);
 
   /**
@@ -654,15 +707,19 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery dueDate(Date dueDate);
 
   /**
-   * <p>Only select tasks with the described due date by the given expression.</p>
+   * <p>
+   * Only select tasks with the described due date by the given expression.
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery dueDateExpression(String dueDateExpression);
 
@@ -672,15 +729,19 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery dueBefore(Date dueDate);
 
   /**
-   * <p>Only select tasks which have a due date before the described date by the given expression.</p>
+   * <p>
+   * Only select tasks which have a due date before the described date by the given expression.
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery dueBeforeExpression(String dueDateExpression);
 
@@ -690,15 +751,19 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery dueAfter(Date dueDate);
 
   /**
-   * <p>Only select tasks which have a due date after the described date by the given expression.</p>
+   * <p>
+   * Only select tasks which have a due date after the described date by the given expression.
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery dueAfterExpression(String dueDateExpression);
 
@@ -708,15 +773,19 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery followUpDate(Date followUpDate);
 
   /**
-   * <p>Only select tasks with the described follow-up date by the given expression.</p>
+   * <p>
+   * Only select tasks with the described follow-up date by the given expression.
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery followUpDateExpression(String followUpDateExpression);
 
@@ -726,35 +795,46 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery followUpBefore(Date followUpDate);
 
   /**
-   * <p>Only select tasks which have a follow-up date before the described date by the given expression.</p>
+   * <p>
+   * Only select tasks which have a follow-up date before the described date by the given
+   * expression.
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery followUpBeforeExpression(String followUpDateExpression);
 
   /**
    * Only select tasks which have no follow-up date or a follow-up date before the given date.
-   * Serves the typical use case "give me all tasks without follow-up or follow-up date which is already due"
+   * Serves the typical use case "give me all tasks without follow-up or follow-up date which is
+   * already due"
    */
   TaskQuery followUpBeforeOrNotExistent(Date followUpDate);
 
   /**
-   * <p>Only select tasks which have no follow-up date or a follow-up date before the described date by the given expression.
-   * Serves the typical use case "give me all tasks without follow-up or follow-up date which is already due"</p>
+   * <p>
+   * Only select tasks which have no follow-up date or a follow-up date before the described date by
+   * the given expression. Serves the typical use case "give me all tasks without follow-up or
+   * follow-up date which is already due"
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery followUpBeforeOrNotExistentExpression(String followUpDateExpression);
 
@@ -764,15 +844,19 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery followUpAfter(Date followUpDate);
 
   /**
-   * <p>Only select tasks which have a follow-up date after the described date by the given expression.</p>
+   * <p>
+   * Only select tasks which have a follow-up date after the described date by the given expression.
+   * </p>
    *
    * @throws BadUserRequestException
-   *   <ul><li>When the query is executed and expressions are disabled for adhoc queries
-   *  (in case the query is executed via {@link #list()}, {@link #listPage(int, int)}, {@link #singleResult()}, or {@link #count()})
-   *  or stored queries (in case the query is stored along with a filter).
-   *  Expression evaluation can be activated by setting the process engine configuration properties
-   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
-   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *           <ul>
+   *           <li>When the query is executed and expressions are disabled for adhoc queries (in
+   *           case the query is executed via {@link #list()}, {@link #listPage(int, int)},
+   *           {@link #singleResult()}, or {@link #count()}) or stored queries (in case the query is
+   *           stored along with a filter). Expression evaluation can be activated by setting the
+   *           process engine configuration properties <code>enableExpressionsInAdhocQueries</code>
+   *           (default <code>false</code>) and <code>enableExpressionsInStoredQueries</code>
+   *           (default <code>true</code>) to <code>true</code>.
    */
   TaskQuery followUpAfterExpression(String followUpDateExpression);
 
@@ -787,11 +871,12 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery active();
 
   /**
-   * If called, the form keys of the fetched tasks are initialized and
-   * {@link Task#getFormKey()} will return a value (in case the task has a form key).
+   * If called, the form keys of the fetched tasks are initialized and {@link Task#getFormKey()}
+   * will return a value (in case the task has a form key).
    *
    * @throws ProcessEngineException
-   *   When method has been executed within "or query". Method must be executed on the base query.
+   *           When method has been executed within "or query". Method must be executed on the base
+   *           query.
    *
    * @return the query itself
    */
@@ -808,101 +893,117 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /**
    * Order by task id (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByTaskId();
 
   /**
    * Order by task name (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByTaskName();
 
   /**
-   * Order by task name case insensitive (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Order by task name case insensitive (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByTaskNameCaseInsensitive();
 
   /**
    * Order by description (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByTaskDescription();
 
   /**
    * Order by priority (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByTaskPriority();
 
   /**
    * Order by assignee (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByTaskAssignee();
 
   /**
-   * Order by the time on which the tasks were created (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Order by the time on which the tasks were created (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByTaskCreateTime();
 
   /**
    * Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByProcessInstanceId();
 
   /**
    * Order by case instance id (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByCaseInstanceId();
 
   /**
    * Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByExecutionId();
 
   /**
    * Order by case execution id (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByCaseExecutionId();
 
   /**
    * Order by due date (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByDueDate();
 
   /**
    * Order by follow-up date (needs to be followed by {@link #asc()} or {@link #desc()}).
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByFollowUpDate();
 
   /**
-   * Order by a process instance variable value of a certain type. Calling this method multiple times
-   * specifies secondary, tertiary orderings, etc. The ordering of variables with <code>null</code>
-   * values is database-specific.
+   * Order by a process instance variable value of a certain type. Calling this method multiple
+   * times specifies secondary, tertiary orderings, etc. The ordering of variables with
+   * <code>null</code> values is database-specific.
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByProcessVariable(String variableName, ValueType valueType);
 
   /**
@@ -910,69 +1011,83 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * specifies secondary, tertiary orderings, etc. The ordering of variables with <code>null</code>
    * values is database-specific.
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByExecutionVariable(String variableName, ValueType valueType);
 
   /**
-   * Order by a task variable value of a certain type. Calling this method multiple times
-   * specifies secondary, tertiary orderings, etc. The ordering of variables with <code>null</code>
-   * values is database-specific.
+   * Order by a task variable value of a certain type. Calling this method multiple times specifies
+   * secondary, tertiary orderings, etc. The ordering of variables with <code>null</code> values is
+   * database-specific.
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByTaskVariable(String variableName, ValueType valueType);
 
   /**
-   * Order by a task variable value of a certain type. Calling this method multiple times
-   * specifies secondary, tertiary orderings, etc. The ordering of variables with <code>null</code>
-   * values is database-specific.
+   * Order by a task variable value of a certain type. Calling this method multiple times specifies
+   * secondary, tertiary orderings, etc. The ordering of variables with <code>null</code> values is
+   * database-specific.
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByCaseExecutionVariable(String variableName, ValueType valueType);
 
   /**
-   * Order by a task variable value of a certain type. Calling this method multiple times
-   * specifies secondary, tertiary orderings, etc. The ordering of variables with <code>null</code>
-   * values is database-specific.
+   * Order by a task variable value of a certain type. Calling this method multiple times specifies
+   * secondary, tertiary orderings, etc. The ordering of variables with <code>null</code> values is
+   * database-specific.
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByCaseInstanceVariable(String variableName, ValueType valueType);
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of tasks without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of tasks without tenant id is database-specific.
    *
-   * @throws ProcessEngineException When method has been executed within "or query".
-   * */
+   * @throws ProcessEngineException
+   *           When method has been executed within "or query".
+   */
   TaskQuery orderByTenantId();
 
   /**
-   * <p>After calling or(), a chain of several filter criteria could follow. Each filter criterion that follows or()
-   * will be linked together with an OR expression until the OR query is terminated. To terminate the OR query right
-   * after the last filter criterion was applied, {@link #endOr()} must be invoked.</p>
+   * <p>
+   * After calling or(), a chain of several filter criteria could follow. Each filter criterion that
+   * follows or() will be linked together with an OR expression until the OR query is terminated. To
+   * terminate the OR query right after the last filter criterion was applied, {@link #endOr()} must
+   * be invoked.
+   * </p>
    *
-   * @return an object of the type {@link TaskQuery} on which an arbitrary amount of filter criteria could be applied.
-   * The several filter criteria will be linked together by an OR expression.
+   * @return an object of the type {@link TaskQuery} on which an arbitrary amount of filter criteria
+   *         could be applied. The several filter criteria will be linked together by an OR
+   *         expression.
    *
-   * @throws ProcessEngineException when or() has been invoked directly after or() or after or() and trailing filter
-   * criteria. To prevent throwing this exception, {@link #endOr()} must be invoked after a chain of filter criteria to
-   * mark the end of the OR query.
-   * */
+   * @throws ProcessEngineException
+   *           when or() has been invoked directly after or() or after or() and trailing filter
+   *           criteria. To prevent throwing this exception, {@link #endOr()} must be invoked after
+   *           a chain of filter criteria to mark the end of the OR query.
+   */
   TaskQuery or();
 
   /**
-   * <p>endOr() terminates an OR query on which an arbitrary amount of filter criteria were applied. To terminate the
-   * OR query which has been started by invoking {@link #or()}, endOr() must be invoked. Filter criteria which are
-   * applied after calling endOr() are linked together by an AND expression.</p>
+   * <p>
+   * endOr() terminates an OR query on which an arbitrary amount of filter criteria were applied. To
+   * terminate the OR query which has been started by invoking {@link #or()}, endOr() must be
+   * invoked. Filter criteria which are applied after calling endOr() are linked together by an AND
+   * expression.
+   * </p>
    *
-   * @return an object of the type {@link TaskQuery} on which an arbitrary amount of filter criteria could be applied.
-   * The filter criteria will be linked together by an AND expression.
+   * @return an object of the type {@link TaskQuery} on which an arbitrary amount of filter criteria
+   *         could be applied. The filter criteria will be linked together by an AND expression.
    *
-   * @throws ProcessEngineException when endOr() has been invoked before {@link #or()} was invoked. To prevent throwing
-   * this exception, {@link #or()} must be invoked first.
-   * */
+   * @throws ProcessEngineException
+   *           when endOr() has been invoked before {@link #or()} was invoked. To prevent throwing
+   *           this exception, {@link #or()} must be invoked first.
+   */
   TaskQuery endOr();
 }

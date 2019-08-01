@@ -41,13 +41,13 @@ import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.query.QueryProperty;
 import org.joda.time.DateTime;
 
-
 /**
  * Abstract superclass for all query types.
  *
  * @author Joram Barrez
  */
-public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryParameterObject implements Command<Object>, Query<T,U>, Serializable {
+public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryParameterObject
+    implements Command<Object>, Query<T, U>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -57,6 +57,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   protected enum ResultType {
     LIST, LIST_PAGE, LIST_IDS, SINGLE_RESULT, COUNT
   }
+
   protected transient CommandExecutor commandExecutor;
 
   protected ResultType resultType;
@@ -74,7 +75,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     // all queries that are created with a dedicated command executor
     // are treated as adhoc queries (i.e. queries not created in the context
     // of a command)
-    addValidator(AdhocQueryValidator.<AbstractQuery<?, ?>>get());
+    addValidator(AdhocQueryValidator.<AbstractQuery<?, ?>> get());
   }
 
   public AbstractQuery<T, U> setCommandExecutor(CommandExecutor commandExecutor) {
@@ -108,10 +109,14 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
       currentOrderingProperty = orderingProperties.get(orderingProperties.size() - 1);
     }
 
-    ensureNotNull(NotValidException.class, "You should call any of the orderBy methods first before specifying a direction", "currentOrderingProperty", currentOrderingProperty);
+    ensureNotNull(NotValidException.class,
+        "You should call any of the orderBy methods first before specifying a direction",
+        "currentOrderingProperty", currentOrderingProperty);
 
     if (currentOrderingProperty.getDirection() != null) {
-      ensureNull(NotValidException.class, "Invalid query: can specify only one direction desc() or asc() for an ordering constraint", "direction", direction);
+      ensureNull(NotValidException.class,
+          "Invalid query: can specify only one direction desc() or asc() for an ordering constraint",
+          "direction", direction);
     }
 
     currentOrderingProperty.setDirection(direction);
@@ -121,7 +126,9 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   protected void checkQueryOk() {
 
     for (QueryOrderingProperty orderingProperty : orderingProperties) {
-      ensureNotNull(NotValidException.class, "Invalid query: call asc() or desc() after using orderByXX()", "direction", orderingProperty.getDirection());
+      ensureNotNull(NotValidException.class,
+          "Invalid query: call asc() or desc() after using orderByXX()", "direction",
+          orderingProperty.getDirection());
     }
 
   }
@@ -129,7 +136,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   @SuppressWarnings("unchecked")
   public U singleResult() {
     this.resultType = ResultType.SINGLE_RESULT;
-    if (commandExecutor!=null) {
+    if (commandExecutor != null) {
       return (U) commandExecutor.execute(this);
     }
     return executeSingleResult(Context.getCommandContext());
@@ -138,7 +145,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   @SuppressWarnings("unchecked")
   public List<U> list() {
     this.resultType = ResultType.LIST;
-    if (commandExecutor!=null) {
+    if (commandExecutor != null) {
       return (List<U>) commandExecutor.execute(this);
     }
     return evaluateExpressionsAndExecuteList(Context.getCommandContext(), null);
@@ -149,26 +156,27 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     this.firstResult = firstResult;
     this.maxResults = maxResults;
     this.resultType = ResultType.LIST_PAGE;
-    if (commandExecutor!=null) {
+    if (commandExecutor != null) {
       return (List<U>) commandExecutor.execute(this);
     }
-    return evaluateExpressionsAndExecuteList(Context.getCommandContext(), new Page(firstResult, maxResults));
+    return evaluateExpressionsAndExecuteList(Context.getCommandContext(),
+        new Page(firstResult, maxResults));
   }
 
   public long count() {
     this.resultType = ResultType.COUNT;
-    if (commandExecutor!=null) {
+    if (commandExecutor != null) {
       return (Long) commandExecutor.execute(this);
     }
     return evaluateExpressionsAndExecuteCount(Context.getCommandContext());
   }
 
   public Object execute(CommandContext commandContext) {
-    if (resultType==ResultType.LIST) {
+    if (resultType == ResultType.LIST) {
       return evaluateExpressionsAndExecuteList(commandContext, null);
-    } else if (resultType==ResultType.SINGLE_RESULT) {
+    } else if (resultType == ResultType.SINGLE_RESULT) {
       return executeSingleResult(commandContext);
-    } else if (resultType==ResultType.LIST_PAGE) {
+    } else if (resultType == ResultType.LIST_PAGE) {
       return evaluateExpressionsAndExecuteList(commandContext, null);
     } else if (resultType == ResultType.LIST_IDS) {
       return evaluateExpressionsAndExecuteIdsList(commandContext);
@@ -192,8 +200,8 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   }
 
   /**
-   * Whether or not the query has excluding conditions. If the query has excluding conditions,
-   * (e.g. task due date before and after are excluding), the SQL query is avoided and a default result is
+   * Whether or not the query has excluding conditions. If the query has excluding conditions, (e.g.
+   * task due date before and after are excluding), the SQL query is avoided and a default result is
    * returned. The returned result is the same as if the SQL was executed and there were no entries.
    *
    * @return {@code true} if the query does have excluding conditions, {@code false} otherwise
@@ -204,7 +212,9 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
 
   /**
    * Executes the actual query to retrieve the list of results.
-   * @param page used if the results must be paged. If null, no paging will be applied.
+   * 
+   * @param page
+   *          used if the results must be paged. If null, no paging will be applied.
    */
   public abstract List<U> executeList(CommandContext commandContext, Page page);
 
@@ -213,7 +223,8 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-     throw new ProcessEngineException("Query return "+results.size()+" results instead of max 1");
+      throw new ProcessEngineException(
+          "Query return " + results.size() + " results instead of max 1");
     }
     return null;
   }
@@ -233,7 +244,8 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   protected void evaluateExpressions() {
     // we cannot iterate directly on the entry set cause the expressions
     // are removed by the setter methods during the iteration
-    ArrayList<Map.Entry<String, String>> entries = new ArrayList<Map.Entry<String, String>>(expressions.entrySet());
+    ArrayList<Map.Entry<String, String>> entries = new ArrayList<Map.Entry<String, String>>(
+        expressions.entrySet());
 
     for (Map.Entry<String, String> entry : entries) {
       String methodName = entry.getKey();
@@ -242,13 +254,12 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
       Object value;
 
       try {
-        value = Context.getProcessEngineConfiguration()
-          .getExpressionManager()
-          .createExpression(expression)
-          .getValue(null);
-      }
-      catch (ProcessEngineException e) {
-        throw new ProcessEngineException("Unable to resolve expression '" + expression + "' for method '" + methodName + "' on class '" + getClass().getCanonicalName() + "'", e);
+        value = Context.getProcessEngineConfiguration().getExpressionManager()
+            .createExpression(expression).getValue(null);
+      } catch (ProcessEngineException e) {
+        throw new ProcessEngineException("Unable to resolve expression '" + expression
+            + "' for method '" + methodName + "' on class '" + getClass().getCanonicalName() + "'",
+            e);
       }
 
       // automatically convert DateTime to date
@@ -260,9 +271,11 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
         Method method = getMethod(methodName);
         method.invoke(this, value);
       } catch (InvocationTargetException e) {
-        throw new ProcessEngineException("Unable to invoke method '" + methodName + "' on class '" + getClass().getCanonicalName() + "'", e);
+        throw new ProcessEngineException("Unable to invoke method '" + methodName + "' on class '"
+            + getClass().getCanonicalName() + "'", e);
       } catch (IllegalAccessException e) {
-        throw new ProcessEngineException("Unable to access method '" + methodName + "' on class '" + getClass().getCanonicalName() + "'", e);
+        throw new ProcessEngineException("Unable to access method '" + methodName + "' on class '"
+            + getClass().getCanonicalName() + "'", e);
       }
     }
   }
@@ -273,27 +286,31 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
         return method;
       }
     }
-    throw new ProcessEngineException("Unable to find method '" + methodName + "' on class '" + getClass().getCanonicalName() + "'");
+    throw new ProcessEngineException("Unable to find method '" + methodName + "' on class '"
+        + getClass().getCanonicalName() + "'");
   }
 
   public T extend(T extendingQuery) {
-    throw new ProcessEngineException("Extending of query type '" + extendingQuery.getClass().getCanonicalName() + "' currently not supported");
+    throw new ProcessEngineException("Extending of query type '"
+        + extendingQuery.getClass().getCanonicalName() + "' currently not supported");
   }
 
-  protected void mergeOrdering(AbstractQuery<?, ?> extendedQuery, AbstractQuery<?, ?> extendingQuery) {
+  protected void mergeOrdering(AbstractQuery<?, ?> extendedQuery,
+      AbstractQuery<?, ?> extendingQuery) {
     extendedQuery.orderingProperties = this.orderingProperties;
     if (extendingQuery.orderingProperties != null) {
-       if (extendedQuery.orderingProperties == null) {
-         extendedQuery.orderingProperties = extendingQuery.orderingProperties;
-       }
-       else {
-         extendedQuery.orderingProperties.addAll(extendingQuery.orderingProperties);
-       }
+      if (extendedQuery.orderingProperties == null) {
+        extendedQuery.orderingProperties = extendingQuery.orderingProperties;
+      } else {
+        extendedQuery.orderingProperties.addAll(extendingQuery.orderingProperties);
+      }
     }
   }
 
-  protected void mergeExpressions(AbstractQuery<?, ?> extendedQuery, AbstractQuery<?, ?> extendingQuery) {
-    Map<String, String> mergedExpressions = new HashMap<String, String>(extendingQuery.getExpressions());
+  protected void mergeExpressions(AbstractQuery<?, ?> extendedQuery,
+      AbstractQuery<?, ?> extendingQuery) {
+    Map<String, String> mergedExpressions = new HashMap<String, String>(
+        extendingQuery.getExpressions());
     for (Map.Entry<String, String> entry : this.getExpressions().entrySet()) {
       if (!mergedExpressions.containsKey(entry.getKey())) {
         mergedExpressions.put(entry.getKey(), entry.getValue());

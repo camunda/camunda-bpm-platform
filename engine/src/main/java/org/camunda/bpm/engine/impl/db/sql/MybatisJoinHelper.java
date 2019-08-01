@@ -36,7 +36,8 @@ public class MybatisJoinHelper {
 
   static {
     mappings.put(QueryOrderingProperty.RELATION_VARIABLE, new VariableTableMapping());
-    mappings.put(QueryOrderingProperty.RELATION_PROCESS_DEFINITION, new ProcessDefinitionTableMapping());
+    mappings.put(QueryOrderingProperty.RELATION_PROCESS_DEFINITION,
+        new ProcessDefinitionTableMapping());
     mappings.put(QueryOrderingProperty.RELATION_CASE_DEFINITION, new CaseDefinitionTableMapping());
   }
 

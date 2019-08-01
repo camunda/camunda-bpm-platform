@@ -81,9 +81,12 @@ public class MultiTenancyHistoricBatchQueryTest {
 
   @Before
   public void deployProcesses() {
-    ProcessDefinition sharedDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sharedDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_TWO,
+        ProcessModels.ONE_TASK_PROCESS);
 
     sharedBatch = batchHelper.migrateProcessInstanceAsync(sharedDefinition, sharedDefinition);
     tenant1Batch = batchHelper.migrateProcessInstanceAsync(tenant1Definition, tenant1Definition);
@@ -167,22 +170,20 @@ public class MultiTenancyHistoricBatchQueryTest {
     try {
       historyService.deleteHistoricBatch(tenant2Batch.getId());
       Assert.fail("exception expected");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // then
-      Assert.assertThat(e.getMessage(), CoreMatchers
-        .containsString("Cannot delete historic batch '"+ tenant2Batch.getId() 
-        +"' because it belongs to no authenticated tenant"));
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot delete historic batch '"
+          + tenant2Batch.getId() + "' because it belongs to no authenticated tenant"));
     }
 
     identityService.clearAuthentication();
   }
 
-
   @Test
   public void testHistoricBatchQueryFilterByTenant() {
     // when
-    HistoricBatch returnedBatch = historyService.createHistoricBatchQuery().tenantIdIn(TENANT_ONE).singleResult();
+    HistoricBatch returnedBatch = historyService.createHistoricBatchQuery().tenantIdIn(TENANT_ONE)
+        .singleResult();
 
     // then
     Assert.assertNotNull(returnedBatch);
@@ -193,10 +194,7 @@ public class MultiTenancyHistoricBatchQueryTest {
   public void testHistoricBatchQueryFilterByTenants() {
     // when
     List<HistoricBatch> returnedBatches = historyService.createHistoricBatchQuery()
-      .tenantIdIn(TENANT_ONE, TENANT_TWO)
-      .orderByTenantId()
-      .asc()
-      .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc().list();
 
     // then
     Assert.assertEquals(2, returnedBatches.size());
@@ -207,7 +205,8 @@ public class MultiTenancyHistoricBatchQueryTest {
   @Test
   public void testHistoricBatchQueryFilterWithoutTenantId() {
     // when
-    HistoricBatch returnedBatch = historyService.createHistoricBatchQuery().withoutTenantId().singleResult();
+    HistoricBatch returnedBatch = historyService.createHistoricBatchQuery().withoutTenantId()
+        .singleResult();
 
     // then
     Assert.assertNotNull(returnedBatch);
@@ -221,8 +220,7 @@ public class MultiTenancyHistoricBatchQueryTest {
     try {
       historyService.createHistoricBatchQuery().tenantIdIn(tenantIds);
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       // happy path
     }
   }
@@ -230,12 +228,11 @@ public class MultiTenancyHistoricBatchQueryTest {
   @Test
   public void testBatchQueryFailOnNullTenantIdCase2() {
 
-    String[] tenantIds = new String[]{ null };
+    String[] tenantIds = new String[] { null };
     try {
       historyService.createHistoricBatchQuery().tenantIdIn(tenantIds);
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       // happy path
     }
   }
@@ -244,7 +241,8 @@ public class MultiTenancyHistoricBatchQueryTest {
   public void testOrderByTenantIdAsc() {
 
     // when
-    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByTenantId().asc().list();
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByTenantId()
+        .asc().list();
 
     // then
     verifySorting(orderedBatches, historicBatchByTenantId());
@@ -254,7 +252,8 @@ public class MultiTenancyHistoricBatchQueryTest {
   public void testOrderByTenantIdDesc() {
 
     // when
-    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByTenantId().desc().list();
+    List<HistoricBatch> orderedBatches = historyService.createHistoricBatchQuery().orderByTenantId()
+        .desc().list();
 
     // then
     verifySorting(orderedBatches, inverted(historicBatchByTenantId()));

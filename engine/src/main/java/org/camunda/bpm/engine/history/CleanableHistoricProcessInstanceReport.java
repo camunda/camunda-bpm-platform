@@ -23,26 +23,30 @@ import org.camunda.bpm.engine.query.Query;
  * Defines a report query for cleanable process instances.
  *
  */
-public interface CleanableHistoricProcessInstanceReport extends Query<CleanableHistoricProcessInstanceReport, CleanableHistoricProcessInstanceReportResult> {
+public interface CleanableHistoricProcessInstanceReport extends
+    Query<CleanableHistoricProcessInstanceReport, CleanableHistoricProcessInstanceReportResult> {
 
   /**
    * Only takes historic process instances into account for the given process definition ids.
    *
-   * @throws NotValidException if one of the given ids is null
+   * @throws NotValidException
+   *           if one of the given ids is null
    */
   CleanableHistoricProcessInstanceReport processDefinitionIdIn(String... processDefinitionIds);
 
   /**
    * Only takes historic process instances into account for the given process definition keys.
    *
-   * @throws NotValidException if one of the given keys is null
+   * @throws NotValidException
+   *           if one of the given keys is null
    */
   CleanableHistoricProcessInstanceReport processDefinitionKeyIn(String... processDefinitionKeys);
 
   /**
    * Only select historic process instances with one of the given tenant ids.
    *
-   * @throws NotValidException if one of the given ids is null
+   * @throws NotValidException
+   *           if one of the given ids is null
    */
   CleanableHistoricProcessInstanceReport tenantIdIn(String... tenantIds);
 
@@ -57,7 +61,8 @@ public interface CleanableHistoricProcessInstanceReport extends Query<CleanableH
   CleanableHistoricProcessInstanceReport compact();
 
   /**
-   * Order by finished process instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Order by finished process instances amount (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
    */
   CleanableHistoricProcessInstanceReport orderByFinished();
 

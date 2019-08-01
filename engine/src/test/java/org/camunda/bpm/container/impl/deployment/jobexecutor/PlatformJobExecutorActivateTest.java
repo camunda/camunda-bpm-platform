@@ -54,21 +54,21 @@ public class PlatformJobExecutorActivateTest {
     // given
     JobExecutorXmlImpl jobExecutorXml = defineJobExecutor();
     ProcessEngineXmlImpl processEngineXml = defineProcessEngine();
-    BpmPlatformXmlImpl bpmPlatformXml = new BpmPlatformXmlImpl(jobExecutorXml, Collections.<ProcessEngineXml>singletonList(processEngineXml));
+    BpmPlatformXmlImpl bpmPlatformXml = new BpmPlatformXmlImpl(jobExecutorXml,
+        Collections.<ProcessEngineXml> singletonList(processEngineXml));
 
     // when
     deployPlatform(bpmPlatformXml);
 
     try {
       ProcessEngine processEngine = getProcessEngine(ENGINE_NAME);
-      ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+      ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+          .getProcessEngineConfiguration();
       // then
       assertEquals(true, processEngineConfiguration.getJobExecutor().isActive());
-    }
-    finally {
+    } finally {
       undeployPlatform();
     }
-
 
   }
 
@@ -79,27 +79,27 @@ public class PlatformJobExecutorActivateTest {
     JobExecutorXmlImpl jobExecutorXml = defineJobExecutor();
     ProcessEngineXmlImpl processEngineXml = defineProcessEngine();
     // activate set to false
-    processEngineXml.getProperties()
-      .put("jobExecutorActivate", "false");
-    BpmPlatformXmlImpl bpmPlatformXml = new BpmPlatformXmlImpl(jobExecutorXml, Collections.<ProcessEngineXml>singletonList(processEngineXml));
+    processEngineXml.getProperties().put("jobExecutorActivate", "false");
+    BpmPlatformXmlImpl bpmPlatformXml = new BpmPlatformXmlImpl(jobExecutorXml,
+        Collections.<ProcessEngineXml> singletonList(processEngineXml));
 
     // when
     deployPlatform(bpmPlatformXml);
 
     try {
       ProcessEngine processEngine = getProcessEngine(ENGINE_NAME);
-      ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+      ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+          .getProcessEngineConfiguration();
       // then
       assertEquals(false, processEngineConfiguration.getJobExecutor().isActive());
-    }
-    finally {
+    } finally {
       undeployPlatform();
     }
   }
 
-
   protected ProcessEngine getProcessEngine(String engineName) {
-    RuntimeContainerDelegateImpl containerDelegate = (RuntimeContainerDelegateImpl) RuntimeContainerDelegate.INSTANCE.get();
+    RuntimeContainerDelegateImpl containerDelegate = (RuntimeContainerDelegateImpl) RuntimeContainerDelegate.INSTANCE
+        .get();
     return containerDelegate.getProcessEngine(engineName);
   }
 
@@ -111,11 +111,11 @@ public class PlatformJobExecutorActivateTest {
     processEngineXml.setPlugins(new ArrayList<ProcessEnginePluginXml>());
     processEngineXml.setName(ENGINE_NAME);
     processEngineXml.setJobAcquisitionName(ACQUISITION_NAME);
-    processEngineXml.setConfigurationClass(StandaloneInMemProcessEngineConfiguration.class.getName());
+    processEngineXml
+        .setConfigurationClass(StandaloneInMemProcessEngineConfiguration.class.getName());
     processEngineXml.setDefault(true);
     return processEngineXml;
   }
-
 
   private JobExecutorXmlImpl defineJobExecutor() {
     JobAcquisitionXmlImpl jobAcquisition = new JobAcquisitionXmlImpl();
@@ -123,26 +123,25 @@ public class PlatformJobExecutorActivateTest {
     jobAcquisition.setName(ACQUISITION_NAME);
     JobExecutorXmlImpl jobExecutorXml = new JobExecutorXmlImpl();
     jobExecutorXml.setProperties(new HashMap<String, String>());
-    jobExecutorXml.setJobAcquisitions(Collections.<JobAcquisitionXml>singletonList(jobAcquisition));
+    jobExecutorXml
+        .setJobAcquisitions(Collections.<JobAcquisitionXml> singletonList(jobAcquisition));
     return jobExecutorXml;
   }
 
   private void undeployPlatform() {
-    RuntimeContainerDelegateImpl containerDelegate = (RuntimeContainerDelegateImpl) RuntimeContainerDelegate.INSTANCE.get();
+    RuntimeContainerDelegateImpl containerDelegate = (RuntimeContainerDelegateImpl) RuntimeContainerDelegate.INSTANCE
+        .get();
     containerDelegate.getServiceContainer().createUndeploymentOperation("deploy BPM platform")
-      .addStep(new StopJobExecutorStep())
-      .addStep(new StopProcessEnginesStep())
-      .addStep(new StopManagedThreadPoolStep())
-      .execute();
+        .addStep(new StopJobExecutorStep()).addStep(new StopProcessEnginesStep())
+        .addStep(new StopManagedThreadPoolStep()).execute();
   }
 
   private void deployPlatform(BpmPlatformXmlImpl bpmPlatformXml) {
-    RuntimeContainerDelegateImpl containerDelegate = (RuntimeContainerDelegateImpl) RuntimeContainerDelegate.INSTANCE.get();
+    RuntimeContainerDelegateImpl containerDelegate = (RuntimeContainerDelegateImpl) RuntimeContainerDelegate.INSTANCE
+        .get();
     containerDelegate.getServiceContainer().createDeploymentOperation("deploy BPM platform")
-      .addAttachment(Attachments.BPM_PLATFORM_XML, bpmPlatformXml)
-      .addStep(new StartManagedThreadPoolStep())
-      .addStep(new StartJobExecutorStep())
-      .addStep(new PlatformXmlStartProcessEnginesStep())
-      .execute();
+        .addAttachment(Attachments.BPM_PLATFORM_XML, bpmPlatformXml)
+        .addStep(new StartManagedThreadPoolStep()).addStep(new StartJobExecutorStep())
+        .addStep(new PlatformXmlStartProcessEnginesStep()).execute();
   }
 }

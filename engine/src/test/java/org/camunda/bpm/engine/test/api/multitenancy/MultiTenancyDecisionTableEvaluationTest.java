@@ -47,15 +47,14 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
   public void testFailToEvaluateDecisionByIdWithoutTenantId() {
     deployment(DMN_FILE);
 
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
 
     try {
       decisionService.evaluateDecisionTableById(decisionDefinition.getId())
-          .variables(createVariables())
-          .decisionDefinitionWithoutTenantId()
-          .evaluate();
+          .variables(createVariables()).decisionDefinitionWithoutTenantId().evaluate();
       fail("BadUserRequestException exception");
-    } catch(BadUserRequestException e) {
+    } catch (BadUserRequestException e) {
       assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
     }
   }
@@ -63,15 +62,14 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
   public void testFailToEvaluateDecisionByIdWithTenantId() {
     deploymentForTenant(TENANT_ONE, DMN_FILE);
 
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
 
     try {
       decisionService.evaluateDecisionTableById(decisionDefinition.getId())
-          .variables(createVariables())
-          .decisionDefinitionTenantId(TENANT_ONE)
-          .evaluate();
+          .variables(createVariables()).decisionDefinitionTenantId(TENANT_ONE).evaluate();
       fail("BadUserRequestException exception");
-    } catch(BadUserRequestException e) {
+    } catch (BadUserRequestException e) {
       assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
     }
   }
@@ -82,12 +80,12 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
 
     try {
       decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-          .variables(createVariables())
-          .decisionDefinitionTenantId("nonExistingTenantId")
+          .variables(createVariables()).decisionDefinitionTenantId("nonExistingTenantId")
           .evaluate();
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision' and tenant-id 'nonExistingTenantId'"));
+      assertThat(e.getMessage(), containsString(
+          "no decision definition deployed with key 'decision' and tenant-id 'nonExistingTenantId'"));
     }
   }
 
@@ -97,8 +95,7 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
 
     try {
       decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-          .variables(createVariables())
-          .evaluate();
+          .variables(createVariables()).evaluate();
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("multiple tenants."));
@@ -108,10 +105,9 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
   public void testEvaluateDecisionByKeyWithoutTenantId() {
     deployment(DMN_FILE);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-        .variables(createVariables())
-        .decisionDefinitionWithoutTenantId()
-        .evaluate();
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY).variables(createVariables())
+        .decisionDefinitionWithoutTenantId().evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
@@ -119,22 +115,20 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
   public void testEvaluateDecisionByKeyForAnyTenants() {
     deploymentForTenant(TENANT_ONE, DMN_FILE);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-        .variables(createVariables())
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY).variables(createVariables())
         .evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 
-
   public void testEvaluateDecisionByKeyAndTenantId() {
     deploymentForTenant(TENANT_ONE, DMN_FILE);
     deploymentForTenant(TENANT_TWO, DMN_FILE_SECOND_VERSION);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-        .variables(createVariables())
-        .decisionDefinitionTenantId(TENANT_ONE)
-        .evaluate();
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY).variables(createVariables())
+        .decisionDefinitionTenantId(TENANT_ONE).evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
@@ -143,10 +137,9 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
     deploymentForTenant(TENANT_ONE, DMN_FILE);
     deploymentForTenant(TENANT_ONE, DMN_FILE_SECOND_VERSION);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-        .variables(createVariables())
-        .decisionDefinitionTenantId(TENANT_ONE)
-        .evaluate();
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY).variables(createVariables())
+        .decisionDefinitionTenantId(TENANT_ONE).evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
   }
@@ -157,11 +150,9 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
     deploymentForTenant(TENANT_TWO, DMN_FILE);
     deploymentForTenant(TENANT_TWO, DMN_FILE_SECOND_VERSION);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-        .variables(createVariables())
-        .version(1)
-        .decisionDefinitionTenantId(TENANT_TWO)
-        .evaluate();
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY).variables(createVariables()).version(1)
+        .decisionDefinitionTenantId(TENANT_TWO).evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
@@ -171,10 +162,9 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
 
     deployment(DMN_FILE);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-        .decisionDefinitionWithoutTenantId()
-        .variables(createVariables())
-        .evaluate();
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY).decisionDefinitionWithoutTenantId()
+        .variables(createVariables()).evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
@@ -186,12 +176,12 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
 
     try {
       decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-        .variables(createVariables())
-        .evaluate();
+          .variables(createVariables()).evaluate();
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision'"));
+      assertThat(e.getMessage(),
+          containsString("no decision definition deployed with key 'decision'"));
     }
   }
 
@@ -202,9 +192,7 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
 
     try {
       decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-        .decisionDefinitionTenantId(TENANT_ONE)
-        .variables(createVariables())
-        .evaluate();
+          .decisionDefinitionTenantId(TENANT_ONE).variables(createVariables()).evaluate();
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -215,16 +203,14 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
   public void testFailToEvaluateDecisionByIdNoAuthenticatedTenants() {
     deploymentForTenant(TENANT_ONE, DMN_FILE);
 
-    DecisionDefinition decisionDefinition = repositoryService
-      .createDecisionDefinitionQuery()
-      .singleResult();
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
 
     identityService.setAuthentication("user", null, null);
 
     try {
       decisionService.evaluateDecisionTableById(decisionDefinition.getId())
-        .variables(createVariables())
-        .evaluate();
+          .variables(createVariables()).evaluate();
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -238,10 +224,9 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
     deploymentForTenant(TENANT_ONE, DMN_FILE);
     deploymentForTenant(TENANT_TWO, DMN_FILE);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-      .decisionDefinitionTenantId(TENANT_ONE)
-      .variables(createVariables())
-      .evaluate();
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY).decisionDefinitionTenantId(TENANT_ONE)
+        .variables(createVariables()).evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
@@ -249,14 +234,13 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
   public void testEvaluateDecisionByIdAuthenticatedTenant() {
     deploymentForTenant(TENANT_ONE, DMN_FILE);
 
-    DecisionDefinition decisionDefinition = repositoryService
-        .createDecisionDefinitionQuery()
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
         .singleResult();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableById(decisionDefinition.getId())
-        .variables(createVariables())
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableById(decisionDefinition.getId()).variables(createVariables())
         .evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
@@ -268,8 +252,8 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
     deploymentForTenant(TENANT_ONE, DMN_FILE);
     deploymentForTenant(TENANT_TWO, DMN_FILE_SECOND_VERSION);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-        .variables(createVariables())
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY).variables(createVariables())
         .evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
@@ -281,10 +265,9 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
 
     deploymentForTenant(TENANT_ONE, DMN_FILE);
 
-    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY)
-        .decisionDefinitionTenantId(TENANT_ONE)
-        .variables(createVariables())
-        .evaluate();
+    DmnDecisionTableResult decisionResult = decisionService
+        .evaluateDecisionTableByKey(DECISION_DEFINITION_KEY).decisionDefinitionTenantId(TENANT_ONE)
+        .variables(createVariables()).evaluate();
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
@@ -293,7 +276,8 @@ public class MultiTenancyDecisionTableEvaluationTest extends PluggableProcessEng
     return Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
   }
 
-  protected void assertThatDecisionHasResult(DmnDecisionTableResult decisionResult, Object expectedValue) {
+  protected void assertThatDecisionHasResult(DmnDecisionTableResult decisionResult,
+      Object expectedValue) {
     assertThat(decisionResult, is(notNullValue()));
     assertThat(decisionResult.size(), is(1));
     String value = decisionResult.getSingleResult().getFirstEntry();

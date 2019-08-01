@@ -47,10 +47,7 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
     ensureNotEmpty(BadUserRequestException.class, "jobIds", jobIds);
     EnsureUtil.ensureGreaterThanOrEqual("Retries count", retries, 0);
     checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_SET_JOB_RETRIES);
-    writeUserOperationLog(commandContext,
-        retries,
-        jobIds.size(),
-        true);
+    writeUserOperationLog(commandContext, retries, jobIds.size(), true);
 
     BatchEntity batch = createBatch(commandContext, jobIds);
 
@@ -65,27 +62,17 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
     return batch;
   }
 
-
-  protected void writeUserOperationLog(CommandContext commandContext,
-                                       int retries,
-                                       int numInstances,
-                                       boolean async) {
+  protected void writeUserOperationLog(CommandContext commandContext, int retries, int numInstances,
+      boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
-    propertyChanges.add(new PropertyChange("nrOfInstances",
-        null,
-        numInstances));
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
     propertyChanges.add(new PropertyChange("retries", null, retries));
 
-    commandContext.getOperationLogManager()
-        .logJobOperation(UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES,
-            null,
-            null,
-            null,
-            null,
-            null,
-            propertyChanges);
+    commandContext.getOperationLogManager().logJobOperation(
+        UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES, null, null, null, null, null,
+        propertyChanges);
   }
 
   protected abstract List<String> collectJobIds(CommandContext commandContext);
@@ -96,7 +83,9 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
   }
 
   @Override
-  protected BatchJobHandler<SetRetriesBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<SetRetriesBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_SET_JOB_RETRIES);
+  protected BatchJobHandler<SetRetriesBatchConfiguration> getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
+    return (BatchJobHandler<SetRetriesBatchConfiguration>) processEngineConfiguration
+        .getBatchHandlers().get(Batch.TYPE_SET_JOB_RETRIES);
   }
 }

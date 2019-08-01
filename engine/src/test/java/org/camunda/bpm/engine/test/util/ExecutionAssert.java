@@ -42,7 +42,8 @@ public class ExecutionAssert {
   }
 
   public ExecutionAssert hasProcessDefinitionId(String expectedProcessDefinitionId) {
-    ExecutionTreeAssertion assertion = ExecutionTreeProcessDefinitionIdAssertion.processDefinitionId(expectedProcessDefinitionId);
+    ExecutionTreeAssertion assertion = ExecutionTreeProcessDefinitionIdAssertion
+        .processDefinitionId(expectedProcessDefinitionId);
     matches(assertion);
     return this;
   }

@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
-
 /**
  * @author Joram Barrez
  */
@@ -47,14 +46,16 @@ public class GetDeploymentResourceCmd implements Command<InputStream>, Serializa
     ensureNotNull("deploymentId", deploymentId);
     ensureNotNull("resourceName", resourceName);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadDeployment(deploymentId);
     }
 
-    ResourceEntity resource = commandContext
-      .getResourceManager()
-      .findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
-    ensureNotNull(DeploymentResourceNotFoundException.class, "no resource found with name '" + resourceName + "' in deployment '" + deploymentId + "'", "resource", resource);
+    ResourceEntity resource = commandContext.getResourceManager()
+        .findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
+    ensureNotNull(DeploymentResourceNotFoundException.class,
+        "no resource found with name '" + resourceName + "' in deployment '" + deploymentId + "'",
+        "resource", resource);
     return new ByteArrayInputStream(resource.getBytes());
   }
 

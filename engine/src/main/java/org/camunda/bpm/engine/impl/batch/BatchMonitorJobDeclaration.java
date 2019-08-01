@@ -26,8 +26,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
 /**
- * Job declaration for batch monitor jobs. The batch monitor job
- * polls for the completion of the batch.
+ * Job declaration for batch monitor jobs. The batch monitor job polls for the completion of the
+ * batch.
  */
 public class BatchMonitorJobDeclaration extends JobDeclaration<BatchEntity, MessageEntity> {
 
@@ -56,8 +56,7 @@ public class BatchMonitorJobDeclaration extends JobDeclaration<BatchEntity, Mess
   }
 
   public ParameterValueProvider getJobPriorityProvider() {
-    long batchJobPriority = Context.getProcessEngineConfiguration()
-      .getBatchJobPriority();
+    long batchJobPriority = Context.getProcessEngineConfiguration().getBatchJobPriority();
     return new ConstantValueProvider(batchJobPriority);
   }
 

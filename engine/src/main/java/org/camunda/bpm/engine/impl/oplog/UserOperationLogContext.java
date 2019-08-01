@@ -20,13 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <p>Provides information about user operations.</p>
+ * <p>
+ * Provides information about user operations.
+ * </p>
  *
- * <p>One context object can contain many entries. An entry represents one operation on a set of
+ * <p>
+ * One context object can contain many entries. An entry represents one operation on a set of
  * resources of the same type. One such operation can change multiple properties on these entities.
- * For example, more than one entry is needed when a cascading command is logged. Then there is an entry
- * for the changes performed on the addressed resource type as well as entries for those resource types that
- * are affected by the cascading behavior.</p>
+ * For example, more than one entry is needed when a cascading command is logged. Then there is an
+ * entry for the changes performed on the addressed resource type as well as entries for those
+ * resource types that are affected by the cascading behavior.
+ * </p>
  *
  * @author Roman Smirnov
  * @author Thorben Lindhauer
@@ -64,7 +68,5 @@ public class UserOperationLogContext {
   public List<UserOperationLogContextEntry> getEntries() {
     return entries;
   }
-
-
 
 }

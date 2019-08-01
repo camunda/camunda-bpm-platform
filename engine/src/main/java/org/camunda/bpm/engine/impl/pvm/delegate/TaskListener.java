@@ -18,8 +18,6 @@ package org.camunda.bpm.engine.impl.pvm.delegate;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 
-
-
 /**
  * @deprecated use org.camunda.bpm.engine.delegate.TaskListener instead
  * 
@@ -30,6 +28,6 @@ public interface TaskListener {
   String EVENTNAME_CREATE = "create";
   String EVENTNAME_ASSIGNMENT = "assignment";
   String EVENTNAME_COMPLETE = "complete";
-  
+
   void notify(DelegateTask delegateTask);
 }

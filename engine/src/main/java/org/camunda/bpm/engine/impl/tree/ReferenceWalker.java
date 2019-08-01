@@ -22,13 +22,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <p>A walker for walking through an object reference structure (e.g. an execution tree).
- * Any visited element can have any number of following elements. The elements are visited
- * with a breadth-first approach: The walker maintains a list of next elements to which it adds
- * a new elements at the end whenever it has visited an element. The walker stops when it encounters
- * an element that fulfills the given {@link WalkCondition}.
+ * <p>
+ * A walker for walking through an object reference structure (e.g. an execution tree). Any visited
+ * element can have any number of following elements. The elements are visited with a breadth-first
+ * approach: The walker maintains a list of next elements to which it adds a new elements at the end
+ * whenever it has visited an element. The walker stops when it encounters an element that fulfills
+ * the given {@link WalkCondition}.
  *
- * <p>Subclasses define the type of objects and provide the walking behavior.
+ * <p>
+ * Subclasses define the type of objects and provide the walking behavior.
  *
  * @author Thorben Lindhauer
  */
@@ -120,6 +122,5 @@ public abstract class ReferenceWalker<T> {
     }
 
   }
-
 
 }

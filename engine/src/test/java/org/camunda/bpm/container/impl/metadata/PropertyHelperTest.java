@@ -48,7 +48,6 @@ public class PropertyHelperTest extends TestCase {
   protected static final String WAIT_INCREASE_FACTOR = "waitIncreaseFactor";
   protected static final String BACKOFF_TIME_IN_MILLIS = "backoffTimeInMillis";
 
-
   /**
    * Assert that String, int and boolean properties can be set.
    */
@@ -141,7 +140,8 @@ public class PropertyHelperTest extends TestCase {
     Properties source = new Properties();
     source.put("camunda.test.oneKey", "1234");
     source.put("camunda.test.anotherKey", "5678");
-    String result = PropertyHelper.resolveProperty(source, "-${ camunda.test.oneKey }-${ camunda.test.anotherKey}-");
+    String result = PropertyHelper.resolveProperty(source,
+        "-${ camunda.test.oneKey }-${ camunda.test.anotherKey}-");
     Assert.assertEquals("-1234-5678-", result);
   }
 

@@ -45,26 +45,23 @@ public class DecisionEvaluationUtil {
     if ("singleEntry".equals(mapDecisionResult)) {
       return new SingleEntryDecisionResultMapper();
 
-    }
-    else if ("singleResult".equals(mapDecisionResult)) {
+    } else if ("singleResult".equals(mapDecisionResult)) {
       return new SingleResultDecisionResultMapper();
 
-    }
-    else if ("collectEntries".equals(mapDecisionResult)) {
+    } else if ("collectEntries".equals(mapDecisionResult)) {
       return new CollectEntriesDecisionResultMapper();
 
-    }
-    else if ("resultList".equals(mapDecisionResult) || mapDecisionResult == null) {
+    } else if ("resultList".equals(mapDecisionResult) || mapDecisionResult == null) {
       return new ResultListDecisionTableResultMapper();
 
-    }
-    else {
+    } else {
       return null;
     }
   }
 
-  public static void evaluateDecision(AbstractVariableScope execution, BaseCallableElement callableElement,
-      String resultVariable, DecisionResultMapper decisionResultMapper) throws Exception {
+  public static void evaluateDecision(AbstractVariableScope execution,
+      BaseCallableElement callableElement, String resultVariable,
+      DecisionResultMapper decisionResultMapper) throws Exception {
 
     DecisionDefinition decisionDefinition = resolveDecisionDefinition(callableElement, execution);
     DecisionInvocation invocation = createInvocation(decisionDefinition, execution);
@@ -82,37 +79,41 @@ public class DecisionEvaluationUtil {
     }
   }
 
-  public static DmnDecisionResult evaluateDecision(DecisionDefinition decisionDefinition, VariableMap variables) throws Exception {
+  public static DmnDecisionResult evaluateDecision(DecisionDefinition decisionDefinition,
+      VariableMap variables) throws Exception {
     DecisionInvocation invocation = createInvocation(decisionDefinition, variables);
     invoke(invocation);
     return invocation.getInvocationResult();
   }
 
-  public static DmnDecisionTableResult evaluateDecisionTable(DecisionDefinition decisionDefinition, VariableMap variables) throws Exception {
+  public static DmnDecisionTableResult evaluateDecisionTable(DecisionDefinition decisionDefinition,
+      VariableMap variables) throws Exception {
     // doesn't throw an exception if the decision definition is not implemented as decision table
     DmnDecisionResult decisionResult = evaluateDecision(decisionDefinition, variables);
     return DmnDecisionTableResultImpl.wrap(decisionResult);
   }
 
   protected static void invoke(DecisionInvocation invocation) throws Exception {
-    Context.getProcessEngineConfiguration()
-      .getDelegateInterceptor()
-      .handleInvocation(invocation);
+    Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
   }
 
-  protected static DecisionInvocation createInvocation(DecisionDefinition decisionDefinition, VariableMap variables) {
+  protected static DecisionInvocation createInvocation(DecisionDefinition decisionDefinition,
+      VariableMap variables) {
     return createInvocation(decisionDefinition, variables.asVariableContext());
   }
 
-  protected static DecisionInvocation createInvocation(DecisionDefinition decisionDefinition, AbstractVariableScope variableScope) {
+  protected static DecisionInvocation createInvocation(DecisionDefinition decisionDefinition,
+      AbstractVariableScope variableScope) {
     return createInvocation(decisionDefinition, VariableScopeContext.wrap(variableScope));
   }
 
-  protected static DecisionInvocation createInvocation(DecisionDefinition decisionDefinition, VariableContext variableContext) {
+  protected static DecisionInvocation createInvocation(DecisionDefinition decisionDefinition,
+      VariableContext variableContext) {
     return new DecisionInvocation(decisionDefinition, variableContext);
   }
 
-  protected static DecisionDefinition resolveDecisionDefinition(BaseCallableElement callableElement, AbstractVariableScope execution) {
+  protected static DecisionDefinition resolveDecisionDefinition(BaseCallableElement callableElement,
+      AbstractVariableScope execution) {
     return CallableElementUtil.getDecisionDefinitionToCall(execution, callableElement);
   }
 

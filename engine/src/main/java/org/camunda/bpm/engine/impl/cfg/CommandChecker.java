@@ -40,9 +40,8 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 
 /**
- * Is invoked while executing a command to check if the current operation is
- * allowed on the entity. If it is not allowed, the checker throws a
- * {@link ProcessEngineException}.
+ * Is invoked while executing a command to check if the current operation is allowed on the entity.
+ * If it is not allowed, the checker throws a {@link ProcessEngineException}.
  */
 public interface CommandChecker {
 
@@ -82,12 +81,13 @@ public interface CommandChecker {
   void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
   /**
-   *  Checks if it is allowed to update a process instance's retries of the given process definition.
+   * Checks if it is allowed to update a process instance's retries of the given process definition.
    */
   void checkUpdateRetriesProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
   /**
-   * Checks if it is allowed to update a process instance's suspension state of the given process definition.
+   * Checks if it is allowed to update a process instance's suspension state of the given process
+   * definition.
    */
   void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionId(String processDefinitionId);
 
@@ -109,24 +109,27 @@ public interface CommandChecker {
   /**
    * Checks if it is allowed to delete a process definition, which corresponds to the given id.
    *
-   * @param processDefinitionId the id which corresponds to the process definition
+   * @param processDefinitionId
+   *          the id which corresponds to the process definition
    */
   void checkDeleteProcessDefinitionById(String processDefinitionId);
 
   /**
    * Checks if it is allowed to delete a process definition, which corresponds to the given key.
    *
-   * @param processDefinitionKey the key which corresponds to the process definition
+   * @param processDefinitionKey
+   *          the key which corresponds to the process definition
    */
   void checkDeleteProcessDefinitionByKey(String processDefinitionKey);
 
   /**
-   *  Checks if it is allowed to update a process instance of the given process definition key.
+   * Checks if it is allowed to update a process instance of the given process definition key.
    */
   void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey);
 
   /**
-   * Checks if it is allowed to update a process instance's suspension state of the given process definition.
+   * Checks if it is allowed to update a process instance's suspension state of the given process
+   * definition.
    */
   void checkUpdateProcessInstanceSuspensionStateByProcessDefinitionKey(String processDefinitionKey);
 
@@ -150,9 +153,11 @@ public interface CommandChecker {
    */
   void checkUpdateProcessInstanceVariables(ExecutionEntity execution);
 
-  void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition);
+  void checkCreateMigrationPlan(ProcessDefinition sourceProcessDefinition,
+      ProcessDefinition targetProcessDefinition);
 
-  void checkMigrateProcessInstance(ExecutionEntity processInstance, ProcessDefinition targetProcessDefinition);
+  void checkMigrateProcessInstance(ExecutionEntity processInstance,
+      ProcessDefinition targetProcessDefinition);
 
   void checkReadProcessInstance(String processInstanceId);
 
@@ -267,7 +272,7 @@ public interface CommandChecker {
   void checkTaskWork(TaskEntity task);
 
   /**
-   *  Check if it is allowed to delete a task
+   * Check if it is allowed to delete a task
    */
   void checkDeleteTask(TaskEntity task);
 
@@ -279,7 +284,8 @@ public interface CommandChecker {
   /**
    * Checks if it is allowed to read the given decision requirements definition.
    */
-  void checkReadDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition);
+  void checkReadDecisionRequirementsDefinition(
+      DecisionRequirementsDefinitionEntity decisionRequirementsDefinition);
 
   /**
    * Checks if it is allowed to read the given case definition.
@@ -307,8 +313,8 @@ public interface CommandChecker {
   void checkDeleteHistoricCaseInstance(HistoricCaseInstance instance);
 
   /**
-   * Checks if it is allowed to delete the historic decision instance of the given
-   * decision definition key.
+   * Checks if it is allowed to delete the historic decision instance of the given decision
+   * definition key.
    */
   void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey);
 
@@ -363,8 +369,10 @@ public interface CommandChecker {
   void checkDeleteHistoricVariableInstance(HistoricVariableInstanceEntity variable);
 
   /**
-   * Checks if it is allowed to delete the historic variable instances of the given process instance.
+   * Checks if it is allowed to delete the historic variable instances of the given process
+   * instance.
    */
-  void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance);
+  void checkDeleteHistoricVariableInstancesByProcessInstance(
+      HistoricProcessInstanceEntity instance);
 
 }

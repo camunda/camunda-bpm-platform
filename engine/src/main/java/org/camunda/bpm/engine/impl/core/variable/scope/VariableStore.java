@@ -43,7 +43,7 @@ public class VariableStore<T extends CoreVariableInstance> {
   protected List<VariableStoreObserver<T>> observers;
 
   public VariableStore() {
-    this(VariableCollectionProvider.<T>emptyVariables());
+    this(VariableCollectionProvider.<T> emptyVariables());
   }
 
   public VariableStore(VariablesProvider<T> provider, VariableStoreObserver<T>... observers) {
@@ -59,8 +59,7 @@ public class VariableStore<T extends CoreVariableInstance> {
     if (variables != null) {
       // already initialized
       return;
-    }
-    else {
+    } else {
       this.variablesProvider = variablesProvider;
     }
 
@@ -85,8 +84,7 @@ public class VariableStore<T extends CoreVariableInstance> {
           result.put(variableName, variables.get(variableName));
         }
       }
-    }
-    else {
+    } else {
       // in this case we don't initialize the variables map,
       // otherwise it would most likely contain only a subset
       // of existing variables
@@ -127,15 +125,13 @@ public class VariableStore<T extends CoreVariableInstance> {
       listener.onAdd(value);
     }
 
-    if(removedVariables.containsKey(value.getName())){
+    if (removedVariables.containsKey(value.getName())) {
       removedVariables.remove(value.getName());
     }
   }
 
-  public void updateVariable(T value)
-  {
-    if (!containsKey(value.getName()))
-    {
+  public void updateVariable(T value) {
+    if (!containsKey(value.getName())) {
       throw ProcessEngineLogger.CORE_LOGGER.duplicateVariableInstanceException(value);
     }
   }

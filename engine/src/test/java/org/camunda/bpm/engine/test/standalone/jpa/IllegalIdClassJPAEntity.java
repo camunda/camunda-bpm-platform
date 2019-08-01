@@ -23,8 +23,7 @@ import javax.persistence.Id;
 
 /**
  * 
- * WARNING: This class cannot be used in JPA-context, since it has an illegal
- * type of ID.
+ * WARNING: This class cannot be used in JPA-context, since it has an illegal type of ID.
  * 
  * For testing purposes only.
  * 

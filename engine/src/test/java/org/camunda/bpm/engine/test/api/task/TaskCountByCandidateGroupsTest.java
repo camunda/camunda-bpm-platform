@@ -50,10 +50,7 @@ public class TaskCountByCandidateGroupsTest {
   public ProcessEngineTestRule processEngineTestRule = new ProcessEngineTestRule(processEngineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain
-    .outerRule(processEngineTestRule)
-    .around(processEngineRule);
-
+  public RuleChain ruleChain = RuleChain.outerRule(processEngineTestRule).around(processEngineRule);
 
   protected TaskService taskService;
   protected IdentityService identityService;
@@ -64,7 +61,6 @@ public class TaskCountByCandidateGroupsTest {
   protected List<String> tasks = new ArrayList<String>();
   protected List<String> tenants = Arrays.asList("tenant1", "tenant2");
   protected List<String> groups = Arrays.asList("aGroupId", "anotherGroupId");
-
 
   @Before
   public void setUp() {
@@ -89,7 +85,8 @@ public class TaskCountByCandidateGroupsTest {
   @Test
   public void shouldReturnTaskCountsByGroup() {
     // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
+    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport()
+        .taskCountByCandidateGroup();
 
     // then
     assertEquals(3, results.size());
@@ -98,10 +95,11 @@ public class TaskCountByCandidateGroupsTest {
   @Test
   public void shouldProvideTaskCountForEachGroup() {
     // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
+    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport()
+        .taskCountByCandidateGroup();
 
     // then
-    for (TaskCountByCandidateGroupResult result : results ) {
+    for (TaskCountByCandidateGroupResult result : results) {
       checkResultCount(result, null, 1);
       checkResultCount(result, groups.get(0), 2);
       checkResultCount(result, groups.get(1), 1);
@@ -111,10 +109,11 @@ public class TaskCountByCandidateGroupsTest {
   @Test
   public void shouldProvideGroupNameForEachGroup() {
     // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
+    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport()
+        .taskCountByCandidateGroup();
 
     // then
-    for (TaskCountByCandidateGroupResult result : results ) {
+    for (TaskCountByCandidateGroupResult result : results) {
       assertTrue(checkResultName(result));
     }
   }
@@ -127,7 +126,8 @@ public class TaskCountByCandidateGroupsTest {
 
     // when
     taskService.delegateTask(tasks.get(2), userId);
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
+    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport()
+        .taskCountByCandidateGroup();
 
     identityService.deleteUser(userId);
 
@@ -147,16 +147,16 @@ public class TaskCountByCandidateGroupsTest {
     tasks.add(task.getId());
   }
 
-  protected void checkResultCount(TaskCountByCandidateGroupResult result, String expectedResultName, int expectedResultCount) {
-    if((expectedResultName == null && result.getGroupName() == null) ||
-       (result.getGroupName() != null && result.getGroupName().equals(expectedResultName))) {
+  protected void checkResultCount(TaskCountByCandidateGroupResult result, String expectedResultName,
+      int expectedResultCount) {
+    if ((expectedResultName == null && result.getGroupName() == null)
+        || (result.getGroupName() != null && result.getGroupName().equals(expectedResultName))) {
       assertEquals(expectedResultCount, result.getTaskCount());
     }
   }
 
   protected boolean checkResultName(TaskCountByCandidateGroupResult result) {
-    return result.getGroupName() == null ||
-           result.getGroupName().equals(groups.get(0)) ||
-           result.getGroupName().equals(groups.get(1));
+    return result.getGroupName() == null || result.getGroupName().equals(groups.get(0))
+        || result.getGroupName().equals(groups.get(1));
   }
 }

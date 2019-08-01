@@ -47,11 +47,9 @@ public abstract class CoreModelElement implements Serializable {
   /** contains all listeners (built-in + user-provided) */
   protected Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> listeners = new HashMap<String, List<DelegateListener<? extends BaseDelegateExecution>>>();
 
-  protected Map<String, List<VariableListener<?>>> builtInVariableListeners =
-      new HashMap<String, List<VariableListener<?>>>();
+  protected Map<String, List<VariableListener<?>>> builtInVariableListeners = new HashMap<String, List<VariableListener<?>>>();
 
-  protected Map<String, List<VariableListener<?>>> variableListeners =
-      new HashMap<String, List<VariableListener<?>>>();
+  protected Map<String, List<VariableListener<?>>> variableListeners = new HashMap<String, List<VariableListener<?>>>();
 
   public CoreModelElement(String id) {
     this.id = id;
@@ -100,18 +98,21 @@ public abstract class CoreModelElement implements Serializable {
     this.name = name;
   }
 
-  //event listeners //////////////////////////////////////////////////////////
+  // event listeners //////////////////////////////////////////////////////////
 
   public List<DelegateListener<? extends BaseDelegateExecution>> getListeners(String eventName) {
-    List<DelegateListener<? extends BaseDelegateExecution>> listenerList = getListeners().get(eventName);
+    List<DelegateListener<? extends BaseDelegateExecution>> listenerList = getListeners()
+        .get(eventName);
     if (listenerList != null) {
       return listenerList;
     }
     return Collections.emptyList();
   }
 
-  public List<DelegateListener<? extends BaseDelegateExecution>> getBuiltInListeners(String eventName) {
-    List<DelegateListener<? extends BaseDelegateExecution>> listenerList = getBuiltInListeners().get(eventName);
+  public List<DelegateListener<? extends BaseDelegateExecution>> getBuiltInListeners(
+      String eventName) {
+    List<DelegateListener<? extends BaseDelegateExecution>> listenerList = getBuiltInListeners()
+        .get(eventName);
     if (listenerList != null) {
       return listenerList;
     }
@@ -134,24 +135,29 @@ public abstract class CoreModelElement implements Serializable {
     return Collections.emptyList();
   }
 
-  public void addListener(String eventName, DelegateListener<? extends BaseDelegateExecution> listener) {
+  public void addListener(String eventName,
+      DelegateListener<? extends BaseDelegateExecution> listener) {
     addListener(eventName, listener, -1);
   }
 
-  public void addBuiltInListener(String eventName, DelegateListener<? extends BaseDelegateExecution> listener) {
+  public void addBuiltInListener(String eventName,
+      DelegateListener<? extends BaseDelegateExecution> listener) {
     addBuiltInListener(eventName, listener, -1);
   }
 
-  public void addBuiltInListener(String eventName, DelegateListener<? extends BaseDelegateExecution> listener, int index) {
+  public void addBuiltInListener(String eventName,
+      DelegateListener<? extends BaseDelegateExecution> listener, int index) {
     addListenerToMap(listeners, eventName, listener, index);
     addListenerToMap(builtInListeners, eventName, listener, index);
   }
 
-  public void addListener(String eventName, DelegateListener<? extends BaseDelegateExecution> listener, int index) {
+  public void addListener(String eventName,
+      DelegateListener<? extends BaseDelegateExecution> listener, int index) {
     addListenerToMap(listeners, eventName, listener, index);
   }
 
-  protected <T> void addListenerToMap(Map<String, List<T>> listenerMap, String eventName, T listener, int index) {
+  protected <T> void addListenerToMap(Map<String, List<T>> listenerMap, String eventName,
+      T listener, int index) {
     List<T> listeners = listenerMap.get(eventName);
     if (listeners == null) {
       listeners = new ArrayList<T>();
@@ -176,7 +182,8 @@ public abstract class CoreModelElement implements Serializable {
     addBuiltInVariableListener(eventName, listener, -1);
   }
 
-  public void addBuiltInVariableListener(String eventName, VariableListener<?> listener, int index) {
+  public void addBuiltInVariableListener(String eventName, VariableListener<?> listener,
+      int index) {
     addListenerToMap(variableListeners, eventName, listener, index);
     addListenerToMap(builtInVariableListeners, eventName, listener, index);
   }

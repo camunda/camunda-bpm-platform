@@ -22,9 +22,8 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
- * The producer for DMN history events. The history event producer is
- * responsible for extracting data from the dmn engine and adding the data to a
- * {@link HistoryEvent}.
+ * The producer for DMN history events. The history event producer is responsible for extracting
+ * data from the dmn engine and adding the data to a {@link HistoryEvent}.
  *
  * @author Philipp Ossler
  *
@@ -32,8 +31,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 public interface DmnHistoryEventProducer {
 
   /**
-   * Creates the history event fired when a decision is evaluated while execute
-   * a process instance.
+   * Creates the history event fired when a decision is evaluated while execute a process instance.
    *
    * @param execution
    *          the current execution
@@ -43,11 +41,11 @@ public interface DmnHistoryEventProducer {
    *
    * @see #createDecisionEvaluatedEvt(DmnDecisionEvaluationEvent)
    */
-  HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution, DmnDecisionEvaluationEvent decisionEvaluationEvent);
+  HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution,
+      DmnDecisionEvaluationEvent decisionEvaluationEvent);
 
   /**
-   * Creates the history event fired when a decision is evaluated while execute
-   * a case instance.
+   * Creates the history event fired when a decision is evaluated while execute a case instance.
    *
    * @param execution
    *          the current case execution
@@ -57,11 +55,12 @@ public interface DmnHistoryEventProducer {
    *
    * @see #createDecisionEvaluatedEvt(DmnDecisionEvaluationEvent)
    */
-  HistoryEvent createDecisionEvaluatedEvt(DelegateCaseExecution execution, DmnDecisionEvaluationEvent decisionEvaluationEvent);
+  HistoryEvent createDecisionEvaluatedEvt(DelegateCaseExecution execution,
+      DmnDecisionEvaluationEvent decisionEvaluationEvent);
 
   /**
-   * Creates the history event fired when a decision is evaluated. If the
-   * decision is evaluated while execute a process instance then you should use
+   * Creates the history event fired when a decision is evaluated. If the decision is evaluated
+   * while execute a process instance then you should use
    * {@link #createDecisionEvaluatedEvt(DelegateExecution, DmnDecisionEvaluationEvent)} instead.
    *
    * @param decisionEvaluationEvent

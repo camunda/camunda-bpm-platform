@@ -43,10 +43,11 @@ public class GetDeploymentCaseDefinitionCmd implements Command<CaseDefinition>, 
   public CaseDefinition execute(CommandContext commandContext) {
     ensureNotNull("caseDefinitionId", caseDefinitionId);
 
-    CaseDefinitionEntity caseDefinition = Context.getProcessEngineConfiguration().getDeploymentCache()
-        .findDeployedCaseDefinitionById(caseDefinitionId);
+    CaseDefinitionEntity caseDefinition = Context.getProcessEngineConfiguration()
+        .getDeploymentCache().findDeployedCaseDefinitionById(caseDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadCaseDefinition(caseDefinition);
     }
 

@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 
-public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitionQuery, DecisionDefinition> implements DecisionDefinitionQuery {
+public class DecisionDefinitionQueryImpl extends
+    AbstractQuery<DecisionDefinitionQuery, DecisionDefinition> implements DecisionDefinitionQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -84,7 +85,8 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return this;
   }
 
-  public DecisionDefinitionQuery decisionDefinitionCategoryLike(String decisionDefinitionCategoryLike) {
+  public DecisionDefinitionQuery decisionDefinitionCategoryLike(
+      String decisionDefinitionCategoryLike) {
     ensureNotNull(NotValidException.class, "categoryLike", decisionDefinitionCategoryLike);
     this.categoryLike = decisionDefinitionCategoryLike;
     return this;
@@ -144,14 +146,18 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return this;
   }
 
-  public DecisionDefinitionQuery decisionRequirementsDefinitionId(String decisionRequirementsDefinitionId) {
-    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionId", decisionRequirementsDefinitionId);
+  public DecisionDefinitionQuery decisionRequirementsDefinitionId(
+      String decisionRequirementsDefinitionId) {
+    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionId",
+        decisionRequirementsDefinitionId);
     this.decisionRequirementsDefinitionId = decisionRequirementsDefinitionId;
     return this;
   }
 
-  public DecisionDefinitionQuery decisionRequirementsDefinitionKey(String decisionRequirementsDefinitionKey) {
-    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionKey", decisionRequirementsDefinitionKey);
+  public DecisionDefinitionQuery decisionRequirementsDefinitionKey(
+      String decisionRequirementsDefinitionKey) {
+    ensureNotNull(NotValidException.class, "decisionRequirementsDefinitionKey",
+        decisionRequirementsDefinitionKey);
     this.decisionRequirementsDefinitionKey = decisionRequirementsDefinitionKey;
     return this;
   }
@@ -189,7 +195,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   }
 
   public DecisionDefinitionQuery includeDecisionDefinitionsWithoutTenantId() {
-    this.includeDefinitionsWithoutTenantId  = true;
+    this.includeDefinitionsWithoutTenantId = true;
     return this;
   }
 
@@ -232,22 +238,20 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return orderBy(DecisionDefinitionQueryProperty.VERSION_TAG);
   }
 
-  //results ////////////////////////////////////////////
+  // results ////////////////////////////////////////////
 
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getDecisionDefinitionManager()
-      .findDecisionDefinitionCountByQueryCriteria(this);
+    return commandContext.getDecisionDefinitionManager()
+        .findDecisionDefinitionCountByQueryCriteria(this);
   }
 
   @Override
   public List<DecisionDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getDecisionDefinitionManager()
-      .findDecisionDefinitionsByQueryCriteria(this, page);
+    return commandContext.getDecisionDefinitionManager()
+        .findDecisionDefinitionsByQueryCriteria(this, page);
   }
 
   @Override
@@ -255,8 +259,10 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     super.checkQueryOk();
 
     // latest() makes only sense when used with key() or keyLike()
-    if (latest && ( (id != null) || (name != null) || (nameLike != null) || (version != null) || (deploymentId != null) ) ){
-      throw new NotValidException("Calling latest() can only be used in combination with key(String) and keyLike(String)");
+    if (latest && ((id != null) || (name != null) || (nameLike != null) || (version != null)
+        || (deploymentId != null))) {
+      throw new NotValidException(
+          "Calling latest() can only be used in combination with key(String) and keyLike(String)");
     }
   }
 

@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-public abstract class TenantQueryImpl extends AbstractQuery<TenantQuery, Tenant> implements TenantQuery {
+public abstract class TenantQueryImpl extends AbstractQuery<TenantQuery, Tenant>
+    implements TenantQuery {
 
   private static final long serialVersionUID = 1L;
   protected String id;
@@ -81,7 +82,7 @@ public abstract class TenantQueryImpl extends AbstractQuery<TenantQuery, Tenant>
     return this;
   }
 
-  //sorting ////////////////////////////////////////////////////////
+  // sorting ////////////////////////////////////////////////////////
 
   public TenantQuery orderByTenantId() {
     return orderBy(TenantQueryProperty.GROUP_ID);
@@ -91,7 +92,7 @@ public abstract class TenantQueryImpl extends AbstractQuery<TenantQuery, Tenant>
     return orderBy(TenantQueryProperty.NAME);
   }
 
-  //getters ////////////////////////////////////////////////////////
+  // getters ////////////////////////////////////////////////////////
 
   public String getId() {
     return id;

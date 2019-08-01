@@ -26,47 +26,25 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  */
 public class AsyncProcessModels {
 
-  public static final BpmnModelInstance ASYNC_BEFORE_USER_TASK_PROCESS =
-    modify(ProcessModels.ONE_TASK_PROCESS)
-      .activityBuilder("userTask")
-      .camundaAsyncBefore()
-    .done();
+  public static final BpmnModelInstance ASYNC_BEFORE_USER_TASK_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).activityBuilder("userTask").camundaAsyncBefore().done();
 
-  public static final BpmnModelInstance ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS =
-    modify(ProcessModels.SUBPROCESS_PROCESS)
-      .activityBuilder("userTask")
-      .camundaAsyncBefore()
-    .done();
+  public static final BpmnModelInstance ASYNC_BEFORE_SUBPROCESS_USER_TASK_PROCESS = modify(
+      ProcessModels.SUBPROCESS_PROCESS).activityBuilder("userTask").camundaAsyncBefore().done();
 
-  public static final BpmnModelInstance ASYNC_BEFORE_START_EVENT_PROCESS =
-    modify(ProcessModels.ONE_TASK_PROCESS)
-      .flowNodeBuilder("startEvent")
-      .camundaAsyncBefore()
-    .done();
+  public static final BpmnModelInstance ASYNC_BEFORE_START_EVENT_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).flowNodeBuilder("startEvent").camundaAsyncBefore().done();
 
-  public static final BpmnModelInstance ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS =
-    modify(ProcessModels.SUBPROCESS_PROCESS)
-      .flowNodeBuilder("subProcessStart")
-      .camundaAsyncBefore()
-    .done();
+  public static final BpmnModelInstance ASYNC_BEFORE_SUBPROCESS_START_EVENT_PROCESS = modify(
+      ProcessModels.SUBPROCESS_PROCESS).flowNodeBuilder("subProcessStart").camundaAsyncBefore()
+          .done();
 
-  public static final BpmnModelInstance ASYNC_AFTER_USER_TASK_PROCESS =
-    modify(ProcessModels.TWO_TASKS_PROCESS)
-      .activityBuilder("userTask1")
-      .camundaAsyncAfter()
-    .done();
+  public static final BpmnModelInstance ASYNC_AFTER_USER_TASK_PROCESS = modify(
+      ProcessModels.TWO_TASKS_PROCESS).activityBuilder("userTask1").camundaAsyncAfter().done();
 
-  public static final BpmnModelInstance ASYNC_AFTER_SUBPROCESS_USER_TASK_PROCESS =
-    ProcessModels.newModel()
-    .startEvent()
-      .subProcess("subProcess")
-        .embeddedSubProcess()
-        .startEvent()
-        .userTask("userTask1")
-        .camundaAsyncAfter()
-      .subProcessDone()
-    .userTask("userTask2")
-    .endEvent()
-    .done();
+  public static final BpmnModelInstance ASYNC_AFTER_SUBPROCESS_USER_TASK_PROCESS = ProcessModels
+      .newModel().startEvent().subProcess("subProcess").embeddedSubProcess().startEvent()
+      .userTask("userTask1").camundaAsyncAfter().subProcessDone().userTask("userTask2").endEvent()
+      .done();
 
 }

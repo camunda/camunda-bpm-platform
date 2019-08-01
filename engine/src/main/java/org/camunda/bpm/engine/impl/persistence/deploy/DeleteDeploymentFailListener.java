@@ -31,7 +31,8 @@ public class DeleteDeploymentFailListener implements TransactionListener {
   protected ProcessApplicationReference processApplicationReference;
   protected CommandExecutor commandExecutor;
 
-  public DeleteDeploymentFailListener(String deploymentId, ProcessApplicationReference processApplicationReference, CommandExecutor commandExecutor) {
+  public DeleteDeploymentFailListener(String deploymentId,
+      ProcessApplicationReference processApplicationReference, CommandExecutor commandExecutor) {
     this.deploymentId = deploymentId;
     this.processApplicationReference = processApplicationReference;
     this.commandExecutor = commandExecutor;
@@ -39,7 +40,7 @@ public class DeleteDeploymentFailListener implements TransactionListener {
 
   public void execute(CommandContext commandContext) {
 
-    //we can not use commandContext parameter here, as it can be in inconsistent state
+    // we can not use commandContext parameter here, as it can be in inconsistent state
     commandExecutor.execute(new Command<Void>() {
       @Override
       public Void execute(final CommandContext commandContext) {
@@ -48,7 +49,8 @@ public class DeleteDeploymentFailListener implements TransactionListener {
           public Void call() throws Exception {
             new RegisterDeploymentCmd(deploymentId).execute(commandContext);
             if (processApplicationReference != null) {
-              new RegisterProcessApplicationCmd(deploymentId, processApplicationReference).execute(commandContext);
+              new RegisterProcessApplicationCmd(deploymentId, processApplicationReference)
+                  .execute(commandContext);
             }
             return null;
           }

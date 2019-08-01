@@ -37,24 +37,27 @@ import org.camunda.bpm.model.cmmn.instance.Task;
 
 /**
  * Listener which can be registered within the engine to receive events during transforming (and
- * maybe influence it). Instead of implementing this interface you might consider to extend
- * the {@link AbstractCmmnTransformListener}, which contains an empty implementation for all methods
- * and makes your implementation easier and more robust to future changes.
+ * maybe influence it). Instead of implementing this interface you might consider to extend the
+ * {@link AbstractCmmnTransformListener}, which contains an empty implementation for all methods and
+ * makes your implementation easier and more robust to future changes.
  *
  * @author Sebastian Menski
  *
  */
 public interface CmmnTransformListener {
 
-  void transformRootElement(Definitions definitions, List<? extends CmmnCaseDefinition> caseDefinitions);
+  void transformRootElement(Definitions definitions,
+      List<? extends CmmnCaseDefinition> caseDefinitions);
 
   void transformCase(Case element, CmmnCaseDefinition caseDefinition);
 
   /**
-   * @deprecated use {@link #transformCasePlanModel(org.camunda.bpm.model.cmmn.instance.CasePlanModel, CmmnActivity)}
+   * @deprecated use
+   *             {@link #transformCasePlanModel(org.camunda.bpm.model.cmmn.instance.CasePlanModel, CmmnActivity)}
    */
   @Deprecated
-  void transformCasePlanModel(org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel, CmmnActivity caseActivity);
+  void transformCasePlanModel(org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel,
+      CmmnActivity caseActivity);
 
   void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity caseActivity);
 
@@ -64,7 +67,8 @@ public interface CmmnTransformListener {
 
   void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity caseActivity);
 
-  void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity caseActivity);
+  void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask,
+      CmmnActivity caseActivity);
 
   void transformTask(PlanItem planItem, Task task, CmmnActivity caseActivity);
 
@@ -72,7 +76,8 @@ public interface CmmnTransformListener {
 
   void transformMilestone(PlanItem planItem, Milestone milestone, CmmnActivity caseActivity);
 
-  void transformEventListener(PlanItem planItem, EventListener eventListener, CmmnActivity caseActivity);
+  void transformEventListener(PlanItem planItem, EventListener eventListener,
+      CmmnActivity caseActivity);
 
   void transformSentry(Sentry sentry, CmmnSentryDeclaration sentryDeclaration);
 

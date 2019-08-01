@@ -38,54 +38,43 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSp
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeForHistoricProcessInstancesBatchAuthorizationTest extends BatchCreationAuthorizationTest {
+public class SetRemovalTimeForHistoricProcessInstancesBatchAuthorizationTest
+    extends BatchCreationAuthorizationTest {
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
-        scenario()
-            .withAuthorizations(
-              grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY)
-            )
-            .failsDueToRequired(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)
-            ),
-        scenario()
-            .withAuthorizations(
+    return AuthorizationTestRule
+        .asParameters(
+            scenario()
+                .withAuthorizations(grant(Resources.PROCESS_DEFINITION, "Process", "userId",
+                    Permissions.READ_HISTORY))
+                .failsDueToRequired(grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+                    grant(Resources.BATCH, "batchId", "userId",
+                        BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)),
+            scenario().withAuthorizations(
                 grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY),
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)
-            ),
-        scenario()
-            .withAuthorizations(
+                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
+            scenario().withAuthorizations(
                 grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY),
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)
-            ).succeeds()
-    );
+                grant(Resources.BATCH, "batchId", "userId",
+                    BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME))
+                .succeeds());
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   public void shouldAuthorizeSetRemovalTimeForHistoricProcessInstancesBatch() {
     // given
     setupHistory();
 
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("batchId", "*")
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", "*").start();
 
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .absoluteRemovalTime(new Date())
-      .byQuery(query)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricProcessInstances().absoluteRemovalTime(new Date())
+        .byQuery(query).executeAsync();
 
     // then
     authRule.assertScenario(scenario);

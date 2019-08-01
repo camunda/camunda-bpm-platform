@@ -32,12 +32,10 @@ public class SignalEventFactory implements BpmnEventFactory {
   public static final String SIGNAL_NAME = "signal";
 
   @Override
-  public MigratingBpmnEventTrigger addBoundaryEvent(ProcessEngine engine, BpmnModelInstance modelInstance, String activityId, String boundaryEventId) {
-    ModifiableBpmnModelInstance.wrap(modelInstance)
-      .activityBuilder(activityId)
-      .boundaryEvent(boundaryEventId)
-        .signal(SIGNAL_NAME)
-      .done();
+  public MigratingBpmnEventTrigger addBoundaryEvent(ProcessEngine engine,
+      BpmnModelInstance modelInstance, String activityId, String boundaryEventId) {
+    ModifiableBpmnModelInstance.wrap(modelInstance).activityBuilder(activityId)
+        .boundaryEvent(boundaryEventId).signal(SIGNAL_NAME).done();
 
     SignalTrigger trigger = new SignalTrigger();
     trigger.engine = engine;
@@ -48,15 +46,11 @@ public class SignalEventFactory implements BpmnEventFactory {
   }
 
   @Override
-  public MigratingBpmnEventTrigger addEventSubProcess(ProcessEngine engine, BpmnModelInstance modelInstance, String parentId, String subProcessId, String startEventId) {
-    ModifiableBpmnModelInstance.wrap(modelInstance)
-      .addSubProcessTo(parentId)
-      .id(subProcessId)
-      .triggerByEvent()
-      .embeddedSubProcess()
-        .startEvent(startEventId).signal(SIGNAL_NAME)
-      .subProcessDone()
-      .done();
+  public MigratingBpmnEventTrigger addEventSubProcess(ProcessEngine engine,
+      BpmnModelInstance modelInstance, String parentId, String subProcessId, String startEventId) {
+    ModifiableBpmnModelInstance.wrap(modelInstance).addSubProcessTo(parentId).id(subProcessId)
+        .triggerByEvent().embeddedSubProcess().startEvent(startEventId).signal(SIGNAL_NAME)
+        .subProcessDone().done();
 
     SignalTrigger trigger = new SignalTrigger();
     trigger.engine = engine;
@@ -74,22 +68,21 @@ public class SignalEventFactory implements BpmnEventFactory {
 
     @Override
     public void trigger(String processInstanceId) {
-      EventSubscription eventSubscription = engine.getRuntimeService().createEventSubscriptionQuery()
-        .activityId(activityId)
-        .eventName(signalName)
-        .processInstanceId(processInstanceId)
-        .singleResult();
+      EventSubscription eventSubscription = engine.getRuntimeService()
+          .createEventSubscriptionQuery().activityId(activityId).eventName(signalName)
+          .processInstanceId(processInstanceId).singleResult();
 
-      if (eventSubscription == null)
-      {
+      if (eventSubscription == null) {
         throw new RuntimeException("Event subscription not found");
       }
 
-      engine.getRuntimeService().signalEventReceived(eventSubscription.getEventName(), eventSubscription.getExecutionId());
+      engine.getRuntimeService().signalEventReceived(eventSubscription.getEventName(),
+          eventSubscription.getExecutionId());
     }
 
     @Override
-    public void assertEventTriggerMigrated(MigrationTestRule migrationContext, String targetActivityId) {
+    public void assertEventTriggerMigrated(MigrationTestRule migrationContext,
+        String targetActivityId) {
       migrationContext.assertEventSubscriptionMigrated(activityId, targetActivityId, SIGNAL_NAME);
     }
 

@@ -33,7 +33,7 @@ public class DiagramNode extends DiagramElement {
   public DiagramNode() {
     super();
   }
-  
+
   public DiagramNode(String id) {
     super(id);
   }
@@ -77,10 +77,11 @@ public class DiagramNode extends DiagramElement {
   public void setHeight(Double height) {
     this.height = height;
   }
-  
+
   @Override
   public String toString() {
-    return super.toString() + ", x=" + getX() + ", y=" + getY() + ", width=" + getWidth() + ", height=" + getHeight();
+    return super.toString() + ", x=" + getX() + ", y=" + getY() + ", width=" + getWidth()
+        + ", height=" + getHeight();
   }
 
   @Override

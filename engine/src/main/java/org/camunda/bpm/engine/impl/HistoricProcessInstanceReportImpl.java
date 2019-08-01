@@ -75,13 +75,15 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
   }
 
   public HistoricProcessInstanceReport processDefinitionIdIn(String... processDefinitionIds) {
-    ensureNotNull(NotValidException.class, "", "processDefinitionIdIn", (Object[]) processDefinitionIds);
+    ensureNotNull(NotValidException.class, "", "processDefinitionIdIn",
+        (Object[]) processDefinitionIds);
     this.processDefinitionIdIn = processDefinitionIds;
     return this;
   }
 
   public HistoricProcessInstanceReport processDefinitionKeyIn(String... processDefinitionKeys) {
-    ensureNotNull(NotValidException.class, "", "processDefinitionKeyIn", (Object[]) processDefinitionKeys);
+    ensureNotNull(NotValidException.class, "", "processDefinitionKeyIn",
+        (Object[]) processDefinitionKeys);
     this.processDefinitionKeyIn = processDefinitionKeys;
     return this;
   }
@@ -94,7 +96,7 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
 
     CommandContext commandContext = Context.getCommandContext();
 
-    if(commandContext == null) {
+    if (commandContext == null) {
       return commandExecutor.execute(new Command<List<DurationReportResult>>() {
 
         @Override
@@ -103,8 +105,7 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
         }
 
       });
-    }
-    else {
+    } else {
       return executeDurationReport(commandContext);
     }
 
@@ -114,20 +115,20 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
 
     doAuthCheck(commandContext);
 
-    if(areNotInAscendingOrder(startedAfter, startedBefore)) {
+    if (areNotInAscendingOrder(startedAfter, startedBefore)) {
       return Collections.emptyList();
     }
 
-    return commandContext
-      .getHistoricReportManager()
-      .selectHistoricProcessInstanceDurationReport(this);
+    return commandContext.getHistoricReportManager()
+        .selectHistoricProcessInstanceDurationReport(this);
 
   }
 
   protected void doAuthCheck(CommandContext commandContext) {
     // since a report does only make sense in context of historic
     // data, the authorization check will be performed here
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       if (processDefinitionIdIn == null && processDefinitionKeyIn == null) {
         checker.checkReadHistoryAnyProcessDefinition();
       } else {
@@ -139,7 +140,7 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
         if (processDefinitionIdIn != null) {
           for (String processDefinitionId : processDefinitionIdIn) {
             ProcessDefinition processDefinition = commandContext.getProcessDefinitionManager()
-              .findLatestProcessDefinitionById(processDefinitionId);
+                .findLatestProcessDefinitionById(processDefinitionId);
 
             if (processDefinition != null && processDefinition.getKey() != null) {
               processDefinitionKeys.add(processDefinition.getKey());

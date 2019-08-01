@@ -18,7 +18,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 
-public class CleanableHistoricDecisionInstanceReportResultEntity implements CleanableHistoricDecisionInstanceReportResult {
+public class CleanableHistoricDecisionInstanceReportResultEntity
+    implements CleanableHistoricDecisionInstanceReportResult {
 
   protected String decisionDefinitionId;
   protected String decisionDefinitionKey;
@@ -94,16 +95,12 @@ public class CleanableHistoricDecisionInstanceReportResultEntity implements Clea
   }
 
   public String toString() {
-    return this.getClass().getSimpleName()
-        + "[decisionDefinitionId = " + decisionDefinitionId
-        + ", decisionDefinitionKey = " + decisionDefinitionKey
-        + ", decisionDefinitionName = " + decisionDefinitionName
-        + ", decisionDefinitionVersion = " + decisionDefinitionVersion
-        + ", historyTimeToLive = " + historyTimeToLive
-        + ", finishedDecisionInstanceCount = " + finishedDecisionInstanceCount
-        + ", cleanableDecisionInstanceCount = " + cleanableDecisionInstanceCount
-        + ", tenantId = " + tenantId
-        + "]";
+    return this.getClass().getSimpleName() + "[decisionDefinitionId = " + decisionDefinitionId
+        + ", decisionDefinitionKey = " + decisionDefinitionKey + ", decisionDefinitionName = "
+        + decisionDefinitionName + ", decisionDefinitionVersion = " + decisionDefinitionVersion
+        + ", historyTimeToLive = " + historyTimeToLive + ", finishedDecisionInstanceCount = "
+        + finishedDecisionInstanceCount + ", cleanableDecisionInstanceCount = "
+        + cleanableDecisionInstanceCount + ", tenantId = " + tenantId + "]";
   }
 
 }

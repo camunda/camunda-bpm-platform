@@ -30,7 +30,8 @@ import org.camunda.bpm.engine.management.JobDefinitionQuery;
 /**
  * @author roman.smirnov
  */
-public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, JobDefinition> implements JobDefinitionQuery, Serializable {
+public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, JobDefinition>
+    implements JobDefinitionQuery, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -158,17 +159,13 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getJobDefinitionManager()
-      .findJobDefinitionCountByQueryCriteria(this);
+    return commandContext.getJobDefinitionManager().findJobDefinitionCountByQueryCriteria(this);
   }
 
   @Override
   public List<JobDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getJobDefinitionManager()
-      .findJobDefnitionByQueryCriteria(this, page);
+    return commandContext.getJobDefinitionManager().findJobDefnitionByQueryCriteria(this, page);
   }
 
   // getters /////////////////////////////////////////////

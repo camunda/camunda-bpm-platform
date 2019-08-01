@@ -29,13 +29,12 @@ import org.junit.Assert;
  */
 public class JobAcquisitionTestHelper {
 
-
   /**
    * suspends random process instances that are active
    */
   public static void suspendInstances(ProcessEngine processEngine, int numInstances) {
-    List<ProcessInstance> instancesToSuspend = processEngine.getRuntimeService().createProcessInstanceQuery()
-        .active().listPage(0, numInstances);
+    List<ProcessInstance> instancesToSuspend = processEngine.getRuntimeService()
+        .createProcessInstanceQuery().active().listPage(0, numInstances);
     if (instancesToSuspend.size() < numInstances) {
       throw new ProcessEngineException("Cannot suspend " + numInstances + " process instances");
     }
@@ -49,8 +48,8 @@ public class JobAcquisitionTestHelper {
    * activates random process instances that are active
    */
   public static void activateInstances(ProcessEngine processEngine, int numInstances) {
-    List<ProcessInstance> instancesToActivate = processEngine.getRuntimeService().createProcessInstanceQuery()
-        .suspended().listPage(0, numInstances);
+    List<ProcessInstance> instancesToActivate = processEngine.getRuntimeService()
+        .createProcessInstanceQuery().suspended().listPage(0, numInstances);
     if (instancesToActivate.size() < numInstances) {
       throw new ProcessEngineException("Cannot activate " + numInstances + " process instances");
     }
@@ -61,8 +60,9 @@ public class JobAcquisitionTestHelper {
   }
 
   public static void assertInBetween(long minimum, long maximum, long actualValue) {
-    Assert.assertTrue("Expected '" + actualValue + "' to be between '" + minimum + "' and '" + maximum + "'",
-      actualValue >= minimum && actualValue <= maximum);
+    Assert.assertTrue(
+        "Expected '" + actualValue + "' to be between '" + minimum + "' and '" + maximum + "'",
+        actualValue >= minimum && actualValue <= maximum);
   }
 
 }

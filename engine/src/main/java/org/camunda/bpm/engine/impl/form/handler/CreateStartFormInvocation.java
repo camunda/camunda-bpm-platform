@@ -28,7 +28,8 @@ public class CreateStartFormInvocation extends DelegateInvocation {
   protected StartFormHandler startFormHandler;
   protected ProcessDefinitionEntity definition;
 
-  public CreateStartFormInvocation(StartFormHandler startFormHandler, ProcessDefinitionEntity definition) {
+  public CreateStartFormInvocation(StartFormHandler startFormHandler,
+      ProcessDefinitionEntity definition) {
     super(null, definition);
     this.startFormHandler = startFormHandler;
     this.definition = definition;

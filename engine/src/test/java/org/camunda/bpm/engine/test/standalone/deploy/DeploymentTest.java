@@ -41,9 +41,11 @@ public class DeploymentTest {
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setJdbcUrl("jdbc:h2:mem:DeploymentTest-HistoryLevelNone;DB_CLOSE_DELAY=1000");
-      configuration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
+      configuration
+          .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
       configuration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_NONE);
       configuration.setDbHistoryUsed(false);
       return configuration;
@@ -55,38 +57,32 @@ public class DeploymentTest {
 
   @Test
   public void shouldDeleteDeployment() {
-     BpmnModelInstance instance = Bpmn.createExecutableProcess("process").startEvent().endEvent().done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process").startEvent().endEvent()
+        .done();
 
-     DeploymentWithDefinitions deployment = engineRule.getRepositoryService()
-         .createDeployment()
-         .addModelInstance("foo.bpmn", instance)
-         .deployWithResult();
+    DeploymentWithDefinitions deployment = engineRule.getRepositoryService().createDeployment()
+        .addModelInstance("foo.bpmn", instance).deployWithResult();
 
-     engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
+    engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
 
-     long count = engineRule.getRepositoryService().createDeploymentQuery().count();
-     assertThat(count, is(0L));
+    long count = engineRule.getRepositoryService().createDeploymentQuery().count();
+    assertThat(count, is(0L));
   }
 
   @Test
   public void shouldDeleteDeploymentWithRunningInstance() {
-     BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
-         .startEvent()
-         .userTask("testTask")
-         .endEvent()
-         .done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("testTask").endEvent().done();
 
-     DeploymentWithDefinitions deployment = engineRule.getRepositoryService()
-         .createDeployment()
-         .addModelInstance("foo.bpmn", instance)
-         .deployWithResult();
-     
-     engineRule.getRuntimeService().startProcessInstanceByKey("process");
-     assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count(), is(1L));
+    DeploymentWithDefinitions deployment = engineRule.getRepositoryService().createDeployment()
+        .addModelInstance("foo.bpmn", instance).deployWithResult();
 
-     engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count(), is(1L));
 
-     long count = engineRule.getRepositoryService().createDeploymentQuery().count();
-     assertThat(count, is(0L));
+    engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
+
+    long count = engineRule.getRepositoryService().createDeploymentQuery().count();
+    assertThat(count, is(0L));
   }
 }

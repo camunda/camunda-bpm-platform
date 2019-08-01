@@ -22,33 +22,38 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
- * Subscriptions for compensation start events must be migrated, similar to compensation boundary events.
- * However, this is not validated by {@link NoUnmappedLeafInstanceValidator} because
- * the corresponding event scope instance need not be a leaf in the instance tree (the scope itself may contain
- * event subscriptions).
+ * Subscriptions for compensation start events must be migrated, similar to compensation boundary
+ * events. However, this is not validated by {@link NoUnmappedLeafInstanceValidator} because the
+ * corresponding event scope instance need not be a leaf in the instance tree (the scope itself may
+ * contain event subscriptions).
  *
  * @author Thorben Lindhauer
  */
-public class NoUnmappedCompensationStartEventValidator implements MigratingCompensationInstanceValidator {
+public class NoUnmappedCompensationStartEventValidator
+    implements MigratingCompensationInstanceValidator {
 
   @Override
-  public void validate(MigratingEventScopeInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+  public void validate(MigratingEventScopeInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
       MigratingActivityInstanceValidationReportImpl ancestorInstanceReport) {
-    MigratingCompensationEventSubscriptionInstance eventSubscription = migratingInstance.getEventSubscription();
+    MigratingCompensationEventSubscriptionInstance eventSubscription = migratingInstance
+        .getEventSubscription();
 
     ActivityImpl eventHandlerActivity = (ActivityImpl) eventSubscription.getSourceScope();
 
-    // note: compensation event scopes without children are already handled by NoUnmappedLeafInstanceValidator
-    if (eventHandlerActivity.isTriggeredByEvent()
-        && eventSubscription.getTargetScope() == null
+    // note: compensation event scopes without children are already handled by
+    // NoUnmappedLeafInstanceValidator
+    if (eventHandlerActivity.isTriggeredByEvent() && eventSubscription.getTargetScope() == null
         && !migratingInstance.getChildren().isEmpty()) {
-      ancestorInstanceReport.addFailure("Cannot migrate subscription for compensation handler '" + eventSubscription.getSourceScope().getId() + "'. "
+      ancestorInstanceReport.addFailure("Cannot migrate subscription for compensation handler '"
+          + eventSubscription.getSourceScope().getId() + "'. "
           + "There is no migration instruction for the compensation start event");
     }
   }
 
   @Override
-  public void validate(MigratingCompensationEventSubscriptionInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+  public void validate(MigratingCompensationEventSubscriptionInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
       MigratingActivityInstanceValidationReportImpl ancestorInstanceReport) {
     // Compensation start event subscriptions are MigratingEventScopeInstances
     // because they reference an event scope execution

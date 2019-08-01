@@ -44,10 +44,8 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-
 /**
- * Convenience for ProcessEngine and services initialization in the form of a
- * JUnit rule.
+ * Convenience for ProcessEngine and services initialization in the form of a JUnit rule.
  * <p>
  * Usage:
  * </p>
@@ -62,36 +60,30 @@ import org.junit.runners.model.Statement;
  * }
  * </pre>
  * <p>
- * The ProcessEngine and the services will be made available to the test class
- * through the getters of the processEngineRule. The processEngine will be
- * initialized by default with the camunda.cfg.xml resource on the classpath. To
- * specify a different configuration file, pass the resource location in
- * {@link #ProcessEngineRule(String) the appropriate constructor}. Process
- * engines will be cached statically. Right before the first time the setUp is
- * called for a given configuration resource, the process engine will be
- * constructed.
+ * The ProcessEngine and the services will be made available to the test class through the getters
+ * of the processEngineRule. The processEngine will be initialized by default with the
+ * camunda.cfg.xml resource on the classpath. To specify a different configuration file, pass the
+ * resource location in {@link #ProcessEngineRule(String) the appropriate constructor}. Process
+ * engines will be cached statically. Right before the first time the setUp is called for a given
+ * configuration resource, the process engine will be constructed.
  * </p>
  * <p>
- * You can declare a deployment with the {@link Deployment} annotation. This
- * base class will make sure that this deployment gets deployed before the setUp
- * and {@link RepositoryService#deleteDeployment(String, boolean) cascade
- * deleted} after the tearDown.
+ * You can declare a deployment with the {@link Deployment} annotation. This base class will make
+ * sure that this deployment gets deployed before the setUp and
+ * {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted} after the tearDown.
  * </p>
  * <p>
- * The processEngineRule also lets you
- * {@link ProcessEngineRule#setCurrentTime(Date) set the current time used by
- * the process engine}. This can be handy to control the exact time that is used
- * by the engine in order to verify e.g. e.g. due dates of timers. Or start, end
- * and duration times in the history service. In the tearDown, the internal
- * clock will automatically be reset to use the current system time rather then
- * the time that was set during a test method. In other words, you don't have to
- * clean up your own time messing mess ;-)
+ * The processEngineRule also lets you {@link ProcessEngineRule#setCurrentTime(Date) set the current
+ * time used by the process engine}. This can be handy to control the exact time that is used by the
+ * engine in order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the
+ * history service. In the tearDown, the internal clock will automatically be reset to use the
+ * current system time rather then the time that was set during a test method. In other words, you
+ * don't have to clean up your own time messing mess ;-)
  * </p>
  * <p>
- * If you need the history service for your tests then you can specify the
- * required history level of the test method or class, using the
- * {@link RequiredHistoryLevel} annotation. If the current history level of the
- * process engine is lower than the specified one then the test is skipped.
+ * If you need the history service for your tests then you can specify the required history level of
+ * the test method or class, using the {@link RequiredHistoryLevel} annotation. If the current
+ * history level of the process engine is lower than the specified one then the test is skipped.
  * </p>
  *
  * @author Tom Baeyens
@@ -148,8 +140,8 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
   @Override
   public void starting(Description description) {
-    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, description.getTestClass(), description.getMethodName(),
-        description.getAnnotation(Deployment.class));
+    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, description.getTestClass(),
+        description.getMethodName(), description.getAnnotation(Deployment.class));
   }
 
   @Override
@@ -161,14 +153,18 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
     initializeServices();
 
-    final boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, description);
-    final boolean runsWithRequiredDatabase = TestHelper.annotationRequiredDatabaseCheck(processEngine, description);
+    final boolean hasRequiredHistoryLevel = TestHelper
+        .annotationRequiredHistoryLevelCheck(processEngine, description);
+    final boolean runsWithRequiredDatabase = TestHelper
+        .annotationRequiredDatabaseCheck(processEngine, description);
     return new Statement() {
 
       @Override
       public void evaluate() throws Throwable {
-        Assume.assumeTrue("ignored because the current history level is too low", hasRequiredHistoryLevel);
-        Assume.assumeTrue("ignored because the database doesn't match the required ones", runsWithRequiredDatabase);
+        Assume.assumeTrue("ignored because the current history level is too low",
+            hasRequiredHistoryLevel);
+        Assume.assumeTrue("ignored because the database doesn't match the required ones",
+            runsWithRequiredDatabase);
         ProcessEngineRule.super.apply(base, description).evaluate();
       }
     };
@@ -187,7 +183,8 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   }
 
   protected void initializeServices() {
-    processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+    processEngineConfiguration = ((ProcessEngineImpl) processEngine)
+        .getProcessEngineConfiguration();
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
@@ -223,7 +220,8 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     identityService.clearAuthentication();
     processEngine.getProcessEngineConfiguration().setTenantCheckEnabled(true);
 
-    TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, description.getTestClass(), description.getMethodName());
+    TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, description.getTestClass(),
+        description.getMethodName());
     for (String additionalDeployment : additionalDeployments) {
       TestHelper.deleteDeployment(processEngine, additionalDeployment);
     }
@@ -234,7 +232,6 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
     TestHelper.resetIdGenerator(processEngineConfiguration);
     ClockUtil.reset();
-
 
     clearServiceReferences();
   }
@@ -263,7 +260,8 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     return processEngineConfiguration;
   }
 
-  public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  public void setProcessEngineConfiguration(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.processEngineConfiguration = processEngineConfiguration;
   }
 

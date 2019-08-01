@@ -21,11 +21,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation for a test method or class to specify the required history level.
- * If the current history level of the process engine is lower than the
- * specified one then the test method is skipped.
+ * Annotation for a test method or class to specify the required history level. If the current
+ * history level of the process engine is lower than the specified one then the test method is
+ * skipped.
  *
- * <p>Usage:</p>
+ * <p>
+ * Usage:
+ * </p>
  *
  * <pre>
  * package org.example;

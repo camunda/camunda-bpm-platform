@@ -46,13 +46,12 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testHistoricProcessInstanceForSingleActivityInstantiation() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .startBeforeActivity("task1")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .startBeforeActivity("task1").execute();
 
     // then
-    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery()
+        .singleResult();
     assertNotNull(historicInstance);
     assertEquals(instance.getId(), historicInstance.getId());
     assertNotNull(historicInstance.getStartTime());
@@ -61,7 +60,8 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
     // should be the first activity started
     assertEquals("task1", historicInstance.getStartActivityId());
 
-    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().singleResult();
+    HistoricActivityInstance historicActivityInstance = historyService
+        .createHistoricActivityInstanceQuery().singleResult();
     assertNotNull(historicActivityInstance);
     assertEquals("task1", historicActivityInstance.getActivityId());
     assertNotNull(historicActivityInstance.getId());
@@ -73,14 +73,12 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   @Deployment(resources = SUBPROCESS_PROCESS)
   public void testHistoricActivityInstancesForSubprocess() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("subprocess")
-      .startBeforeActivity("innerTask")
-      .startBeforeActivity("theSubProcessStart")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("subprocess")
+        .startBeforeActivity("innerTask").startBeforeActivity("theSubProcessStart").execute();
 
     // then
-    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery()
+        .singleResult();
     assertNotNull(historicInstance);
     assertEquals(instance.getId(), historicInstance.getId());
     assertNotNull(historicInstance.getStartTime());
@@ -92,8 +90,8 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
     // subprocess, subprocess start event, two innerTasks
     assertEquals(4, historyService.createHistoricActivityInstanceQuery().count());
 
-    HistoricActivityInstance subProcessInstance = historyService.createHistoricActivityInstanceQuery()
-        .activityId("subProcess").singleResult();
+    HistoricActivityInstance subProcessInstance = historyService
+        .createHistoricActivityInstanceQuery().activityId("subProcess").singleResult();
     assertNotNull(subProcessInstance);
     assertEquals("subProcess", subProcessInstance.getActivityId());
     assertNotNull(subProcessInstance.getId());
@@ -101,8 +99,8 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
     assertNotNull(subProcessInstance.getStartTime());
     assertNull(subProcessInstance.getEndTime());
 
-    HistoricActivityInstance startEventInstance = historyService.createHistoricActivityInstanceQuery()
-        .activityId("theSubProcessStart").singleResult();
+    HistoricActivityInstance startEventInstance = historyService
+        .createHistoricActivityInstanceQuery().activityId("theSubProcessStart").singleResult();
     assertNotNull(startEventInstance);
     assertEquals("theSubProcessStart", startEventInstance.getActivityId());
     assertNotNull(startEventInstance.getId());
@@ -110,8 +108,8 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
     assertNotNull(startEventInstance.getStartTime());
     assertNotNull(startEventInstance.getEndTime());
 
-    List<HistoricActivityInstance> innerTaskInstances = historyService.createHistoricActivityInstanceQuery()
-        .activityId("innerTask").list();
+    List<HistoricActivityInstance> innerTaskInstances = historyService
+        .createHistoricActivityInstanceQuery().activityId("innerTask").list();
 
     assertEquals(2, innerTaskInstances.size());
 
@@ -128,14 +126,12 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   @Deployment(resources = ASYNC_PROCESS)
   public void testHistoricProcessInstanceAsyncStartEvent() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .startBeforeActivity("task2")
-      .setVariable("aVar", "aValue")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .startBeforeActivity("task2").setVariable("aVar", "aValue").execute();
 
     // then
-    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery()
+        .singleResult();
     assertNotNull(historicInstance);
     assertEquals(instance.getId(), historicInstance.getId());
     assertNotNull(historicInstance.getStartTime());
@@ -151,8 +147,7 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
     ActivityInstance activityInstance = runtimeService.getActivityInstance(instance.getId());
 
     HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery()
-        .variableName("aVar")
-        .singleResult();
+        .variableName("aVar").singleResult();
 
     assertNotNull(historicVariable);
     assertEquals(instance.getId(), historicVariable.getProcessInstanceId());
@@ -174,18 +169,14 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testHistoricVariableInstanceForSingleActivityInstantiation() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .startBeforeActivity("task1")
-      .setVariable("aVar", "aValue")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .startBeforeActivity("task1").setVariable("aVar", "aValue").execute();
 
     ActivityInstance activityInstance = runtimeService.getActivityInstance(instance.getId());
 
     // then
     HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery()
-        .variableName("aVar")
-        .singleResult();
+        .variableName("aVar").singleResult();
 
     assertNotNull(historicVariable);
     assertEquals(instance.getId(), historicVariable.getProcessInstanceId());
@@ -207,19 +198,15 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testHistoricVariableInstanceSetOnProcessInstance() {
     // when
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      // set the variables directly one the instance
-      .setVariable("aVar", "aValue")
-      .startBeforeActivity("task1")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        // set the variables directly one the instance
+        .setVariable("aVar", "aValue").startBeforeActivity("task1").execute();
 
     ActivityInstance activityInstance = runtimeService.getActivityInstance(instance.getId());
 
     // then
     HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery()
-        .variableName("aVar")
-        .singleResult();
+        .variableName("aVar").singleResult();
 
     assertNotNull(historicVariable);
     assertEquals(instance.getId(), historicVariable.getProcessInstanceId());
@@ -241,13 +228,12 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testHistoricProcessInstanceForSynchronousCompletion() {
     // when the process instance ends immediately
-    ProcessInstance instance = runtimeService
-      .createProcessInstanceByKey("exclusiveGateway")
-      .startAfterActivity("task1")
-      .execute();
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("exclusiveGateway")
+        .startAfterActivity("task1").execute();
 
     // then
-    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery()
+        .singleResult();
     assertNotNull(historicInstance);
     assertEquals(instance.getId(), historicInstance.getId());
     assertNotNull(historicInstance.getStartTime());
@@ -259,17 +245,14 @@ public class ProcessInstantiationAtActivitiesHistoryTest extends PluggableProces
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testSkipCustomListenerEnsureHistoryWritten() {
     // when creating the task skipping custom listeners
-    runtimeService.createProcessInstanceByKey("exclusiveGateway")
-      .startBeforeActivity("task2")
-      .execute(true, false);
+    runtimeService.createProcessInstanceByKey("exclusiveGateway").startBeforeActivity("task2")
+        .execute(true, false);
 
     // then the task assignment history (which uses a task listener) is written
     Task task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
 
-    HistoricActivityInstance instance = historyService
-        .createHistoricActivityInstanceQuery()
-        .activityId("task2")
-        .singleResult();
+    HistoricActivityInstance instance = historyService.createHistoricActivityInstanceQuery()
+        .activityId("task2").singleResult();
     assertNotNull(instance);
     assertEquals(task.getId(), instance.getTaskId());
     assertEquals("kermit", instance.getAssignee());

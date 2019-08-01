@@ -28,7 +28,9 @@ import java.util.List;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
-public class HistoricExternalTaskLogQueryImpl extends AbstractQuery<HistoricExternalTaskLogQuery, HistoricExternalTaskLog> implements HistoricExternalTaskLogQuery {
+public class HistoricExternalTaskLogQueryImpl
+    extends AbstractQuery<HistoricExternalTaskLogQuery, HistoricExternalTaskLog>
+    implements HistoricExternalTaskLogQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -185,7 +187,6 @@ public class HistoricExternalTaskLogQueryImpl extends AbstractQuery<HistoricExte
 
   // order by //////////////////////////////////////////////
 
-
   @Override
   public HistoricExternalTaskLogQuery orderByTimestamp() {
     orderBy(HistoricExternalTaskLogQueryProperty.TIMESTAMP);
@@ -269,16 +270,14 @@ public class HistoricExternalTaskLogQueryImpl extends AbstractQuery<HistoricExte
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-        .getHistoricExternalTaskLogManager()
+    return commandContext.getHistoricExternalTaskLogManager()
         .findHistoricExternalTaskLogsCountByQueryCriteria(this);
   }
 
   @Override
   public List<HistoricExternalTaskLog> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-        .getHistoricExternalTaskLogManager()
+    return commandContext.getHistoricExternalTaskLogManager()
         .findHistoricExternalTaskLogsByQueryCriteria(this, page);
   }
 

@@ -46,7 +46,8 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/authorization/messageStartEventProcess.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/authorization/messageStartEventProcess.bpmn20.xml")
+            .getId();
     super.setUp();
   }
 
@@ -193,7 +194,8 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     verifyQueryResults(query, 9);
 
     disableAuthorization();
-    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
+        .list();
     for (HistoricProcessInstance instance : instances) {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }

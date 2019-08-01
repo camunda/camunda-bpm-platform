@@ -31,9 +31,9 @@ public class PassThroughDelegate extends AbstractBpmnActivityBehavior implements
   }
 
   @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
     super.leave(execution);
   }
-
 
 }

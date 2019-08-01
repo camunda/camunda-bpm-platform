@@ -34,11 +34,11 @@ public class DelegateTaskFormHandler extends DelegateFormHandler implements Task
   }
 
   public TaskFormData createTaskForm(final TaskEntity task) {
-    return performContextSwitch(new Callable<TaskFormData> () {
+    return performContextSwitch(new Callable<TaskFormData>() {
       public TaskFormData call() throws Exception {
-        CreateTaskFormInvocation invocation = new CreateTaskFormInvocation((TaskFormHandler) formHandler, task);
-        Context.getProcessEngineConfiguration()
-            .getDelegateInterceptor()
+        CreateTaskFormInvocation invocation = new CreateTaskFormInvocation(
+            (TaskFormHandler) formHandler, task);
+        Context.getProcessEngineConfiguration().getDelegateInterceptor()
             .handleInvocation(invocation);
         return (TaskFormData) invocation.getInvocationResult();
       }

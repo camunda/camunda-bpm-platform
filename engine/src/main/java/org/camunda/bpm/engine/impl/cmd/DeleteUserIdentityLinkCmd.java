@@ -37,8 +37,8 @@ public class DeleteUserIdentityLinkCmd extends DeleteIdentityLinkCmd {
 
     PropertyChange propertyChange = new PropertyChange(type, null, userId);
 
-    commandContext.getOperationLogManager()
-        .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_USER_LINK, task, propertyChange);
+    commandContext.getOperationLogManager().logLinkOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_USER_LINK, task, propertyChange);
 
     return null;
   }

@@ -54,8 +54,8 @@ public class ProcessEngineLogger extends BaseLogger {
 
   public static final String PROJECT_CODE = "ENGINE";
 
-  public static final ProcessEngineLogger INSTANCE = BaseLogger.createLogger(
-      ProcessEngineLogger.class, PROJECT_CODE, "org.camunda.bpm.engine", "00");
+  public static final ProcessEngineLogger INSTANCE = BaseLogger
+      .createLogger(ProcessEngineLogger.class, PROJECT_CODE, "org.camunda.bpm.engine", "00");
 
   public static final BpmnParseLogger BPMN_PARSE_LOGGER = BaseLogger.createLogger(
       BpmnParseLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.bpmn.parser", "01");
@@ -78,66 +78,72 @@ public class ProcessEngineLogger extends BaseLogger {
   public static final ProcessApplicationLogger PROCESS_APPLICATION_LOGGER = BaseLogger.createLogger(
       ProcessApplicationLogger.class, PROJECT_CODE, "org.camunda.bpm.application", "07");
 
-  public static final ContainerIntegrationLogger CONTAINER_INTEGRATION_LOGGER = BaseLogger.createLogger(
-      ContainerIntegrationLogger.class, PROJECT_CODE, "org.camunda.bpm.container", "08");
+  public static final ContainerIntegrationLogger CONTAINER_INTEGRATION_LOGGER = BaseLogger
+      .createLogger(ContainerIntegrationLogger.class, PROJECT_CODE, "org.camunda.bpm.container",
+          "08");
 
-  public static final EngineUtilLogger UTIL_LOGGER = BaseLogger.createLogger(
-      EngineUtilLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.util", "09");
+  public static final EngineUtilLogger UTIL_LOGGER = BaseLogger.createLogger(EngineUtilLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.util", "09");
 
-  public static final TransactionLogger TX_LOGGER = BaseLogger.createLogger(
-      TransactionLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.tx", "11");
+  public static final TransactionLogger TX_LOGGER = BaseLogger.createLogger(TransactionLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.tx", "11");
 
-  public static final ConfigurationLogger CONFIG_LOGGER = BaseLogger.createLogger(
-      ConfigurationLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.cfg", "12");
+  public static final ConfigurationLogger CONFIG_LOGGER = BaseLogger
+      .createLogger(ConfigurationLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.cfg", "12");
 
-  public static final CommandLogger CMD_LOGGER = BaseLogger.createLogger(
-      CommandLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.cmd", "13");
+  public static final CommandLogger CMD_LOGGER = BaseLogger.createLogger(CommandLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.cmd", "13");
 
   public static final JobExecutorLogger JOB_EXECUTOR_LOGGER = BaseLogger.createLogger(
       JobExecutorLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.jobexecutor", "14");
 
-  public static final TestLogger TEST_LOGGER = BaseLogger.createLogger(
-      TestLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.test", "15");
+  public static final TestLogger TEST_LOGGER = BaseLogger.createLogger(TestLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.test", "15");
 
-  public static final ContextLogger CONTEXT_LOGGER = BaseLogger.createLogger(
-      ContextLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.context", "16");
+  public static final ContextLogger CONTEXT_LOGGER = BaseLogger.createLogger(ContextLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.context", "16");
 
-  public static final CoreLogger CORE_LOGGER = BaseLogger.createLogger(
-      CoreLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.core", "17");
+  public static final CoreLogger CORE_LOGGER = BaseLogger.createLogger(CoreLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.core", "17");
 
-  public static final MetricsLogger METRICS_LOGGER = BaseLogger.createLogger(
-      MetricsLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.metrics", "18");
+  public static final MetricsLogger METRICS_LOGGER = BaseLogger.createLogger(MetricsLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.metrics", "18");
 
-  public static final AdministratorAuthorizationPluginLogger ADMIN_PLUGIN_LOGGER = BaseLogger.createLogger(
-      AdministratorAuthorizationPluginLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.plugin.admin", "19");
+  public static final AdministratorAuthorizationPluginLogger ADMIN_PLUGIN_LOGGER = BaseLogger
+      .createLogger(AdministratorAuthorizationPluginLogger.class, PROJECT_CODE,
+          "org.camunda.bpm.engine.plugin.admin", "19");
 
-  public static final PvmLogger PVM_LOGGER = BaseLogger.createLogger(
-      PvmLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.pvm", "20");
+  public static final PvmLogger PVM_LOGGER = BaseLogger.createLogger(PvmLogger.class, PROJECT_CODE,
+      "org.camunda.bpm.engine.pvm", "20");
 
-  public static final ScriptLogger SCRIPT_LOGGER = BaseLogger.createLogger(
-      ScriptLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.script", "21");
+  public static final ScriptLogger SCRIPT_LOGGER = BaseLogger.createLogger(ScriptLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.script", "21");
 
-  public static final DecisionLogger DECISION_LOGGER = BaseLogger.createLogger(
-      DecisionLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.dmn", "22");
+  public static final DecisionLogger DECISION_LOGGER = BaseLogger.createLogger(DecisionLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.dmn", "22");
 
-  public static final MigrationLogger MIGRATION_LOGGER = BaseLogger.createLogger(
-      MigrationLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.migration", "23");
+  public static final MigrationLogger MIGRATION_LOGGER = BaseLogger
+      .createLogger(MigrationLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.migration", "23");
 
   public static final ExternalTaskLogger EXTERNAL_TASK_LOGGER = BaseLogger.createLogger(
-    ExternalTaskLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.externaltask", "24");
+      ExternalTaskLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.externaltask", "24");
 
-  public static final SecurityLogger SECURITY_LOGGER = BaseLogger.createLogger(
-    SecurityLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.security", "25");
+  public static final SecurityLogger SECURITY_LOGGER = BaseLogger.createLogger(SecurityLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.security", "25");
 
-  public static final IncidentLogger INCIDENT_LOGGER = BaseLogger.createLogger(
-      IncidentLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.incident", "26");
+  public static final IncidentLogger INCIDENT_LOGGER = BaseLogger.createLogger(IncidentLogger.class,
+      PROJECT_CODE, "org.camunda.bpm.engine.incident", "26");
 
-  public static boolean shouldLogJobException(ProcessEngineConfiguration processEngineConfiguration, JobEntity currentJob) {
-    boolean enableReducedJobExceptionLogging = processEngineConfiguration.isEnableReducedJobExceptionLogging();
-    return currentJob == null || !enableReducedJobExceptionLogging || enableReducedJobExceptionLogging && currentJob.getRetries() <= 1;
+  public static boolean shouldLogJobException(ProcessEngineConfiguration processEngineConfiguration,
+      JobEntity currentJob) {
+    boolean enableReducedJobExceptionLogging = processEngineConfiguration
+        .isEnableReducedJobExceptionLogging();
+    return currentJob == null || !enableReducedJobExceptionLogging
+        || enableReducedJobExceptionLogging && currentJob.getRetries() <= 1;
   }
 
-  public static boolean shouldLogCmdException(ProcessEngineConfiguration processEngineConfiguration) {
+  public static boolean shouldLogCmdException(
+      ProcessEngineConfiguration processEngineConfiguration) {
     return processEngineConfiguration.isEnableCmdExceptionLogging();
   }
 
@@ -150,13 +156,11 @@ public class ProcessEngineLogger extends BaseLogger {
   }
 
   public void initializingProcessEngineForResource(URL resourceUrl) {
-    logInfo(
-        "003", "Initializing process engine for resource {}", resourceUrl);
+    logInfo("003", "Initializing process engine for resource {}", resourceUrl);
   }
 
   public void initializingProcessEngine(String name) {
-    logInfo(
-        "004", "Initializing process engine {}", name);
+    logInfo("004", "Initializing process engine {}", name);
   }
 
   public void exceptionWhileInitializingProcessengine(Throwable e) {
@@ -172,12 +176,9 @@ public class ProcessEngineLogger extends BaseLogger {
   }
 
   public void historyCleanupJobReconfigurationFailure(Exception exception) {
-    logInfo(
-      "008",
-      "History Cleanup Job reconfiguration failed on Process Engine Bootstrap. Possible concurrent execution with the JobExecutor: {}",
-      exception.getMessage()
-    );
+    logInfo("008",
+        "History Cleanup Job reconfiguration failed on Process Engine Bootstrap. Possible concurrent execution with the JobExecutor: {}",
+        exception.getMessage());
   }
 
 }
-

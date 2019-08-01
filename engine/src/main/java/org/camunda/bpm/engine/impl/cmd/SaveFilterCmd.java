@@ -39,15 +39,14 @@ public class SaveFilterCmd implements Command<Filter>, Serializable {
 
   public Filter execute(CommandContext commandContext) {
     EnsureUtil.ensureNotNull("filter", filter);
-    
-    String operation = filter.getId() == null ? UserOperationLogEntry.OPERATION_TYPE_CREATE : UserOperationLogEntry.OPERATION_TYPE_UPDATE;
-    
-    Filter savedFilter = commandContext
-      .getFilterManager()
-      .insertOrUpdateFilter(filter);
-    
+
+    String operation = filter.getId() == null ? UserOperationLogEntry.OPERATION_TYPE_CREATE
+        : UserOperationLogEntry.OPERATION_TYPE_UPDATE;
+
+    Filter savedFilter = commandContext.getFilterManager().insertOrUpdateFilter(filter);
+
     commandContext.getOperationLogManager().logFilterOperation(operation, filter.getId());
-    
+
     return savedFilter;
   }
 

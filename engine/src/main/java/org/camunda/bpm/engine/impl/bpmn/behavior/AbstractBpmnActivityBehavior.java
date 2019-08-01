@@ -31,10 +31,9 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
- * Denotes an 'activity' in the sense of BPMN 2.0:
- * a parent class for all tasks, subprocess and callActivity.
+ * Denotes an 'activity' in the sense of BPMN 2.0: a parent class for all tasks, subprocess and
+ * callActivity.
  *
  * @author Joram Barrez
  * @author Daniel Meyer
@@ -45,9 +44,8 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   /**
-   * Subclasses that call leave() will first pass through this method, before
-   * the regular {@link FlowNodeActivityBehavior#leave(ActivityExecution)} is
-   * called.
+   * Subclasses that call leave() will first pass through this method, before the regular
+   * {@link FlowNodeActivityBehavior#leave(ActivityExecution)} is called.
    */
   @Override
   public void doLeave(ActivityExecution execution) {
@@ -56,35 +54,40 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     ActivityImpl compensationHandler = ((ActivityImpl) currentActivity).findCompensationHandler();
 
     // subscription for compensation event subprocess is already created
-    if(compensationHandler != null && !isCompensationEventSubprocess(compensationHandler)) {
+    if (compensationHandler != null && !isCompensationEventSubprocess(compensationHandler)) {
       createCompensateEventSubscription(execution, compensationHandler);
     }
     super.doLeave(execution);
   }
 
   protected boolean isCompensationEventSubprocess(ActivityImpl activity) {
-    return activity.isCompensationHandler() && activity.isSubProcessScope() && activity.isTriggeredByEvent();
+    return activity.isCompensationHandler() && activity.isSubProcessScope()
+        && activity.isTriggeredByEvent();
   }
 
-  protected void createCompensateEventSubscription(ActivityExecution execution, ActivityImpl compensationHandler) {
-    // the compensate event subscription is created at subprocess or miBody of the the current activity
+  protected void createCompensateEventSubscription(ActivityExecution execution,
+      ActivityImpl compensationHandler) {
+    // the compensate event subscription is created at subprocess or miBody of the the current
+    // activity
     PvmActivity currentActivity = execution.getActivity();
-    ActivityExecution scopeExecution = execution.findExecutionForFlowScope(currentActivity.getFlowScope());
+    ActivityExecution scopeExecution = execution
+        .findExecutionForFlowScope(currentActivity.getFlowScope());
 
-    EventSubscriptionEntity.createAndInsert((ExecutionEntity) scopeExecution, EventType.COMPENSATE, compensationHandler);
+    EventSubscriptionEntity.createAndInsert((ExecutionEntity) scopeExecution, EventType.COMPENSATE,
+        compensationHandler);
   }
 
   /**
-   * Takes an {@link ActivityExecution} and an {@link Callable} and wraps
-   * the call to the Callable with the proper error propagation. This method
-   * also makes sure that exceptions not caught by following activities in the
-   * process will be thrown and not propagated.
+   * Takes an {@link ActivityExecution} and an {@link Callable} and wraps the call to the Callable
+   * with the proper error propagation. This method also makes sure that exceptions not caught by
+   * following activities in the process will be thrown and not propagated.
    *
    * @param execution
    * @param toExecute
    * @throws Exception
    */
-  protected void executeWithErrorPropagation(ActivityExecution execution, Callable<Void> toExecute) throws Exception {
+  protected void executeWithErrorPropagation(ActivityExecution execution, Callable<Void> toExecute)
+      throws Exception {
     String activityInstanceId = execution.getActivityInstanceId();
     try {
       toExecute.call();
@@ -93,24 +96,23 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
         try {
           BpmnExceptionHandler.propagateException(execution, ex);
-        }
-        catch (ErrorPropagationException e) {
+        } catch (ErrorPropagationException e) {
           // exception has been logged by thrower
           // re-throw the original exception so that it is logged
           // and set as cause of the failure
           throw ex;
         }
 
-      }
-      else {
+      } else {
         throw ex;
       }
     }
   }
 
   @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-    if(SIGNAL_COMPENSATION_DONE.equals(signalName)) {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
+    if (SIGNAL_COMPENSATION_DONE.equals(signalName)) {
       signalCompensationDone(execution);
     } else {
       super.signal(execution, signalName, signalData);
@@ -118,19 +120,21 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   }
 
   protected void signalCompensationDone(ActivityExecution execution) {
-    // default behavior is to join compensating executions and propagate the signal if all executions have compensated
+    // default behavior is to join compensating executions and propagate the signal if all
+    // executions have compensated
 
-    // only wait for non-event-scope executions cause a compensation event subprocess consume the compensation event and
+    // only wait for non-event-scope executions cause a compensation event subprocess consume the
+    // compensation event and
     // do not have to compensate embedded subprocesses (which are still non-event-scope executions)
 
-    if(((PvmExecutionImpl) execution).getNonEventScopeExecutions().isEmpty()) {
-      if(execution.getParent() != null) {
+    if (((PvmExecutionImpl) execution).getNonEventScopeExecutions().isEmpty()) {
+      if (execution.getParent() != null) {
         ActivityExecution parent = execution.getParent();
         execution.remove();
         parent.signal(SIGNAL_COMPENSATION_DONE, null);
       }
     } else {
-      ((ExecutionEntity)execution).forceUpdate();
+      ((ExecutionEntity) execution).forceUpdate();
     }
 
   }

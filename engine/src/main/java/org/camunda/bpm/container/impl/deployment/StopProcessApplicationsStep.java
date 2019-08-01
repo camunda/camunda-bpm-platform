@@ -29,7 +29,9 @@ import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>Deployment operation step that is responsible for stopping (undeploying) all process applications</p>
+ * <p>
+ * Deployment operation step that is responsible for stopping (undeploying) all process applications
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -45,7 +47,8 @@ public class StopProcessApplicationsStep extends DeploymentOperationStep {
   public void performOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
-    List<JmxManagedProcessApplication> processApplicationsReferences = serviceContainer.getServiceValuesByType(ServiceTypes.PROCESS_APPLICATION);
+    List<JmxManagedProcessApplication> processApplicationsReferences = serviceContainer
+        .getServiceValuesByType(ServiceTypes.PROCESS_APPLICATION);
 
     for (JmxManagedProcessApplication processApplication : processApplicationsReferences) {
       stopProcessApplication(processApplication.getProcessApplicationReference());
@@ -54,7 +57,8 @@ public class StopProcessApplicationsStep extends DeploymentOperationStep {
   }
 
   /**
-   * <p> Stops a process application. Exceptions are logged but not re-thrown).
+   * <p>
+   * Stops a process application. Exceptions are logged but not re-thrown).
    *
    * @param processApplicationReference
    */
@@ -64,10 +68,10 @@ public class StopProcessApplicationsStep extends DeploymentOperationStep {
       // unless the user has overridden the stop behavior,
       // this causes the process application to remove its services
       // (triggers nested undeployment operation)
-      ProcessApplicationInterface processApplication = processApplicationReference.getProcessApplication();
+      ProcessApplicationInterface processApplication = processApplicationReference
+          .getProcessApplication();
       processApplication.undeploy();
-    }
-    catch(Throwable t) {
+    } catch (Throwable t) {
       LOG.exceptionWhileStopping("Process Application", processApplicationReference.getName(), t);
     }
 

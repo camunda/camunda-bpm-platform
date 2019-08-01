@@ -76,15 +76,11 @@ public class DeleteBatchAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.DELETE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.DELETE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations()
+            .failsDueToRequired(grant(Resources.BATCH, "batchId", "userId", Permissions.DELETE)),
+        scenario()
+            .withAuthorizations(grant(Resources.BATCH, "batchId", "userId", Permissions.DELETE))
+            .succeeds());
   }
 
   protected MigrationPlan migrationPlan;
@@ -98,13 +94,13 @@ public class DeleteBatchAuthorizationTest {
 
   @Before
   public void deployProcessesAndCreateMigrationPlan() {
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    migrationPlan = engineRule
-        .getRuntimeService()
-        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .build();
+    migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId()).build();
   }
 
   @After
@@ -116,9 +112,9 @@ public class DeleteBatchAuthorizationTest {
   public void deleteBatch() {
     if (authRule.scenarioFailed()) {
       engineRule.getManagementService().deleteBatch(batch.getId(), true);
-    }
-    else {
-      if (!cascade && engineRule.getProcessEngineConfiguration().getHistoryLevel() == HistoryLevel.HISTORY_LEVEL_FULL) {
+    } else {
+      if (!cascade && engineRule.getProcessEngineConfiguration()
+          .getHistoryLevel() == HistoryLevel.HISTORY_LEVEL_FULL) {
         engineRule.getHistoryService().deleteHistoricBatch(batch.getId());
       }
     }
@@ -128,19 +124,13 @@ public class DeleteBatchAuthorizationTest {
   public void testDeleteBatch() {
 
     // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
-    batch = engineRule
-        .getRuntimeService()
-        .newMigration(migrationPlan)
-        .processInstanceIds(Arrays.asList(processInstance.getId()))
-        .executeAsync();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("batchId", batch.getId())
-      .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", batch.getId()).start();
 
     cascade = false;
     engineRule.getManagementService().deleteBatch(batch.getId(), cascade);
@@ -150,9 +140,7 @@ public class DeleteBatchAuthorizationTest {
       Assert.assertEquals(0, engineRule.getManagementService().createBatchQuery().count());
 
       List<UserOperationLogEntry> userOperationLogEntries = engineRule.getHistoryService()
-        .createUserOperationLogQuery()
-        .operationType(OPERATION_TYPE_DELETE)
-        .list();
+          .createUserOperationLogQuery().operationType(OPERATION_TYPE_DELETE).list();
 
       assertEquals(1, userOperationLogEntries.size());
 
@@ -169,19 +157,13 @@ public class DeleteBatchAuthorizationTest {
   @Test
   public void testDeleteBatchCascade() {
     // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
-    batch = engineRule
-        .getRuntimeService()
-        .newMigration(migrationPlan)
-        .processInstanceIds(Arrays.asList(processInstance.getId()))
-        .executeAsync();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+    batch = engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("batchId", batch.getId())
-      .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", batch.getId()).start();
 
     cascade = true;
     engineRule.getManagementService().deleteBatch(batch.getId(), cascade);
@@ -191,12 +173,10 @@ public class DeleteBatchAuthorizationTest {
       Assert.assertEquals(0, engineRule.getManagementService().createBatchQuery().count());
       Assert.assertEquals(0, engineRule.getHistoryService().createHistoricBatchQuery().count());
 
-      UserOperationLogQuery query = engineRule.getHistoryService()
-        .createUserOperationLogQuery();
+      UserOperationLogQuery query = engineRule.getHistoryService().createUserOperationLogQuery();
 
-      List<UserOperationLogEntry> userOperationLogEntries = query.operationType(OPERATION_TYPE_DELETE)
-        .batchId(batch.getId())
-        .list();
+      List<UserOperationLogEntry> userOperationLogEntries = query
+          .operationType(OPERATION_TYPE_DELETE).batchId(batch.getId()).list();
       assertEquals(1, userOperationLogEntries.size());
 
       UserOperationLogEntry entry = userOperationLogEntries.get(0);
@@ -205,9 +185,8 @@ public class DeleteBatchAuthorizationTest {
       assertEquals(CATEGORY_OPERATOR, entry.getCategory());
 
       // Ensure that HistoricBatch deletion is not logged
-      List<UserOperationLogEntry> userOperationLogHistoricEntries = query.operationType(OPERATION_TYPE_DELETE_HISTORY)
-        .batchId(batch.getId())
-        .list();
+      List<UserOperationLogEntry> userOperationLogHistoricEntries = query
+          .operationType(OPERATION_TYPE_DELETE_HISTORY).batchId(batch.getId()).list();
       assertEquals(0, userOperationLogHistoricEntries.size());
     }
   }

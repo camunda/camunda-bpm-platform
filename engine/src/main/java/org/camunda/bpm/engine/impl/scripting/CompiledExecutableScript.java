@@ -49,7 +49,8 @@ public class CompiledExecutableScript extends ExecutableScript {
     this.compiledScript = compiledScript;
   }
 
-  public Object evaluate(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
+  public Object evaluate(ScriptEngine scriptEngine, VariableScope variableScope,
+      Bindings bindings) {
     try {
       LOG.debugEvaluatingCompiledScript(language);
       return getCompiledScript().eval(bindings);
@@ -58,7 +59,8 @@ public class CompiledExecutableScript extends ExecutableScript {
         throw (BpmnError) e.getCause();
       }
       String activityIdMessage = getActivityIdExceptionMessage(variableScope);
-      throw new ScriptEvaluationException("Unable to evaluate script" + activityIdMessage +": " + e.getMessage(), e);
+      throw new ScriptEvaluationException(
+          "Unable to evaluate script" + activityIdMessage + ": " + e.getMessage(), e);
     }
   }
 

@@ -74,20 +74,25 @@ public class CustomHistoryLevelIncidentTest {
   @Parameters
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
-      new Object[]{ Arrays.asList(HistoryEventTypes.INCIDENT_CREATE) },
-      new Object[]{ Arrays.asList(HistoryEventTypes.INCIDENT_CREATE, HistoryEventTypes.INCIDENT_RESOLVE) },
-      new Object[]{ Arrays.asList(HistoryEventTypes.INCIDENT_DELETE, HistoryEventTypes.INCIDENT_CREATE, HistoryEventTypes.INCIDENT_MIGRATE, HistoryEventTypes.INCIDENT_RESOLVE) }
-    });
+        new Object[] { Arrays.asList(HistoryEventTypes.INCIDENT_CREATE) },
+        new Object[] {
+            Arrays.asList(HistoryEventTypes.INCIDENT_CREATE, HistoryEventTypes.INCIDENT_RESOLVE) },
+        new Object[] {
+            Arrays.asList(HistoryEventTypes.INCIDENT_DELETE, HistoryEventTypes.INCIDENT_CREATE,
+                HistoryEventTypes.INCIDENT_MIGRATE, HistoryEventTypes.INCIDENT_RESOLVE) } });
   }
 
   @Parameter(0)
   public static List<HistoryEventTypes> eventTypes;
 
-  CustomHistoryLevelIncident customHistoryLevelIncident = new CustomHistoryLevelIncident(eventTypes);
+  CustomHistoryLevelIncident customHistoryLevelIncident = new CustomHistoryLevelIncident(
+      eventTypes);
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl processEngineConfiguration) {
-      processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:" + CustomHistoryLevelIncident.class.getSimpleName());
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl processEngineConfiguration) {
+      processEngineConfiguration
+          .setJdbcUrl("jdbc:h2:mem:" + CustomHistoryLevelIncident.class.getSimpleName());
       List<HistoryLevel> levels = new ArrayList<>();
       levels.add(customHistoryLevelIncident);
       processEngineConfiguration.setCustomHistoryLevels(levels);
@@ -99,11 +104,13 @@ public class CustomHistoryLevelIncidentTest {
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
-  protected BatchMigrationHelper migrationHelper = new BatchMigrationHelper(engineRule, migrationRule);
+  protected BatchMigrationHelper migrationHelper = new BatchMigrationHelper(engineRule,
+      migrationRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule).around(migrationRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule).around(migrationRule);
 
   protected HistoryService historyService;
   protected RuntimeService runtimeService;
@@ -115,13 +122,9 @@ public class CustomHistoryLevelIncidentTest {
   DeploymentWithDefinitions deployment;
 
   public static String PROCESS_DEFINITION_KEY = "oneFailingServiceTaskProcess";
-  public static BpmnModelInstance FAILING_SERVICE_TASK_MODEL  = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
-    .startEvent("start")
-    .serviceTask("task")
-      .camundaAsyncBefore()
-      .camundaClass(FailingDelegate.class.getName())
-    .endEvent("end")
-    .done();
+  public static BpmnModelInstance FAILING_SERVICE_TASK_MODEL = Bpmn
+      .createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent("start").serviceTask("task")
+      .camundaAsyncBefore().camundaClass(FailingDelegate.class.getName()).endEvent("end").done();
 
   @Before
   public void setUp() throws Exception {
@@ -153,7 +156,8 @@ public class CustomHistoryLevelIncidentTest {
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
         }
 
-        List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
+        List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery()
+            .list();
         for (HistoricIncident historicIncident : historicIncidents) {
           commandContext.getDbEntityManager().delete((HistoricIncidentEntity) historicIncident);
         }
@@ -168,23 +172,21 @@ public class CustomHistoryLevelIncidentTest {
   @Test
   public void testDeleteHistoricIncidentByProcDefId() {
     // given
-    deployment = repositoryService.createDeployment().addModelInstance("process.bpmn", FAILING_SERVICE_TASK_MODEL).deployWithResult();
+    deployment = repositoryService.createDeployment()
+        .addModelInstance("process.bpmn", FAILING_SERVICE_TASK_MODEL).deployWithResult();
     String processDefinitionId = deployment.getDeployedProcessDefinitions().get(0).getId();
 
     runtimeService.startProcessInstanceById(processDefinitionId);
     executeAvailableJobs();
 
-
     if (eventTypes != null) {
-      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery()
+          .singleResult();
       assertNotNull(historicIncident);
     }
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey(PROCESS_DEFINITION_KEY)
-      .cascade()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey(PROCESS_DEFINITION_KEY).cascade().delete();
 
     // then
     List<HistoricIncident> incidents = historyService.createHistoricIncidentQuery().list();
@@ -215,7 +217,8 @@ public class CustomHistoryLevelIncidentTest {
 
     // assume
     if (eventTypes != null) {
-      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery()
+          .singleResult();
       assertNotNull(historicIncident);
     }
 
@@ -247,7 +250,8 @@ public class CustomHistoryLevelIncidentTest {
 
     // assume
     if (eventTypes != null) {
-      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery()
+          .singleResult();
       assertNotNull(historicIncident);
     }
 
@@ -269,7 +273,8 @@ public class CustomHistoryLevelIncidentTest {
     for (Job job : jobs) {
       try {
         managementService.executeJob(job.getId());
-      } catch (Exception e) {}
+      } catch (Exception e) {
+      }
     }
 
     executeAvailableJobs();
@@ -288,21 +293,19 @@ public class CustomHistoryLevelIncidentTest {
 
     MigrationPlan migrationPlan = runtimeService
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    Batch batch = runtimeService.newMigration(migrationPlan).processInstanceIds(Arrays.asList(processInstance.getId(), "unknownId")).executeAsync();
+    Batch batch = runtimeService.newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId(), "unknownId")).executeAsync();
     return batch;
   }
 
   protected BpmnModelInstance createModelInstance() {
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
-        .startEvent("start")
-        .userTask("userTask1")
-        .endEvent("end")
-        .done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process").startEvent("start")
+        .userTask("userTask1").endEvent("end").done();
     return instance;
   }
 }

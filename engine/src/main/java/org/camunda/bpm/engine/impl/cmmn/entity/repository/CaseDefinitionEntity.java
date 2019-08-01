@@ -38,7 +38,8 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
  * @author Roman Smirnov
  *
  */
-public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefinition, ResourceDefinitionEntity<CaseDefinitionEntity>, DbEntity, HasDbRevision {
+public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefinition,
+    ResourceDefinitionEntity<CaseDefinitionEntity>, DbEntity, HasDbRevision {
 
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
@@ -180,7 +181,8 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     DeploymentCache deploymentCache = configuration.getDeploymentCache();
 
-    CaseDefinitionEntity caseDefinition = deploymentCache.findCaseDefinitionFromCache(caseDefinitionId);
+    CaseDefinitionEntity caseDefinition = deploymentCache
+        .findCaseDefinitionFromCache(caseDefinitionId);
 
     if (caseDefinition == null) {
       CommandContext commandContext = Context.getCommandContext();
@@ -212,9 +214,7 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   protected void ensurePreviousCaseDefinitionIdInitialized() {
     if (previousCaseDefinitionId == null && !firstVersion) {
-      previousCaseDefinitionId = Context
-          .getCommandContext()
-          .getCaseDefinitionManager()
+      previousCaseDefinitionId = Context.getCommandContext().getCaseDefinitionManager()
           .findPreviousCaseDefinitionId(key, version, tenantId);
 
       if (previousCaseDefinitionId == null) {
@@ -231,10 +231,7 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
       caseInstance.setTenantId(tenantId);
     }
 
-    Context
-        .getCommandContext()
-        .getCaseExecutionManager()
-        .insertCaseExecution(caseInstance);
+    Context.getCommandContext().getCaseExecutionManager().insertCaseExecution(caseInstance);
     return caseInstance;
   }
 
@@ -246,21 +243,23 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   @Override
   public String toString() {
-    return "CaseDefinitionEntity["+id+"]";
+    return "CaseDefinitionEntity[" + id + "]";
   }
 
   /**
    * Updates all modifiable fields from another case definition entity.
+   * 
    * @param updatingCaseDefinition
    */
   @Override
   public void updateModifiableFieldsFromEntity(CaseDefinitionEntity updatingCaseDefinition) {
-    if (this.key.equals(updatingCaseDefinition.key) && this.deploymentId.equals(updatingCaseDefinition.deploymentId)) {
+    if (this.key.equals(updatingCaseDefinition.key)
+        && this.deploymentId.equals(updatingCaseDefinition.deploymentId)) {
       this.revision = updatingCaseDefinition.revision;
       this.historyTimeToLive = updatingCaseDefinition.historyTimeToLive;
-    }
-    else {
-      LOG.logUpdateUnrelatedCaseDefinitionEntity(this.key, updatingCaseDefinition.key, this.deploymentId, updatingCaseDefinition.deploymentId);
+    } else {
+      LOG.logUpdateUnrelatedCaseDefinitionEntity(this.key, updatingCaseDefinition.key,
+          this.deploymentId, updatingCaseDefinition.deploymentId);
     }
   }
 }

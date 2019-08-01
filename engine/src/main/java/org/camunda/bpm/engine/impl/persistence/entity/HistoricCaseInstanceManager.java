@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
-
 /**
  * @author Sebastian Menski
  */
@@ -58,7 +57,7 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
   public void deleteHistoricCaseInstanceByCaseDefinitionId(String caseDefinitionId) {
     if (isHistoryEnabled()) {
       List<String> historicCaseInstanceIds = getDbEntityManager()
-        .selectList("selectHistoricCaseInstanceIdsByCaseDefinitionId", caseDefinitionId);
+          .selectList("selectHistoricCaseInstanceIdsByCaseDefinitionId", caseDefinitionId);
 
       if (historicCaseInstanceIds != null && !historicCaseInstanceIds.isEmpty()) {
         deleteHistoricCaseInstancesByIds(historicCaseInstanceIds);
@@ -70,40 +69,51 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
     if (isHistoryEnabled()) {
       getHistoricDetailManager().deleteHistoricDetailsByCaseInstanceIds(historicCaseInstanceIds);
 
-      getHistoricVariableInstanceManager().deleteHistoricVariableInstancesByCaseInstanceIds(historicCaseInstanceIds);
+      getHistoricVariableInstanceManager()
+          .deleteHistoricVariableInstancesByCaseInstanceIds(historicCaseInstanceIds);
 
-      getHistoricCaseActivityInstanceManager().deleteHistoricCaseActivityInstancesByCaseInstanceIds(historicCaseInstanceIds);
+      getHistoricCaseActivityInstanceManager()
+          .deleteHistoricCaseActivityInstancesByCaseInstanceIds(historicCaseInstanceIds);
 
-      getHistoricTaskInstanceManager().deleteHistoricTaskInstancesByCaseInstanceIds(historicCaseInstanceIds);
+      getHistoricTaskInstanceManager()
+          .deleteHistoricTaskInstancesByCaseInstanceIds(historicCaseInstanceIds);
 
-      getDbEntityManager().delete(HistoricCaseInstanceEntity.class, "deleteHistoricCaseInstancesByIds", historicCaseInstanceIds);
+      getDbEntityManager().delete(HistoricCaseInstanceEntity.class,
+          "deleteHistoricCaseInstancesByIds", historicCaseInstanceIds);
     }
   }
 
-  public long findHistoricCaseInstanceCountByQueryCriteria(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
+  public long findHistoricCaseInstanceCountByQueryCriteria(
+      HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
     if (isHistoryEnabled()) {
       configureHistoricCaseInstanceQuery(historicCaseInstanceQuery);
-      return (Long) getDbEntityManager().selectOne("selectHistoricCaseInstanceCountByQueryCriteria", historicCaseInstanceQuery);
+      return (Long) getDbEntityManager().selectOne("selectHistoricCaseInstanceCountByQueryCriteria",
+          historicCaseInstanceQuery);
     }
     return 0;
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricCaseInstance> findHistoricCaseInstancesByQueryCriteria(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery, Page page) {
+  public List<HistoricCaseInstance> findHistoricCaseInstancesByQueryCriteria(
+      HistoricCaseInstanceQueryImpl historicCaseInstanceQuery, Page page) {
     if (isHistoryEnabled()) {
       configureHistoricCaseInstanceQuery(historicCaseInstanceQuery);
-      return getDbEntityManager().selectList("selectHistoricCaseInstancesByQueryCriteria", historicCaseInstanceQuery, page);
+      return getDbEntityManager().selectList("selectHistoricCaseInstancesByQueryCriteria",
+          historicCaseInstanceQuery, page);
     }
     return Collections.EMPTY_LIST;
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricCaseInstance> findHistoricCaseInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbEntityManager().selectListWithRawParameter("selectHistoricCaseInstanceByNativeQuery", parameterMap, firstResult, maxResults);
+  public List<HistoricCaseInstance> findHistoricCaseInstancesByNativeQuery(
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return getDbEntityManager().selectListWithRawParameter(
+        "selectHistoricCaseInstanceByNativeQuery", parameterMap, firstResult, maxResults);
   }
 
   public long findHistoricCaseInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbEntityManager().selectOne("selectHistoricCaseInstanceCountByNativeQuery", parameterMap);
+    return (Long) getDbEntityManager().selectOne("selectHistoricCaseInstanceCountByNativeQuery",
+        parameterMap);
   }
 
   protected void configureHistoricCaseInstanceQuery(HistoricCaseInstanceQueryImpl query) {
@@ -111,28 +121,35 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<String> findHistoricCaseInstanceIdsForCleanup(int batchSize, int minuteFrom, int minuteTo) {
+  public List<String> findHistoricCaseInstanceIdsForCleanup(int batchSize, int minuteFrom,
+      int minuteTo) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("currentTimestamp", ClockUtil.getCurrentTime());
     if (minuteTo - minuteFrom + 1 < 60) {
       parameters.put("minuteFrom", minuteFrom);
       parameters.put("minuteTo", minuteTo);
     }
-    ListQueryParameterObject parameterObject = new ListQueryParameterObject(parameters, 0, batchSize);
-    return getDbEntityManager().selectList("selectHistoricCaseInstanceIdsForCleanup", parameterObject);
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject(parameters, 0,
+        batchSize);
+    return getDbEntityManager().selectList("selectHistoricCaseInstanceIdsForCleanup",
+        parameterObject);
   }
 
   @SuppressWarnings("unchecked")
-  public List<CleanableHistoricCaseInstanceReportResult> findCleanableHistoricCaseInstancesReportByCriteria(CleanableHistoricCaseInstanceReportImpl query, Page page) {
+  public List<CleanableHistoricCaseInstanceReportResult> findCleanableHistoricCaseInstancesReportByCriteria(
+      CleanableHistoricCaseInstanceReportImpl query, Page page) {
     query.setCurrentTimestamp(ClockUtil.getCurrentTime());
     getTenantManager().configureQuery(query);
-    return getDbEntityManager().selectList("selectFinishedCaseInstancesReportEntities", query, page);
+    return getDbEntityManager().selectList("selectFinishedCaseInstancesReportEntities", query,
+        page);
   }
 
-  public long findCleanableHistoricCaseInstancesReportCountByCriteria(CleanableHistoricCaseInstanceReportImpl query) {
+  public long findCleanableHistoricCaseInstancesReportCountByCriteria(
+      CleanableHistoricCaseInstanceReportImpl query) {
     query.setCurrentTimestamp(ClockUtil.getCurrentTime());
     getTenantManager().configureQuery(query);
-    return (Long) getDbEntityManager().selectOne("selectFinishedCaseInstancesReportEntitiesCount", query);
+    return (Long) getDbEntityManager().selectOne("selectFinishedCaseInstancesReportEntitiesCount",
+        query);
   }
 
 }

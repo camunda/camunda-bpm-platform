@@ -54,16 +54,13 @@ public class HistoricTaskDurationReportTest {
   public ProcessEngineTestRule processEngineTestRule = new ProcessEngineTestRule(processEngineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain
-    .outerRule(processEngineTestRule)
-    .around(processEngineRule);
+  public RuleChain ruleChain = RuleChain.outerRule(processEngineTestRule).around(processEngineRule);
 
   protected ProcessEngineConfiguration processEngineConfiguration;
   protected HistoryService historyService;
 
   protected static final String PROCESS_DEFINITION_KEY = "HISTORIC_TASK_INST_REPORT";
   protected static final String ANOTHER_PROCESS_DEFINITION_KEY = "ANOTHER_HISTORIC_TASK_INST_REPORT";
-
 
   @Before
   public void setUp() {
@@ -77,7 +74,7 @@ public class HistoricTaskDurationReportTest {
   @After
   public void cleanUp() {
     List<Task> list = processEngineRule.getTaskService().createTaskQuery().list();
-    for( Task task : list ) {
+    for (Task task : list) {
       processEngineRule.getTaskService().deleteTask(task.getId(), true);
     }
   }
@@ -90,7 +87,8 @@ public class HistoricTaskDurationReportTest {
     startAndCompleteProcessInstance(ANOTHER_PROCESS_DEFINITION_KEY, 2016, 8, 14, 11, 43);
 
     // when
-    List<DurationReportResult> taskReportResults = historyService.createHistoricTaskInstanceReport().duration(PeriodUnit.MONTH);
+    List<DurationReportResult> taskReportResults = historyService.createHistoricTaskInstanceReport()
+        .duration(PeriodUnit.MONTH);
 
     // then
     assertEquals(3, taskReportResults.size());
@@ -107,10 +105,8 @@ public class HistoricTaskDurationReportTest {
     Calendar calendar = Calendar.getInstance();
     calendar.set(2016, 11, 14, 12, 5);
 
-    List<DurationReportResult> taskReportResults = historyService
-      .createHistoricTaskInstanceReport()
-      .completedAfter(calendar.getTime())
-      .duration(PeriodUnit.MONTH);
+    List<DurationReportResult> taskReportResults = historyService.createHistoricTaskInstanceReport()
+        .completedAfter(calendar.getTime()).duration(PeriodUnit.MONTH);
 
     // then
     assertEquals(1, taskReportResults.size());
@@ -127,10 +123,8 @@ public class HistoricTaskDurationReportTest {
     Calendar calendar = Calendar.getInstance();
     calendar.set(2016, 11, 14, 12, 5);
 
-    List<DurationReportResult> taskReportResults = historyService
-      .createHistoricTaskInstanceReport()
-      .completedBefore(calendar.getTime())
-      .duration(PeriodUnit.MONTH);
+    List<DurationReportResult> taskReportResults = historyService.createHistoricTaskInstanceReport()
+        .completedBefore(calendar.getTime()).duration(PeriodUnit.MONTH);
 
     // then
     assertEquals(2, taskReportResults.size());
@@ -141,14 +135,11 @@ public class HistoricTaskDurationReportTest {
     startAndCompleteProcessInstance(PROCESS_DEFINITION_KEY, 2016, 7, 14, 11, 43);
     startAndCompleteProcessInstance(PROCESS_DEFINITION_KEY, 2016, 7, 14, 11, 43);
 
-    DurationReportResult taskReportResult = historyService
-      .createHistoricTaskInstanceReport()
-      .duration(PeriodUnit.MONTH).get(0);
+    DurationReportResult taskReportResult = historyService.createHistoricTaskInstanceReport()
+        .duration(PeriodUnit.MONTH).get(0);
 
     List<HistoricTaskInstance> historicTaskInstances = historyService
-      .createHistoricTaskInstanceQuery()
-      .processDefinitionKey(PROCESS_DEFINITION_KEY)
-      .list();
+        .createHistoricTaskInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).list();
 
     long min = 0;
     long max = 0;
@@ -173,13 +164,11 @@ public class HistoricTaskDurationReportTest {
   @Test
   public void testCompletedAfterWithNullValue() {
     try {
-      historyService
-        .createHistoricTaskInstanceReport()
-        .completedAfter(null)
-        .duration(PeriodUnit.MONTH);
+      historyService.createHistoricTaskInstanceReport().completedAfter(null)
+          .duration(PeriodUnit.MONTH);
 
       fail("Expected NotValidException");
-    } catch( NotValidException nve) {
+    } catch (NotValidException nve) {
       assertTrue(nve.getMessage().contains("completedAfter"));
     }
   }
@@ -187,28 +176,23 @@ public class HistoricTaskDurationReportTest {
   @Test
   public void testCompletedBeforeWithNullValue() {
     try {
-      historyService
-        .createHistoricTaskInstanceReport()
-        .completedBefore(null)
-        .duration(PeriodUnit.MONTH);
+      historyService.createHistoricTaskInstanceReport().completedBefore(null)
+          .duration(PeriodUnit.MONTH);
 
       fail("Expected NotValidException");
-    } catch( NotValidException nve) {
+    } catch (NotValidException nve) {
       assertTrue(nve.getMessage().contains("completedBefore"));
     }
   }
 
   protected BpmnModelInstance createProcessWithUserTask(String key) {
-    return Bpmn.createExecutableProcess(key)
-      .startEvent()
-      .userTask(key + "_task1")
-      .name(key + " Task 1")
-      .endEvent()
-      .done();
+    return Bpmn.createExecutableProcess(key).startEvent().userTask(key + "_task1")
+        .name(key + " Task 1").endEvent().done();
   }
 
   protected void completeTask(String pid) {
-    Task task = processEngineRule.getTaskService().createTaskQuery().processInstanceId(pid).singleResult();
+    Task task = processEngineRule.getTaskService().createTaskQuery().processInstanceId(pid)
+        .singleResult();
     processEngineRule.getTaskService().complete(task.getId());
   }
 
@@ -226,8 +210,9 @@ public class HistoricTaskDurationReportTest {
     ClockUtil.setCurrentTime(calendar.getTime());
   }
 
-  protected void startAndCompleteProcessInstance(String key, int year, int month, int dayOfMonth, int hourOfDay, int minute) {
-    setCurrentTime(year, month, dayOfMonth , hourOfDay, minute);
+  protected void startAndCompleteProcessInstance(String key, int year, int month, int dayOfMonth,
+      int hourOfDay, int minute) {
+    setCurrentTime(year, month, dayOfMonth, hourOfDay, minute);
 
     ProcessInstance pi = processEngineRule.getRuntimeService().startProcessInstanceByKey(key);
 

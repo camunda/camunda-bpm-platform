@@ -39,7 +39,8 @@ public class ExecutionVariableSnapshotObserver implements ExecutionObserver {
     this(executionEntity, true, false);
   }
 
-  public ExecutionVariableSnapshotObserver(ExecutionEntity executionEntity, boolean localVariables, boolean deserializeValues) {
+  public ExecutionVariableSnapshotObserver(ExecutionEntity executionEntity, boolean localVariables,
+      boolean deserializeValues) {
     this.execution = executionEntity;
     this.execution.addExecutionObserver(this);
     this.localVariables = localVariables;
@@ -62,6 +63,7 @@ public class ExecutionVariableSnapshotObserver implements ExecutionObserver {
   }
 
   private VariableMap getVariables(final boolean localVariables) {
-    return this.localVariables ? execution.getVariablesLocalTyped(deserializeValues) : execution.getVariablesTyped(deserializeValues);
+    return this.localVariables ? execution.getVariablesLocalTyped(deserializeValues)
+        : execution.getVariablesTyped(deserializeValues);
   }
 }

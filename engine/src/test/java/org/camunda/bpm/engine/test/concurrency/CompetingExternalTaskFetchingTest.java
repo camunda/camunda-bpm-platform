@@ -55,8 +55,8 @@ public class CompetingExternalTaskFetchingTest extends PluggableProcessEngineTes
       instructions.put(topic, instruction);
 
       try {
-        fetchedTasks = processEngineConfiguration.getCommandExecutorTxRequired().execute(
-            new FetchExternalTasksCmd(workerId, results, instructions));
+        fetchedTasks = processEngineConfiguration.getCommandExecutorTxRequired()
+            .execute(new FetchExternalTasksCmd(workerId, results, instructions));
       } catch (OptimisticLockingException e) {
         exception = e;
       }
@@ -67,8 +67,10 @@ public class CompetingExternalTaskFetchingTest extends PluggableProcessEngineTes
   public void testCompetingExternalTaskFetching() {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
-    ExternalTaskFetcherThread thread1 = new ExternalTaskFetcherThread("thread1", 5, "externalTaskTopic");
-    ExternalTaskFetcherThread thread2 = new ExternalTaskFetcherThread("thread2", 5, "externalTaskTopic");
+    ExternalTaskFetcherThread thread1 = new ExternalTaskFetcherThread("thread1", 5,
+        "externalTaskTopic");
+    ExternalTaskFetcherThread thread2 = new ExternalTaskFetcherThread("thread2", 5,
+        "externalTaskTopic");
 
     // both threads fetch the same task and wait before flushing the lock
     thread1.startAndWaitUntilControlIsReturned();

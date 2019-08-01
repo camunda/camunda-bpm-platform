@@ -73,22 +73,24 @@ public class EnvScriptCachingTest extends PluggableProcessEngineTestCase {
     // given
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
 
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-        .addClasspathResource(PROCESS_PATH)
+    ProcessApplicationDeployment deployment = repositoryService
+        .createDeployment(processApplication.getReference()).addClasspathResource(PROCESS_PATH)
         .deploy();
 
     // when
     executeScript(processApplication);
 
     // then
-    Map<String, List<ExecutableScript>> environmentScripts = processApplication.getEnvironmentScripts();
+    Map<String, List<ExecutableScript>> environmentScripts = processApplication
+        .getEnvironmentScripts();
     assertNotNull(environmentScripts);
 
     List<ExecutableScript> groovyEnvScripts = environmentScripts.get(SCRIPT_LANGUAGE);
 
     assertNotNull(groovyEnvScripts);
     assertFalse(groovyEnvScripts.isEmpty());
-    assertEquals(processEngineConfiguration.getEnvScriptResolvers().size(), groovyEnvScripts.size());
+    assertEquals(processEngineConfiguration.getEnvScriptResolvers().size(),
+        groovyEnvScripts.size());
 
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
@@ -99,15 +101,16 @@ public class EnvScriptCachingTest extends PluggableProcessEngineTestCase {
 
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
 
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-        .addClasspathResource(PROCESS_PATH)
+    ProcessApplicationDeployment deployment = repositoryService
+        .createDeployment(processApplication.getReference()).addClasspathResource(PROCESS_PATH)
         .deploy();
 
     // when
     executeScript(processApplication);
 
     // then
-    Map<String, List<ExecutableScript>> environmentScripts = processApplication.getEnvironmentScripts();
+    Map<String, List<ExecutableScript>> environmentScripts = processApplication
+        .getEnvironmentScripts();
     assertNotNull(environmentScripts);
     assertNull(environmentScripts.get(SCRIPT_LANGUAGE));
 
@@ -121,25 +124,26 @@ public class EnvScriptCachingTest extends PluggableProcessEngineTestCase {
   }
 
   protected void executeScript(final ProcessApplicationInterface processApplication) {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
-          return Context.executeWithinProcessApplication(new Callable<Void>() {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        return Context.executeWithinProcessApplication(new Callable<Void>() {
 
-            public Void call() throws Exception {
-              ScriptingEngines scriptingEngines = processEngineConfiguration.getScriptingEngines();
-              ScriptEngine scriptEngine = scriptingEngines.getScriptEngineForLanguage(SCRIPT_LANGUAGE);
+          public Void call() throws Exception {
+            ScriptingEngines scriptingEngines = processEngineConfiguration.getScriptingEngines();
+            ScriptEngine scriptEngine = scriptingEngines
+                .getScriptEngineForLanguage(SCRIPT_LANGUAGE);
 
-              SourceExecutableScript script = createScript(SCRIPT_LANGUAGE, SCRIPT);
+            SourceExecutableScript script = createScript(SCRIPT_LANGUAGE, SCRIPT);
 
-              ScriptingEnvironment scriptingEnvironment = processEngineConfiguration.getScriptingEnvironment();
-              scriptingEnvironment.execute(script, null, null, scriptEngine);
+            ScriptingEnvironment scriptingEnvironment = processEngineConfiguration
+                .getScriptingEnvironment();
+            scriptingEnvironment.execute(script, null, null, scriptEngine);
 
-              return null;
-            }
-          }, processApplication.getReference());
-        }
-      });
+            return null;
+          }
+        }, processApplication.getReference());
+      }
+    });
   }
 
 }

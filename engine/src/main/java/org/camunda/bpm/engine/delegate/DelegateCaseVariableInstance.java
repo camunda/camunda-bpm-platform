@@ -16,15 +16,17 @@
  */
 package org.camunda.bpm.engine.delegate;
 
-
 /**
  * @author Thorben Lindhauer
  *
  */
-public interface DelegateCaseVariableInstance extends DelegateVariableInstance<DelegateCaseExecution> {
+public interface DelegateCaseVariableInstance
+    extends DelegateVariableInstance<DelegateCaseExecution> {
 
-  /** The event name, which caused the listener to be notified.
-   * Valid values are the constants defined in {@link CaseVariableListener}.*/
+  /**
+   * The event name, which caused the listener to be notified. Valid values are the constants
+   * defined in {@link CaseVariableListener}.
+   */
   String getEventName();
 
   /** The case execution in which context the variable was created/updated/deleted. */

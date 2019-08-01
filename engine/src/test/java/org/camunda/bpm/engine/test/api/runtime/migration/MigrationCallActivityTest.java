@@ -49,9 +49,8 @@ public class MigrationCallActivityTest {
 
   @Before
   public void deployOneTaskProcess() {
-    testHelper.deployAndGetDefinition(
-        modify(ProcessModels.ONE_TASK_PROCESS)
-          .changeElementId(ProcessModels.PROCESS_KEY, "oneTaskProcess"));
+    testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+        .changeElementId(ProcessModels.PROCESS_KEY, "oneTaskProcess"));
   }
 
   @Before
@@ -68,25 +67,25 @@ public class MigrationCallActivityTest {
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("callActivity", "callActivity")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("callActivity", "callActivity").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("callActivity").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity"))
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("callActivity")
+            .scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity"))
+            .done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("callActivity", testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .activity("callActivity",
+                testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
+            .done());
 
     // and it is possible to complete the called process instance
     testHelper.completeTask("userTask");
@@ -105,31 +104,29 @@ public class MigrationCallActivityTest {
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("callActivity", "callActivity")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("callActivity", "callActivity").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-    .hasProcessDefinitionId(targetProcessDefinition.getId())
-    .matches(
-      describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .child("callActivity").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity"))
-        .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("callActivity")
+            .scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity"))
+            .done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("callActivity", testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .activity("callActivity",
+                testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
+            .done());
 
     // and it is possible to complete the called case instance
-    CaseExecution caseExecution = rule.getCaseService()
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult();
+    CaseExecution caseExecution = rule.getCaseService().createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
 
     testHelper.completeTask("PI_HumanTask_1");
     // and the calling process instance
@@ -145,33 +142,31 @@ public class MigrationCallActivityTest {
   @Test
   public void testCallBpmnProcessAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
-        CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
         CallActivityModels.subProcessBpmnCallActivityProcess("oneTaskProcess"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("callActivity", "callActivity")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("callActivity", "callActivity").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child(null).scope()
-            .child("callActivity").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity"))
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child(null).scope()
+            .child("callActivity").scope()
+            .id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity")).done());
 
     testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .beginScope("subProcess")
-          .activity("callActivity", testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
-      .done());
+        describeActivityInstanceTree(targetProcessDefinition.getId()).beginScope("subProcess")
+            .activity("callActivity",
+                testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
+            .done());
 
     // and it is possible to complete the called process instance
     testHelper.completeTask("userTask");
@@ -184,48 +179,43 @@ public class MigrationCallActivityTest {
   @Test
   public void testCallBpmnProcessParallelMultiInstance() {
     // given
-    BpmnModelInstance model = modify(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"))
-      .activityBuilder("callActivity")
-      .multiInstance()
-      .parallel()
-      .cardinality("1")
-      .done();
+    BpmnModelInstance model = modify(
+        CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"))
+            .activityBuilder("callActivity").multiInstance().parallel().cardinality("1").done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("callActivity#multiInstanceBody", "callActivity#multiInstanceBody")
-      .mapActivities("callActivity", "callActivity")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("callActivity#multiInstanceBody", "callActivity#multiInstanceBody")
+        .mapActivities("callActivity", "callActivity").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child(null).scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity#multiInstanceBody"))
-            .child("callActivity").concurrent().noScope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity"))
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child(null).scope()
+            .id(testHelper
+                .getSingleExecutionIdForActivityBeforeMigration("callActivity#multiInstanceBody"))
+            .child("callActivity").concurrent().noScope()
+            .id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity")).done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .beginMiBody("callActivity")
-          .activity("callActivity", testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .beginMiBody("callActivity")
+            .activity("callActivity",
+                testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
+            .done());
 
     // and the link between calling and called instance is maintained correctly
 
     testHelper.assertSuperExecutionOfProcessInstance(
-        rule.getRuntimeService()
-          .createProcessInstanceQuery()
-          .processDefinitionKey("oneTaskProcess")
-          .singleResult()
-          .getId(),
+        rule.getRuntimeService().createProcessInstanceQuery().processDefinitionKey("oneTaskProcess")
+            .singleResult().getId(),
         testHelper.getSingleExecutionIdForActivityAfterMigration("callActivity"));
 
     // and it is possible to complete the called process instance
@@ -240,53 +230,45 @@ public class MigrationCallActivityTest {
   public void testCallCmmnCaseParallelMultiInstance() {
     // given
     BpmnModelInstance model = modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
-      .activityBuilder("callActivity")
-      .multiInstance()
-      .parallel()
-      .cardinality("1")
-      .done();
+        .activityBuilder("callActivity").multiInstance().parallel().cardinality("1").done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("callActivity#multiInstanceBody", "callActivity#multiInstanceBody")
-      .mapActivities("callActivity", "callActivity")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("callActivity#multiInstanceBody", "callActivity#multiInstanceBody")
+        .mapActivities("callActivity", "callActivity").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-    .hasProcessDefinitionId(targetProcessDefinition.getId())
-    .matches(
-      describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-        .child(null).scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity#multiInstanceBody"))
-          .child("callActivity").concurrent().noScope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity"))
-        .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child(null).scope()
+            .id(testHelper
+                .getSingleExecutionIdForActivityBeforeMigration("callActivity#multiInstanceBody"))
+            .child("callActivity").concurrent().noScope()
+            .id(testHelper.getSingleExecutionIdForActivityBeforeMigration("callActivity")).done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .beginMiBody("callActivity")
-          .activity("callActivity", testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .beginMiBody("callActivity")
+            .activity("callActivity",
+                testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
+            .done());
 
     // and the link between calling and called instance is maintained correctly
     testHelper.assertSuperExecutionOfCaseInstance(
-        rule.getCaseService()
-          .createCaseInstanceQuery()
-          .caseDefinitionKey("oneTaskCase")
-          .singleResult()
-          .getId(),
+        rule.getCaseService().createCaseInstanceQuery().caseDefinitionKey("oneTaskCase")
+            .singleResult().getId(),
         testHelper.getSingleExecutionIdForActivityAfterMigration("callActivity"));
 
     // and it is possible to complete the called case instance
-    CaseExecution caseExecution = rule.getCaseService()
-      .createCaseExecutionQuery()
-      .activityId("PI_HumanTask_1")
-      .singleResult();
+    CaseExecution caseExecution = rule.getCaseService().createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
 
     testHelper.completeTask("PI_HumanTask_1");
 
@@ -305,41 +287,34 @@ public class MigrationCallActivityTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
         modify(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"))
-          .activityBuilder("callActivity")
-          .multiInstance()
-          .parallel()
-          .cardinality("1")
-          .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
+            .activityBuilder("callActivity").multiInstance().parallel().cardinality("1").done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("callActivity", "callActivity")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("callActivity", "callActivity").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("callActivity").scope()
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("callActivity")
+            .scope().done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("callActivity", testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .activity("callActivity",
+                testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
+            .done());
 
     // then the link between calling and called instance is maintained correctly
 
     testHelper.assertSuperExecutionOfProcessInstance(
-        rule.getRuntimeService()
-          .createProcessInstanceQuery()
-          .processDefinitionKey("oneTaskProcess")
-          .singleResult()
-          .getId(),
+        rule.getRuntimeService().createProcessInstanceQuery().processDefinitionKey("oneTaskProcess")
+            .singleResult().getId(),
         testHelper.getSingleExecutionIdForActivityAfterMigration("callActivity"));
 
     // then it is possible to complete the called process instance
@@ -353,51 +328,41 @@ public class MigrationCallActivityTest {
   @Test
   public void testCallCmmnCaseParallelMultiInstanceRemoveMiBody() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
-        modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
-          .activityBuilder("callActivity")
-          .multiInstance()
-          .parallel()
-          .cardinality("1")
-          .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
+            .activityBuilder("callActivity").multiInstance().parallel().cardinality("1").done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("callActivity", "callActivity")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("callActivity", "callActivity").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("callActivity").scope()
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("callActivity")
+            .scope().done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("callActivity", testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
-      .done());
-
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .activity("callActivity",
+                testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
+            .done());
 
     // and the link between calling and called instance is maintained correctly
     testHelper.assertSuperExecutionOfCaseInstance(
-        rule.getCaseService()
-          .createCaseInstanceQuery()
-          .caseDefinitionKey("oneTaskCase")
-          .singleResult()
-          .getId(),
+        rule.getCaseService().createCaseInstanceQuery().caseDefinitionKey("oneTaskCase")
+            .singleResult().getId(),
         testHelper.getSingleExecutionIdForActivityAfterMigration("callActivity"));
 
     // and it is possible to complete the called case instance
-    CaseExecution caseExecution = rule.getCaseService()
-      .createCaseExecutionQuery()
-      .activityId("PI_HumanTask_1")
-      .singleResult();
+    CaseExecution caseExecution = rule.getCaseService().createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
 
     testHelper.completeTask("PI_HumanTask_1");
 
@@ -416,42 +381,35 @@ public class MigrationCallActivityTest {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
         modify(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"))
-          .activityBuilder("callActivity")
-          .multiInstance()
-          .sequential()
-          .cardinality("1")
-          .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
+            .activityBuilder("callActivity").multiInstance().sequential().cardinality("1").done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("callActivity", "callActivity")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("callActivity", "callActivity").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("callActivity").scope()
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("callActivity")
+            .scope().done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("callActivity", testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .activity("callActivity",
+                testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
+            .done());
 
     // then the link between calling and called instance is maintained correctly
 
     testHelper.assertSuperExecutionOfProcessInstance(
-        rule.getRuntimeService()
-          .createProcessInstanceQuery()
-          .processDefinitionKey("oneTaskProcess")
-          .singleResult()
-          .getId(),
+        rule.getRuntimeService().createProcessInstanceQuery().processDefinitionKey("oneTaskProcess")
+            .singleResult().getId(),
         testHelper.getSingleExecutionIdForActivityAfterMigration("callActivity"));
 
     // then it is possible to complete the called process instance
@@ -465,50 +423,41 @@ public class MigrationCallActivityTest {
   @Test
   public void testCallCmmnCaseSequentialMultiInstanceRemoveMiBody() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
-        modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
-          .activityBuilder("callActivity")
-          .multiInstance()
-          .sequential()
-          .cardinality("1")
-          .done());
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
+            .activityBuilder("callActivity").multiInstance().sequential().cardinality("1").done());
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("callActivity", "callActivity")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("callActivity", "callActivity").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("callActivity").scope()
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("callActivity")
+            .scope().done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("callActivity", testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .activity("callActivity",
+                testHelper.getSingleActivityInstanceBeforeMigration("callActivity").getId())
+            .done());
 
     // then the link between calling and called instance is maintained correctly
     testHelper.assertSuperExecutionOfCaseInstance(
-        rule.getCaseService()
-          .createCaseInstanceQuery()
-          .caseDefinitionKey("oneTaskCase")
-          .singleResult()
-          .getId(),
+        rule.getCaseService().createCaseInstanceQuery().caseDefinitionKey("oneTaskCase")
+            .singleResult().getId(),
         testHelper.getSingleExecutionIdForActivityAfterMigration("callActivity"));
 
     // and it is possible to complete the called case instance
-    CaseExecution caseExecution = rule.getCaseService()
-      .createCaseExecutionQuery()
-      .activityId("PI_HumanTask_1")
-      .singleResult();
+    CaseExecution caseExecution = rule.getCaseService().createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
 
     testHelper.completeTask("PI_HumanTask_1");
 
@@ -528,24 +477,20 @@ public class MigrationCallActivityTest {
     BpmnModelInstance model = CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess");
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(model).callActivityBuilder("callActivity")
-        .calledElement("foo")
-        .done());
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
+        modify(model).callActivityBuilder("callActivity").calledElement("foo").done());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("callActivity", "callActivity")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("callActivity", "callActivity").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
-    // then the called instance has not changed (e.g. not been migrated to a different process definition)
-    ProcessInstance calledInstance = rule
-      .getRuntimeService()
-      .createProcessInstanceQuery()
-      .processDefinitionKey("oneTaskProcess")
-      .singleResult();
+    // then the called instance has not changed (e.g. not been migrated to a different process
+    // definition)
+    ProcessInstance calledInstance = rule.getRuntimeService().createProcessInstanceQuery()
+        .processDefinitionKey("oneTaskProcess").singleResult();
     Assert.assertNotNull(calledInstance);
 
     // and it is possible to complete the called process instance

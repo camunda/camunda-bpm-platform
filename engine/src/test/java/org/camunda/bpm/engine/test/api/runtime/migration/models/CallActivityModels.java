@@ -25,69 +25,37 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 public class CallActivityModels {
 
   public static BpmnModelInstance oneBpmnCallActivityProcess(String calledProcessKey) {
-    return ProcessModels.newModel()
-        .startEvent()
-        .callActivity("callActivity")
-          .calledElement(calledProcessKey)
-        .userTask("userTask")
-        .endEvent()
-        .done();
+    return ProcessModels.newModel().startEvent().callActivity("callActivity")
+        .calledElement(calledProcessKey).userTask("userTask").endEvent().done();
   }
 
   public static BpmnModelInstance subProcessBpmnCallActivityProcess(String calledProcessKey) {
-    return ProcessModels.newModel()
-        .startEvent()
-        .subProcess("subProcess")
-        .embeddedSubProcess()
-          .startEvent()
-          .callActivity("callActivity")
-            .calledElement(calledProcessKey)
-          .userTask("userTask")
-          .endEvent()
-        .subProcessDone()
-        .endEvent()
-        .done();
+    return ProcessModels.newModel().startEvent().subProcess("subProcess").embeddedSubProcess()
+        .startEvent().callActivity("callActivity").calledElement(calledProcessKey)
+        .userTask("userTask").endEvent().subProcessDone().endEvent().done();
   }
 
   public static BpmnModelInstance oneCmmnCallActivityProcess(String caseCaseKey) {
-    return ProcessModels.newModel()
-        .startEvent()
-        .callActivity("callActivity")
-          .camundaCaseRef(caseCaseKey)
-        .userTask("userTask")
-        .endEvent()
-        .done();
+    return ProcessModels.newModel().startEvent().callActivity("callActivity")
+        .camundaCaseRef(caseCaseKey).userTask("userTask").endEvent().done();
   }
 
-  public static BpmnModelInstance oneBpmnCallActivityProcessAsExpression(int processNumber){
-    return ProcessModels.newModel(processNumber)
-        .startEvent()
-        .callActivity()
-          .calledElement("${NextProcess}")
-          .camundaIn("NextProcess", "NextProcess")
-        .endEvent()
-        .done();
+  public static BpmnModelInstance oneBpmnCallActivityProcessAsExpression(int processNumber) {
+    return ProcessModels.newModel(processNumber).startEvent().callActivity()
+        .calledElement("${NextProcess}").camundaIn("NextProcess", "NextProcess").endEvent().done();
   }
 
-  public static BpmnModelInstance oneBpmnCallActivityProcessAsExpressionAsync(int processNumber){
-    return ProcessModels.newModel(processNumber)
-        .startEvent()
-          .camundaAsyncBefore(true)
-        .callActivity()
-          .calledElement("${NextProcess}")
-          .camundaIn("NextProcess", "NextProcess")
-        .endEvent()
-        .done();
+  public static BpmnModelInstance oneBpmnCallActivityProcessAsExpressionAsync(int processNumber) {
+    return ProcessModels.newModel(processNumber).startEvent().camundaAsyncBefore(true)
+        .callActivity().calledElement("${NextProcess}").camundaIn("NextProcess", "NextProcess")
+        .endEvent().done();
   }
 
-  public static BpmnModelInstance oneBpmnCallActivityProcessPassingVariables(int processNumber, int calledProcessNumber){
-    return ProcessModels.newModel(processNumber)
-        .startEvent()
-        .callActivity()
-          .calledElement("Process"+calledProcessNumber)
-          .camundaInputParameter("NextProcess", "Process"+(processNumber+1))
-          .camundaIn("NextProcess", "NextProcess")
-        .endEvent()
-        .done();
+  public static BpmnModelInstance oneBpmnCallActivityProcessPassingVariables(int processNumber,
+      int calledProcessNumber) {
+    return ProcessModels.newModel(processNumber).startEvent().callActivity()
+        .calledElement("Process" + calledProcessNumber)
+        .camundaInputParameter("NextProcess", "Process" + (processNumber + 1))
+        .camundaIn("NextProcess", "NextProcess").endEvent().done();
   }
 }

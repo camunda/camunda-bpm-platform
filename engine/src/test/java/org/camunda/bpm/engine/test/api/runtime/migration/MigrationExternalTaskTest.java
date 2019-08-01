@@ -62,87 +62,106 @@ public class MigrationExternalTaskTest {
   @Test
   public void testTrees() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("externalTask", "externalTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("externalTask", "externalTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then the execution and activity instance tree are exactly as before migration
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("externalTask").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("externalTask"))
-        .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("externalTask")
+            .scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("externalTask"))
+            .done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("externalTask", testHelper.getSingleActivityInstanceBeforeMigration("externalTask").getId())
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(describeActivityInstanceTree(targetProcessDefinition.getId())
+            .activity("externalTask",
+                testHelper.getSingleActivityInstanceBeforeMigration("externalTask").getId())
+            .done());
 
   }
 
   @Test
   public void testProperties() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
-        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY)
-        .changeElementId("externalTask", "newExternalTask"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY)
+            .changeElementId("externalTask", "newExternalTask"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("externalTask", "newExternalTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("externalTask", "newExternalTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ExternalTask externalTaskBeforeMigration = rule.getExternalTaskService().createExternalTaskQuery().singleResult();
+    ExternalTask externalTaskBeforeMigration = rule.getExternalTaskService()
+        .createExternalTaskQuery().singleResult();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then all properties are the same apart from the process reference
-    ExternalTask externalTaskAfterMigration = rule.getExternalTaskService().createExternalTaskQuery().singleResult();
+    ExternalTask externalTaskAfterMigration = rule.getExternalTaskService()
+        .createExternalTaskQuery().singleResult();
 
     Assert.assertEquals("newExternalTask", externalTaskAfterMigration.getActivityId());
-    Assert.assertEquals(targetProcessDefinition.getId(), externalTaskAfterMigration.getProcessDefinitionId());
-    Assert.assertEquals("new" + ProcessModels.PROCESS_KEY, externalTaskAfterMigration.getProcessDefinitionKey());
+    Assert.assertEquals(targetProcessDefinition.getId(),
+        externalTaskAfterMigration.getProcessDefinitionId());
+    Assert.assertEquals("new" + ProcessModels.PROCESS_KEY,
+        externalTaskAfterMigration.getProcessDefinitionKey());
 
-    Assert.assertEquals(externalTaskBeforeMigration.getPriority(), externalTaskAfterMigration.getPriority());
-    Assert.assertEquals(externalTaskBeforeMigration.getActivityInstanceId(), externalTaskAfterMigration.getActivityInstanceId());
-    Assert.assertEquals(externalTaskBeforeMigration.getErrorMessage(), externalTaskAfterMigration.getErrorMessage());
-    Assert.assertEquals(externalTaskBeforeMigration.getExecutionId(), externalTaskAfterMigration.getExecutionId());
+    Assert.assertEquals(externalTaskBeforeMigration.getPriority(),
+        externalTaskAfterMigration.getPriority());
+    Assert.assertEquals(externalTaskBeforeMigration.getActivityInstanceId(),
+        externalTaskAfterMigration.getActivityInstanceId());
+    Assert.assertEquals(externalTaskBeforeMigration.getErrorMessage(),
+        externalTaskAfterMigration.getErrorMessage());
+    Assert.assertEquals(externalTaskBeforeMigration.getExecutionId(),
+        externalTaskAfterMigration.getExecutionId());
     Assert.assertEquals(externalTaskBeforeMigration.getId(), externalTaskAfterMigration.getId());
-    Assert.assertEquals(externalTaskBeforeMigration.getLockExpirationTime(), externalTaskAfterMigration.getLockExpirationTime());
+    Assert.assertEquals(externalTaskBeforeMigration.getLockExpirationTime(),
+        externalTaskAfterMigration.getLockExpirationTime());
     Assert.assertEquals(processInstance.getId(), externalTaskAfterMigration.getProcessInstanceId());
-    Assert.assertEquals(externalTaskBeforeMigration.getRetries(), externalTaskAfterMigration.getRetries());
-    Assert.assertEquals(externalTaskBeforeMigration.getTenantId(), externalTaskAfterMigration.getTenantId());
-    Assert.assertEquals(externalTaskBeforeMigration.getTopicName(), externalTaskAfterMigration.getTopicName());
-    Assert.assertEquals(externalTaskBeforeMigration.getWorkerId(), externalTaskAfterMigration.getWorkerId());
+    Assert.assertEquals(externalTaskBeforeMigration.getRetries(),
+        externalTaskAfterMigration.getRetries());
+    Assert.assertEquals(externalTaskBeforeMigration.getTenantId(),
+        externalTaskAfterMigration.getTenantId());
+    Assert.assertEquals(externalTaskBeforeMigration.getTopicName(),
+        externalTaskAfterMigration.getTopicName());
+    Assert.assertEquals(externalTaskBeforeMigration.getWorkerId(),
+        externalTaskAfterMigration.getWorkerId());
   }
-
 
   @Test
   public void testContinueProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("externalTask", "externalTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("externalTask", "externalTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -157,26 +176,28 @@ public class MigrationExternalTaskTest {
   @Test
   public void testChangeTaskConfiguration() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
-        .serviceTaskBuilder("externalTask")
-        .camundaTopic("new" + ExternalTaskModels.TOPIC)
-        .camundaTaskPriority(Integer.toString(ExternalTaskModels.PRIORITY * 2))
-        .done());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
+            .serviceTaskBuilder("externalTask").camundaTopic("new" + ExternalTaskModels.TOPIC)
+            .camundaTaskPriority(Integer.toString(ExternalTaskModels.PRIORITY * 2)).done());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("externalTask", "externalTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("externalTask", "externalTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then the task's topic and priority have not changed
-    ExternalTask externalTaskAfterMigration = rule.getExternalTaskService().createExternalTaskQuery().singleResult();
-    Assert.assertEquals(ExternalTaskModels.PRIORITY.longValue(), externalTaskAfterMigration.getPriority());
+    ExternalTask externalTaskAfterMigration = rule.getExternalTaskService()
+        .createExternalTaskQuery().singleResult();
+    Assert.assertEquals(ExternalTaskModels.PRIORITY.longValue(),
+        externalTaskAfterMigration.getPriority());
     Assert.assertEquals(ExternalTaskModels.TOPIC, externalTaskAfterMigration.getTopicName());
 
   }
@@ -184,22 +205,19 @@ public class MigrationExternalTaskTest {
   @Test
   public void testChangeTaskType() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
-        .startEvent()
-        .businessRuleTask("externalBusinessRuleTask")
-          .camundaType(ExternalTaskModels.EXTERNAL_TASK_TYPE)
-          .camundaTopic(ExternalTaskModels.TOPIC)
-          .camundaTaskPriority(ExternalTaskModels.PRIORITY.toString())
-        .endEvent()
-        .done());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels
+        .newModel().startEvent().businessRuleTask("externalBusinessRuleTask")
+        .camundaType(ExternalTaskModels.EXTERNAL_TASK_TYPE).camundaTopic(ExternalTaskModels.TOPIC)
+        .camundaTaskPriority(ExternalTaskModels.PRIORITY.toString()).endEvent().done());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("externalTask", "externalBusinessRuleTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("externalTask", "externalBusinessRuleTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -215,45 +233,53 @@ public class MigrationExternalTaskTest {
   @Test
   public void testLockedTaskProperties() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
-        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY)
-        .changeElementId("externalTask", "newExternalTask"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY)
+            .changeElementId("externalTask", "newExternalTask"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("externalTask", "newExternalTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("externalTask", "newExternalTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     fetchAndLockSingleTask(ExternalTaskModels.TOPIC);
-    ExternalTask externalTaskBeforeMigration = rule.getExternalTaskService().createExternalTaskQuery().singleResult();
+    ExternalTask externalTaskBeforeMigration = rule.getExternalTaskService()
+        .createExternalTaskQuery().singleResult();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then the locking properties have not been changed
-    ExternalTask externalTaskAfterMigration = rule.getExternalTaskService().createExternalTaskQuery().singleResult();
+    ExternalTask externalTaskAfterMigration = rule.getExternalTaskService()
+        .createExternalTaskQuery().singleResult();
 
-    Assert.assertEquals(externalTaskBeforeMigration.getLockExpirationTime(), externalTaskAfterMigration.getLockExpirationTime());
-    Assert.assertEquals(externalTaskBeforeMigration.getWorkerId(), externalTaskAfterMigration.getWorkerId());
+    Assert.assertEquals(externalTaskBeforeMigration.getLockExpirationTime(),
+        externalTaskAfterMigration.getLockExpirationTime());
+    Assert.assertEquals(externalTaskBeforeMigration.getWorkerId(),
+        externalTaskAfterMigration.getWorkerId());
   }
 
   @Test
   public void testLockedTaskContinueProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
-        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY)
-        .changeElementId("externalTask", "newExternalTask"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY)
+            .changeElementId("externalTask", "newExternalTask"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("externalTask", "newExternalTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("externalTask", "newExternalTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     LockedExternalTask externalTask = fetchAndLockSingleTask(ExternalTaskModels.TOPIC);
 
@@ -268,37 +294,38 @@ public class MigrationExternalTaskTest {
 
   @Test
   public void cannotMigrateFromExternalToClassDelegateServiceTask() {
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ServiceTaskModels.oneClassDelegateServiceTask("foo.Bar"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ServiceTaskModels.oneClassDelegateServiceTask("foo.Bar"));
 
     try {
       rule.getRuntimeService()
-        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("externalTask", "serviceTask")
-        .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities("externalTask", "serviceTask").build();
       Assert.fail("exception expected");
     } catch (MigrationPlanValidationException e) {
       // then
-      assertThat(e.getValidationReport())
-      .hasInstructionFailures("externalTask",
-        "Activities have incompatible types (ExternalTaskActivityBehavior is not compatible with"
-        + " ClassDelegateActivityBehavior)"
-      );
+      assertThat(e.getValidationReport()).hasInstructionFailures("externalTask",
+          "Activities have incompatible types (ExternalTaskActivityBehavior is not compatible with"
+              + " ClassDelegateActivityBehavior)");
     }
   }
 
   @Test
   public void testAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("externalTask", "externalTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("externalTask", "externalTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -313,15 +340,17 @@ public class MigrationExternalTaskTest {
   @Test
   public void testRemoveParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("externalTask", "externalTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("externalTask", "externalTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -336,21 +365,25 @@ public class MigrationExternalTaskTest {
   @Test
   public void testIncident() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
-        .changeElementId("externalTask", "newExternalTask"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
+            .changeElementId("externalTask", "newExternalTask"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("externalTask", "newExternalTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("externalTask", "newExternalTask").build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ExternalTask externalTask = rule.getExternalTaskService().createExternalTaskQuery().singleResult();
+    ExternalTask externalTask = rule.getExternalTaskService().createExternalTaskQuery()
+        .singleResult();
     rule.getExternalTaskService().setRetries(externalTask.getId(), 0);
 
-    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
+    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery()
+        .singleResult();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -379,22 +412,26 @@ public class MigrationExternalTaskTest {
   @Test
   public void testIncidentWithoutMapExternalTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
-        .changeElementId("externalTask", "newExternalTask"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS)
+            .changeElementId("externalTask", "newExternalTask"));
 
-    //external task is not mapped to new external task
+    // external task is not mapped to new external task
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    ExternalTask externalTask = rule.getExternalTaskService().createExternalTaskQuery().singleResult();
+    ExternalTask externalTask = rule.getExternalTaskService().createExternalTaskQuery()
+        .singleResult();
     rule.getExternalTaskService().setRetries(externalTask.getId(), 0);
 
-    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery().singleResult();
+    Incident incidentBeforeMigration = rule.getRuntimeService().createIncidentQuery()
+        .singleResult();
     assertNotNull(incidentBeforeMigration);
 
     // when migration is executed
@@ -407,49 +444,53 @@ public class MigrationExternalTaskTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn" })
   public void testProcessDefinitionWithoutIdField() {
-     // given
+    // given
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn").getDeployedProcessDefinitions().get(0);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn").getDeployedProcessDefinitions().get(0);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn")
+        .getDeployedProcessDefinitions().get(0);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn")
+        .getDeployedProcessDefinitions().get(0);
 
-    //external task is not mapped to new external task
+    // external task is not mapped to new external task
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     List<MigrationInstruction> instructions = migrationPlan.getInstructions();
     // test that the messageEventDefinition without an id isn't included
     assertEquals(2, instructions.size());
   }
 
-
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn" })
   public void testProcessDefinitionWithIdField() {
-     // given
+    // given
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithIdTest.bpmn").getDeployedProcessDefinitions().get(0);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithIdTest.bpmn").getDeployedProcessDefinitions().get(0);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithIdTest.bpmn")
+        .getDeployedProcessDefinitions().get(0);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithIdTest.bpmn")
+        .getDeployedProcessDefinitions().get(0);
 
-    //external task is not mapped to new external task
+    // external task is not mapped to new external task
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     List<MigrationInstruction> instructions = migrationPlan.getInstructions();
     assertEquals(2, instructions.size());
   }
 
   protected LockedExternalTask fetchAndLockSingleTask(String topic) {
-    List<LockedExternalTask> tasks = rule
-      .getExternalTaskService()
-      .fetchAndLock(1, WORKER_ID)
-      .topic(topic, 1000L)
-      .execute();
+    List<LockedExternalTask> tasks = rule.getExternalTaskService().fetchAndLock(1, WORKER_ID)
+        .topic(topic, 1000L).execute();
 
     Assert.assertEquals(1, tasks.size());
 

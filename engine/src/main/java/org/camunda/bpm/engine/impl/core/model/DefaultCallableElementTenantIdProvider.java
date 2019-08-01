@@ -25,8 +25,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 /**
- * Default implementation for {@link BaseCallableElement#getTenantIdProvider()}.
- * Uses the tenant id of the calling definition.
+ * Default implementation for {@link BaseCallableElement#getTenantIdProvider()}. Uses the tenant id
+ * of the calling definition.
  */
 public class DefaultCallableElementTenantIdProvider implements ParameterValueProvider {
 
@@ -39,12 +39,14 @@ public class DefaultCallableElementTenantIdProvider implements ParameterValuePro
       return getCaseDefinitionTenantId((CaseExecutionEntity) execution);
 
     } else {
-      throw new ProcessEngineException("Unexpected execution of type " + execution.getClass().getName());
+      throw new ProcessEngineException(
+          "Unexpected execution of type " + execution.getClass().getName());
     }
   }
 
   protected String getProcessDefinitionTenantId(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution
+        .getProcessDefinition();
     return processDefinition.getTenantId();
   }
 

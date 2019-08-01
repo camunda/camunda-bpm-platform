@@ -32,7 +32,8 @@ import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
  * @author Daniel Meyer
  *
  */
-public class JmxManagedProcessApplication implements PlatformService<JmxManagedProcessApplication>, JmxManagedProcessApplicationMBean {
+public class JmxManagedProcessApplication
+    implements PlatformService<JmxManagedProcessApplication>, JmxManagedProcessApplicationMBean {
 
   protected final ProcessApplicationInfoImpl processApplicationInfo;
   protected final ProcessApplicationReference processApplicationReference;
@@ -40,24 +41,25 @@ public class JmxManagedProcessApplication implements PlatformService<JmxManagedP
   protected List<ProcessesXml> processesXmls;
   protected Map<String, DeployedProcessArchive> deploymentMap;
 
-	public JmxManagedProcessApplication(ProcessApplicationInfoImpl processApplicationInfo, ProcessApplicationReference processApplicationReference) {
+  public JmxManagedProcessApplication(ProcessApplicationInfoImpl processApplicationInfo,
+      ProcessApplicationReference processApplicationReference) {
     this.processApplicationInfo = processApplicationInfo;
     this.processApplicationReference = processApplicationReference;
-	}
+  }
 
-	public String getProcessApplicationName() {
-		return processApplicationInfo.getName();
-	}
+  public String getProcessApplicationName() {
+    return processApplicationInfo.getName();
+  }
 
-	public void start(PlatformServiceContainer mBeanServiceContainer) {
-	}
+  public void start(PlatformServiceContainer mBeanServiceContainer) {
+  }
 
-	public void stop(PlatformServiceContainer mBeanServiceContainer) {
-	}
+  public void stop(PlatformServiceContainer mBeanServiceContainer) {
+  }
 
-	public JmxManagedProcessApplication getValue() {
-		return this;
-	}
+  public JmxManagedProcessApplication getValue() {
+    return this;
+  }
 
   public void setProcessesXmls(List<ProcessesXml> processesXmls) {
     this.processesXmls = processesXmls;

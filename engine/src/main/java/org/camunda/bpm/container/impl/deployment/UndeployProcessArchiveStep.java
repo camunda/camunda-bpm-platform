@@ -30,8 +30,9 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 
 /**
- * <p>Deployment operation step responsible for performing the undeployment of a
- * process archive</p>
+ * <p>
+ * Deployment operation step responsible for performing the undeployment of a process archive
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -43,32 +44,39 @@ public class UndeployProcessArchiveStep extends DeploymentOperationStep {
   protected ProcessArchiveXml processArchive;
   protected String processEngineName;
 
-  public UndeployProcessArchiveStep(JmxManagedProcessApplication deployedProcessApplication, ProcessArchiveXml processArchive, String processEngineName) {
+  public UndeployProcessArchiveStep(JmxManagedProcessApplication deployedProcessApplication,
+      ProcessArchiveXml processArchive, String processEngineName) {
     this.deployedProcessApplication = deployedProcessApplication;
     this.processArchive = processArchive;
     this.processEngineName = processEngineName;
   }
 
   public String getName() {
-    return "Undeploying process archvie "+processArchvieName;
+    return "Undeploying process archvie " + processArchvieName;
   }
 
   public void performOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
 
-    final Map<String, DeployedProcessArchive> processArchiveDeploymentMap = deployedProcessApplication.getProcessArchiveDeploymentMap();
-    final DeployedProcessArchive deployedProcessArchive = processArchiveDeploymentMap.get(processArchive.getName());
-    final ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
+    final Map<String, DeployedProcessArchive> processArchiveDeploymentMap = deployedProcessApplication
+        .getProcessArchiveDeploymentMap();
+    final DeployedProcessArchive deployedProcessArchive = processArchiveDeploymentMap
+        .get(processArchive.getName());
+    final ProcessEngine processEngine = serviceContainer
+        .getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
 
     // unregrister with the process engine.
-    processEngine.getManagementService().unregisterProcessApplication(deployedProcessArchive.getAllDeploymentIds(), true);
+    processEngine.getManagementService()
+        .unregisterProcessApplication(deployedProcessArchive.getAllDeploymentIds(), true);
 
     // delete the deployment if not disabled
-    if (PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {
+    if (PropertyHelper.getBooleanProperty(processArchive.getProperties(),
+        ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {
       if (processEngine != null) {
         // always cascade & skip custom listeners
-        deleteDeployment(deployedProcessArchive.getPrimaryDeploymentId(), processEngine.getRepositoryService());
+        deleteDeployment(deployedProcessArchive.getPrimaryDeploymentId(),
+            processEngine.getRepositoryService());
       }
     }
 

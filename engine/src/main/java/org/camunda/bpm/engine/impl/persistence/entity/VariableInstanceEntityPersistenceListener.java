@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycle
  * @author Thorben Lindhauer
  *
  */
-public class VariableInstanceEntityPersistenceListener implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
+public class VariableInstanceEntityPersistenceListener
+    implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
 
   public static final VariableInstanceEntityPersistenceListener INSTANCE = new VariableInstanceEntityPersistenceListener();
 

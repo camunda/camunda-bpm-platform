@@ -23,7 +23,9 @@ import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
  */
 public class AsyncAfterMessageJobDeclaration extends MessageJobDeclaration {
 
-  public static final String[] asyncAfterOperations = new String[] {PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE.getCanonicalName(), PvmAtomicOperation.ACTIVITY_END.getCanonicalName()};
+  public static final String[] asyncAfterOperations = new String[] {
+      PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE.getCanonicalName(),
+      PvmAtomicOperation.ACTIVITY_END.getCanonicalName() };
 
   public AsyncAfterMessageJobDeclaration() {
     super(asyncAfterOperations);

@@ -35,15 +35,15 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class AcquireJobsCmdTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/standalone/jobexecutor/oneJobProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/standalone/jobexecutor/oneJobProcess.bpmn20.xml" })
   public void testJobsNotVisisbleToAcquisitionIfInstanceSuspended() {
 
     ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
     ProcessInstance pi = runtimeService.startProcessInstanceByKey(pd.getKey());
 
     // now there is one job:
-    Job job = managementService.createJobQuery()
-      .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
 
     makeSureJobDue(job);
@@ -60,14 +60,14 @@ public class AcquireJobsCmdTest extends PluggableProcessEngineTestCase {
     assertEquals(0, acquiredJobs.size());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/standalone/jobexecutor/oneJobProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/standalone/jobexecutor/oneJobProcess.bpmn20.xml" })
   public void testJobsNotVisisbleToAcquisitionIfDefinitionSuspended() {
 
     ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
     runtimeService.startProcessInstanceByKey(pd.getKey());
     // now there is one job:
-    Job job = managementService.createJobQuery()
-      .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
 
     makeSureJobDue(job);
@@ -85,22 +85,20 @@ public class AcquireJobsCmdTest extends PluggableProcessEngineTestCase {
   }
 
   protected void makeSureJobDue(final Job job) {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
-          Date currentTime = ClockUtil.getCurrentTime();
-          commandContext.getJobManager()
-            .findJobById(job.getId())
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        Date currentTime = ClockUtil.getCurrentTime();
+        commandContext.getJobManager().findJobById(job.getId())
             .setDuedate(new Date(currentTime.getTime() - 10000));
-          return null;
-        }
+        return null;
+      }
 
-      });
+    });
   }
 
   private AcquiredJobs executeAcquireJobsCommand() {
     return processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new AcquireJobsCmd(processEngineConfiguration.getJobExecutor()));
+        .execute(new AcquireJobsCmd(processEngineConfiguration.getJobExecutor()));
   }
 
 }

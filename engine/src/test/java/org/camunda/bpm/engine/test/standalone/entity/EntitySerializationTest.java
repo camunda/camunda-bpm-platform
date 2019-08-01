@@ -62,36 +62,38 @@ public class EntitySerializationTest extends TestCase {
   }
 
   public void testExecutionEntitySerialization() throws Exception {
-   ExecutionEntity execution = new ExecutionEntity();
+    ExecutionEntity execution = new ExecutionEntity();
 
-   ActivityImpl activityImpl = new ActivityImpl("test", null);
-   activityImpl.getExecutionListeners().put("start", Collections.<ExecutionListener>singletonList(new TestExecutionListener()));
-   execution.setActivity(activityImpl);
+    ActivityImpl activityImpl = new ActivityImpl("test", null);
+    activityImpl.getExecutionListeners().put("start",
+        Collections.<ExecutionListener> singletonList(new TestExecutionListener()));
+    execution.setActivity(activityImpl);
 
-   ProcessDefinitionImpl processDefinitionImpl = new ProcessDefinitionImpl("test");
-   processDefinitionImpl.getExecutionListeners().put("start", Collections.<ExecutionListener>singletonList(new TestExecutionListener()));
-   execution.setProcessDefinition(processDefinitionImpl);
+    ProcessDefinitionImpl processDefinitionImpl = new ProcessDefinitionImpl("test");
+    processDefinitionImpl.getExecutionListeners().put("start",
+        Collections.<ExecutionListener> singletonList(new TestExecutionListener()));
+    execution.setProcessDefinition(processDefinitionImpl);
 
-   TransitionImpl transitionImpl = new TransitionImpl("test", new ProcessDefinitionImpl("test"));
-   transitionImpl.addExecutionListener(new TestExecutionListener());
-   execution.setTransition(transitionImpl);
+    TransitionImpl transitionImpl = new TransitionImpl("test", new ProcessDefinitionImpl("test"));
+    transitionImpl.addExecutionListener(new TestExecutionListener());
+    execution.setTransition(transitionImpl);
 
-   execution.getProcessInstanceStartContext().setInitial(activityImpl);
-   execution.setSuperExecution(new ExecutionEntity());
+    execution.getProcessInstanceStartContext().setInitial(activityImpl);
+    execution.setSuperExecution(new ExecutionEntity());
 
-   execution.setActive(true);
-   execution.setCanceled(false);
-   execution.setBusinessKey("myBusinessKey");
-   execution.setDeleteReason("no reason");
-   execution.setActivityInstanceId("123");
-   execution.setScope(false);
+    execution.setActive(true);
+    execution.setCanceled(false);
+    execution.setBusinessKey("myBusinessKey");
+    execution.setDeleteReason("no reason");
+    execution.setActivityInstanceId("123");
+    execution.setScope(false);
 
-   byte[] data = writeObject(execution);
-   execution = (ExecutionEntity) readObject(data);
+    byte[] data = writeObject(execution);
+    execution = (ExecutionEntity) readObject(data);
 
-   assertEquals("myBusinessKey", execution.getBusinessKey());
-   assertEquals("no reason", execution.getDeleteReason());
-   assertEquals("123", execution.getActivityInstanceId());
+    assertEquals("myBusinessKey", execution.getBusinessKey());
+    assertEquals("no reason", execution.getDeleteReason());
+    assertEquals("123", execution.getActivityInstanceId());
 
   }
 

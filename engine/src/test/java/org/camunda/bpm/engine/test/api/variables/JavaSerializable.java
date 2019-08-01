@@ -70,5 +70,4 @@ public class JavaSerializable implements Serializable {
     return "JavaSerializable [property=" + property + "]";
   }
 
-
 }

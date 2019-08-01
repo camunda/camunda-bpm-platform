@@ -25,7 +25,8 @@ import org.camunda.bpm.model.cmmn.VariableTransition;
  * @author Deivarayan Azhagappan
  *
  */
-public class VariableOnPartListener implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
+public class VariableOnPartListener
+    implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
 
   protected CmmnExecution execution;
 

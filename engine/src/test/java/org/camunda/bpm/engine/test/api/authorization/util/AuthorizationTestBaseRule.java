@@ -83,8 +83,10 @@ public class AuthorizationTestBaseRule extends TestWatcher {
     return authorization;
   }
 
-  public void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
-    Authorization authorization = createAuthorization(Authorization.AUTH_TYPE_GRANT, resource, resourceId);
+  public void createGrantAuthorization(Resource resource, String resourceId, String userId,
+      Permission... permissions) {
+    Authorization authorization = createAuthorization(Authorization.AUTH_TYPE_GRANT, resource,
+        resourceId);
     authorization.setUserId(userId);
     for (Permission permission : permissions) {
       authorization.addPermission(permission);

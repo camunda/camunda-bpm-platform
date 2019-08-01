@@ -24,8 +24,9 @@ import org.camunda.bpm.engine.history.NativeHistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-
-public class NativeHistoricActivityInstanceQueryImpl extends AbstractNativeQuery<NativeHistoricActivityInstanceQuery, HistoricActivityInstance> implements NativeHistoricActivityInstanceQuery {
+public class NativeHistoricActivityInstanceQueryImpl
+    extends AbstractNativeQuery<NativeHistoricActivityInstanceQuery, HistoricActivityInstance>
+    implements NativeHistoricActivityInstanceQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,19 +38,17 @@ public class NativeHistoricActivityInstanceQueryImpl extends AbstractNativeQuery
     super(commandExecutor);
   }
 
+  // results ////////////////////////////////////////////////////////////////
 
- //results ////////////////////////////////////////////////////////////////
-  
-  public List<HistoricActivityInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return commandContext
-      .getHistoricActivityInstanceManager()
-      .findHistoricActivityInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+  public List<HistoricActivityInstance> executeList(CommandContext commandContext,
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return commandContext.getHistoricActivityInstanceManager()
+        .findHistoricActivityInstancesByNativeQuery(parameterMap, firstResult, maxResults);
   }
-  
+
   public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext
-      .getHistoricActivityInstanceManager()
-      .findHistoricActivityInstanceCountByNativeQuery(parameterMap);
+    return commandContext.getHistoricActivityInstanceManager()
+        .findHistoricActivityInstanceCountByNativeQuery(parameterMap);
   }
 
 }

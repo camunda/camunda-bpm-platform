@@ -48,7 +48,6 @@ import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-
 /**
  * @author Frederik Heremans
  */
@@ -94,15 +93,15 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
     protected void setUp() throws Exception {
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-          .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/jpa/camunda.cfg.xml");
+          .createProcessEngineConfigurationFromResource(
+              "org/camunda/bpm/engine/test/standalone/jpa/camunda.cfg.xml");
 
       processEngineConfiguration.setJavaSerializationFormatEnabled(true);
 
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
 
       EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) processEngineConfiguration
-        .getSessionFactories()
-        .get(EntityManagerSession.class);
+          .getSessionFactories().get(EntityManagerSession.class);
 
       entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
     }
@@ -149,11 +148,11 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
     // Test entities with all possible ID types
     byteIdJPAEntity = new ByteIdJPAEntity();
-    byteIdJPAEntity.setByteId((byte)1);
+    byteIdJPAEntity.setByteId((byte) 1);
     manager.persist(byteIdJPAEntity);
 
     shortIdJPAEntity = new ShortIdJPAEntity();
-    shortIdJPAEntity.setShortId((short)123);
+    shortIdJPAEntity.setShortId((short) 123);
     manager.persist(shortIdJPAEntity);
 
     integerIdJPAEntity = new IntegerIdJPAEntity();
@@ -189,7 +188,8 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     manager.persist(stringIdJPAEntity);
 
     bigDecimalIdJPAEntity = new BigDecimalIdJPAEntity();
-    bigDecimalIdJPAEntity.setBigDecimalId(new BigDecimal("12345678912345678900000.123456789123456789"));
+    bigDecimalIdJPAEntity
+        .setBigDecimalId(new BigDecimal("12345678912345678900000.123456789123456789"));
     manager.persist(bigDecimalIdJPAEntity);
 
     bigIntegerIdJPAEntity = new BigIntegerIdJPAEntity();
@@ -257,48 +257,57 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     variables.put("subclassPropertyAccess", subclassPropertyAccess);
 
     // Start the process with the JPA-entities as variables. They will be stored in the DB.
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess",
+        variables);
 
     // Read entity with @Id on field
-    Object fieldAccessResult = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
+    Object fieldAccessResult = runtimeService.getVariable(processInstance.getId(),
+        "simpleEntityFieldAccess");
     Assert.assertTrue(fieldAccessResult instanceof FieldAccessJPAEntity);
-    Assert.assertEquals(1L, ((FieldAccessJPAEntity)fieldAccessResult).getId().longValue());
-    Assert.assertEquals("value1", ((FieldAccessJPAEntity)fieldAccessResult).getValue());
+    Assert.assertEquals(1L, ((FieldAccessJPAEntity) fieldAccessResult).getId().longValue());
+    Assert.assertEquals("value1", ((FieldAccessJPAEntity) fieldAccessResult).getValue());
 
     // Read entity with @Id on property
-    Object propertyAccessResult = runtimeService.getVariable(processInstance.getId(), "simpleEntityPropertyAccess");
+    Object propertyAccessResult = runtimeService.getVariable(processInstance.getId(),
+        "simpleEntityPropertyAccess");
     Assert.assertTrue(propertyAccessResult instanceof PropertyAccessJPAEntity);
-    Assert.assertEquals(1L, ((PropertyAccessJPAEntity)propertyAccessResult).getId().longValue());
-    Assert.assertEquals("value2", ((PropertyAccessJPAEntity)propertyAccessResult).getValue());
+    Assert.assertEquals(1L, ((PropertyAccessJPAEntity) propertyAccessResult).getId().longValue());
+    Assert.assertEquals("value2", ((PropertyAccessJPAEntity) propertyAccessResult).getValue());
 
     // Read entity with @Id on field of mapped superclass
-    Object subclassFieldResult = runtimeService.getVariable(processInstance.getId(), "subclassFieldAccess");
+    Object subclassFieldResult = runtimeService.getVariable(processInstance.getId(),
+        "subclassFieldAccess");
     Assert.assertTrue(subclassFieldResult instanceof SubclassFieldAccessJPAEntity);
-    Assert.assertEquals(1L, ((SubclassFieldAccessJPAEntity)subclassFieldResult).getId().longValue());
-    Assert.assertEquals("value3", ((SubclassFieldAccessJPAEntity)subclassFieldResult).getValue());
+    Assert.assertEquals(1L,
+        ((SubclassFieldAccessJPAEntity) subclassFieldResult).getId().longValue());
+    Assert.assertEquals("value3", ((SubclassFieldAccessJPAEntity) subclassFieldResult).getValue());
 
     // Read entity with @Id on property of mapped superclass
-    Object subclassPropertyResult = runtimeService.getVariable(processInstance.getId(), "subclassPropertyAccess");
+    Object subclassPropertyResult = runtimeService.getVariable(processInstance.getId(),
+        "subclassPropertyAccess");
     Assert.assertTrue(subclassPropertyResult instanceof SubclassPropertyAccessJPAEntity);
-    Assert.assertEquals(1L, ((SubclassPropertyAccessJPAEntity)subclassPropertyResult).getId().longValue());
-    Assert.assertEquals("value4", ((SubclassPropertyAccessJPAEntity)subclassPropertyResult).getValue());
+    Assert.assertEquals(1L,
+        ((SubclassPropertyAccessJPAEntity) subclassPropertyResult).getId().longValue());
+    Assert.assertEquals("value4",
+        ((SubclassPropertyAccessJPAEntity) subclassPropertyResult).getValue());
 
     // -----------------------------------------------------------------------------
     // Test updating JPA-entity to null-value and back again
     // -----------------------------------------------------------------------------
-    Object currentValue = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
+    Object currentValue = runtimeService.getVariable(processInstance.getId(),
+        "simpleEntityFieldAccess");
     assertNotNull(currentValue);
     // Set to null
     runtimeService.setVariable(processInstance.getId(), "simpleEntityFieldAccess", null);
     currentValue = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
     assertNull(currentValue);
     // Set to JPA-entity again
-    runtimeService.setVariable(processInstance.getId(), "simpleEntityFieldAccess", simpleEntityFieldAccess);
+    runtimeService.setVariable(processInstance.getId(), "simpleEntityFieldAccess",
+        simpleEntityFieldAccess);
     currentValue = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
     assertNotNull(currentValue);
     Assert.assertTrue(currentValue instanceof FieldAccessJPAEntity);
-    Assert.assertEquals(1L, ((FieldAccessJPAEntity)currentValue).getId().longValue());
-
+    Assert.assertEquals(1L, ((FieldAccessJPAEntity) currentValue).getId().longValue());
 
     // -----------------------------------------------------------------------------
     // Test all allowed types of ID values
@@ -319,70 +328,90 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     variables.put("bigIntegerIdJPAEntity", bigIntegerIdJPAEntity);
 
     // Start the process with the JPA-entities as variables. They will be stored in the DB.
-    ProcessInstance processInstanceAllTypes = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
-    Object byteIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "byteIdJPAEntity");
+    ProcessInstance processInstanceAllTypes = runtimeService
+        .startProcessInstanceByKey("JPAVariableProcess", variables);
+    Object byteIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "byteIdJPAEntity");
     assertTrue(byteIdResult instanceof ByteIdJPAEntity);
-    assertEquals(byteIdJPAEntity.getByteId(), ((ByteIdJPAEntity)byteIdResult).getByteId());
+    assertEquals(byteIdJPAEntity.getByteId(), ((ByteIdJPAEntity) byteIdResult).getByteId());
 
-    Object shortIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "shortIdJPAEntity");
+    Object shortIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "shortIdJPAEntity");
     assertTrue(shortIdResult instanceof ShortIdJPAEntity);
-    assertEquals(shortIdJPAEntity.getShortId(), ((ShortIdJPAEntity)shortIdResult).getShortId());
+    assertEquals(shortIdJPAEntity.getShortId(), ((ShortIdJPAEntity) shortIdResult).getShortId());
 
-    Object integerIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "integerIdJPAEntity");
+    Object integerIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "integerIdJPAEntity");
     assertTrue(integerIdResult instanceof IntegerIdJPAEntity);
-    assertEquals(integerIdJPAEntity.getIntId(), ((IntegerIdJPAEntity)integerIdResult).getIntId());
+    assertEquals(integerIdJPAEntity.getIntId(), ((IntegerIdJPAEntity) integerIdResult).getIntId());
 
-    Object longIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "longIdJPAEntity");
+    Object longIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "longIdJPAEntity");
     assertTrue(longIdResult instanceof LongIdJPAEntity);
-    assertEquals(longIdJPAEntity.getLongId(), ((LongIdJPAEntity)longIdResult).getLongId());
+    assertEquals(longIdJPAEntity.getLongId(), ((LongIdJPAEntity) longIdResult).getLongId());
 
-    Object floatIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "floatIdJPAEntity");
+    Object floatIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "floatIdJPAEntity");
     assertTrue(floatIdResult instanceof FloatIdJPAEntity);
-    assertEquals(floatIdJPAEntity.getFloatId(), ((FloatIdJPAEntity)floatIdResult).getFloatId());
+    assertEquals(floatIdJPAEntity.getFloatId(), ((FloatIdJPAEntity) floatIdResult).getFloatId());
 
-    Object doubleIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "doubleIdJPAEntity");
+    Object doubleIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "doubleIdJPAEntity");
     assertTrue(doubleIdResult instanceof DoubleIdJPAEntity);
-    assertEquals(doubleIdJPAEntity.getDoubleId(), ((DoubleIdJPAEntity)doubleIdResult).getDoubleId());
+    assertEquals(doubleIdJPAEntity.getDoubleId(),
+        ((DoubleIdJPAEntity) doubleIdResult).getDoubleId());
 
-    Object charIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "charIdJPAEntity");
+    Object charIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "charIdJPAEntity");
     assertTrue(charIdResult instanceof CharIdJPAEntity);
-    assertEquals(charIdJPAEntity.getCharId(), ((CharIdJPAEntity)charIdResult).getCharId());
+    assertEquals(charIdJPAEntity.getCharId(), ((CharIdJPAEntity) charIdResult).getCharId());
 
-    Object stringIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "stringIdJPAEntity");
+    Object stringIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "stringIdJPAEntity");
     assertTrue(stringIdResult instanceof StringIdJPAEntity);
-    assertEquals(stringIdJPAEntity.getStringId(), ((StringIdJPAEntity)stringIdResult).getStringId());
+    assertEquals(stringIdJPAEntity.getStringId(),
+        ((StringIdJPAEntity) stringIdResult).getStringId());
 
-    Object dateIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "dateIdJPAEntity");
+    Object dateIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "dateIdJPAEntity");
     assertTrue(dateIdResult instanceof DateIdJPAEntity);
-    assertEquals(dateIdJPAEntity.getDateId(), ((DateIdJPAEntity)dateIdResult).getDateId());
+    assertEquals(dateIdJPAEntity.getDateId(), ((DateIdJPAEntity) dateIdResult).getDateId());
 
-    Object sqlDateIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(), "sqlDateIdJPAEntity");
+    Object sqlDateIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "sqlDateIdJPAEntity");
     assertTrue(sqlDateIdResult instanceof SQLDateIdJPAEntity);
-    assertEquals(sqlDateIdJPAEntity.getDateId(), ((SQLDateIdJPAEntity)sqlDateIdResult).getDateId());
+    assertEquals(sqlDateIdJPAEntity.getDateId(),
+        ((SQLDateIdJPAEntity) sqlDateIdResult).getDateId());
 
-    Object bigDecimalIdResult= runtimeService.getVariable(processInstanceAllTypes.getId(), "bigDecimalIdJPAEntity");
+    Object bigDecimalIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "bigDecimalIdJPAEntity");
     assertTrue(bigDecimalIdResult instanceof BigDecimalIdJPAEntity);
-    assertEquals(bigDecimalIdJPAEntity.getBigDecimalId(), ((BigDecimalIdJPAEntity)bigDecimalIdResult).getBigDecimalId());
+    assertEquals(bigDecimalIdJPAEntity.getBigDecimalId(),
+        ((BigDecimalIdJPAEntity) bigDecimalIdResult).getBigDecimalId());
 
-    Object bigIntegerIdResult= runtimeService.getVariable(processInstanceAllTypes.getId(), "bigIntegerIdJPAEntity");
+    Object bigIntegerIdResult = runtimeService.getVariable(processInstanceAllTypes.getId(),
+        "bigIntegerIdJPAEntity");
     assertTrue(bigIntegerIdResult instanceof BigIntegerIdJPAEntity);
-    assertEquals(bigIntegerIdJPAEntity.getBigIntegerId(), ((BigIntegerIdJPAEntity)bigIntegerIdResult).getBigIntegerId());
+    assertEquals(bigIntegerIdJPAEntity.getBigIntegerId(),
+        ((BigIntegerIdJPAEntity) bigIntegerIdResult).getBigIntegerId());
   }
-
 
   @Deployment
   public void testIllegalEntities() {
     setupIllegalJPAEntities();
-    // Starting process instance with a variable that has a compound primary key, which is not supported.
+    // Starting process instance with a variable that has a compound primary key, which is not
+    // supported.
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("compoundIdJPAEntity", compoundIdJPAEntity);
 
     try {
       runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
       fail("Exception expected");
-    } catch(ProcessEngineException ae) {
-      assertTextPresent("Cannot find field or method with annotation @Id on class", ae.getMessage());
-      assertTextPresent("only single-valued primary keys are supported on JPA-enities", ae.getMessage());
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("Cannot find field or method with annotation @Id on class",
+          ae.getMessage());
+      assertTextPresent("only single-valued primary keys are supported on JPA-enities",
+          ae.getMessage());
     }
 
     // Starting process instance with a variable that has null as ID-value
@@ -392,7 +421,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     try {
       runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
       fail("Exception expected");
-    } catch(ProcessEngineException ae) {
+    } catch (ProcessEngineException ae) {
       assertTextPresent("Value of primary key for JPA-Entity is null", ae.getMessage());
     }
 
@@ -407,7 +436,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     try {
       runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
       fail("Exception expected");
-    } catch(ProcessEngineException ae) {
+    } catch (ProcessEngineException ae) {
       assertTextPresent("Unsupported Primary key type for JPA-Entity", ae.getMessage());
     }
 
@@ -418,13 +447,16 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     nonPersistentEntity.setId(9999L);
     variables.put("nonPersistentEntity", nonPersistentEntity);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("JPAVariableProcessExceptions", variables);
 
     try {
       runtimeService.getVariable(processInstance.getId(), "nonPersistentEntity");
       fail("Exception expected");
-    } catch(ProcessEngineException ae) {
-      assertTextPresent("Entity does not exist: " + FieldAccessJPAEntity.class.getName() + " - 9999", ae.getMessage());
+    } catch (ProcessEngineException ae) {
+      assertTextPresent(
+          "Entity does not exist: " + FieldAccessJPAEntity.class.getName() + " - 9999",
+          ae.getMessage());
     }
   }
 
@@ -435,10 +467,12 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("entityToQuery", entityToQuery);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess",
+        variables);
 
     // Query the processInstance
-    ProcessInstance result = runtimeService.createProcessInstanceQuery().variableValueEquals("entityToQuery", entityToQuery).singleResult();
+    ProcessInstance result = runtimeService.createProcessInstanceQuery()
+        .variableValueEquals("entityToQuery", entityToQuery).singleResult();
     assertNotNull(result);
     assertEquals(result.getId(), processInstance.getId());
 
@@ -446,39 +480,50 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     FieldAccessJPAEntity unexistingEntity = new FieldAccessJPAEntity();
     unexistingEntity.setId(8888L);
 
-    result = runtimeService.createProcessInstanceQuery().variableValueEquals("entityToQuery", unexistingEntity).singleResult();
+    result = runtimeService.createProcessInstanceQuery()
+        .variableValueEquals("entityToQuery", unexistingEntity).singleResult();
     assertNull(result);
 
     // All other operators are unsupported
     try {
-      runtimeService.createProcessInstanceQuery().variableValueNotEquals("entityToQuery", entityToQuery).singleResult();
+      runtimeService.createProcessInstanceQuery()
+          .variableValueNotEquals("entityToQuery", entityToQuery).singleResult();
       fail("Exception expected");
-    } catch(ProcessEngineException ae) {
-      assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'",
+          ae.getMessage());
     }
     try {
-      runtimeService.createProcessInstanceQuery().variableValueGreaterThan("entityToQuery", entityToQuery).singleResult();
+      runtimeService.createProcessInstanceQuery()
+          .variableValueGreaterThan("entityToQuery", entityToQuery).singleResult();
       fail("Exception expected");
-    } catch(ProcessEngineException ae) {
-      assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'",
+          ae.getMessage());
     }
     try {
-      runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("entityToQuery", entityToQuery).singleResult();
+      runtimeService.createProcessInstanceQuery()
+          .variableValueGreaterThanOrEqual("entityToQuery", entityToQuery).singleResult();
       fail("Exception expected");
-    } catch(ProcessEngineException ae) {
-      assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'",
+          ae.getMessage());
     }
     try {
-      runtimeService.createProcessInstanceQuery().variableValueLessThan("entityToQuery", entityToQuery).singleResult();
+      runtimeService.createProcessInstanceQuery()
+          .variableValueLessThan("entityToQuery", entityToQuery).singleResult();
       fail("Exception expected");
-    } catch(ProcessEngineException ae) {
-      assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'",
+          ae.getMessage());
     }
     try {
-      runtimeService.createProcessInstanceQuery().variableValueLessThanOrEqual("entityToQuery", entityToQuery).singleResult();
+      runtimeService.createProcessInstanceQuery()
+          .variableValueLessThanOrEqual("entityToQuery", entityToQuery).singleResult();
       fail("Exception expected");
-    } catch(ProcessEngineException ae) {
-      assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'", ae.getMessage());
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("JPA entity variables can only be used in 'variableValueEquals'",
+          ae.getMessage());
     }
   }
 
@@ -488,12 +533,13 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("entityToUpdate", entityToUpdate);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("UpdateJPAValuesProcess", variables);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("UpdateJPAValuesProcess", variables);
 
     // Servicetask in process 'UpdateJPAValuesProcess' should have set value on entityToUpdate.
     Object updatedEntity = runtimeService.getVariable(processInstance.getId(), "entityToUpdate");
     assertTrue(updatedEntity instanceof FieldAccessJPAEntity);
-    assertEquals("updatedValue", ((FieldAccessJPAEntity)updatedEntity).getValue());
+    assertEquals("updatedValue", ((FieldAccessJPAEntity) updatedEntity).getValue());
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
@@ -502,20 +548,21 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     JavaSerializable pojo = new JavaSerializable("foo");
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(pojo);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()),
+        processEngine);
 
-    ObjectValue serializedObjectValue = Variables
-      .serializedObjectValue(serializedObject)
-      .serializationDataFormat(SerializationDataFormats.JAVA)
-      .objectTypeName(pojo.getClass().getName())
-      .create();
+    ObjectValue serializedObjectValue = Variables.serializedObjectValue(serializedObject)
+        .serializationDataFormat(SerializationDataFormats.JAVA)
+        .objectTypeName(pojo.getClass().getName()).create();
     VariableMap variables = Variables.createVariables().putValueTyped("var", serializedObjectValue);
 
     // when
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        variables);
 
     // then
-    JavaSerializable returnedPojo = (JavaSerializable) runtimeService.getVariable(processInstance.getId(), "var");
+    JavaSerializable returnedPojo = (JavaSerializable) runtimeService
+        .getVariable(processInstance.getId(), "var");
     assertEquals(pojo, returnedPojo);
   }
 

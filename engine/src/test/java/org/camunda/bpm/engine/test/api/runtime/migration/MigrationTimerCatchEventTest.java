@@ -52,32 +52,33 @@ public class MigrationTimerCatchEventTest {
   @Test
   public void testMigrateJob() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("timerCatch", "timerCatch")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("timerCatch", "timerCatch").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
-    testHelper.assertJobMigrated(
-        testHelper.snapshotBeforeMigration.getJobs().get(0),
-        "timerCatch");
+    testHelper.assertJobMigrated(testHelper.snapshotBeforeMigration.getJobs().get(0), "timerCatch");
 
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("timerCatch").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("timerCatch"))
-        .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("timerCatch")
+            .scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("timerCatch"))
+            .done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .activity("timerCatch", testHelper.getSingleActivityInstanceBeforeMigration("timerCatch").getId())
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(
+            describeActivityInstanceTree(targetProcessDefinition.getId())
+                .activity("timerCatch",
+                    testHelper.getSingleActivityInstanceBeforeMigration("timerCatch").getId())
+                .done());
 
     // and it is possible to trigger the event
     Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);
@@ -90,20 +91,20 @@ public class MigrationTimerCatchEventTest {
   @Test
   public void testMigrateJobChangeActivityId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(TimerCatchModels.ONE_TIMER_CATCH_PROCESS)
-        .changeElementId("timerCatch", "newTimerCatch"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(TimerCatchModels.ONE_TIMER_CATCH_PROCESS)
+            .changeElementId("timerCatch", "newTimerCatch"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("timerCatch", "newTimerCatch")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("timerCatch", "newTimerCatch").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
-    testHelper.assertJobMigrated(
-        testHelper.snapshotBeforeMigration.getJobs().get(0),
+    testHelper.assertJobMigrated(testHelper.snapshotBeforeMigration.getJobs().get(0),
         "newTimerCatch");
 
     // and it is possible to trigger the event
@@ -117,27 +118,22 @@ public class MigrationTimerCatchEventTest {
   @Test
   public void testMigrateJobPreserveTimerConfiguration() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
-      .startEvent()
-      .intermediateCatchEvent("timerCatch")
-        .timerWithDuration("PT50M")
-      .userTask("userTask")
-      .endEvent()
-      .done());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
+        ProcessModels.newModel().startEvent().intermediateCatchEvent("timerCatch")
+            .timerWithDuration("PT50M").userTask("userTask").endEvent().done());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("timerCatch", "timerCatch")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("timerCatch", "timerCatch").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertJobMigrated(       // this also asserts that the due has not changed
-        testHelper.snapshotBeforeMigration.getJobs().get(0),
-        "timerCatch");
+    testHelper.assertJobMigrated( // this also asserts that the due has not changed
+        testHelper.snapshotBeforeMigration.getJobs().get(0), "timerCatch");
 
     // and it is possible to trigger the event
     Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);
@@ -152,29 +148,22 @@ public class MigrationTimerCatchEventTest {
     // given
     ClockTestUtil.setClockToDateWithoutMilliseconds();
 
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
-      .startEvent()
-      .intermediateCatchEvent("timerCatch")
-        .timerWithDuration("PT50M")
-      .userTask("userTask")
-      .endEvent()
-      .done());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
+        ProcessModels.newModel().startEvent().intermediateCatchEvent("timerCatch")
+            .timerWithDuration("PT50M").userTask("userTask").endEvent().done());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("timerCatch", "timerCatch")
-        .updateEventTrigger()
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("timerCatch", "timerCatch").updateEventTrigger().build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     Date newDueDate = new DateTime(ClockUtil.getCurrentTime()).plusMinutes(50).toDate();
-    testHelper.assertJobMigrated(
-        testHelper.snapshotBeforeMigration.getJobs().get(0),
-        "timerCatch",
+    testHelper.assertJobMigrated(testHelper.snapshotBeforeMigration.getJobs().get(0), "timerCatch",
         newDueDate);
 
     // and it is possible to trigger the event
@@ -188,21 +177,20 @@ public class MigrationTimerCatchEventTest {
   @Test
   public void testMigrateJobChangeProcessKey() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(TimerCatchModels.ONE_TIMER_CATCH_PROCESS)
-        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(TimerCatchModels.ONE_TIMER_CATCH_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("timerCatch", "timerCatch")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("timerCatch", "timerCatch").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
-    testHelper.assertJobMigrated(
-        testHelper.snapshotBeforeMigration.getJobs().get(0),
-        "timerCatch");
+    testHelper.assertJobMigrated(testHelper.snapshotBeforeMigration.getJobs().get(0), "timerCatch");
 
     // and it is possible to trigger the event
     Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);
@@ -215,35 +203,34 @@ public class MigrationTimerCatchEventTest {
   @Test
   public void testMigrateJobAddParentScope() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(TimerCatchModels.SUBPROCESS_TIMER_CATCH_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(TimerCatchModels.ONE_TIMER_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(TimerCatchModels.SUBPROCESS_TIMER_CATCH_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("timerCatch", "timerCatch")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("timerCatch", "timerCatch").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    testHelper.assertJobMigrated(
-        testHelper.snapshotBeforeMigration.getJobs().get(0),
-        "timerCatch");
+    testHelper.assertJobMigrated(testHelper.snapshotBeforeMigration.getJobs().get(0), "timerCatch");
 
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child(null).scope()
-            .child("timerCatch").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("timerCatch"))
-        .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child(null).scope()
+            .child("timerCatch").scope()
+            .id(testHelper.getSingleExecutionIdForActivityBeforeMigration("timerCatch")).done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-      describeActivityInstanceTree(targetProcessDefinition.getId())
-        .beginScope("subProcess")
-          .activity("timerCatch", testHelper.getSingleActivityInstanceBeforeMigration("timerCatch").getId())
-      .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(
+            describeActivityInstanceTree(targetProcessDefinition.getId()).beginScope("subProcess")
+                .activity("timerCatch",
+                    testHelper.getSingleActivityInstanceBeforeMigration("timerCatch").getId())
+                .done());
 
     // and it is possible to trigger the event
     Job jobAfterMigration = testHelper.snapshotAfterMigration.getJobs().get(0);

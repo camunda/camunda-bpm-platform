@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 
-
 /**
  * Helper class for bpmn constructs that allow class delegation.
  *
@@ -73,22 +72,24 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
 
   // Signallable activity behavior
   @Override
-  public void signal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
-    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
-    if(ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
+  public void signal(final ActivityExecution execution, final String signalName,
+      final Object signalData) throws Exception {
+    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil
+        .getTargetProcessApplication((ExecutionEntity) execution);
+    if (ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
       Context.executeWithinProcessApplication(new Callable<Void>() {
         public Void call() throws Exception {
           signal(execution, signalName, signalData);
           return null;
         }
       }, targetProcessApplication, new InvocationContext(execution));
-    }
-    else {
+    } else {
       doSignal(execution, signalName, signalData);
     }
   }
 
-  protected void doSignal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
+  protected void doSignal(final ActivityExecution execution, final String signalName,
+      final Object signalData) throws Exception {
     final ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution);
 
     if (activityBehaviorInstance instanceof CustomActivityBehavior) {
@@ -96,13 +97,14 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
       ActivityBehavior delegate = behavior.getDelegateActivityBehavior();
 
       if (!(delegate instanceof SignallableActivityBehavior)) {
-        throw LOG.incorrectlyUsedSignalException(SignallableActivityBehavior.class.getName() );
+        throw LOG.incorrectlyUsedSignalException(SignallableActivityBehavior.class.getName());
       }
     }
     executeWithErrorPropagation(execution, new Callable<Void>() {
       @Override
       public Void call() throws Exception {
-        ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
+        ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName,
+            signalData);
         return null;
       }
     });
@@ -116,11 +118,8 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
     } else if (delegateInstance instanceof JavaDelegate) {
       return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance);
     } else {
-      throw LOG.missingDelegateParentClassException(
-        delegateInstance.getClass().getName(),
-        JavaDelegate.class.getName(),
-        ActivityBehavior.class.getName()
-      );
+      throw LOG.missingDelegateParentClassException(delegateInstance.getClass().getName(),
+          JavaDelegate.class.getName(), ActivityBehavior.class.getName());
     }
   }
 

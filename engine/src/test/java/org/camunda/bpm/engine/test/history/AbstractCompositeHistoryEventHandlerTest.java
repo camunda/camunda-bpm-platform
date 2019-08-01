@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public abstract class AbstractCompositeHistoryEventHandlerTest extends PluggableProcessEngineTestCase {
+public abstract class AbstractCompositeHistoryEventHandlerTest
+    extends PluggableProcessEngineTestCase {
 
   protected HistoryEventHandler originalHistoryEventHandler;
 

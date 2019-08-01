@@ -49,7 +49,8 @@ public class DecisionServiceDelegate implements JavaDelegate, CaseExecutionListe
     return (Boolean) singleResult.getSingleEntry();
   }
 
-  protected DmnDecisionTableResult evaluateDecision(DecisionService decisionService, VariableScope variableScope) {
+  protected DmnDecisionTableResult evaluateDecision(DecisionService decisionService,
+      VariableScope variableScope) {
     return decisionService.evaluateDecisionTableByKey("testDecision", variableScope.getVariables());
   }
 

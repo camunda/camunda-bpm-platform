@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.impl.form.validator;
 import org.camunda.bpm.engine.impl.form.FormException;
 
 /**
- * Runtime exception for use within a {@linkplain FormFieldValidator}.
- * Optionally contains a detail which uniquely identifies the problem.
+ * Runtime exception for use within a {@linkplain FormFieldValidator}. Optionally contains a detail
+ * which uniquely identifies the problem.
  *
  * @author Thomas Skjolberg
  */

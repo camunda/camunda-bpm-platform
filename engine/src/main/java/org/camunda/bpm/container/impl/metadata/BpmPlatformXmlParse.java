@@ -36,7 +36,9 @@ import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.util.xml.Parser;
 
 /**
- * <p>Parse implementation for parsing the {@link BpmPlatformXml}</p>
+ * <p>
+ * Parse implementation for parsing the {@link BpmPlatformXml}
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -63,10 +65,10 @@ public class BpmPlatformXmlParse extends DeploymentMetadataParse {
 
     for (Element element : rootElement.elements()) {
 
-      if(JOB_EXECUTOR.equals(element.getTagName())) {
+      if (JOB_EXECUTOR.equals(element.getTagName())) {
         parseJobExecutor(element, jobExecutor);
 
-      } else if(PROCESS_ENGINE.equals(element.getTagName())) {
+      } else if (PROCESS_ENGINE.equals(element.getTagName())) {
         parseProcessEngine(element, processEngines);
 
       }
@@ -77,7 +79,8 @@ public class BpmPlatformXmlParse extends DeploymentMetadataParse {
   }
 
   /**
-   * parse a <code>&lt;job-executor .../&gt;</code> element and add it to the list of parsed elements
+   * parse a <code>&lt;job-executor .../&gt;</code> element and add it to the list of parsed
+   * elements
    */
   protected void parseJobExecutor(Element element, JobExecutorXmlImpl jobExecutorXml) {
 
@@ -86,10 +89,10 @@ public class BpmPlatformXmlParse extends DeploymentMetadataParse {
 
     for (Element childElement : element.elements()) {
 
-      if(JOB_ACQUISITION.equals(childElement.getTagName())) {
+      if (JOB_ACQUISITION.equals(childElement.getTagName())) {
         parseJobAcquisition(childElement, jobAcquisitions);
 
-      }else if(PROPERTIES.equals(childElement.getTagName())){
+      } else if (PROPERTIES.equals(childElement.getTagName())) {
         parseProperties(childElement, properties);
       }
 
@@ -101,8 +104,8 @@ public class BpmPlatformXmlParse extends DeploymentMetadataParse {
   }
 
   /**
-   * parse a <code>&lt;job-acquisition .../&gt;</code> element and add it to the
-   * list of parsed elements
+   * parse a <code>&lt;job-acquisition .../&gt;</code> element and add it to the list of parsed
+   * elements
    */
   protected void parseJobAcquisition(Element element, List<JobAcquisitionXml> jobAcquisitions) {
 
@@ -129,7 +132,6 @@ public class BpmPlatformXmlParse extends DeploymentMetadataParse {
     jobAcquisitions.add(jobAcquisition);
 
   }
-
 
   public BpmPlatformXml getBpmPlatformXml() {
     return bpmPlatformXml;

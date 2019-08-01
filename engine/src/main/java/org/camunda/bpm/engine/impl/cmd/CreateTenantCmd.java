@@ -25,7 +25,8 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-public class CreateTenantCmd extends AbstractWritableIdentityServiceCmd<Tenant> implements Command<Tenant>, Serializable {
+public class CreateTenantCmd extends AbstractWritableIdentityServiceCmd<Tenant>
+    implements Command<Tenant>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -40,9 +41,7 @@ public class CreateTenantCmd extends AbstractWritableIdentityServiceCmd<Tenant> 
   protected Tenant executeCmd(CommandContext commandContext) {
     ensureWhitelistedResourceId(commandContext, "Tenant", tenantId);
 
-    return commandContext
-      .getWritableIdentityProvider()
-      .createNewTenant(tenantId);
+    return commandContext.getWritableIdentityProvider().createNewTenant(tenantId);
   }
 
 }

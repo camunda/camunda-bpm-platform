@@ -32,65 +32,52 @@ public class TriggerConditionalEventOnStartAtActivityTest extends AbstractCondit
 
   @Test
   public void testTriggerGlobalEventSubProcess() {
-    //given
+    // given
     deployConditionalEventSubProcess(TASK_MODEL, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(1, tasksAfterVariableIsSet.size());
     assertEquals(TASK_AFTER_CONDITION_ID, tasksAfterVariableIsSet.get(0).getTaskDefinitionKey());
   }
 
-
   @Test
   public void testNonInterruptingTriggerGlobalEventSubProcess() {
-    //given
+    // given
     deployConditionalEventSubProcess(TASK_MODEL, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(2, tasksAfterVariableIsSet.size());
     assertEquals(1, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
     assertEquals(1, conditionEventSubscriptionQuery.count());
   }
 
-
   @Test
   public void testTriggerInnerEventSubProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-        .startEvent()
-        .userTask(TASK_BEFORE_CONDITION_ID)
-        .name(TASK_BEFORE_CONDITION)
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
     deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, true);
 
-
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(1, tasksAfterVariableIsSet.size());
     assertEquals(TASK_AFTER_CONDITION_ID, tasksAfterVariableIsSet.get(0).getTaskDefinitionKey());
@@ -98,28 +85,19 @@ public class TriggerConditionalEventOnStartAtActivityTest extends AbstractCondit
 
   @Test
   public void testNonInterruptingTriggerInnerEventSubProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
     deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, false);
 
-
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(2, tasksAfterVariableIsSet.size());
     assertEquals(1, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
@@ -128,27 +106,19 @@ public class TriggerConditionalEventOnStartAtActivityTest extends AbstractCondit
 
   @Test
   public void testTriggerGlobalEventSubProcessFromInnerSubProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(1, tasksAfterVariableIsSet.size());
     assertEquals(TASK_AFTER_CONDITION_ID, tasksAfterVariableIsSet.get(0).getTaskDefinitionKey());
@@ -156,109 +126,85 @@ public class TriggerConditionalEventOnStartAtActivityTest extends AbstractCondit
 
   @Test
   public void testNonInterruptingTriggerGlobalEventSubProcessFromInnerSubProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-        .startEvent()
-        .userTask(TASK_BEFORE_CONDITION_ID)
-        .name(TASK_BEFORE_CONDITION)
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(2, tasksAfterVariableIsSet.size());
     assertEquals(1, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
     assertEquals(1, conditionEventSubscriptionQuery.count());
   }
 
-
   @Test
   public void testTriggerGlobalAndInnerEventSubProcessFromInnerSubProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
-    modelInstance = addConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, TASK_AFTER_CONDITION_ID + 1, true);
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
+    modelInstance = addConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID,
+        TASK_AFTER_CONDITION_ID + 1, true);
     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(1, tasksAfterVariableIsSet.size());
     assertEquals(TASK_AFTER_CONDITION_ID, tasksAfterVariableIsSet.get(0).getTaskDefinitionKey());
   }
 
-
   @Test
   public void testNonInterruptingTriggerGlobalAndInnerEventSubProcessFromInnerSubProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-        .startEvent()
-        .userTask(TASK_BEFORE_CONDITION_ID)
-        .name(TASK_BEFORE_CONDITION)
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
-    modelInstance = addConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, TASK_AFTER_CONDITION_ID + 1, false);
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
+    modelInstance = addConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID,
+        TASK_AFTER_CONDITION_ID + 1, false);
     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(3, tasksAfterVariableIsSet.size());
     assertEquals(2, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID).count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID + 1).count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID).count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID + 1).count());
     assertEquals(2, conditionEventSubscriptionQuery.count());
   }
 
-
   @Test
   public void testTriggerBoundaryEvent() {
-    //given
+    // given
     deployConditionalBoundaryEventProcess(TASK_MODEL, TASK_BEFORE_CONDITION_ID, true);
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(1, tasksAfterVariableIsSet.size());
     assertEquals(TASK_AFTER_CONDITION_ID, tasksAfterVariableIsSet.get(0).getTaskDefinitionKey());
@@ -266,47 +212,36 @@ public class TriggerConditionalEventOnStartAtActivityTest extends AbstractCondit
 
   @Test
   public void testNonInterruptingTriggerBoundaryEvent() {
-    //given
+    // given
     deployConditionalBoundaryEventProcess(TASK_MODEL, TASK_BEFORE_CONDITION_ID, false);
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(2, tasksAfterVariableIsSet.size());
     assertEquals(1, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
     assertEquals(1, conditionEventSubscriptionQuery.count());
   }
 
-
   @Test
   public void testTriggerBoundaryEventFromInnerSubProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
     deployConditionalBoundaryEventProcess(modelInstance, SUB_PROCESS_ID, true);
 
-
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(1, tasksAfterVariableIsSet.size());
     assertEquals(TASK_AFTER_CONDITION_ID, tasksAfterVariableIsSet.get(0).getTaskDefinitionKey());
@@ -314,28 +249,19 @@ public class TriggerConditionalEventOnStartAtActivityTest extends AbstractCondit
 
   @Test
   public void testNonInterruptingTriggerBoundaryEventFromInnerSubProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
     deployConditionalBoundaryEventProcess(modelInstance, SUB_PROCESS_ID, false);
 
-
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(2, tasksAfterVariableIsSet.size());
     assertEquals(1, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
@@ -344,175 +270,140 @@ public class TriggerConditionalEventOnStartAtActivityTest extends AbstractCondit
 
   @Test
   public void testTriggerUserAndSubProcessBoundaryEventFromInnerSubProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-        .startEvent()
-        .userTask(TASK_BEFORE_CONDITION_ID)
-          .name(TASK_BEFORE_CONDITION)
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
-    modelInstance = addConditionalBoundaryEvent(modelInstance, TASK_BEFORE_CONDITION_ID, TASK_AFTER_CONDITION_ID + 1, true);
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
+    modelInstance = addConditionalBoundaryEvent(modelInstance, TASK_BEFORE_CONDITION_ID,
+        TASK_AFTER_CONDITION_ID + 1, true);
     deployConditionalBoundaryEventProcess(modelInstance, SUB_PROCESS_ID, true);
 
-
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(1, tasksAfterVariableIsSet.size());
     assertEquals(TASK_AFTER_CONDITION_ID, tasksAfterVariableIsSet.get(0).getTaskDefinitionKey());
   }
 
-
   @Test
   public void testNonInterruptingTriggerUserAndSubProcessBoundaryEventFromInnerSubProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-        .startEvent()
-        .userTask(TASK_BEFORE_CONDITION_ID)
-        .name(TASK_BEFORE_CONDITION)
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
-    modelInstance = addConditionalBoundaryEvent(modelInstance, TASK_BEFORE_CONDITION_ID, TASK_AFTER_CONDITION_ID + 1, false);
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
+    modelInstance = addConditionalBoundaryEvent(modelInstance, TASK_BEFORE_CONDITION_ID,
+        TASK_AFTER_CONDITION_ID + 1, false);
     deployConditionalBoundaryEventProcess(modelInstance, SUB_PROCESS_ID, false);
 
-
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(3, tasksAfterVariableIsSet.size());
     assertEquals(2, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID+1).count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID).count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID + 1).count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID).count());
     assertEquals(2, conditionEventSubscriptionQuery.count());
   }
 
   @Test
   public void testTriggerMixedProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
     boolean isInterrupting = true;
-    modelInstance = addConditionalBoundaryEvent(modelInstance, TASK_BEFORE_CONDITION_ID, TASK_AFTER_CONDITION_ID + 1, isInterrupting);
-    modelInstance = addConditionalBoundaryEvent(modelInstance, SUB_PROCESS_ID, TASK_AFTER_CONDITION_ID + 2, isInterrupting);
-    modelInstance = addConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, TASK_AFTER_CONDITION_ID + 3, isInterrupting);
+    modelInstance = addConditionalBoundaryEvent(modelInstance, TASK_BEFORE_CONDITION_ID,
+        TASK_AFTER_CONDITION_ID + 1, isInterrupting);
+    modelInstance = addConditionalBoundaryEvent(modelInstance, SUB_PROCESS_ID,
+        TASK_AFTER_CONDITION_ID + 2, isInterrupting);
+    modelInstance = addConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID,
+        TASK_AFTER_CONDITION_ID + 3, isInterrupting);
     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, isInterrupting);
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(1, tasksAfterVariableIsSet.size());
     assertEquals(TASK_AFTER_CONDITION_ID, tasksAfterVariableIsSet.get(0).getTaskDefinitionKey());
   }
 
-
   @Test
   public void testNonInterruptingTriggerMixedProcess() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent().subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().done();
     boolean isInterrupting = false;
-    modelInstance = addConditionalBoundaryEvent(modelInstance, TASK_BEFORE_CONDITION_ID, TASK_AFTER_CONDITION_ID + 1, isInterrupting);
-    modelInstance = addConditionalBoundaryEvent(modelInstance, SUB_PROCESS_ID, TASK_AFTER_CONDITION_ID + 2, isInterrupting);
-    modelInstance = addConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, TASK_AFTER_CONDITION_ID + 3, isInterrupting);
+    modelInstance = addConditionalBoundaryEvent(modelInstance, TASK_BEFORE_CONDITION_ID,
+        TASK_AFTER_CONDITION_ID + 1, isInterrupting);
+    modelInstance = addConditionalBoundaryEvent(modelInstance, SUB_PROCESS_ID,
+        TASK_AFTER_CONDITION_ID + 2, isInterrupting);
+    modelInstance = addConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID,
+        TASK_AFTER_CONDITION_ID + 3, isInterrupting);
     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, isInterrupting);
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(5, tasksAfterVariableIsSet.size());
     assertEquals(4, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID+1).count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID+2).count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID+3).count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID).count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID + 1).count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID + 2).count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID + 3).count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID).count());
     assertEquals(4, conditionEventSubscriptionQuery.count());
   }
 
   @Test
   @Ignore
   public void testTwoInstructions() {
-    //given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent("start")
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-        .startEvent()
-        .userTask(TASK_BEFORE_CONDITION_ID)
-        .name(TASK_BEFORE_CONDITION)
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .moveToNode("start")
-      .subProcess(SUB_PROCESS_ID + 1)
-      .embeddedSubProcess()
-        .startEvent()
-        .userTask(TASK_BEFORE_CONDITION_ID + 1)
-        .name(TASK_BEFORE_CONDITION + 1)
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent("start").subProcess(SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID).name(TASK_BEFORE_CONDITION).endEvent().subProcessDone()
+        .endEvent().moveToNode("start").subProcess(SUB_PROCESS_ID + 1).embeddedSubProcess()
+        .startEvent().userTask(TASK_BEFORE_CONDITION_ID + 1).name(TASK_BEFORE_CONDITION + 1)
+        .endEvent().subProcessDone().endEvent().done();
     boolean isInterrupting = true;
-    modelInstance = addConditionalBoundaryEvent(modelInstance, SUB_PROCESS_ID, TASK_AFTER_CONDITION_ID, isInterrupting);
-    modelInstance = addConditionalBoundaryEvent(modelInstance, SUB_PROCESS_ID + 1, TASK_AFTER_CONDITION_ID + 1, isInterrupting);
-    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+    modelInstance = addConditionalBoundaryEvent(modelInstance, SUB_PROCESS_ID,
+        TASK_AFTER_CONDITION_ID, isInterrupting);
+    modelInstance = addConditionalBoundaryEvent(modelInstance, SUB_PROCESS_ID + 1,
+        TASK_AFTER_CONDITION_ID + 1, isInterrupting);
+    engine.manageDeployment(repositoryService.createDeployment()
+        .addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
 
-    //when
+    // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-      .setVariable(VARIABLE_NAME, "1")
-      .startBeforeActivity(TASK_BEFORE_CONDITION_ID + 1)
-      .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID + 1).executeWithVariablesInReturn();
 
-    //then
+    // then
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertTaskNames(tasksAfterVariableIsSet, TASK_AFTER_CONDITION_ID, TASK_AFTER_CONDITION_ID + 1);
   }
@@ -521,69 +412,59 @@ public class TriggerConditionalEventOnStartAtActivityTest extends AbstractCondit
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testSubProcessNonInterruptingTriggerGlobalEventSubProcess() {
     // given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent("start")
-      .userTask("beforeSubProcess")
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-        .startEvent()
-        .userTask(TASK_BEFORE_CONDITION_ID)
-        .name(TASK_BEFORE_CONDITION)
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent("start").userTask("beforeSubProcess").subProcess(SUB_PROCESS_ID)
+        .embeddedSubProcess().startEvent().userTask(TASK_BEFORE_CONDITION_ID)
+        .name(TASK_BEFORE_CONDITION).endEvent().subProcessDone().endEvent().done();
 
-    modelInstance = addConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, TASK_AFTER_CONDITION_ID, false);
+    modelInstance = addConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        TASK_AFTER_CONDITION_ID, false);
 
-    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+    engine.manageDeployment(repositoryService.createDeployment()
+        .addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
 
     // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-    .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-    .setVariable(VARIABLE_NAME, "1")
-    .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
     // then
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().count());
-    assertEquals("variable", historyService.createHistoricVariableInstanceQuery().singleResult().getName());
+    assertEquals("variable",
+        historyService.createHistoricVariableInstanceQuery().singleResult().getName());
 
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(2, tasksAfterVariableIsSet.size());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_BEFORE_CONDITION_ID).count());
-    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID).count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey(TASK_BEFORE_CONDITION_ID).count());
+    assertEquals(1,
+        taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID).count());
   }
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testSubProcessInterruptingTriggerGlobalEventSubProcess() {
     // given
-    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent("start")
-      .userTask("beforeSubProcess")
-      .subProcess(SUB_PROCESS_ID)
-      .embeddedSubProcess()
-        .startEvent()
-        .userTask(TASK_BEFORE_CONDITION_ID)
-        .name(TASK_BEFORE_CONDITION)
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent("start").userTask("beforeSubProcess").subProcess(SUB_PROCESS_ID)
+        .embeddedSubProcess().startEvent().userTask(TASK_BEFORE_CONDITION_ID)
+        .name(TASK_BEFORE_CONDITION).endEvent().subProcessDone().endEvent().done();
 
-    modelInstance = addConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, TASK_AFTER_CONDITION_ID, true);
+    modelInstance = addConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY,
+        TASK_AFTER_CONDITION_ID, true);
 
-    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+    engine.manageDeployment(repositoryService.createDeployment()
+        .addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
 
     // when
     runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
-    .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
-    .setVariable(VARIABLE_NAME, "1")
-    .executeWithVariablesInReturn();
+        .startBeforeActivity(TASK_BEFORE_CONDITION_ID).setVariable(VARIABLE_NAME, "1")
+        .executeWithVariablesInReturn();
 
     // then
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().count());
-    assertEquals("variable", historyService.createHistoricVariableInstanceQuery().singleResult().getName());
+    assertEquals("variable",
+        historyService.createHistoricVariableInstanceQuery().singleResult().getName());
 
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(1, tasksAfterVariableIsSet.size());

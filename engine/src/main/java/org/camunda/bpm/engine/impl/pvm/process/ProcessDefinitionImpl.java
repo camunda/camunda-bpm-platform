@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -55,7 +54,9 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   }
 
   protected void ensureDefaultInitialExists() {
-    ensureNotNull("Process '" + name + "' has no default start activity (e.g. none start event), hence you cannot use 'startProcessInstanceBy...' but have to start it using one of the modeled start events (e.g. message start events)", "initial", initial);
+    ensureNotNull("Process '" + name
+        + "' has no default start activity (e.g. none start event), hence you cannot use 'startProcessInstanceBy...' but have to start it using one of the modeled start events (e.g. message start events)",
+        "initial", initial);
   }
 
   public PvmProcessInstance createProcessInstance() {
@@ -77,7 +78,8 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     return createProcessInstance(businessKey, null, initial);
   }
 
-  public PvmProcessInstance createProcessInstance(String businessKey, String caseInstanceId, ActivityImpl initial) {
+  public PvmProcessInstance createProcessInstance(String businessKey, String caseInstanceId,
+      ActivityImpl initial) {
     PvmExecutionImpl processInstance = (PvmExecutionImpl) createProcessInstanceForInitial(initial);
 
     processInstance.setBusinessKey(businessKey);
@@ -88,7 +90,9 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
 
   /** creates a process instance using the provided activity as initial */
   public PvmProcessInstance createProcessInstanceForInitial(ActivityImpl initial) {
-    ensureNotNull("Cannot start process instance, initial activity where the process instance should start is null", "initial", initial);
+    ensureNotNull(
+        "Cannot start process instance, initial activity where the process instance should start is null",
+        "initial", initial);
 
     PvmExecutionImpl processInstance = newProcessInstance();
 
@@ -97,7 +101,8 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     processInstance.setProcessInstance(processInstance);
 
     // always set the process instance to the initial activity, no matter how deeply it is nested;
-    // this is required for firing history events (cf start activity) and persisting the initial activity
+    // this is required for firing history events (cf start activity) and persisting the initial
+    // activity
     // on async start
     processInstance.setActivity(initial);
 
@@ -114,10 +119,10 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
 
   public synchronized List<ActivityImpl> getInitialActivityStack(ActivityImpl startActivity) {
     List<ActivityImpl> initialActivityStack = initialActivityStacks.get(startActivity);
-    if(initialActivityStack == null) {
+    if (initialActivityStack == null) {
       initialActivityStack = new ArrayList<ActivityImpl>();
       ActivityImpl activity = startActivity;
-      while (activity!=null) {
+      while (activity != null) {
         initialActivityStack.add(0, activity);
         activity = activity.getParentFlowScopeActivity();
       }
@@ -139,11 +144,11 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   }
 
   public Lane getLaneForId(String id) {
-    if(laneSets != null && laneSets.size() > 0) {
+    if (laneSets != null && laneSets.size() > 0) {
       Lane lane;
-      for(LaneSet set : laneSets) {
+      for (LaneSet set : laneSets) {
         lane = set.getLaneForId(id);
-        if(lane != null) {
+        if (lane != null) {
           return lane;
         }
       }
@@ -169,23 +174,23 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
 
   @Override
   public String toString() {
-    return "ProcessDefinition("+id+")";
+    return "ProcessDefinition(" + id + ")";
   }
 
-   public String getDescription() {
+  public String getDescription() {
     return (String) getProperty("documentation");
   }
 
   /**
-   * @return all lane-sets defined on this process-instance. Returns an empty list if none are defined.
+   * @return all lane-sets defined on this process-instance. Returns an empty list if none are
+   *         defined.
    */
   public List<LaneSet> getLaneSets() {
-    if(laneSets == null) {
+    if (laneSets == null) {
       laneSets = new ArrayList<LaneSet>();
     }
     return laneSets;
   }
-
 
   public void setParticipantProcess(ParticipantProcess participantProcess) {
     this.participantProcess = participantProcess;

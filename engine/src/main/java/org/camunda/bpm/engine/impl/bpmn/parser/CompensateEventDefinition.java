@@ -24,7 +24,7 @@ import java.io.Serializable;
 public class CompensateEventDefinition implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   protected String activityRef;
   protected boolean waitForCompletion;
 

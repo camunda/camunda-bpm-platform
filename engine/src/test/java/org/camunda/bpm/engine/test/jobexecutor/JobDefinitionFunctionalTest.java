@@ -57,13 +57,9 @@ public class JobDefinitionFunctionalTest {
   protected ManagementService managementService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  protected static final BpmnModelInstance SIMPLE_ASYNC_PROCESS = Bpmn.createExecutableProcess("simpleAsyncProcess")
-      .startEvent()
-      .serviceTask()
-        .camundaExpression("${true}")
-        .camundaAsyncBefore()
-      .endEvent()
-      .done();
+  protected static final BpmnModelInstance SIMPLE_ASYNC_PROCESS = Bpmn
+      .createExecutableProcess("simpleAsyncProcess").startEvent().serviceTask()
+      .camundaExpression("${true}").camundaAsyncBefore().endEvent().done();
 
   @Before
   public void initServices() {
@@ -127,20 +123,12 @@ public class JobDefinitionFunctionalTest {
 
   @Test
   public void testExclusiveJobs() {
-    testRule.deploy(Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .serviceTask("task1")
-          .camundaExpression("${true}")
-          .camundaAsyncBefore()
-        .serviceTask("task2")
-          .camundaExpression("${true}")
-          .camundaAsyncBefore()
-        .endEvent()
-        .done());
+    testRule.deploy(Bpmn.createExecutableProcess("testProcess").startEvent().serviceTask("task1")
+        .camundaExpression("${true}").camundaAsyncBefore().serviceTask("task2")
+        .camundaExpression("${true}").camundaAsyncBefore().endEvent().done());
 
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
-      .activityIdIn("task2")
-      .singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().activityIdIn("task2")
+        .singleResult();
 
     // given that the second task is suspended
     managementService.suspendJobDefinitionById(jobDefinition.getId());
@@ -153,8 +141,7 @@ public class JobDefinitionFunctionalTest {
     // then the second task is not executed
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     // there is a suspended job instance
-    Job job = managementService.createJobQuery()
-      .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
     assertEquals(job.getJobDefinitionId(), jobDefinition.getId());
     assertTrue(job.isSuspended());
 
@@ -170,7 +157,7 @@ public class JobDefinitionFunctionalTest {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
 
     return processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new AcquireJobsCmd(jobExecutor));
+        .execute(new AcquireJobsCmd(jobExecutor));
   }
 
 }

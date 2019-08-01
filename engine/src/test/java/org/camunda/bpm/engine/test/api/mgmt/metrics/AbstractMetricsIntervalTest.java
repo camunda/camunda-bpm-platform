@@ -38,8 +38,8 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * Represents the abstract metrics interval test class, which contains methods
- * for generating metrics and clean up afterwards.
+ * Represents the abstract metrics interval test class, which contains methods for generating
+ * metrics and clean up afterwards.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
@@ -69,24 +69,24 @@ public abstract class AbstractMetricsIntervalTest {
   protected Random rand;
 
   protected void generateMeterData(long dataCount, long interval) {
-    //set up for randomnes
+    // set up for randomnes
     Set<String> metricNames = metricsRegistry.getMeters().keySet();
     metricsCount = metricNames.size();
 
-    //start date is the default interval since mariadb can't set 0 as timestamp
+    // start date is the default interval since mariadb can't set 0 as timestamp
     long startDate = DEFAULT_INTERVAL_MILLIS;
     firstInterval = new DateTime(startDate);
-    //we will have 5 metric reports in an interval
+    // we will have 5 metric reports in an interval
     int dataPerInterval = 5;
 
-    //generate data
+    // generate data
     for (int i = 0; i < dataCount; i++) {
-      //calulate diff so timer can be set correctly
+      // calulate diff so timer can be set correctly
       long diff = interval / dataPerInterval;
       for (int j = 0; j < dataPerInterval; j++) {
         ClockUtil.setCurrentTime(new Date(startDate));
-        //generate random count of data per interv
-        //for each metric
+        // generate random count of data per interv
+        // for each metric
         reportMetrics();
         startDate += diff;
       }
@@ -95,11 +95,11 @@ public abstract class AbstractMetricsIntervalTest {
 
   protected void reportMetrics() {
     for (String metricName : metricsRegistry.getMeters().keySet()) {
-      //mark random occurence
+      // mark random occurence
       long occurence = (long) (rand.nextInt((MAX_OCCURENCE - MIN_OCCURENCE) + 1) + MIN_OCCURENCE);
       metricsRegistry.markOccurrence(metricName, occurence);
     }
-    //report logged metrics
+    // report logged metrics
     processEngineConfiguration.getDbMetricsReporter().reportNow();
   }
 
@@ -121,12 +121,13 @@ public abstract class AbstractMetricsIntervalTest {
     processEngineConfiguration = ENGINE_RULE.getProcessEngineConfiguration();
     managementService = ENGINE_RULE.getManagementService();
 
-    //clean up before start
+    // clean up before start
     clearMetrics();
 
-    //init metrics
+    // init metrics
     processEngineConfiguration.setDbMetricsReporterActivate(true);
-    lastReporterId = processEngineConfiguration.getDbMetricsReporter().getMetricsCollectionTask().getReporter();
+    lastReporterId = processEngineConfiguration.getDbMetricsReporter().getMetricsCollectionTask()
+        .getReporter();
     processEngineConfiguration.getDbMetricsReporter().setReporterId(REPORTER_ID);
     metricsRegistry = processEngineConfiguration.getMetricsRegistry();
     rand = new Random(new Date().getTime());

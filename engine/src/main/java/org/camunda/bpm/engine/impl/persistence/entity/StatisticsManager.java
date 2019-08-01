@@ -41,18 +41,21 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 public class StatisticsManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
-  public List<ProcessDefinitionStatistics> getStatisticsGroupedByProcessDefinitionVersion(ProcessDefinitionStatisticsQueryImpl query, Page page) {
+  public List<ProcessDefinitionStatistics> getStatisticsGroupedByProcessDefinitionVersion(
+      ProcessDefinitionStatisticsQueryImpl query, Page page) {
     configureQuery(query);
     return getDbEntityManager().selectList("selectProcessDefinitionStatistics", query, page);
   }
 
-  public long getStatisticsCountGroupedByProcessDefinitionVersion(ProcessDefinitionStatisticsQueryImpl query) {
+  public long getStatisticsCountGroupedByProcessDefinitionVersion(
+      ProcessDefinitionStatisticsQueryImpl query) {
     configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectProcessDefinitionStatisticsCount", query);
   }
 
   @SuppressWarnings("unchecked")
-  public List<ActivityStatistics> getStatisticsGroupedByActivity(ActivityStatisticsQueryImpl query, Page page) {
+  public List<ActivityStatistics> getStatisticsGroupedByActivity(ActivityStatisticsQueryImpl query,
+      Page page) {
     configureQuery(query);
     return getDbEntityManager().selectList("selectActivityStatistics", query, page);
   }
@@ -63,7 +66,8 @@ public class StatisticsManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<DeploymentStatistics> getStatisticsGroupedByDeployment(DeploymentStatisticsQueryImpl query, Page page) {
+  public List<DeploymentStatistics> getStatisticsGroupedByDeployment(
+      DeploymentStatisticsQueryImpl query, Page page) {
     configureQuery(query);
     return getDbEntityManager().selectList("selectDeploymentStatistics", query, page);
   }
@@ -74,7 +78,8 @@ public class StatisticsManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<BatchStatistics> getStatisticsGroupedByBatch(BatchStatisticsQueryImpl query, Page page) {
+  public List<BatchStatistics> getStatisticsGroupedByBatch(BatchStatisticsQueryImpl query,
+      Page page) {
     configureQuery(query);
     return getDbEntityManager().selectList("selectBatchStatistics", query, page);
   }
@@ -107,35 +112,49 @@ public class StatisticsManager extends AbstractManager {
 
   protected void checkReadProcessDefinition(ActivityStatisticsQueryImpl query) {
     CommandContext commandContext = getCommandContext();
-    if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
+    if (isAuthorizationEnabled() && getCurrentAuthentication() != null
+        && commandContext.isAuthorizationCheckEnabled()) {
       String processDefinitionId = query.getProcessDefinitionId();
-      ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
-      ensureNotNull("no deployed process definition found with id '" + processDefinitionId + "'", "processDefinition", definition);
+      ProcessDefinitionEntity definition = getProcessDefinitionManager()
+          .findLatestProcessDefinitionById(processDefinitionId);
+      ensureNotNull("no deployed process definition found with id '" + processDefinitionId + "'",
+          "processDefinition", definition);
       getAuthorizationManager().checkAuthorization(READ, PROCESS_DEFINITION, definition.getKey());
     }
   }
 
-  public long getStatisticsCountGroupedByDecisionRequirementsDefinition(HistoricDecisionInstanceStatisticsQueryImpl decisionRequirementsDefinitionStatisticsQuery) {
+  public long getStatisticsCountGroupedByDecisionRequirementsDefinition(
+      HistoricDecisionInstanceStatisticsQueryImpl decisionRequirementsDefinitionStatisticsQuery) {
     configureQuery(decisionRequirementsDefinitionStatisticsQuery);
-    return (Long) getDbEntityManager().selectOne("selectDecisionDefinitionStatisticsCount", decisionRequirementsDefinitionStatisticsQuery);
+    return (Long) getDbEntityManager().selectOne("selectDecisionDefinitionStatisticsCount",
+        decisionRequirementsDefinitionStatisticsQuery);
   }
 
-  protected void configureQuery(HistoricDecisionInstanceStatisticsQueryImpl decisionRequirementsDefinitionStatisticsQuery) {
+  protected void configureQuery(
+      HistoricDecisionInstanceStatisticsQueryImpl decisionRequirementsDefinitionStatisticsQuery) {
     checkReadDecisionRequirementsDefinition(decisionRequirementsDefinitionStatisticsQuery);
     getTenantManager().configureQuery(decisionRequirementsDefinitionStatisticsQuery);
   }
 
-  protected void checkReadDecisionRequirementsDefinition(HistoricDecisionInstanceStatisticsQueryImpl query) {
+  protected void checkReadDecisionRequirementsDefinition(
+      HistoricDecisionInstanceStatisticsQueryImpl query) {
     CommandContext commandContext = getCommandContext();
-    if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
+    if (isAuthorizationEnabled() && getCurrentAuthentication() != null
+        && commandContext.isAuthorizationCheckEnabled()) {
       String decisionRequirementsDefinitionId = query.getDecisionRequirementsDefinitionId();
-      DecisionRequirementsDefinition definition = getDecisionRequirementsDefinitionManager().findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
-      ensureNotNull("no deployed decision requirements definition found with id '" + decisionRequirementsDefinitionId + "'", "decisionRequirementsDefinition", definition);
-      getAuthorizationManager().checkAuthorization(READ, DECISION_REQUIREMENTS_DEFINITION, definition.getKey());
+      DecisionRequirementsDefinition definition = getDecisionRequirementsDefinitionManager()
+          .findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
+      ensureNotNull(
+          "no deployed decision requirements definition found with id '"
+              + decisionRequirementsDefinitionId + "'",
+          "decisionRequirementsDefinition", definition);
+      getAuthorizationManager().checkAuthorization(READ, DECISION_REQUIREMENTS_DEFINITION,
+          definition.getKey());
     }
   }
 
-  public List<HistoricDecisionInstanceStatistics> getStatisticsGroupedByDecisionRequirementsDefinition(HistoricDecisionInstanceStatisticsQueryImpl query, Page page) {
+  public List<HistoricDecisionInstanceStatistics> getStatisticsGroupedByDecisionRequirementsDefinition(
+      HistoricDecisionInstanceStatisticsQueryImpl query, Page page) {
     configureQuery(query);
     return getDbEntityManager().selectList("selectDecisionDefinitionStatistics", query, page);
   }

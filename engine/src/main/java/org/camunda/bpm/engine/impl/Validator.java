@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.engine.impl;
 
-
 /**
- * Validators must be equal (in terms of {@link #equals(Object)}) if they validate
- * the exact same thing.
+ * Validators must be equal (in terms of {@link #equals(Object)}) if they validate the exact same
+ * thing.
  *
  * @author Thorben Lindhauer
  */

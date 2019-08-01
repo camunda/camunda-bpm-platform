@@ -20,9 +20,11 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * <p>Base atomic operation used for implementing atomic operations which
- * create a new concurrent execution for executing an activity. This atomic
- * operation makes sure the execution is created under the correct parent.</p>
+ * <p>
+ * Base atomic operation used for implementing atomic operations which create a new concurrent
+ * execution for executing an activity. This atomic operation makes sure the execution is created
+ * under the correct parent.
+ * </p>
  *
  * @author Thorben Lindhauer
  * @author Daniel Meyer

@@ -20,24 +20,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * In order to distinguish between the used hashed algorithm
- * for the password encryption, as prefix is persisted with the
- * encrypted to the database.
- * The {@link DatabasePrefixHandler} is used to handle the prefix, especially for building
- * the prefix, retrieving the algorithm name from the prefix and
- * removing the prefix name from the hashed password.
+ * In order to distinguish between the used hashed algorithm for the password encryption, as prefix
+ * is persisted with the encrypted to the database. The {@link DatabasePrefixHandler} is used to
+ * handle the prefix, especially for building the prefix, retrieving the algorithm name from the
+ * prefix and removing the prefix name from the hashed password.
  */
 public class DatabasePrefixHandler {
 
   protected Pattern pattern = Pattern.compile("^\\{(.*?)\\}");
 
-  public String generatePrefix(String algorithmName){
+  public String generatePrefix(String algorithmName) {
     return "{" + algorithmName + "}";
   }
 
   public String retrieveAlgorithmName(String encryptedPasswordWithPrefix) {
     Matcher matcher = pattern.matcher(encryptedPasswordWithPrefix);
-    if(matcher.find()){
+    if (matcher.find()) {
       return matcher.group(1);
     }
     return null;
@@ -45,10 +43,10 @@ public class DatabasePrefixHandler {
 
   public String removePrefix(String encryptedPasswordWithPrefix) {
     int index = encryptedPasswordWithPrefix.indexOf("}");
-    if(!encryptedPasswordWithPrefix.startsWith("{") || index < 0){
+    if (!encryptedPasswordWithPrefix.startsWith("{") || index < 0) {
       return null;
     }
-    return encryptedPasswordWithPrefix.substring(index+1);
+    return encryptedPasswordWithPrefix.substring(index + 1);
   }
 
 }

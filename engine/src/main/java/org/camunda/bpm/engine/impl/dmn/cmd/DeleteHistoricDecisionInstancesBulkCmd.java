@@ -45,12 +45,14 @@ public class DeleteHistoricDecisionInstancesBulkCmd implements Command<Object> {
 
   @Override
   public Object execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().checkAuthorization(Permissions.DELETE_HISTORY, Resources.DECISION_DEFINITION);
+    commandContext.getAuthorizationManager().checkAuthorization(Permissions.DELETE_HISTORY,
+        Resources.DECISION_DEFINITION);
 
     ensureNotEmpty(BadUserRequestException.class, "decisionInstanceIds", decisionInstanceIds);
     writeUserOperationLog(commandContext, decisionInstanceIds.size());
 
-    commandContext.getHistoricDecisionInstanceManager().deleteHistoricDecisionInstanceByIds(decisionInstanceIds);
+    commandContext.getHistoricDecisionInstanceManager()
+        .deleteHistoricDecisionInstanceByIds(decisionInstanceIds);
 
     return null;
   }
@@ -60,7 +62,7 @@ public class DeleteHistoricDecisionInstancesBulkCmd implements Command<Object> {
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, false));
 
-    commandContext.getOperationLogManager()
-      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, propertyChanges);
+    commandContext.getOperationLogManager().logDecisionInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, propertyChanges);
   }
 }

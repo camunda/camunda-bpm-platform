@@ -41,7 +41,8 @@ public class UpdateDecisionDefinitionHistoryTimeToLiveCmd implements Command<Voi
   protected String decisionDefinitionId;
   protected Integer historyTimeToLive;
 
-  public UpdateDecisionDefinitionHistoryTimeToLiveCmd(String decisionDefinitionId, Integer historyTimeToLive) {
+  public UpdateDecisionDefinitionHistoryTimeToLiveCmd(String decisionDefinitionId,
+      Integer historyTimeToLive) {
     this.decisionDefinitionId = decisionDefinitionId;
     this.historyTimeToLive = historyTimeToLive;
   }
@@ -51,10 +52,12 @@ public class UpdateDecisionDefinitionHistoryTimeToLiveCmd implements Command<Voi
 
     ensureNotNull(BadUserRequestException.class, "decisionDefinitionId", decisionDefinitionId);
     if (historyTimeToLive != null) {
-      ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive", historyTimeToLive, 0);
+      ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive",
+          historyTimeToLive, 0);
     }
 
-    DecisionDefinitionEntity decisionDefinitionEntity = commandContext.getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
+    DecisionDefinitionEntity decisionDefinitionEntity = commandContext
+        .getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
     logUserOperation(commandContext, decisionDefinitionEntity);
     decisionDefinitionEntity.setHistoryTimeToLive(historyTimeToLive);
 
@@ -62,18 +65,22 @@ public class UpdateDecisionDefinitionHistoryTimeToLiveCmd implements Command<Voi
   }
 
   protected void checkAuthorization(CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-        checker.checkUpdateDecisionDefinitionById(decisionDefinitionId);
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
+      checker.checkUpdateDecisionDefinitionById(decisionDefinitionId);
     }
   }
 
-  protected void logUserOperation(CommandContext commandContext, DecisionDefinitionEntity decisionDefinitionEntity) {
+  protected void logUserOperation(CommandContext commandContext,
+      DecisionDefinitionEntity decisionDefinitionEntity) {
     List<PropertyChange> propertyChanges = new ArrayList<>();
-    propertyChanges.add(new PropertyChange("historyTimeToLive", decisionDefinitionEntity.getHistoryTimeToLive(), historyTimeToLive));
+    propertyChanges.add(new PropertyChange("historyTimeToLive",
+        decisionDefinitionEntity.getHistoryTimeToLive(), historyTimeToLive));
     propertyChanges.add(new PropertyChange("decisionDefinitionId", null, decisionDefinitionId));
-    propertyChanges.add(new PropertyChange("decisionDefinitionKey", null, decisionDefinitionEntity.getKey()));
+    propertyChanges
+        .add(new PropertyChange("decisionDefinitionKey", null, decisionDefinitionEntity.getKey()));
 
-    commandContext.getOperationLogManager()
-      .logDecisionDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE, propertyChanges);
+    commandContext.getOperationLogManager().logDecisionDefinitionOperation(
+        UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE, propertyChanges);
   }
 }

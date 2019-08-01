@@ -55,10 +55,12 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule engineTestRule = new ProcessEngineTestRule(engineRule);
-  protected BatchSetRemovalTimeRule testRule = new BatchSetRemovalTimeRule(engineRule, engineTestRule);
+  protected BatchSetRemovalTimeRule testRule = new BatchSetRemovalTimeRule(engineRule,
+      engineTestRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected DecisionService decisionService;
@@ -83,8 +85,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
   @After
   public void clearDatabase() {
     List<Batch> batches = managementService.createBatchQuery()
-      .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION)
-      .list();
+        .type(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION).list();
 
     if (!batches.isEmpty()) {
       for (Batch batch : batches) {
@@ -103,18 +104,19 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .calculatedRemovalTime()
-      .byQuery(historicProcessInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricProcessInstances().calculatedRemovalTime()
+        .byQuery(historicProcessInstanceQuery).executeAsync();
 
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery().list();
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+        .createUserOperationLogQuery().list();
 
     // then
-    assertProperties(userOperationLogEntries, "mode", "removalTime", "hierarchical", "nrOfInstances", "async");
+    assertProperties(userOperationLogEntries, "mode", "removalTime", "hierarchical",
+        "nrOfInstances", "async");
     assertOperationType(userOperationLogEntries, "SetRemovalTime");
     assertCategory(userOperationLogEntries, "Operator");
     assertEntityType(userOperationLogEntries, "ProcessInstance");
@@ -127,17 +129,15 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .calculatedRemovalTime()
-      .byQuery(historicProcessInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricProcessInstances().calculatedRemovalTime()
+        .byQuery(historicProcessInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("mode")
-      .singleResult();
+        .property("mode").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -151,17 +151,15 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .absoluteRemovalTime(new Date())
-      .byQuery(historicProcessInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricProcessInstances().absoluteRemovalTime(new Date())
+        .byQuery(historicProcessInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("mode")
-      .singleResult();
+        .property("mode").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -177,21 +175,20 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .absoluteRemovalTime(removalTime)
-      .byQuery(historicProcessInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricProcessInstances().absoluteRemovalTime(removalTime)
+        .byQuery(historicProcessInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("removalTime")
-      .singleResult();
+        .property("removalTime").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
-    assertThat(fromMillis(userOperationLogEntry.getNewValue())).isEqualToIgnoringMillis(removalTime);
+    assertThat(fromMillis(userOperationLogEntry.getNewValue()))
+        .isEqualToIgnoringMillis(removalTime);
   }
 
   @Test
@@ -201,17 +198,15 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .clearedRemovalTime()
-      .byQuery(historicProcessInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricProcessInstances().clearedRemovalTime()
+        .byQuery(historicProcessInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("removalTime")
-      .singleResult();
+        .property("removalTime").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -226,17 +221,15 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .clearedRemovalTime()
-      .byQuery(historicProcessInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricProcessInstances().clearedRemovalTime()
+        .byQuery(historicProcessInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("nrOfInstances")
-      .singleResult();
+        .property("nrOfInstances").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -250,17 +243,15 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .clearedRemovalTime()
-      .byQuery(historicProcessInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricProcessInstances().clearedRemovalTime()
+        .byQuery(historicProcessInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("async")
-      .singleResult();
+        .property("async").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -274,18 +265,15 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .clearedRemovalTime()
-      .byQuery(historicProcessInstanceQuery)
-      .hierarchical()
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricProcessInstances().clearedRemovalTime()
+        .byQuery(historicProcessInstanceQuery).hierarchical().executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("hierarchical")
-      .singleResult();
+        .property("hierarchical").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -299,17 +287,15 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .clearedRemovalTime()
-      .byQuery(historicProcessInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricProcessInstances().clearedRemovalTime()
+        .byQuery(historicProcessInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("hierarchical")
-      .singleResult();
+        .property("hierarchical").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -317,53 +303,48 @@ public class BatchSetRemovalTimeUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldWriteUserOperationLogForDecisionInstances() {
     // given
     evaluate();
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService
+        .createHistoricDecisionInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .calculatedRemovalTime()
-      .byQuery(historicDecisionInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricDecisionInstances().calculatedRemovalTime()
+        .byQuery(historicDecisionInstanceQuery).executeAsync();
 
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery().list();
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+        .createUserOperationLogQuery().list();
 
     // then
-    assertProperties(userOperationLogEntries, "mode", "removalTime", "hierarchical", "nrOfInstances", "async");
+    assertProperties(userOperationLogEntries, "mode", "removalTime", "hierarchical",
+        "nrOfInstances", "async");
     assertOperationType(userOperationLogEntries, "SetRemovalTime");
     assertCategory(userOperationLogEntries, "Operator");
     assertEntityType(userOperationLogEntries, "DecisionInstance");
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldWriteUserOperationLogForDecisionInstances_ModeCalculatedRemovalTime() {
     // given
     evaluate();
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService
+        .createHistoricDecisionInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .calculatedRemovalTime()
-      .byQuery(historicDecisionInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricDecisionInstances().calculatedRemovalTime()
+        .byQuery(historicDecisionInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("mode")
-      .singleResult();
+        .property("mode").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -371,26 +352,22 @@ public class BatchSetRemovalTimeUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldWriteUserOperationLogForDecisionInstances_ModeAbsoluteRemovalTime() {
     // given
     evaluate();
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService
+        .createHistoricDecisionInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .absoluteRemovalTime(new Date())
-      .byQuery(historicDecisionInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricDecisionInstances().absoluteRemovalTime(new Date())
+        .byQuery(historicDecisionInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("mode")
-      .singleResult();
+        .property("mode").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -398,9 +375,7 @@ public class BatchSetRemovalTimeUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldWriteUserOperationLogForDecisionInstances_RemovalTime() {
     // given
     Date removalTime = new Date();
@@ -409,44 +384,39 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService
+        .createHistoricDecisionInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .absoluteRemovalTime(removalTime)
-      .byQuery(historicDecisionInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricDecisionInstances().absoluteRemovalTime(removalTime)
+        .byQuery(historicDecisionInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("removalTime")
-      .singleResult();
+        .property("removalTime").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
-    assertThat(fromMillis(userOperationLogEntry.getNewValue())).isEqualToIgnoringMillis(removalTime);
+    assertThat(fromMillis(userOperationLogEntry.getNewValue()))
+        .isEqualToIgnoringMillis(removalTime);
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldWriteUserOperationLogForDecisionInstances_RemovalTimeNull() {
     // given
     evaluate();
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService
+        .createHistoricDecisionInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .clearedRemovalTime()
-      .byQuery(historicDecisionInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricDecisionInstances().clearedRemovalTime()
+        .byQuery(historicDecisionInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("removalTime")
-      .singleResult();
+        .property("removalTime").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -454,26 +424,22 @@ public class BatchSetRemovalTimeUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldWriteUserOperationLogForDecisionInstances_NrOfInstances() {
     // given
     evaluate();
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService
+        .createHistoricDecisionInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .clearedRemovalTime()
-      .byQuery(historicDecisionInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricDecisionInstances().clearedRemovalTime()
+        .byQuery(historicDecisionInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("nrOfInstances")
-      .singleResult();
+        .property("nrOfInstances").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -481,26 +447,22 @@ public class BatchSetRemovalTimeUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldWriteUserOperationLogForDecisionInstances_AsyncTrue() {
     // given
     evaluate();
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService
+        .createHistoricDecisionInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .clearedRemovalTime()
-      .byQuery(historicDecisionInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricDecisionInstances().clearedRemovalTime()
+        .byQuery(historicDecisionInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("async")
-      .singleResult();
+        .property("async").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -508,27 +470,22 @@ public class BatchSetRemovalTimeUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldWriteUserOperationLogForDecisionInstances_HierarchicalTrue() {
     // given
     evaluate();
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService
+        .createHistoricDecisionInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .clearedRemovalTime()
-      .byQuery(historicDecisionInstanceQuery)
-      .hierarchical()
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricDecisionInstances().clearedRemovalTime()
+        .byQuery(historicDecisionInstanceQuery).hierarchical().executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("hierarchical")
-      .singleResult();
+        .property("hierarchical").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -536,26 +493,22 @@ public class BatchSetRemovalTimeUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldWriteUserOperationLogForDecisionInstances_HierarchicalFalse() {
     // given
     evaluate();
 
     identityService.setAuthenticatedUserId("aUserId");
 
-    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService
+        .createHistoricDecisionInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .clearedRemovalTime()
-      .byQuery(historicDecisionInstanceQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricDecisionInstances().clearedRemovalTime()
+        .byQuery(historicDecisionInstanceQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("hierarchical")
-      .singleResult();
+        .property("hierarchical").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -572,12 +525,11 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     HistoricBatchQuery historicBatchQuery = historyService.createHistoricBatchQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricBatches()
-      .calculatedRemovalTime()
-      .byQuery(historicBatchQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricBatches().calculatedRemovalTime()
+        .byQuery(historicBatchQuery).executeAsync();
 
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery().list();
+    List<UserOperationLogEntry> userOperationLogEntries = historyService
+        .createUserOperationLogQuery().list();
 
     // then
     assertProperties(userOperationLogEntries, "mode", "removalTime", "nrOfInstances", "async");
@@ -596,14 +548,11 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     HistoricBatchQuery historicBatchQuery = historyService.createHistoricBatchQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricBatches()
-      .calculatedRemovalTime()
-      .byQuery(historicBatchQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricBatches().calculatedRemovalTime()
+        .byQuery(historicBatchQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("mode")
-      .singleResult();
+        .property("mode").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -620,14 +569,11 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     HistoricBatchQuery historicBatchQuery = historyService.createHistoricBatchQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricBatches()
-      .absoluteRemovalTime(new Date())
-      .byQuery(historicBatchQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricBatches().absoluteRemovalTime(new Date())
+        .byQuery(historicBatchQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("mode")
-      .singleResult();
+        .property("mode").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -646,18 +592,16 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     HistoricBatchQuery historicBatchQuery = historyService.createHistoricBatchQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricBatches()
-      .absoluteRemovalTime(removalTime)
-      .byQuery(historicBatchQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricBatches().absoluteRemovalTime(removalTime)
+        .byQuery(historicBatchQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("removalTime")
-      .singleResult();
+        .property("removalTime").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
-    assertThat(fromMillis(userOperationLogEntry.getNewValue())).isEqualToIgnoringMillis(removalTime);
+    assertThat(fromMillis(userOperationLogEntry.getNewValue()))
+        .isEqualToIgnoringMillis(removalTime);
   }
 
   @Test
@@ -670,14 +614,11 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     HistoricBatchQuery historicBatchQuery = historyService.createHistoricBatchQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricBatches()
-      .clearedRemovalTime()
-      .byQuery(historicBatchQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricBatches().clearedRemovalTime()
+        .byQuery(historicBatchQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("removalTime")
-      .singleResult();
+        .property("removalTime").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -694,14 +635,11 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     HistoricBatchQuery historicBatchQuery = historyService.createHistoricBatchQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricBatches()
-      .clearedRemovalTime()
-      .byQuery(historicBatchQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricBatches().clearedRemovalTime()
+        .byQuery(historicBatchQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("nrOfInstances")
-      .singleResult();
+        .property("nrOfInstances").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
@@ -718,43 +656,44 @@ public class BatchSetRemovalTimeUserOperationLogTest {
     HistoricBatchQuery historicBatchQuery = historyService.createHistoricBatchQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricBatches()
-      .clearedRemovalTime()
-      .byQuery(historicBatchQuery)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricBatches().clearedRemovalTime()
+        .byQuery(historicBatchQuery).executeAsync();
 
     UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
-      .property("async")
-      .singleResult();
+        .property("async").singleResult();
 
     // then
     assertThat(userOperationLogEntry.getOrgValue()).isNull();
     assertThat(userOperationLogEntry.getNewValue()).isEqualTo("true");
   }
 
-  // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // helper
+  // ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  protected void assertProperties(List<UserOperationLogEntry> userOperationLogEntries, String... expectedProperties) {
+  protected void assertProperties(List<UserOperationLogEntry> userOperationLogEntries,
+      String... expectedProperties) {
     assertThat(userOperationLogEntries.size()).isEqualTo(expectedProperties.length);
 
-    assertThat(userOperationLogEntries)
-      .extracting("property")
-      .containsExactlyInAnyOrder(expectedProperties);
+    assertThat(userOperationLogEntries).extracting("property")
+        .containsExactlyInAnyOrder(expectedProperties);
   }
 
-  protected void assertEntityType(List<UserOperationLogEntry> userOperationLogEntries, String entityType) {
+  protected void assertEntityType(List<UserOperationLogEntry> userOperationLogEntries,
+      String entityType) {
     for (UserOperationLogEntry userOperationLogEntry : userOperationLogEntries) {
       assertThat(userOperationLogEntry.getEntityType()).isEqualTo(entityType);
     }
   }
 
-  protected void assertOperationType(List<UserOperationLogEntry> userOperationLogEntries, String operationType) {
+  protected void assertOperationType(List<UserOperationLogEntry> userOperationLogEntries,
+      String operationType) {
     for (UserOperationLogEntry userOperationLogEntry : userOperationLogEntries) {
       assertThat(userOperationLogEntry.getOperationType()).isEqualTo(operationType);
     }
   }
 
-  protected void assertCategory(List<UserOperationLogEntry> userOperationLogEntries, String category) {
+  protected void assertCategory(List<UserOperationLogEntry> userOperationLogEntries,
+      String category) {
     for (UserOperationLogEntry userOperationLogEntry : userOperationLogEntries) {
       assertThat(userOperationLogEntry.getCategory()).isEqualTo(category);
     }
@@ -769,17 +708,16 @@ public class BatchSetRemovalTimeUserOperationLogTest {
 
   protected void evaluate() {
     decisionService.evaluateDecisionByKey("dish-decision")
-      .variables(
-        Variables.createVariables()
-          .putValue("temperature", 32)
-          .putValue("dayType", "Weekend")
-      ).evaluate();
+        .variables(
+            Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"))
+        .evaluate();
   }
 
   protected void createBatch(int times) {
     for (int i = 0; i < times; i++) {
       String processInstanceId = testRule.process().serviceTask().deploy().start();
-      historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+      historyService.deleteHistoricProcessInstancesAsync(
+          Collections.singletonList(processInstanceId), "aDeleteReason");
     }
   }
 

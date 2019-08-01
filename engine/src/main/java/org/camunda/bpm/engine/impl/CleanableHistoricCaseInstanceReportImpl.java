@@ -27,7 +27,9 @@ import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-public class CleanableHistoricCaseInstanceReportImpl extends AbstractQuery<CleanableHistoricCaseInstanceReport, CleanableHistoricCaseInstanceReportResult> implements CleanableHistoricCaseInstanceReport {
+public class CleanableHistoricCaseInstanceReportImpl extends
+    AbstractQuery<CleanableHistoricCaseInstanceReport, CleanableHistoricCaseInstanceReportResult>
+    implements CleanableHistoricCaseInstanceReport {
 
   private static final long serialVersionUID = 1L;
 
@@ -52,7 +54,8 @@ public class CleanableHistoricCaseInstanceReportImpl extends AbstractQuery<Clean
 
   @Override
   public CleanableHistoricCaseInstanceReport caseDefinitionKeyIn(String... caseDefinitionKeys) {
-    ensureNotNull(NotValidException.class, "", "caseDefinitionKeyIn", (Object[]) caseDefinitionKeys);
+    ensureNotNull(NotValidException.class, "", "caseDefinitionKeyIn",
+        (Object[]) caseDefinitionKeys);
     this.caseDefinitionKeyIn = caseDefinitionKeys;
     return this;
   }
@@ -87,16 +90,15 @@ public class CleanableHistoricCaseInstanceReportImpl extends AbstractQuery<Clean
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-        .getHistoricCaseInstanceManager()
+    return commandContext.getHistoricCaseInstanceManager()
         .findCleanableHistoricCaseInstancesReportCountByCriteria(this);
   }
 
   @Override
-  public List<CleanableHistoricCaseInstanceReportResult> executeList(CommandContext commandContext, Page page) {
+  public List<CleanableHistoricCaseInstanceReportResult> executeList(CommandContext commandContext,
+      Page page) {
     checkQueryOk();
-    return commandContext
-        .getHistoricCaseInstanceManager()
+    return commandContext.getHistoricCaseInstanceManager()
         .findCleanableHistoricCaseInstancesReportByCriteria(this, page);
   }
 

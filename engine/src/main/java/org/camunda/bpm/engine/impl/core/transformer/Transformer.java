@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.core.transformer;
 
 import org.camunda.bpm.engine.impl.core.model.CoreActivity;
 
-
 /**
  * @author Roman Smirnov
  *
@@ -26,6 +25,5 @@ import org.camunda.bpm.engine.impl.core.model.CoreActivity;
 public interface Transformer<T extends Transform<? extends CoreActivity>> {
 
   T createTransform();
-
 
 }

@@ -19,16 +19,15 @@ package org.camunda.bpm.engine.repository;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
-/** An object structure representing an executable process composed of
- * activities and transitions.
+/**
+ * An object structure representing an executable process composed of activities and transitions.
  *
- * Business processes are often created with graphical editors that store the
- * process definition in certain file format. These files can be added to a
- * {@link Deployment} artifact, such as for example a Business Archive (.bar)
- * file.
+ * Business processes are often created with graphical editors that store the process definition in
+ * certain file format. These files can be added to a {@link Deployment} artifact, such as for
+ * example a Business Archive (.bar) file.
  *
- * At deploy time, the engine will then parse the process definition files to an
- * executable instance of this class, that can be used to start a {@link ProcessInstance}.
+ * At deploy time, the engine will then parse the process definition files to an executable instance
+ * of this class, that can be used to start a {@link ProcessInstance}.
  *
  * @author Tom Baeyens
  * @author Joram Barez
@@ -39,7 +38,9 @@ public interface ProcessDefinition extends ResourceDefinition {
   /** description of this process **/
   String getDescription();
 
-  /** Does this process definition has a {@link FormService#getStartFormData(String) start form key}. */
+  /**
+   * Does this process definition has a {@link FormService#getStartFormData(String) start form key}.
+   */
   boolean hasStartFormKey();
 
   /** Returns true if the process definition is in suspended state. */
@@ -47,7 +48,6 @@ public interface ProcessDefinition extends ResourceDefinition {
 
   /** Version tag of the process definition. */
   String getVersionTag();
-
 
   /** Returns true if the process definition is startable in Tasklist. */
   boolean isStartableInTasklist();

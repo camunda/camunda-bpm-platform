@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -28,7 +27,7 @@ public abstract class CommandInterceptor implements CommandExecutor {
   public CommandExecutor getNext() {
     return next;
   }
-  
+
   public void setNext(CommandExecutor next) {
     this.next = next;
   }

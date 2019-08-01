@@ -26,9 +26,10 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERM
 
 import java.util.Date;
 
-
 /**
- * <p>{@link HistoryEvent} implementation for events that happen in a case activity.</p>
+ * <p>
+ * {@link HistoryEvent} implementation for events that happen in a case activity.
+ * </p>
  *
  * @author Sebastian Menski
  */
@@ -60,7 +61,7 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
   /** the id of the called case in case of a case task */
   protected String calledCaseInstanceId;
 
-  /** id of the tenant which belongs to the case activity instance  */
+  /** id of the tenant which belongs to the case activity instance */
   protected String tenantId;
 
   /** the flag whether this case activity is required */
@@ -189,23 +190,14 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
   }
 
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[caseActivityId=" + caseActivityId
-           + ", caseActivityName=" + caseActivityName
-           + ", caseActivityInstanceId=" + id
-           + ", caseActivityInstanceState=" + caseActivityInstanceState
-           + ", parentCaseActivityInstanceId=" + parentCaseActivityInstanceId
-           + ", taskId=" + taskId
-           + ", calledProcessInstanceId=" + calledProcessInstanceId
-           + ", calledCaseInstanceId=" + calledCaseInstanceId
-           + ", durationInMillis=" + durationInMillis
-           + ", createTime=" + startTime
-           + ", endTime=" + endTime
-           + ", eventType=" + eventType
-           + ", caseExecutionId=" + caseExecutionId
-           + ", caseDefinitionId=" + caseDefinitionId
-           + ", caseInstanceId=" + caseInstanceId
-           + ", tenantId=" + tenantId
-           + "]";
+    return this.getClass().getSimpleName() + "[caseActivityId=" + caseActivityId
+        + ", caseActivityName=" + caseActivityName + ", caseActivityInstanceId=" + id
+        + ", caseActivityInstanceState=" + caseActivityInstanceState
+        + ", parentCaseActivityInstanceId=" + parentCaseActivityInstanceId + ", taskId=" + taskId
+        + ", calledProcessInstanceId=" + calledProcessInstanceId + ", calledCaseInstanceId="
+        + calledCaseInstanceId + ", durationInMillis=" + durationInMillis + ", createTime="
+        + startTime + ", endTime=" + endTime + ", eventType=" + eventType + ", caseExecutionId="
+        + caseExecutionId + ", caseDefinitionId=" + caseDefinitionId + ", caseInstanceId="
+        + caseInstanceId + ", tenantId=" + tenantId + "]";
   }
 }

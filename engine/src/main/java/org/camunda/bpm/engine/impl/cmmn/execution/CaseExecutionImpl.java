@@ -155,12 +155,15 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
     return createSubProcessInstance(processDefinition, null);
   }
 
-  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition,
+      String businessKey) {
     return createSubProcessInstance(processDefinition, businessKey, getCaseInstanceId());
   }
 
-  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
-    ExecutionImpl subProcessInstance = (ExecutionImpl) processDefinition.createProcessInstance(businessKey, caseInstanceId);
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition,
+      String businessKey, String caseInstanceId) {
+    ExecutionImpl subProcessInstance = (ExecutionImpl) processDefinition
+        .createProcessInstance(businessKey, caseInstanceId);
 
     // manage bidirectional super-subprocess relation
     subProcessInstance.setSuperCaseExecution(this);
@@ -183,8 +186,10 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
     return createSubCaseInstance(caseDefinition, null);
   }
 
-  public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey) {
-    CaseExecutionImpl caseInstance = (CaseExecutionImpl) caseDefinition.createCaseInstance(businessKey);
+  public CaseExecutionImpl createSubCaseInstance(CmmnCaseDefinition caseDefinition,
+      String businessKey) {
+    CaseExecutionImpl caseInstance = (CaseExecutionImpl) caseDefinition
+        .createCaseInstance(businessKey);
 
     // manage bidirectional super-sub-case-instances relation
     subCaseInstance.setSuperCaseExecution(this);
@@ -296,7 +301,7 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
     if (isCaseInstanceExecution()) {
       return "CaseInstance[" + getToStringIdentity() + "]";
     } else {
-      return "CmmnExecution["+getToStringIdentity() + "]";
+      return "CmmnExecution[" + getToStringIdentity() + "]";
     }
   }
 

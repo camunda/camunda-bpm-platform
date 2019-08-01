@@ -84,7 +84,8 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   }
 
   public DeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
-    ensureNotNull("inputStream for resource '" + resourceName + "' is null", "inputStream", inputStream);
+    ensureNotNull("inputStream for resource '" + resourceName + "' is null", "inputStream",
+        inputStream);
     byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
 
     return addBytes(resourceName, bytes);
@@ -100,8 +101,8 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     ensureNotNull("text", text);
 
     byte[] bytes = (repositoryService != null && repositoryService.getDeploymentCharset() != null)
-      ? text.getBytes(repositoryService.getDeploymentCharset())
-      : text.getBytes();
+        ? text.getBytes(repositoryService.getDeploymentCharset())
+        : text.getBytes();
 
     return addBytes(resourceName, bytes);
   }
@@ -185,7 +186,8 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     return this;
   }
 
-  public DeploymentBuilder addDeploymentResourcesById(String deploymentId, List<String> resourceIds) {
+  public DeploymentBuilder addDeploymentResourcesById(String deploymentId,
+      List<String> resourceIds) {
     ensureNotNull(NotValidException.class, "deploymentId", deploymentId);
 
     ensureNotNull(NotValidException.class, "resourceIds", resourceIds);
@@ -206,7 +208,8 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     return this;
   }
 
-  public DeploymentBuilder addDeploymentResourcesByName(String deploymentId, List<String> resourceNames) {
+  public DeploymentBuilder addDeploymentResourcesByName(String deploymentId,
+      List<String> resourceNames) {
     ensureNotNull(NotValidException.class, "deploymentId", deploymentId);
 
     ensureNotNull(NotValidException.class, "resourceNames", resourceNames);
@@ -220,7 +223,9 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
   public DeploymentBuilder name(String name) {
     if (nameFromDeployment != null && !nameFromDeployment.isEmpty()) {
-      String message = String.format("Cannot set the deployment name to '%s', because the property 'nameForDeployment' has been already set to '%s'.", name, nameFromDeployment);
+      String message = String.format(
+          "Cannot set the deployment name to '%s', because the property 'nameForDeployment' has been already set to '%s'.",
+          name, nameFromDeployment);
       throw new NotValidException(message);
     }
     deployment.setName(name);
@@ -230,7 +235,9 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   public DeploymentBuilder nameFromDeployment(String deploymentId) {
     String name = deployment.getName();
     if (name != null && !name.isEmpty()) {
-      String message = String.format("Cannot set the given deployment id '%s' to get the name from it, because the deployment name has been already set to '%s'.", deploymentId, name);
+      String message = String.format(
+          "Cannot set the given deployment id '%s' to get the name from it, because the deployment name has been already set to '%s'.",
+          deploymentId, name);
       throw new NotValidException(message);
     }
     nameFromDeployment = deploymentId;
@@ -270,10 +277,9 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     return repositoryService.deployWithResult(this);
   }
 
-
   public Collection<String> getResourceNames() {
-    if(deployment.getResources() == null) {
-      return Collections.<String>emptySet();
+    if (deployment.getResources() == null) {
+      return Collections.<String> emptySet();
     } else {
       return deployment.getResources().keySet();
     }

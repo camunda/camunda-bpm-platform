@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
-public class MigratingEventSubscriptionInstance implements MigratingInstance, RemovingInstance, EmergingInstance {
+public class MigratingEventSubscriptionInstance
+    implements MigratingInstance, RemovingInstance, EmergingInstance {
 
   public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
@@ -36,9 +37,7 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
   protected EventSubscriptionDeclaration eventSubscriptionDeclaration;
 
   public MigratingEventSubscriptionInstance(EventSubscriptionEntity eventSubscriptionEntity,
-      ScopeImpl targetScope,
-      boolean updateEvent,
-      EventSubscriptionDeclaration targetDeclaration) {
+      ScopeImpl targetScope, boolean updateEvent, EventSubscriptionDeclaration targetDeclaration) {
     this.eventSubscriptionEntity = eventSubscriptionEntity;
     this.targetScope = targetScope;
     this.updateEvent = updateEvent;
@@ -49,7 +48,8 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
     this(eventSubscriptionEntity, null, false, null);
   }
 
-  public MigratingEventSubscriptionInstance(EventSubscriptionDeclaration eventSubscriptionDeclaration) {
+  public MigratingEventSubscriptionInstance(
+      EventSubscriptionDeclaration eventSubscriptionDeclaration) {
     this.eventSubscriptionDeclaration = eventSubscriptionDeclaration;
   }
 

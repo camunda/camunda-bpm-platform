@@ -21,16 +21,15 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValuePro
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
 /**
- * An {@link IoParameter} creates a variable
- * in a target variable scope.
+ * An {@link IoParameter} creates a variable in a target variable scope.
  *
  * @author Daniel Meyer
  */
 public abstract class IoParameter {
 
   /**
-   * The name of the parameter. The name of the parameter is the
-   * variable name in the target {@link VariableScope}.
+   * The name of the parameter. The name of the parameter is the variable name in the target
+   * {@link VariableScope}.
    */
   protected String name;
 
@@ -51,11 +50,12 @@ public abstract class IoParameter {
     execute(scope, scope.getParentVariableScope());
   }
 
-   /**
+  /**
    * @param innerScope
    * @param outerScope
    */
-  protected abstract void execute(AbstractVariableScope innerScope, AbstractVariableScope outerScope);
+  protected abstract void execute(AbstractVariableScope innerScope,
+      AbstractVariableScope outerScope);
 
   // getters / setters ///////////////////////////
 

@@ -40,8 +40,8 @@ public class ExpressionCaseVariableListener implements CaseVariableListener {
   }
 
   /**
-   * Returns the expression text for this execution listener. Comes in handy if you want to
-   * check which listeners you already have.
+   * Returns the expression text for this execution listener. Comes in handy if you want to check
+   * which listeners you already have.
    */
   public String getExpressionText() {
     return expression.getExpressionText();

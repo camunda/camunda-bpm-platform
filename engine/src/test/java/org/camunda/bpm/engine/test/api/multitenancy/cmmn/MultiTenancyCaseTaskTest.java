@@ -52,7 +52,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     createCaseInstance("caseTaskCaseDeployment", TENANT_ONE);
     createCaseInstance("caseTaskCaseDeployment", TENANT_TWO);
 
-    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
+        .caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
@@ -65,7 +66,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     createCaseInstance("caseTaskCase", TENANT_ONE);
     createCaseInstance("caseTaskCase", TENANT_TWO);
 
-    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
+        .caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
@@ -80,12 +82,14 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     createCaseInstance("caseTaskCase", TENANT_ONE);
     createCaseInstance("caseTaskCase", TENANT_TWO);
 
-    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
+        .caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
 
-    CaseDefinition latestCaseDefinitionTenantTwo = repositoryService.createCaseDefinitionQuery().
-        caseDefinitionKey("oneTaskCase").tenantIdIn(TENANT_TWO).latestVersion().singleResult();
-    query = caseService.createCaseInstanceQuery().caseDefinitionId(latestCaseDefinitionTenantTwo.getId());
+    CaseDefinition latestCaseDefinitionTenantTwo = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("oneTaskCase").tenantIdIn(TENANT_TWO).latestVersion().singleResult();
+    query = caseService.createCaseInstanceQuery()
+        .caseDefinitionId(latestCaseDefinitionTenantTwo.getId());
     assertThat(query.count(), is(1L));
   }
 
@@ -97,7 +101,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
     createCaseInstance("caseTaskCaseVersion", TENANT_ONE);
     createCaseInstance("caseTaskCaseVersion", TENANT_TWO);
 
-    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
+        .caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
@@ -112,7 +117,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no case definition deployed with key = 'oneTaskCase'"));
+      assertThat(e.getMessage(),
+          containsString("no case definition deployed with key = 'oneTaskCase'"));
     }
   }
 
@@ -126,7 +132,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no case definition deployed with key 'oneTaskCase'"));
+      assertThat(e.getMessage(),
+          containsString("no case definition deployed with key 'oneTaskCase'"));
     }
   }
 
@@ -142,7 +149,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no case definition deployed with key = 'oneTaskCase'"));
+      assertThat(e.getMessage(),
+          containsString("no case definition deployed with key = 'oneTaskCase'"));
     }
   }
 
@@ -152,7 +160,8 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
     caseService.withCaseDefinitionByKey("caseTaskCase").create();
 
-    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
+        .caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
@@ -162,14 +171,17 @@ public class MultiTenancyCaseTaskTest extends PluggableProcessEngineTestCase {
 
     caseService.withCaseDefinitionByKey("caseTaskCase").create();
 
-    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
+        .caseDefinitionKey("oneTaskCase");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
   protected void createCaseInstance(String caseDefinitionKey, String tenantId) {
-    caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId).create();
+    caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId)
+        .create();
 
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(CASE_TASK_ID).tenantIdIn(tenantId).singleResult();
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(CASE_TASK_ID)
+        .tenantIdIn(tenantId).singleResult();
     caseService.withCaseExecution(caseExecution.getId()).manualStart();
   }
 

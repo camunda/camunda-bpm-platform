@@ -32,40 +32,29 @@ import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-public class HistoricProcessInstanceDeletionBatchAuthorizationTest extends BatchCreationAuthorizationTest {
+public class HistoricProcessInstanceDeletionBatchAuthorizationTest
+    extends BatchCreationAuthorizationTest {
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+            grant(Resources.BATCH, "batchId", "userId",
+                BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES)),
         scenario()
-            .withoutAuthorizations()
-            .failsDueToRequired(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES)
-            ).succeeds()
-    );
+            .withAuthorizations(grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
+        scenario().withAuthorizations(grant(Resources.BATCH, "batchId", "userId",
+            BatchPermissions.CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES)).succeeds());
   }
-
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   public void testBatchHistoricProcessInstanceDeletion() {
     List<String> historicProcessInstances = setupHistory();
 
-    //given
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("batchId", "*")
-        .start();
+    // given
+    authRule.init(scenario).withUser("userId").bindResource("batchId", "*").start();
 
     // when
     historyService.deleteHistoricProcessInstancesAsync(historicProcessInstances, TEST_REASON);

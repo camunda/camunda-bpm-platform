@@ -65,30 +65,33 @@ public class UpdateSuspendStateUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testLogCreation() {
 
-
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
     rule.getIdentityService().setAuthenticatedUserId("userId");
 
     // when
-    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
+    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+        .suspendAsync();
     rule.getIdentityService().clearAuthentication();
     helper.executeSeedJob(suspendprocess);
     helper.executeJobs(suspendprocess);
 
     // then
-    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().list();
+    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService()
+        .createUserOperationLogQuery().list();
     assertEquals(2, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
-
-
 
     UserOperationLogEntry asyncEntry = entries.get("async");
     assertNotNull(asyncEntry);
@@ -114,17 +117,21 @@ public class UpdateSuspendStateUserOperationLogTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testNoCreationOnSyncBatchJobExecution() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
-
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     // when
-    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
+    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+        .suspendAsync();
     helper.executeSeedJob(suspendprocess);
 
     // when
@@ -133,7 +140,8 @@ public class UpdateSuspendStateUserOperationLogTest {
     rule.getIdentityService().clearAuthentication();
 
     // then
-    assertEquals(0, rule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).count());
+    assertEquals(0, rule.getHistoryService().createUserOperationLogQuery()
+        .entityType(EntityTypes.PROCESS_INSTANCE).count());
   }
 
   protected Map<String, UserOperationLogEntry> asMap(List<UserOperationLogEntry> logEntries) {

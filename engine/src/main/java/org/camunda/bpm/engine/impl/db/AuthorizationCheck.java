@@ -23,7 +23,9 @@ import java.util.List;
 import org.camunda.bpm.engine.authorization.Permissions;
 
 /**
- * <p>Input for the authorization check algorithm</p>
+ * <p>
+ * Input for the authorization check algorithm
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -33,9 +35,8 @@ public class AuthorizationCheck implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /**
-   * If true authorization check is enabled. for This switch is
-   * useful when implementing a query which may perform an authorization check
-   * only under certain circumstances.
+   * If true authorization check is enabled. for This switch is useful when implementing a query
+   * which may perform an authorization check only under certain circumstances.
    */
   protected boolean isAuthorizationCheckEnabled = false;
 
@@ -43,10 +44,10 @@ public class AuthorizationCheck implements Serializable {
    * If true authorization check is performed.
    */
   protected boolean shouldPerformAuthorizatioCheck = false;
-  
+
   /**
-   * Indicates if the revoke authorization checks are enabled or not.
-   * The authorization checks without checking revoke permissions are much more faster.
+   * Indicates if the revoke authorization checks are enabled or not. The authorization checks
+   * without checking revoke permissions are much more faster.
    */
   protected boolean isRevokeAuthorizationCheckEnabled = false;
 
@@ -56,8 +57,9 @@ public class AuthorizationCheck implements Serializable {
   /** the ids of the groups to check permissions for */
   protected List<String> authGroupIds = new ArrayList<String>();
 
-  /** the default permissions to use if no matching authorization
-   * can be found.*/
+  /**
+   * the default permissions to use if no matching authorization can be found.
+   */
   protected int authDefaultPerm = Permissions.ALL.getValue();
 
   protected CompositePermissionCheck permissionChecks = new CompositePermissionCheck();
@@ -65,13 +67,14 @@ public class AuthorizationCheck implements Serializable {
   public AuthorizationCheck() {
   }
 
-  public AuthorizationCheck(String authUserId, List<String> authGroupIds, CompositePermissionCheck permissionCheck, boolean isRevokeAuthorizationCheckEnabled) {
+  public AuthorizationCheck(String authUserId, List<String> authGroupIds,
+      CompositePermissionCheck permissionCheck, boolean isRevokeAuthorizationCheckEnabled) {
     this.authUserId = authUserId;
     this.authGroupIds = authGroupIds;
     this.permissionChecks = permissionCheck;
-    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;    
+    this.isRevokeAuthorizationCheckEnabled = isRevokeAuthorizationCheckEnabled;
   }
-  
+
   // getters / setters /////////////////////////////////////////
 
   public boolean isAuthorizationCheckEnabled() {
@@ -100,7 +103,8 @@ public class AuthorizationCheck implements Serializable {
   }
 
   protected boolean isPermissionChecksEmpty() {
-    return permissionChecks.getAtomicChecks().isEmpty() && permissionChecks.getCompositeChecks().isEmpty();
+    return permissionChecks.getAtomicChecks().isEmpty()
+        && permissionChecks.getCompositeChecks().isEmpty();
   }
 
   public String getAuthUserId() {
@@ -144,7 +148,7 @@ public class AuthorizationCheck implements Serializable {
   public void setPermissionChecks(CompositePermissionCheck permissionChecks) {
     this.permissionChecks = permissionChecks;
   }
-  
+
   public boolean isRevokeAuthorizationCheckEnabled() {
     return isRevokeAuthorizationCheckEnabled;
   }

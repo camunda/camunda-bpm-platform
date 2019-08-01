@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
 /**
  * Represents a variable value used in queries.
  *
@@ -37,7 +36,7 @@ public class QueryVariableValue implements Serializable {
   protected boolean local;
 
   protected AbstractQueryVariableValueCondition valueCondition;
-  
+
   protected boolean variableNameIgnoreCase;
   protected boolean variableValueIgnoreCase;
 
@@ -45,7 +44,8 @@ public class QueryVariableValue implements Serializable {
     this(name, value, operator, local, false, false);
   }
 
-  public QueryVariableValue(String name, Object value, QueryOperator operator, boolean local, boolean variableNameIgnoreCase, boolean variableValueIgnoreCase) {
+  public QueryVariableValue(String name, Object value, QueryOperator operator, boolean local,
+      boolean variableNameIgnoreCase, boolean variableValueIgnoreCase) {
     this.name = name;
     this.value = Variables.untypedValue(value);
     this.operator = operator;
@@ -73,7 +73,7 @@ public class QueryVariableValue implements Serializable {
   }
 
   public QueryOperator getOperator() {
-    if(operator != null) {
+    if (operator != null) {
       return operator;
     }
     return QueryOperator.EQUALS;
@@ -94,7 +94,6 @@ public class QueryVariableValue implements Serializable {
   public boolean isLocal() {
     return local;
   }
-  
 
   public boolean isVariableNameIgnoreCase() {
     return variableNameIgnoreCase;

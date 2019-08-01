@@ -37,10 +37,7 @@ public class ScriptExecutionListener implements ExecutionListener {
 
   public void notify(DelegateExecution execution) throws Exception {
     ScriptInvocation invocation = new ScriptInvocation(script, execution);
-    Context
-      .getProcessEngineConfiguration()
-      .getDelegateInterceptor()
-      .handleInvocation(invocation);
+    Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
   }
 
   public ExecutableScript getScript() {

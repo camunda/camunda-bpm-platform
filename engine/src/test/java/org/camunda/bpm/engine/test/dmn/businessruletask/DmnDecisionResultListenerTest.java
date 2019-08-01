@@ -39,14 +39,14 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
 
   protected DmnDecisionResult results;
 
-  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION })
   public void testNoOutput() {
     startTestProcess("no output");
 
     assertTrue("The decision result 'ruleResult' should be empty", results.isEmpty());
   }
 
-  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION })
   public void testEmptyOutput() {
     startTestProcess("empty output");
 
@@ -56,7 +56,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
     assertNull(decisionOutput.getFirstEntry());
   }
 
-  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION })
   public void testEmptyMap() {
     startTestProcess("empty map");
 
@@ -67,7 +67,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION })
   public void testSingleEntry() {
     startTestProcess("single entry");
 
@@ -76,7 +76,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
     assertEquals(Variables.stringValue("foo"), firstOutput.getFirstEntryTyped());
   }
 
-  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION })
   public void testMultipleEntries() {
     startTestProcess("multiple entries");
 
@@ -88,7 +88,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
     assertEquals(Variables.stringValue("bar"), firstOutput.getEntryTyped("result2"));
   }
 
-  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION })
   public void testSingleEntryList() {
     startTestProcess("single entry list");
 
@@ -100,7 +100,7 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
     }
   }
 
-  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION })
   public void testMultipleEntriesList() {
     startTestProcess("multiple entries list");
 
@@ -157,9 +157,11 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
   }
 
   protected ProcessInstance startTestProcess(String input) {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("input", input));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess",
+        Collections.<String, Object> singletonMap("input", input));
 
-    // get the result from an execution listener that is invoked at the end of the business rule activity
+    // get the result from an execution listener that is invoked at the end of the business rule
+    // activity
     results = DecisionResultTestListener.getDecisionResult();
     assertNotNull(results);
 

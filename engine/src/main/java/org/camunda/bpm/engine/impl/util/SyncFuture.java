@@ -29,15 +29,15 @@ public class SyncFuture<V> implements Future<V> {
 
   private V result;
   private Throwable e;
-  
+
   public SyncFuture(V result) {
     this.result = result;
   }
-  
+
   public SyncFuture(Throwable e) {
     this.e = e;
   }
-  
+
   public boolean cancel(boolean mayInterruptIfRunning) {
     return false;
   }
@@ -51,14 +51,15 @@ public class SyncFuture<V> implements Future<V> {
   }
 
   public V get() throws InterruptedException, ExecutionException {
-    if(e==null) {
+    if (e == null) {
       return result;
-    } else { 
-      throw new ExecutionException(e); 
+    } else {
+      throw new ExecutionException(e);
     }
   }
 
-  public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+  public V get(long timeout, TimeUnit unit)
+      throws InterruptedException, ExecutionException, TimeoutException {
     return get();
   }
 

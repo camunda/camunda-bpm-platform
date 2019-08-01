@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonObject;
 
-public class DeleteHistoricDecisionInstanceBatchConfigurationJsonConverter extends JsonObjectConverter<BatchConfiguration> {
+public class DeleteHistoricDecisionInstanceBatchConfigurationJsonConverter
+    extends JsonObjectConverter<BatchConfiguration> {
 
   public static final DeleteHistoricDecisionInstanceBatchConfigurationJsonConverter INSTANCE = new DeleteHistoricDecisionInstanceBatchConfigurationJsonConverter();
 

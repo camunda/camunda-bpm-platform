@@ -37,11 +37,9 @@ public class ScriptCaseVariableListener implements CaseVariableListener {
   public void notify(DelegateCaseVariableInstance variableInstance) throws Exception {
     DelegateCaseVariableInstanceImpl variableInstanceImpl = (DelegateCaseVariableInstanceImpl) variableInstance;
 
-    ScriptInvocation invocation = new ScriptInvocation(script, variableInstanceImpl.getScopeExecution());
-    Context
-      .getProcessEngineConfiguration()
-      .getDelegateInterceptor()
-      .handleInvocation(invocation);
+    ScriptInvocation invocation = new ScriptInvocation(script,
+        variableInstanceImpl.getScopeExecution());
+    Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
   }
 
   public ExecutableScript getScript() {

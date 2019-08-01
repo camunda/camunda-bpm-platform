@@ -39,7 +39,9 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
- * <p>A simple Service Container that delegates to the JVM's {@link MBeanServer}.</p>
+ * <p>
+ * A simple Service Container that delegates to the JVM's {@link MBeanServer}.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -57,7 +59,8 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
 
   public final static String SERVICE_NAME_EXECUTOR = "executor-service";
 
-  public synchronized <S> void startService(ServiceType serviceType, String localName, PlatformService<S> service) {
+  public synchronized <S> void startService(ServiceType serviceType, String localName,
+      PlatformService<S> service) {
 
     String serviceName = composeLocalName(serviceType, localName);
     startService(serviceName, service);
@@ -69,7 +72,8 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
     ObjectName serviceName = getObjectName(name);
 
     if (getService(serviceName) != null) {
-      throw new ProcessEngineException("Cannot register service " + serviceName + " with MBeans Container, service with same name already registered.");
+      throw new ProcessEngineException("Cannot register service " + serviceName
+          + " with MBeans Container, service with same name already registered.");
     }
 
     final MBeanServer beanServer = getmBeanServer();
@@ -85,8 +89,7 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
         currentOperationContext.peek().serviceAdded(name);
       }
 
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.cannotRegisterService(serviceName, e);
     }
   }
@@ -94,8 +97,7 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
   public static ObjectName getObjectName(String serviceName) {
     try {
       return new ObjectName(serviceName);
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       throw LOG.cannotComposeNameFor(serviceName, e);
     }
   }
@@ -118,7 +120,8 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
 
     final PlatformService<Object> service = getService(serviceName);
 
-    ensureNotNull("Cannot stop service " + serviceName + ": no such service registered", "service", service);
+    ensureNotNull("Cannot stop service " + serviceName + ": no such service registered", "service",
+        service);
 
     try {
       // call the service-provided stop behavior
@@ -128,8 +131,7 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
       try {
         mBeanServer.unregisterMBean(serviceName);
         servicesByName.remove(serviceName);
-      }
-      catch (Throwable t) {
+      } catch (Throwable t) {
         throw LOG.exceptionWhileUnregisteringService(serviceName.getCanonicalName(), t);
       }
     }
@@ -141,7 +143,8 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
   }
 
   public DeploymentOperationBuilder createUndeploymentOperation(String name) {
-    DeploymentOperationBuilder builder = new DeploymentOperation.DeploymentOperationBuilder(this, name);
+    DeploymentOperationBuilder builder = new DeploymentOperation.DeploymentOperationBuilder(this,
+        name);
     builder.setUndeploymentOperation();
     return builder;
   }
@@ -149,7 +152,7 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
   public void executeDeploymentOperation(DeploymentOperation operation) {
 
     Stack<DeploymentOperation> currentOperationContext = activeDeploymentOperations.get();
-    if(currentOperationContext == null) {
+    if (currentOperationContext == null) {
       currentOperationContext = new Stack<DeploymentOperation>();
       activeDeploymentOperations.set(currentOperationContext);
     }
@@ -158,10 +161,9 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
       currentOperationContext.push(operation);
       // execute the operation
       operation.execute();
-    }
-    finally {
+    } finally {
       currentOperationContext.pop();
-      if(currentOperationContext.isEmpty()) {
+      if (currentOperationContext.isEmpty()) {
         activeDeploymentOperations.remove();
       }
     }
@@ -187,23 +189,20 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
   }
 
   /**
-   * get the service value for a specific service by name or null if no such
-   * Service exists.
+   * get the service value for a specific service by name or null if no such Service exists.
    *
    */
   public <S> S getServiceValue(ObjectName name) {
     PlatformService<S> service = getService(name);
-    if(service != null) {
+    if (service != null) {
       return service.getValue();
-    }
-    else {
+    } else {
       return null;
     }
   }
 
   /**
-   * get the service value for a specific service by name or null if no such
-   * Service exists.
+   * get the service value for a specific service by name or null if no such Service exists.
    *
    */
   public <S> S getServiceValue(ServiceType type, String localName) {
@@ -236,7 +235,7 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
     String typeName = composeLocalName(type, "*");
     ObjectName typeObjectName = getObjectName(typeName);
     Set<ObjectName> resultNames = getmBeanServer().queryNames(typeObjectName, null);
-    Set<String> result= new HashSet<String>();
+    Set<String> result = new HashSet<String>();
     for (ObjectName objectName : resultNames) {
       result.add(objectName.toString());
     }
@@ -254,7 +253,8 @@ public class MBeanServiceContainer implements PlatformServiceContainer {
 
     List<S> res = new ArrayList<S>();
     for (String serviceName : serviceNames) {
-      PlatformService<S> BpmPlatformService = (PlatformService<S>) servicesByName.get(getObjectName(serviceName));
+      PlatformService<S> BpmPlatformService = (PlatformService<S>) servicesByName
+          .get(getObjectName(serviceName));
       if (BpmPlatformService != null) {
         res.add(BpmPlatformService.getValue());
       }

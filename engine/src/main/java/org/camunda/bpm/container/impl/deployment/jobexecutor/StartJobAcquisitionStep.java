@@ -36,7 +36,9 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.RuntimeContainerJobExecutor;
 
 /**
- * <p>Deployment operation step responsible for starting a JobEexecutor</p>
+ * <p>
+ * Deployment operation step responsible for starting a JobEexecutor
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -53,17 +55,18 @@ public class StartJobAcquisitionStep extends DeploymentOperationStep {
   }
 
   public String getName() {
-    return "Start job acquisition '"+jobAcquisitionXml.getName()+"'";
+    return "Start job acquisition '" + jobAcquisitionXml.getName() + "'";
   }
 
   public void performOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final AbstractProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
+    final AbstractProcessApplication processApplication = operationContext
+        .getAttachment(PROCESS_APPLICATION);
 
     ClassLoader configurationClassloader = null;
 
-    if(processApplication != null) {
+    if (processApplication != null) {
       configurationClassloader = processApplication.getProcessApplicationClassloader();
     } else {
       configurationClassloader = ProcessEngineConfiguration.class.getClassLoader();
@@ -71,12 +74,13 @@ public class StartJobAcquisitionStep extends DeploymentOperationStep {
 
     String configurationClassName = jobAcquisitionXml.getJobExecutorClassName();
 
-    if(configurationClassName == null || configurationClassName.isEmpty()) {
+    if (configurationClassName == null || configurationClassName.isEmpty()) {
       configurationClassName = RuntimeContainerJobExecutor.class.getName();
     }
 
     // create & instantiate the job executor class
-    Class<? extends JobExecutor> jobExecutorClass = loadJobExecutorClass(configurationClassloader, configurationClassName);
+    Class<? extends JobExecutor> jobExecutorClass = loadJobExecutorClass(configurationClassloader,
+        configurationClassName);
     JobExecutor jobExecutor = instantiateJobExecutor(jobExecutorClass);
 
     // apply properties
@@ -87,25 +91,25 @@ public class StartJobAcquisitionStep extends DeploymentOperationStep {
     JmxManagedJobExecutor jmxManagedJobExecutor = new JmxManagedJobExecutor(jobExecutor);
 
     // deploy the job executor service into the container
-    serviceContainer.startService(ServiceTypes.JOB_EXECUTOR, jobAcquisitionXml.getName(), jmxManagedJobExecutor);
+    serviceContainer.startService(ServiceTypes.JOB_EXECUTOR, jobAcquisitionXml.getName(),
+        jmxManagedJobExecutor);
   }
-
 
   protected JobExecutor instantiateJobExecutor(Class<? extends JobExecutor> configurationClass) {
     try {
       return configurationClass.newInstance();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.couldNotInstantiateJobExecutorClass(e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  protected Class<? extends JobExecutor> loadJobExecutorClass(ClassLoader processApplicationClassloader, String jobExecutorClassname) {
+  protected Class<? extends JobExecutor> loadJobExecutorClass(
+      ClassLoader processApplicationClassloader, String jobExecutorClassname) {
     try {
-      return (Class<? extends JobExecutor>) processApplicationClassloader.loadClass(jobExecutorClassname);
-    }
-    catch (ClassNotFoundException e) {
+      return (Class<? extends JobExecutor>) processApplicationClassloader
+          .loadClass(jobExecutorClassname);
+    } catch (ClassNotFoundException e) {
       throw LOG.couldNotLoadJobExecutorClass(e);
     }
   }

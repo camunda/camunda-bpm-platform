@@ -57,7 +57,8 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
     String id = element.getId();
     Collection<OnPart> onParts = element.getOnParts();
     IfPart ifPart = element.getIfPart();
-    List<CamundaVariableOnPart> variableOnParts = queryExtensionElementsByClass(element, CamundaVariableOnPart.class);
+    List<CamundaVariableOnPart> variableOnParts = queryExtensionElementsByClass(element,
+        CamundaVariableOnPart.class);
 
     if ((ifPart == null || ifPart.getConditions().isEmpty()) && variableOnParts.isEmpty()) {
 
@@ -91,7 +92,7 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
 
     // the variableOnParts will be initialized immediately as it does not have any dependency
     initializeVariableOnParts(element, sentryDeclaration, context, variableOnParts);
-    
+
     // ...whereas the onParts will be initialized later because the
     // the reference to the plan items (sourceRef) and the reference
     // to the sentry (sentryRef) cannot be set in this step. To set
@@ -118,7 +119,8 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
     }
   }
 
-  protected void initializeOnPart(PlanItemOnPart onPart, Sentry sentry, CmmnHandlerContext context) {
+  protected void initializeOnPart(PlanItemOnPart onPart, Sentry sentry,
+      CmmnHandlerContext context) {
     CmmnActivity parent = context.getParent();
     String sentryId = sentry.getId();
     CmmnSentryDeclaration sentryDeclaration = parent.getSentry(sentryId);
@@ -156,13 +158,15 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
 
   }
 
-  protected void initializeOnPart(CaseFileItemOnPart onPart, Sentry sentry, CmmnHandlerContext context) {
+  protected void initializeOnPart(CaseFileItemOnPart onPart, Sentry sentry,
+      CmmnHandlerContext context) {
     // not yet implemented
     String id = sentry.getId();
     LOG.ignoredUnsupportedAttribute("onPart", "CaseFileItem", id);
   }
 
-  protected void initializeIfPart(IfPart ifPart, CmmnSentryDeclaration sentryDeclaration, CmmnHandlerContext context) {
+  protected void initializeIfPart(IfPart ifPart, CmmnSentryDeclaration sentryDeclaration,
+      CmmnHandlerContext context) {
     if (ifPart == null) {
       return;
     }
@@ -183,21 +187,23 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
     sentryDeclaration.setIfPart(ifPartDeclaration);
   }
 
-  protected void initializeVariableOnParts(CmmnElement element, CmmnSentryDeclaration sentryDeclaration, 
-    CmmnHandlerContext context, List<CamundaVariableOnPart> variableOnParts) {
-    for(CamundaVariableOnPart variableOnPart: variableOnParts) {
+  protected void initializeVariableOnParts(CmmnElement element,
+      CmmnSentryDeclaration sentryDeclaration, CmmnHandlerContext context,
+      List<CamundaVariableOnPart> variableOnParts) {
+    for (CamundaVariableOnPart variableOnPart : variableOnParts) {
       initializeVariableOnPart(variableOnPart, sentryDeclaration, context);
     }
   }
 
-  protected void initializeVariableOnPart(CamundaVariableOnPart variableOnPart, CmmnSentryDeclaration sentryDeclaration, CmmnHandlerContext context) {
+  protected void initializeVariableOnPart(CamundaVariableOnPart variableOnPart,
+      CmmnSentryDeclaration sentryDeclaration, CmmnHandlerContext context) {
     VariableTransition variableTransition;
 
     try {
       variableTransition = variableOnPart.getVariableEvent();
-    } catch(IllegalArgumentException illegalArgumentexception) {
+    } catch (IllegalArgumentException illegalArgumentexception) {
       throw LOG.nonMatchingVariableEvents(sentryDeclaration.getId());
-    } catch(NullPointerException nullPointerException) {
+    } catch (NullPointerException nullPointerException) {
       throw LOG.nonMatchingVariableEvents(sentryDeclaration.getId());
     }
 
@@ -210,13 +216,14 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
         variableOnPartDeclaration.setVariableEvent(variableEventName);
         variableOnPartDeclaration.setVariableName(variableName);
         sentryDeclaration.addVariableOnParts(variableOnPartDeclaration);
-      } 
+      }
     } else {
       throw LOG.emptyVariableName(sentryDeclaration.getId());
     }
   }
 
-  protected <V extends ModelElementInstance> List<V> queryExtensionElementsByClass(CmmnElement element, Class<V> cls) {
+  protected <V extends ModelElementInstance> List<V> queryExtensionElementsByClass(
+      CmmnElement element, Class<V> cls) {
     ExtensionElements extensionElements = element.getExtensionElements();
 
     if (extensionElements != null) {

@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -53,14 +52,15 @@ public class DelegateTaskCmd implements Command<Object>, Serializable {
     checkDelegateTask(task, commandContext);
 
     task.delegate(userId);
-    
+
     task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_DELEGATE);
 
     return null;
   }
 
   protected void checkDelegateTask(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkTaskAssign(task);
     }
   }

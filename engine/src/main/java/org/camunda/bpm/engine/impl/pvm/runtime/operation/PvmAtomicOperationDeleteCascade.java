@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -49,7 +48,8 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
         if (deleteRoot.isSkipSubprocesses()) {
           subProcessInstance.setSuperExecution(null);
         } else {
-          subProcessInstance.deleteCascade(execution.getDeleteReason(), nextLeaf.isSkipCustomListeners(), nextLeaf.isSkipIoMappings());
+          subProcessInstance.deleteCascade(execution.getDeleteReason(),
+              nextLeaf.isSkipCustomListeners(), nextLeaf.isSkipIoMappings());
         }
       }
 
@@ -67,9 +67,9 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
   }
 
   protected PvmExecutionImpl getDeleteRoot(PvmExecutionImpl execution) {
-    if(execution == null) {
+    if (execution == null) {
       return null;
-    } else if(execution.isDeleteRoot()) {
+    } else if (execution.isDeleteRoot()) {
       return execution;
     } else {
       return getDeleteRoot(execution.getParent());

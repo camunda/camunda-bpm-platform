@@ -42,7 +42,9 @@ import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 
 /**
- * <p>This deployment operation step starts an {@link MBeanService} for the process application.</p>
+ * <p>
+ * This deployment operation step starts an {@link MBeanService} for the process application.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -55,25 +57,32 @@ public class StartProcessApplicationServiceStep extends DeploymentOperationStep 
 
   public void performOperationStep(DeploymentOperation operationContext) {
 
-    final AbstractProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
-    final Map<URL, ProcessesXml> processesXmls = operationContext.getAttachment(PROCESSES_XML_RESOURCES);
-    final Map<String, DeployedProcessArchive> processArchiveDeploymentMap = operationContext.getAttachment(PROCESS_ARCHIVE_DEPLOYMENT_MAP);
+    final AbstractProcessApplication processApplication = operationContext
+        .getAttachment(PROCESS_APPLICATION);
+    final Map<URL, ProcessesXml> processesXmls = operationContext
+        .getAttachment(PROCESSES_XML_RESOURCES);
+    final Map<String, DeployedProcessArchive> processArchiveDeploymentMap = operationContext
+        .getAttachment(PROCESS_ARCHIVE_DEPLOYMENT_MAP);
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
 
-    ProcessApplicationInfoImpl processApplicationInfo = createProcessApplicationInfo(processApplication, processArchiveDeploymentMap);
+    ProcessApplicationInfoImpl processApplicationInfo = createProcessApplicationInfo(
+        processApplication, processArchiveDeploymentMap);
 
     // create service
-    JmxManagedProcessApplication mbean = new JmxManagedProcessApplication(processApplicationInfo, processApplication.getReference());
+    JmxManagedProcessApplication mbean = new JmxManagedProcessApplication(processApplicationInfo,
+        processApplication.getReference());
     mbean.setProcessesXmls(new ArrayList<ProcessesXml>(processesXmls.values()));
     mbean.setDeploymentMap(processArchiveDeploymentMap);
 
     // start service
-    serviceContainer.startService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName(), mbean);
+    serviceContainer.startService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName(),
+        mbean);
 
     notifyBpmPlatformPlugins(serviceContainer, processApplication);
   }
 
-  protected ProcessApplicationInfoImpl createProcessApplicationInfo(final AbstractProcessApplication processApplication,
+  protected ProcessApplicationInfoImpl createProcessApplicationInfo(
+      final AbstractProcessApplication processApplication,
       final Map<String, DeployedProcessArchive> processArchiveDeploymentMap) {
     // populate process application info
     ProcessApplicationInfoImpl processApplicationInfo = new ProcessApplicationInfoImpl();
@@ -83,8 +92,9 @@ public class StartProcessApplicationServiceStep extends DeploymentOperationStep 
 
     // create deployment infos
     List<ProcessApplicationDeploymentInfo> deploymentInfoList = new ArrayList<ProcessApplicationDeploymentInfo>();
-    if(processArchiveDeploymentMap != null) {
-      for (Entry<String, DeployedProcessArchive> deployment : processArchiveDeploymentMap.entrySet()) {
+    if (processArchiveDeploymentMap != null) {
+      for (Entry<String, DeployedProcessArchive> deployment : processArchiveDeploymentMap
+          .entrySet()) {
 
         final DeployedProcessArchive deployedProcessArchive = deployment.getValue();
         for (String deploymentId : deployedProcessArchive.getAllDeploymentIds()) {
@@ -102,12 +112,13 @@ public class StartProcessApplicationServiceStep extends DeploymentOperationStep 
     return processApplicationInfo;
   }
 
-  protected void notifyBpmPlatformPlugins(PlatformServiceContainer serviceContainer, AbstractProcessApplication processApplication) {
-    JmxManagedBpmPlatformPlugins plugins =
-        serviceContainer.getService(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_PLATFORM_PLUGINS);
+  protected void notifyBpmPlatformPlugins(PlatformServiceContainer serviceContainer,
+      AbstractProcessApplication processApplication) {
+    JmxManagedBpmPlatformPlugins plugins = serviceContainer.getService(ServiceTypes.BPM_PLATFORM,
+        RuntimeContainerDelegateImpl.SERVICE_NAME_PLATFORM_PLUGINS);
 
     if (plugins != null) {
-      for (BpmPlatformPlugin  plugin : plugins.getValue().getPlugins()) {
+      for (BpmPlatformPlugin plugin : plugins.getValue().getPlugins()) {
         plugin.postProcessApplicationDeploy(processApplication);
       }
     }

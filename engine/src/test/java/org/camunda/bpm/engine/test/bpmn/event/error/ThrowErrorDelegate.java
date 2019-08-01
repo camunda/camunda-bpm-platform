@@ -34,7 +34,8 @@ public class ThrowErrorDelegate extends AbstractBpmnActivityBehavior implements 
   }
 
   @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
     handle(execution, "signaled");
   }
 
@@ -43,11 +44,9 @@ public class ThrowErrorDelegate extends AbstractBpmnActivityBehavior implements 
     String type = (String) execution.getVariable("type");
     if ("error".equalsIgnoreCase(type)) {
       throw new BpmnError("MyError");
-    }
-    else if ("exception".equalsIgnoreCase(type)) {
+    } else if ("exception".equalsIgnoreCase(type)) {
       throw new MyBusinessException("MyException");
-    }
-    else if ("leave".equalsIgnoreCase(type)) {
+    } else if ("leave".equalsIgnoreCase(type)) {
       execution.setVariable("type", null);
       leave(execution);
     }

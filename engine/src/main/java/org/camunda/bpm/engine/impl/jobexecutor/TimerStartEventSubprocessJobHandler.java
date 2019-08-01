@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
- * {@link JobHandler} implementation for timer start events which are embedded into an event subprocess.
+ * {@link JobHandler} implementation for timer start events which are embedded into an event
+ * subprocess.
  *
  * The configuration is the id of the start event activity.
  *
@@ -38,16 +39,19 @@ public class TimerStartEventSubprocessJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
     String activityId = configuration.getTimerElementKey();
     ActivityImpl eventSubprocessActivity = execution.getProcessDefinition()
-      .findActivity(activityId);
+        .findActivity(activityId);
 
-    if(eventSubprocessActivity != null) {
+    if (eventSubprocessActivity != null) {
       execution.executeEventHandlerActivity(eventSubprocessActivity);
 
     } else {
-      throw new ProcessEngineException("Error while triggering event subprocess using timer start event: cannot find activity with id '"+configuration+"'.");
+      throw new ProcessEngineException(
+          "Error while triggering event subprocess using timer start event: cannot find activity with id '"
+              + configuration + "'.");
     }
 
   }

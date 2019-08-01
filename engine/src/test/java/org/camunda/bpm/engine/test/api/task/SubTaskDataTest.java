@@ -52,15 +52,17 @@ public class SubTaskDataTest {
   @Test
   @Deployment
   public void testSubTaskData() {
-    //given simple process with user task
+    // given simple process with user task
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subTaskTest");
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     // when set variable to user task
     taskService.setVariable(task.getId(), "testVariable", "testValue");
 
     // then variable is set in the scope of execution
-    Assert.assertEquals("testValue", runtimeService.getVariable(task.getExecutionId(), "testVariable"));
+    Assert.assertEquals("testValue",
+        runtimeService.getVariable(task.getExecutionId(), "testVariable"));
 
     // when sub task is created create subtask for user task
     Task subTask = taskService.newTask("123456789");
@@ -71,7 +73,8 @@ public class SubTaskDataTest {
     // and variable is update
     taskService.setVariable(subTask.getId(), "testVariable", "newTestValue");
 
-    //then variable is also updated in the scope execution
-    Assert.assertEquals("newTestValue", runtimeService.getVariable(task.getExecutionId(), "testVariable"));
+    // then variable is also updated in the scope execution
+    Assert.assertEquals("newTestValue",
+        runtimeService.getVariable(task.getExecutionId(), "testVariable"));
   }
 }

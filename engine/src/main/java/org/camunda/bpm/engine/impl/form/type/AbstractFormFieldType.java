@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.form.type;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer

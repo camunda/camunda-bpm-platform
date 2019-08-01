@@ -80,15 +80,16 @@ public class MigrationTimerBoundryEventTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
     managementService.executeJob(job.getId());
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -107,15 +108,16 @@ public class MigrationTimerBoundryEventTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
     managementService.executeJob(job.getId());
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -135,11 +137,12 @@ public class MigrationTimerBoundryEventTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -155,31 +158,25 @@ public class MigrationTimerBoundryEventTest {
   public void testMigrationTwoNonInterruptingTimerEvents() {
     // given
     Date futureDueDate = DateUtils.addYears(ClockUtil.getCurrentTime(), 1);
-    BpmnModelInstance model = Bpmn.createExecutableProcess()
-        .startEvent("startEvent")
-        .userTask("userTask").name("User Task")
-        .boundaryEvent("timerPast")
-          .cancelActivity(false)
-          .timerWithDate(DUE_DATE_IN_THE_PAST)
-        .userTask("past")
-        .moveToActivity("userTask")
-          .boundaryEvent("timerFuture")
-          .cancelActivity(false)
-          .timerWithDate(sdf.format(futureDueDate))
-        .userTask("future")
-        .done();
+    BpmnModelInstance model = Bpmn.createExecutableProcess().startEvent("startEvent")
+        .userTask("userTask").name("User Task").boundaryEvent("timerPast").cancelActivity(false)
+        .timerWithDate(DUE_DATE_IN_THE_PAST).userTask("past").moveToActivity("userTask")
+        .boundaryEvent("timerFuture").cancelActivity(false).timerWithDate(sdf.format(futureDueDate))
+        .userTask("future").done();
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    Job job = managementService.createJobQuery().duedateLowerThan(ClockUtil.getCurrentTime()).singleResult();
+    Job job = managementService.createJobQuery().duedateLowerThan(ClockUtil.getCurrentTime())
+        .singleResult();
     assertNotNull(job);
     managementService.executeJob(job.getId());
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -187,7 +184,8 @@ public class MigrationTimerBoundryEventTest {
     // then
     List<Job> list = managementService.createJobQuery().list();
     assertEquals(1, list.size());
-    assertEquals(1, managementService.createJobQuery().duedateHigherThan(ClockUtil.getCurrentTime()).count());
+    assertEquals(1,
+        managementService.createJobQuery().duedateHigherThan(ClockUtil.getCurrentTime()).count());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("past").count());
     assertEquals(0, taskService.createTaskQuery().taskDefinitionKey("future").count());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
@@ -196,21 +194,18 @@ public class MigrationTimerBoundryEventTest {
   @Test
   public void testMigrationWithTargetNonInterruptingTimerEvent() {
     // given
-    BpmnModelInstance sourceModel = Bpmn.createExecutableProcess()
-        .startEvent("startEvent")
-        .userTask("userTask").name("User Task")
-        .userTask("afterTimer")
-        .endEvent("endEvent")
-        .done();
+    BpmnModelInstance sourceModel = Bpmn.createExecutableProcess().startEvent("startEvent")
+        .userTask("userTask").name("User Task").userTask("afterTimer").endEvent("endEvent").done();
     BpmnModelInstance targetModel = createModel(false, DUE_DATE_IN_THE_PAST);
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceModel);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetModel);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -225,24 +220,21 @@ public class MigrationTimerBoundryEventTest {
   public void testMigrationWithSourceNonInterruptingTimerEvent() {
     // given
     BpmnModelInstance sourceModel = createModel(false, DUE_DATE_IN_THE_PAST);
-    BpmnModelInstance targetModel = Bpmn.createExecutableProcess()
-        .startEvent("startEvent")
-        .userTask("userTask").name("User Task")
-        .userTask("afterTimer")
-        .endEvent("endEvent")
-        .done();
+    BpmnModelInstance targetModel = Bpmn.createExecutableProcess().startEvent("startEvent")
+        .userTask("userTask").name("User Task").userTask("afterTimer").endEvent("endEvent").done();
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceModel);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetModel);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
     managementService.executeJob(job.getId());
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -258,47 +250,35 @@ public class MigrationTimerBoundryEventTest {
   public void testMigrationTwoToOneNonInterruptingTimerEvents() {
     // given
     Date futureDueDate = DateUtils.addYears(ClockUtil.getCurrentTime(), 1);
-    BpmnModelInstance sourceModel = Bpmn.createExecutableProcess()
-        .startEvent("startEvent")
-        .userTask("userTask").name("User Task")
-        .boundaryEvent("timerPast")
-          .cancelActivity(false)
-          .timerWithDate(DUE_DATE_IN_THE_PAST)
-        .userTask("past")
-        .moveToActivity("userTask")
-          .boundaryEvent("timerFuture")
-          .cancelActivity(false)
-          .timerWithDate(sdf.format(futureDueDate))
-        .userTask("future")
-        .done();
-    BpmnModelInstance targetModel = Bpmn.createExecutableProcess()
-        .startEvent("startEvent")
-        .userTask("userTask").name("User Task")
-          .boundaryEvent("timerFuture")
-          .cancelActivity(false)
-          .timerWithDate(sdf.format(futureDueDate))
-        .userTask("future")
-        .done();
+    BpmnModelInstance sourceModel = Bpmn.createExecutableProcess().startEvent("startEvent")
+        .userTask("userTask").name("User Task").boundaryEvent("timerPast").cancelActivity(false)
+        .timerWithDate(DUE_DATE_IN_THE_PAST).userTask("past").moveToActivity("userTask")
+        .boundaryEvent("timerFuture").cancelActivity(false).timerWithDate(sdf.format(futureDueDate))
+        .userTask("future").done();
+    BpmnModelInstance targetModel = Bpmn.createExecutableProcess().startEvent("startEvent")
+        .userTask("userTask").name("User Task").boundaryEvent("timerFuture").cancelActivity(false)
+        .timerWithDate(sdf.format(futureDueDate)).userTask("future").done();
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceModel);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetModel);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     Job job = managementService.createJobQuery().activityId("timerPast").singleResult();
     assertNotNull(job);
     managementService.executeJob(job.getId());
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .mapActivities("timerPast", "timerFuture")
-        .mapActivities("past", "future")
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().mapActivities("timerPast", "timerFuture")
+        .mapActivities("past", "future").build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    List<Job> list = managementService.createJobQuery().duedateHigherThan(ClockUtil.getCurrentTime()).list();
+    List<Job> list = managementService.createJobQuery()
+        .duedateHigherThan(ClockUtil.getCurrentTime()).list();
     assertEquals(1, list.size());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("userTask").count());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("future").count());
@@ -308,28 +288,22 @@ public class MigrationTimerBoundryEventTest {
   public void testMigrationNonInterruptingTimerEventDifferentActivityId() {
     // given
     BpmnModelInstance sourceModel = createModel(false, DUE_DATE_IN_THE_PAST);
-    BpmnModelInstance targetModel = Bpmn.createExecutableProcess()
-        .startEvent("startEvent")
-        .userTask("userTask").name("User Task")
-        .boundaryEvent("timer2")
-          .cancelActivity(false)
-          .timerWithDate(DUE_DATE_IN_THE_PAST)
-        .userTask("afterTimer")
-        .endEvent("endEvent")
-        .done();
+    BpmnModelInstance targetModel = Bpmn.createExecutableProcess().startEvent("startEvent")
+        .userTask("userTask").name("User Task").boundaryEvent("timer2").cancelActivity(false)
+        .timerWithDate(DUE_DATE_IN_THE_PAST).userTask("afterTimer").endEvent("endEvent").done();
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceModel);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetModel);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
     managementService.executeJob(job.getId());
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .mapActivities("timer", "timer2")
-      .build();
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().mapActivities("timer", "timer2").build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
@@ -342,15 +316,10 @@ public class MigrationTimerBoundryEventTest {
   }
 
   protected BpmnModelInstance createModel(boolean isCancelActivity, String date) {
-    BpmnModelInstance model = Bpmn.createExecutableProcess()
-        .startEvent("startEvent")
-        .userTask("userTask").name("User Task")
-        .boundaryEvent("timer")
-          .cancelActivity(isCancelActivity)
-          .timerWithDate(date)
-        .userTask("afterTimer")
-        .endEvent("endEvent")
-        .done();
+    BpmnModelInstance model = Bpmn.createExecutableProcess().startEvent("startEvent")
+        .userTask("userTask").name("User Task").boundaryEvent("timer")
+        .cancelActivity(isCancelActivity).timerWithDate(date).userTask("afterTimer")
+        .endEvent("endEvent").done();
     return model;
   }
 }

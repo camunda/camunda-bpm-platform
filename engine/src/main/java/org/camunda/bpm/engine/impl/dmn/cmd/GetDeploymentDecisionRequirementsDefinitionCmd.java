@@ -31,7 +31,8 @@ import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 /**
  * Gives access to a deployed decision requirements definition instance.
  */
-public class GetDeploymentDecisionRequirementsDefinitionCmd implements Command<DecisionRequirementsDefinition>, Serializable {
+public class GetDeploymentDecisionRequirementsDefinitionCmd
+    implements Command<DecisionRequirementsDefinition>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String decisionRequirementsDefinitionId;
@@ -43,9 +44,11 @@ public class GetDeploymentDecisionRequirementsDefinitionCmd implements Command<D
   public DecisionRequirementsDefinition execute(CommandContext commandContext) {
     ensureNotNull("decisionRequirementsDefinitionId", decisionRequirementsDefinitionId);
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-    DecisionRequirementsDefinitionEntity decisionRequirementsDefinition = deploymentCache.findDeployedDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
+    DecisionRequirementsDefinitionEntity decisionRequirementsDefinition = deploymentCache
+        .findDeployedDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadDecisionRequirementsDefinition(decisionRequirementsDefinition);
     }
 

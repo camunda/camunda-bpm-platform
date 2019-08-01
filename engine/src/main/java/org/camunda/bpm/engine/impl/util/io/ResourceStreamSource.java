@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -29,7 +28,7 @@ public class ResourceStreamSource implements StreamSource {
 
   String resource;
   ClassLoader classLoader;
-  
+
   public ResourceStreamSource(String resource) {
     this.resource = resource;
   }
@@ -51,6 +50,6 @@ public class ResourceStreamSource implements StreamSource {
   }
 
   public String toString() {
-    return "Resource["+resource+"]";
+    return "Resource[" + resource + "]";
   }
 }

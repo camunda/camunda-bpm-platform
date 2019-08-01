@@ -22,10 +22,11 @@ import org.camunda.bpm.model.cmmn.instance.Stage;
 import org.camunda.bpm.model.cmmn.instance.Task;
 
 /**
- * Listener interface implemented by user code which wants to be notified
- * when a state transition happens on a {@link CaseExecution}.
+ * Listener interface implemented by user code which wants to be notified when a state transition
+ * happens on a {@link CaseExecution}.
  *
- * <p>The following state transition are supported on a {@link CaseInstance}:
+ * <p>
+ * The following state transition are supported on a {@link CaseInstance}:
  * <ul>
  * <li>{@link #CREATE}</li>
  * <li>{@link #COMPLETE}</li>
@@ -36,9 +37,9 @@ import org.camunda.bpm.model.cmmn.instance.Task;
  * </ul>
  * </p>
  *
- * <p>And on a {@link CaseExecution} which is not a {@link CaseInstance} and which
- * is associated with a {@link Task} or a {@link Stage} the following state transition
- * are supported:
+ * <p>
+ * And on a {@link CaseExecution} which is not a {@link CaseInstance} and which is associated with a
+ * {@link Task} or a {@link Stage} the following state transition are supported:
  * <ul>
  * <li>{@link #CREATE}</li>
  * <li>{@link #ENABLE}</li>

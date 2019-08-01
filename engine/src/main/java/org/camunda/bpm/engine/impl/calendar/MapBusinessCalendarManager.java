@@ -19,19 +19,19 @@ package org.camunda.bpm.engine.impl.calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * @author Tom Baeyens
  */
 public class MapBusinessCalendarManager implements BusinessCalendarManager {
-  
+
   private Map<String, BusinessCalendar> businessCalendars = new HashMap<String, BusinessCalendar>();
 
   public BusinessCalendar getBusinessCalendar(String businessCalendarRef) {
     return businessCalendars.get(businessCalendarRef);
   }
-  
-  public BusinessCalendarManager addBusinessCalendar(String businessCalendarRef, BusinessCalendar businessCalendar) {
+
+  public BusinessCalendarManager addBusinessCalendar(String businessCalendarRef,
+      BusinessCalendar businessCalendar) {
     businessCalendars.put(businessCalendarRef, businessCalendar);
     return this;
   }

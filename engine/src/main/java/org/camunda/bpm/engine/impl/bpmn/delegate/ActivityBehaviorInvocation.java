@@ -30,7 +30,8 @@ public class ActivityBehaviorInvocation extends DelegateInvocation {
 
   protected final ActivityExecution execution;
 
-  public ActivityBehaviorInvocation(ActivityBehavior behaviorInstance, ActivityExecution execution) {
+  public ActivityBehaviorInvocation(ActivityBehavior behaviorInstance,
+      ActivityExecution execution) {
     super(execution, null);
     this.behaviorInstance = behaviorInstance;
     this.execution = execution;

@@ -17,20 +17,24 @@
 package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
 /**
- * Checks that a migration instruction is valid for the
- * migration plan. For example if the instruction migrates
- * an activity to a different type.
+ * Checks that a migration instruction is valid for the migration plan. For example if the
+ * instruction migrates an activity to a different type.
  */
 public interface MigrationInstructionValidator {
 
   /**
-   * Check that a migration instruction is valid for a migration plan. If it is invalid
-   * a failure has to added to the validation report.
+   * Check that a migration instruction is valid for a migration plan. If it is invalid a failure
+   * has to added to the validation report.
    *
-   *  @param instruction the instruction to validate
-   * @param instructions the complete migration plan to validate
-   * @param report the validation report
+   * @param instruction
+   *          the instruction to validate
+   * @param instructions
+   *          the complete migration plan to validate
+   * @param report
+   *          the validation report
    */
-  void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report);
+  void validate(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
+      MigrationInstructionValidationReportImpl report);
 
 }

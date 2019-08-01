@@ -22,8 +22,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * Pass the output variables from the process instance of a subprocess to the
- * calling process instance.
+ * Pass the output variables from the process instance of a subprocess to the calling process
+ * instance.
  *
  * @author Philipp Ossler
  *
@@ -37,7 +37,8 @@ public class OutputVariablesPropagator implements TreeVisitor<ActivityExecution>
 
       PvmExecutionImpl superExecution = (PvmExecutionImpl) execution.getSuperExecution();
       ActivityImpl activity = superExecution.getActivity();
-      SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) activity.getActivityBehavior();
+      SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) activity
+          .getActivityBehavior();
 
       subProcessActivityBehavior.passOutputVariables(superExecution, execution);
     }

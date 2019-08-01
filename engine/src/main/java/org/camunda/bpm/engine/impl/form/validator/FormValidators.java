@@ -28,38 +28,45 @@ import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
 /**
- * <p>Registry for built-in {@link FormFieldValidator} implementations.</p>
+ * <p>
+ * Registry for built-in {@link FormFieldValidator} implementations.
+ * </p>
  *
- * <p>Factory for {@link FormFieldValidator} instances.</p>
+ * <p>
+ * Factory for {@link FormFieldValidator} instances.
+ * </p>
  *
  * @author Daniel Meyer
  *
  */
 public class FormValidators {
 
-  /** the registry of configured validators. Populated through {@link ProcessEngineConfiguration}. */
+  /**
+   * the registry of configured validators. Populated through {@link ProcessEngineConfiguration}.
+   */
   protected Map<String, Class<? extends FormFieldValidator>> validators = new HashMap<String, Class<? extends FormFieldValidator>>();
 
   /**
    * factory method for creating validator instances
    *
    */
-  public FormFieldValidator createValidator(Element constraint, BpmnParse bpmnParse, ExpressionManager expressionManager) {
+  public FormFieldValidator createValidator(Element constraint, BpmnParse bpmnParse,
+      ExpressionManager expressionManager) {
 
     String name = constraint.attribute("name");
     String config = constraint.attribute("config");
 
-    if("validator".equals(name)) {
+    if ("validator".equals(name)) {
 
       // custom validators
 
-      if(config == null || config.isEmpty()) {
-        bpmnParse.addError("validator configuration needs to provide either a fully " +
-        		"qualified classname or an expression resolving to a custom FormFieldValidator implementation.",
-        		constraint);
+      if (config == null || config.isEmpty()) {
+        bpmnParse.addError("validator configuration needs to provide either a fully "
+            + "qualified classname or an expression resolving to a custom FormFieldValidator implementation.",
+            constraint);
 
       } else {
-        if(StringUtil.isExpression(config)) {
+        if (StringUtil.isExpression(config)) {
           // expression
           Expression validatorExpression = expressionManager.createExpression(config);
           return new DelegateFormFieldValidator(validatorExpression);
@@ -74,12 +81,13 @@ public class FormValidators {
       // built-in validators
 
       Class<? extends FormFieldValidator> validator = validators.get(name);
-      if(validator != null) {
+      if (validator != null) {
         FormFieldValidator validatorInstance = createValidatorInstance(validator);
         return validatorInstance;
 
       } else {
-        bpmnParse.addError("Cannot find validator implementation for name '"+name+"'.", constraint);
+        bpmnParse.addError("Cannot find validator implementation for name '" + name + "'.",
+            constraint);
 
       }
 
@@ -87,10 +95,10 @@ public class FormValidators {
 
     return null;
 
-
   }
 
-  protected FormFieldValidator createValidatorInstance(Class<? extends FormFieldValidator> validator) {
+  protected FormFieldValidator createValidatorInstance(
+      Class<? extends FormFieldValidator> validator) {
     try {
       return validator.newInstance();
 

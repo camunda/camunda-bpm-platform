@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  * @author Kristin Polenz
  */
@@ -29,7 +28,8 @@ public class SendTaskTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testJavaDelegate() {
     DummySendTask.wasExecuted = false;
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("sendTaskJavaDelegate");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("sendTaskJavaDelegate");
 
     assertProcessEnded(processInstance.getId());
     assertTrue(DummySendTask.wasExecuted);

@@ -70,17 +70,18 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     return createdIncidents;
   }
 
-  /** Instantiate recursive a new incident a super execution
-   * (i.e. super process instance) which is affected from this
-   * incident.
-   * For example: a super process instance called via CallActivity
-   * a new process instance on which an incident happened, so that
-   * the super process instance has an incident too. */
-  protected void createRecursiveIncidents(String rootCauseIncidentId, List<IncidentEntity> createdIncidents) {
+  /**
+   * Instantiate recursive a new incident a super execution (i.e. super process instance) which is
+   * affected from this incident. For example: a super process instance called via CallActivity a
+   * new process instance on which an incident happened, so that the super process instance has an
+   * incident too.
+   */
+  protected void createRecursiveIncidents(String rootCauseIncidentId,
+      List<IncidentEntity> createdIncidents) {
 
     final ExecutionEntity execution = getExecution();
 
-    if(execution != null) {
+    if (execution != null) {
 
       ExecutionEntity superExecution = execution.getProcessInstance().getSuperExecution();
 
@@ -108,7 +109,8 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     }
   }
 
-  public static IncidentEntity createAndInsertIncident(String incidentType, IncidentContext context, String message) {
+  public static IncidentEntity createAndInsertIncident(String incidentType, IncidentContext context,
+      String message) {
     // create new incident
     IncidentEntity newIncident = create(incidentType);
     newIncident.setIncidentMessage(message);
@@ -122,16 +124,13 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
     if (context.getExecutionId() != null) {
       // fetch execution
-      ExecutionEntity execution = Context
-        .getCommandContext()
-        .getExecutionManager()
-        .findExecutionById(context.getExecutionId());
+      ExecutionEntity execution = Context.getCommandContext().getExecutionManager()
+          .findExecutionById(context.getExecutionId());
 
       if (execution != null) {
         // link incident with execution
         newIncident.setExecution(execution);
-      }
-      else {
+      } else {
         LOG.executionNotFound(context.getExecutionId());
       }
     }
@@ -144,10 +143,8 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   protected static IncidentEntity create(String incidentType) {
 
-    String incidentId = Context.getProcessEngineConfiguration()
-        .getDbSqlSessionFactory()
-        .getIdGenerator()
-        .getNextId();
+    String incidentId = Context.getProcessEngineConfiguration().getDbSqlSessionFactory()
+        .getIdGenerator().getNextId();
 
     // decorate new incident
     IncidentEntity newIncident = new IncidentEntity();
@@ -162,10 +159,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   protected static void insert(IncidentEntity incident) {
     // persist new incident
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .insert(incident);
+    Context.getCommandContext().getDbEntityManager().insert(incident);
 
     incident.fireHistoricIncidentEvent(HistoryEventTypes.INCIDENT_CREATE);
   }
@@ -182,7 +176,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
     ExecutionEntity execution = getExecution();
 
-    if(execution != null) {
+    if (execution != null) {
       // Extract possible super execution of the assigned execution
       ExecutionEntity superExecution = null;
       if (execution.getId().equals(execution.getProcessInstanceId())) {
@@ -206,21 +200,20 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     }
 
     // always delete the incident
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .delete(this);
+    Context.getCommandContext().getDbEntityManager().delete(this);
 
     // update historic incident
-    HistoryEventType eventType = resolved ? HistoryEventTypes.INCIDENT_RESOLVE : HistoryEventTypes.INCIDENT_DELETE;
+    HistoryEventType eventType = resolved ? HistoryEventTypes.INCIDENT_RESOLVE
+        : HistoryEventTypes.INCIDENT_DELETE;
     fireHistoricIncidentEvent(eventType);
   }
 
   protected void fireHistoricIncidentEvent(final HistoryEventType eventType) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
-    if(historyLevel.isHistoryEventProduced(eventType, this)) {
+    if (historyLevel.isHistoryEventProduced(eventType, this)) {
 
       HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
         @Override
@@ -345,9 +338,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   public ProcessDefinitionEntity getProcessDefinition() {
     if (processDefinitionId != null) {
-      return Context
-          .getProcessEngineConfiguration()
-          .getDeploymentCache()
+      return Context.getProcessEngineConfiguration().getDeploymentCache()
           .findDeployedProcessDefinitionById(processDefinitionId);
     }
     return null;
@@ -398,7 +389,6 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.tenantId = tenantId;
   }
 
-
   public void setJobDefinitionId(String jobDefinitionId) {
     this.jobDefinitionId = jobDefinitionId;
   }
@@ -412,8 +402,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
       executionId = execution.getId();
       processInstanceId = execution.getProcessInstanceId();
       execution.addIncident(this);
-    }
-    else {
+    } else {
       ExecutionEntity oldExecution = getExecution();
       if (oldExecution != null) {
         oldExecution.removeIncident(this);
@@ -424,18 +413,16 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   }
 
   public ExecutionEntity getExecution() {
-    if(executionId != null) {
-      ExecutionEntity execution = Context.getCommandContext()
-        .getExecutionManager()
-        .findExecutionById(executionId);
+    if (executionId != null) {
+      ExecutionEntity execution = Context.getCommandContext().getExecutionManager()
+          .findExecutionById(executionId);
 
       if (execution == null) {
         LOG.executionNotFound(executionId);
       }
 
       return execution;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -467,21 +454,13 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", incidentTimestamp=" + incidentTimestamp
-           + ", incidentType=" + incidentType
-           + ", executionId=" + executionId
-           + ", activityId=" + activityId
-           + ", processInstanceId=" + processInstanceId
-           + ", processDefinitionId=" + processDefinitionId
-           + ", causeIncidentId=" + causeIncidentId
-           + ", rootCauseIncidentId=" + rootCauseIncidentId
-           + ", configuration=" + configuration
-           + ", tenantId=" + tenantId
-           + ", incidentMessage=" + incidentMessage
-           + ", jobDefinitionId=" + jobDefinitionId
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", incidentTimestamp="
+        + incidentTimestamp + ", incidentType=" + incidentType + ", executionId=" + executionId
+        + ", activityId=" + activityId + ", processInstanceId=" + processInstanceId
+        + ", processDefinitionId=" + processDefinitionId + ", causeIncidentId=" + causeIncidentId
+        + ", rootCauseIncidentId=" + rootCauseIncidentId + ", configuration=" + configuration
+        + ", tenantId=" + tenantId + ", incidentMessage=" + incidentMessage + ", jobDefinitionId="
+        + jobDefinitionId + "]";
   }
 
   @Override

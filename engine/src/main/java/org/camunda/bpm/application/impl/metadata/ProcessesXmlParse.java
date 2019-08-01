@@ -39,9 +39,13 @@ import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.util.xml.Parser;
 
 /**
- * <p>{@link Parse} object for the <code>processes.xml</code> file.</p>
+ * <p>
+ * {@link Parse} object for the <code>processes.xml</code> file.
+ * </p>
  *
- * <p>This class is NOT Threadsafe</p>
+ * <p>
+ * This class is NOT Threadsafe
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -72,10 +76,10 @@ public class ProcessesXmlParse extends DeploymentMetadataParse {
 
     for (Element element : rootElement.elements()) {
 
-      if(PROCESS_ENGINE.equals(element.getTagName())) {
+      if (PROCESS_ENGINE.equals(element.getTagName())) {
         parseProcessEngine(element, processEngines);
 
-      } else if(PROCESS_ARCHIVE.equals(element.getTagName())) {
+      } else if (PROCESS_ARCHIVE.equals(element.getTagName())) {
         parseProcessArchive(element, processArchives);
 
       }
@@ -87,9 +91,11 @@ public class ProcessesXmlParse extends DeploymentMetadataParse {
   }
 
   /**
-   * parse a <code>&lt;process-archive .../&gt;</code> element and add it to the list of parsed elements
+   * parse a <code>&lt;process-archive .../&gt;</code> element and add it to the list of parsed
+   * elements
    */
-  protected void parseProcessArchive(Element element, List<ProcessArchiveXml> parsedProcessArchives) {
+  protected void parseProcessArchive(Element element,
+      List<ProcessArchiveXml> parsedProcessArchives) {
 
     ProcessArchiveXmlImpl processArchive = new ProcessArchiveXmlImpl();
 
@@ -100,13 +106,14 @@ public class ProcessesXmlParse extends DeploymentMetadataParse {
 
     Map<String, String> properties = new HashMap<String, String>();
     for (Element childElement : element.elements()) {
-      if(PROCESS_ENGINE.equals(childElement.getTagName())) {
+      if (PROCESS_ENGINE.equals(childElement.getTagName())) {
         processArchive.setProcessEngineName(childElement.getText());
 
-      } else if(PROCESS.equals(childElement.getTagName()) || RESOURCE.equals(childElement.getTagName())) {
+      } else if (PROCESS.equals(childElement.getTagName())
+          || RESOURCE.equals(childElement.getTagName())) {
         processResourceNames.add(childElement.getText());
 
-      } else if(PROPERTIES.equals(childElement.getTagName())) {
+      } else if (PROPERTIES.equals(childElement.getTagName())) {
         parseProperties(childElement, properties);
 
       }

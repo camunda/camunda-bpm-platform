@@ -91,8 +91,8 @@ public class ScriptEngineCachingTest extends PluggableProcessEngineTestCase {
     // then
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
 
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-        .addClasspathResource(PROCESS_PATH)
+    ProcessApplicationDeployment deployment = repositoryService
+        .createDeployment(processApplication.getReference()).addClasspathResource(PROCESS_PATH)
         .deploy();
 
     // when
@@ -115,8 +115,8 @@ public class ScriptEngineCachingTest extends PluggableProcessEngineTestCase {
 
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
 
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-        .addClasspathResource(PROCESS_PATH)
+    ProcessApplicationDeployment deployment = repositoryService
+        .createDeployment(processApplication.getReference()).addClasspathResource(PROCESS_PATH)
         .deploy();
 
     // when
@@ -141,8 +141,8 @@ public class ScriptEngineCachingTest extends PluggableProcessEngineTestCase {
 
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
 
-    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
-        .addClasspathResource(PROCESS_PATH)
+    ProcessApplicationDeployment deployment = repositoryService
+        .createDeployment(processApplication.getReference()).addClasspathResource(PROCESS_PATH)
         .deploy();
 
     // when
@@ -167,25 +167,26 @@ public class ScriptEngineCachingTest extends PluggableProcessEngineTestCase {
   protected ScriptEngine getScriptEngine(final String name) {
     final ScriptingEngines scriptingEngines = getScriptingEngines();
     return processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<ScriptEngine>() {
-        public ScriptEngine execute(CommandContext commandContext) {
-          return scriptingEngines.getScriptEngineForLanguage(name);
-        }
-      });
+        .execute(new Command<ScriptEngine>() {
+          public ScriptEngine execute(CommandContext commandContext) {
+            return scriptingEngines.getScriptEngineForLanguage(name);
+          }
+        });
   }
 
-  protected ScriptEngine getScriptEngineFromPa(final String name, final ProcessApplicationInterface processApplication) {
+  protected ScriptEngine getScriptEngineFromPa(final String name,
+      final ProcessApplicationInterface processApplication) {
     return processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<ScriptEngine>() {
-        public ScriptEngine execute(CommandContext commandContext) {
-          return Context.executeWithinProcessApplication(new Callable<ScriptEngine>() {
+        .execute(new Command<ScriptEngine>() {
+          public ScriptEngine execute(CommandContext commandContext) {
+            return Context.executeWithinProcessApplication(new Callable<ScriptEngine>() {
 
-            public ScriptEngine call() throws Exception {
-              return getScriptEngine(name);
-            }
-          }, processApplication.getReference());
-        }
-      });
+              public ScriptEngine call() throws Exception {
+                return getScriptEngine(name);
+              }
+            }, processApplication.getReference());
+          }
+        });
   }
 
 }

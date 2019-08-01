@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.management.Metrics;
 
 /**
  * Batch of work for history cleanup.
+ * 
  * @author Svetlana Dorokhova.
  */
 public class HistoryCleanupBatch extends HistoryCleanupHandler {
@@ -72,7 +73,8 @@ public class HistoryCleanupBatch extends HistoryCleanupHandler {
    * Size of the batch.
    */
   public int size() {
-    return historicProcessInstanceIds.size() + historicDecisionInstanceIds.size() + historicCaseInstanceIds.size() + historicBatchIds.size();
+    return historicProcessInstanceIds.size() + historicDecisionInstanceIds.size()
+        + historicCaseInstanceIds.size() + historicBatchIds.size();
   }
 
   public void performCleanup() {
@@ -81,13 +83,16 @@ public class HistoryCleanupBatch extends HistoryCleanupHandler {
 
     if (size() > 0) {
       if (historicProcessInstanceIds.size() > 0) {
-        commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(historicProcessInstanceIds);
+        commandContext.getHistoricProcessInstanceManager()
+            .deleteHistoricProcessInstanceByIds(historicProcessInstanceIds);
       }
       if (historicDecisionInstanceIds.size() > 0) {
-        commandContext.getHistoricDecisionInstanceManager().deleteHistoricDecisionInstanceByIds(historicDecisionInstanceIds);
+        commandContext.getHistoricDecisionInstanceManager()
+            .deleteHistoricDecisionInstanceByIds(historicDecisionInstanceIds);
       }
       if (historicCaseInstanceIds.size() > 0) {
-        commandContext.getHistoricCaseInstanceManager().deleteHistoricCaseInstancesByIds(historicCaseInstanceIds);
+        commandContext.getHistoricCaseInstanceManager()
+            .deleteHistoricCaseInstancesByIds(historicCaseInstanceIds);
       }
       if (historicBatchIds.size() > 0) {
         commandContext.getHistoricBatchManager().deleteHistoricBatchesByIds(historicBatchIds);
@@ -100,13 +105,16 @@ public class HistoryCleanupBatch extends HistoryCleanupHandler {
     Map<String, Long> reports = new HashMap<>();
 
     if (historicProcessInstanceIds.size() > 0) {
-      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES, (long) historicProcessInstanceIds.size());
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES,
+          (long) historicProcessInstanceIds.size());
     }
     if (historicDecisionInstanceIds.size() > 0) {
-      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES, (long) historicDecisionInstanceIds.size());
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES,
+          (long) historicDecisionInstanceIds.size());
     }
     if (historicCaseInstanceIds.size() > 0) {
-      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES, (long) historicCaseInstanceIds.size());
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES,
+          (long) historicCaseInstanceIds.size());
     }
     if (historicBatchIds.size() > 0) {
       reports.put(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS, (long) historicBatchIds.size());
@@ -121,9 +129,7 @@ public class HistoryCleanupBatch extends HistoryCleanupHandler {
   }
 
   public Integer getBatchSizeThreshold() {
-    return Context
-        .getProcessEngineConfiguration()
-        .getHistoryCleanupBatchThreshold();
+    return Context.getProcessEngineConfiguration().getHistoryCleanupBatchThreshold();
   }
 
 }

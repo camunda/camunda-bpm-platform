@@ -55,44 +55,39 @@ public class FoxJobRetryCmdEventsTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-
   @Parameterized.Parameter
   public RetryCmdDeployment deployment;
 
   @Parameterized.Parameters(name = "deployment {index}")
   public static Collection<RetryCmdDeployment[]> scenarios() {
     return RetryCmdDeployment.asParameters(
-        deployment()
-            .withEventProcess(prepareSignalEventProcess()),
-        deployment()
-            .withEventProcess(prepareMessageEventProcess()),
-        deployment()
-            .withEventProcess(prepareEscalationEventProcess()),
-        deployment()
-            .withEventProcess(prepareCompensationEventProcess())
-    );
+        deployment().withEventProcess(prepareSignalEventProcess()),
+        deployment().withEventProcess(prepareMessageEventProcess()),
+        deployment().withEventProcess(prepareEscalationEventProcess()),
+        deployment().withEventProcess(prepareCompensationEventProcess()));
   }
 
   private Deployment currentDeployment;
 
   @Before
-  public void setUp () {
+  public void setUp() {
     currentDeployment = testRule.deploy(deployment.getBpmnModelInstances());
   }
 
   @Test
-  public void testFailedIntermediateThrowingSignalEventAsync () {
-    ProcessInstance pi = engineRule.getRuntimeService().startProcessInstanceByKey(RetryCmdDeployment.PROCESS_ID);
+  public void testFailedIntermediateThrowingSignalEventAsync() {
+    ProcessInstance pi = engineRule.getRuntimeService()
+        .startProcessInstanceByKey(RetryCmdDeployment.PROCESS_ID);
     assertJobRetries(pi);
   }
 
   @After
   public void tearDown() {
-    engineRule.getRepositoryService().deleteDeployment(currentDeployment.getId(),true,true);
+    engineRule.getRepositoryService().deleteDeployment(currentDeployment.getId(), true, true);
   }
 
   protected void assertJobRetries(ProcessInstance pi) {
-    assertThat(pi,is(notNullValue()));
+    assertThat(pi, is(notNullValue()));
 
     Job job = fetchJob(pi.getProcessInstanceId());
 
@@ -103,12 +98,12 @@ public class FoxJobRetryCmdEventsTest {
 
     // update job
     job = fetchJob(pi.getProcessInstanceId());
-    assertThat(job.getRetries(),is(4));
+    assertThat(job.getRetries(), is(4));
   }
 
   protected Job fetchJob(String processInstanceId) {
-    return engineRule.getManagementService().createJobQuery().processInstanceId(processInstanceId).singleResult();
+    return engineRule.getManagementService().createJobQuery().processInstanceId(processInstanceId)
+        .singleResult();
   }
-
 
 }

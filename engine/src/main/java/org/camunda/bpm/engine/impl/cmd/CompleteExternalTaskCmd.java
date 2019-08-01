@@ -29,7 +29,8 @@ public class CompleteExternalTaskCmd extends HandleExternalTaskCmd {
   protected Map<String, Object> variables;
   protected Map<String, Object> localVariables;
 
-  public CompleteExternalTaskCmd(String externalTaskId, String workerId, Map<String, Object> variables, Map<String, Object> localVariables) {
+  public CompleteExternalTaskCmd(String externalTaskId, String workerId,
+      Map<String, Object> variables, Map<String, Object> localVariables) {
     super(externalTaskId, workerId);
     this.localVariables = localVariables;
     this.variables = variables;

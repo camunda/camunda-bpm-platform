@@ -28,9 +28,11 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * Job declaration for history cleanup.
+ * 
  * @author Svetlana Dorokhova
  */
-public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupContext, EverLivingJobEntity> {
+public class HistoryCleanupJobDeclaration
+    extends JobDeclaration<HistoryCleanupContext, EverLivingJobEntity> {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -52,7 +54,6 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
   protected void postInitialize(HistoryCleanupContext context, EverLivingJobEntity job) {
   }
 
-
   @Override
   public EverLivingJobEntity reconfigure(HistoryCleanupContext context, EverLivingJobEntity job) {
     HistoryCleanupJobHandlerConfiguration configuration = resolveJobHandlerConfiguration(context);
@@ -61,7 +62,8 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
   }
 
   @Override
-  protected HistoryCleanupJobHandlerConfiguration resolveJobHandlerConfiguration(HistoryCleanupContext context) {
+  protected HistoryCleanupJobHandlerConfiguration resolveJobHandlerConfiguration(
+      HistoryCleanupContext context) {
     HistoryCleanupJobHandlerConfiguration config = new HistoryCleanupJobHandlerConfiguration();
     config.setImmediatelyDue(context.isImmediatelyDue());
     config.setMinuteFrom(context.getMinuteFrom());
@@ -79,8 +81,9 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
     if (isImmediatelyDue) {
       return ClockUtil.getCurrentTime();
     } else {
-      final BatchWindow currentOrNextBatchWindow = commandContext.getProcessEngineConfiguration().getBatchWindowManager()
-        .getCurrentOrNextBatchWindow(ClockUtil.getCurrentTime(), commandContext.getProcessEngineConfiguration());
+      final BatchWindow currentOrNextBatchWindow = commandContext.getProcessEngineConfiguration()
+          .getBatchWindowManager().getCurrentOrNextBatchWindow(ClockUtil.getCurrentTime(),
+              commandContext.getProcessEngineConfiguration());
       if (currentOrNextBatchWindow != null) {
         return currentOrNextBatchWindow.getStart();
       } else {

@@ -30,14 +30,14 @@ public class AtomicOperationCaseExecutionDeleteCascade implements CmmnAtomicOper
     return "delete-cascade";
   }
 
- protected CmmnExecution findFirstLeaf(CmmnExecution execution) {
-   List<? extends CmmnExecution> executions = execution.getCaseExecutions();
+  protected CmmnExecution findFirstLeaf(CmmnExecution execution) {
+    List<? extends CmmnExecution> executions = execution.getCaseExecutions();
 
-   if (executions.size() > 0) {
-     return findFirstLeaf(executions.get(0));
-   }
-   return execution;
- }
+    if (executions.size() > 0) {
+      return findFirstLeaf(executions.get(0));
+    }
+    return execution;
+  }
 
   public void execute(CmmnExecution execution) {
     CmmnExecution firstLeaf = findFirstLeaf(execution);

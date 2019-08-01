@@ -42,37 +42,30 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   private List<String> caseInstanceIds;
 
   /**
-   * Setup starts 4 case instances of oneTaskCase
-   * and 1 instance of oneTaskCase2
+   * Setup starts 4 case instances of oneTaskCase and 1 instance of oneTaskCase2
    */
   protected void setUp() throws Exception {
     super.setUp();
     repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
-      .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn")
-      .deploy();
+        .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+        .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase2.cmmn").deploy();
 
     caseInstanceIds = new ArrayList<String>();
     for (int i = 0; i < 4; i++) {
-      String id = caseService
-          .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-          .businessKey(String.valueOf(i))
-          .create()
-          .getId();
+      String id = caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+          .businessKey(String.valueOf(i)).create().getId();
 
       caseInstanceIds.add(id);
     }
-    String id = caseService
-        .withCaseDefinitionByKey(CASE_DEFINITION_KEY_2)
-        .businessKey("1")
-        .create()
+    String id = caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY_2).businessKey("1").create()
         .getId();
 
     caseInstanceIds.add(id);
   }
 
   protected void tearDown() throws Exception {
-    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService
+        .createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
     super.tearDown();
@@ -84,7 +77,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     if (countExpected == 1) {
       assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
+    } else if (countExpected > 1) {
       verifySingleResultFails(query);
     } else if (countExpected == 0) {
       assertNull(query.singleResult());
@@ -95,20 +88,16 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testCaseInstanceProperties() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .caseDefinitionKey(CASE_DEFINITION_KEY_2)
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey(CASE_DEFINITION_KEY_2).singleResult().getId();
 
-    CaseInstance caseInstance = caseService
-      .createCaseInstanceQuery()
-      .caseDefinitionKey(CASE_DEFINITION_KEY_2)
-      .singleResult();
+    CaseInstance caseInstance = caseService.createCaseInstanceQuery()
+        .caseDefinitionKey(CASE_DEFINITION_KEY_2).singleResult();
 
     assertNotNull(caseInstance.getId());
     assertEquals(caseInstance.getId(), caseInstance.getCaseInstanceId());
@@ -146,16 +135,14 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionKey(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
 
   }
 
   public void testQueryByCaseDefinitionId() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .caseDefinitionKey(CASE_DEFINITION_KEY)
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey(CASE_DEFINITION_KEY).singleResult().getId();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -174,7 +161,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionId(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
 
   }
 
@@ -188,33 +176,26 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByCompleted() {
 
-    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService
+        .createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
-    repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn")
-        .deploy();
+    repositoryService.createDeployment().addClasspathResource(
+        "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn").deploy();
 
     for (int i = 0; i < 4; i++) {
-      String id = caseService
-          .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-          .businessKey(String.valueOf(i))
-          .create()
-          .getId();
+      String id = caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+          .businessKey(String.valueOf(i)).create().getId();
 
       caseInstanceIds.add(id);
     }
 
-    List<CaseExecution> executions = caseService
-      .createCaseExecutionQuery()
-      .activityId("PI_HumanTask_1")
-      .list();
+    List<CaseExecution> executions = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").list();
 
     for (CaseExecution caseExecution : executions) {
-      caseService
-        .withCaseExecution(caseExecution.getId())
-        .disable();
+      caseService.withCaseExecution(caseExecution.getId()).disable();
     }
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
@@ -224,23 +205,15 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 4);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/CaseInstanceQueryTest.testQueryByTerminated.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/CaseInstanceQueryTest.testQueryByTerminated.cmmn" })
   public void testQueryByTerminated() {
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("termination")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("termination").create().getId();
 
-    String caseExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .caseInstanceId(caseInstanceId)
-        .singleResult()
-        .getId();
+    String caseExecutionId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .caseInstanceId(caseInstanceId).singleResult().getId();
 
-    caseService
-      .withCaseExecution(caseExecutionId)
-      .complete();
+    caseService.withCaseExecution(caseExecutionId).complete();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -267,40 +240,31 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceBusinessKey(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
 
   }
 
   public void testQueryByCaseInstanceBusinessKeyAndCaseDefinitionKey() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
-    query
-      .caseInstanceBusinessKey("0")
-      .caseDefinitionKey(CASE_DEFINITION_KEY);
+    query.caseInstanceBusinessKey("0").caseDefinitionKey(CASE_DEFINITION_KEY);
 
     verifyQueryResults(query, 1);
 
-    query
-      .caseInstanceBusinessKey("1")
-      .caseDefinitionKey(CASE_DEFINITION_KEY);
+    query.caseInstanceBusinessKey("1").caseDefinitionKey(CASE_DEFINITION_KEY);
 
     verifyQueryResults(query, 1);
 
-    query
-      .caseInstanceBusinessKey("2")
-      .caseDefinitionKey(CASE_DEFINITION_KEY);
+    query.caseInstanceBusinessKey("2").caseDefinitionKey(CASE_DEFINITION_KEY);
 
     verifyQueryResults(query, 1);
 
-    query
-      .caseInstanceBusinessKey("3")
-      .caseDefinitionKey(CASE_DEFINITION_KEY);
+    query.caseInstanceBusinessKey("3").caseDefinitionKey(CASE_DEFINITION_KEY);
 
     verifyQueryResults(query, 1);
 
-    query
-      .caseInstanceBusinessKey("1")
-      .caseDefinitionKey(CASE_DEFINITION_KEY_2);
+    query.caseInstanceBusinessKey("1").caseDefinitionKey(CASE_DEFINITION_KEY_2);
 
     verifyQueryResults(query, 1);
 
@@ -327,15 +291,14 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseInstanceId(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
 
   }
 
   public void testQueryByNullVariableValueEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aNullValue", null)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aNullValue", null)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -345,10 +308,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByStringVariableValueEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aStringValue", "abc")
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aStringValue", "abc")
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -358,10 +319,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByBooleanVariableValueEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aBooleanValue", true)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aBooleanValue", true)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -371,10 +330,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByShortVariableValueEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aShortValue", (short) 123)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aShortValue", (short) 123)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -384,10 +341,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByIntegerVariableValueEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("anIntegerValue", 456)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("anIntegerValue", 456)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -397,10 +352,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByLongVariableValueEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aLongValue", (long) 789)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aLongValue", (long) 789)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -411,10 +364,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByDateVariableValueEquals() {
     Date now = new Date();
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDateValue", now)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDateValue", now)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -424,10 +375,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByDoubleVariableValueEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDoubleValue", 1.5)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDoubleValue", 1.5)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -439,17 +388,16 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByByteArrayVariableValueEquals() {
     byte[] bytes = "somebytes".getBytes();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aByteArrayValue", bytes)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aByteArrayValue", bytes)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueEquals("aByteArrayValue", bytes).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryBySerializableVariableValueEquals() {
@@ -458,24 +406,21 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("two");
     serializable.add("three");
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aSerializableValue", serializable)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+        .setVariable("aSerializableValue", serializable).create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueEquals("aSerializableValue", serializable).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByStringVariableValueNotEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aStringValue", "abc")
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aStringValue", "abc")
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -485,10 +430,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByBooleanVariableValueNotEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aBooleanValue", true)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aBooleanValue", true)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -498,10 +441,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByShortVariableValueNotEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aShortValue", (short) 123)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aShortValue", (short) 123)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -511,10 +452,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByIntegerVariableValueNotEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("anIntegerValue", 456)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("anIntegerValue", 456)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -524,10 +463,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByLongVariableValueNotEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aLongValue", (long) 789)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aLongValue", (long) 789)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -539,10 +476,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByDateVariableValueNotEquals() {
     Date now = new Date();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDateValue", now)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDateValue", now)
+        .create();
 
     Date before = new Date(now.getTime() - 100000);
 
@@ -554,10 +489,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByDoubleVariableValueNotEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDoubleValue", 1.5)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDoubleValue", 1.5)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -569,17 +502,16 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByByteArrayVariableValueNotEquals() {
     byte[] bytes = "somebytes".getBytes();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aByteArrayValue", bytes)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aByteArrayValue", bytes)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueNotEquals("aByteArrayValue", bytes).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryBySerializableVariableValueNotEquals() {
@@ -588,39 +520,35 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("two");
     serializable.add("three");
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aSerializableValue", serializable)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+        .setVariable("aSerializableValue", serializable).create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueNotEquals("aSerializableValue", serializable).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByNullVariableValueGreaterThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aNullValue", null)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aNullValue", null)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueGreaterThan("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
   }
 
   public void testQueryByStringVariableValueGreaterThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aStringValue", "abc")
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aStringValue", "abc")
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -631,25 +559,22 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByBooleanVariableValueGreaterThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aBooleanValue", true)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aBooleanValue", true)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueGreaterThan("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
   }
 
   public void testQueryByShortVariableValueGreaterThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aShortValue", (short) 123)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aShortValue", (short) 123)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -660,10 +585,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByIntegerVariableValueGreaterThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("anIntegerValue", 456)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("anIntegerValue", 456)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -674,10 +597,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByLongVariableValueGreaterThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aLongValue", (long) 789)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aLongValue", (long) 789)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -690,10 +611,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByDateVariableValueGreaterThan() {
     Date now = new Date();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDateValue", now)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDateValue", now)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -706,10 +625,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByDoubleVariableValueGreaterThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDoubleValue", 1.5)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDoubleValue", 1.5)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -722,17 +639,16 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByByteArrayVariableValueGreaterThan() {
     byte[] bytes = "somebytes".getBytes();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aByteArrayValue", bytes)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aByteArrayValue", bytes)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueGreaterThan("aByteArrayValue", bytes).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryBySerializableVariableGreaterThan() {
@@ -741,39 +657,35 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("two");
     serializable.add("three");
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aSerializableValue", serializable)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+        .setVariable("aSerializableValue", serializable).create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueGreaterThan("aSerializableValue", serializable).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByNullVariableValueGreaterThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aNullValue", null)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aNullValue", null)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueGreaterThanOrEqual("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
   }
 
   public void testQueryByStringVariableValueGreaterThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aStringValue", "abc")
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aStringValue", "abc")
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -790,25 +702,22 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByBooleanVariableValueGreaterThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aBooleanValue", true)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aBooleanValue", true)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueGreaterThanOrEqual("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
   }
 
   public void testQueryByShortVariableValueGreaterThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aShortValue", (short) 123)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aShortValue", (short) 123)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -825,10 +734,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByIntegerVariableValueGreaterThanOrEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("anIntegerValue", 456)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("anIntegerValue", 456)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -845,10 +752,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByLongVariableValueGreaterThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aLongValue", (long) 789)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aLongValue", (long) 789)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -867,10 +772,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByDateVariableValueGreaterThanOrEqual() {
     Date now = new Date();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDateValue", now)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDateValue", now)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -889,10 +792,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByDoubleVariableValueGreaterThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDoubleValue", 1.5)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDoubleValue", 1.5)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -911,17 +812,16 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByByteArrayVariableValueGreaterThanOrEqual() {
     byte[] bytes = "somebytes".getBytes();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aByteArrayValue", bytes)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aByteArrayValue", bytes)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueGreaterThanOrEqual("aByteArrayValue", bytes).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryBySerializableVariableGreaterThanOrEqual() {
@@ -930,39 +830,35 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("two");
     serializable.add("three");
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aSerializableValue", serializable)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+        .setVariable("aSerializableValue", serializable).create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueGreaterThanOrEqual("aSerializableValue", serializable).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByNullVariableValueLessThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aNullValue", null)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aNullValue", null)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueLessThan("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
   }
 
   public void testQueryByStringVariableValueLessThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aStringValue", "abc")
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aStringValue", "abc")
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -973,25 +869,22 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByBooleanVariableValueLessThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aBooleanValue", true)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aBooleanValue", true)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueLessThan("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
   }
 
   public void testQueryByShortVariableValueLessThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aShortValue", (short) 123)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aShortValue", (short) 123)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1002,10 +895,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByIntegerVariableValueLessThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("anIntegerValue", 456)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("anIntegerValue", 456)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1016,10 +907,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByLongVariableValueLessThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aLongValue", (long) 789)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aLongValue", (long) 789)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1032,10 +921,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByDateVariableValueLessThan() {
     Date now = new Date();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDateValue", now)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDateValue", now)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1048,10 +935,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByDoubleVariableValueLessThan() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDoubleValue", 1.5)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDoubleValue", 1.5)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1064,17 +949,16 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByByteArrayVariableValueLessThan() {
     byte[] bytes = "somebytes".getBytes();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aByteArrayValue", bytes)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aByteArrayValue", bytes)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueLessThan("aByteArrayValue", bytes).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryBySerializableVariableLessThan() {
@@ -1083,39 +967,35 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("two");
     serializable.add("three");
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aSerializableValue", serializable)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+        .setVariable("aSerializableValue", serializable).create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueLessThan("aSerializableValue", serializable).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByNullVariableValueLessThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aNullValue", null)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aNullValue", null)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueLessThanOrEqual("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
   }
 
   public void testQueryByStringVariableValueLessThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aStringValue", "abc")
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aStringValue", "abc")
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1132,25 +1012,22 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByBooleanVariableValueLessThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aBooleanValue", true)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aBooleanValue", true)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueLessThanOrEqual("aBooleanValue", false).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
   }
 
   public void testQueryByShortVariableValueLessThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aShortValue", (short) 123)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aShortValue", (short) 123)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1167,10 +1044,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByIntegerVariableValueLessThanOrEquals() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("anIntegerValue", 456)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("anIntegerValue", 456)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1187,10 +1062,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByLongVariableValueLessThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aLongValue", (long) 789)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aLongValue", (long) 789)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1209,10 +1082,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByDateVariableValueLessThanOrEqual() {
     Date now = new Date();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDateValue", now)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDateValue", now)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1231,10 +1102,8 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByDoubleVariableValueLessThanOrEqual() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aDoubleValue", 1.5)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aDoubleValue", 1.5)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1253,17 +1122,16 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByByteArrayVariableValueLessThanOrEqual() {
     byte[] bytes = "somebytes".getBytes();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aByteArrayValue", bytes)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aByteArrayValue", bytes)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueLessThanOrEqual("aByteArrayValue", bytes).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryBySerializableVariableLessThanOrEqual() {
@@ -1272,39 +1140,35 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     serializable.add("two");
     serializable.add("three");
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aSerializableValue", serializable)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+        .setVariable("aSerializableValue", serializable).create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueLessThanOrEqual("aSerializableValue", serializable).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public void testQueryByNullVariableValueLike() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aNullValue", null)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aNullValue", null)
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     try {
       query.variableValueLike("aNullValue", null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
   }
 
   public void testQueryByStringVariableValueLike() {
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("aStringValue", "abc")
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("aStringValue", "abc")
+        .create();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
@@ -1329,46 +1193,34 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
     // asc
-    query
-      .orderByCaseDefinitionId()
-      .asc();
+    query.orderByCaseDefinitionId().asc();
     verifyQueryResults(query, 5);
 
     query = caseService.createCaseInstanceQuery();
 
-    query
-      .orderByCaseDefinitionKey()
-      .asc();
+    query.orderByCaseDefinitionKey().asc();
     verifyQueryResults(query, 5);
 
     query = caseService.createCaseInstanceQuery();
 
-    query
-      .orderByCaseInstanceId()
-      .asc();
+    query.orderByCaseInstanceId().asc();
     verifyQueryResults(query, 5);
 
     // desc
 
     query = caseService.createCaseInstanceQuery();
 
-    query
-      .orderByCaseDefinitionId()
-      .desc();
+    query.orderByCaseDefinitionId().desc();
     verifyQueryResults(query, 5);
 
     query = caseService.createCaseInstanceQuery();
 
-    query
-      .orderByCaseDefinitionKey()
-      .desc();
+    query.orderByCaseDefinitionKey().desc();
     verifyQueryResults(query, 5);
 
     query = caseService.createCaseInstanceQuery();
 
-    query
-      .orderByCaseInstanceId()
-      .desc();
+    query.orderByCaseInstanceId().desc();
     verifyQueryResults(query, 5);
 
     query = caseService.createCaseInstanceQuery();
@@ -1377,92 +1229,81 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
 
   public void testCaseVariableValueEqualsNumber() throws Exception {
     // long
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("var", 123L)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("var", 123L).create();
 
     // non-matching long
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("var", 12345L)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("var", 12345L).create();
 
     // short
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("var", (short) 123)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("var", (short) 123)
+        .create();
 
     // double
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("var", 123.0d)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("var", 123.0d).create();
 
     // integer
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("var", 123)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("var", 123).create();
 
     // untyped null (should not match)
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("var", null)
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("var", null).create();
 
     // typed null (should not match)
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("var", Variables.longValue(null))
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+        .setVariable("var", Variables.longValue(null)).create();
 
-    caseService
-      .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
-      .setVariable("var", "123")
-      .create();
+    caseService.withCaseDefinitionByKey(CASE_DEFINITION_KEY).setVariable("var", "123").create();
 
-    assertEquals(4, caseService.createCaseInstanceQuery().variableValueEquals("var", Variables.numberValue(123)).count());
-    assertEquals(4, caseService.createCaseInstanceQuery().variableValueEquals("var", Variables.numberValue(123L)).count());
-    assertEquals(4, caseService.createCaseInstanceQuery().variableValueEquals("var", Variables.numberValue(123.0d)).count());
-    assertEquals(4, caseService.createCaseInstanceQuery().variableValueEquals("var", Variables.numberValue((short) 123)).count());
+    assertEquals(4, caseService.createCaseInstanceQuery()
+        .variableValueEquals("var", Variables.numberValue(123)).count());
+    assertEquals(4, caseService.createCaseInstanceQuery()
+        .variableValueEquals("var", Variables.numberValue(123L)).count());
+    assertEquals(4, caseService.createCaseInstanceQuery()
+        .variableValueEquals("var", Variables.numberValue(123.0d)).count());
+    assertEquals(4, caseService.createCaseInstanceQuery()
+        .variableValueEquals("var", Variables.numberValue((short) 123)).count());
 
-    assertEquals(1, caseService.createCaseInstanceQuery().variableValueEquals("var", Variables.numberValue(null)).count());
+    assertEquals(1, caseService.createCaseInstanceQuery()
+        .variableValueEquals("var", Variables.numberValue(null)).count());
 
     // other operators
-    assertEquals(4, caseService.createCaseInstanceQuery().variableValueNotEquals("var", Variables.numberValue(123)).count());
-    assertEquals(1, caseService.createCaseInstanceQuery().variableValueGreaterThan("var", Variables.numberValue(123L)).count());
-    assertEquals(5, caseService.createCaseInstanceQuery().variableValueGreaterThanOrEqual("var", Variables.numberValue(123.0d)).count());
-    assertEquals(0, caseService.createCaseInstanceQuery().variableValueLessThan("var", Variables.numberValue((short) 123)).count());
-    assertEquals(4, caseService.createCaseInstanceQuery().variableValueLessThanOrEqual("var", Variables.numberValue((short) 123)).count());
+    assertEquals(4, caseService.createCaseInstanceQuery()
+        .variableValueNotEquals("var", Variables.numberValue(123)).count());
+    assertEquals(1, caseService.createCaseInstanceQuery()
+        .variableValueGreaterThan("var", Variables.numberValue(123L)).count());
+    assertEquals(5, caseService.createCaseInstanceQuery()
+        .variableValueGreaterThanOrEqual("var", Variables.numberValue(123.0d)).count());
+    assertEquals(0, caseService.createCaseInstanceQuery()
+        .variableValueLessThan("var", Variables.numberValue((short) 123)).count());
+    assertEquals(4, caseService.createCaseInstanceQuery()
+        .variableValueLessThanOrEqual("var", Variables.numberValue((short) 123)).count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcessWithCaseCallActivity.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/superProcessWithCaseCallActivity.bpmn20.xml" })
   public void testQueryBySuperProcessInstanceId() {
-    String superProcessInstanceId = runtimeService.startProcessInstanceByKey("subProcessQueryTest").getId();
+    String superProcessInstanceId = runtimeService.startProcessInstanceByKey("subProcessQueryTest")
+        .getId();
 
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
         .superProcessInstanceId(superProcessInstanceId);
 
     verifyQueryResults(query, 1);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcessWithCaseCallActivityInsideSubProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/superProcessWithCaseCallActivityInsideSubProcess.bpmn20.xml" })
   public void testQueryBySuperProcessInstanceIdNested() {
-    String superProcessInstanceId = runtimeService.startProcessInstanceByKey("subProcessQueryTest").getId();
+    String superProcessInstanceId = runtimeService.startProcessInstanceByKey("subProcessQueryTest")
+        .getId();
 
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
         .superProcessInstanceId(superProcessInstanceId);
 
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidSuperProcessInstanceId() {
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
         .superProcessInstanceId("invalid");
 
     verifyQueryResults(query, 0);
@@ -1470,24 +1311,20 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.superProcessInstanceId(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
 
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
-      "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
+      "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testQueryBySubProcessInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneProcessTaskCase").getId();
 
-    String subProcessInstanceId = runtimeService
-        .createProcessInstanceQuery()
-        .superCaseInstanceId(superCaseInstanceId)
-        .singleResult()
-        .getId();
+    String subProcessInstanceId = runtimeService.createProcessInstanceQuery()
+        .superCaseInstanceId(superCaseInstanceId).singleResult().getId();
 
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
         .subProcessInstanceId(subProcessInstanceId);
 
     verifyQueryResults(query, 1);
@@ -1497,9 +1334,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByInvalidSubProcessInstanceId() {
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
-        .subProcessInstanceId("invalid");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().subProcessInstanceId("invalid");
 
     verifyQueryResults(query, 0);
 
@@ -1511,21 +1346,18 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn" })
   public void testQueryBySuperCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
 
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
         .superCaseInstanceId(superCaseInstanceId);
 
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidSuperCaseInstanceId() {
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
-        .superCaseInstanceId("invalid");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().superCaseInstanceId("invalid");
 
     verifyQueryResults(query, 0);
 
@@ -1537,18 +1369,14 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn" })
   public void testQueryBySubCaseInstanceId() {
     String superCaseInstanceId = caseService.createCaseInstanceByKey("oneCaseTaskCase").getId();
 
-    String subCaseInstanceId = caseService
-        .createCaseInstanceQuery()
-        .superCaseInstanceId(superCaseInstanceId)
-        .singleResult()
-        .getId();
+    String subCaseInstanceId = caseService.createCaseInstanceQuery()
+        .superCaseInstanceId(superCaseInstanceId).singleResult().getId();
 
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery()
         .subCaseInstanceId(subCaseInstanceId);
 
     verifyQueryResults(query, 1);
@@ -1558,9 +1386,7 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByInvalidSubCaseInstanceId() {
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
-        .subCaseInstanceId("invalid");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().subCaseInstanceId("invalid");
 
     verifyQueryResults(query, 0);
 
@@ -1573,22 +1399,15 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByDeploymentId() {
-    String deploymentId = repositoryService
-        .createDeploymentQuery()
-        .singleResult()
-        .getId();
+    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
 
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
-        .deploymentId(deploymentId);
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().deploymentId(deploymentId);
 
     verifyQueryResults(query, 5);
   }
 
   public void testQueryByInvalidDeploymentId() {
-    CaseInstanceQuery query = caseService
-        .createCaseInstanceQuery()
-        .deploymentId("invalid");
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().deploymentId("invalid");
 
     verifyQueryResults(query, 0);
 

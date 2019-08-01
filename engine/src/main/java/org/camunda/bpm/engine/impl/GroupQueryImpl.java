@@ -22,11 +22,11 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-
 /**
  * @author Joram Barrez
  */
-public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements GroupQuery {
+public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group>
+    implements GroupQuery {
 
   private static final long serialVersionUID = 1L;
   protected String id;
@@ -93,7 +93,7 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
     return this;
   }
 
-  //sorting ////////////////////////////////////////////////////////
+  // sorting ////////////////////////////////////////////////////////
 
   public GroupQuery orderByGroupId() {
     return orderBy(GroupQueryProperty.GROUP_ID);
@@ -107,26 +107,32 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
     return orderBy(GroupQueryProperty.TYPE);
   }
 
-  //getters ////////////////////////////////////////////////////////
+  // getters ////////////////////////////////////////////////////////
 
   public String getId() {
     return id;
   }
+
   public String getName() {
     return name;
   }
+
   public String getNameLike() {
     return nameLike;
   }
+
   public String getType() {
     return type;
   }
+
   public String getUserId() {
     return userId;
   }
+
   public String getTenantId() {
     return tenantId;
   }
+
   public String[] getIds() {
     return ids;
   }

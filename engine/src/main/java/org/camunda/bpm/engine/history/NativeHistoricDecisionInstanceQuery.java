@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.query.NativeQuery;
  *
  * @author Philipp Ossler
  */
-public interface NativeHistoricDecisionInstanceQuery extends NativeQuery<NativeHistoricDecisionInstanceQuery, HistoricDecisionInstance> {
+public interface NativeHistoricDecisionInstanceQuery
+    extends NativeQuery<NativeHistoricDecisionInstanceQuery, HistoricDecisionInstance> {
 
 }

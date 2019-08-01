@@ -17,9 +17,9 @@
 package org.camunda.bpm.engine;
 
 /**
- * Class contains constants that identifies the activity types, which are used by Camunda.
- * Events, gateways and activities are summed together as activities.
- * They typically correspond to the XML tags used in the BPMN 2.0 process definition file.
+ * Class contains constants that identifies the activity types, which are used by Camunda. Events,
+ * gateways and activities are summed together as activities. They typically correspond to the XML
+ * tags used in the BPMN 2.0 process definition file.
  *
  * @author Thorben Lindhauer
  * @author Christopher Zell <christopher.zell@camunda.com>
@@ -28,7 +28,7 @@ public final class ActivityTypes {
 
   public static final String MULTI_INSTANCE_BODY = "multiInstanceBody";
 
-  //gateways //////////////////////////////////////////////
+  // gateways //////////////////////////////////////////////
 
   public static final String GATEWAY_EXCLUSIVE = "exclusiveGateway";
   public static final String GATEWAY_INCLUSIVE = "inclusiveGateway";
@@ -36,7 +36,7 @@ public final class ActivityTypes {
   public static final String GATEWAY_COMPLEX = "complexGateway";
   public static final String GATEWAY_EVENT_BASED = "eventBasedGateway";
 
-  //tasks //////////////////////////////////////////////
+  // tasks //////////////////////////////////////////////
   public static final String TASK = "task";
   public static final String TASK_SCRIPT = "scriptTask";
   public static final String TASK_SERVICE = "serviceTask";
@@ -46,13 +46,13 @@ public final class ActivityTypes {
   public static final String TASK_SEND_TASK = "sendTask";
   public static final String TASK_RECEIVE_TASK = "receiveTask";
 
-  //other ////////////////////////////////////////////////
+  // other ////////////////////////////////////////////////
   public static final String SUB_PROCESS = "subProcess";
   public static final String SUB_PROCESS_AD_HOC = "adHocSubProcess";
   public static final String CALL_ACTIVITY = "callActivity";
   public static final String TRANSACTION = "transaction";
 
-  //boundary events ////////////////////////////////////////
+  // boundary events ////////////////////////////////////////
   public static final String BOUNDARY_TIMER = "boundaryTimer";
   public static final String BOUNDARY_MESSAGE = "boundaryMessage";
   public static final String BOUNDARY_SIGNAL = "boundarySignal";
@@ -62,7 +62,7 @@ public final class ActivityTypes {
   public static final String BOUNDARY_CANCEL = "cancelBoundaryCatch";
   public static final String BOUNDARY_CONDITIONAL = "boundaryConditional";
 
-  //start events ////////////////////////////////////////
+  // start events ////////////////////////////////////////
   public static final String START_EVENT = "startEvent";
   public static final String START_EVENT_TIMER = "startTimerEvent";
   public static final String START_EVENT_MESSAGE = "messageStartEvent";
@@ -72,7 +72,7 @@ public final class ActivityTypes {
   public static final String START_EVENT_ERROR = "errorStartEvent";
   public static final String START_EVENT_CONDITIONAL = "conditionalStartEvent";
 
-  //intermediate catch events ////////////////////////////////////////
+  // intermediate catch events ////////////////////////////////////////
   public static final String INTERMEDIATE_EVENT_CATCH = "intermediateCatchEvent";
   public static final String INTERMEDIATE_EVENT_MESSAGE = "intermediateMessageCatch";
   public static final String INTERMEDIATE_EVENT_TIMER = "intermediateTimer";
@@ -80,7 +80,7 @@ public final class ActivityTypes {
   public static final String INTERMEDIATE_EVENT_SIGNAL = "intermediateSignalCatch";
   public static final String INTERMEDIATE_EVENT_CONDITIONAL = "intermediateConditional";
 
-  //intermediate throw events ////////////////////////////////
+  // intermediate throw events ////////////////////////////////
   public static final String INTERMEDIATE_EVENT_THROW = "intermediateThrowEvent";
   public static final String INTERMEDIATE_EVENT_SIGNAL_THROW = "intermediateSignalThrow";
   public static final String INTERMEDIATE_EVENT_COMPENSATION_THROW = "intermediateCompensationThrowEvent";
@@ -88,8 +88,7 @@ public final class ActivityTypes {
   public static final String INTERMEDIATE_EVENT_NONE_THROW = "intermediateNoneThrowEvent";
   public static final String INTERMEDIATE_EVENT_ESCALATION_THROW = "intermediateEscalationThrowEvent";
 
-
-  //end events ////////////////////////////////////////
+  // end events ////////////////////////////////////////
   public static final String END_EVENT_ERROR = "errorEndEvent";
   public static final String END_EVENT_CANCEL = "cancelEndEvent";
   public static final String END_EVENT_TERMINATE = "terminateEndEvent";
@@ -102,5 +101,6 @@ public final class ActivityTypes {
   /**
    * Should not be instantiated, since it makes no sense.
    */
-  private ActivityTypes(){}
+  private ActivityTypes() {
+  }
 }

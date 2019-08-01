@@ -26,8 +26,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
 /**
- * Job declaration for batch seed jobs. The batch seed job
- * creates all batch jobs required to complete the batch.
+ * Job declaration for batch seed jobs. The batch seed job creates all batch jobs required to
+ * complete the batch.
  */
 public class BatchSeedJobDeclaration extends JobDeclaration<BatchEntity, MessageEntity> {
 
@@ -56,8 +56,7 @@ public class BatchSeedJobDeclaration extends JobDeclaration<BatchEntity, Message
   }
 
   public ParameterValueProvider getJobPriorityProvider() {
-    long batchJobPriority = Context.getProcessEngineConfiguration()
-      .getBatchJobPriority();
+    long batchJobPriority = Context.getProcessEngineConfiguration().getBatchJobPriority();
     return new ConstantValueProvider(batchJobPriority);
   }
 

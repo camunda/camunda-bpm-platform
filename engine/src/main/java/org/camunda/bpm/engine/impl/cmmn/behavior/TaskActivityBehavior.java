@@ -54,5 +54,4 @@ public class TaskActivityBehavior extends StageOrTaskActivityBehavior {
     return "task";
   }
 
-
 }

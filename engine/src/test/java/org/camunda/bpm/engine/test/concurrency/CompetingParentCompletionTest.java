@@ -33,7 +33,7 @@ import org.slf4j.Logger;
  */
 public class CompetingParentCompletionTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   Thread testThread = Thread.currentThread();
   static ControllableThread activeThread;
@@ -56,14 +56,13 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
     public void run() {
       try {
-        processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, cmd));
+        processEngineConfiguration.getCommandExecutorTxRequired()
+            .execute(new ControlledCommand(activeThread, cmd));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 
@@ -86,40 +85,32 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   public class TerminateSingleThread extends SingleThread {
 
     public TerminateSingleThread(String caseExecutionId) {
-      super(caseExecutionId, new StateTransitionCaseExecutionCmd(caseExecutionId, null, null, null, null) {
+      super(caseExecutionId,
+          new StateTransitionCaseExecutionCmd(caseExecutionId, null, null, null, null) {
 
-        private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
-        @Override
-        protected void performStateTransition(CommandContext commandContext, CaseExecutionEntity caseExecution) {
-          caseExecution.terminate();
-        }
+            @Override
+            protected void performStateTransition(CommandContext commandContext,
+                CaseExecutionEntity caseExecution) {
+              caseExecution.terminate();
+            }
 
-      });
+          });
     }
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingParentCompletionTest.testComplete.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/concurrency/CompetingParentCompletionTest.testComplete.cmmn" })
   public void testComplete() {
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String firstHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String firstHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_1").singleResult().getId();
 
-    String secondHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String secondHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_2").singleResult().getId();
 
     LOG.debug("test thread starts thread one");
     SingleThread threadOne = new CompletionSingleThread(firstHumanTaskId);
@@ -136,30 +127,21 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
+    assertTextPresent("was updated by another transaction concurrently",
+        threadTwo.exception.getMessage());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingParentCompletionTest.testDisable.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/concurrency/CompetingParentCompletionTest.testDisable.cmmn" })
   public void testDisable() {
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String firstHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String firstHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_1").singleResult().getId();
 
-    String secondHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String secondHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_2").singleResult().getId();
 
     LOG.debug("test thread starts thread one");
     SingleThread threadOne = new DisableSingleThread(firstHumanTaskId);
@@ -176,30 +158,21 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
+    assertTextPresent("was updated by another transaction concurrently",
+        threadTwo.exception.getMessage());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingParentCompletionTest.testTerminate.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/concurrency/CompetingParentCompletionTest.testTerminate.cmmn" })
   public void testTerminate() {
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String firstHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String firstHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_1").singleResult().getId();
 
-    String secondHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String secondHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_2").singleResult().getId();
 
     LOG.debug("test thread starts thread one");
     SingleThread threadOne = new TerminateSingleThread(firstHumanTaskId);
@@ -216,7 +189,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
+    assertTextPresent("was updated by another transaction concurrently",
+        threadTwo.exception.getMessage());
 
   }
 

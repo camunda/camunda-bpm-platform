@@ -38,10 +38,11 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import static org.camunda.bpm.container.impl.deployment.Attachments.PROCESSES_XML_RESOURCES;
 import static org.camunda.bpm.container.impl.deployment.Attachments.PROCESS_APPLICATION;
 
-
 /**
- * <p>Detects and parses all META-INF/processes.xml files within the process application
- * and attaches the parsed Metadata to the operation context.</p>
+ * <p>
+ * Detects and parses all META-INF/processes.xml files within the process application and attaches
+ * the parsed Metadata to the operation context.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -56,7 +57,8 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
 
   public void performOperationStep(DeploymentOperation operationContext) {
 
-    final AbstractProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
+    final AbstractProcessApplication processApplication = operationContext
+        .getAttachment(PROCESS_APPLICATION);
 
     Map<URL, ProcessesXml> parsedFiles = parseProcessesXmlFiles(processApplication);
 
@@ -64,7 +66,8 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
     operationContext.addAttachment(PROCESSES_XML_RESOURCES, parsedFiles);
   }
 
-  protected Map<URL, ProcessesXml> parseProcessesXmlFiles(final AbstractProcessApplication processApplication) {
+  protected Map<URL, ProcessesXml> parseProcessesXmlFiles(
+      final AbstractProcessApplication processApplication) {
 
     String[] deploymentDescriptors = getDeploymentDescriptorLocations(processApplication);
     List<URL> processesXmlUrls = getProcessesXmlUrls(deploymentDescriptors, processApplication);
@@ -76,7 +79,7 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
 
       LOG.foundProcessesXmlFile(url.toString());
 
-      if(isEmptyFile(url)) {
+      if (isEmptyFile(url)) {
         parsedFiles.put(url, ProcessesXml.EMPTY_PROCESSES_XML);
         LOG.emptyProcessesXml();
 
@@ -85,15 +88,17 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
       }
     }
 
-    if(parsedFiles.isEmpty()) {
+    if (parsedFiles.isEmpty()) {
       LOG.noProcessesXmlForPa(processApplication.getName());
     }
 
     return parsedFiles;
   }
 
-  protected List<URL> getProcessesXmlUrls(String[] deploymentDescriptors, AbstractProcessApplication processApplication) {
-    ClassLoader processApplicationClassloader = processApplication.getProcessApplicationClassloader();
+  protected List<URL> getProcessesXmlUrls(String[] deploymentDescriptors,
+      AbstractProcessApplication processApplication) {
+    ClassLoader processApplicationClassloader = processApplication
+        .getProcessApplicationClassloader();
 
     List<URL> result = new ArrayList<URL>();
 
@@ -102,9 +107,9 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
 
       Enumeration<URL> processesXmlFileLocations = null;
       try {
-        processesXmlFileLocations = processApplicationClassloader.getResources(deploymentDescriptor);
-      }
-      catch (IOException e) {
+        processesXmlFileLocations = processApplicationClassloader
+            .getResources(deploymentDescriptor);
+      } catch (IOException e) {
         throw LOG.exceptionWhileReadingProcessesXml(deploymentDescriptor, e);
       }
 
@@ -117,10 +122,12 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
     return result;
   }
 
-  protected String[] getDeploymentDescriptorLocations(AbstractProcessApplication processApplication) {
-    ProcessApplication annotation = processApplication.getClass().getAnnotation(ProcessApplication.class);
-    if(annotation == null) {
-      return new String[] {ProcessApplication.DEFAULT_META_INF_PROCESSES_XML};
+  protected String[] getDeploymentDescriptorLocations(
+      AbstractProcessApplication processApplication) {
+    ProcessApplication annotation = processApplication.getClass()
+        .getAnnotation(ProcessApplication.class);
+    if (annotation == null) {
+      return new String[] { ProcessApplication.DEFAULT_META_INF_PROCESSES_XML };
 
     } else {
       return annotation.deploymentDescriptors();
@@ -136,11 +143,9 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
       inputStream = url.openStream();
       return inputStream.available() == 0;
 
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       throw LOG.exceptionWhileReadingProcessesXml(url.toString(), e);
-    }
-    finally {
+    } finally {
       IoUtil.closeSilently(inputStream);
 
     }
@@ -150,10 +155,8 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
 
     final ProcessesXmlParser processesXmlParser = new ProcessesXmlParser();
 
-    ProcessesXml processesXml = processesXmlParser.createParse()
-      .sourceUrl(url)
-      .execute()
-      .getProcessesXml();
+    ProcessesXml processesXml = processesXmlParser.createParse().sourceUrl(url).execute()
+        .getProcessesXml();
 
     return processesXml;
 

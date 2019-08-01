@@ -26,13 +26,12 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 
-
 /**
  * @author Daniel Meyer
  */
 public class EventSubscriptionQueryImpl
-                extends AbstractQuery<EventSubscriptionQuery, EventSubscription>
-                implements Serializable, EventSubscriptionQuery {
+    extends AbstractQuery<EventSubscriptionQuery, EventSubscription>
+    implements Serializable, EventSubscriptionQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -98,7 +97,7 @@ public class EventSubscriptionQueryImpl
   }
 
   public EventSubscriptionQuery includeEventSubscriptionsWithoutTenantId() {
-    this.includeEventSubscriptionsWithoutTenantId  = true;
+    this.includeEventSubscriptionsWithoutTenantId = true;
     return this;
   }
 
@@ -116,42 +115,44 @@ public class EventSubscriptionQueryImpl
     return orderBy(EventSubscriptionQueryProperty.TENANT_ID);
   }
 
-  //results //////////////////////////////////////////
+  // results //////////////////////////////////////////
 
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getEventSubscriptionManager()
-      .findEventSubscriptionCountByQueryCriteria(this);
+    return commandContext.getEventSubscriptionManager()
+        .findEventSubscriptionCountByQueryCriteria(this);
   }
 
   @Override
   public List<EventSubscription> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getEventSubscriptionManager()
-      .findEventSubscriptionsByQueryCriteria(this,page);
+    return commandContext.getEventSubscriptionManager().findEventSubscriptionsByQueryCriteria(this,
+        page);
   }
 
-  //getters //////////////////////////////////////////
-
+  // getters //////////////////////////////////////////
 
   public String getEventSubscriptionId() {
     return eventSubscriptionId;
   }
+
   public String getEventName() {
     return eventName;
   }
+
   public String getEventType() {
     return eventType;
   }
+
   public String getExecutionId() {
     return executionId;
   }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public String getActivityId() {
     return activityId;
   }

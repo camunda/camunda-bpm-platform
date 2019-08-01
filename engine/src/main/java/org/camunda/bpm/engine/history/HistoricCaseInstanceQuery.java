@@ -30,7 +30,8 @@ import org.camunda.bpm.engine.query.Query;
  * @author Joram Barrez
  * @author Falko Menge
  */
-public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQuery, HistoricCaseInstance> {
+public interface HistoricCaseInstanceQuery
+    extends Query<HistoricCaseInstanceQuery, HistoricCaseInstance> {
 
   /** Only select historic case instances with the given case instance id. */
   HistoricCaseInstanceQuery caseInstanceId(String caseInstanceId);
@@ -41,21 +42,29 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
   /** Only select historic case instances for the given case definition */
   HistoricCaseInstanceQuery caseDefinitionId(String caseDefinitionId);
 
-  /** Only select historic case instances that are defined by a case definition with the given key.  */
+  /**
+   * Only select historic case instances that are defined by a case definition with the given key.
+   */
   HistoricCaseInstanceQuery caseDefinitionKey(String caseDefinitionKey);
 
-  /** Only select historic case instances that don't have a case definition of which the key is present in the given list */
+  /**
+   * Only select historic case instances that don't have a case definition of which the key is
+   * present in the given list
+   */
   HistoricCaseInstanceQuery caseDefinitionKeyNotIn(List<String> caseDefinitionKeys);
 
-  /** Only select historic case instances that are defined by a case definition with the given name.  */
+  /**
+   * Only select historic case instances that are defined by a case definition with the given name.
+   */
   HistoricCaseInstanceQuery caseDefinitionName(String caseDefinitionName);
 
   /**
-   * Only select historic case instances that are defined by case definition which name
-   * is like the given value.
+   * Only select historic case instances that are defined by case definition which name is like the
+   * given value.
    *
-   * @param nameLike The string can include the wildcard character '%' to express
-   *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+   * @param nameLike
+   *          The string can include the wildcard character '%' to express like-strategy: starts
+   *          with (string%), ends with (%string) or contains (%string%).
    */
   HistoricCaseInstanceQuery caseDefinitionNameLike(String nameLike);
 
@@ -65,14 +74,17 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
   /**
    * Only select historic case instances which had a business key like the given value.
    *
-   * @param caseInstanceBusinessKeyLike The string can include the wildcard character '%' to express
-   *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+   * @param caseInstanceBusinessKeyLike
+   *          The string can include the wildcard character '%' to express like-strategy: starts
+   *          with (string%), ends with (%string) or contains (%string%).
    */
   HistoricCaseInstanceQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike);
 
   /**
-   * <p>Only selects historic case instances with historic case activity instances
-   * in at least one of the given case activity ids.</p>
+   * <p>
+   * Only selects historic case instances with historic case activity instances in at least one of
+   * the given case activity ids.
+   * </p>
    */
   HistoricCaseInstanceQuery caseActivityIdIn(String... caseActivityIds);
 
@@ -94,22 +106,23 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
   /** Only select historic case instances started by the given case instance. */
   HistoricCaseInstanceQuery superCaseInstanceId(String superCaseInstanceId);
 
-  /** Only select historic case instances having a sub case instance
-   * with the given case instance id.
+  /**
+   * Only select historic case instances having a sub case instance with the given case instance id.
    *
-   * Note that there will always be maximum only <b>one</b>
-   * such case instance that can be the result of this query.
+   * Note that there will always be maximum only <b>one</b> such case instance that can be the
+   * result of this query.
    */
   HistoricCaseInstanceQuery subCaseInstanceId(String subCaseInstanceId);
 
   /** Only select historic case instances started by the given process instance. */
   HistoricCaseInstanceQuery superProcessInstanceId(String superProcessInstanceId);
 
-  /** Only select historic case instances having a sub process instance
-   * with the given process instance id.
+  /**
+   * Only select historic case instances having a sub process instance with the given process
+   * instance id.
    *
-   * Note that there will always be maximum only <b>one</b>
-   * such case instance that can be the result of this query.
+   * Note that there will always be maximum only <b>one</b> such case instance that can be the
+   * result of this query.
    */
   HistoricCaseInstanceQuery subProcessInstanceId(String subProcessInstanceId);
 
@@ -147,78 +160,100 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
   /**
    * Only select case instances which have a global variable with the given value.
    *
-   * @param name the name of the variable
-   * @param value the value of the variable
-   * @throws NotValidException if the name is null
+   * @param name
+   *          the name of the variable
+   * @param value
+   *          the value of the variable
+   * @throws NotValidException
+   *           if the name is null
    */
   HistoricCaseInstanceQuery variableValueEquals(String name, Object value);
 
   /**
-   * Only select case instances which have a global variable with the given name
-   * but a different value.
+   * Only select case instances which have a global variable with the given name but a different
+   * value.
    *
-   * @param name the name of the variable
-   * @param value the value of the variable
-   * @throws NotValidException if the name is null
+   * @param name
+   *          the name of the variable
+   * @param value
+   *          the value of the variable
+   * @throws NotValidException
+   *           if the name is null
    */
   HistoricCaseInstanceQuery variableValueNotEquals(String name, Object value);
 
   /**
-   * Only select case instances which had a global variable with the given name
-   * and a value greater than the given value when they where closed.
+   * Only select case instances which had a global variable with the given name and a value greater
+   * than the given value when they where closed.
    *
-   * @param name the name of the variable
-   * @param value the value of the variable
-   * @throws NotValidException if the name or value is null
+   * @param name
+   *          the name of the variable
+   * @param value
+   *          the value of the variable
+   * @throws NotValidException
+   *           if the name or value is null
    */
   HistoricCaseInstanceQuery variableValueGreaterThan(String name, Object value);
 
   /**
-   * Only select case instances which have a global variable with the given name
-   * and a value greater or equal than the given value.
+   * Only select case instances which have a global variable with the given name and a value greater
+   * or equal than the given value.
    *
-   * @param name the name of the variable
-   * @param value the value of the variable
-   * @throws NotValidException if the name or value is null
+   * @param name
+   *          the name of the variable
+   * @param value
+   *          the value of the variable
+   * @throws NotValidException
+   *           if the name or value is null
    */
   HistoricCaseInstanceQuery variableValueGreaterThanOrEqual(String name, Object value);
 
   /**
-   * Only select case instances which have a global variable with the given name
-   * and a value less than the given value.
+   * Only select case instances which have a global variable with the given name and a value less
+   * than the given value.
    *
-   * @param name the name of the variable
-   * @param value the value of the variable
-   * @throws NotValidException if the name or value is null
+   * @param name
+   *          the name of the variable
+   * @param value
+   *          the value of the variable
+   * @throws NotValidException
+   *           if the name or value is null
    */
   HistoricCaseInstanceQuery variableValueLessThan(String name, Object value);
 
   /**
-   * Only select case instances which have a global variable with the given name
-   * and a value less or equal than the given value.
+   * Only select case instances which have a global variable with the given name and a value less or
+   * equal than the given value.
    *
-   * @param name the name of the variable
-   * @param value the value of the variable
-   * @throws NotValidException if the name or value is null
+   * @param name
+   *          the name of the variable
+   * @param value
+   *          the value of the variable
+   * @throws NotValidException
+   *           if the name or value is null
    */
   HistoricCaseInstanceQuery variableValueLessThanOrEqual(String name, Object value);
 
   /**
-   * Only select case instances which have a global variable with the given name
-   * and a value like given value.
+   * Only select case instances which have a global variable with the given name and a value like
+   * given value.
    *
-   * @param name the name of the variable
-   * @param value the value of the variable, it can include the wildcard character '%'
-   *              to express like-strategy: starts with (string%), ends with (%string),
-   *              contains (%string%)
-   * @throws NotValidException if the name or value is null
+   * @param name
+   *          the name of the variable
+   * @param value
+   *          the value of the variable, it can include the wildcard character '%' to express
+   *          like-strategy: starts with (string%), ends with (%string), contains (%string%)
+   * @throws NotValidException
+   *           if the name or value is null
    */
   HistoricCaseInstanceQuery variableValueLike(String name, String value);
 
   /** Order by the case instance id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricCaseInstanceQuery orderByCaseInstanceId();
 
-  /** Order by the case definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the case definition id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   HistoricCaseInstanceQuery orderByCaseDefinitionId();
 
   /** Order by the business key (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -230,12 +265,15 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
   /** Order by the close time (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricCaseInstanceQuery orderByCaseInstanceCloseTime();
 
-  /** Order by the duration of the case instance (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the duration of the case instance (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
+   */
   HistoricCaseInstanceQuery orderByCaseInstanceDuration();
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of historic case instances without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of historic case instances without tenant id is database-specific.
    */
   HistoricCaseInstanceQuery orderByTenantId();
 

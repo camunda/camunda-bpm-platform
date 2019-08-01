@@ -27,10 +27,8 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
-
 /**
- * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file, through
- * a stream of bytes.
+ * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file, through a stream of bytes.
  *
  * @author Falko Menge
  */
@@ -41,29 +39,30 @@ public class GetDeploymentProcessModelCmd implements Command<InputStream>, Seria
 
   public GetDeploymentProcessModelCmd(String processDefinitionId) {
     if (processDefinitionId == null || processDefinitionId.length() < 1) {
-      throw new ProcessEngineException("The process definition id is mandatory, but '" + processDefinitionId + "' has been provided.");
+      throw new ProcessEngineException("The process definition id is mandatory, but '"
+          + processDefinitionId + "' has been provided.");
     }
     this.processDefinitionId = processDefinitionId;
   }
 
   public InputStream execute(final CommandContext commandContext) {
-    ProcessDefinitionEntity processDefinition = Context
-            .getProcessEngineConfiguration()
-            .getDeploymentCache()
-            .findDeployedProcessDefinitionById(processDefinitionId);
+    ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration()
+        .getDeploymentCache().findDeployedProcessDefinitionById(processDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessDefinition(processDefinition);
     }
 
     final String deploymentId = processDefinition.getDeploymentId();
     final String resourceName = processDefinition.getResourceName();
 
-    InputStream processModelStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-      public InputStream call() throws Exception {
-        return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
-      }
-    });
+    InputStream processModelStream = commandContext
+        .runWithoutAuthorization(new Callable<InputStream>() {
+          public InputStream call() throws Exception {
+            return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
+          }
+        });
 
     return processModelStream;
   }

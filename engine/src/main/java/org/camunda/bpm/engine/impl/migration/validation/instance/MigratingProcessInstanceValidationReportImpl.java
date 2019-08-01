@@ -23,13 +23,12 @@ import org.camunda.bpm.engine.migration.MigratingActivityInstanceValidationRepor
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigratingTransitionInstanceValidationReport;
 
-public class MigratingProcessInstanceValidationReportImpl implements MigratingProcessInstanceValidationReport {
+public class MigratingProcessInstanceValidationReportImpl
+    implements MigratingProcessInstanceValidationReport {
 
   protected String processInstanceId;
-  protected List<MigratingActivityInstanceValidationReport> activityInstanceReports =
-      new ArrayList<MigratingActivityInstanceValidationReport>();
-  protected List<MigratingTransitionInstanceValidationReport> transitionInstanceReports =
-      new ArrayList<MigratingTransitionInstanceValidationReport>();
+  protected List<MigratingActivityInstanceValidationReport> activityInstanceReports = new ArrayList<MigratingActivityInstanceValidationReport>();
+  protected List<MigratingTransitionInstanceValidationReport> transitionInstanceReports = new ArrayList<MigratingTransitionInstanceValidationReport>();
   protected List<String> failures = new ArrayList<String>();
 
   public String getProcessInstanceId() {
@@ -44,7 +43,8 @@ public class MigratingProcessInstanceValidationReportImpl implements MigratingPr
     activityInstanceReports.add(instanceReport);
   }
 
-  public void addTransitionInstanceReport(MigratingTransitionInstanceValidationReport instanceReport) {
+  public void addTransitionInstanceReport(
+      MigratingTransitionInstanceValidationReport instanceReport) {
     transitionInstanceReports.add(instanceReport);
   }
 
@@ -66,22 +66,20 @@ public class MigratingProcessInstanceValidationReportImpl implements MigratingPr
   }
 
   public boolean hasFailures() {
-    return !failures.isEmpty() || !activityInstanceReports.isEmpty() || !transitionInstanceReports.isEmpty();
+    return !failures.isEmpty() || !activityInstanceReports.isEmpty()
+        || !transitionInstanceReports.isEmpty();
   }
 
   public void writeTo(StringBuilder sb) {
-    sb.append("Cannot migrate process instance '")
-      .append(processInstanceId)
-      .append("':\n");
+    sb.append("Cannot migrate process instance '").append(processInstanceId).append("':\n");
 
     for (String failure : failures) {
       sb.append("\t").append(failure).append("\n");
     }
 
     for (MigratingActivityInstanceValidationReport report : activityInstanceReports) {
-      sb.append("\tCannot migrate activity instance '")
-        .append(report.getActivityInstanceId())
-        .append("':\n");
+      sb.append("\tCannot migrate activity instance '").append(report.getActivityInstanceId())
+          .append("':\n");
 
       for (String failure : report.getFailures()) {
         sb.append("\t\t").append(failure).append("\n");
@@ -89,9 +87,8 @@ public class MigratingProcessInstanceValidationReportImpl implements MigratingPr
     }
 
     for (MigratingTransitionInstanceValidationReport report : transitionInstanceReports) {
-      sb.append("\tCannot migrate transition instance '")
-        .append(report.getTransitionInstanceId())
-        .append("':\n");
+      sb.append("\tCannot migrate transition instance '").append(report.getTransitionInstanceId())
+          .append("':\n");
 
       for (String failure : report.getFailures()) {
         sb.append("\t\t").append(failure).append("\n");

@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.engine.impl.pvm.process;
 
-
 /**
- * Object indicating that a {@link ProcessDefinitionImpl} is a participant in a collaboration (pool). 
- * Currently only used to store graphical information and the pool name.
+ * Object indicating that a {@link ProcessDefinitionImpl} is a participant in a collaboration
+ * (pool). Currently only used to store graphical information and the pool name.
  * 
  * @author Frederik Heremans
  */
@@ -31,28 +30,27 @@ public class ParticipantProcess implements HasDIBounds {
   protected int y = -1;
   protected int width = -1;
   protected int height = -1;
-  
+
   public void setId(String id) {
     this.id = id;
   }
-  
+
   public String getId() {
     return id;
   }
-  
-  
+
   public String getName() {
     return name;
   }
-  
+
   public void setName(String name) {
     this.name = name;
   }
-  
+
   public int getX() {
     return x;
   }
-  
+
   public void setX(int x) {
     this.x = x;
   }
@@ -80,6 +78,5 @@ public class ParticipantProcess implements HasDIBounds {
   public void setHeight(int height) {
     this.height = height;
   }
-  
-  
+
 }

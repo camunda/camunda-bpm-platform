@@ -25,7 +25,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Daniel Meyer
  *
  */
-public class PvmAtomicOperationsTransitionInterruptFlowScope extends PvmAtomicOperationInterruptScope {
+public class PvmAtomicOperationsTransitionInterruptFlowScope
+    extends PvmAtomicOperationInterruptScope {
 
   public String getCanonicalName() {
     return "transition-interrupt-scope";

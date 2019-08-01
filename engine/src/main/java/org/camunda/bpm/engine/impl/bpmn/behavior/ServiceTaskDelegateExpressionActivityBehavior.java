@@ -36,10 +36,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 
-
 /**
- * {@link ActivityBehavior} used when 'delegateExpression' is used
- * for a serviceTask.
+ * {@link ActivityBehavior} used when 'delegateExpression' is used for a serviceTask.
  *
  * @author Joram Barrez
  * @author Josh Long
@@ -53,31 +51,35 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;
 
-  public ServiceTaskDelegateExpressionActivityBehavior(Expression expression, List<FieldDeclaration> fieldDeclarations) {
+  public ServiceTaskDelegateExpressionActivityBehavior(Expression expression,
+      List<FieldDeclaration> fieldDeclarations) {
     this.expression = expression;
     this.fieldDeclarations = fieldDeclarations;
   }
 
   @Override
-  public void signal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
-    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
-    if(ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
+  public void signal(final ActivityExecution execution, final String signalName,
+      final Object signalData) throws Exception {
+    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil
+        .getTargetProcessApplication((ExecutionEntity) execution);
+    if (ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
       Context.executeWithinProcessApplication(new Callable<Void>() {
         public Void call() throws Exception {
           signal(execution, signalName, signalData);
           return null;
         }
       }, targetProcessApplication, new InvocationContext(execution));
-    }
-    else {
+    } else {
       doSignal(execution, signalName, signalData);
     }
   }
 
-  public void doSignal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
+  public void doSignal(final ActivityExecution execution, final String signalName,
+      final Object signalData) throws Exception {
     Object delegate = expression.getValue(execution);
     applyFieldDeclaration(fieldDeclarations, delegate);
-    final ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution, delegate);
+    final ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution,
+        delegate);
 
     if (activityBehaviorInstance instanceof CustomActivityBehavior) {
       CustomActivityBehavior behavior = (CustomActivityBehavior) activityBehaviorInstance;
@@ -91,15 +93,16 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
     executeWithErrorPropagation(execution, new Callable<Void>() {
       @Override
       public Void call() throws Exception {
-        ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
+        ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName,
+            signalData);
         return null;
       }
     });
   }
 
-	@Override
+  @Override
   public void performExecution(final ActivityExecution execution) throws Exception {
-	  Callable<Void> callable = new Callable<Void>() {
+    Callable<Void> callable = new Callable<Void>() {
       @Override
       public Void call() throws Exception {
         // Note: we can't cache the result of the expression, because the
@@ -108,18 +111,17 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
         applyFieldDeclaration(fieldDeclarations, delegate);
 
         if (delegate instanceof ActivityBehavior) {
-          Context.getProcessEngineConfiguration()
-            .getDelegateInterceptor()
-            .handleInvocation(new ActivityBehaviorInvocation((ActivityBehavior) delegate, execution));
+          Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(
+              new ActivityBehaviorInvocation((ActivityBehavior) delegate, execution));
 
         } else if (delegate instanceof JavaDelegate) {
-          Context.getProcessEngineConfiguration()
-            .getDelegateInterceptor()
-            .handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
+          Context.getProcessEngineConfiguration().getDelegateInterceptor()
+              .handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
           leave(execution);
 
         } else {
-          throw LOG.resolveDelegateExpressionException(expression, ActivityBehavior.class, JavaDelegate.class);
+          throw LOG.resolveDelegateExpressionException(expression, ActivityBehavior.class,
+              JavaDelegate.class);
         }
         return null;
       }
@@ -127,7 +129,8 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
     executeWithErrorPropagation(execution, callable);
   }
 
-  protected ActivityBehavior getActivityBehaviorInstance(ActivityExecution execution, Object delegateInstance) {
+  protected ActivityBehavior getActivityBehaviorInstance(ActivityExecution execution,
+      Object delegateInstance) {
 
     if (delegateInstance instanceof ActivityBehavior) {
       return new CustomActivityBehavior((ActivityBehavior) delegateInstance);
@@ -135,7 +138,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
       return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance);
     } else {
       throw LOG.missingDelegateParentClassException(delegateInstance.getClass().getName(),
-        JavaDelegate.class.getName(), ActivityBehavior.class.getName());
+          JavaDelegate.class.getName(), ActivityBehavior.class.getName());
     }
   }
 

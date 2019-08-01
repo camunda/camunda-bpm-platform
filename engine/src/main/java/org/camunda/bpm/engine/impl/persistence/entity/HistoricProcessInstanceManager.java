@@ -44,7 +44,8 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
 
   public HistoricProcessInstanceEntity findHistoricProcessInstance(String processInstanceId) {
     if (isHistoryEnabled()) {
-      return getDbEntityManager().selectById(HistoricProcessInstanceEntity.class, processInstanceId);
+      return getDbEntityManager().selectById(HistoricProcessInstanceEntity.class,
+          processInstanceId);
     }
     return null;
   }
@@ -60,7 +61,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   public void deleteHistoricProcessInstanceByProcessDefinitionId(String processDefinitionId) {
     if (isHistoryEnabled()) {
       List<String> historicProcessInstanceIds = getDbEntityManager()
-        .selectList("selectHistoricProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
+          .selectList("selectHistoricProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
 
       if (!historicProcessInstanceIds.isEmpty()) {
         deleteHistoricProcessInstanceByIds(historicProcessInstanceIds);
@@ -71,45 +72,61 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   public void deleteHistoricProcessInstanceByIds(List<String> processInstanceIds) {
     if (isHistoryEnabled()) {
       CommandContext commandContext = Context.getCommandContext();
-  
-      commandContext.getHistoricDetailManager().deleteHistoricDetailsByProcessInstanceIds(processInstanceIds);
-      commandContext.getHistoricVariableInstanceManager().deleteHistoricVariableInstanceByProcessInstanceIds(processInstanceIds);
+
+      commandContext.getHistoricDetailManager()
+          .deleteHistoricDetailsByProcessInstanceIds(processInstanceIds);
+      commandContext.getHistoricVariableInstanceManager()
+          .deleteHistoricVariableInstanceByProcessInstanceIds(processInstanceIds);
       commandContext.getCommentManager().deleteCommentsByProcessInstanceIds(processInstanceIds);
-      commandContext.getAttachmentManager().deleteAttachmentsByProcessInstanceIds(processInstanceIds);
-      commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstancesByProcessInstanceIds(processInstanceIds, false);
-      commandContext.getHistoricActivityInstanceManager().deleteHistoricActivityInstancesByProcessInstanceIds(processInstanceIds);
-      commandContext.getHistoricIncidentManager().deleteHistoricIncidentsByProcessInstanceIds(processInstanceIds);
-      commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByProcessInstanceIds(processInstanceIds);
-      commandContext.getHistoricExternalTaskLogManager().deleteHistoricExternalTaskLogsByProcessInstanceIds(processInstanceIds);
-  
-      commandContext.getDbEntityManager().deletePreserveOrder(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstances", processInstanceIds);
+      commandContext.getAttachmentManager()
+          .deleteAttachmentsByProcessInstanceIds(processInstanceIds);
+      commandContext.getHistoricTaskInstanceManager()
+          .deleteHistoricTaskInstancesByProcessInstanceIds(processInstanceIds, false);
+      commandContext.getHistoricActivityInstanceManager()
+          .deleteHistoricActivityInstancesByProcessInstanceIds(processInstanceIds);
+      commandContext.getHistoricIncidentManager()
+          .deleteHistoricIncidentsByProcessInstanceIds(processInstanceIds);
+      commandContext.getHistoricJobLogManager()
+          .deleteHistoricJobLogsByProcessInstanceIds(processInstanceIds);
+      commandContext.getHistoricExternalTaskLogManager()
+          .deleteHistoricExternalTaskLogsByProcessInstanceIds(processInstanceIds);
+
+      commandContext.getDbEntityManager().deletePreserveOrder(HistoricProcessInstanceEntity.class,
+          "deleteHistoricProcessInstances", processInstanceIds);
     }
   }
 
-  public long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+  public long findHistoricProcessInstanceCountByQueryCriteria(
+      HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
     if (isHistoryEnabled()) {
       configureQuery(historicProcessInstanceQuery);
-      return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceCountByQueryCriteria", historicProcessInstanceQuery);
+      return (Long) getDbEntityManager().selectOne(
+          "selectHistoricProcessInstanceCountByQueryCriteria", historicProcessInstanceQuery);
     }
     return 0;
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery, Page page) {
+  public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(
+      HistoricProcessInstanceQueryImpl historicProcessInstanceQuery, Page page) {
     if (isHistoryEnabled()) {
       configureQuery(historicProcessInstanceQuery);
-      return getDbEntityManager().selectList("selectHistoricProcessInstancesByQueryCriteria", historicProcessInstanceQuery, page);
+      return getDbEntityManager().selectList("selectHistoricProcessInstancesByQueryCriteria",
+          historicProcessInstanceQuery, page);
     }
     return Collections.EMPTY_LIST;
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbEntityManager().selectListWithRawParameter("selectHistoricProcessInstanceByNativeQuery", parameterMap, firstResult, maxResults);
+  public List<HistoricProcessInstance> findHistoricProcessInstancesByNativeQuery(
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return getDbEntityManager().selectListWithRawParameter(
+        "selectHistoricProcessInstanceByNativeQuery", parameterMap, firstResult, maxResults);
   }
 
   public long findHistoricProcessInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceCountByNativeQuery", parameterMap);
+    return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceCountByNativeQuery",
+        parameterMap);
   }
 
   protected void configureQuery(HistoricProcessInstanceQueryImpl query) {
@@ -118,196 +135,211 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<String> findHistoricProcessInstanceIdsForCleanup(Integer batchSize, int minuteFrom, int minuteTo) {
+  public List<String> findHistoricProcessInstanceIdsForCleanup(Integer batchSize, int minuteFrom,
+      int minuteTo) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("currentTimestamp", ClockUtil.getCurrentTime());
     if (minuteTo - minuteFrom + 1 < 60) {
       parameters.put("minuteFrom", minuteFrom);
       parameters.put("minuteTo", minuteTo);
     }
-    ListQueryParameterObject parameterObject = new ListQueryParameterObject(parameters, 0, batchSize);
-    return (List<String>) getDbEntityManager().selectList("selectHistoricProcessInstanceIdsForCleanup", parameterObject);
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject(parameters, 0,
+        batchSize);
+    return (List<String>) getDbEntityManager()
+        .selectList("selectHistoricProcessInstanceIdsForCleanup", parameterObject);
   }
 
   @SuppressWarnings("unchecked")
-  public List<String> findHistoricProcessInstanceIds(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+  public List<String> findHistoricProcessInstanceIds(
+      HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
     configureQuery(historicProcessInstanceQuery);
-    return (List<String>) getDbEntityManager().selectList("selectHistoricProcessInstanceIdsByQueryCriteria", historicProcessInstanceQuery);
+    return (List<String>) getDbEntityManager().selectList(
+        "selectHistoricProcessInstanceIdsByQueryCriteria", historicProcessInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<CleanableHistoricProcessInstanceReportResult> findCleanableHistoricProcessInstancesReportByCriteria(CleanableHistoricProcessInstanceReportImpl query, Page page) {
+  public List<CleanableHistoricProcessInstanceReportResult> findCleanableHistoricProcessInstancesReportByCriteria(
+      CleanableHistoricProcessInstanceReportImpl query, Page page) {
     query.setCurrentTimestamp(ClockUtil.getCurrentTime());
 
-    getAuthorizationManager().configureQueryHistoricFinishedInstanceReport(query, Resources.PROCESS_DEFINITION);
+    getAuthorizationManager().configureQueryHistoricFinishedInstanceReport(query,
+        Resources.PROCESS_DEFINITION);
     getTenantManager().configureQuery(query);
-    return getDbEntityManager().selectList("selectFinishedProcessInstancesReportEntities", query, page);
+    return getDbEntityManager().selectList("selectFinishedProcessInstancesReportEntities", query,
+        page);
   }
 
-  public long findCleanableHistoricProcessInstancesReportCountByCriteria(CleanableHistoricProcessInstanceReportImpl query) {
+  public long findCleanableHistoricProcessInstancesReportCountByCriteria(
+      CleanableHistoricProcessInstanceReportImpl query) {
     query.setCurrentTimestamp(ClockUtil.getCurrentTime());
 
-    getAuthorizationManager().configureQueryHistoricFinishedInstanceReport(query, Resources.PROCESS_DEFINITION);
+    getAuthorizationManager().configureQueryHistoricFinishedInstanceReport(query,
+        Resources.PROCESS_DEFINITION);
     getTenantManager().configureQuery(query);
-    return (Long) getDbEntityManager().selectOne("selectFinishedProcessInstancesReportEntitiesCount", query);
+    return (Long) getDbEntityManager()
+        .selectOne("selectFinishedProcessInstancesReportEntitiesCount", query);
   }
 
-  public void addRemovalTimeToProcessInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToProcessInstancesByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     CommandContext commandContext = Context.getCommandContext();
 
     commandContext.getHistoricActivityInstanceManager()
-      .addRemovalTimeToActivityInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToActivityInstancesByRootProcessInstanceId(rootProcessInstanceId,
+            removalTime);
 
     commandContext.getHistoricTaskInstanceManager()
-      .addRemovalTimeToTaskInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToTaskInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
     commandContext.getHistoricVariableInstanceManager()
-      .addRemovalTimeToVariableInstancesByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToVariableInstancesByRootProcessInstanceId(rootProcessInstanceId,
+            removalTime);
 
     commandContext.getHistoricDetailManager()
-      .addRemovalTimeToDetailsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToDetailsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
     commandContext.getHistoricIncidentManager()
-      .addRemovalTimeToIncidentsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToIncidentsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
     commandContext.getHistoricExternalTaskLogManager()
-      .addRemovalTimeToExternalTaskLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToExternalTaskLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
     commandContext.getHistoricJobLogManager()
-      .addRemovalTimeToJobLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToJobLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
-    commandContext.getOperationLogManager()
-      .addRemovalTimeToUserOperationLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+    commandContext.getOperationLogManager().addRemovalTimeToUserOperationLogByRootProcessInstanceId(
+        rootProcessInstanceId, removalTime);
 
     commandContext.getHistoricIdentityLinkManager()
-      .addRemovalTimeToIdentityLinkLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToIdentityLinkLogByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
     commandContext.getCommentManager()
-      .addRemovalTimeToCommentsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToCommentsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
     commandContext.getAttachmentManager()
-      .addRemovalTimeToAttachmentsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToAttachmentsByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
     commandContext.getByteArrayManager()
-      .addRemovalTimeToByteArraysByRootProcessInstanceId(rootProcessInstanceId, removalTime);
+        .addRemovalTimeToByteArraysByRootProcessInstanceId(rootProcessInstanceId, removalTime);
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricProcessInstanceEventEntity.class, "updateHistoricProcessInstanceEventsByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricProcessInstanceEventEntity.class,
+        "updateHistoricProcessInstanceEventsByRootProcessInstanceId", parameters);
   }
 
   public void addRemovalTimeById(String processInstanceId, Date removalTime) {
     CommandContext commandContext = Context.getCommandContext();
 
     commandContext.getHistoricActivityInstanceManager()
-      .addRemovalTimeToActivityInstancesByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToActivityInstancesByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getHistoricTaskInstanceManager()
-      .addRemovalTimeToTaskInstancesByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToTaskInstancesByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getHistoricVariableInstanceManager()
-      .addRemovalTimeToVariableInstancesByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToVariableInstancesByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getHistoricDetailManager()
-      .addRemovalTimeToDetailsByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToDetailsByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getHistoricIncidentManager()
-      .addRemovalTimeToIncidentsByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToIncidentsByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getHistoricExternalTaskLogManager()
-      .addRemovalTimeToExternalTaskLogByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToExternalTaskLogByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getHistoricJobLogManager()
-      .addRemovalTimeToJobLogByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToJobLogByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getOperationLogManager()
-      .addRemovalTimeToUserOperationLogByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToUserOperationLogByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getHistoricIdentityLinkManager()
-      .addRemovalTimeToIdentityLinkLogByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToIdentityLinkLogByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getCommentManager()
-      .addRemovalTimeToCommentsByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToCommentsByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getAttachmentManager()
-      .addRemovalTimeToAttachmentsByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToAttachmentsByProcessInstanceId(processInstanceId, removalTime);
 
     commandContext.getByteArrayManager()
-      .addRemovalTimeToByteArraysByProcessInstanceId(processInstanceId, removalTime);
+        .addRemovalTimeToByteArraysByProcessInstanceId(processInstanceId, removalTime);
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricProcessInstanceEventEntity.class, "updateHistoricProcessInstanceByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricProcessInstanceEventEntity.class,
+        "updateHistoricProcessInstanceByProcessInstanceId", parameters);
   }
 
-  public Map<Class<? extends DbEntity>, DbOperation> deleteHistoricProcessInstancesByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public Map<Class<? extends DbEntity>, DbOperation> deleteHistoricProcessInstancesByRemovalTime(
+      Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
     CommandContext commandContext = Context.getCommandContext();
 
     Map<Class<? extends DbEntity>, DbOperation> deleteOperations = new HashMap<>();
 
     DbOperation deleteActivityInstances = commandContext.getHistoricActivityInstanceManager()
-      .deleteHistoricActivityInstancesByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteHistoricActivityInstancesByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteActivityInstances.getEntityType(), deleteActivityInstances);
 
     DbOperation deleteTaskInstances = commandContext.getHistoricTaskInstanceManager()
-      .deleteHistoricTaskInstancesByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteHistoricTaskInstancesByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteTaskInstances.getEntityType(), deleteTaskInstances);
 
     DbOperation deleteVariableInstances = commandContext.getHistoricVariableInstanceManager()
-      .deleteHistoricVariableInstancesByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteHistoricVariableInstancesByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteVariableInstances.getEntityType(), deleteVariableInstances);
 
     DbOperation deleteDetails = commandContext.getHistoricDetailManager()
-      .deleteHistoricDetailsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteHistoricDetailsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteDetails.getEntityType(), deleteDetails);
 
     DbOperation deleteIncidents = commandContext.getHistoricIncidentManager()
-      .deleteHistoricIncidentsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteHistoricIncidentsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteIncidents.getEntityType(), deleteIncidents);
 
     DbOperation deleteTaskLog = commandContext.getHistoricExternalTaskLogManager()
-      .deleteExternalTaskLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteExternalTaskLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteTaskLog.getEntityType(), deleteTaskLog);
 
     DbOperation deleteJobLog = commandContext.getHistoricJobLogManager()
-      .deleteJobLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteJobLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteJobLog.getEntityType(), deleteJobLog);
 
     DbOperation deleteOperationLog = commandContext.getOperationLogManager()
-      .deleteOperationLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteOperationLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteOperationLog.getEntityType(), deleteOperationLog);
 
     DbOperation deleteIdentityLinkLog = commandContext.getHistoricIdentityLinkManager()
-      .deleteHistoricIdentityLinkLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteHistoricIdentityLinkLogByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteIdentityLinkLog.getEntityType(), deleteIdentityLinkLog);
 
     DbOperation deleteComments = commandContext.getCommentManager()
-      .deleteCommentsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteCommentsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteComments.getEntityType(), deleteComments);
 
     DbOperation deleteAttachments = commandContext.getAttachmentManager()
-      .deleteAttachmentsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteAttachmentsByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteAttachments.getEntityType(), deleteAttachments);
 
     DbOperation deleteByteArrays = commandContext.getByteArrayManager()
-      .deleteByteArraysByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
+        .deleteByteArraysByRemovalTime(removalTime, minuteFrom, minuteTo, batchSize);
 
     deleteOperations.put(deleteByteArrays.getEntityType(), deleteByteArrays);
 
@@ -319,8 +351,8 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     }
     parameters.put("batchSize", batchSize);
 
-    DbOperation deleteProcessInstances = getDbEntityManager()
-      .deletePreserveOrder(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstancesByRemovalTime",
+    DbOperation deleteProcessInstances = getDbEntityManager().deletePreserveOrder(
+        HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstancesByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
 
     deleteOperations.put(deleteProcessInstances.getEntityType(), deleteProcessInstances);

@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -40,7 +39,6 @@ public class TransitionImpl extends CoreModelElement implements PvmTransition {
 
   /** Graphical information: a list of waypoints: x1, y1, x2, y2, x3, y3, .. */
   protected List<Integer> waypoints = new ArrayList<Integer>();
-
 
   public TransitionImpl(String id, ProcessDefinitionImpl processDefinition) {
     super(id);
@@ -75,7 +73,8 @@ public class TransitionImpl extends CoreModelElement implements PvmTransition {
   }
 
   public String toString() {
-    return "("+source.getId()+")--"+(id!=null?id+"-->(":">(")+destination.getId()+")";
+    return "(" + source.getId() + ")--" + (id != null ? id + "-->(" : ">(") + destination.getId()
+        + ")";
   }
 
   // getters and setters //////////////////////////////////////////////////////

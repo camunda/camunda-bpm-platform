@@ -16,10 +16,11 @@
  */
 package org.camunda.bpm.container.impl.jmx.services;
 
-
 /**
- * <p>MBean responsible for controlling a Thread Pool. The thread pool is used by the
- * JobExecutor component.</p>
+ * <p>
+ * MBean responsible for controlling a Thread Pool. The thread pool is used by the JobExecutor
+ * component.
+ * </p>
  * 
  * @author Daniel Meyer
  *

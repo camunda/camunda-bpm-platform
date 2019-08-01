@@ -28,13 +28,14 @@ public class FailingTransactionListenerDelegate implements JavaDelegate {
   @Override
   public void execute(DelegateExecution execution) throws Exception {
 
-    Context.getCommandContext().getTransactionContext().addTransactionListener(TransactionState.COMMITTING, new TransactionListener() {
+    Context.getCommandContext().getTransactionContext()
+        .addTransactionListener(TransactionState.COMMITTING, new TransactionListener() {
 
-      @Override
-      public void execute(CommandContext context) {
-        throw new RuntimeException("exception in transaction listener");
-      }
-    });
+          @Override
+          public void execute(CommandContext context) {
+            throw new RuntimeException("exception in transaction listener");
+          }
+        });
   }
 
 }

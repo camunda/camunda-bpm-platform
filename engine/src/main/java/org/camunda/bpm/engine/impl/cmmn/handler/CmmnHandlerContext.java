@@ -24,8 +24,10 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 
 /**
- * <p>This context contains necessary information (like caseDefinition)
- * to be accessed by a {@link CmmnHandlerContext}.</p>
+ * <p>
+ * This context contains necessary information (like caseDefinition) to be accessed by a
+ * {@link CmmnHandlerContext}.
+ * </p>
  *
  * @author Roman Smirnov
  *

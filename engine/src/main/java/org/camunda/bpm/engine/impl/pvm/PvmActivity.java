@@ -23,12 +23,10 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
 
-
 /**
- * Defines an activity insisde a process. Note that the term "activity" is meant to be
- * understood in a broader sense than in BPMN: everything inside a process which can have incoming
- * or outgoing sequence flows (transitions) are activities. Examples: events, tasks, gateways,
- * subprocesses ...
+ * Defines an activity insisde a process. Note that the term "activity" is meant to be understood in
+ * a broader sense than in BPMN: everything inside a process which can have incoming or outgoing
+ * sequence flows (transitions) are activities. Examples: events, tasks, gateways, subprocesses ...
  *
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -36,8 +34,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
 public interface PvmActivity extends PvmScope {
 
   /**
-   * The inner behavior of an activity. The inner behavior is the logic which is executed after
-   * the {@link ExecutionListener#EVENTNAME_START start} listeners have been executed.
+   * The inner behavior of an activity. The inner behavior is the logic which is executed after the
+   * {@link ExecutionListener#EVENTNAME_START start} listeners have been executed.
    *
    * In case the activity {@link #isScope() is scope}, a new execution will be created
    *
@@ -55,7 +53,9 @@ public interface PvmActivity extends PvmScope {
 
   /**
    * Finds and returns an outgoing sequence flow (transition) by it's id.
-   * @param transitionId the id of the transition to find
+   * 
+   * @param transitionId
+   *          the id of the transition to find
    * @return the transition or null in case it cannot be found
    */
   PvmTransition findOutgoingTransition(String transitionId);
@@ -71,17 +71,18 @@ public interface PvmActivity extends PvmScope {
   List<PvmTransition> getIncomingTransitions();
 
   /**
-   * Indicates whether the activity is executed asynchronously.
-   * This can be done <em>after</em> the {@link #getActivityStartBehavior() activity start behavior} and
-   * <em>before</em> the {@link ExecutionListener#EVENTNAME_START start} listeners are invoked.
+   * Indicates whether the activity is executed asynchronously. This can be done <em>after</em> the
+   * {@link #getActivityStartBehavior() activity start behavior} and <em>before</em> the
+   * {@link ExecutionListener#EVENTNAME_START start} listeners are invoked.
    *
    * @return true if the activity is executed asynchronously.
    */
   boolean isAsyncBefore();
 
   /**
-   * Indicates whether execution after this execution should continue asynchronously.
-   * This can be done <em>after</em> the {@link ExecutionListener#EVENTNAME_END end} listeners are invoked.
+   * Indicates whether execution after this execution should continue asynchronously. This can be
+   * done <em>after</em> the {@link ExecutionListener#EVENTNAME_END end} listeners are invoked.
+   * 
    * @return true if execution after this activity continues asynchronously.
    */
   boolean isAsyncAfter();

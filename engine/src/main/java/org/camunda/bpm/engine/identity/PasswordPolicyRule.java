@@ -19,17 +19,16 @@ package org.camunda.bpm.engine.identity;
 import java.util.Map;
 
 /**
- * Describes a rule of a {@link PasswordPolicy}. All rules attached to a
- * {@link PasswordPolicy} must be matched by passwords for engine-managed users
- * to be policy compliant.
+ * Describes a rule of a {@link PasswordPolicy}. All rules attached to a {@link PasswordPolicy} must
+ * be matched by passwords for engine-managed users to be policy compliant.
  * 
  * @author Miklas Boskamp
  */
 public interface PasswordPolicyRule {
 
   /**
-   * Placeholder string that can be used to display a description of this rule.
-   * The actual description text must be managed on the calling side.
+   * Placeholder string that can be used to display a description of this rule. The actual
+   * description text must be managed on the calling side.
    * 
    * @return the placeholder for the description text.
    */
@@ -47,9 +46,8 @@ public interface PasswordPolicyRule {
    * 
    * @param password
    *          the string that should be checked
-   * @return <code>true</code> if the given password matches this rule.
-   *         <code>false</code> if the given password is not compliant with this
-   *         rule.
+   * @return <code>true</code> if the given password matches this rule. <code>false</code> if the
+   *         given password is not compliant with this rule.
    */
   boolean execute(String password);
 }

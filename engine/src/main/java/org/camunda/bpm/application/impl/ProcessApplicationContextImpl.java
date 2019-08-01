@@ -22,8 +22,7 @@ package org.camunda.bpm.application.impl;
  */
 public class ProcessApplicationContextImpl {
 
-  protected static ThreadLocal<ProcessApplicationIdentifier> currentProcessApplication =
-      new ThreadLocal<ProcessApplicationIdentifier>();
+  protected static ThreadLocal<ProcessApplicationIdentifier> currentProcessApplication = new ThreadLocal<ProcessApplicationIdentifier>();
 
   public static ProcessApplicationIdentifier get() {
     return currentProcessApplication.get();

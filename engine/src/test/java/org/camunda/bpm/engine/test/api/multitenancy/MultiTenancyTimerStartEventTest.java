@@ -43,12 +43,8 @@ import org.junit.rules.RuleChain;
 
 public class MultiTenancyTimerStartEventTest {
 
-  protected static final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess()
-      .startEvent()
-        .timerWithDuration("PT1M")
-      .userTask()
-      .endEvent()
-      .done();
+  protected static final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess().startEvent()
+      .timerWithDuration("PT1M").userTask().endEvent().done();
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
@@ -106,22 +102,22 @@ public class MultiTenancyTimerStartEventTest {
   @Test
   public void deleteJobsWhileUndeployment() {
 
-     Deployment deploymentForTenantOne = testRule.deployForTenant(TENANT_ONE, PROCESS);
-     Deployment deploymentForTenantTwo = testRule.deployForTenant(TENANT_TWO, PROCESS);
+    Deployment deploymentForTenantOne = testRule.deployForTenant(TENANT_ONE, PROCESS);
+    Deployment deploymentForTenantTwo = testRule.deployForTenant(TENANT_TWO, PROCESS);
 
-     JobQuery query = managementService.createJobQuery();
-     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    JobQuery query = managementService.createJobQuery();
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
 
-     repositoryService.deleteDeployment(deploymentForTenantOne.getId(), true);
+    repositoryService.deleteDeployment(deploymentForTenantOne.getId(), true);
 
-     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
-     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
 
-     repositoryService.deleteDeployment(deploymentForTenantTwo.getId(), true);
+    repositoryService.deleteDeployment(deploymentForTenantTwo.getId(), true);
 
-     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
-     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
   }
 
   @Test
@@ -139,23 +135,15 @@ public class MultiTenancyTimerStartEventTest {
   @Test
   public void failedJobRetryTimeCycle() {
 
-    testRule.deployForTenant(TENANT_ONE, Bpmn.createExecutableProcess("failingProcess")
-      .startEvent()
-        .timerWithDuration("PT1M")
-        .camundaFailedJobRetryTimeCycle("R5/PT1M")
-      .serviceTask()
-        .camundaExpression("${failing}")
-      .endEvent()
-      .done());
+    testRule.deployForTenant(TENANT_ONE,
+        Bpmn.createExecutableProcess("failingProcess").startEvent().timerWithDuration("PT1M")
+            .camundaFailedJobRetryTimeCycle("R5/PT1M").serviceTask().camundaExpression("${failing}")
+            .endEvent().done());
 
-    testRule.deployForTenant(TENANT_TWO, Bpmn.createExecutableProcess("failingProcess")
-      .startEvent()
-        .timerWithDuration("PT1M")
-        .camundaFailedJobRetryTimeCycle("R4/PT1M")
-      .serviceTask()
-        .camundaExpression("${failing}")
-      .endEvent()
-      .done());
+    testRule.deployForTenant(TENANT_TWO,
+        Bpmn.createExecutableProcess("failingProcess").startEvent().timerWithDuration("PT1M")
+            .camundaFailedJobRetryTimeCycle("R4/PT1M").serviceTask().camundaExpression("${failing}")
+            .endEvent().done());
 
     List<Job> jobs = managementService.createJobQuery().timers().list();
     executeFailingJobs(jobs);
@@ -170,12 +158,8 @@ public class MultiTenancyTimerStartEventTest {
   @Test
   public void timerStartEventWithTimerCycle() {
 
-    testRule.deployForTenant(TENANT_ONE, Bpmn.createExecutableProcess()
-        .startEvent()
-          .timerWithCycle("R2/PT1M")
-        .userTask()
-        .endEvent()
-        .done());
+    testRule.deployForTenant(TENANT_ONE, Bpmn.createExecutableProcess().startEvent()
+        .timerWithCycle("R2/PT1M").userTask().endEvent().done());
 
     // execute first timer cycle
     Job job = managementService.createJobQuery().singleResult();
@@ -199,7 +183,8 @@ public class MultiTenancyTimerStartEventTest {
         managementService.executeJob(job.getId());
 
         fail("expected exception");
-      } catch (Exception e) {}
+      } catch (Exception e) {
+      }
     }
   }
 

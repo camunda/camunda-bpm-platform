@@ -50,12 +50,14 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
     // if an outgoing sequence flow has no id, we cannot use it in asyncAfter
     try {
-      repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/async/AsyncAfterTest.testTransitionIdRequired.bpmn20.xml")
-        .deploy();
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/async/AsyncAfterTest.testTransitionIdRequired.bpmn20.xml")
+          .deploy();
       fail("Exception expected");
-    } catch ( ProcessEngineException e) {
-      assertTextPresent("Sequence flow with sourceRef='service' must have an id, activity with id 'service' uses 'asyncAfter'.", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent(
+          "Sequence flow with sourceRef='service' must have an id, activity with id 'service' uses 'asyncAfter'.",
+          e.getMessage());
     }
 
   }
@@ -145,7 +147,8 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     // if we execute the job, the process instance continues along the selected path
     managementService.executeJob(continuationJob.getId());
 
-    assertNotNull(runtimeService.createExecutionQuery().activityId("taskAfterFlow2").singleResult());
+    assertNotNull(
+        runtimeService.createExecutionQuery().activityId("taskAfterFlow2").singleResult());
     assertNull(runtimeService.createExecutionQuery().activityId("taskAfterFlow3").singleResult());
 
     // end the process
@@ -171,7 +174,8 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     managementService.executeJob(continuationJob.getId());
 
     assertNull(runtimeService.createExecutionQuery().activityId("taskAfterFlow2").singleResult());
-    assertNotNull(runtimeService.createExecutionQuery().activityId("taskAfterFlow3").singleResult());
+    assertNotNull(
+        runtimeService.createExecutionQuery().activityId("taskAfterFlow3").singleResult());
 
   }
 
@@ -194,8 +198,10 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     managementService.executeJob(jobs.get(1).getId());
 
     // both subsequent tasks are activated
-    assertNotNull(runtimeService.createExecutionQuery().activityId("taskAfterFlow2").singleResult());
-    assertNotNull(runtimeService.createExecutionQuery().activityId("taskAfterFlow3").singleResult());
+    assertNotNull(
+        runtimeService.createExecutionQuery().activityId("taskAfterFlow2").singleResult());
+    assertNotNull(
+        runtimeService.createExecutionQuery().activityId("taskAfterFlow3").singleResult());
 
   }
 
@@ -243,7 +249,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
     // if we execute the job, the listeners are invoked;
     managementService.executeJob(continuationJob.getId());
-    assertTrue((Boolean)runtimeService.getVariable(pi.getId(), "subprocess-listenerEndInvoked"));
+    assertTrue((Boolean) runtimeService.getVariable(pi.getId(), "subprocess-listenerEndInvoked"));
 
   }
 
@@ -413,7 +419,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
     // finish tasks
     List<Task> tasks = taskQuery.active().list();
-    for(Task task : tasks) {
+    for (Task task : tasks) {
       taskService.complete(task.getId());
     }
 
@@ -452,7 +458,8 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("flow", false);
 
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExclusiveGateway", variables);
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExclusiveGateway",
+        variables);
 
     // listeners should be fired
     assertListenerStartInvoked(pi);
@@ -469,7 +476,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
     // finish tasks
     List<Task> tasks = taskQuery.active().list();
-    for(Task task : tasks) {
+    for (Task task : tasks) {
       taskService.complete(task.getId());
     }
 
@@ -482,7 +489,8 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("flow", false);
 
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExclusiveGateway", variables);
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExclusiveGateway",
+        variables);
 
     // no listeners are fired:
     assertNotListenerStartInvoked(pi);
@@ -502,10 +510,11 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     // and we will wait *after* the gateway:
     assertEquals(1, managementService.createJobQuery().active().count());
   }
+
   /**
-   * Test for CAM-2518: Fixes an issue that creates an infinite loop when using
-   * asyncAfter together with an execution listener on sequence flow event "take".
-   * So the only required assertion here is that the process executes successfully.
+   * Test for CAM-2518: Fixes an issue that creates an infinite loop when using asyncAfter together
+   * with an execution listener on sequence flow event "take". So the only required assertion here
+   * is that the process executes successfully.
    */
   @Deployment
   public void testAsyncAfterWithExecutionListener() {
@@ -577,7 +586,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAsyncAfterServiceWrappedInParallelMultiInstance(){
+  public void testAsyncAfterServiceWrappedInParallelMultiInstance() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -595,7 +604,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAsyncAfterServiceWrappedInSequentialMultiInstance(){
+  public void testAsyncAfterServiceWrappedInSequentialMultiInstance() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -691,27 +700,18 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
   public void testAsyncAfterErrorEvent() {
     // given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .serviceTask("servTask")
-        .camundaClass(ThrowBpmnErrorDelegate.class)
-      .boundaryEvent()
-        .camundaAsyncAfter(true)
-        .camundaFailedJobRetryTimeCycle("R10/PT10S")
-        .errorEventDefinition()
-        .errorEventDefinitionDone()
-      .serviceTask()
-        .camundaClass("foo")
-      .endEvent()
-      .moveToActivity("servTask")
-      .endEvent().done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process").startEvent()
+        .serviceTask("servTask").camundaClass(ThrowBpmnErrorDelegate.class).boundaryEvent()
+        .camundaAsyncAfter(true).camundaFailedJobRetryTimeCycle("R10/PT10S").errorEventDefinition()
+        .errorEventDefinitionDone().serviceTask().camundaClass("foo").endEvent()
+        .moveToActivity("servTask").endEvent().done();
     deployment(instance);
 
     runtimeService.startProcessInstanceByKey("process");
 
     Job job = managementService.createJobQuery().singleResult();
 
-   // when job fails
+    // when job fails
     try {
       managementService.executeJob(job.getId());
     } catch (Exception e) {
@@ -754,7 +754,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
   private void assertBehaviorInvoked(ProcessInstance pi, int times) {
     Long behaviorInvoked = (Long) runtimeService.getVariable(pi.getId(), "behaviorInvoked");
     assertNotNull("behavior was not invoked", behaviorInvoked);
-    assertEquals(times , behaviorInvoked.intValue());
+    assertEquals(times, behaviorInvoked.intValue());
 
   }
 

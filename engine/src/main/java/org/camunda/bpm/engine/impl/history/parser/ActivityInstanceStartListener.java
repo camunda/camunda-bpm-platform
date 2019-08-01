@@ -33,7 +33,7 @@ public class ActivityInstanceStartListener extends HistoryExecutionListener {
 
   protected HistoryEvent createHistoryEvent(DelegateExecution execution) {
     ensureHistoryLevelInitialized();
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_START, execution)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_START, execution)) {
       return eventProducer.createActivityInstanceStartEvt(execution);
     } else {
       return null;

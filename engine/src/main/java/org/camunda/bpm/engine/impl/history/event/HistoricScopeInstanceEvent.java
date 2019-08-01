@@ -50,10 +50,10 @@ public class HistoricScopeInstanceEvent extends HistoryEvent {
   }
 
   public Long getDurationInMillis() {
-    if(durationInMillis != null) {
+    if (durationInMillis != null) {
       return durationInMillis;
 
-    } else if(startTime != null && endTime != null) {
+    } else if (startTime != null && endTime != null) {
       return endTime.getTime() - startTime.getTime();
 
     } else {

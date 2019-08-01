@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
-
 /**
  * @author Daniel Meyer
  * @author Falko Menge
@@ -38,16 +37,16 @@ public class CancelEndEventActivityBehavior extends AbstractBpmnActivityBehavior
   @Override
   public void execute(ActivityExecution execution) throws Exception {
 
-    EnsureUtil
-    .ensureNotNull("Could not find cancel boundary event for cancel end event " + execution.getActivity(), "cancelBoundaryEvent", cancelBoundaryEvent);
+    EnsureUtil.ensureNotNull(
+        "Could not find cancel boundary event for cancel end event " + execution.getActivity(),
+        "cancelBoundaryEvent", cancelBoundaryEvent);
 
-    List<EventSubscriptionEntity> compensateEventSubscriptions =
-        CompensationUtil.collectCompensateEventSubscriptionsForScope(execution);
+    List<EventSubscriptionEntity> compensateEventSubscriptions = CompensationUtil
+        .collectCompensateEventSubscriptionsForScope(execution);
 
-    if(compensateEventSubscriptions.isEmpty()) {
+    if (compensateEventSubscriptions.isEmpty()) {
       leave(execution);
-    }
-    else {
+    } else {
       CompensationUtil.throwCompensationEvent(compensateEventSubscriptions, execution, false);
     }
 
@@ -61,13 +60,14 @@ public class CancelEndEventActivityBehavior extends AbstractBpmnActivityBehavior
     boundaryEventScopeExecution.executeActivity(cancelBoundaryEvent);
   }
 
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
 
     // join compensating executions
-    if(!execution.hasChildren()) {
+    if (!execution.hasChildren()) {
       leave(execution);
     } else {
-      ((ExecutionEntity)execution).forceUpdate();
+      ((ExecutionEntity) execution).forceUpdate();
     }
   }
 

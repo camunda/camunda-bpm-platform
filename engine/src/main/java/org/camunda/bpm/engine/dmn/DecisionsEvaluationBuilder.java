@@ -31,20 +31,20 @@ import org.camunda.bpm.engine.exception.NotValidException;
 public interface DecisionsEvaluationBuilder {
 
   /**
-   * Specify the id of the tenant the decision definition belongs to. Can only be
-   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   * Specify the id of the tenant the decision definition belongs to. Can only be used when the
+   * definition is referenced by <code>key</code> and not by <code>id</code>.
    */
   DecisionsEvaluationBuilder decisionDefinitionTenantId(String tenantId);
 
   /**
-   * Specify that the decision definition belongs to no tenant. Can only be
-   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   * Specify that the decision definition belongs to no tenant. Can only be used when the definition
+   * is referenced by <code>key</code> and not by <code>id</code>.
    */
   DecisionsEvaluationBuilder decisionDefinitionWithoutTenantId();
 
   /**
-   * Set the version of the decision definition. If <code>null</code> then
-   * the latest version is taken.
+   * Set the version of the decision definition. If <code>null</code> then the latest version is
+   * taken.
    */
   DecisionsEvaluationBuilder version(Integer version);
 
@@ -65,8 +65,8 @@ public interface DecisionsEvaluationBuilder {
    *           when the given decision definition id / key is null.
    *
    * @throws AuthorizationException
-   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
-   *           on {@link Resources#DECISION_DEFINITION}.
+   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission on
+   *           {@link Resources#DECISION_DEFINITION}.
    */
   DmnDecisionResult evaluate();
 

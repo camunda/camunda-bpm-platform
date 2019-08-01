@@ -66,8 +66,7 @@ public class UserOperationLogContextEntryBuilder {
     entry.setProcessDefinitionKey(jobDefinition.getProcessDefinitionKey());
 
     if (jobDefinition.getProcessDefinitionId() != null) {
-      ProcessDefinitionEntity processDefinition = Context
-          .getProcessEngineConfiguration()
+      ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration()
           .getDeploymentCache()
           .findDeployedProcessDefinitionById(jobDefinition.getProcessDefinitionId());
       entry.setDeploymentId(processDefinition.getDeploymentId());
@@ -81,14 +80,16 @@ public class UserOperationLogContextEntryBuilder {
     entry.setRootProcessInstanceId(execution.getRootProcessInstanceId());
     entry.setProcessDefinitionId(execution.getProcessDefinitionId());
 
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution
+        .getProcessDefinition();
     entry.setProcessDefinitionKey(processDefinition.getKey());
     entry.setDeploymentId(processDefinition.getDeploymentId());
 
     return this;
   }
 
-  public UserOperationLogContextEntryBuilder inContextOf(ProcessDefinitionEntity processDefinition) {
+  public UserOperationLogContextEntryBuilder inContextOf(
+      ProcessDefinitionEntity processDefinition) {
     entry.setProcessDefinitionId(processDefinition.getId());
     entry.setProcessDefinitionKey(processDefinition.getKey());
     entry.setDeploymentId(processDefinition.getDeploymentId());
@@ -96,7 +97,8 @@ public class UserOperationLogContextEntryBuilder {
     return this;
   }
 
-  public UserOperationLogContextEntryBuilder inContextOf(TaskEntity task, List<PropertyChange> propertyChanges) {
+  public UserOperationLogContextEntryBuilder inContextOf(TaskEntity task,
+      List<PropertyChange> propertyChanges) {
 
     if (propertyChanges == null || propertyChanges.isEmpty()) {
       if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
@@ -129,7 +131,8 @@ public class UserOperationLogContextEntryBuilder {
     return this;
   }
 
-  public UserOperationLogContextEntryBuilder inContextOf(HistoricTaskInstance task, List<PropertyChange> propertyChanges) {
+  public UserOperationLogContextEntryBuilder inContextOf(HistoricTaskInstance task,
+      List<PropertyChange> propertyChanges) {
 
     if (propertyChanges == null || propertyChanges.isEmpty()) {
       if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
@@ -151,7 +154,8 @@ public class UserOperationLogContextEntryBuilder {
     return this;
   }
 
-  public UserOperationLogContextEntryBuilder inContextOf(ExecutionEntity processInstance, List<PropertyChange> propertyChanges) {
+  public UserOperationLogContextEntryBuilder inContextOf(ExecutionEntity processInstance,
+      List<PropertyChange> propertyChanges) {
 
     if (propertyChanges == null || propertyChanges.isEmpty()) {
       if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
@@ -173,8 +177,9 @@ public class UserOperationLogContextEntryBuilder {
 
     return this;
   }
-  
-  public UserOperationLogContextEntryBuilder inContextOf(HistoryEvent historyEvent, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
+
+  public UserOperationLogContextEntryBuilder inContextOf(HistoryEvent historyEvent,
+      ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
 
     if (propertyChanges == null || propertyChanges.isEmpty()) {
       if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
@@ -200,7 +205,8 @@ public class UserOperationLogContextEntryBuilder {
     return this;
   }
 
-  public UserOperationLogContextEntryBuilder inContextOf(HistoricVariableInstanceEntity variable, ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
+  public UserOperationLogContextEntryBuilder inContextOf(HistoricVariableInstanceEntity variable,
+      ResourceDefinitionEntity<?> definition, List<PropertyChange> propertyChanges) {
 
     if (propertyChanges == null || propertyChanges.isEmpty()) {
       if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
@@ -223,11 +229,12 @@ public class UserOperationLogContextEntryBuilder {
       }
       entry.setDeploymentId(definition.getDeploymentId());
     }
-    
+
     return this;
   }
-  
-  public UserOperationLogContextEntryBuilder inContextOf(ExternalTaskEntity task, ExecutionEntity execution, ProcessDefinitionEntity definition) {
+
+  public UserOperationLogContextEntryBuilder inContextOf(ExternalTaskEntity task,
+      ExecutionEntity execution, ProcessDefinitionEntity definition) {
     if (execution != null) {
       inContextOf(execution);
     } else if (definition != null) {
@@ -297,7 +304,7 @@ public class UserOperationLogContextEntryBuilder {
     entry.setTaskId(taskId);
     return this;
   }
-  
+
   public UserOperationLogContextEntryBuilder caseInstanceId(String caseInstanceId) {
     entry.setCaseInstanceId(caseInstanceId);
     return this;

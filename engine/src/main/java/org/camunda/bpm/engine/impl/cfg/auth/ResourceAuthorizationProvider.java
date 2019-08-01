@@ -30,11 +30,14 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 
 /**
- * <p>Manages (create/update/delete) default authorization when an entity is
- * changed</p>
+ * <p>
+ * Manages (create/update/delete) default authorization when an entity is changed
+ * </p>
  *
- * <p>Implementations should throw an exception when a specific resource's id is <code>*</code>, as
- * <code>*</code> represents access to all resources/by all users.</p>
+ * <p>
+ * Implementations should throw an exception when a specific resource's id is <code>*</code>, as
+ * <code>*</code> represents access to all resources/by all users.
+ * </p>
  *
  *
  * @author Daniel Meyer
@@ -44,22 +47,24 @@ public interface ResourceAuthorizationProvider {
   // Users /////////////////////////////////////////////
 
   /**
-   * <p>Invoked whenever a new user is created</p>
+   * <p>
+   * Invoked whenever a new user is created
+   * </p>
    *
    * @param user
    *          a newly created user
-   * @return a list of authorizations to be automatically added when a new user
-   *         is created.
+   * @return a list of authorizations to be automatically added when a new user is created.
    */
   public AuthorizationEntity[] newUser(User user);
 
   /**
-   * <p>Invoked whenever a new group is created</p>
+   * <p>
+   * Invoked whenever a new group is created
+   * </p>
    *
    * @param group
    *          a newly created {@link Group}
-   * @return a list of authorizations to be automatically added when a new
-   *         {@link Group} is created.
+   * @return a list of authorizations to be automatically added when a new {@link Group} is created.
    */
   public AuthorizationEntity[] newGroup(Group group);
 
@@ -70,191 +75,242 @@ public interface ResourceAuthorizationProvider {
    *
    * @param tenant
    *          a newly created {@link Tenant}
-   * @return a list of authorizations to be automatically added when a new
-   *         {@link Tenant} is created.
+   * @return a list of authorizations to be automatically added when a new {@link Tenant} is
+   *         created.
    */
   public AuthorizationEntity[] newTenant(Tenant tenant);
 
   /**
-   * <p>Invoked whenever a user is added to a group</p>
+   * <p>
+   * Invoked whenever a user is added to a group
+   * </p>
    *
    * @param userId
-   *          the id of the user who is added to a group a newly created
-   *          {@link User}
+   *          the id of the user who is added to a group a newly created {@link User}
    * @param groupId
    *          the id of the group to which the user is added
-   * @return a list of authorizations to be automatically added when a new
-   *         {@link User} is created.
+   * @return a list of authorizations to be automatically added when a new {@link User} is created.
    */
   public AuthorizationEntity[] groupMembershipCreated(String groupId, String userId);
 
   /**
-   * <p>Invoked whenever an user is added to a tenant.</p>
+   * <p>
+   * Invoked whenever an user is added to a tenant.
+   * </p>
    *
    * @param tenant
    *          the id of the tenant
    * @param userId
    *          the id of the user
-   * @return a list of authorizations to be automatically added when a new
-   *         membership is created.
+   * @return a list of authorizations to be automatically added when a new membership is created.
    */
   public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, User user);
 
   /**
-   * <p>Invoked whenever a group is added to a tenant.</p>
+   * <p>
+   * Invoked whenever a group is added to a tenant.
+   * </p>
    *
    * @param tenant
    *          the id of the tenant
    * @param groupId
    *          the id of the group
-   * @return a list of authorizations to be automatically added when a new
-   *         membership is created.
+   * @return a list of authorizations to be automatically added when a new membership is created.
    */
   public AuthorizationEntity[] tenantMembershipCreated(Tenant tenant, Group group);
 
   // Filter ////////////////////////////////////////////////
 
   /**
-   * <p>Invoked whenever a new filter is created</p>
+   * <p>
+   * Invoked whenever a new filter is created
+   * </p>
    *
-   * @param filter the newly created filter
-   * @return a list of authorizations to be automatically added when a new
-   *         {@link Filter} is created.
+   * @param filter
+   *          the newly created filter
+   * @return a list of authorizations to be automatically added when a new {@link Filter} is
+   *         created.
    */
   public AuthorizationEntity[] newFilter(Filter filter);
 
   // Deployment //////////////////////////////////////////////
 
   /**
-   * <p>Invoked whenever a new deployment is created</p>
+   * <p>
+   * Invoked whenever a new deployment is created
+   * </p>
    *
-   * @param deployment the newly created deployment
-   * @return a list of authorizations to be automatically added when a new
-   *         {@link Deployment} is created.
+   * @param deployment
+   *          the newly created deployment
+   * @return a list of authorizations to be automatically added when a new {@link Deployment} is
+   *         created.
    */
   public AuthorizationEntity[] newDeployment(Deployment deployment);
 
   // Process Definition //////////////////////////////////////
 
   /**
-   * <p>Invoked whenever a new process definition is created</p>
+   * <p>
+   * Invoked whenever a new process definition is created
+   * </p>
    *
-   * @param processDefinition the newly created process definition
-   * @return a list of authorizations to be automatically added when a new
-   *         {@link ProcessDefinition} is created.
+   * @param processDefinition
+   *          the newly created process definition
+   * @return a list of authorizations to be automatically added when a new {@link ProcessDefinition}
+   *         is created.
    */
   public AuthorizationEntity[] newProcessDefinition(ProcessDefinition processDefinition);
 
   // Process Instance ///////////////////////////////////////
 
   /**
-   * <p>Invoked whenever a new process instance is started</p>
+   * <p>
+   * Invoked whenever a new process instance is started
+   * </p>
    *
-   * @param processInstance the newly started process instance
-   * @return a list of authorizations to be automatically added when a new
-   *         {@link ProcessInstance} is started.
+   * @param processInstance
+   *          the newly started process instance
+   * @return a list of authorizations to be automatically added when a new {@link ProcessInstance}
+   *         is started.
    */
   public AuthorizationEntity[] newProcessInstance(ProcessInstance processInstance);
 
   // Task /////////////////////////////////////////////////
 
   /**
-   * <p>Invoked whenever a new task is created</p>
+   * <p>
+   * Invoked whenever a new task is created
+   * </p>
    *
-   * @param task the newly created task
-   * @return a list of authorizations to be automatically added when a new
-   *         {@link Task} is created.
+   * @param task
+   *          the newly created task
+   * @return a list of authorizations to be automatically added when a new {@link Task} is created.
    */
   public AuthorizationEntity[] newTask(Task task);
 
   /**
-   * <p>Invoked whenever an user has been assigned to a task.</p>
+   * <p>
+   * Invoked whenever an user has been assigned to a task.
+   * </p>
    *
-   * @param task the task on which the assignee has been changed
-   * @param oldAssignee the old assignee of the task
-   * @param newAssignee the new assignee of the task
+   * @param task
+   *          the task on which the assignee has been changed
+   * @param oldAssignee
+   *          the old assignee of the task
+   * @param newAssignee
+   *          the new assignee of the task
    *
-   * @return a list of authorizations to be automatically added when an
-   *          assignee of a task changes.
+   * @return a list of authorizations to be automatically added when an assignee of a task changes.
    */
   public AuthorizationEntity[] newTaskAssignee(Task task, String oldAssignee, String newAssignee);
 
   /**
-   * <p>Invoked whenever an user has been set as the owner of a task.</p>
+   * <p>
+   * Invoked whenever an user has been set as the owner of a task.
+   * </p>
    *
-   * @param task the task on which the owner has been changed
-   * @param oldOwner the old owner of the task
-   * @param newOwner the new owner of the task
+   * @param task
+   *          the task on which the owner has been changed
+   * @param oldOwner
+   *          the old owner of the task
+   * @param newOwner
+   *          the new owner of the task
    *
-   * @return a list of authorizations to be automatically added when the
-   *          owner of a task changes.
+   * @return a list of authorizations to be automatically added when the owner of a task changes.
    */
   public AuthorizationEntity[] newTaskOwner(Task task, String oldOwner, String newOwner);
 
   /**
-   * <p>Invoked whenever a new user identity link has been added to a task.</p>
+   * <p>
+   * Invoked whenever a new user identity link has been added to a task.
+   * </p>
    *
-   * @param task the task on which a new identity link has been added
-   * @param userId the user for which the identity link has been created
-   * @param type the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
+   * @param task
+   *          the task on which a new identity link has been added
+   * @param userId
+   *          the user for which the identity link has been created
+   * @param type
+   *          the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
    *
-   * @return a list of authorizations to be automatically added when
-   *          a new user identity link has been added.
+   * @return a list of authorizations to be automatically added when a new user identity link has
+   *         been added.
    */
   public AuthorizationEntity[] newTaskUserIdentityLink(Task task, String userId, String type);
 
   /**
-   * <p>Invoked whenever a new group identity link has been added to a task.</p>
+   * <p>
+   * Invoked whenever a new group identity link has been added to a task.
+   * </p>
    *
-   * @param task the task on which a new identity link has been added
-   * @param groupId the group for which the identity link has been created
-   * @param type the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
+   * @param task
+   *          the task on which a new identity link has been added
+   * @param groupId
+   *          the group for which the identity link has been created
+   * @param type
+   *          the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
    *
-   * @return a list of authorizations to be automatically added when
-   *          a new group identity link has been added.
+   * @return a list of authorizations to be automatically added when a new group identity link has
+   *         been added.
    */
   public AuthorizationEntity[] newTaskGroupIdentityLink(Task task, String groupId, String type);
 
   /**
-   * <p>Invoked whenever a user identity link of a task has been deleted.</p>
+   * <p>
+   * Invoked whenever a user identity link of a task has been deleted.
+   * </p>
    *
-   * @param task the task on which the identity link has been deleted
-   * @param userId the user for which the identity link has been deleted
-   * @param type the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
+   * @param task
+   *          the task on which the identity link has been deleted
+   * @param userId
+   *          the user for which the identity link has been deleted
+   * @param type
+   *          the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
    *
-   * @return a list of authorizations to be automatically deleted when
-   *          a user identity link has been deleted.
+   * @return a list of authorizations to be automatically deleted when a user identity link has been
+   *         deleted.
    */
   public AuthorizationEntity[] deleteTaskUserIdentityLink(Task task, String userId, String type);
 
   /**
-   * <p>Invoked whenever a group identity link of a task has been deleted.</p>
+   * <p>
+   * Invoked whenever a group identity link of a task has been deleted.
+   * </p>
    *
-   * @param task the task on which the identity link has been deleted
-   * @param groupId the group for which the identity link has been deleted
-   * @param type the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
+   * @param task
+   *          the task on which the identity link has been deleted
+   * @param groupId
+   *          the group for which the identity link has been deleted
+   * @param type
+   *          the type of the identity link (e.g. {@link IdentityLinkType#CANDIDATE})
    *
-   * @return a list of authorizations to be automatically deleted when
-   *          a group identity link has been deleted.
+   * @return a list of authorizations to be automatically deleted when a group identity link has
+   *         been deleted.
    */
   public AuthorizationEntity[] deleteTaskGroupIdentityLink(Task task, String groupId, String type);
 
   /**
-   * <p>Invoked whenever a new decision definition is created.</p>
+   * <p>
+   * Invoked whenever a new decision definition is created.
+   * </p>
    *
-   * @param decisionDefinition the newly created decision definition
+   * @param decisionDefinition
+   *          the newly created decision definition
    * @return a list of authorizations to be automatically added when a new
    *         {@link DecisionDefinition} is created.
    */
   public AuthorizationEntity[] newDecisionDefinition(DecisionDefinition decisionDefinition);
 
   /**
-   * <p>Invoked whenever a new decision requirements definition is created.</p>
+   * <p>
+   * Invoked whenever a new decision requirements definition is created.
+   * </p>
    *
-   * @param decisionRequirementsDefinition the newly created decision requirements definition
+   * @param decisionRequirementsDefinition
+   *          the newly created decision requirements definition
    * @return a list of authorizations to be automatically added when a new
    *         {@link DecisionRequirementsDefinition} is created.
    */
-  public AuthorizationEntity[] newDecisionRequirementsDefinition(DecisionRequirementsDefinition decisionRequirementsDefinition);
+  public AuthorizationEntity[] newDecisionRequirementsDefinition(
+      DecisionRequirementsDefinition decisionRequirementsDefinition);
 
 }

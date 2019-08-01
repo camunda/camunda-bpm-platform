@@ -25,11 +25,12 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 
-
 /**
- * Gives access to a deployed decision requirements model, e.g., a DMN 1.1 XML file, through a stream of bytes.
+ * Gives access to a deployed decision requirements model, e.g., a DMN 1.1 XML file, through a
+ * stream of bytes.
  */
-public class GetDeploymentDecisionRequirementsModelCmd implements Command<InputStream>, Serializable {
+public class GetDeploymentDecisionRequirementsModelCmd
+    implements Command<InputStream>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String decisionRequirementsDefinitionId;
@@ -39,7 +40,8 @@ public class GetDeploymentDecisionRequirementsModelCmd implements Command<InputS
   }
 
   public InputStream execute(final CommandContext commandContext) {
-    DecisionRequirementsDefinition decisionRequirementsDefinition = new GetDeploymentDecisionRequirementsDefinitionCmd(decisionRequirementsDefinitionId).execute(commandContext);
+    DecisionRequirementsDefinition decisionRequirementsDefinition = new GetDeploymentDecisionRequirementsDefinitionCmd(
+        decisionRequirementsDefinitionId).execute(commandContext);
 
     final String deploymentId = decisionRequirementsDefinition.getDeploymentId();
     final String resourceName = decisionRequirementsDefinition.getResourceName();

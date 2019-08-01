@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDef
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.repository.*;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -59,27 +58,25 @@ public class DeploymentEntity implements Serializable, DeploymentWithDefinitions
   }
 
   public void addResource(ResourceEntity resource) {
-    if (resources==null) {
+    if (resources == null) {
       resources = new HashMap<String, ResourceEntity>();
     }
     resources.put(resource.getName(), resource);
   }
 
   public void clearResources() {
-    if(resources!=null){
+    if (resources != null) {
       resources.clear();
     }
   }
 
   // lazy loading /////////////////////////////////////////////////////////////
   public Map<String, ResourceEntity> getResources() {
-    if (resources==null && id!=null) {
-      List<ResourceEntity> resourcesList = Context
-        .getCommandContext()
-        .getResourceManager()
-        .findResourcesByDeploymentId(id);
+    if (resources == null && id != null) {
+      List<ResourceEntity> resourcesList = Context.getCommandContext().getResourceManager()
+          .findResourcesByDeploymentId(id);
       resources = new HashMap<String, ResourceEntity>();
-      for (ResourceEntity resource: resourcesList) {
+      for (ResourceEntity resource : resourcesList) {
         resources.put(resource.getName(), resource);
       }
     }
@@ -116,7 +113,7 @@ public class DeploymentEntity implements Serializable, DeploymentWithDefinitions
 
   @SuppressWarnings("unchecked")
   public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
-    if(deployedArtifacts == null) {
+    if (deployedArtifacts == null) {
       return null;
     } else {
       return (List<T>) deployedArtifacts.get(clazz);
@@ -214,21 +211,16 @@ public class DeploymentEntity implements Serializable, DeploymentWithDefinitions
 
   @Override
   public List<DecisionRequirementsDefinition> getDeployedDecisionRequirementsDefinitions() {
-    return deployedArtifacts == null ? null : deployedArtifacts.get(DecisionRequirementsDefinitionEntity.class);
+    return deployedArtifacts == null ? null
+        : deployedArtifacts.get(DecisionRequirementsDefinitionEntity.class);
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", name=" + name
-           + ", resources=" + resources
-           + ", deploymentTime=" + deploymentTime
-           + ", validatingSchema=" + validatingSchema
-           + ", isNew=" + isNew
-           + ", source=" + source
-           + ", tenantId=" + tenantId
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", name=" + name + ", resources="
+        + resources + ", deploymentTime=" + deploymentTime + ", validatingSchema="
+        + validatingSchema + ", isNew=" + isNew + ", source=" + source + ", tenantId=" + tenantId
+        + "]";
   }
 
 }

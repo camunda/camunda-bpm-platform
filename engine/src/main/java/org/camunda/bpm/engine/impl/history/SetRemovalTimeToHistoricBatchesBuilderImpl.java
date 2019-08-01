@@ -33,7 +33,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeToHistoricBatchesBuilderImpl implements SetRemovalTimeSelectModeForHistoricBatchesBuilder {
+public class SetRemovalTimeToHistoricBatchesBuilderImpl
+    implements SetRemovalTimeSelectModeForHistoricBatchesBuilder {
 
   protected HistoricBatchQuery query;
   protected List<String> ids;
@@ -58,7 +59,8 @@ public class SetRemovalTimeToHistoricBatchesBuilderImpl implements SetRemovalTim
   }
 
   public SetRemovalTimeToHistoricBatchesBuilder absoluteRemovalTime(Date removalTime) {
-    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive","mode", mode);
+    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive",
+        "mode", mode);
 
     this.mode = Mode.ABSOLUTE_REMOVAL_TIME;
     this.removalTime = removalTime;
@@ -66,14 +68,16 @@ public class SetRemovalTimeToHistoricBatchesBuilderImpl implements SetRemovalTim
   }
 
   public SetRemovalTimeToHistoricBatchesBuilder calculatedRemovalTime() {
-    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive","mode", mode);
+    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive",
+        "mode", mode);
 
     this.mode = Mode.CALCULATED_REMOVAL_TIME;
     return this;
   }
 
   public SetRemovalTimeToHistoricBatchesBuilder clearedRemovalTime() {
-    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive","mode", mode);
+    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive",
+        "mode", mode);
 
     mode = Mode.CLEARED_REMOVAL_TIME;
     return this;
@@ -99,11 +103,8 @@ public class SetRemovalTimeToHistoricBatchesBuilderImpl implements SetRemovalTim
     return mode;
   }
 
-  public enum Mode
-  {
-    CALCULATED_REMOVAL_TIME,
-    ABSOLUTE_REMOVAL_TIME,
-    CLEARED_REMOVAL_TIME;
+  public enum Mode {
+    CALCULATED_REMOVAL_TIME, ABSOLUTE_REMOVAL_TIME, CLEARED_REMOVAL_TIME;
   }
 
 }

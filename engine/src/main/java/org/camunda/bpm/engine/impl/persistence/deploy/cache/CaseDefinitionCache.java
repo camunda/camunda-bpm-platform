@@ -54,36 +54,54 @@ public class CaseDefinitionCache extends ResourceDefinitionCache<CaseDefinitionE
 
   @Override
   protected void checkDefinitionFound(String definitionId, CaseDefinitionEntity definition) {
-    ensureNotNull(CaseDefinitionNotFoundException.class, "no deployed case definition found with id '" + definitionId + "'", "caseDefinition", definition);
+    ensureNotNull(CaseDefinitionNotFoundException.class,
+        "no deployed case definition found with id '" + definitionId + "'", "caseDefinition",
+        definition);
   }
 
   @Override
-  protected void checkInvalidDefinitionByKey(String definitionKey, CaseDefinitionEntity definition) {
-    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key '" + definitionKey + "'", "caseDefinition", definition);
+  protected void checkInvalidDefinitionByKey(String definitionKey,
+      CaseDefinitionEntity definition) {
+    ensureNotNull(CaseDefinitionNotFoundException.class,
+        "no case definition deployed with key '" + definitionKey + "'", "caseDefinition",
+        definition);
   }
 
   @Override
-  protected void checkInvalidDefinitionByKeyAndTenantId(String definitionKey, String tenantId, CaseDefinitionEntity definition) {
-    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key '" + definitionKey + "' and tenant-id '" + tenantId + "'", "caseDefinition", definition);
+  protected void checkInvalidDefinitionByKeyAndTenantId(String definitionKey, String tenantId,
+      CaseDefinitionEntity definition) {
+    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key '"
+        + definitionKey + "' and tenant-id '" + tenantId + "'", "caseDefinition", definition);
   }
 
   @Override
-  protected void checkInvalidDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId, CaseDefinitionEntity definition) {
-    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key = '" + definitionKey + "', version = '" + definitionVersion + "'"
-        + " and tenant-id = '" + tenantId + "'", "caseDefinition", definition);
+  protected void checkInvalidDefinitionByKeyVersionAndTenantId(String definitionKey,
+      Integer definitionVersion, String tenantId, CaseDefinitionEntity definition) {
+    ensureNotNull(CaseDefinitionNotFoundException.class,
+        "no case definition deployed with key = '" + definitionKey + "', version = '"
+            + definitionVersion + "'" + " and tenant-id = '" + tenantId + "'",
+        "caseDefinition", definition);
   }
 
   @Override
-  protected void checkInvalidDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId, CaseDefinitionEntity definition) {
-    throw new UnsupportedOperationException("Version tag is not implemented in case definition.");  }
-
-  @Override
-  protected void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey, CaseDefinitionEntity definition) {
-    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key = '" + definitionKey + "' in deployment = '" + deploymentId + "'", "caseDefinition", definition);
+  protected void checkInvalidDefinitionByKeyVersionTagAndTenantId(String definitionKey,
+      String definitionVersionTag, String tenantId, CaseDefinitionEntity definition) {
+    throw new UnsupportedOperationException("Version tag is not implemented in case definition.");
   }
 
   @Override
-  protected void checkInvalidDefinitionWasCached(String deploymentId, String definitionId, CaseDefinitionEntity definition) {
-    ensureNotNull("deployment '" + deploymentId + "' didn't put case definition '" + definitionId + "' in the cache", "cachedCaseDefinition", definition);
+  protected void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey,
+      CaseDefinitionEntity definition) {
+    ensureNotNull(
+        CaseDefinitionNotFoundException.class, "no case definition deployed with key = '"
+            + definitionKey + "' in deployment = '" + deploymentId + "'",
+        "caseDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionWasCached(String deploymentId, String definitionId,
+      CaseDefinitionEntity definition) {
+    ensureNotNull("deployment '" + deploymentId + "' didn't put case definition '" + definitionId
+        + "' in the cache", "cachedCaseDefinition", definition);
   }
 }

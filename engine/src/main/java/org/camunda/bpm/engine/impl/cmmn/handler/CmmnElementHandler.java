@@ -21,13 +21,16 @@ import org.camunda.bpm.engine.impl.core.handler.ModelElementHandler;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
 /**
- * <p>This handler handles an instance of a {@link CmmnElement} to create
- * a new {@link CmmnActivity activity}.</p>
+ * <p>
+ * This handler handles an instance of a {@link CmmnElement} to create a new {@link CmmnActivity
+ * activity}.
+ * </p>
  *
  * @author Roman Smirnov
  *
  */
-public abstract class CmmnElementHandler<T extends CmmnElement, E> implements ModelElementHandler<T, CmmnHandlerContext, E> {
+public abstract class CmmnElementHandler<T extends CmmnElement, E>
+    implements ModelElementHandler<T, CmmnHandlerContext, E> {
 
   public abstract E handleElement(T element, CmmnHandlerContext context);
 

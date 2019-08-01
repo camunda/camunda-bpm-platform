@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl;
 
-
-
 /**
  * Represents a variable value used in a task query.
  *
@@ -30,26 +28,30 @@ public class TaskQueryVariableValue extends QueryVariableValue {
   protected boolean isProcessInstanceVariable;
 
   /**
-   * <p>The parameters <code>isTaskVariable</code> and <code> isProcessInstanceVariable</code>
-   * have the following meaning:</p>
+   * <p>
+   * The parameters <code>isTaskVariable</code> and <code> isProcessInstanceVariable</code> have the
+   * following meaning:
+   * </p>
    *
    * <ul>
-   *   <li>if <code>isTaskVariable == true</code>: only query after task variables</li>
-   *   <li>if <code>isTaskVariable == false && isProcessInstanceVariable == true</code>:
-   *       only query after process instance variables</li>
-   *   <li>if <code>isTaskVariable == false && isProcessInstanceVariable == false</code>:
-   *       only query after case instance variables</li>
+   * <li>if <code>isTaskVariable == true</code>: only query after task variables</li>
+   * <li>if <code>isTaskVariable == false && isProcessInstanceVariable == true</code>: only query
+   * after process instance variables</li>
+   * <li>if <code>isTaskVariable == false && isProcessInstanceVariable == false</code>: only query
+   * after case instance variables</li>
    * </ul>
    */
-  public TaskQueryVariableValue(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
+  public TaskQueryVariableValue(String name, Object value, QueryOperator operator,
+      boolean isTaskVariable, boolean isProcessInstanceVariable) {
     this(name, value, operator, isTaskVariable, isProcessInstanceVariable, false, false);
   }
-  
-  public TaskQueryVariableValue(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable, boolean variableNameIgnoreCase, boolean variableValueIgnoreCase) {
+
+  public TaskQueryVariableValue(String name, Object value, QueryOperator operator,
+      boolean isTaskVariable, boolean isProcessInstanceVariable, boolean variableNameIgnoreCase,
+      boolean variableValueIgnoreCase) {
     super(name, value, operator, isTaskVariable, variableNameIgnoreCase, variableValueIgnoreCase);
     this.isProcessInstanceVariable = isProcessInstanceVariable;
   }
-  
 
   public boolean isProcessInstanceVariable() {
     return isProcessInstanceVariable;

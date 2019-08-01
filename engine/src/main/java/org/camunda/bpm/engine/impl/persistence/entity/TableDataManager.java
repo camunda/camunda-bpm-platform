@@ -57,7 +57,6 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -99,10 +98,12 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(CaseSentryPartEntity.class, "ACT_RU_CASE_SENTRY_PART");
 
     // DMN
-    persistentObjectToTableNameMap.put(DecisionRequirementsDefinitionEntity.class, "ACT_RE_DECISION_REQ_DEF");
+    persistentObjectToTableNameMap.put(DecisionRequirementsDefinitionEntity.class,
+        "ACT_RE_DECISION_REQ_DEF");
     persistentObjectToTableNameMap.put(DecisionDefinitionEntity.class, "ACT_RE_DECISION_DEF");
     persistentObjectToTableNameMap.put(HistoricDecisionInputInstanceEntity.class, "ACT_HI_DEC_IN");
-    persistentObjectToTableNameMap.put(HistoricDecisionOutputInstanceEntity.class, "ACT_HI_DEC_OUT");
+    persistentObjectToTableNameMap.put(HistoricDecisionOutputInstanceEntity.class,
+        "ACT_HI_DEC_OUT");
 
     // history
     persistentObjectToTableNameMap.put(CommentEntity.class, "ACT_HI_COMMENT");
@@ -117,7 +118,8 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(HistoricExternalTaskLogEntity.class, "ACT_HI_EXT_TASK_LOG");
 
     persistentObjectToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_HI_CASEINST");
-    persistentObjectToTableNameMap.put(HistoricCaseActivityInstanceEntity.class, "ACT_HI_CASEACTINST");
+    persistentObjectToTableNameMap.put(HistoricCaseActivityInstanceEntity.class,
+        "ACT_HI_CASEACTINST");
     persistentObjectToTableNameMap.put(HistoricIdentityLinkLogEntity.class, "ACT_HI_IDENTITYLINK");
     // a couple of stuff goes to the same table
     persistentObjectToTableNameMap.put(HistoricFormPropertyEntity.class, "ACT_HI_DETAIL");
@@ -128,7 +130,6 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(HistoricDecisionInstanceEntity.class, "ACT_HI_DECINST");
     persistentObjectToTableNameMap.put(UserOperationLogEntryEventEntity.class, "ACT_HI_OP_LOG");
 
-
     // Identity module
     persistentObjectToTableNameMap.put(GroupEntity.class, "ACT_ID_GROUP");
     persistentObjectToTableNameMap.put(MembershipEntity.class, "ACT_ID_MEMBERSHIP");
@@ -137,7 +138,6 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(UserEntity.class, "ACT_ID_USER");
     persistentObjectToTableNameMap.put(IdentityInfoEntity.class, "ACT_ID_INFO");
     persistentObjectToTableNameMap.put(AuthorizationEntity.class, "ACT_RU_AUTHORIZATION");
-
 
     // general
     persistentObjectToTableNameMap.put(PropertyEntity.class, "ACT_GE_PROPERTY");
@@ -156,7 +156,6 @@ public class TableDataManager extends AbstractManager {
     apiTypeToTableNameMap.put(Incident.class, "ACT_RU_INCIDENT");
     apiTypeToTableNameMap.put(Filter.class, "ACT_RU_FILTER");
 
-
     // history
     apiTypeToTableNameMap.put(HistoricProcessInstance.class, "ACT_HI_PROCINST");
     apiTypeToTableNameMap.put(HistoricActivityInstance.class, "ACT_HI_ACTINST");
@@ -165,7 +164,6 @@ public class TableDataManager extends AbstractManager {
     apiTypeToTableNameMap.put(HistoricFormProperty.class, "ACT_HI_DETAIL");
     apiTypeToTableNameMap.put(HistoricTaskInstance.class, "ACT_HI_TASKINST");
     apiTypeToTableNameMap.put(HistoricVariableInstance.class, "ACT_HI_VARINST");
-
 
     apiTypeToTableNameMap.put(HistoricCaseInstance.class, "ACT_HI_CASEINST");
     apiTypeToTableNameMap.put(HistoricCaseActivityInstance.class, "ACT_HI_CASEACTINST");
@@ -178,7 +176,7 @@ public class TableDataManager extends AbstractManager {
   public Map<String, Long> getTableCount() {
     Map<String, Long> tableCount = new HashMap<String, Long>();
     try {
-      for (String tableName: getDbEntityManager().getTableNamesPresentInDatabase()) {
+      for (String tableName : getDbEntityManager().getTableNamesPresentInDatabase()) {
         tableCount.put(tableName, getTableCount(tableName));
       }
       LOG.countRowsPerProcessEngineTable(tableCount);
@@ -191,18 +189,19 @@ public class TableDataManager extends AbstractManager {
   protected long getTableCount(String tableName) {
     LOG.selectTableCountForTable(tableName);
     Long count = (Long) getDbEntityManager().selectOne("selectTableCount",
-            Collections.singletonMap("tableName", tableName));
+        Collections.singletonMap("tableName", tableName));
     return count;
   }
 
   @SuppressWarnings("unchecked")
-  public TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults) {
+  public TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult,
+      int maxResults) {
 
     TablePage tablePage = new TablePage();
 
     @SuppressWarnings("rawtypes")
-    List tableData = getDbSqlSession().getSqlSession()
-      .selectList("selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
+    List tableData = getDbSqlSession().getSqlSession().selectList("selectTableData", tablePageQuery,
+        new RowBounds(firstResult, maxResults));
 
     tablePage.setTableName(tablePageQuery.getTableName());
     tablePage.setTotal(getTableCount(tablePageQuery.getTableName()));
@@ -213,7 +212,8 @@ public class TableDataManager extends AbstractManager {
   }
 
   public List<Class<? extends DbEntity>> getEntities(String tableName) {
-    String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
+    String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory()
+        .getDatabaseTablePrefix();
     List<Class<? extends DbEntity>> entities = new ArrayList<Class<? extends DbEntity>>();
 
     Set<Class<? extends DbEntity>> entityClasses = persistentObjectToTableNameMap.keySet();
@@ -227,19 +227,18 @@ public class TableDataManager extends AbstractManager {
   }
 
   public String getTableName(Class<?> entityClass, boolean withPrefix) {
-    String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
+    String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory()
+        .getDatabaseTablePrefix();
     String tableName = null;
 
     if (DbEntity.class.isAssignableFrom(entityClass)) {
       tableName = persistentObjectToTableNameMap.get(entityClass);
-    }
-    else {
+    } else {
       tableName = apiTypeToTableNameMap.get(entityClass);
     }
     if (withPrefix) {
       return databaseTablePrefix + tableName;
-    }
-    else {
+    } else {
       return tableName;
     }
   }
@@ -251,12 +250,10 @@ public class TableDataManager extends AbstractManager {
     try {
       try {
         result.setTableName(tableName);
-        DatabaseMetaData metaData = getDbSqlSession()
-            .getSqlSession()
-            .getConnection()
-            .getMetaData();
+        DatabaseMetaData metaData = getDbSqlSession().getSqlSession().getConnection().getMetaData();
 
-        if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+        if (DbSqlSessionFactory.POSTGRES
+            .equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
           tableName = tableName.toLowerCase();
         }
 
@@ -264,7 +261,7 @@ public class TableDataManager extends AbstractManager {
         tableName = getDbSqlSession().prependDatabaseTablePrefix(tableName);
 
         resultSet = metaData.getColumns(null, databaseSchema, tableName, null);
-        while(resultSet.next()) {
+        while (resultSet.next()) {
           String name = resultSet.getString("COLUMN_NAME").toUpperCase();
           String type = resultSet.getString("TYPE_NAME").toUpperCase();
           result.addColumnMetaData(name, type);
@@ -281,7 +278,7 @@ public class TableDataManager extends AbstractManager {
       throw LOG.retrieveMetadataException(e);
     }
 
-    if(result.getColumnNames().size() == 0) {
+    if (result.getColumnNames().size() == 0) {
       // According to API, when a table doesn't exist, null should be returned
       result = null;
     }

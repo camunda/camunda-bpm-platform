@@ -20,8 +20,8 @@ import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
 /**
- * Implemented by classes which provide access to the {@link CmmnModelInstance}
- * and the currently executed {@link CmmnElement}.
+ * Implemented by classes which provide access to the {@link CmmnModelInstance} and the currently
+ * executed {@link CmmnElement}.
  *
  * @author Roman Smirnov
  *
@@ -36,8 +36,11 @@ public interface CmmnModelExecutionContext {
   CmmnModelInstance getCmmnModelInstance();
 
   /**
-   * <p>Returns the currently executed Element in the Cmmn Model. This method returns a {@link CmmnElement} which may be casted
-   * to the concrete type of the Cmmn Model Element currently executed.</p>
+   * <p>
+   * Returns the currently executed Element in the Cmmn Model. This method returns a
+   * {@link CmmnElement} which may be casted to the concrete type of the Cmmn Model Element
+   * currently executed.
+   * </p>
    *
    * @return the {@link CmmnElement} corresponding to the current Cmmn Model Element
    */

@@ -60,28 +60,21 @@ public class SetExternalTaskRetriesAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.UPDATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
+            grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId",
+                Permissions.UPDATE_INSTANCE)),
+        scenario().withAuthorizations(
+            grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
+            .succeeds(),
+        scenario().withAuthorizations(
+            grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)).succeeds(),
+        scenario().withAuthorizations(grant(Resources.PROCESS_DEFINITION, "processDefinitionKey",
+            "userId", Permissions.UPDATE_INSTANCE)).succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
+            .succeeds());
   }
 
   @Before
@@ -99,16 +92,15 @@ public class SetExternalTaskRetriesAuthorizationTest {
   public void testSetRetries() {
 
     // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
-    ExternalTask task = engineRule.getExternalTaskService().createExternalTaskQuery().singleResult();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ExternalTask task = engineRule.getExternalTaskService().createExternalTaskQuery()
+        .singleResult();
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("processInstanceId", processInstance.getId())
-      .bindResource("processDefinitionKey", "oneExternalTaskProcess")
-      .start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("processInstanceId", processInstance.getId())
+        .bindResource("processDefinitionKey", "oneExternalTaskProcess").start();
 
     engineRule.getExternalTaskService().setRetries(task.getId(), 5);
 

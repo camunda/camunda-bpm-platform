@@ -52,10 +52,10 @@ public class DurationHelper {
   public DurationHelper(String expressions) throws Exception {
     this(expressions, null);
   }
-  
+
   public DurationHelper(String expressions, Date startDate) throws Exception {
     List<String> expression = new ArrayList<String>();
-    if(expressions != null) {
+    if (expressions != null) {
       expression = Arrays.asList(expressions.split("/"));
     }
     datatypeFactory = DatatypeFactory.newInstance();
@@ -65,7 +65,8 @@ public class DurationHelper {
     }
     if (expression.get(0).startsWith("R")) {
       isRepeat = true;
-      times = expression.get(0).length() ==  1 ? Integer.MAX_VALUE : Integer.parseInt(expression.get(0).substring(1));
+      times = expression.get(0).length() == 1 ? Integer.MAX_VALUE
+          : Integer.parseInt(expression.get(0).substring(1));
       expression = expression.subList(1, expression.size());
     }
 
@@ -78,7 +79,7 @@ public class DurationHelper {
         period = parsePeriod(expression.get(1));
       } else {
         end = DateTimeUtil.parseDate(expression.get(1));
-        period = datatypeFactory.newDuration(end.getTime()-start.getTime());
+        period = datatypeFactory.newDuration(end.getTime() - start.getTime());
       }
     }
     if (start == null && end == null) {
@@ -89,12 +90,12 @@ public class DurationHelper {
   public Date getDateAfter() {
     return getDateAfter(null);
   }
-  
+
   public Date getDateAfter(Date date) {
     if (isRepeat) {
       return getDateAfterRepeat(date == null ? ClockUtil.getCurrentTime() : date);
     }
-    //TODO: is this correct?
+    // TODO: is this correct?
     if (end != null) {
       return end;
     }
@@ -112,7 +113,7 @@ public class DurationHelper {
   private Date getDateAfterRepeat(Date date) {
     if (start != null) {
       Date cur = start;
-      for (int i=0;i<times && !cur.after(date);i++) {
+      for (int i = 0; i < times && !cur.after(date); i++) {
         cur = add(cur, period);
       }
       return cur.before(date) ? null : cur;
@@ -120,7 +121,7 @@ public class DurationHelper {
     Date cur = add(end, period.negate());
     Date next = end;
 
-    for (int i=0;i<times && cur.after(date);i++) {
+    for (int i = 0; i < times && cur.after(date); i++) {
       next = cur;
       cur = add(cur, period.negate());
     }

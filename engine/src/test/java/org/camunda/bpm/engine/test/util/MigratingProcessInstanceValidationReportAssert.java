@@ -36,7 +36,8 @@ public class MigratingProcessInstanceValidationReportAssert {
 
   protected MigratingProcessInstanceValidationReport actual;
 
-  public MigratingProcessInstanceValidationReportAssert(MigratingProcessInstanceValidationReport report) {
+  public MigratingProcessInstanceValidationReportAssert(
+      MigratingProcessInstanceValidationReport report) {
     this.actual = report;
   }
 
@@ -46,14 +47,17 @@ public class MigratingProcessInstanceValidationReportAssert {
     return this;
   }
 
-  public MigratingProcessInstanceValidationReportAssert hasProcessInstance(ProcessInstance processInstance) {
+  public MigratingProcessInstanceValidationReportAssert hasProcessInstance(
+      ProcessInstance processInstance) {
     return hasProcessInstanceId(processInstance.getId());
   }
 
-  public MigratingProcessInstanceValidationReportAssert hasProcessInstanceId(String processInstanceId) {
+  public MigratingProcessInstanceValidationReportAssert hasProcessInstanceId(
+      String processInstanceId) {
     isNotNull();
 
-    assertEquals("Expected report to be for process instance", processInstanceId, actual.getProcessInstanceId());
+    assertEquals("Expected report to be for process instance", processInstanceId,
+        actual.getProcessInstanceId());
 
     return this;
   }
@@ -68,18 +72,21 @@ public class MigratingProcessInstanceValidationReportAssert {
       matchers.add(Matchers.containsString(expectedFailure));
     }
 
-    Assert.assertThat("Expected failures:\n" + joinFailures(Arrays.asList(expectedFailures)) +
-        "But found failures:\n" + joinFailures(actualFailures),
-      actualFailures, Matchers.containsInAnyOrder(matchers));
+    Assert.assertThat(
+        "Expected failures:\n" + joinFailures(Arrays.asList(expectedFailures))
+            + "But found failures:\n" + joinFailures(actualFailures),
+        actualFailures, Matchers.containsInAnyOrder(matchers));
 
     return this;
   }
 
-  public MigratingProcessInstanceValidationReportAssert hasActivityInstanceFailures(String sourceScopeId, String... expectedFailures) {
+  public MigratingProcessInstanceValidationReportAssert hasActivityInstanceFailures(
+      String sourceScopeId, String... expectedFailures) {
     isNotNull();
 
     MigratingActivityInstanceValidationReport actualReport = null;
-    for (MigratingActivityInstanceValidationReport instanceReport : actual.getActivityInstanceReports()) {
+    for (MigratingActivityInstanceValidationReport instanceReport : actual
+        .getActivityInstanceReports()) {
       if (sourceScopeId.equals(instanceReport.getSourceScopeId())) {
         actualReport = instanceReport;
         break;
@@ -93,11 +100,13 @@ public class MigratingProcessInstanceValidationReportAssert {
     return this;
   }
 
-  public MigratingProcessInstanceValidationReportAssert hasTransitionInstanceFailures(String sourceScopeId, String... expectedFailures) {
+  public MigratingProcessInstanceValidationReportAssert hasTransitionInstanceFailures(
+      String sourceScopeId, String... expectedFailures) {
     isNotNull();
 
     MigratingTransitionInstanceValidationReport actualReport = null;
-    for (MigratingTransitionInstanceValidationReport instanceReport : actual.getTransitionInstanceReports()) {
+    for (MigratingTransitionInstanceValidationReport instanceReport : actual
+        .getTransitionInstanceReports()) {
       if (sourceScopeId.equals(instanceReport.getSourceScopeId())) {
         actualReport = instanceReport;
         break;
@@ -111,19 +120,21 @@ public class MigratingProcessInstanceValidationReportAssert {
     return this;
   }
 
-  protected void assertFailures(String sourceScopeId, List<String> expectedFailures, List<String> actualFailures) {
+  protected void assertFailures(String sourceScopeId, List<String> expectedFailures,
+      List<String> actualFailures) {
 
     Collection<Matcher<? super String>> matchers = new ArrayList<Matcher<? super String>>();
     for (String expectedFailure : expectedFailures) {
       matchers.add(Matchers.containsString(expectedFailure));
     }
 
-    Assert.assertThat("Expected failures for source scope: " + sourceScopeId + "\n" + joinFailures(expectedFailures) +
-        "But found failures:\n" + joinFailures(actualFailures),
-      actualFailures, Matchers.containsInAnyOrder(matchers));
+    Assert.assertThat("Expected failures for source scope: " + sourceScopeId + "\n"
+        + joinFailures(expectedFailures) + "But found failures:\n" + joinFailures(actualFailures),
+        actualFailures, Matchers.containsInAnyOrder(matchers));
   }
 
-  public static MigratingProcessInstanceValidationReportAssert assertThat(MigratingProcessInstanceValidationReport report) {
+  public static MigratingProcessInstanceValidationReportAssert assertThat(
+      MigratingProcessInstanceValidationReport report) {
     return new MigratingProcessInstanceValidationReportAssert(report);
   }
 
@@ -135,7 +146,5 @@ public class MigratingProcessInstanceValidationReportAssert {
 
     return builder.toString();
   }
-
-
 
 }

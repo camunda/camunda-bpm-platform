@@ -24,10 +24,10 @@ import org.camunda.bpm.container.impl.spi.PlatformServiceContainer.ServiceType;
  */
 public enum ServiceTypes implements ServiceType {
 
-  BPM_PLATFORM("org.camunda.bpm.platform"),
-  PROCESS_ENGINE("org.camunda.bpm.platform.process-engine"),
-  JOB_EXECUTOR("org.camunda.bpm.platform.job-executor"),
-  PROCESS_APPLICATION("org.camunda.bpm.platform.job-executor.process-application");
+  BPM_PLATFORM("org.camunda.bpm.platform"), PROCESS_ENGINE(
+      "org.camunda.bpm.platform.process-engine"), JOB_EXECUTOR(
+          "org.camunda.bpm.platform.job-executor"), PROCESS_APPLICATION(
+              "org.camunda.bpm.platform.job-executor.process-application");
 
   protected String serviceRealm;
 

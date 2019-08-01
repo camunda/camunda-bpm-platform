@@ -21,8 +21,7 @@ import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import java.util.List;
 
 /**
- * Configuration object that is passed to the Job that will actually perform execution of
- * deletion.
+ * Configuration object that is passed to the Job that will actually perform execution of deletion.
  * <p>
  * This object will be serialized and persisted as run will be performed asynchronously.
  *
@@ -34,15 +33,18 @@ public class DeleteProcessInstanceBatchConfiguration extends BatchConfiguration 
   protected boolean skipCustomListeners;
   protected boolean skipSubprocesses;
 
-  public DeleteProcessInstanceBatchConfiguration(List<String> ids, boolean skipCustomListeners, boolean skipSubprocesses) {
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, boolean skipCustomListeners,
+      boolean skipSubprocesses) {
     this(ids, null, skipCustomListeners, skipSubprocesses, true);
   }
 
-  public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason, boolean skipCustomListeners) {
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason,
+      boolean skipCustomListeners) {
     this(ids, deleteReason, skipCustomListeners, true, true);
   }
 
-  public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses, boolean failIfNotExists) {
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason,
+      boolean skipCustomListeners, boolean skipSubprocesses, boolean failIfNotExists) {
     super(ids);
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;

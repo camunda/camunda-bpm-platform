@@ -61,38 +61,40 @@ public class MigrationMultiInstanceTest {
   @Test
   public void testMigrateParallelMultiInstanceTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child(null).scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration(miBodyOf("userTask")))
-            .child("userTask").concurrent().noScope().up()
-            .child("userTask").concurrent().noScope().up()
-            .child("userTask").concurrent().noScope().up()
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child(null).scope()
+            .id(testHelper.getSingleExecutionIdForActivityBeforeMigration(miBodyOf("userTask")))
+            .child("userTask").concurrent().noScope().up().child("userTask").concurrent().noScope()
+            .up().child("userTask").concurrent().noScope().up().done());
 
-    ActivityInstance[] userTaskInstances = testHelper.snapshotBeforeMigration.getActivityTree().getActivityInstances("userTask");
+    ActivityInstance[] userTaskInstances = testHelper.snapshotBeforeMigration.getActivityTree()
+        .getActivityInstances("userTask");
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-        describeActivityInstanceTree(targetProcessDefinition.getId())
-          .beginMiBody("userTask", testHelper.getSingleActivityInstanceBeforeMigration(miBodyOf("userTask")).getId())
-            .activity("userTask", userTaskInstances[0].getId())
-            .activity("userTask", userTaskInstances[1].getId())
-            .activity("userTask", userTaskInstances[2].getId())
-        .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(
+            describeActivityInstanceTree(targetProcessDefinition.getId())
+                .beginMiBody("userTask",
+                    testHelper.getSingleActivityInstanceBeforeMigration(miBodyOf("userTask"))
+                        .getId())
+                .activity("userTask", userTaskInstances[0].getId())
+                .activity("userTask", userTaskInstances[1].getId())
+                .activity("userTask", userTaskInstances[2].getId()).done());
 
     List<Task> migratedTasks = testHelper.snapshotAfterMigration.getTasks();
     Assert.assertEquals(3, migratedTasks.size());
@@ -110,17 +112,18 @@ public class MigrationMultiInstanceTest {
   @Test
   public void testMigrateParallelMultiInstanceTasksVariables() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
+        .mapActivities("userTask", "userTask").build();
 
     ProcessInstance processInstance = rule.getRuntimeService()
-      .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
+        .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
 
     List<Task> tasksBeforeMigration = rule.getTaskService().createTaskQuery().list();
     Map<String, Integer> loopCounterDistribution = new HashMap<String, Integer>();
@@ -135,9 +138,12 @@ public class MigrationMultiInstanceTest {
     // then
     List<Task> tasks = testHelper.snapshotAfterMigration.getTasks();
     Task firstTask = tasks.get(0);
-    Assert.assertEquals(3, rule.getTaskService().getVariable(firstTask.getId(), NUMBER_OF_INSTANCES));
-    Assert.assertEquals(3, rule.getTaskService().getVariable(firstTask.getId(), NUMBER_OF_ACTIVE_INSTANCES));
-    Assert.assertEquals(0, rule.getTaskService().getVariable(firstTask.getId(), NUMBER_OF_COMPLETED_INSTANCES));
+    Assert.assertEquals(3,
+        rule.getTaskService().getVariable(firstTask.getId(), NUMBER_OF_INSTANCES));
+    Assert.assertEquals(3,
+        rule.getTaskService().getVariable(firstTask.getId(), NUMBER_OF_ACTIVE_INSTANCES));
+    Assert.assertEquals(0,
+        rule.getTaskService().getVariable(firstTask.getId(), NUMBER_OF_COMPLETED_INSTANCES));
 
     for (Task task : tasks) {
       Integer loopCounter = (Integer) rule.getTaskService().getVariable(task.getId(), LOOP_COUNTER);
@@ -149,42 +155,45 @@ public class MigrationMultiInstanceTest {
   @Test
   public void testMigrateParallelMultiInstancePartiallyComplete() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
+        .mapActivities("userTask", "userTask").build();
 
     // when
-    ProcessInstance processInstance =
-        rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     testHelper.completeAnyTask("userTask");
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child(null).scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration(miBodyOf("userTask")))
-            .child("userTask").concurrent().noScope().up()
-            .child("userTask").concurrent().noScope().up()
-            .child("userTask").concurrent().noScope().up()
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child(null).scope()
+            .id(testHelper.getSingleExecutionIdForActivityBeforeMigration(miBodyOf("userTask")))
+            .child("userTask").concurrent().noScope().up().child("userTask").concurrent().noScope()
+            .up().child("userTask").concurrent().noScope().up().done());
 
-    ActivityInstance[] userTaskInstances = testHelper.snapshotBeforeMigration.getActivityTree().getActivityInstances("userTask");
+    ActivityInstance[] userTaskInstances = testHelper.snapshotBeforeMigration.getActivityTree()
+        .getActivityInstances("userTask");
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-        describeActivityInstanceTree(targetProcessDefinition.getId())
-          .beginMiBody("userTask", testHelper.getSingleActivityInstanceBeforeMigration(miBodyOf("userTask")).getId())
-            .activity("userTask", userTaskInstances[0].getId())
-            .activity("userTask", userTaskInstances[1].getId())
-            .transition("userTask") // bug CAM-5609
-        .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(
+            describeActivityInstanceTree(targetProcessDefinition.getId())
+                .beginMiBody("userTask",
+                    testHelper.getSingleActivityInstanceBeforeMigration(miBodyOf("userTask"))
+                        .getId())
+                .activity("userTask", userTaskInstances[0].getId())
+                .activity("userTask", userTaskInstances[1].getId()).transition("userTask") // bug
+                                                                                           // CAM-5609
+                .done());
 
     List<Task> migratedTasks = testHelper.snapshotAfterMigration.getTasks();
     Assert.assertEquals(2, migratedTasks.size());
@@ -199,80 +208,79 @@ public class MigrationMultiInstanceTest {
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
-
   @Test
   public void testMigrateParallelMiBodyRemoveSubprocess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
 
     try {
       rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("subProcess"), miBodyOf("userTask"))
-      .mapActivities("userTask", "userTask")
-      .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities(miBodyOf("subProcess"), miBodyOf("userTask"))
+          .mapActivities("userTask", "userTask").build();
       fail("Should not succeed");
-    }
-    catch (MigrationPlanValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasInstructionFailures(miBodyOf("subProcess"),
-          "Cannot remove the inner activity of a multi-instance body when the body is mapped"
-        );
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport()).hasInstructionFailures(miBodyOf("subProcess"),
+          "Cannot remove the inner activity of a multi-instance body when the body is mapped");
     }
   }
-
 
   @Test
   public void testMigrateParallelMiBodyAddSubprocess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_SUBPROCESS_PROCESS);
 
     try {
       rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("userTask"), miBodyOf("subProcess"))
-      .mapActivities("userTask", "userTask")
-      .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities(miBodyOf("userTask"), miBodyOf("subProcess"))
+          .mapActivities("userTask", "userTask").build();
       fail("Should not succeed");
-    }
-    catch (MigrationPlanValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasInstructionFailures(miBodyOf("userTask"),
-          "Must map the inner activity of a multi-instance body when the body is mapped"
-        );
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport()).hasInstructionFailures(miBodyOf("userTask"),
+          "Must map the inner activity of a multi-instance body when the body is mapped");
     }
   }
 
   @Test
   public void testMigrateSequentialMultiInstanceTask() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("userTask").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration(miBodyOf("userTask")))
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("userTask").scope()
+            .id(testHelper.getSingleExecutionIdForActivityBeforeMigration(miBodyOf("userTask")))
+            .done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-        describeActivityInstanceTree(targetProcessDefinition.getId())
-          .beginMiBody("userTask", testHelper.getSingleActivityInstanceBeforeMigration(miBodyOf("userTask")).getId())
-            .activity("userTask", testHelper.getSingleActivityInstanceBeforeMigration("userTask").getId())
-        .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(
+            describeActivityInstanceTree(targetProcessDefinition.getId())
+                .beginMiBody("userTask",
+                    testHelper.getSingleActivityInstanceBeforeMigration(miBodyOf("userTask"))
+                        .getId())
+                .activity("userTask",
+                    testHelper.getSingleActivityInstanceBeforeMigration("userTask").getId())
+                .done());
 
     Task migratedTask = testHelper.snapshotAfterMigration.getTaskForKey("userTask");
     Assert.assertNotNull(migratedTask);
@@ -288,14 +296,15 @@ public class MigrationMultiInstanceTest {
   @Test
   public void testMigrateSequentialMultiInstanceTasksVariables() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
+        .mapActivities("userTask", "userTask").build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
@@ -303,43 +312,51 @@ public class MigrationMultiInstanceTest {
     // then
     Task task = testHelper.snapshotAfterMigration.getTaskForKey("userTask");
     Assert.assertEquals(3, rule.getTaskService().getVariable(task.getId(), NUMBER_OF_INSTANCES));
-    Assert.assertEquals(1, rule.getTaskService().getVariable(task.getId(), NUMBER_OF_ACTIVE_INSTANCES));
-    Assert.assertEquals(0, rule.getTaskService().getVariable(task.getId(), NUMBER_OF_COMPLETED_INSTANCES));
-    Assert.assertEquals(0, rule.getTaskService().getVariable(task.getId(), NUMBER_OF_COMPLETED_INSTANCES));
+    Assert.assertEquals(1,
+        rule.getTaskService().getVariable(task.getId(), NUMBER_OF_ACTIVE_INSTANCES));
+    Assert.assertEquals(0,
+        rule.getTaskService().getVariable(task.getId(), NUMBER_OF_COMPLETED_INSTANCES));
+    Assert.assertEquals(0,
+        rule.getTaskService().getVariable(task.getId(), NUMBER_OF_COMPLETED_INSTANCES));
   }
 
   @Test
   public void testMigrateSequentialMultiInstancePartiallyComplete() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
-      .mapActivities("userTask", "userTask")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
+        .mapActivities("userTask", "userTask").build();
 
     // when
-    ProcessInstance processInstance =
-        rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     testHelper.completeAnyTask("userTask");
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
     testHelper.assertExecutionTreeAfterMigration()
-      .hasProcessDefinitionId(targetProcessDefinition.getId())
-      .matches(
-        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
-          .child("userTask").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration(miBodyOf("userTask")))
-          .done());
+        .hasProcessDefinitionId(targetProcessDefinition.getId())
+        .matches(describeExecutionTree(null).scope()
+            .id(testHelper.snapshotBeforeMigration.getProcessInstanceId()).child("userTask").scope()
+            .id(testHelper.getSingleExecutionIdForActivityBeforeMigration(miBodyOf("userTask")))
+            .done());
 
-    testHelper.assertActivityTreeAfterMigration().hasStructure(
-        describeActivityInstanceTree(targetProcessDefinition.getId())
-          .beginMiBody("userTask", testHelper.getSingleActivityInstanceBeforeMigration(miBodyOf("userTask")).getId())
-            .activity("userTask", testHelper.getSingleActivityInstanceBeforeMigration("userTask").getId())
-        .done());
+    testHelper.assertActivityTreeAfterMigration()
+        .hasStructure(
+            describeActivityInstanceTree(targetProcessDefinition.getId())
+                .beginMiBody("userTask",
+                    testHelper.getSingleActivityInstanceBeforeMigration(miBodyOf("userTask"))
+                        .getId())
+                .activity("userTask",
+                    testHelper.getSingleActivityInstanceBeforeMigration("userTask").getId())
+                .done());
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask("userTask");
@@ -347,72 +364,64 @@ public class MigrationMultiInstanceTest {
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
-
   @Test
   public void testMigrateSequenatialMiBodyRemoveSubprocess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
 
     try {
       rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("subProcess"), miBodyOf("userTask"))
-      .mapActivities("userTask", "userTask")
-      .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities(miBodyOf("subProcess"), miBodyOf("userTask"))
+          .mapActivities("userTask", "userTask").build();
       fail("Should not succeed");
-    }
-    catch (MigrationPlanValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasInstructionFailures(miBodyOf("subProcess"),
-          "Cannot remove the inner activity of a multi-instance body when the body is mapped"
-        );
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport()).hasInstructionFailures(miBodyOf("subProcess"),
+          "Cannot remove the inner activity of a multi-instance body when the body is mapped");
     }
   }
-
 
   @Test
   public void testMigrateSequentialMiBodyAddSubprocess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_SUBPROCESS_PROCESS);
 
     try {
       rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("userTask"), miBodyOf("subProcess"))
-      .mapActivities("userTask", "userTask")
-      .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities(miBodyOf("userTask"), miBodyOf("subProcess"))
+          .mapActivities("userTask", "userTask").build();
       fail("Should not succeed");
-    }
-    catch (MigrationPlanValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasInstructionFailures(miBodyOf("userTask"),
-          "Must map the inner activity of a multi-instance body when the body is mapped"
-        );
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport()).hasInstructionFailures(miBodyOf("userTask"),
+          "Must map the inner activity of a multi-instance body when the body is mapped");
     }
   }
 
   @Test
   public void testMigrateParallelToSequential() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.PAR_MI_ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MultiInstanceProcessModels.SEQ_MI_ONE_TASK_PROCESS);
 
     try {
       rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
-      .mapActivities("userTask", "userTask")
-      .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities(miBodyOf("userTask"), miBodyOf("userTask"))
+          .mapActivities("userTask", "userTask").build();
       fail("Should not succeed");
-    }
-    catch (MigrationPlanValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasInstructionFailures(miBodyOf("userTask"),
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport()).hasInstructionFailures(miBodyOf("userTask"),
           "Activities have incompatible types (ParallelMultiInstanceActivityBehavior is not "
-          + "compatible with SequentialMultiInstanceActivityBehavior)"
-        );
+              + "compatible with SequentialMultiInstanceActivityBehavior)");
     }
   }
 

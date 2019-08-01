@@ -62,28 +62,21 @@ public class UnlockExternalTaskAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.UPDATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
+            grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId",
+                Permissions.UPDATE_INSTANCE)),
+        scenario().withAuthorizations(
+            grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
+            .succeeds(),
+        scenario().withAuthorizations(
+            grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)).succeeds(),
+        scenario().withAuthorizations(grant(Resources.PROCESS_DEFINITION, "processDefinitionKey",
+            "userId", Permissions.UPDATE_INSTANCE)).succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
+            .succeeds());
   }
 
   @Before
@@ -101,31 +94,27 @@ public class UnlockExternalTaskAuthorizationTest {
   public void testSetJobPriority() {
 
     // given
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
-    List<LockedExternalTask> tasks = engineRule.getExternalTaskService()
-        .fetchAndLock(5, "workerId")
-        .topic("externalTaskTopic", 5000L)
-        .execute();
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> tasks = engineRule.getExternalTaskService().fetchAndLock(5, "workerId")
+        .topic("externalTaskTopic", 5000L).execute();
 
     LockedExternalTask task = tasks.get(0);
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("processInstanceId", processInstance.getId())
-      .bindResource("processDefinitionKey", "oneExternalTaskProcess")
-      .start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("processInstanceId", processInstance.getId())
+        .bindResource("processDefinitionKey", "oneExternalTaskProcess").start();
 
     engineRule.getExternalTaskService().unlock(task.getId());
 
     // then
     if (authRule.assertScenario(scenario)) {
-      ExternalTask externalTask = engineRule.getExternalTaskService().createExternalTaskQuery().singleResult();
+      ExternalTask externalTask = engineRule.getExternalTaskService().createExternalTaskQuery()
+          .singleResult();
       Assert.assertNull(externalTask.getLockExpirationTime());
     }
 
   }
-
 
 }

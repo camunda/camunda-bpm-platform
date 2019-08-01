@@ -54,10 +54,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class GetHistoricDecisionInstancesForOptimizeTest {
 
-  public static final String DECISION_PROCESS =
-    "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml";
-  public static final String DECISION_SINGLE_OUTPUT_DMN =
-    "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml";
+  public static final String DECISION_PROCESS = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml";
+  public static final String DECISION_SINGLE_OUTPUT_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml";
 
   protected static final String VARIABLE_NAME = "aVariableName";
   protected static final String VARIABLE_VALUE = "aVariableValue";
@@ -76,8 +74,7 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
 
   @Before
   public void init() {
-    ProcessEngineConfigurationImpl config =
-      engineRule.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl config = engineRule.getProcessEngineConfiguration();
     optimizeService = config.getOptimizeService();
     identityService = engineRule.getIdentityService();
     runtimeService = engineRule.getRuntimeService();
@@ -101,7 +98,7 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
   }
 
   @Test
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void getCompletedHistoricDecisionInstances() {
     // given start process and evaluate decision
     VariableMap variables = Variables.createVariables();
@@ -109,8 +106,8 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     // when
-    List<HistoricDecisionInstance> decisionInstances =
-      optimizeService.getHistoricDecisionInstances(pastDate(), null, 10);
+    List<HistoricDecisionInstance> decisionInstances = optimizeService
+        .getHistoricDecisionInstances(pastDate(), null, 10);
 
     // then
     assertThat(decisionInstances.size(), is(1));
@@ -118,7 +115,7 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
   }
 
   @Test
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void decisionInputInstanceProperties() {
     // given start process and evaluate decision
     VariableMap variables = Variables.createVariables();
@@ -126,8 +123,8 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     // when
-    List<HistoricDecisionInstance> decisionInstances =
-      optimizeService.getHistoricDecisionInstances(pastDate(), null, 10);
+    List<HistoricDecisionInstance> decisionInstances = optimizeService
+        .getHistoricDecisionInstances(pastDate(), null, 10);
 
     // then
     assertThat(decisionInstances.size(), is(1));
@@ -143,7 +140,7 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
   }
 
   @Test
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void decisionOutputInstanceProperties() {
     // given start process and evaluate decision
     VariableMap variables = Variables.createVariables();
@@ -151,8 +148,8 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     // when
-    List<HistoricDecisionInstance> decisionInstances =
-      optimizeService.getHistoricDecisionInstances(pastDate(), null, 10);
+    List<HistoricDecisionInstance> decisionInstances = optimizeService
+        .getHistoricDecisionInstances(pastDate(), null, 10);
 
     // then
     assertThat(decisionInstances.size(), is(1));
@@ -173,7 +170,7 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
   }
 
   @Test
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void fishedAfterParameterWorks() {
     // given start process and evaluate decision
     VariableMap variables = Variables.createVariables();
@@ -183,12 +180,12 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
-    ProcessInstance secondProcessInstance =
-      runtimeService.startProcessInstanceByKey("testProcess", variables);
+    ProcessInstance secondProcessInstance = runtimeService.startProcessInstanceByKey("testProcess",
+        variables);
 
     // when
-    List<HistoricDecisionInstance> decisionInstances =
-      optimizeService.getHistoricDecisionInstances(now, null, 10);
+    List<HistoricDecisionInstance> decisionInstances = optimizeService
+        .getHistoricDecisionInstances(now, null, 10);
 
     // then
     assertThat(decisionInstances.size(), is(1));
@@ -197,22 +194,22 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
   }
 
   @Test
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void fishedAtParameterWorks() {
     // given start process and evaluate decision
     VariableMap variables = Variables.createVariables();
     variables.put("input1", null);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
-    ProcessInstance firstProcessInstance =
-      runtimeService.startProcessInstanceByKey("testProcess", variables);
+    ProcessInstance firstProcessInstance = runtimeService.startProcessInstanceByKey("testProcess",
+        variables);
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     // when
-    List<HistoricDecisionInstance> decisionInstances =
-      optimizeService.getHistoricDecisionInstances(null, now, 10);
+    List<HistoricDecisionInstance> decisionInstances = optimizeService
+        .getHistoricDecisionInstances(null, now, 10);
 
     // then
     assertThat(decisionInstances.size(), is(1));
@@ -221,7 +218,7 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
   }
 
   @Test
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void fishedAfterAndFinishedAtParameterWorks() {
     // given start process and evaluate decision
     VariableMap variables = Variables.createVariables();
@@ -238,15 +235,15 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     // when
-    List<HistoricDecisionInstance> decisionInstances =
-      optimizeService.getHistoricDecisionInstances(now, now, 10);
+    List<HistoricDecisionInstance> decisionInstances = optimizeService
+        .getHistoricDecisionInstances(now, now, 10);
 
     // then
     assertThat(decisionInstances.size(), is(0));
   }
 
   @Test
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void maxResultsParameterWorks() {
     // given start process and evaluate decision
     VariableMap variables = Variables.createVariables();
@@ -256,15 +253,15 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     // when
-    List<HistoricDecisionInstance> decisionInstances =
-      optimizeService.getHistoricDecisionInstances(null, null, 2);
+    List<HistoricDecisionInstance> decisionInstances = optimizeService
+        .getHistoricDecisionInstances(null, null, 2);
 
     // then
     assertThat(decisionInstances.size(), is(2));
   }
 
   @Test
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void resultIsSortedByEvaluationTime() {
     // given start process and evaluate decision
     VariableMap variables = Variables.createVariables();
@@ -274,18 +271,18 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
 
     ClockUtil.setCurrentTime(nowMinus2Seconds);
-    ProcessInstance firstProcessInstance =
-      runtimeService.startProcessInstanceByKey("testProcess", variables);
+    ProcessInstance firstProcessInstance = runtimeService.startProcessInstanceByKey("testProcess",
+        variables);
     ClockUtil.setCurrentTime(now);
-    ProcessInstance secondProcessInstance =
-      runtimeService.startProcessInstanceByKey("testProcess", variables);
+    ProcessInstance secondProcessInstance = runtimeService.startProcessInstanceByKey("testProcess",
+        variables);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
-    ProcessInstance thirdProcessInstance =
-      runtimeService.startProcessInstanceByKey("testProcess", variables);
+    ProcessInstance thirdProcessInstance = runtimeService.startProcessInstanceByKey("testProcess",
+        variables);
 
     // when
-    List<HistoricDecisionInstance> decisionInstances =
-      optimizeService.getHistoricDecisionInstances(pastDate(), null, 3);
+    List<HistoricDecisionInstance> decisionInstances = optimizeService
+        .getHistoricDecisionInstances(pastDate(), null, 3);
 
     // then
     assertThat(decisionInstances.size(), is(3));
@@ -303,11 +300,10 @@ public class GetHistoricDecisionInstancesForOptimizeTest {
     identityService.saveUser(user);
   }
 
-  private void assertThatDecisionsHaveAllImportantInformation(List<HistoricDecisionInstance> decisionInstances) {
+  private void assertThatDecisionsHaveAllImportantInformation(
+      List<HistoricDecisionInstance> decisionInstances) {
     assertThat(decisionInstances.size(), is(1));
-    HistoricDecisionInstance decisionInstance =
-      decisionInstances.get(0);
-
+    HistoricDecisionInstance decisionInstance = decisionInstances.get(0);
 
     assertThat(decisionInstance, notNullValue());
     assertThat(decisionInstance.getProcessDefinitionKey(), is("testProcess"));

@@ -34,7 +34,8 @@ public class PermissionsTest {
     for (Permissions permission : Permissions.values()) {
       String permissionName = permission.getName();
       for (Resource resource : permission.getTypes()) {
-        Class<? extends Enum<?>> clazz = ResourceTypeUtil.getPermissionEnums().get(resource.resourceType());
+        Class<? extends Enum<?>> clazz = ResourceTypeUtil.getPermissionEnums()
+            .get(resource.resourceType());
         if (clazz != null && !clazz.equals(Permissions.class)) {
           Permission resolvedPermission = null;
           for (Enum<?> enumCandidate : clazz.getEnumConstants()) {
@@ -44,9 +45,10 @@ public class PermissionsTest {
             }
           }
           assertThat(resolvedPermission)
-            .overridingErrorMessage("Permission %s for resource %s not found in new enum %s", permission, resource, clazz.getSimpleName())
-            .isNotNull();
-            
+              .overridingErrorMessage("Permission %s for resource %s not found in new enum %s",
+                  permission, resource, clazz.getSimpleName())
+              .isNotNull();
+
           assertThat(resolvedPermission.getValue()).isEqualTo(permission.getValue());
         }
       }
@@ -60,9 +62,11 @@ public class PermissionsTest {
 
   @Test
   public void testRestOfPermissionsEnumValues() {
-    for (Class<? extends Enum<? extends Permission>> permissionsClass : ResourceTypeUtil.getPermissionEnums().values()) {
-      if(!permissionsClass.equals(Permissions.class)) {
-        verifyValuesAreUniqueAndPowerOfTwo((Permission[])permissionsClass.getEnumConstants(), permissionsClass.getSimpleName());
+    for (Class<? extends Enum<? extends Permission>> permissionsClass : ResourceTypeUtil
+        .getPermissionEnums().values()) {
+      if (!permissionsClass.equals(Permissions.class)) {
+        verifyValuesAreUniqueAndPowerOfTwo((Permission[]) permissionsClass.getEnumConstants(),
+            permissionsClass.getSimpleName());
       }
     }
   }
@@ -72,14 +76,14 @@ public class PermissionsTest {
     for (Permission permission : permissions) {
       int value = permission.getValue();
       // value is unique
-      assertThat(values.add(value))
-          .overridingErrorMessage("The value '%s' of '%s' permission is not unique for '%s' permission enum. Another permission already has this value.", value, permission, className)
-          .isTrue();
+      assertThat(values.add(value)).overridingErrorMessage(
+          "The value '%s' of '%s' permission is not unique for '%s' permission enum. Another permission already has this value.",
+          value, permission, className).isTrue();
       if (value != Integer.MAX_VALUE && value != 0) {
         // value is power of 2
-        assertThat(isPowerOfTwo(value))
-          .overridingErrorMessage("The value '%s' of '%s' permission is invalid for '%s' permission enum. The values must be power of 2.", value, permission, className)
-          .isTrue();
+        assertThat(isPowerOfTwo(value)).overridingErrorMessage(
+            "The value '%s' of '%s' permission is invalid for '%s' permission enum. The values must be power of 2.",
+            value, permission, className).isTrue();
       }
     }
   }

@@ -115,13 +115,15 @@ public class DisabledPermissionsAuthorizationTest {
     // given
     processEngineConfiguration.setDisabledPermissions(Arrays.asList(READ.name()));
 
-    authRule.createGrantAuthorization(PROCESS_INSTANCE, ANY, USER_ID, ProcessInstancePermissions.RETRY_JOB);
+    authRule.createGrantAuthorization(PROCESS_INSTANCE, ANY, USER_ID,
+        ProcessInstancePermissions.RETRY_JOB);
 
     authRule.enableAuthorization(USER_ID);
 
     // expected exception
     exceptionRule.expect(BadUserRequestException.class);
-    exceptionRule.expectMessage("The 'READ' permission is disabled, please check your process engine configuration.");
+    exceptionRule.expectMessage(
+        "The 'READ' permission is disabled, please check your process engine configuration.");
 
     // when
     authorizationService.isUserAuthorized(USER_ID, null, READ, PROCESS_DEFINITION);
@@ -130,7 +132,8 @@ public class DisabledPermissionsAuthorizationTest {
   @Test
   public void testCustomPermissionDuplicateValue() {
     // given
-    processEngineConfiguration.setDisabledPermissions(Arrays.asList(ProcessInstancePermissions.SUSPEND.name()));
+    processEngineConfiguration
+        .setDisabledPermissions(Arrays.asList(ProcessInstancePermissions.SUSPEND.name()));
     Resource resource1 = TestResource.RESOURCE1;
     Resource resource2 = TestResource.RESOURCE2;
 
@@ -143,9 +146,12 @@ public class DisabledPermissionsAuthorizationTest {
     authRule.enableAuthorization(USER_ID);
 
     // then
-    // verify that the custom permission with the same value is not affected by disabling the build-in permission
-    assertEquals(true, authorizationService.isUserAuthorized(USER_ID, null, TestPermissions.RANDOM, resource1));
-    assertEquals(true, authorizationService.isUserAuthorized(USER_ID, null, TestPermissions.RANDOM, resource2, "resource2-1"));
+    // verify that the custom permission with the same value is not affected by disabling the
+    // build-in permission
+    assertEquals(true,
+        authorizationService.isUserAuthorized(USER_ID, null, TestPermissions.RANDOM, resource1));
+    assertEquals(true, authorizationService.isUserAuthorized(USER_ID, null, TestPermissions.RANDOM,
+        resource2, "resource2-1"));
   }
 
   // specific scenarios //////////////////////////////////////
@@ -199,7 +205,8 @@ public class DisabledPermissionsAuthorizationTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testDeleteHistoricProcessInstanceIgnoreDeleteHistory() {
     // given
-    processEngineConfiguration.setDisabledPermissions(Arrays.asList(Permissions.DELETE_HISTORY.name()));
+    processEngineConfiguration
+        .setDisabledPermissions(Arrays.asList(Permissions.DELETE_HISTORY.name()));
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     runtimeService.deleteProcessInstance(processInstance.getId(), "any");
@@ -218,7 +225,8 @@ public class DisabledPermissionsAuthorizationTest {
 
     // when
     authRule.enableAuthorization(USER_ID);
-    List<org.camunda.bpm.engine.repository.Deployment> deployments = engineRule.getRepositoryService().createDeploymentQuery().list();
+    List<org.camunda.bpm.engine.repository.Deployment> deployments = engineRule
+        .getRepositoryService().createDeploymentQuery().list();
 
     // then
     assertEquals(1, deployments.size());
@@ -229,18 +237,22 @@ public class DisabledPermissionsAuthorizationTest {
   public void testStartableInTasklistIgnoreRead() {
     // given
     processEngineConfiguration.setDisabledPermissions(Arrays.asList(READ.name()));
-    authRule.createGrantAuthorization(PROCESS_DEFINITION, "oneTaskProcess", USER_ID, CREATE_INSTANCE);
+    authRule.createGrantAuthorization(PROCESS_DEFINITION, "oneTaskProcess", USER_ID,
+        CREATE_INSTANCE);
     authRule.createGrantAuthorization(PROCESS_INSTANCE, "*", USER_ID, CREATE);
 
     authRule.disableAuthorization();
-    ProcessDefinition definition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
+    ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("oneTaskProcess").singleResult();
     authRule.enableAuthorization(USER_ID);
 
     // when
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().startablePermissionCheck().startableInTasklist().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .startablePermissionCheck().startableInTasklist().list();
     // then
     assertNotNull(processDefinitions);
-    assertEquals(1, repositoryService.createProcessDefinitionQuery().startablePermissionCheck().startableInTasklist().count());
+    assertEquals(1, repositoryService.createProcessDefinitionQuery().startablePermissionCheck()
+        .startableInTasklist().count());
     assertEquals(definition.getId(), processDefinitions.get(0).getId());
     assertTrue(processDefinitions.get(0).isStartableInTasklist());
   }
@@ -256,7 +268,8 @@ public class DisabledPermissionsAuthorizationTest {
     authRule.enableAuthorization(USER_ID);
 
     // when
-    DeploymentStatisticsQuery query = engineRule.getManagementService().createDeploymentStatisticsQuery();
+    DeploymentStatisticsQuery query = engineRule.getManagementService()
+        .createDeploymentStatisticsQuery();
 
     // then
     List<DeploymentStatistics> statistics = query.list();
@@ -279,12 +292,14 @@ public class DisabledPermissionsAuthorizationTest {
     permissions.add(READ.name());
     permissions.add(READ_INSTANCE.name());
     processEngineConfiguration.setDisabledPermissions(permissions);
-    String processDefinitionId = runtimeService.startProcessInstanceByKey("timerBoundaryProcess").getProcessDefinitionId();
+    String processDefinitionId = runtimeService.startProcessInstanceByKey("timerBoundaryProcess")
+        .getProcessDefinitionId();
 
     authRule.enableAuthorization(USER_ID);
 
     // when
-    ActivityStatistics statistics = managementService.createActivityStatisticsQuery(processDefinitionId).singleResult();
+    ActivityStatistics statistics = managementService
+        .createActivityStatisticsQuery(processDefinitionId).singleResult();
 
     // then
     assertNotNull(statistics);
@@ -303,16 +318,15 @@ public class DisabledPermissionsAuthorizationTest {
     permissions.add(READ.name());
     permissions.add(READ_INSTANCE.name());
     processEngineConfiguration.setDisabledPermissions(permissions);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
     authRule.createGrantAuthorization(PROCESS_INSTANCE, "*", USER_ID, UPDATE);
 
     authRule.enableAuthorization(USER_ID);
 
     // when
     List<LockedExternalTask> externalTasks = engineRule.getExternalTaskService()
-        .fetchAndLock(1, "aWorkerId")
-        .topic("externalTaskTopic", 10000L)
-        .execute();
+        .fetchAndLock(1, "aWorkerId").topic("externalTaskTopic", 10000L).execute();
 
     // then
     assertEquals(1, externalTasks.size());
@@ -331,7 +345,8 @@ public class DisabledPermissionsAuthorizationTest {
   }
 
   protected void executeAvailableJobs(final String key) {
-    List<Job> jobs = managementService.createJobQuery().processDefinitionKey(key).withRetriesLeft().list();
+    List<Job> jobs = managementService.createJobQuery().processDefinitionKey(key).withRetriesLeft()
+        .list();
 
     if (jobs.isEmpty()) {
       return;

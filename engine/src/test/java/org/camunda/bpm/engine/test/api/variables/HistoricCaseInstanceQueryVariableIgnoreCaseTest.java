@@ -28,7 +28,8 @@ import org.junit.After;
 import org.junit.Before;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class HistoricCaseInstanceQueryVariableIgnoreCaseTest extends AbstractVariableIgnoreCaseTest<HistoricCaseInstanceQueryImpl, HistoricCaseInstance> {
+public class HistoricCaseInstanceQueryVariableIgnoreCaseTest
+    extends AbstractVariableIgnoreCaseTest<HistoricCaseInstanceQueryImpl, HistoricCaseInstance> {
 
   RepositoryService repositoryService;
 
@@ -36,8 +37,10 @@ public class HistoricCaseInstanceQueryVariableIgnoreCaseTest extends AbstractVar
   public void init() {
     repositoryService = engineRule.getRepositoryService();
 
-    repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn").deploy();
-    engineRule.getCaseService().withCaseDefinitionByKey("oneTaskCase").setVariables(VARIABLES).businessKey("oneTaskCase").create();
+    repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn").deploy();
+    engineRule.getCaseService().withCaseDefinitionByKey("oneTaskCase").setVariables(VARIABLES)
+        .businessKey("oneTaskCase").create();
     instance = engineRule.getHistoryService().createHistoricCaseInstanceQuery().singleResult();
   }
 
@@ -50,11 +53,13 @@ public class HistoricCaseInstanceQueryVariableIgnoreCaseTest extends AbstractVar
 
   @Override
   protected HistoricCaseInstanceQueryImpl createQuery() {
-    return (HistoricCaseInstanceQueryImpl) engineRule.getHistoryService().createHistoricCaseInstanceQuery();
+    return (HistoricCaseInstanceQueryImpl) engineRule.getHistoryService()
+        .createHistoricCaseInstanceQuery();
   }
 
   @Override
-  protected void assertThatTwoInstancesAreEqual(HistoricCaseInstance one, HistoricCaseInstance two) {
+  protected void assertThatTwoInstancesAreEqual(HistoricCaseInstance one,
+      HistoricCaseInstance two) {
     assertThat(one.getId()).isEqualTo(two.getId());
   }
 

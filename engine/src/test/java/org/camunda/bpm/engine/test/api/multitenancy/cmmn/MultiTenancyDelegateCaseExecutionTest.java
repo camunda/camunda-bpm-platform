@@ -54,11 +54,8 @@ public class MultiTenancyDelegateCaseExecutionTest extends PluggableProcessEngin
   }
 
   protected void createCaseInstance(String caseDefinitionKey) {
-    CaseDefinition caseDefinition = repositoryService
-        .createCaseDefinitionQuery()
-        .caseDefinitionKey(caseDefinitionKey)
-        .latestVersion()
-        .singleResult();
+    CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey(caseDefinitionKey).latestVersion().singleResult();
 
     caseService.createCaseInstanceById(caseDefinition.getId());
   }

@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 public class ExclusiveTimerEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment
@@ -45,8 +44,6 @@ public class ExclusiveTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(0, jobQuery.count());
     assertProcessEnded(pi.getProcessInstanceId());
 
-
   }
-
 
 }

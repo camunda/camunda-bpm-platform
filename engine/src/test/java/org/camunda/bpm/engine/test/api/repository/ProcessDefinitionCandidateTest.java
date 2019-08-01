@@ -52,7 +52,7 @@ public class ProcessDefinitionCandidateTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   protected RepositoryService repositoryService;
 
@@ -65,13 +65,14 @@ public class ProcessDefinitionCandidateTest {
   public void shouldPropagateTenantIdToCandidateStarterUser() {
     // when
     DeploymentBuilder builder = repositoryService.createDeployment()
-      .addClasspathResource(CANDIDATE_STARTER_USER)
-      .tenantId(TENANT_ONE);
+        .addClasspathResource(CANDIDATE_STARTER_USER).tenantId(TENANT_ONE);
     testRule.deploy(builder);
 
     // then
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    List<IdentityLink> links = repositoryService
+        .getIdentityLinksForProcessDefinition(processDefinition.getId());
     assertEquals(1, links.size());
 
     IdentityLink link = links.get(0);
@@ -83,13 +84,14 @@ public class ProcessDefinitionCandidateTest {
   public void shouldPropagateTenantIdToCandidateStarterUsers() {
     // when
     DeploymentBuilder builder = repositoryService.createDeployment()
-      .addClasspathResource(CANDIDATE_STARTER_USERS)
-      .tenantId(TENANT_ONE);
+        .addClasspathResource(CANDIDATE_STARTER_USERS).tenantId(TENANT_ONE);
     testRule.deploy(builder);
 
     // then
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    List<IdentityLink> links = repositoryService
+        .getIdentityLinksForProcessDefinition(processDefinition.getId());
     assertEquals(3, links.size());
 
     for (IdentityLink link : links) {
@@ -102,13 +104,14 @@ public class ProcessDefinitionCandidateTest {
   public void shouldPropagateTenantIdToCandidateStarterGroup() {
     // when
     DeploymentBuilder builder = repositoryService.createDeployment()
-      .addClasspathResource(CANDIDATE_STARTER_GROUP)
-      .tenantId(TENANT_ONE);
+        .addClasspathResource(CANDIDATE_STARTER_GROUP).tenantId(TENANT_ONE);
     testRule.deploy(builder);
 
     // then
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    List<IdentityLink> links = repositoryService
+        .getIdentityLinksForProcessDefinition(processDefinition.getId());
     assertEquals(1, links.size());
 
     IdentityLink link = links.get(0);
@@ -120,13 +123,14 @@ public class ProcessDefinitionCandidateTest {
   public void shouldPropagateTenantIdToCandidateStarterGroups() {
     // when
     DeploymentBuilder builder = repositoryService.createDeployment()
-      .addClasspathResource(CANDIDATE_STARTER_GROUPS)
-      .tenantId(TENANT_ONE);
+        .addClasspathResource(CANDIDATE_STARTER_GROUPS).tenantId(TENANT_ONE);
     testRule.deploy(builder);
 
     // then
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(processDefinition.getId());
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
+    List<IdentityLink> links = repositoryService
+        .getIdentityLinksForProcessDefinition(processDefinition.getId());
     assertEquals(3, links.size());
 
     for (IdentityLink link : links) {

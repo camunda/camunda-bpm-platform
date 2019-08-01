@@ -31,7 +31,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 
-public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHistoricBatchReport, CleanableHistoricBatchReportResult> implements CleanableHistoricBatchReport {
+public class CleanableHistoricBatchReportImpl
+    extends AbstractQuery<CleanableHistoricBatchReport, CleanableHistoricBatchReportResult>
+    implements CleanableHistoricBatchReport {
 
   private static final long serialVersionUID = 1L;
 
@@ -56,33 +58,39 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
     checkQueryOk();
     checkPermissions(commandContext);
 
-    Map<String, Integer> batchOperationsForHistoryCleanup = commandContext.getProcessEngineConfiguration().getParsedBatchOperationsForHistoryCleanup();
+    Map<String, Integer> batchOperationsForHistoryCleanup = commandContext
+        .getProcessEngineConfiguration().getParsedBatchOperationsForHistoryCleanup();
 
     if (isHistoryCleanupStrategyRemovalTimeBased()) {
       addBatchOperationsWithoutTTL(batchOperationsForHistoryCleanup);
     }
 
-    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchesReportCountByCriteria(this, batchOperationsForHistoryCleanup);
+    return commandContext.getHistoricBatchManager()
+        .findCleanableHistoricBatchesReportCountByCriteria(this, batchOperationsForHistoryCleanup);
   }
 
   @Override
-  public List<CleanableHistoricBatchReportResult> executeList(CommandContext commandContext, Page page) {
+  public List<CleanableHistoricBatchReportResult> executeList(CommandContext commandContext,
+      Page page) {
     provideHistoryCleanupStrategy(commandContext);
 
     checkQueryOk();
     checkPermissions(commandContext);
 
-    Map<String, Integer> batchOperationsForHistoryCleanup = commandContext.getProcessEngineConfiguration().getParsedBatchOperationsForHistoryCleanup();
+    Map<String, Integer> batchOperationsForHistoryCleanup = commandContext
+        .getProcessEngineConfiguration().getParsedBatchOperationsForHistoryCleanup();
 
     if (isHistoryCleanupStrategyRemovalTimeBased()) {
       addBatchOperationsWithoutTTL(batchOperationsForHistoryCleanup);
     }
 
-    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchesReportByCriteria(this, page, batchOperationsForHistoryCleanup);
+    return commandContext.getHistoricBatchManager()
+        .findCleanableHistoricBatchesReportByCriteria(this, page, batchOperationsForHistoryCleanup);
   }
 
   protected void addBatchOperationsWithoutTTL(Map<String, Integer> batchOperations) {
-    Map<String, BatchJobHandler<?>> batchJobHandlers = Context.getProcessEngineConfiguration().getBatchHandlers();
+    Map<String, BatchJobHandler<?>> batchJobHandlers = Context.getProcessEngineConfiguration()
+        .getBatchHandlers();
 
     Set<String> batchOperationKeys = null;
     if (batchJobHandlers != null) {
@@ -107,16 +115,18 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
   }
 
   private void checkPermissions(CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadHistoricBatch();
     }
   }
 
   protected void provideHistoryCleanupStrategy(CommandContext commandContext) {
     String historyCleanupStrategy = commandContext.getProcessEngineConfiguration()
-      .getHistoryCleanupStrategy();
+        .getHistoryCleanupStrategy();
 
-    isHistoryCleanupStrategyRemovalTimeBased = HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED.equals(historyCleanupStrategy);
+    isHistoryCleanupStrategyRemovalTimeBased = HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED
+        .equals(historyCleanupStrategy);
   }
 
   public boolean isHistoryCleanupStrategyRemovalTimeBased() {

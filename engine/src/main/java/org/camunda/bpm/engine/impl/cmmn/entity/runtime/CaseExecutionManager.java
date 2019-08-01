@@ -43,19 +43,18 @@ public class CaseExecutionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public void deleteCaseInstancesByCaseDefinition(String caseDefinitionId, String deleteReason, boolean cascade) {
+  public void deleteCaseInstancesByCaseDefinition(String caseDefinitionId, String deleteReason,
+      boolean cascade) {
     List<String> caseInstanceIds = getDbEntityManager()
         .selectList("selectCaseInstanceIdsByCaseDefinitionId", caseDefinitionId);
 
-    for (String caseInstanceId: caseInstanceIds) {
+    for (String caseInstanceId : caseInstanceIds) {
       deleteCaseInstance(caseInstanceId, deleteReason, cascade);
     }
 
     if (cascade) {
-      Context
-        .getCommandContext()
-        .getHistoricCaseInstanceManager()
-        .deleteHistoricCaseInstanceByCaseDefinitionId(caseDefinitionId);
+      Context.getCommandContext().getHistoricCaseInstanceManager()
+          .deleteHistoricCaseInstanceByCaseDefinitionId(caseDefinitionId);
     }
 
   }
@@ -67,22 +66,19 @@ public class CaseExecutionManager extends AbstractManager {
   public void deleteCaseInstance(String caseInstanceId, String deleteReason, boolean cascade) {
     CaseExecutionEntity execution = findCaseExecutionById(caseInstanceId);
 
-    if(execution == null) {
+    if (execution == null) {
       throw new BadUserRequestException("No case instance found for id '" + caseInstanceId + "'");
     }
 
     CommandContext commandContext = Context.getCommandContext();
-    commandContext
-      .getTaskManager()
-      .deleteTasksByCaseInstanceId(caseInstanceId, deleteReason, cascade);
+    commandContext.getTaskManager().deleteTasksByCaseInstanceId(caseInstanceId, deleteReason,
+        cascade);
 
     execution.deleteCascade();
 
     if (cascade) {
-      Context
-        .getCommandContext()
-        .getHistoricCaseInstanceManager()
-        .deleteHistoricCaseInstancesByIds(Arrays.asList(caseInstanceId));
+      Context.getCommandContext().getHistoricCaseInstanceManager()
+          .deleteHistoricCaseInstancesByIds(Arrays.asList(caseInstanceId));
     }
   }
 
@@ -90,39 +86,50 @@ public class CaseExecutionManager extends AbstractManager {
     return getDbEntityManager().selectById(CaseExecutionEntity.class, caseExecutionId);
   }
 
-  public CaseExecutionEntity findSubCaseInstanceBySuperCaseExecutionId(String superCaseExecutionId) {
-    return (CaseExecutionEntity) getDbEntityManager().selectOne("selectSubCaseInstanceBySuperCaseExecutionId", superCaseExecutionId);
+  public CaseExecutionEntity findSubCaseInstanceBySuperCaseExecutionId(
+      String superCaseExecutionId) {
+    return (CaseExecutionEntity) getDbEntityManager()
+        .selectOne("selectSubCaseInstanceBySuperCaseExecutionId", superCaseExecutionId);
   }
 
   public CaseExecutionEntity findSubCaseInstanceBySuperExecutionId(String superExecutionId) {
-    return (CaseExecutionEntity) getDbEntityManager().selectOne("selectSubCaseInstanceBySuperExecutionId", superExecutionId);
+    return (CaseExecutionEntity) getDbEntityManager()
+        .selectOne("selectSubCaseInstanceBySuperExecutionId", superExecutionId);
   }
 
   public long findCaseExecutionCountByQueryCriteria(CaseExecutionQueryImpl caseExecutionQuery) {
     configureTenantCheck(caseExecutionQuery);
-    return (Long) getDbEntityManager().selectOne("selectCaseExecutionCountByQueryCriteria", caseExecutionQuery);
+    return (Long) getDbEntityManager().selectOne("selectCaseExecutionCountByQueryCriteria",
+        caseExecutionQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<CaseExecution> findCaseExecutionsByQueryCriteria(CaseExecutionQueryImpl caseExecutionQuery, Page page) {
+  public List<CaseExecution> findCaseExecutionsByQueryCriteria(
+      CaseExecutionQueryImpl caseExecutionQuery, Page page) {
     configureTenantCheck(caseExecutionQuery);
-    return getDbEntityManager().selectList("selectCaseExecutionsByQueryCriteria", caseExecutionQuery, page);
+    return getDbEntityManager().selectList("selectCaseExecutionsByQueryCriteria",
+        caseExecutionQuery, page);
   }
 
   public long findCaseInstanceCountByQueryCriteria(CaseInstanceQueryImpl caseInstanceQuery) {
     configureTenantCheck(caseInstanceQuery);
-    return (Long) getDbEntityManager().selectOne("selectCaseInstanceCountByQueryCriteria", caseInstanceQuery);
+    return (Long) getDbEntityManager().selectOne("selectCaseInstanceCountByQueryCriteria",
+        caseInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<CaseInstance> findCaseInstanceByQueryCriteria(CaseInstanceQueryImpl caseInstanceQuery, Page page) {
+  public List<CaseInstance> findCaseInstanceByQueryCriteria(CaseInstanceQueryImpl caseInstanceQuery,
+      Page page) {
     configureTenantCheck(caseInstanceQuery);
-    return getDbEntityManager().selectList("selectCaseInstanceByQueryCriteria", caseInstanceQuery, page);
+    return getDbEntityManager().selectList("selectCaseInstanceByQueryCriteria", caseInstanceQuery,
+        page);
   }
 
   @SuppressWarnings("unchecked")
-  public List<CaseExecutionEntity> findChildCaseExecutionsByParentCaseExecutionId(String parentCaseExecutionId) {
-    return getDbEntityManager().selectList("selectCaseExecutionsByParentCaseExecutionId", parentCaseExecutionId);
+  public List<CaseExecutionEntity> findChildCaseExecutionsByParentCaseExecutionId(
+      String parentCaseExecutionId) {
+    return getDbEntityManager().selectList("selectCaseExecutionsByParentCaseExecutionId",
+        parentCaseExecutionId);
   }
 
   @SuppressWarnings("unchecked")

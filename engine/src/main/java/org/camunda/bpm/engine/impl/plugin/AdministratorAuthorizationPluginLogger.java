@@ -25,13 +25,13 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 public class AdministratorAuthorizationPluginLogger extends ProcessEngineLogger {
 
   public void grantGroupPermissions(String administratorGroupName, String resourceName) {
-    logInfo(
-        "001", "GRANT group {} ALL permissions on resource {}.", administratorGroupName , resourceName);
+    logInfo("001", "GRANT group {} ALL permissions on resource {}.", administratorGroupName,
+        resourceName);
   }
 
   public void grantUserPermissions(String administratorUserName, String resourceName) {
-    logInfo(
-        "002", "GRANT user {} ALL permissions on resource {}.", administratorUserName , resourceName);
+    logInfo("002", "GRANT user {} ALL permissions on resource {}.", administratorUserName,
+        resourceName);
   }
 
 }

@@ -70,17 +70,14 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     ClockUtil.reset();
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testCreateHistoricJobLogProperties() {
     runtimeService.startProcessInstanceByKey("process");
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .creationLog()
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().creationLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -108,13 +105,12 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertFalse(historicJob.isDeletionLog());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testFailedHistoricJobLogProperties() {
     runtimeService.startProcessInstanceByKey("process");
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
     try {
       managementService.executeJob(job.getId());
@@ -123,9 +119,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
       // expected
     }
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .failureLog()
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().failureLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -152,19 +146,17 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertFalse(historicJob.isDeletionLog());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testSuccessfulHistoricJobLogProperties() {
-    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", false));
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("fail", false));
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
     managementService.executeJob(job.getId());
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .successLog()
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().successLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -192,19 +184,16 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertFalse(historicJob.isDeletionLog());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testDeletedHistoricJobLogProperties() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
     runtimeService.deleteProcessInstance(processInstanceId, null);
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .deletionLog()
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().deletionLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -232,19 +221,16 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertTrue(historicJob.isDeletionLog());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testAsyncBeforeJobHandlerType() {
     processEngineConfiguration.setEnsureJobDueDateNotNull(false);
 
     runtimeService.startProcessInstanceByKey("process");
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .jobId(job.getId())
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().jobId(job.getId())
         .singleResult();
 
     assertNotNull(historicJob);
@@ -257,21 +243,18 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(MessageJobDeclaration.ASYNC_BEFORE, historicJob.getJobDefinitionConfiguration());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testAsyncBeforeJobHandlerTypeDueDateSet() {
     processEngineConfiguration.setEnsureJobDueDateNotNull(true);
     Date testDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
 
     runtimeService.startProcessInstanceByKey("process");
 
-    Job job = managementService
-      .createJobQuery()
-      .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
-    HistoricJobLog historicJob = historyService
-      .createHistoricJobLogQuery()
-      .jobId(job.getId())
-      .singleResult();
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().jobId(job.getId())
+        .singleResult();
 
     assertNotNull(historicJob);
 
@@ -283,28 +266,24 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(MessageJobDeclaration.ASYNC_BEFORE, historicJob.getJobDefinitionConfiguration());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testAsyncAfterJobHandlerType() {
     processEngineConfiguration.setEnsureJobDueDateNotNull(false);
 
-    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", false));
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("fail", false));
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
     managementService.executeJob(job.getId());
 
-    Job anotherJob = managementService
-        .createJobQuery()
-        .singleResult();
+    Job anotherJob = managementService.createJobQuery().singleResult();
 
     assertFalse(job.getId().equals(anotherJob.getId()));
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .jobId(anotherJob.getId())
-        .singleResult();
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery()
+        .jobId(anotherJob.getId()).singleResult();
 
     assertNotNull(historicJob);
 
@@ -316,29 +295,25 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(MessageJobDeclaration.ASYNC_AFTER, historicJob.getJobDefinitionConfiguration());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testAsyncAfterJobHandlerTypeDueDateSet() {
     processEngineConfiguration.setEnsureJobDueDateNotNull(true);
     Date testDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
 
-    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", false));
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("fail", false));
 
-    Job job = managementService
-      .createJobQuery()
-      .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
     managementService.executeJob(job.getId());
 
-    Job anotherJob = managementService
-      .createJobQuery()
-      .singleResult();
+    Job anotherJob = managementService.createJobQuery().singleResult();
 
     assertFalse(job.getId().equals(anotherJob.getId()));
 
-    HistoricJobLog historicJob = historyService
-      .createHistoricJobLogQuery()
-      .jobId(anotherJob.getId())
-      .singleResult();
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery()
+        .jobId(anotherJob.getId()).singleResult();
 
     assertNotNull(historicJob);
 
@@ -350,34 +325,31 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(MessageJobDeclaration.ASYNC_AFTER, historicJob.getJobDefinitionConfiguration());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuationWithLongId.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuationWithLongId.bpmn20.xml" })
   public void testSuccessfulHistoricJobLogEntryStoredForLongActivityId() {
-    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", false));
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("fail", false));
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
     managementService.executeJob(job.getId());
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .successLog()
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().successLog()
         .singleResult();
     assertNotNull(historicJob);
-    assertEquals("serviceTaskIdIsReallyLongAndItShouldBeMoreThan64CharsSoItWill" +
-        "BlowAnyActivityIdColumnWhereSizeIs64OrLessSoWeAlignItTo255LikeEverywhereElse", historicJob.getActivityId());
+    assertEquals(
+        "serviceTaskIdIsReallyLongAndItShouldBeMoreThan64CharsSoItWill"
+            + "BlowAnyActivityIdColumnWhereSizeIs64OrLessSoWeAlignItTo255LikeEverywhereElse",
+        historicJob.getActivityId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testStartTimerEvent.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testStartTimerEvent.bpmn20.xml" })
   public void testStartTimerEventJobHandlerType() {
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .jobId(job.getId())
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().jobId(job.getId())
         .singleResult();
 
     assertNotNull(historicJob);
@@ -390,17 +362,14 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testStartTimerEventInsideEventSubProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testStartTimerEventInsideEventSubProcess.bpmn20.xml" })
   public void testStartTimerEventInsideEventSubProcessJobHandlerType() {
     runtimeService.startProcessInstanceByKey("process");
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .jobId(job.getId())
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().jobId(job.getId())
         .singleResult();
 
     assertNotNull(historicJob);
@@ -413,17 +382,14 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testIntermediateTimerEvent.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testIntermediateTimerEvent.bpmn20.xml" })
   public void testIntermediateTimerEventJobHandlerType() {
     runtimeService.startProcessInstanceByKey("process");
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .jobId(job.getId())
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().jobId(job.getId())
         .singleResult();
 
     assertNotNull(historicJob);
@@ -436,17 +402,14 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getDuedate(), historicJob.getJobDueDate());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testBoundaryTimerEvent.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testBoundaryTimerEvent.bpmn20.xml" })
   public void testBoundaryTimerEventJobHandlerType() {
     runtimeService.startProcessInstanceByKey("process");
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .jobId(job.getId())
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().jobId(job.getId())
         .singleResult();
 
     assertNotNull(historicJob);
@@ -461,21 +424,16 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testCatchingSignalEvent.bpmn20.xml",
-      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testThrowingSignalEventAsync.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testThrowingSignalEventAsync.bpmn20.xml" })
   public void testCatchingSignalEventJobHandlerType() {
     processEngineConfiguration.setEnsureJobDueDateNotNull(false);
 
     runtimeService.startProcessInstanceByKey("catchSignal");
     runtimeService.startProcessInstanceByKey("throwSignal");
 
-    Job job = managementService
-        .createJobQuery()
-        .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .jobId(job.getId())
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().jobId(job.getId())
         .singleResult();
 
     assertNotNull(historicJob);
@@ -490,9 +448,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testCatchingSignalEvent.bpmn20.xml",
-    "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testThrowingSignalEventAsync.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testCatchingSignalEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testThrowingSignalEventAsync.bpmn20.xml" })
   public void testCatchingSignalEventJobHandlerTypeDueDateSet() {
     processEngineConfiguration.setEnsureJobDueDateNotNull(true);
     Date testDate = ClockTestUtil.setClockToDateWithoutMilliseconds();
@@ -500,14 +457,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("catchSignal");
     runtimeService.startProcessInstanceByKey("throwSignal");
 
-    Job job = managementService
-      .createJobQuery()
-      .singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
-    HistoricJobLog historicJob = historyService
-      .createHistoricJobLogQuery()
-      .jobId(job.getId())
-      .singleResult();
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().jobId(job.getId())
+        .singleResult();
 
     assertNotNull(historicJob);
 
@@ -522,8 +475,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testCatchingSignalEvent.bpmn20.xml",
-      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testThrowingSignalEventAsync.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testThrowingSignalEventAsync.bpmn20.xml" })
   public void testCatchingSignalEventActivityId() {
     // given + when (1)
     String processInstanceId = runtimeService.startProcessInstanceByKey("catchSignal").getId();
@@ -533,11 +485,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     // then (1)
 
-    HistoricJobLog historicJob = historyService
-        .createHistoricJobLogQuery()
-        .jobId(jobId)
-        .creationLog()
-        .singleResult();
+    HistoricJobLog historicJob = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .creationLog().singleResult();
     assertNotNull(historicJob);
 
     assertEquals("signalEvent", historicJob.getActivityId());
@@ -551,10 +500,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     }
 
     // then (2)
-    historicJob = historyService
-        .createHistoricJobLogQuery()
-        .jobId(jobId)
-        .failureLog()
+    historicJob = historyService.createHistoricJobLogQuery().jobId(jobId).failureLog()
         .singleResult();
     assertNotNull(historicJob);
 
@@ -566,17 +512,15 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
     // then (3)
 
-    historicJob = historyService
-        .createHistoricJobLogQuery()
-        .jobId(jobId)
-        .successLog()
+    historicJob = historyService.createHistoricJobLogQuery().jobId(jobId).successLog()
         .singleResult();
     assertNotNull(historicJob);
 
     assertEquals("signalEvent", historicJob.getActivityId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testFailedJobEvents() {
     // given
     runtimeService.startProcessInstanceByKey("process");
@@ -584,8 +528,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
-    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).failureLog().orderByJobRetries().desc();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .creationLog();
+    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .failureLog().orderByJobRetries().desc();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -687,7 +633,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(0, failedJobLogEntry.getJobRetries());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testFailedJobEventsExecutedByJobExecutor() {
     // given
     runtimeService.startProcessInstanceByKey("process");
@@ -695,8 +642,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
-    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).failureLog().orderByJobRetries().desc();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .creationLog();
+    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .failureLog().orderByJobRetries().desc();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -752,16 +701,20 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(0, failedJobLogEntry.getJobRetries());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testSuccessfulJobEvent() {
     // given
-    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", false));
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("fail", false));
 
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
-    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId).successLog();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .creationLog();
+    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .successLog();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -783,16 +736,20 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, succeededJobLogEntry.getJobRetries());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testSuccessfulJobEventExecutedByJobExecutor() {
     // given
-    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", false));
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("fail", false));
 
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
-    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId).successLog();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .creationLog();
+    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .successLog();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -814,7 +771,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, succeededJobLogEntry.getJobRetries());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testSuccessfulAndFailedJobEvents() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -822,9 +780,12 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
-    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).failureLog().orderByJobRetries().desc();
-    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId).successLog();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .creationLog();
+    HistoricJobLogQuery failedQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .failureLog().orderByJobRetries().desc();
+    HistoricJobLogQuery succeededQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .successLog();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -903,16 +864,21 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     // given
     runtimeService.startProcessInstanceByKey("process").getId();
 
-    String serviceTask1JobId = managementService.createJobQuery().activityId("serviceTask1").singleResult().getId();
+    String serviceTask1JobId = managementService.createJobQuery().activityId("serviceTask1")
+        .singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
     assertEquals(2, query.count());
 
     // serviceTask1
-    HistoricJobLogQuery serviceTask1Query = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId);
-    HistoricJobLogQuery serviceTask1CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).creationLog();
-    HistoricJobLogQuery serviceTask1DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).deletionLog();
-    HistoricJobLogQuery serviceTask1SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).successLog();
+    HistoricJobLogQuery serviceTask1Query = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask1JobId);
+    HistoricJobLogQuery serviceTask1CreatedQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask1JobId).creationLog();
+    HistoricJobLogQuery serviceTask1DeletedQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask1JobId).deletionLog();
+    HistoricJobLogQuery serviceTask1SuccessfulQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask1JobId).successLog();
 
     assertEquals(1, serviceTask1Query.count());
     assertEquals(1, serviceTask1CreatedQuery.count());
@@ -920,12 +886,17 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(0, serviceTask1SuccessfulQuery.count());
 
     // serviceTask2
-    String serviceTask2JobId = managementService.createJobQuery().activityId("serviceTask2").singleResult().getId();
+    String serviceTask2JobId = managementService.createJobQuery().activityId("serviceTask2")
+        .singleResult().getId();
 
-    HistoricJobLogQuery serviceTask2Query = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId);
-    HistoricJobLogQuery serviceTask2CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).creationLog();
-    HistoricJobLogQuery serviceTask2DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).deletionLog();
-    HistoricJobLogQuery serviceTask2SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).successLog();
+    HistoricJobLogQuery serviceTask2Query = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask2JobId);
+    HistoricJobLogQuery serviceTask2CreatedQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask2JobId).creationLog();
+    HistoricJobLogQuery serviceTask2DeletedQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask2JobId).deletionLog();
+    HistoricJobLogQuery serviceTask2SuccessfulQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask2JobId).successLog();
 
     assertEquals(1, serviceTask2Query.count());
     assertEquals(1, serviceTask2CreatedQuery.count());
@@ -965,8 +936,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testSuperProcessWithCallActivity.bpmn20.xml",
-      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testSubProcessWithErrorEndEvent.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testSubProcessWithErrorEndEvent.bpmn20.xml" })
   public void testErrorEndEventInterruptingCallActivity() {
     // given
     runtimeService.startProcessInstanceByKey("process").getId();
@@ -975,12 +945,17 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(2, query.count());
 
     // serviceTask1
-    String serviceTask1JobId = managementService.createJobQuery().activityId("serviceTask1").singleResult().getId();
+    String serviceTask1JobId = managementService.createJobQuery().activityId("serviceTask1")
+        .singleResult().getId();
 
-    HistoricJobLogQuery serviceTask1Query = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId);
-    HistoricJobLogQuery serviceTask1CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).creationLog();
-    HistoricJobLogQuery serviceTask1DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).deletionLog();
-    HistoricJobLogQuery serviceTask1SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask1JobId).successLog();
+    HistoricJobLogQuery serviceTask1Query = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask1JobId);
+    HistoricJobLogQuery serviceTask1CreatedQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask1JobId).creationLog();
+    HistoricJobLogQuery serviceTask1DeletedQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask1JobId).deletionLog();
+    HistoricJobLogQuery serviceTask1SuccessfulQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask1JobId).successLog();
 
     assertEquals(1, serviceTask1Query.count());
     assertEquals(1, serviceTask1CreatedQuery.count());
@@ -988,12 +963,17 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(0, serviceTask1SuccessfulQuery.count());
 
     // serviceTask2
-    String serviceTask2JobId = managementService.createJobQuery().activityId("serviceTask2").singleResult().getId();
+    String serviceTask2JobId = managementService.createJobQuery().activityId("serviceTask2")
+        .singleResult().getId();
 
-    HistoricJobLogQuery serviceTask2Query = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId);
-    HistoricJobLogQuery serviceTask2CreatedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).creationLog();
-    HistoricJobLogQuery serviceTask2DeletedQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).deletionLog();
-    HistoricJobLogQuery serviceTask2SuccessfulQuery = historyService.createHistoricJobLogQuery().jobId(serviceTask2JobId).successLog();
+    HistoricJobLogQuery serviceTask2Query = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask2JobId);
+    HistoricJobLogQuery serviceTask2CreatedQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask2JobId).creationLog();
+    HistoricJobLogQuery serviceTask2DeletedQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask2JobId).deletionLog();
+    HistoricJobLogQuery serviceTask2SuccessfulQuery = historyService.createHistoricJobLogQuery()
+        .jobId(serviceTask2JobId).successLog();
 
     assertEquals(1, serviceTask2Query.count());
     assertEquals(1, serviceTask2CreatedQuery.count());
@@ -1034,7 +1014,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testDeletedJob() {
     // given
     runtimeService.startProcessInstanceByKey("process");
@@ -1042,8 +1023,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
-    HistoricJobLogQuery deletedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).deletionLog();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .creationLog();
+    HistoricJobLogQuery deletedQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .deletionLog();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -1065,7 +1048,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, deletedJobLogEntry.getJobRetries());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testDeletedProcessInstance() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -1073,8 +1057,10 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     String jobId = managementService.createJobQuery().singleResult().getId();
 
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId);
-    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId).creationLog();
-    HistoricJobLogQuery deletedQuery = historyService.createHistoricJobLogQuery().jobId(jobId).deletionLog();
+    HistoricJobLogQuery createdQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .creationLog();
+    HistoricJobLogQuery deletedQuery = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .deletionLog();
 
     // there exists one historic job log entry
     assertEquals(1, query.count());
@@ -1096,7 +1082,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(3, deletedJobLogEntry.getJobRetries());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testExceptionStacktrace() {
     // given
     runtimeService.startProcessInstanceByKey("process");
@@ -1112,11 +1099,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     }
 
     // then
-    String failedHistoricJobLogId = historyService
-        .createHistoricJobLogQuery()
-        .failureLog()
-        .singleResult()
-        .getId();
+    String failedHistoricJobLogId = historyService.createHistoricJobLogQuery().failureLog()
+        .singleResult().getId();
 
     String stacktrace = historyService.getHistoricJobLogExceptionStacktrace(failedHistoricJobLogId);
     assertNotNull(stacktrace);
@@ -1157,16 +1141,16 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     }
 
     // then (1)
-    HistoricJobLog serviceTask1FailedHistoricJobLog = historyService
-        .createHistoricJobLogQuery()
-        .failureLog()
-        .singleResult();
+    HistoricJobLog serviceTask1FailedHistoricJobLog = historyService.createHistoricJobLogQuery()
+        .failureLog().singleResult();
 
     String serviceTask1FailedHistoricJobLogId = serviceTask1FailedHistoricJobLog.getId();
 
-    assertEquals(FirstFailingDelegate.FIRST_EXCEPTION_MESSAGE, serviceTask1FailedHistoricJobLog.getJobExceptionMessage());
+    assertEquals(FirstFailingDelegate.FIRST_EXCEPTION_MESSAGE,
+        serviceTask1FailedHistoricJobLog.getJobExceptionMessage());
 
-    String serviceTask1Stacktrace = historyService.getHistoricJobLogExceptionStacktrace(serviceTask1FailedHistoricJobLogId);
+    String serviceTask1Stacktrace = historyService
+        .getHistoricJobLogExceptionStacktrace(serviceTask1FailedHistoricJobLogId);
     assertNotNull(serviceTask1Stacktrace);
     assertTextPresent(FirstFailingDelegate.FIRST_EXCEPTION_MESSAGE, serviceTask1Stacktrace);
     assertTextPresent(FirstFailingDelegate.class.getName(), serviceTask1Stacktrace);
@@ -1181,19 +1165,16 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     }
 
     // then (2)
-    HistoricJobLog serviceTask2FailedHistoricJobLog = historyService
-        .createHistoricJobLogQuery()
-        .failureLog()
-        .orderByJobRetries()
-        .desc()
-        .list()
-        .get(1);
+    HistoricJobLog serviceTask2FailedHistoricJobLog = historyService.createHistoricJobLogQuery()
+        .failureLog().orderByJobRetries().desc().list().get(1);
 
     String serviceTask2FailedHistoricJobLogId = serviceTask2FailedHistoricJobLog.getId();
 
-    assertEquals(SecondFailingDelegate.SECOND_EXCEPTION_MESSAGE, serviceTask2FailedHistoricJobLog.getJobExceptionMessage());
+    assertEquals(SecondFailingDelegate.SECOND_EXCEPTION_MESSAGE,
+        serviceTask2FailedHistoricJobLog.getJobExceptionMessage());
 
-    String serviceTask2Stacktrace = historyService.getHistoricJobLogExceptionStacktrace(serviceTask2FailedHistoricJobLogId);
+    String serviceTask2Stacktrace = historyService
+        .getHistoricJobLogExceptionStacktrace(serviceTask2FailedHistoricJobLogId);
     assertNotNull(serviceTask2Stacktrace);
     assertTextPresent(SecondFailingDelegate.SECOND_EXCEPTION_MESSAGE, serviceTask2Stacktrace);
     assertTextPresent(SecondFailingDelegate.class.getName(), serviceTask2Stacktrace);
@@ -1217,9 +1198,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     }
 
     // then
-    HistoricJobLog failedHistoricJobLog = historyService
-        .createHistoricJobLogQuery()
-        .failureLog()
+    HistoricJobLog failedHistoricJobLog = historyService.createHistoricJobLogQuery().failureLog()
         .singleResult();
 
     String failedHistoricJobLogId = failedHistoricJobLog.getId();
@@ -1235,10 +1214,11 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
   public void testThrowExceptionMessageTruncation() {
     // given
     String exceptionMessage = randomString(10000);
-    ThrowExceptionWithOverlongMessageDelegate delegate =
-        new ThrowExceptionWithOverlongMessageDelegate(exceptionMessage);
+    ThrowExceptionWithOverlongMessageDelegate delegate = new ThrowExceptionWithOverlongMessageDelegate(
+        exceptionMessage);
 
-    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("delegate", delegate));
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("delegate", delegate));
     Job job = managementService.createJobQuery().singleResult();
 
     // when
@@ -1250,9 +1230,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     }
 
     // then
-    HistoricJobLog failedHistoricJobLog = historyService
-        .createHistoricJobLogQuery()
-        .failureLog()
+    HistoricJobLog failedHistoricJobLog = historyService.createHistoricJobLogQuery().failureLog()
         .singleResult();
 
     assertNotNull(failedHistoricJobLog);
@@ -1266,7 +1244,6 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
   protected static String randomString(int numCharacters) {
     return new BigInteger(numCharacters, new Random()).toString(2);
   }
-
 
   public void testDeleteByteArray() {
     final String processDefinitionId = "myProcessDefition";
@@ -1282,14 +1259,12 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
           log.setJobDefinitionType(MessageEntity.TYPE);
           log.setProcessDefinitionId(processDefinitionId);
 
-
           byte[] aByteValue = StringUtil.toByteArray("abc");
-          ByteArrayEntity byteArray = ExceptionUtil.createJobExceptionByteArray(aByteValue, ResourceTypes.HISTORY);
+          ByteArrayEntity byteArray = ExceptionUtil.createJobExceptionByteArray(aByteValue,
+              ResourceTypes.HISTORY);
           log.setExceptionByteArrayId(byteArray.getId());
 
-          commandContext
-            .getHistoricJobLogManager()
-            .insert(log);
+          commandContext.getHistoricJobLogManager().insert(log);
         }
 
         return null;
@@ -1302,7 +1277,8 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByProcessDefinitionId(processDefinitionId);
+        commandContext.getHistoricJobLogManager()
+            .deleteHistoricJobLogsByProcessDefinitionId(processDefinitionId);
         return null;
       }
 

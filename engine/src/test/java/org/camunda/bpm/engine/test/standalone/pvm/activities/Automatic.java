@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -30,7 +29,7 @@ public class Automatic implements ActivityBehavior {
 
   public void execute(ActivityExecution execution) throws Exception {
     List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
-    if(outgoingTransitions.isEmpty()) {
+    if (outgoingTransitions.isEmpty()) {
       execution.end(true);
     } else {
       execution.leaveActivityViaTransition(outgoingTransitions.get(0));

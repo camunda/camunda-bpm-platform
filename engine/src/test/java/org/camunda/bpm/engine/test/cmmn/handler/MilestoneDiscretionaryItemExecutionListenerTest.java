@@ -47,7 +47,8 @@ public class MilestoneDiscretionaryItemExecutionListenerTest extends CmmnElement
 
   protected AbstractExecutionListenerSpec testSpecification;
 
-  public MilestoneDiscretionaryItemExecutionListenerTest(AbstractExecutionListenerSpec testSpecification) {
+  public MilestoneDiscretionaryItemExecutionListenerTest(
+      AbstractExecutionListenerSpec testSpecification) {
     this.testSpecification = testSpecification;
   }
 

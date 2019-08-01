@@ -26,14 +26,15 @@ import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstancePa
 public interface MigrationObserverBehavior {
 
   /**
-   * Implement to perform activity-specific migration behavior that is not
-   * covered by the regular migration procedure. Called after the scope execution and any ancestor executions
-   * have been migrated to their target activities and process definition.
+   * Implement to perform activity-specific migration behavior that is not covered by the regular
+   * migration procedure. Called after the scope execution and any ancestor executions have been
+   * migrated to their target activities and process definition.
    */
   void migrateScope(ActivityExecution scopeExecution);
 
   /**
    * Callback to implement behavior specific parsing (e.g. adding additional dependent entities).
    */
-  void onParseMigratingInstance(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance);
+  void onParseMigratingInstance(MigratingInstanceParseContext parseContext,
+      MigratingActivityInstance migratingInstance);
 }

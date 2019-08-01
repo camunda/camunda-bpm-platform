@@ -28,7 +28,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 
-public class OptimizeHistoricVariableUpdateQueryCmd implements Command<List<HistoricVariableUpdate>> {
+public class OptimizeHistoricVariableUpdateQueryCmd
+    implements Command<List<HistoricVariableUpdate>> {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -36,20 +37,22 @@ public class OptimizeHistoricVariableUpdateQueryCmd implements Command<List<Hist
   protected Date occurredAt;
   protected int maxResults;
 
-  public OptimizeHistoricVariableUpdateQueryCmd(Date occurredAfter, Date occurredAt, int maxResults) {
+  public OptimizeHistoricVariableUpdateQueryCmd(Date occurredAfter, Date occurredAt,
+      int maxResults) {
     this.occurredAfter = occurredAfter;
     this.occurredAt = occurredAt;
     this.maxResults = maxResults;
   }
 
   public List<HistoricVariableUpdate> execute(CommandContext commandContext) {
-    List<HistoricVariableUpdate> historicVariableUpdates =
-      commandContext.getOptimizeManager().getHistoricVariableUpdates(occurredAfter, occurredAt, maxResults);
+    List<HistoricVariableUpdate> historicVariableUpdates = commandContext.getOptimizeManager()
+        .getHistoricVariableUpdates(occurredAfter, occurredAt, maxResults);
     fetchVariableValues(historicVariableUpdates, commandContext);
     return historicVariableUpdates;
   }
 
-  private void fetchVariableValues(List<HistoricVariableUpdate> historicVariableUpdates, CommandContext commandContext) {
+  private void fetchVariableValues(List<HistoricVariableUpdate> historicVariableUpdates,
+      CommandContext commandContext) {
     if (historicVariableUpdates != null) {
 
       List<String> byteArrayIds = getByteArrayIds(historicVariableUpdates);
@@ -64,10 +67,12 @@ public class OptimizeHistoricVariableUpdateQueryCmd implements Command<List<Hist
 
   protected boolean isNotByteArrayVariableType(HistoricDetailVariableInstanceUpdateEntity entity) {
     // do not fetch values for byte arrays/ blob variables (e.g. files or bytes)
-    return !AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(entity.getSerializer().getType().getName());
+    return !AbstractTypedValueSerializer.BINARY_VALUE_TYPES
+        .contains(entity.getSerializer().getType().getName());
   }
 
-  protected boolean isHistoricDetailVariableInstanceUpdateEntity(HistoricVariableUpdate variableUpdate) {
+  protected boolean isHistoricDetailVariableInstanceUpdateEntity(
+      HistoricVariableUpdate variableUpdate) {
     return variableUpdate instanceof HistoricDetailVariableInstanceUpdateEntity;
   }
 
@@ -92,14 +97,14 @@ public class OptimizeHistoricVariableUpdateQueryCmd implements Command<List<Hist
   }
 
   protected void resolveTypedValues(List<HistoricVariableUpdate> variableUpdates) {
-    for (HistoricVariableUpdate variableUpdate: variableUpdates) {
+    for (HistoricVariableUpdate variableUpdate : variableUpdates) {
       if (isHistoricDetailVariableInstanceUpdateEntity(variableUpdate)) {
         HistoricDetailVariableInstanceUpdateEntity entity = (HistoricDetailVariableInstanceUpdateEntity) variableUpdate;
 
         if (isNotByteArrayVariableType(entity)) {
           try {
             entity.getTypedValue(false);
-          } catch(Exception t) {
+          } catch (Exception t) {
             // do not fail if one of the variables fails to load
             LOG.exceptionWhileGettingValueForVariable(t);
           }

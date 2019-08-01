@@ -93,7 +93,8 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
     // given: a caseDefinition
 
     // when
-    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition, context);
+    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition,
+        context);
 
     // then
     assertEquals(caseDefinition.getId(), activity.getKey());
@@ -104,7 +105,8 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
     // given: a caseDefinition
 
     // when
-    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition, context);
+    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition,
+        context);
 
     // then
     String deploymentId = context.getDeployment().getId();
@@ -116,7 +118,8 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
     // given: a caseDefinition
 
     // when
-    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition, context);
+    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition,
+        context);
 
     // then
     assertNull(activity.getHistoryTimeToLive());
@@ -129,7 +132,8 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
     caseDefinition.setCamundaHistoryTimeToLive(historyTimeToLive);
 
     // when
-    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition, context);
+    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition,
+        context);
 
     // then
     assertEquals(Integer.valueOf(historyTimeToLive), activity.getHistoryTimeToLive());

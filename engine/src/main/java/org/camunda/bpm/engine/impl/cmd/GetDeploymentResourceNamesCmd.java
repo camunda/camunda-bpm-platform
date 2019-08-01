@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Joram Barrez
  */
@@ -43,14 +42,13 @@ public class GetDeploymentResourceNamesCmd implements Command<List>, Serializabl
   public List execute(CommandContext commandContext) {
     ensureNotNull("deploymentId", deploymentId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadDeployment(deploymentId);
     }
 
-    return Context
-      .getCommandContext()
-      .getDeploymentManager()
-      .getDeploymentResourceNames(deploymentId);
+    return Context.getCommandContext().getDeploymentManager()
+        .getDeploymentResourceNames(deploymentId);
   }
 
 }

@@ -33,7 +33,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeToHistoricProcessInstancesBuilderImpl implements SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder {
+public class SetRemovalTimeToHistoricProcessInstancesBuilderImpl
+    implements SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder {
 
   protected HistoricProcessInstanceQuery query;
   protected List<String> ids;
@@ -47,18 +48,20 @@ public class SetRemovalTimeToHistoricProcessInstancesBuilderImpl implements SetR
     this.commandExecutor = commandExecutor;
   }
 
-  public SetRemovalTimeToHistoricProcessInstancesBuilder byQuery(HistoricProcessInstanceQuery query) {
+  public SetRemovalTimeToHistoricProcessInstancesBuilder byQuery(
+      HistoricProcessInstanceQuery query) {
     this.query = query;
     return this;
   }
 
   public SetRemovalTimeToHistoricProcessInstancesBuilder byIds(String... ids) {
-    this.ids = ids !=  null ? Arrays.asList(ids) : null;
+    this.ids = ids != null ? Arrays.asList(ids) : null;
     return this;
   }
 
   public SetRemovalTimeToHistoricProcessInstancesBuilder absoluteRemovalTime(Date removalTime) {
-    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive","mode", mode);
+    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive",
+        "mode", mode);
 
     this.mode = Mode.ABSOLUTE_REMOVAL_TIME;
     this.removalTime = removalTime;
@@ -67,14 +70,16 @@ public class SetRemovalTimeToHistoricProcessInstancesBuilderImpl implements SetR
 
   @Override
   public SetRemovalTimeToHistoricProcessInstancesBuilder calculatedRemovalTime() {
-    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive","mode", mode);
+    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive",
+        "mode", mode);
 
     this.mode = Mode.CALCULATED_REMOVAL_TIME;
     return this;
   }
 
   public SetRemovalTimeToHistoricProcessInstancesBuilder clearedRemovalTime() {
-    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive","mode", mode);
+    ensureNull(BadUserRequestException.class, "The removal time modes are mutually exclusive",
+        "mode", mode);
 
     this.mode = Mode.CLEARED_REMOVAL_TIME;
     return this;
@@ -105,11 +110,8 @@ public class SetRemovalTimeToHistoricProcessInstancesBuilderImpl implements SetR
     return mode;
   }
 
-  public static enum Mode
-  {
-    CALCULATED_REMOVAL_TIME,
-    ABSOLUTE_REMOVAL_TIME,
-    CLEARED_REMOVAL_TIME;
+  public static enum Mode {
+    CALCULATED_REMOVAL_TIME, ABSOLUTE_REMOVAL_TIME, CLEARED_REMOVAL_TIME;
   }
 
   public boolean isHierarchical() {

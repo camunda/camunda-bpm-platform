@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
@@ -54,7 +53,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
   protected static final String TENANT_ONE = "tenant1";
 
   protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().done();
-  protected static final BpmnModelInstance startEndProcess = Bpmn.createExecutableProcess().startEvent().endEvent().done();
+  protected static final BpmnModelInstance startEndProcess = Bpmn.createExecutableProcess()
+      .startEvent().endEvent().done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
@@ -64,7 +64,7 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected IdentityService identityService;
@@ -82,7 +82,7 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     repositoryService.createDeployment().addModelInstance("emptyProcess.bpmn", emptyProcess)
-      .tenantId(TENANT_ONE).deploy();
+        .tenantId(TENANT_ONE).deploy();
 
     identityService.clearAuthentication();
 
@@ -96,7 +96,7 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     repositoryService.createDeployment().addModelInstance("emptyProcess.bpmn", emptyProcess)
-      .tenantId(TENANT_ONE).deploy();
+        .tenantId(TENANT_ONE).deploy();
 
     identityService.clearAuthentication();
 
@@ -110,8 +110,10 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    repositoryService.createDeployment().addModelInstance("emptyProcessOne", emptyProcess).tenantId(TENANT_ONE).deploy();
-    repositoryService.createDeployment().addModelInstance("emptyProcessTwo", startEndProcess).tenantId(TENANT_TWO).deploy();
+    repositoryService.createDeployment().addModelInstance("emptyProcessOne", emptyProcess)
+        .tenantId(TENANT_ONE).deploy();
+    repositoryService.createDeployment().addModelInstance("emptyProcessTwo", startEndProcess)
+        .tenantId(TENANT_TWO).deploy();
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     assertThat(query.count(), is(2L));
@@ -183,7 +185,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    List<String> deploymentResourceNames = repositoryService.getDeploymentResourceNames(deployment.getId());
+    List<String> deploymentResourceNames = repositoryService
+        .getDeploymentResourceNames(deployment.getId());
     assertThat(deploymentResourceNames, hasSize(1));
   }
 
@@ -195,7 +198,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    List<String> deploymentResourceNames = repositoryService.getDeploymentResourceNames(deploymentOne.getId());
+    List<String> deploymentResourceNames = repositoryService
+        .getDeploymentResourceNames(deploymentOne.getId());
     assertThat(deploymentResourceNames, hasSize(1));
 
     deploymentResourceNames = repositoryService.getDeploymentResourceNames(deploymentTwo.getId());
@@ -221,7 +225,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deployment.getId());
+    List<Resource> deploymentResources = repositoryService
+        .getDeploymentResources(deployment.getId());
     assertThat(deploymentResources, hasSize(1));
   }
 
@@ -233,7 +238,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deploymentOne.getId());
+    List<Resource> deploymentResources = repositoryService
+        .getDeploymentResources(deploymentOne.getId());
     assertThat(deploymentResources, hasSize(1));
 
     deploymentResources = repositoryService.getDeploymentResources(deploymentTwo.getId());
@@ -263,7 +269,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    InputStream inputStream = repositoryService.getResourceAsStream(deployment.getId(), resource.getName());
+    InputStream inputStream = repositoryService.getResourceAsStream(deployment.getId(),
+        resource.getName());
     assertThat(inputStream, notNullValue());
   }
 
@@ -278,10 +285,12 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    InputStream inputStream = repositoryService.getResourceAsStream(deploymentOne.getId(), resourceOne.getName());
+    InputStream inputStream = repositoryService.getResourceAsStream(deploymentOne.getId(),
+        resourceOne.getName());
     assertThat(inputStream, notNullValue());
 
-    inputStream = repositoryService.getResourceAsStream(deploymentTwo.getId(), resourceTwo.getName());
+    inputStream = repositoryService.getResourceAsStream(deploymentTwo.getId(),
+        resourceTwo.getName());
     assertThat(inputStream, notNullValue());
   }
 
@@ -308,7 +317,8 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    InputStream inputStream = repositoryService.getResourceAsStreamById(deployment.getId(), resource.getId());
+    InputStream inputStream = repositoryService.getResourceAsStreamById(deployment.getId(),
+        resource.getId());
     assertThat(inputStream, notNullValue());
   }
 
@@ -323,46 +333,40 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    InputStream inputStream = repositoryService.getResourceAsStreamById(deploymentOne.getId(), resourceOne.getId());
+    InputStream inputStream = repositoryService.getResourceAsStreamById(deploymentOne.getId(),
+        resourceOne.getId());
     assertThat(inputStream, notNullValue());
 
-    inputStream = repositoryService.getResourceAsStreamById(deploymentTwo.getId(), resourceTwo.getId());
+    inputStream = repositoryService.getResourceAsStreamById(deploymentTwo.getId(),
+        resourceTwo.getId());
     assertThat(inputStream, notNullValue());
   }
 
   @Test
   public void redeployForDifferentAuthenticatedTenants() {
     Deployment deploymentOne = repositoryService.createDeployment()
-      .addModelInstance("emptyProcess.bpmn", emptyProcess)
-      .addModelInstance("startEndProcess.bpmn", startEndProcess)
-      .tenantId(TENANT_ONE)
-      .deploy();
+        .addModelInstance("emptyProcess.bpmn", emptyProcess)
+        .addModelInstance("startEndProcess.bpmn", startEndProcess).tenantId(TENANT_ONE).deploy();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_TWO));
 
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot get the deployment");
 
-    repositoryService.createDeployment()
-        .addDeploymentResources(deploymentOne.getId())
-        .tenantId(TENANT_TWO)
-        .deploy();
+    repositoryService.createDeployment().addDeploymentResources(deploymentOne.getId())
+        .tenantId(TENANT_TWO).deploy();
   }
 
   @Test
   public void redeployForTheSameAuthenticatedTenant() {
     Deployment deploymentOne = repositoryService.createDeployment()
-      .addModelInstance("emptyProcess.bpmn", emptyProcess)
-      .addModelInstance("startEndProcess.bpmn", startEndProcess)
-      .tenantId(TENANT_ONE)
-      .deploy();
+        .addModelInstance("emptyProcess.bpmn", emptyProcess)
+        .addModelInstance("startEndProcess.bpmn", startEndProcess).tenantId(TENANT_ONE).deploy();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    repositoryService.createDeployment()
-        .addDeploymentResources(deploymentOne.getId())
-        .tenantId(TENANT_ONE)
-        .deploy();
+    repositoryService.createDeployment().addDeploymentResources(deploymentOne.getId())
+        .tenantId(TENANT_ONE).deploy();
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     assertThat(query.count(), is(2L));
@@ -372,18 +376,14 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
   @Test
   public void redeployForDifferentAuthenticatedTenantsDisabledTenantCheck() {
     Deployment deploymentOne = repositoryService.createDeployment()
-      .addModelInstance("emptyProcess.bpmn", emptyProcess)
-      .addModelInstance("startEndProcess.bpmn", startEndProcess)
-      .tenantId(TENANT_ONE)
-      .deploy();
+        .addModelInstance("emptyProcess.bpmn", emptyProcess)
+        .addModelInstance("startEndProcess.bpmn", startEndProcess).tenantId(TENANT_ONE).deploy();
 
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
-    repositoryService.createDeployment()
-        .addDeploymentResources(deploymentOne.getId())
-        .tenantId(TENANT_TWO)
-        .deploy();
+    repositoryService.createDeployment().addDeploymentResources(deploymentOne.getId())
+        .tenantId(TENANT_TWO).deploy();
 
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     assertThat(query.count(), is(2L));
@@ -394,7 +394,7 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
   @After
   public void tearDown() throws Exception {
     identityService.clearAuthentication();
-    for(Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
   }

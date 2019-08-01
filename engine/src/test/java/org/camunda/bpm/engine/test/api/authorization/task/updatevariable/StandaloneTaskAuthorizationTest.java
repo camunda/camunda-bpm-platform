@@ -61,7 +61,6 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class StandaloneTaskAuthorizationTest {
 
-
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
 
@@ -85,25 +84,12 @@ public class StandaloneTaskAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(TASK, "taskId", userId, UPDATE),
-          grant(TASK, "taskId", userId, UPDATE_VARIABLE)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "taskId", userId, UPDATE)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "*", userId, UPDATE)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "taskId", userId, UPDATE_VARIABLE)),
-      scenario()
-        .withAuthorizations(
-          grant(TASK, "*", userId, UPDATE_VARIABLE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations().failsDueToRequired(grant(TASK, "taskId", userId, UPDATE),
+            grant(TASK, "taskId", userId, UPDATE_VARIABLE)),
+        scenario().withAuthorizations(grant(TASK, "taskId", userId, UPDATE)),
+        scenario().withAuthorizations(grant(TASK, "*", userId, UPDATE)),
+        scenario().withAuthorizations(grant(TASK, "taskId", userId, UPDATE_VARIABLE)),
+        scenario().withAuthorizations(grant(TASK, "*", userId, UPDATE_VARIABLE)).succeeds());
   }
 
   @Before
@@ -120,7 +106,8 @@ public class StandaloneTaskAuthorizationTest {
   public void tearDown() {
     authRule.deleteUsersAndGroups();
     taskService.deleteTask(taskId, true);
-    for (HistoricVariableInstance var : historyService.createHistoricVariableInstanceQuery().includeDeleted().list()) {
+    for (HistoricVariableInstance var : historyService.createHistoricVariableInstanceQuery()
+        .includeDeleted().list()) {
       historyService.deleteHistoricVariableInstance(var.getId());
     }
   }
@@ -131,11 +118,7 @@ public class StandaloneTaskAuthorizationTest {
     createTask(taskId);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
 
@@ -151,11 +134,7 @@ public class StandaloneTaskAuthorizationTest {
     createTask(taskId);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     taskService.setVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
 
@@ -171,11 +150,7 @@ public class StandaloneTaskAuthorizationTest {
     createTask(taskId);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     taskService.setVariables(taskId, getVariables());
 
@@ -191,11 +166,7 @@ public class StandaloneTaskAuthorizationTest {
     createTask(taskId);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     taskService.setVariablesLocal(taskId, getVariables());
 
@@ -214,11 +185,7 @@ public class StandaloneTaskAuthorizationTest {
     taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     taskService.removeVariable(taskId, VARIABLE_NAME);
 
@@ -237,11 +204,7 @@ public class StandaloneTaskAuthorizationTest {
     taskService.setVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     taskService.removeVariableLocal(taskId, VARIABLE_NAME);
 
@@ -260,11 +223,7 @@ public class StandaloneTaskAuthorizationTest {
     taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     taskService.removeVariables(taskId, Arrays.asList(VARIABLE_NAME));
 
@@ -283,11 +242,7 @@ public class StandaloneTaskAuthorizationTest {
     taskService.setVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     taskService.removeVariablesLocal(taskId, Arrays.asList(VARIABLE_NAME));
 
@@ -304,11 +259,7 @@ public class StandaloneTaskAuthorizationTest {
     createTask(taskId);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), null);
 
@@ -326,11 +277,7 @@ public class StandaloneTaskAuthorizationTest {
     taskService.setVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     ((TaskServiceImpl) taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
 
@@ -347,13 +294,10 @@ public class StandaloneTaskAuthorizationTest {
     createTask(taskId);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
-    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(),
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -368,11 +312,7 @@ public class StandaloneTaskAuthorizationTest {
     createTask(taskId);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
     ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), null);
 
@@ -390,13 +330,10 @@ public class StandaloneTaskAuthorizationTest {
     taskService.setVariableLocal(taskId, VARIABLE_NAME, VARIABLE_VALUE);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
-    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null,
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -411,13 +348,10 @@ public class StandaloneTaskAuthorizationTest {
     createTask(taskId);
 
     // when
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("taskId", taskId)
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("taskId", taskId).start();
 
-    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(),
+        Arrays.asList(VARIABLE_NAME));
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -433,7 +367,8 @@ public class StandaloneTaskAuthorizationTest {
   protected void verifyRemoveVariable() {
     verifyVariableInstanceCount(0);
     assertNull(runtimeService.createVariableInstanceQuery().singleResult());
-    HistoricVariableInstance deletedVariable = historyService.createHistoricVariableInstanceQuery().includeDeleted().singleResult();
+    HistoricVariableInstance deletedVariable = historyService.createHistoricVariableInstanceQuery()
+        .includeDeleted().singleResult();
     Assert.assertEquals("DELETED", deletedVariable.getState());
   }
 

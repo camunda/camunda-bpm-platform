@@ -38,7 +38,8 @@ public class DeleteProcessDefinitionsByKeyCmd extends AbstractDeleteProcessDefin
   private final String tenantId;
   private final boolean isTenantIdSet;
 
-  public DeleteProcessDefinitionsByKeyCmd(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings, String tenantId, boolean isTenantIdSet) {
+  public DeleteProcessDefinitionsByKeyCmd(String processDefinitionKey, boolean cascade,
+      boolean skipCustomListeners, boolean skipIoMappings, String tenantId, boolean isTenantIdSet) {
     this.processDefinitionKey = processDefinitionKey;
     this.cascade = cascade;
     this.skipCustomListeners = skipCustomListeners;
@@ -52,13 +53,15 @@ public class DeleteProcessDefinitionsByKeyCmd extends AbstractDeleteProcessDefin
     ensureNotNull("processDefinitionKey", processDefinitionKey);
 
     List<ProcessDefinition> processDefinitions = commandContext.getProcessDefinitionManager()
-      .findDefinitionsByKeyAndTenantId(processDefinitionKey, tenantId, isTenantIdSet);
-    ensureNotEmpty(NotFoundException.class, "No process definition found with key '" + processDefinitionKey + "'",
-      "processDefinitions", processDefinitions);
+        .findDefinitionsByKeyAndTenantId(processDefinitionKey, tenantId, isTenantIdSet);
+    ensureNotEmpty(NotFoundException.class,
+        "No process definition found with key '" + processDefinitionKey + "'", "processDefinitions",
+        processDefinitions);
 
-    for (ProcessDefinition processDefinition: processDefinitions) {
+    for (ProcessDefinition processDefinition : processDefinitions) {
       String processDefinitionId = processDefinition.getId();
-      deleteProcessDefinitionCmd(commandContext, processDefinitionId, cascade, skipCustomListeners, skipIoMappings);
+      deleteProcessDefinitionCmd(commandContext, processDefinitionId, cascade, skipCustomListeners,
+          skipIoMappings);
     }
 
     return null;

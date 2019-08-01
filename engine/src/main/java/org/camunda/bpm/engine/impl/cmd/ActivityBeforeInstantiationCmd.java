@@ -49,15 +49,16 @@ public class ActivityBeforeInstantiationCmd extends AbstractInstantiationCmd {
 
   @Override
   public Void execute(CommandContext commandContext) {
-    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    ExecutionEntity processInstance = commandContext.getExecutionManager()
+        .findExecutionById(processInstanceId);
     ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
 
     PvmActivity activity = processDefinition.findActivity(activityId);
 
     // forbid instantiation of compensation boundary events
     if (activity != null && "compensationBoundaryCatch".equals(activity.getProperty("type"))) {
-      throw new ProcessEngineException("Cannot start before activity " + activityId + "; activity " +
-        "is a compensation boundary event.");
+      throw new ProcessEngineException("Cannot start before activity " + activityId + "; activity "
+          + "is a compensation boundary event.");
     }
 
     return super.execute(commandContext);

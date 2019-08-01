@@ -54,12 +54,14 @@ import org.junit.rules.RuleChain;
 
 public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest {
 
-  private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(
+      "yyyy-MM-dd'T'HH:mm:ss");
   private static final String PROCESS_ID = "process";
   private static final String FAILING_CLASS = "this.class.does.not.Exist";
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setFailedJobRetryTimeCycle("PT5M,PT20M, PT3M");
       configuration.setEnableExceptionsAfterUnhandledBpmnError(true);
       return configuration;
@@ -73,7 +75,8 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   public ExpectedException thrown = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   private RuntimeService runtimeService;
   private ManagementService managementService;
@@ -91,7 +94,8 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
       managementService.deleteBatch(batch.getId(), true);
     }
 
-    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().singleResult();
+    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
+        .singleResult();
     if (historicBatch != null) {
       engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
     }
@@ -139,14 +143,11 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
     // given
     engineRule.getProcessEngineConfiguration().setFailedJobRetryTimeCycle("PT5M");
 
-    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-    .startEvent()
-    .serviceTask()
-      .camundaClass(FAILING_CLASS)
-      .camundaAsyncBefore()
-      .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START, RecorderExecutionListener.class.getName())
-    .endEvent()
-    .done();
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .serviceTask().camundaClass(FAILING_CLASS).camundaAsyncBefore()
+        .camundaExecutionListenerClass(RecorderExecutionListener.EVENTNAME_START,
+            RecorderExecutionListener.class.getName())
+        .endEvent().done();
     testRule.deploy(bpmnModelInstance);
 
     ClockUtil.setCurrentTime(SIMPLE_DATE_FORMAT.parse("2017-01-01T09:55:00"));
@@ -199,7 +200,8 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   @Test
   public void testRetryIntervals() throws ParseException {
     // given
-    BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle("PT3M, PT10M,PT8M");
+    BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle(
+        "PT3M, PT10M,PT8M");
     testRule.deploy(bpmnModelInstance);
 
     ClockUtil.setCurrentTime(SIMPLE_DATE_FORMAT.parse("2017-01-01T09:55:00"));
@@ -266,7 +268,8 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
     BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle("${var}");
     testRule.deploy(bpmnModelInstance);
 
-    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("var", "PT1M,PT2M,PT3M,PT4M,PT5M,PT6M,PT7M,PT8M"));
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("var", "PT1M,PT2M,PT3M,PT4M,PT5M,PT6M,PT7M,PT8M"));
 
     Job job = managementService.createJobQuery().singleResult();
 
@@ -285,7 +288,8 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   @Test
   public void testIntervalsAfterUpdateRetries() throws ParseException {
     // given
-    BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle("PT3M, PT10M,PT8M");
+    BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle(
+        "PT3M, PT10M,PT8M");
     testRule.deploy(bpmnModelInstance);
 
     ClockUtil.setCurrentTime(SIMPLE_DATE_FORMAT.parse("2017-01-01T09:55:00"));
@@ -304,7 +308,8 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
     assertLockExpirationTime(currentTime);
     ClockUtil.setCurrentTime(currentTime);
 
-    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
+    Job job = managementService.createJobQuery().processInstanceId(processInstanceId)
+        .singleResult();
     managementService.setJobRetries(Arrays.asList(job.getId()), 5);
 
     jobRetries = executeJob(processInstanceId);
@@ -338,17 +343,10 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   @Test
   public void testMixConfigurationWithinOneProcess() throws ParseException {
     // given
-    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-        .serviceTask("Task1")
-          .camundaClass(ServiceTaskDelegate.class.getName())
-          .camundaAsyncBefore()
-        .serviceTask("Task2")
-          .camundaClass(FAILING_CLASS)
-          .camundaAsyncBefore()
-          .camundaFailedJobRetryTimeCycle("PT3M, PT10M,PT8M")
-        .endEvent()
-        .done();
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .serviceTask("Task1").camundaClass(ServiceTaskDelegate.class.getName()).camundaAsyncBefore()
+        .serviceTask("Task2").camundaClass(FAILING_CLASS).camundaAsyncBefore()
+        .camundaFailedJobRetryTimeCycle("PT3M, PT10M,PT8M").endEvent().done();
     testRule.deploy(bpmnModelInstance);
 
     ClockUtil.setCurrentTime(SIMPLE_DATE_FORMAT.parse("2017-01-01T09:55:00"));
@@ -385,14 +383,9 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
 
   @Test
   public void testlocalConfigurationWithNestedChangingExpression() throws ParseException {
-    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .serviceTask()
-          .camundaClass("foo")
-          .camundaAsyncBefore()
-          .camundaFailedJobRetryTimeCycle("${var}")
-        .endEvent()
-        .done();
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process").startEvent()
+        .serviceTask().camundaClass("foo").camundaAsyncBefore()
+        .camundaFailedJobRetryTimeCycle("${var}").endEvent().done();
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     Date startDate = simpleDateFormat.parse("2017-01-01T09:55:00");
@@ -455,7 +448,8 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   }
 
   private void assertLockExpirationTime(Date expectedDate) throws ParseException {
-    Date lockExpirationTime = ((JobEntity) managementService.createJobQuery().singleResult()).getLockExpirationTime();
+    Date lockExpirationTime = ((JobEntity) managementService.createJobQuery().singleResult())
+        .getLockExpirationTime();
     assertEquals(expectedDate, lockExpirationTime);
   }
 
@@ -464,25 +458,15 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   }
 
   private BpmnModelInstance prepareProcessFailingServiceTask() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-        .serviceTask()
-          .camundaClass(FAILING_CLASS)
-          .camundaAsyncBefore()
-        .endEvent()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .serviceTask().camundaClass(FAILING_CLASS).camundaAsyncBefore().endEvent().done();
     return modelInstance;
   }
 
   private BpmnModelInstance prepareProcessFailingServiceTaskWithRetryCycle(String retryTimeCycle) {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-        .serviceTask()
-          .camundaClass(FAILING_CLASS)
-          .camundaAsyncBefore()
-          .camundaFailedJobRetryTimeCycle(retryTimeCycle)
-        .endEvent()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .serviceTask().camundaClass(FAILING_CLASS).camundaAsyncBefore()
+        .camundaFailedJobRetryTimeCycle(retryTimeCycle).endEvent().done();
     return modelInstance;
   }
 

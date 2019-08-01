@@ -92,7 +92,8 @@ public class DefaultCmmnElementHandlerRegistry {
     return definitionElementHandlers;
   }
 
-  public void setDefinitionElementHandlers(Map<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement, ? extends CmmnActivity>> definitionElementHandlers) {
+  public void setDefinitionElementHandlers(
+      Map<Class<? extends CmmnElement>, CmmnElementHandler<? extends CmmnElement, ? extends CmmnActivity>> definitionElementHandlers) {
     this.definitionElementHandlers = definitionElementHandlers;
   }
 
@@ -100,7 +101,8 @@ public class DefaultCmmnElementHandlerRegistry {
     return planItemElementHandlers;
   }
 
-  public void setPlanItemElementHandlers(Map<Class<? extends PlanItemDefinition>, ItemHandler> planItemElementHandlers) {
+  public void setPlanItemElementHandlers(
+      Map<Class<? extends PlanItemDefinition>, ItemHandler> planItemElementHandlers) {
     this.planItemElementHandlers = planItemElementHandlers;
   }
 
@@ -108,7 +110,8 @@ public class DefaultCmmnElementHandlerRegistry {
     return discretionaryElementHandlers;
   }
 
-  public void setDiscretionaryElementHandlers(Map<Class<? extends PlanItemDefinition>, ItemHandler> discretionaryElementHandlers) {
+  public void setDiscretionaryElementHandlers(
+      Map<Class<? extends PlanItemDefinition>, ItemHandler> discretionaryElementHandlers) {
     this.discretionaryElementHandlers = discretionaryElementHandlers;
   }
 

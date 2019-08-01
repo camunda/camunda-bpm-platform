@@ -24,8 +24,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 
 /**
- * Fluent builder to notify the process engine that a signal event has been
- * received.
+ * Fluent builder to notify the process engine that a signal event has been received.
  */
 public interface SignalEventReceivedBuilder {
 
@@ -42,16 +41,15 @@ public interface SignalEventReceivedBuilder {
    * Specify a single execution to deliver the signal to.
    *
    * @param executionId
-   *          the id of the process instance or the execution to deliver the
-   *          signal to
+   *          the id of the process instance or the execution to deliver the signal to
    * @return the builder
    */
   SignalEventReceivedBuilder executionId(String executionId);
 
   /**
-   * Specify a tenant to deliver the signal to. The signal can only be received
-   * on executions or process definitions which belongs to the given tenant.
-   * Cannot be used in combination with {@link #executionId(String)}.
+   * Specify a tenant to deliver the signal to. The signal can only be received on executions or
+   * process definitions which belongs to the given tenant. Cannot be used in combination with
+   * {@link #executionId(String)}.
    *
    * @param tenantId
    *          the id of the tenant
@@ -60,9 +58,8 @@ public interface SignalEventReceivedBuilder {
   SignalEventReceivedBuilder tenantId(String tenantId);
 
   /**
-   * Specify that the signal can only be received on executions or process
-   * definitions which belongs to no tenant. Cannot be used in combination with
-   * {@link #executionId(String)}.
+   * Specify that the signal can only be received on executions or process definitions which belongs
+   * to no tenant. Cannot be used in combination with {@link #executionId(String)}.
    *
    * @return the builder
    */
@@ -70,27 +67,24 @@ public interface SignalEventReceivedBuilder {
 
   /**
    * <p>
-   * Delivers the signal to waiting executions and process definitions. The notification and instantiation happen
-   * synchronously.
+   * Delivers the signal to waiting executions and process definitions. The notification and
+   * instantiation happen synchronously.
    * </p>
    *
    * <p>
-   * Note that the signal delivers to all tenants if no tenant is specified
-   * using {@link #tenantId(String)} or {@link #withoutTenantId()}.
+   * Note that the signal delivers to all tenants if no tenant is specified using
+   * {@link #tenantId(String)} or {@link #withoutTenantId()}.
    * </p>
    *
    * @throws ProcessEngineException
-   *           if a single execution is specified and no such execution exists
-   *           or has not subscribed to the signal
+   *           if a single execution is specified and no such execution exists or has not subscribed
+   *           to the signal
    * @throws AuthorizationException
-   *           <li>if notify an execution and the user has no
-   *           {@link Permissions#UPDATE} permission on
-   *           {@link Resources#PROCESS_INSTANCE} or no
-   *           {@link Permissions#UPDATE_INSTANCE} permission on
-   *           {@link Resources#PROCESS_DEFINITION}.</li>
-   *           <li>if start a new process instance and the user has no
-   *           {@link Permissions#CREATE} permission on
-   *           {@link Resources#PROCESS_INSTANCE} and no
+   *           <li>if notify an execution and the user has no {@link Permissions#UPDATE} permission
+   *           on {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE}
+   *           permission on {@link Resources#PROCESS_DEFINITION}.</li>
+   *           <li>if start a new process instance and the user has no {@link Permissions#CREATE}
+   *           permission on {@link Resources#PROCESS_INSTANCE} and no
    *           {@link Permissions#CREATE_INSTANCE} permission on
    *           {@link Resources#PROCESS_DEFINITION}.</li>
    */

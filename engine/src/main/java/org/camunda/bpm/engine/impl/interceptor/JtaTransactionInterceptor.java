@@ -67,7 +67,8 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
         throw err;
       } catch (Exception ex) {
         doRollback(isNew);
-        throw new UndeclaredThrowableException(ex, "TransactionCallback threw undeclared checked exception");
+        throw new UndeclaredThrowableException(ex,
+            "TransactionCallback threw undeclared checked exception");
       }
       if (isNew) {
         doCommit();

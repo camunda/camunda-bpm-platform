@@ -32,12 +32,16 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
- * <p>A job declaration is associated with an activity in the process definition graph.
- * It provides data about jobs which are to be created when executing this activity.
- * It also acts as a factory for new Job Instances.</p>
+ * <p>
+ * A job declaration is associated with an activity in the process definition graph. It provides
+ * data about jobs which are to be created when executing this activity. It also acts as a factory
+ * for new Job Instances.
+ * </p>
  *
- * <p>Jobs are of a type T and are created in the context of type S (e.g. an execution or an event subscription).
- * An instance of the context class is handed in when a job is created.</p>
+ * <p>
+ * Jobs are of a type T and are created in the context of type S (e.g. an execution or an event
+ * subscription). An instance of the context class is handed in when a job is created.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -77,13 +81,12 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
     String jobDefinitionId = resolveJobDefinitionId(context);
     job.setJobDefinitionId(jobDefinitionId);
 
-    if(jobDefinitionId != null) {
+    if (jobDefinitionId != null) {
 
-      JobDefinitionEntity jobDefinition = Context.getCommandContext()
-        .getJobDefinitionManager()
-        .findById(jobDefinitionId);
+      JobDefinitionEntity jobDefinition = Context.getCommandContext().getJobDefinitionManager()
+          .findById(jobDefinitionId);
 
-      if(jobDefinition != null) {
+      if (jobDefinition != null) {
         // if job definition is suspended while creating a job instance,
         // suspend the job instance right away:
         job.setSuspensionState(jobDefinition.getSuspensionState());
@@ -100,15 +103,12 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
     job.setRetries(resolveRetries(context));
     job.setDuedate(resolveDueDate(context));
 
-
     // contentExecution can be null in case of a timer start event or
     // and batch jobs unrelated to executions
     ExecutionEntity contextExecution = resolveExecution(context);
 
     if (Context.getProcessEngineConfiguration().isProducePrioritizedJobs()) {
-      long priority = Context
-          .getProcessEngineConfiguration()
-          .getJobPriorityProvider()
+      long priority = Context.getProcessEngineConfiguration().getJobPriorityProvider()
           .determinePriority(contextExecution, this, jobDefinitionId);
 
       job.setPriority(priority);
@@ -128,7 +128,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
 
   /**
    * Re-initialize configuration part.
-    */
+   */
   public T reconfigure(S context, T job) {
     return job;
   }
@@ -140,9 +140,8 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   }
 
   /**
-   * Returns the execution in which context the job is created. The execution
-   * is used to determine the job's priority based on a BPMN activity
-   * the execution is currently executing. May be null.
+   * Returns the execution in which context the job is created. The execution is used to determine
+   * the job's priority based on a BPMN activity the execution is currently executing. May be null.
    */
   protected abstract ExecutionEntity resolveExecution(S context);
 
@@ -167,10 +166,12 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   }
 
   protected JobHandler resolveJobHandler() {
-     JobHandler jobHandler = Context.getProcessEngineConfiguration().getJobHandlers().get(jobHandlerType);
-     ensureNotNull("Cannot find job handler '" + jobHandlerType + "' from job '" + this + "'", "jobHandler", jobHandler);
+    JobHandler jobHandler = Context.getProcessEngineConfiguration().getJobHandlers()
+        .get(jobHandlerType);
+    ensureNotNull("Cannot find job handler '" + jobHandlerType + "' from job '" + this + "'",
+        "jobHandler", jobHandler);
 
-     return jobHandler;
+    return jobHandler;
   }
 
   protected String resolveJobHandlerType(S context) {
@@ -189,10 +190,11 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
 
   public Date resolveDueDate(S context) {
     ProcessEngineConfiguration processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if (processEngineConfiguration != null && (processEngineConfiguration.isJobExecutorAcquireByDueDate() || processEngineConfiguration.isEnsureJobDueDateNotNull())) {
+    if (processEngineConfiguration != null
+        && (processEngineConfiguration.isJobExecutorAcquireByDueDate()
+            || processEngineConfiguration.isEnsureJobDueDateNotNull())) {
       return ClockUtil.getCurrentTime();
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -208,8 +210,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   public String getActivityId() {
     if (activity != null) {
       return activity.getId();
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -225,8 +226,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   public ProcessDefinitionImpl getProcessDefinition() {
     if (activity != null) {
       return activity.getProcessDefinition();
-    }
-    else {
+    } else {
       return null;
     }
   }

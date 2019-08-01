@@ -36,16 +36,16 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventHistoryTest.testBoundaryCompensationHandlerHistory.bpmn20.xml")
   public void testBoundaryCompensationHandlerHistoryActivityInstance() {
     // given a process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryHandlerProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("boundaryHandlerProcess");
 
     // when throwing compensation
     Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
     taskService.complete(beforeCompensationTask.getId());
 
     String compensationHandlerActivityInstanceId = runtimeService
-        .getActivityInstance(processInstance.getId())
-        .getActivityInstances("compensationHandler")[0]
-        .getId();
+        .getActivityInstance(processInstance.getId()).getActivityInstances("compensationHandler")[0]
+            .getId();
 
     // .. and completing compensation
     Task compensationHandler = taskService.createTaskQuery().singleResult();
@@ -53,13 +53,13 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
 
     // then there is a historic activity instance for the compensation handler
     HistoricActivityInstance historicCompensationHandlerInstance = historyService
-        .createHistoricActivityInstanceQuery()
-        .activityId("compensationHandler")
-        .singleResult();
+        .createHistoricActivityInstanceQuery().activityId("compensationHandler").singleResult();
 
     assertNotNull(historicCompensationHandlerInstance);
-    assertEquals(compensationHandlerActivityInstanceId, historicCompensationHandlerInstance.getId());
-    assertEquals(processInstance.getId(), historicCompensationHandlerInstance.getParentActivityInstanceId());
+    assertEquals(compensationHandlerActivityInstanceId,
+        historicCompensationHandlerInstance.getId());
+    assertEquals(processInstance.getId(),
+        historicCompensationHandlerInstance.getParentActivityInstanceId());
   }
 
   /**
@@ -68,35 +68,39 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventHistoryTest.testBoundaryCompensationHandlerHistory.bpmn20.xml")
   public void FAILING_testBoundaryCompensationHandlerHistoryVariableInstance() {
     // given a process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryHandlerProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("boundaryHandlerProcess");
 
     // when throwing compensation
     Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
     taskService.complete(beforeCompensationTask.getId());
 
     String compensationHandlerActivityInstanceId = runtimeService
-        .getActivityInstance(processInstance.getId())
-        .getActivityInstances("compensationHandler")[0]
-        .getId();
+        .getActivityInstance(processInstance.getId()).getActivityInstances("compensationHandler")[0]
+            .getId();
 
     // .. setting a variable via task service API
     Task compensationHandler = taskService.createTaskQuery().singleResult();
-    runtimeService.setVariableLocal(compensationHandler.getExecutionId(), "apiVariable", "someValue");
+    runtimeService.setVariableLocal(compensationHandler.getExecutionId(), "apiVariable",
+        "someValue");
 
     // .. and completing compensation
     taskService.complete(compensationHandler.getId());
 
     // then there is a historic variable instance for the variable set by API
-    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricVariableInstance historicVariableInstance = historyService
+        .createHistoricVariableInstanceQuery().singleResult();
 
     assertNotNull(historicVariableInstance);
-    assertEquals(compensationHandlerActivityInstanceId, historicVariableInstance.getActivityInstanceId());
+    assertEquals(compensationHandlerActivityInstanceId,
+        historicVariableInstance.getActivityInstanceId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventHistoryTest.testDefaultCompensationHandlerHistory.bpmn20.xml")
   public void testDefaultCompensationHandlerHistoryActivityInstance() {
     // given a process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("defaultHandlerProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("defaultHandlerProcess");
 
     // when throwing compensation
     Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
@@ -104,12 +108,9 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     String compensationHandlerActivityInstanceId = tree
-        .getActivityInstances("compensationHandler")[0]
-        .getId();
+        .getActivityInstances("compensationHandler")[0].getId();
 
-    String subProcessActivityInstanceId = tree
-        .getActivityInstances("subProcess")[0]
-        .getId();
+    String subProcessActivityInstanceId = tree.getActivityInstances("subProcess")[0].getId();
 
     // .. and completing compensation
     Task compensationHandler = taskService.createTaskQuery().singleResult();
@@ -117,13 +118,13 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
 
     // then there is a historic activity instance for the compensation handler
     HistoricActivityInstance historicCompensationHandlerInstance = historyService
-        .createHistoricActivityInstanceQuery()
-        .activityId("compensationHandler")
-        .singleResult();
+        .createHistoricActivityInstanceQuery().activityId("compensationHandler").singleResult();
 
     assertNotNull(historicCompensationHandlerInstance);
-    assertEquals(compensationHandlerActivityInstanceId, historicCompensationHandlerInstance.getId());
-    assertEquals(subProcessActivityInstanceId, historicCompensationHandlerInstance.getParentActivityInstanceId());
+    assertEquals(compensationHandlerActivityInstanceId,
+        historicCompensationHandlerInstance.getId());
+    assertEquals(subProcessActivityInstanceId,
+        historicCompensationHandlerInstance.getParentActivityInstanceId());
   }
 
   /**
@@ -132,7 +133,8 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventHistoryTest.testDefaultCompensationHandlerHistory.bpmn20.xml")
   public void FAILING_testDefaultCompensationHandlerHistoryVariableInstance() {
     // given a process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("defaultHandlerProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("defaultHandlerProcess");
 
     // when throwing compensation
     Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
@@ -140,22 +142,23 @@ public class CompensateEventHistoryTest extends PluggableProcessEngineTestCase {
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     String compensationHandlerActivityInstanceId = tree
-        .getActivityInstances("compensationHandler")[0]
-        .getId();
+        .getActivityInstances("compensationHandler")[0].getId();
 
     // .. setting a variable via task service API
     Task compensationHandler = taskService.createTaskQuery().singleResult();
-    runtimeService.setVariableLocal(compensationHandler.getExecutionId(), "apiVariable", "someValue");
+    runtimeService.setVariableLocal(compensationHandler.getExecutionId(), "apiVariable",
+        "someValue");
 
     // .. and completing compensation
     taskService.complete(compensationHandler.getId());
 
     // then there is a historic variable instance for the variable set by API
-    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricVariableInstance historicVariableInstance = historyService
+        .createHistoricVariableInstanceQuery().singleResult();
 
     assertNotNull(historicVariableInstance);
-    assertEquals(compensationHandlerActivityInstanceId, historicVariableInstance.getActivityInstanceId());
+    assertEquals(compensationHandlerActivityInstanceId,
+        historicVariableInstance.getActivityInstanceId());
   }
-
 
 }

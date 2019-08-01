@@ -31,7 +31,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  * @author Roman Smirnov
  *
  */
-public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<HistoricIncidentQuery, HistoricIncident> implements HistoricIncidentQuery {
+public class HistoricIncidentQueryImpl
+    extends AbstractVariableQueryImpl<HistoricIncidentQuery, HistoricIncident>
+    implements HistoricIncidentQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -130,7 +132,8 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
 
   public HistoricIncidentQuery open() {
     if (incidentState != null) {
-      throw new ProcessEngineException("Already querying for incident state <" + incidentState + ">");
+      throw new ProcessEngineException(
+          "Already querying for incident state <" + incidentState + ">");
     }
     incidentState = IncidentState.DEFAULT;
     return this;
@@ -138,7 +141,8 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
 
   public HistoricIncidentQuery resolved() {
     if (incidentState != null) {
-      throw new ProcessEngineException("Already querying for incident state <" + incidentState + ">");
+      throw new ProcessEngineException(
+          "Already querying for incident state <" + incidentState + ">");
     }
     incidentState = IncidentState.RESOLVED;
     return this;
@@ -146,7 +150,8 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
 
   public HistoricIncidentQuery deleted() {
     if (incidentState != null) {
-      throw new ProcessEngineException("Already querying for incident state <" + incidentState + ">");
+      throw new ProcessEngineException(
+          "Already querying for incident state <" + incidentState + ">");
     }
     incidentState = IncidentState.DELETED;
     return this;
@@ -164,7 +169,6 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     orderBy(HistoricIncidentQueryProperty.INCIDENT_MESSAGE);
     return this;
   }
-
 
   public HistoricIncidentQuery orderByCreateTime() {
     orderBy(HistoricIncidentQueryProperty.INCIDENT_CREATE_TIME);
@@ -229,18 +233,15 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getHistoricIncidentManager()
-      .findHistoricIncidentCountByQueryCriteria(this);
+    return commandContext.getHistoricIncidentManager()
+        .findHistoricIncidentCountByQueryCriteria(this);
   }
 
   public List<HistoricIncident> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getHistoricIncidentManager()
-      .findHistoricIncidentByQueryCriteria(this, page);
+    return commandContext.getHistoricIncidentManager().findHistoricIncidentByQueryCriteria(this,
+        page);
   }
-
 
   // getters /////////////////////////////////////////////////////
 

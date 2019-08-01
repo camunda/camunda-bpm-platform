@@ -37,23 +37,28 @@ public class EventListenerItemHandler extends ItemHandler {
     return new EventListenerActivityBehavior();
   }
 
-  protected void initializeEntryCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeEntryCriterias(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     // entry criteria is not applicable on event listeners
   }
 
-  protected void initializeExitCriterias(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeExitCriterias(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     // exit criteria is not applicable on milestones
   }
 
-  protected void initializeRepetitionRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeRepetitionRule(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     // repetition rule is not applicable on event listeners
   }
 
-  protected void initializeRequiredRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeRequiredRule(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     // required rule is not applicable on event listeners
   }
 
-  protected void initializeManualActivationRule(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeManualActivationRule(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     // manual activation rule is not applicable on event listeners
   }
 

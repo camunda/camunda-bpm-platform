@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.standalone.history;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Frederik Heremans
  */

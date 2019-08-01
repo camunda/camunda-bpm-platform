@@ -38,18 +38,12 @@ public class UpdateHistoricDetailValueDelegate implements JavaDelegate, Serializ
   public void execute(DelegateExecution execution) throws Exception {
     HistoryService historyService = execution.getProcessEngineServices().getHistoryService();
 
-    HistoricVariableInstance variableInstance = historyService
-        .createHistoricVariableInstanceQuery()
-        .variableName("listVar")
-        .singleResult();
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
+        .variableName("listVar").singleResult();
 
     HistoricVariableUpdate initialUpdate = (HistoricVariableUpdate) historyService
-        .createHistoricDetailQuery()
-        .variableUpdates()
-        .variableInstanceId(variableInstance.getId())
-        .orderPartiallyByOccurrence().asc()
-        .list()
-        .get(0);
+        .createHistoricDetailQuery().variableUpdates().variableInstanceId(variableInstance.getId())
+        .orderPartiallyByOccurrence().asc().list().get(0);
 
     List<String> list = (List<String>) initialUpdate.getValue();
 

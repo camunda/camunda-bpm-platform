@@ -24,13 +24,17 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 
 /**
- * <p>The {@link HistoryEventProcessor} should be used to process an history event.</p>
+ * <p>
+ * The {@link HistoryEventProcessor} should be used to process an history event.
+ * </p>
  *
- * <p>The {@link HistoryEvent} will be created with the help of the {@link HistoryEventProducer}
- * from the {@link ProcessEngineConfiguration} and the given implementation of the
- * {@link HistoryEventCreator} which uses the producer object to create an
- * {@link HistoryEvent}. The {@link HistoryEvent} will be handled by the
- * {@link HistoryEventHandler} from the {@link ProcessEngineConfiguration}.</p>
+ * <p>
+ * The {@link HistoryEvent} will be created with the help of the {@link HistoryEventProducer} from
+ * the {@link ProcessEngineConfiguration} and the given implementation of the
+ * {@link HistoryEventCreator} which uses the producer object to create an {@link HistoryEvent}. The
+ * {@link HistoryEvent} will be handled by the {@link HistoryEventHandler} from the
+ * {@link ProcessEngineConfiguration}.
+ * </p>
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  * @since 7.5
@@ -38,15 +42,15 @@ import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 public class HistoryEventProcessor {
 
   /**
-   * The {@link HistoryEventCreator} interface which is used to interchange the implementation
-   * of the creation of different HistoryEvents.
+   * The {@link HistoryEventCreator} interface which is used to interchange the implementation of
+   * the creation of different HistoryEvents.
    */
   public static class HistoryEventCreator {
     /**
-     * Creates the {@link HistoryEvent} with the help off the given
-     * {@link HistoryEventProducer}.
+     * Creates the {@link HistoryEvent} with the help off the given {@link HistoryEventProducer}.
      *
-     * @param producer the producer which is used for the creation
+     * @param producer
+     *          the producer which is used for the creation
      * @return the created {@link HistoryEvent}
      */
     public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
@@ -58,17 +62,19 @@ public class HistoryEventProcessor {
     }
   }
 
-
   /**
-   * Process an {@link HistoryEvent} and handle them directly after creation.
-   * The {@link HistoryEvent} is created with the help of the given
-   * {@link HistoryEventCreator} implementation.
+   * Process an {@link HistoryEvent} and handle them directly after creation. The
+   * {@link HistoryEvent} is created with the help of the given {@link HistoryEventCreator}
+   * implementation.
    *
-   * @param creator the creator is used to create the {@link HistoryEvent} which should be thrown
+   * @param creator
+   *          the creator is used to create the {@link HistoryEvent} which should be thrown
    */
   public static void processHistoryEvents(HistoryEventCreator creator) {
-    HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration().getHistoryEventProducer();
-    HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration().getHistoryEventHandler();
+    HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration()
+        .getHistoryEventProducer();
+    HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration()
+        .getHistoryEventHandler();
 
     HistoryEvent singleEvent = creator.createHistoryEvent(historyEventProducer);
     if (singleEvent != null) {

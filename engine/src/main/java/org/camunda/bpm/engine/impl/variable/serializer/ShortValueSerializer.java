@@ -39,7 +39,7 @@ public class ShortValueSerializer extends PrimitiveValueSerializer<ShortValue> {
     Long longValue = valueFields.getLongValue();
     Short shortValue = null;
 
-    if(longValue != null) {
+    if (longValue != null) {
       shortValue = Short.valueOf(longValue.shortValue());
     }
 

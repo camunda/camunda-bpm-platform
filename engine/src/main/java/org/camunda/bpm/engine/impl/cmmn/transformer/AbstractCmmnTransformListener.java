@@ -36,21 +36,24 @@ import org.camunda.bpm.model.cmmn.instance.Stage;
 import org.camunda.bpm.model.cmmn.instance.Task;
 
 /**
- * Abstract base class for implementing a {@link CmmnTransformListener} without being forced to implement
- * all methods provided, which make the implementation more robust to future changes.
+ * Abstract base class for implementing a {@link CmmnTransformListener} without being forced to
+ * implement all methods provided, which make the implementation more robust to future changes.
  *
  * @author Sebastian Menski
  */
 public class AbstractCmmnTransformListener implements CmmnTransformListener {
 
-  public void transformRootElement(Definitions definitions, List<? extends CmmnCaseDefinition> caseDefinitions) {
+  public void transformRootElement(Definitions definitions,
+      List<? extends CmmnCaseDefinition> caseDefinitions) {
   }
 
   public void transformCase(Case element, CmmnCaseDefinition caseDefinition) {
   }
 
-  public void transformCasePlanModel(org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel, CmmnActivity activity) {
-    transformCasePlanModel((org.camunda.bpm.model.cmmn.instance.CasePlanModel) casePlanModel, activity);
+  public void transformCasePlanModel(
+      org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel, CmmnActivity activity) {
+    transformCasePlanModel((org.camunda.bpm.model.cmmn.instance.CasePlanModel) casePlanModel,
+        activity);
   }
 
   public void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity activity) {
@@ -59,13 +62,15 @@ public class AbstractCmmnTransformListener implements CmmnTransformListener {
   public void transformHumanTask(PlanItem planItem, HumanTask humanTask, CmmnActivity activity) {
   }
 
-  public void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity activity) {
+  public void transformProcessTask(PlanItem planItem, ProcessTask processTask,
+      CmmnActivity activity) {
   }
 
   public void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity activity) {
   }
 
-  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity activity) {
+  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask,
+      CmmnActivity activity) {
   }
 
   public void transformTask(PlanItem planItem, Task task, CmmnActivity activity) {
@@ -77,7 +82,8 @@ public class AbstractCmmnTransformListener implements CmmnTransformListener {
   public void transformMilestone(PlanItem planItem, Milestone milestone, CmmnActivity activity) {
   }
 
-  public void transformEventListener(PlanItem planItem, EventListener eventListener, CmmnActivity activity) {
+  public void transformEventListener(PlanItem planItem, EventListener eventListener,
+      CmmnActivity activity) {
   }
 
   public void transformSentry(Sentry sentry, CmmnSentryDeclaration sentryDeclaration) {

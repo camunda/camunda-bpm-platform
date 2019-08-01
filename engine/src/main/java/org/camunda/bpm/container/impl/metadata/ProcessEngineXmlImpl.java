@@ -23,12 +23,14 @@ import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
- * <p>Implementation of the {@link ProcessEngineXml} descriptor.</p>
+ * <p>
+ * Implementation of the {@link ProcessEngineXml} descriptor.
+ * </p>
  * 
  * @author Daniel Meyer
  */
 public class ProcessEngineXmlImpl implements ProcessEngineXml {
-  
+
   protected String name;
   protected boolean isDefault;
   protected String configurationClass;
@@ -36,59 +38,59 @@ public class ProcessEngineXmlImpl implements ProcessEngineXml {
   protected String datasource;
   protected Map<String, String> properties;
   protected List<ProcessEnginePluginXml> plugins;
-  
+
   public String getName() {
     return name;
   }
-  
+
   public void setName(String name) {
     this.name = name;
   }
-  
+
   public boolean isDefault() {
     return isDefault;
   }
-  
+
   public void setDefault(boolean isDefault) {
     this.isDefault = isDefault;
   }
-  
+
   public String getConfigurationClass() {
     return configurationClass;
   }
-  
+
   public void setConfigurationClass(String configurationClass) {
     this.configurationClass = configurationClass;
   }
-  
+
   public Map<String, String> getProperties() {
     return properties;
   }
-  
+
   public void setProperties(Map<String, String> properties) {
     this.properties = properties;
   }
-  
+
   public String getDatasource() {
     return datasource;
   }
-  
+
   public void setDatasource(String datasource) {
     this.datasource = datasource;
   }
-  
+
   public String getJobAcquisitionName() {
     return jobAcquisitionName;
   }
-  
+
   public void setJobAcquisitionName(String jobAcquisitionName) {
     this.jobAcquisitionName = jobAcquisitionName;
   }
-  
+
   public List<ProcessEnginePluginXml> getPlugins() {
     return plugins;
   }
-  
+
   public void setPlugins(List<ProcessEnginePluginXml> plugins) {
     this.plugins = plugins;
   }

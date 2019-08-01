@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * Wrapper containing the missing authorization information. It contains the name of the violated permission,
- * the type of the resouce and the Id of the resource.
+ * Wrapper containing the missing authorization information. It contains the name of the violated
+ * permission, the type of the resouce and the Id of the resource.
  *
  * @author Filip Hrisafov
  */
@@ -48,10 +48,7 @@ public class MissingAuthorization {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-        + "[permissionName=" + permissionName
-        + ", resourceType=" + resourceType
-        + ", resourceId=" + resourceId
-        + "]";
+    return this.getClass().getSimpleName() + "[permissionName=" + permissionName + ", resourceType="
+        + resourceType + ", resourceId=" + resourceId + "]";
   }
 }

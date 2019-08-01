@@ -32,43 +32,24 @@ import org.camunda.bpm.engine.test.standalone.pvm.activities.End;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.ParallelGateway;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
 
-
 /**
  * @author Tom Baeyens
  */
 public class PvmEmbeddedSubProcessTest extends PvmTestCase {
 
   /**
-   *           +------------------------------+
-   *           | embedded subprocess          |
-   * +-----+   |  +-----------+   +---------+ |   +---+
-   * |start|-->|  |startInside|-->|endInside| |-->|end|
-   * +-----+   |  +-----------+   +---------+ |   +---+
-   *           +------------------------------+
+   * +------------------------------+ | embedded subprocess | +-----+ | +-----------+ +---------+ |
+   * +---+ |start|-->| |startInside|-->|endInside| |-->|end| +-----+ | +-----------+ +---------+ |
+   * +---+ +------------------------------+
    */
   public void testEmbeddedSubProcess() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .createActivity("startInside")
-          .behavior(new Automatic())
-          .transition("endInside")
-        .endActivity()
-        .createActivity("endInside")
-          .behavior(new End())
-        .endActivity()
-        .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new WaitState())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("embeddedsubprocess").endActivity()
+        .createActivity("embeddedsubprocess").scope().behavior(new EmbeddedSubProcess())
+        .createActivity("startInside").behavior(new Automatic()).transition("endInside")
+        .endActivity().createActivity("endInside").behavior(new End()).endActivity()
+        .transition("end").endActivity().createActivity("end").behavior(new WaitState())
+        .endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -80,55 +61,23 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
   }
 
   /**
-   *           +----------------------------------------+
-   *           | embeddedsubprocess        +----------+ |
-   *           |                     +---->|endInside1| |
-   *           |                     |     +----------+ |
-   *           |                     |                  |
-   * +-----+   |  +-----------+   +----+   +----------+ |   +---+
-   * |start|-->|  |startInside|-->|fork|-->|endInside2| |-->|end|
-   * +-----+   |  +-----------+   +----+   +----------+ |   +---+
-   *           |                     |                  |
-   *           |                     |     +----------+ |
-   *           |                     +---->|endInside3| |
-   *           |                           +----------+ |
-   *           +----------------------------------------+
+   * +----------------------------------------+ | embeddedsubprocess +----------+ | |
+   * +---->|endInside1| | | | +----------+ | | | | +-----+ | +-----------+ +----+ +----------+ |
+   * +---+ |start|-->| |startInside|-->|fork|-->|endInside2| |-->|end| +-----+ | +-----------+
+   * +----+ +----------+ | +---+ | | | | | +----------+ | | +---->|endInside3| | | +----------+ |
+   * +----------------------------------------+
    */
   public void testMultipleConcurrentEndsInsideEmbeddedSubProcess() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .createActivity("startInside")
-          .behavior(new Automatic())
-          .transition("fork")
-        .endActivity()
-        .createActivity("fork")
-          .behavior(new ParallelGateway())
-          .transition("endInside1")
-          .transition("endInside2")
-          .transition("endInside3")
-        .endActivity()
-        .createActivity("endInside1")
-          .behavior(new End())
-        .endActivity()
-        .createActivity("endInside2")
-          .behavior(new End())
-        .endActivity()
-        .createActivity("endInside3")
-          .behavior(new End())
-        .endActivity()
-        .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new End())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("embeddedsubprocess").endActivity()
+        .createActivity("embeddedsubprocess").scope().behavior(new EmbeddedSubProcess())
+        .createActivity("startInside").behavior(new Automatic()).transition("fork").endActivity()
+        .createActivity("fork").behavior(new ParallelGateway()).transition("endInside1")
+        .transition("endInside2").transition("endInside3").endActivity()
+        .createActivity("endInside1").behavior(new End()).endActivity().createActivity("endInside2")
+        .behavior(new End()).endActivity().createActivity("endInside3").behavior(new End())
+        .endActivity().transition("end").endActivity().createActivity("end").behavior(new End())
+        .endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -137,59 +86,24 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
   }
 
   /**
-   *           +-------------------------------------------------+
-   *           | embeddedsubprocess        +----------+          |
-   *           |                     +---->|endInside1|          |
-   *           |                     |     +----------+          |
-   *           |                     |                           |
-   * +-----+   |  +-----------+   +----+   +----+   +----------+ |   +---+
-   * |start|-->|  |startInside|-->|fork|-->|wait|-->|endInside2| |-->|end|
-   * +-----+   |  +-----------+   +----+   +----+   +----------+ |   +---+
-   *           |                     |                           |
-   *           |                     |     +----------+          |
-   *           |                     +---->|endInside3|          |
-   *           |                           +----------+          |
-   *           +-------------------------------------------------+
+   * +-------------------------------------------------+ | embeddedsubprocess +----------+ | |
+   * +---->|endInside1| | | | +----------+ | | | | +-----+ | +-----------+ +----+ +----+
+   * +----------+ | +---+ |start|-->| |startInside|-->|fork|-->|wait|-->|endInside2| |-->|end|
+   * +-----+ | +-----------+ +----+ +----+ +----------+ | +---+ | | | | | +----------+ | |
+   * +---->|endInside3| | | +----------+ | +-------------------------------------------------+
    */
   public void testMultipleConcurrentEndsInsideEmbeddedSubProcessWithWaitState() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .createActivity("startInside")
-          .behavior(new Automatic())
-          .transition("fork")
-        .endActivity()
-        .createActivity("fork")
-          .behavior(new ParallelGateway())
-          .transition("endInside1")
-          .transition("wait")
-          .transition("endInside3")
-        .endActivity()
-        .createActivity("endInside1")
-          .behavior(new End())
-        .endActivity()
-        .createActivity("wait")
-          .behavior(new WaitState())
-          .transition("endInside2")
-        .endActivity()
-        .createActivity("endInside2")
-          .behavior(new End())
-        .endActivity()
-        .createActivity("endInside3")
-          .behavior(new End())
-        .endActivity()
-        .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new End())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("embeddedsubprocess").endActivity()
+        .createActivity("embeddedsubprocess").scope().behavior(new EmbeddedSubProcess())
+        .createActivity("startInside").behavior(new Automatic()).transition("fork").endActivity()
+        .createActivity("fork").behavior(new ParallelGateway()).transition("endInside1")
+        .transition("wait").transition("endInside3").endActivity().createActivity("endInside1")
+        .behavior(new End()).endActivity().createActivity("wait").behavior(new WaitState())
+        .transition("endInside2").endActivity().createActivity("endInside2").behavior(new End())
+        .endActivity().createActivity("endInside3").behavior(new End()).endActivity()
+        .transition("end").endActivity().createActivity("end").behavior(new End()).endActivity()
+        .buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -202,48 +116,23 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
   }
 
   /**
-   *           +-------------------------------------------------------+
-   *           | embedded subprocess                                   |
-   *           |                  +--------------------------------+   |
-   *           |                  | nested embedded subprocess     |   |
-   * +-----+   | +-----------+    |  +-----------+   +---------+   |   |   +---+
-   * |start|-->| |startInside|--> |  |startInside|-->|endInside|   |   |-->|end|
-   * +-----+   | +-----------+    |  +-----------+   +---------+   |   |   +---+
-   *           |                  +--------------------------------+   |
-   *           |                                                       |
-   *           +-------------------------------------------------------+
+   * +-------------------------------------------------------+ | embedded subprocess | |
+   * +--------------------------------+ | | | nested embedded subprocess | | +-----+ | +-----------+
+   * | +-----------+ +---------+ | | +---+ |start|-->| |startInside|--> |
+   * |startInside|-->|endInside| | |-->|end| +-----+ | +-----------+ | +-----------+ +---------+ | |
+   * +---+ | +--------------------------------+ | | |
+   * +-------------------------------------------------------+
    */
   public void testNestedSubProcessNoEnd() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .createActivity("startInside")
-          .behavior(new Automatic())
-          .transition("nestedSubProcess")
-        .endActivity()
-          .createActivity("nestedSubProcess")
-          .scope()
-          .behavior(new EmbeddedSubProcess())
-          .createActivity("startNestedInside")
-            .behavior(new Automatic())
-            .transition("endInside")
-            .endActivity()
-          .createActivity("endInside")
-            .behavior(new End())
-            .endActivity()
-        .endActivity()
-      .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new WaitState())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("embeddedsubprocess").endActivity()
+        .createActivity("embeddedsubprocess").scope().behavior(new EmbeddedSubProcess())
+        .createActivity("startInside").behavior(new Automatic()).transition("nestedSubProcess")
+        .endActivity().createActivity("nestedSubProcess").scope().behavior(new EmbeddedSubProcess())
+        .createActivity("startNestedInside").behavior(new Automatic()).transition("endInside")
+        .endActivity().createActivity("endInside").behavior(new End()).endActivity().endActivity()
+        .transition("end").endActivity().createActivity("end").behavior(new WaitState())
+        .endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -255,28 +144,15 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
   }
 
   /**
-   *           +------------------------------+
-   *           | embedded subprocess          |
-   * +-----+   |  +-----------+               |
-   * |start|-->|  |startInside|               |
-   * +-----+   |  +-----------+               |
-   *           +------------------------------+
+   * +------------------------------+ | embedded subprocess | +-----+ | +-----------+ | |start|-->|
+   * |startInside| | +-----+ | +-----------+ | +------------------------------+
    */
   public void testEmbeddedSubProcessWithoutEndEvents() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .createActivity("startInside")
-          .behavior(new Automatic())
-        .endActivity()
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("embeddedsubprocess").endActivity()
+        .createActivity("embeddedsubprocess").scope().behavior(new EmbeddedSubProcess())
+        .createActivity("startInside").behavior(new Automatic()).endActivity().endActivity()
+        .buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -285,40 +161,20 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
   }
 
   /**
-   *           +-------------------------------------------------------+
-   *           | embedded subprocess                                   |
-   *           |                  +--------------------------------+   |
-   *           |                  | nested embedded subprocess     |   |
-   * +-----+   | +-----------+    |  +-----------+                 |   |
-   * |start|-->| |startInside|--> |  |startInside|                 |   |
-   * +-----+   | +-----------+    |  +-----------+                 |   |
-   *           |                  +--------------------------------+   |
-   *           |                                                       |
-   *           +-------------------------------------------------------+
+   * +-------------------------------------------------------+ | embedded subprocess | |
+   * +--------------------------------+ | | | nested embedded subprocess | | +-----+ | +-----------+
+   * | +-----------+ | | |start|-->| |startInside|--> | |startInside| | | +-----+ | +-----------+ |
+   * +-----------+ | | | +--------------------------------+ | | |
+   * +-------------------------------------------------------+
    */
   public void testNestedSubProcessBothNoEnd() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .createActivity("startInside")
-          .behavior(new Automatic())
-          .transition("nestedSubProcess")
-        .endActivity()
-          .createActivity("nestedSubProcess")
-          .scope()
-          .behavior(new EmbeddedSubProcess())
-          .createActivity("startNestedInside")
-            .behavior(new Automatic())
-            .endActivity()
-        .endActivity()
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("embeddedsubprocess").endActivity()
+        .createActivity("embeddedsubprocess").scope().behavior(new EmbeddedSubProcess())
+        .createActivity("startInside").behavior(new Automatic()).transition("nestedSubProcess")
+        .endActivity().createActivity("nestedSubProcess").scope().behavior(new EmbeddedSubProcess())
+        .createActivity("startNestedInside").behavior(new Automatic()).endActivity().endActivity()
+        .endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -326,34 +182,18 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
     assertTrue(processInstance.isEnded());
   }
 
-
   /**
-   *           +------------------------------+
-   *           | embedded subprocess          |
-   * +-----+   |  +-----------+   +---------+ |
-   * |start|-->|  |startInside|-->|endInside| |
-   * +-----+   |  +-----------+   +---------+ |
-   *           +------------------------------+
+   * +------------------------------+ | embedded subprocess | +-----+ | +-----------+ +---------+ |
+   * |start|-->| |startInside|-->|endInside| | +-----+ | +-----------+ +---------+ |
+   * +------------------------------+
    */
   public void testEmbeddedSubProcessNoEnd() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .createActivity("startInside")
-          .behavior(new Automatic())
-          .transition("endInside")
-        .endActivity()
-        .createActivity("endInside")
-          .behavior(new End())
-        .endActivity()
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("embeddedsubprocess").endActivity()
+        .createActivity("embeddedsubprocess").scope().behavior(new EmbeddedSubProcess())
+        .createActivity("startInside").behavior(new Automatic()).transition("endInside")
+        .endActivity().createActivity("endInside").behavior(new End()).endActivity().endActivity()
+        .buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -362,39 +202,22 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
   }
 
   /**
-   *           +------------------------------+
-   *           | embedded subprocess          |
-   * +-----+   |  +-----------+   +---------+ |   +---+
-   * |start|-->|  |startInside|-->|endInside| |-->|end|
-   * +-----+   |  +-----------+   +---------+ |   +---+
-   *           +------------------------------+
+   * +------------------------------+ | embedded subprocess | +-----+ | +-----------+ +---------+ |
+   * +---+ |start|-->| |startInside|-->|endInside| |-->|end| +-----+ | +-----------+ +---------+ |
+   * +---+ +------------------------------+
    */
   public void testStartInScope() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .createActivity("startInside")
-          .behavior(new Automatic())
-          .transition("endInside")
-        .endActivity()
-        .createActivity("endInside")
-          .behavior(new End())
-        .endActivity()
-        .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new WaitState())
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic()).transition("embeddedsubprocess").endActivity()
+        .createActivity("embeddedsubprocess").scope().behavior(new EmbeddedSubProcess())
+        .createActivity("startInside").behavior(new Automatic()).transition("endInside")
+        .endActivity().createActivity("endInside").behavior(new End()).endActivity()
+        .transition("end").endActivity().createActivity("end").behavior(new WaitState())
+        .endActivity().buildProcessDefinition();
 
     PvmProcessInstance processInstance = ((ProcessDefinitionImpl) processDefinition)
-        .createProcessInstanceForInitial((ActivityImpl) processDefinition.findActivity("startInside"));
+        .createProcessInstanceForInitial(
+            (ActivityImpl) processDefinition.findActivity("startInside"));
     processInstance.start();
 
     List<String> expectedActiveActivityIds = new ArrayList<String>();

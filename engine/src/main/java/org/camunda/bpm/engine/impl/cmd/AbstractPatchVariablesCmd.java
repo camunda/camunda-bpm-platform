@@ -36,7 +36,8 @@ public abstract class AbstractPatchVariablesCmd implements Command<Void>, Serial
   protected Collection<String> deletions;
   protected boolean isLocal;
 
-  public AbstractPatchVariablesCmd(String entityId, Map<String, ? extends Object> variables, Collection<String> deletions, boolean isLocal) {
+  public AbstractPatchVariablesCmd(String entityId, Map<String, ? extends Object> variables,
+      Collection<String> deletions, boolean isLocal) {
     this.entityId = entityId;
     this.variables = variables;
     this.deletions = deletions;

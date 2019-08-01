@@ -19,15 +19,14 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 
-
 /**
- * Represents a BPMN Error definition, whereas {@link BpmnError} represents an
- * actual instance of an Error.
+ * Represents a BPMN Error definition, whereas {@link BpmnError} represents an actual instance of an
+ * Error.
  * 
  * @author Joram Barrez
  */
 public class Error {
-  
+
   protected String id;
   protected String errorCode;
   private ParameterValueProvider errorMessageExpression;
@@ -35,15 +34,15 @@ public class Error {
   public String getId() {
     return id;
   }
-  
+
   public void setId(String id) {
     this.id = id;
   }
-  
+
   public String getErrorCode() {
     return errorCode;
   }
-  
+
   public void setErrorCode(String errorCode) {
     this.errorCode = errorCode;
   }

@@ -64,7 +64,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
   }
 
   @Override
-  protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeActivity(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     // execute standard initialization
     super.initializeActivity(element, activity, context);
 
@@ -127,7 +128,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     return taskDefinition;
   }
 
-  protected void initializeTaskDefinitionName(CmmnElement element, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+  protected void initializeTaskDefinitionName(CmmnElement element, TaskDefinition taskDefinition,
+      CmmnHandlerContext context) {
     String name = getName(element);
     if (name == null) {
       HumanTask definition = getDefinition(element);
@@ -142,7 +144,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
 
   }
 
-  protected void initializeTaskDefinitionFormKey(CmmnElement element, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+  protected void initializeTaskDefinitionFormKey(CmmnElement element, TaskDefinition taskDefinition,
+      CmmnHandlerContext context) {
     HumanTask definition = getDefinition(element);
 
     String formKey = definition.getCamundaFormKey();
@@ -153,7 +156,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     }
   }
 
-  protected void initializeTaskDefinitionAssignee(CmmnElement element, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+  protected void initializeTaskDefinitionAssignee(CmmnElement element,
+      TaskDefinition taskDefinition, CmmnHandlerContext context) {
     HumanTask definition = getDefinition(element);
     Role performer = definition.getPerformer();
 
@@ -171,7 +175,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     }
   }
 
-  protected void initializeTaskDefinitionCandidateUsers(CmmnElement element, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+  protected void initializeTaskDefinitionCandidateUsers(CmmnElement element,
+      TaskDefinition taskDefinition, CmmnHandlerContext context) {
     HumanTask definition = getDefinition(element);
     ExpressionManager expressionManager = context.getExpressionManager();
 
@@ -182,7 +187,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     }
   }
 
-  protected void initializeTaskDefinitionCandidateGroups(CmmnElement element, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+  protected void initializeTaskDefinitionCandidateGroups(CmmnElement element,
+      TaskDefinition taskDefinition, CmmnHandlerContext context) {
     HumanTask definition = getDefinition(element);
     ExpressionManager expressionManager = context.getExpressionManager();
 
@@ -193,7 +199,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     }
   }
 
-  protected void initializeTaskDefinitionDueDate(CmmnElement element, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+  protected void initializeTaskDefinitionDueDate(CmmnElement element, TaskDefinition taskDefinition,
+      CmmnHandlerContext context) {
     HumanTask definition = getDefinition(element);
 
     String dueDate = definition.getCamundaDueDate();
@@ -204,7 +211,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     }
   }
 
-  protected void initializeTaskDefinitionFollowUpDate(CmmnElement element, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+  protected void initializeTaskDefinitionFollowUpDate(CmmnElement element,
+      TaskDefinition taskDefinition, CmmnHandlerContext context) {
     HumanTask definition = getDefinition(element);
 
     String followUpDate = definition.getCamundaFollowUpDate();
@@ -215,7 +223,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     }
   }
 
-  protected void initializeTaskDefinitionPriority(CmmnElement element, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+  protected void initializeTaskDefinitionPriority(CmmnElement element,
+      TaskDefinition taskDefinition, CmmnHandlerContext context) {
     HumanTask definition = getDefinition(element);
 
     String priority = definition.getCamundaPriority();
@@ -226,14 +235,14 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     }
   }
 
-  protected void initializeTaskDescription(CmmnElement element, TaskDefinition taskDefinition, CmmnHandlerContext context) {
+  protected void initializeTaskDescription(CmmnElement element, TaskDefinition taskDefinition,
+      CmmnHandlerContext context) {
     String description = getDesciption(element);
-    if (description != null && ! description.isEmpty()) {
+    if (description != null && !description.isEmpty()) {
       ExpressionManager expressionManager = context.getExpressionManager();
       Expression descriptionExpression = expressionManager.createExpression(description);
       taskDefinition.setDescriptionExpression(descriptionExpression);
-    }
-    else {
+    } else {
       String documentation = getDocumentation(element);
       if (documentation != null && !documentation.isEmpty()) {
         ExpressionManager expressionManager = context.getExpressionManager();
@@ -243,10 +252,12 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     }
   }
 
-  protected void initializeTaskListeners(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, TaskDefinition taskDefinition) {
+  protected void initializeTaskListeners(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context, TaskDefinition taskDefinition) {
     HumanTask humanTask = getDefinition(element);
 
-    List<CamundaTaskListener> listeners = queryExtensionElementsByClass(humanTask, CamundaTaskListener.class);
+    List<CamundaTaskListener> listeners = queryExtensionElementsByClass(humanTask,
+        CamundaTaskListener.class);
 
     for (CamundaTaskListener listener : listeners) {
       TaskListener taskListener = initializeTaskListener(element, activity, context, listener);
@@ -264,9 +275,11 @@ public class HumanTaskItemHandler extends TaskItemHandler {
     }
   }
 
-  protected TaskListener initializeTaskListener(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, CamundaTaskListener listener) {
+  protected TaskListener initializeTaskListener(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context, CamundaTaskListener listener) {
     Collection<CamundaField> fields = listener.getCamundaFields();
-    List<FieldDeclaration> fieldDeclarations = initializeFieldDeclarations(element, activity, context, fields);
+    List<FieldDeclaration> fieldDeclarations = initializeFieldDeclarations(element, activity,
+        context, fields);
 
     ExpressionManager expressionManager = context.getExpressionManager();
 
@@ -289,7 +302,8 @@ public class HumanTaskItemHandler extends TaskItemHandler {
       taskListener = new DelegateExpressionTaskListener(delegateExp, fieldDeclarations);
 
     } else if (scriptElement != null) {
-      ExecutableScript executableScript = initializeScript(element, activity, context, scriptElement);
+      ExecutableScript executableScript = initializeScript(element, activity, context,
+          scriptElement);
       if (executableScript != null) {
         taskListener = new ScriptTaskListener(executableScript);
       }

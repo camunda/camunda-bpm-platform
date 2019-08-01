@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.interceptor;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -31,8 +30,7 @@ public class LogInterceptor extends CommandInterceptor {
     LOG.debugStartingCommand(command);
     try {
       return next.execute(command);
-    }
-    finally {
+    } finally {
       LOG.debugFinishingCommand(command);
     }
   }

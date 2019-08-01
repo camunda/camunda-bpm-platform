@@ -25,13 +25,12 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.slf4j.Logger;
 
-
 /**
  * @author Tom Baeyens
  */
 public class CompetingJoinTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   Thread testThread = Thread.currentThread();
   static ControllableThread activeThread;
@@ -40,40 +39,37 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   public class SignalThread extends ControllableThread {
     String executionId;
     OptimisticLockingException exception;
+
     public SignalThread(String executionId) {
       this.executionId = executionId;
     }
+
     public synchronized void startAndWaitUntilControlIsReturned() {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     public void run() {
       try {
-        processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new SignalCmd(executionId, null, null,null)));
+        processEngineConfiguration.getCommandExecutorTxRequired().execute(
+            new ControlledCommand(activeThread, new SignalCmd(executionId, null, null, null)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 
   @Deployment
   public void testCompetingJoins() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CompetingJoinsProcess");
-    Execution execution1 = runtimeService
-      .createExecutionQuery()
-      .processInstanceId(processInstance.getId())
-      .activityId("wait1")
-      .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("CompetingJoinsProcess");
+    Execution execution1 = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId()).activityId("wait1").singleResult();
 
-    Execution execution2 = runtimeService
-      .createExecutionQuery()
-      .processInstanceId(processInstance.getId())
-      .activityId("wait2")
-      .singleResult();
+    Execution execution2 = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId()).activityId("wait2").singleResult();
 
     LOG.debug("test thread starts thread one");
     SignalThread threadOne = new SignalThread(execution1.getId());
@@ -90,7 +86,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
+    assertTextPresent("was updated by another transaction concurrently",
+        threadTwo.exception.getMessage());
   }
 
 }

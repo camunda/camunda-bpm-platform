@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.impl.core.operation.AbstractEventAtomicOperation;
  * @author Roman Smirnov
  *
  */
-public abstract class AbstractCmmnEventAtomicOperation extends AbstractEventAtomicOperation<CmmnExecution> implements CmmnAtomicOperation {
+public abstract class AbstractCmmnEventAtomicOperation
+    extends AbstractEventAtomicOperation<CmmnExecution> implements CmmnAtomicOperation {
 
   protected CmmnActivity getScope(CmmnExecution execution) {
     return execution.getActivity();

@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
-
 /**
  * @author Daniel Meyer
  * @author Tom Baeyens
@@ -34,7 +33,7 @@ public class GetUserPictureCmd implements Command<Picture>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String userId;
-  
+
   public GetUserPictureCmd(String userId) {
     this.userId = userId;
   }
@@ -43,13 +42,13 @@ public class GetUserPictureCmd implements Command<Picture>, Serializable {
     ensureNotNull("userId", userId);
 
     IdentityInfoEntity pictureInfo = commandContext.getIdentityInfoManager()
-      .findUserInfoByUserIdAndKey(userId, "picture");
+        .findUserInfoByUserIdAndKey(userId, "picture");
 
     if (pictureInfo != null) {
       String pictureByteArrayId = pictureInfo.getValue();
       if (pictureByteArrayId != null) {
         ByteArrayEntity byteArray = commandContext.getDbEntityManager()
-          .selectById(ByteArrayEntity.class, pictureByteArrayId);
+            .selectById(ByteArrayEntity.class, pictureByteArrayId);
         return new Picture(byteArray.getBytes(), byteArray.getName());
       }
     }

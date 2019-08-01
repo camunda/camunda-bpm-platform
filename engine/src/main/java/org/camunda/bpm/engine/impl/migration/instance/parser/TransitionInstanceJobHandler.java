@@ -29,10 +29,12 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  * @author Thorben Lindhauer
  *
  */
-public class TransitionInstanceJobHandler implements MigratingDependentInstanceParseHandler<MigratingTransitionInstance, List<JobEntity>> {
+public class TransitionInstanceJobHandler implements
+    MigratingDependentInstanceParseHandler<MigratingTransitionInstance, List<JobEntity>> {
 
   @Override
-  public void handle(MigratingInstanceParseContext parseContext, MigratingTransitionInstance transitionInstance, List<JobEntity> elements) {
+  public void handle(MigratingInstanceParseContext parseContext,
+      MigratingTransitionInstance transitionInstance, List<JobEntity> elements) {
 
     for (JobEntity job : elements) {
       if (!isAsyncContinuation(job)) {
@@ -41,10 +43,11 @@ public class TransitionInstanceJobHandler implements MigratingDependentInstanceP
 
       ScopeImpl targetScope = transitionInstance.getTargetScope();
       if (targetScope != null) {
-        JobDefinitionEntity targetJobDefinitionEntity = parseContext.getTargetJobDefinition(transitionInstance.getTargetScope().getId(), job.getJobHandlerType());
+        JobDefinitionEntity targetJobDefinitionEntity = parseContext.getTargetJobDefinition(
+            transitionInstance.getTargetScope().getId(), job.getJobHandlerType());
 
-        MigratingAsyncJobInstance migratingJobInstance =
-            new MigratingAsyncJobInstance(job, targetJobDefinitionEntity, transitionInstance.getTargetScope());
+        MigratingAsyncJobInstance migratingJobInstance = new MigratingAsyncJobInstance(job,
+            targetJobDefinitionEntity, transitionInstance.getTargetScope());
 
         transitionInstance.setDependentJobInstance(migratingJobInstance);
         parseContext.submit(migratingJobInstance);

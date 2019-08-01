@@ -18,14 +18,13 @@ package org.camunda.bpm.engine.impl.calendar;
 
 import java.util.Date;
 
-
 /**
  * @author Tom Baeyens
  */
 public interface BusinessCalendar {
 
   Date resolveDuedate(String duedateDescription);
-  
+
   Date resolveDuedate(String duedateDescription, Date startDate);
 
 }

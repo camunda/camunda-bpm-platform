@@ -31,13 +31,13 @@ import java.util.Map;
 public class ByteArrayManager extends AbstractManager {
 
   /**
-   * Deletes the {@link ByteArrayEntity} with the given id from the database.
-   * Important: this operation will NOT do any optimistic locking, to avoid loading the
-   * bytes in memory. So use this method only in conjunction with an entity that has
-   * optimistic locking!.
+   * Deletes the {@link ByteArrayEntity} with the given id from the database. Important: this
+   * operation will NOT do any optimistic locking, to avoid loading the bytes in memory. So use this
+   * method only in conjunction with an entity that has optimistic locking!.
    */
   public void deleteByteArrayById(String byteArrayEntityId) {
-    getDbEntityManager().delete(ByteArrayEntity.class, "deleteByteArrayNoRevisionCheck", byteArrayEntityId);
+    getDbEntityManager().delete(ByteArrayEntity.class, "deleteByteArrayNoRevisionCheck",
+        byteArrayEntityId);
   }
 
   public void insertByteArray(ByteArrayEntity arr) {
@@ -45,25 +45,28 @@ public class ByteArrayManager extends AbstractManager {
     getDbEntityManager().insert(arr);
   }
 
-  public void addRemovalTimeToByteArraysByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToByteArraysByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(ByteArrayEntity.class,
+        "updateByteArraysByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToByteArraysByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public void addRemovalTimeToByteArraysByProcessInstanceId(String processInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(ByteArrayEntity.class,
+        "updateByteArraysByProcessInstanceId", parameters);
   }
 
-  public DbOperation deleteByteArraysByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteByteArraysByRemovalTime(Date removalTime, int minuteFrom, int minuteTo,
+      int batchSize) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -72,9 +75,8 @@ public class ByteArrayManager extends AbstractManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(ByteArrayEntity.class, "deleteByteArraysByRemovalTime",
-        new ListQueryParameterObject(parameters, 0, batchSize));
+    return getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class,
+        "deleteByteArraysByRemovalTime", new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
 }

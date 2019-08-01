@@ -23,9 +23,8 @@ import org.camunda.bpm.engine.authorization.Resource;
  *
  */
 public enum TestResource implements Resource {
-  RESOURCE1("resource1", 100),
-  RESOURCE2("resource2", 101);
-  
+  RESOURCE1("resource1", 100), RESOURCE2("resource2", 101);
+
   protected int id;
   protected String name;
 

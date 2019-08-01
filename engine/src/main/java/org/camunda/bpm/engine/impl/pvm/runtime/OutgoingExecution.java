@@ -42,7 +42,7 @@ public class OutgoingExecution {
     if (outgoingExecution.getReplacedBy() != null) {
       outgoingExecution = outgoingExecution.getReplacedBy();
     }
-    if(!outgoingExecution.isEnded()) {
+    if (!outgoingExecution.isEnded()) {
       outgoingExecution.take();
     } else {
       LOG.notTakingTranistion(outgoingTransition);

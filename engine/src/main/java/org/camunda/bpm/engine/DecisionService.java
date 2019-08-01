@@ -49,10 +49,11 @@ public interface DecisionService {
    *           when the given decision definition id is null.
    *
    * @throws AuthorizationException
-   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
-   *           on {@link Resources#DECISION_DEFINITION}.
+   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission on
+   *           {@link Resources#DECISION_DEFINITION}.
    */
-  DmnDecisionTableResult evaluateDecisionTableById(String decisionDefinitionId, Map<String, Object> variables);
+  DmnDecisionTableResult evaluateDecisionTableById(String decisionDefinitionId,
+      Map<String, Object> variables);
 
   /**
    * Evaluates the decision with the given key in the latest version.
@@ -70,42 +71,41 @@ public interface DecisionService {
    *           when the given decision definition key is null.
    *
    * @throws AuthorizationException
-   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
-   *           on {@link Resources#DECISION_DEFINITION}.
+   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission on
+   *           {@link Resources#DECISION_DEFINITION}.
    */
-  DmnDecisionTableResult evaluateDecisionTableByKey(String decisionDefinitionKey, Map<String, Object> variables);
+  DmnDecisionTableResult evaluateDecisionTableByKey(String decisionDefinitionKey,
+      Map<String, Object> variables);
 
   /**
-   * Evaluates the decision with the given key in the specified version. If no
-   * version is provided then the latest version of the decision definition is
-   * taken.
+   * Evaluates the decision with the given key in the specified version. If no version is provided
+   * then the latest version of the decision definition is taken.
    *
    * @param decisionDefinitionKey
    *          the key of the decision definition, cannot be null.
    * @param version
-   *          the version of the decision definition. If <code>null</code> then
-   *          the latest version is taken.
+   *          the version of the decision definition. If <code>null</code> then the latest version
+   *          is taken.
    * @param variables
    *          the input values of the decision.
    * @return the result of the evaluation.
    *
    * @throws NotFoundException
-   *           when no decision definition is deployed with the given key and
-   *           version.
+   *           when no decision definition is deployed with the given key and version.
    *
    * @throws NotValidException
    *           when the given decision definition key is null.
    *
    * @throws AuthorizationException
-   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
-   *           on {@link Resources#DECISION_DEFINITION}.
+   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission on
+   *           {@link Resources#DECISION_DEFINITION}.
    */
-  DmnDecisionTableResult evaluateDecisionTableByKeyAndVersion(String decisionDefinitionKey, Integer version, Map<String, Object> variables);
+  DmnDecisionTableResult evaluateDecisionTableByKeyAndVersion(String decisionDefinitionKey,
+      Integer version, Map<String, Object> variables);
 
   /**
-   * Returns a fluent builder to evaluate the decision table with the given key.
-   * The builder can be used to set further properties and specify evaluation
-   * instructions.
+   * Returns a fluent builder to evaluate the decision table with the given key. The builder can be
+   * used to set further properties and specify evaluation instructions.
    *
    * @param decisionDefinitionKey
    *          the key of the decision definition, cannot be <code>null</code>.
@@ -117,9 +117,8 @@ public interface DecisionService {
   DecisionEvaluationBuilder evaluateDecisionTableByKey(String decisionDefinitionKey);
 
   /**
-   * Returns a fluent builder to evaluate the decision table with the given id.
-   * The builder can be used to set further properties and specify evaluation
-   * instructions.
+   * Returns a fluent builder to evaluate the decision table with the given id. The builder can be
+   * used to set further properties and specify evaluation instructions.
    *
    * @param decisionDefinitionId
    *          the id of the decision definition, cannot be <code>null<code>.
@@ -131,9 +130,8 @@ public interface DecisionService {
   DecisionEvaluationBuilder evaluateDecisionTableById(String decisionDefinitionId);
 
   /**
-   * Returns a fluent builder to evaluate the decision with the given key.
-   * The builder can be used to set further properties and specify evaluation
-   * instructions.
+   * Returns a fluent builder to evaluate the decision with the given key. The builder can be used
+   * to set further properties and specify evaluation instructions.
    *
    * @param decisionDefinitionKey
    *          the key of the decision definition, cannot be <code>null</code>.
@@ -143,9 +141,8 @@ public interface DecisionService {
   DecisionsEvaluationBuilder evaluateDecisionByKey(String decisionDefinitionKey);
 
   /**
-   * Returns a fluent builder to evaluate the decision with the given id.
-   * The builder can be used to set further properties and specify evaluation
-   * instructions.
+   * Returns a fluent builder to evaluate the decision with the given id. The builder can be used to
+   * set further properties and specify evaluation instructions.
    *
    * @param decisionDefinitionId
    *          the id of the decision definition, cannot be <code>null<code>.

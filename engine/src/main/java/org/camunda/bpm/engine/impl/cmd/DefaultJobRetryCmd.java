@@ -45,12 +45,9 @@ import org.camunda.bpm.engine.impl.util.ParseUtil;
 public class DefaultJobRetryCmd extends JobRetryCmd {
 
   public static final List<String> SUPPORTED_TYPES = Arrays.asList(
-      TimerExecuteNestedActivityJobHandler.TYPE,
-      TimerCatchIntermediateEventJobHandler.TYPE,
-      TimerStartEventJobHandler.TYPE,
-      TimerStartEventSubprocessJobHandler.TYPE,
-      AsyncContinuationJobHandler.TYPE
-  );
+      TimerExecuteNestedActivityJobHandler.TYPE, TimerCatchIntermediateEventJobHandler.TYPE,
+      TimerStartEventJobHandler.TYPE, TimerStartEventSubprocessJobHandler.TYPE,
+      AsyncContinuationJobHandler.TYPE);
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   public DefaultJobRetryCmd(String jobId, Throwable exception) {
@@ -91,7 +88,8 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
     }
   }
 
-  protected void executeCustomStrategy(CommandContext commandContext, JobEntity job, ActivityImpl activity) throws Exception {
+  protected void executeCustomStrategy(CommandContext commandContext, JobEntity job,
+      ActivityImpl activity) throws Exception {
     FailedJobRetryConfiguration retryConfiguration = getFailedJobRetryConfiguration(job, activity);
 
     if (retryConfiguration == null) {
@@ -109,7 +107,8 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
 
       List<String> intervals = retryConfiguration.getRetryIntervals();
       int intervalsCount = intervals.size();
-      int indexOfInterval = Math.max(0, Math.min(intervalsCount - 1, intervalsCount - (job.getRetries() - 1)));
+      int indexOfInterval = Math.max(0,
+          Math.min(intervalsCount - 1, intervalsCount - (job.getRetries() - 1)));
       DurationHelper durationHelper = getDurationHelper(intervals.get(indexOfInterval));
       job.setLockExpirationTime(durationHelper.getDateAfter());
 
@@ -124,9 +123,10 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
     ActivityImpl activity = null;
 
     if (SUPPORTED_TYPES.contains(type)) {
-      DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-      ProcessDefinitionEntity processDefinitionEntity =
-          deploymentCache.findDeployedProcessDefinitionById(job.getProcessDefinitionId());
+      DeploymentCache deploymentCache = Context.getProcessEngineConfiguration()
+          .getDeploymentCache();
+      ProcessDefinitionEntity processDefinitionEntity = deploymentCache
+          .findDeployedProcessDefinitionById(job.getProcessDefinitionId());
       activity = processDefinitionEntity.findActivity(job.getActivityId());
 
     } else {
@@ -137,13 +137,13 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
   }
 
   protected ExecutionEntity fetchExecutionEntity(String executionId) {
-    return Context.getCommandContext()
-                  .getExecutionManager()
-                  .findExecutionById(executionId);
+    return Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
   }
 
-  protected FailedJobRetryConfiguration getFailedJobRetryConfiguration(JobEntity job, ActivityImpl activity) {
-    FailedJobRetryConfiguration retryConfiguration = activity.getProperties().get(DefaultFailedJobParseListener.FAILED_JOB_CONFIGURATION);
+  protected FailedJobRetryConfiguration getFailedJobRetryConfiguration(JobEntity job,
+      ActivityImpl activity) {
+    FailedJobRetryConfiguration retryConfiguration = activity.getProperties()
+        .get(DefaultFailedJobParseListener.FAILED_JOB_CONFIGURATION);
 
     while (retryConfiguration != null && retryConfiguration.getExpression() != null) {
       String retryIntervals = getFailedJobRetryTimeCycle(job, retryConfiguration.getExpression());
@@ -169,17 +169,14 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
     }
 
     try {
-       value = expression.getValue(execution, execution);
-    }
-    catch (Exception e) {
+      value = expression.getValue(execution, execution);
+    } catch (Exception e) {
       LOG.exceptionWhileParsingExpression(jobId, e.getCause().getMessage());
     }
 
     if (value instanceof String) {
       return (String) value;
-    }
-    else
-    {
+    } else {
       // default behavior
       return null;
     }

@@ -48,13 +48,16 @@ public class HistoricBatchManager extends AbstractManager {
 
   public long findBatchCountByQueryCriteria(HistoricBatchQueryImpl historicBatchQuery) {
     configureQuery(historicBatchQuery);
-    return (Long) getDbEntityManager().selectOne("selectHistoricBatchCountByQueryCriteria", historicBatchQuery);
+    return (Long) getDbEntityManager().selectOne("selectHistoricBatchCountByQueryCriteria",
+        historicBatchQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricBatch> findBatchesByQueryCriteria(HistoricBatchQueryImpl historicBatchQuery, Page page) {
+  public List<HistoricBatch> findBatchesByQueryCriteria(HistoricBatchQueryImpl historicBatchQuery,
+      Page page) {
     configureQuery(historicBatchQuery);
-    return getDbEntityManager().selectList("selectHistoricBatchesByQueryCriteria", historicBatchQuery, page);
+    return getDbEntityManager().selectList("selectHistoricBatchesByQueryCriteria",
+        historicBatchQuery, page);
   }
 
   public HistoricBatchEntity findHistoricBatchById(String batchId) {
@@ -62,11 +65,13 @@ public class HistoricBatchManager extends AbstractManager {
   }
 
   public HistoricBatchEntity findHistoricBatchByJobId(String jobId) {
-    return (HistoricBatchEntity) getDbEntityManager().selectOne("selectHistoricBatchByJobId", jobId);
+    return (HistoricBatchEntity) getDbEntityManager().selectOne("selectHistoricBatchByJobId",
+        jobId);
   }
 
   @SuppressWarnings("unchecked")
-  public List<String> findHistoricBatchIdsForCleanup(Integer batchSize, Map<String, Integer> batchOperationsForHistoryCleanup, int minuteFrom, int minuteTo) {
+  public List<String> findHistoricBatchIdsForCleanup(Integer batchSize,
+      Map<String, Integer> batchOperationsForHistoryCleanup, int minuteFrom, int minuteTo) {
     Map<String, Object> queryParameters = new HashMap<String, Object>();
     queryParameters.put("currentTimestamp", ClockUtil.getCurrentTime());
     queryParameters.put("map", batchOperationsForHistoryCleanup);
@@ -74,10 +79,13 @@ public class HistoricBatchManager extends AbstractManager {
       queryParameters.put("minuteFrom", minuteFrom);
       queryParameters.put("minuteTo", minuteTo);
     }
-    ListQueryParameterObject parameterObject = new ListQueryParameterObject(queryParameters, 0, batchSize);
-    parameterObject.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("END_TIME_"), Direction.ASCENDING));
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject(queryParameters, 0,
+        batchSize);
+    parameterObject.getOrderingProperties()
+        .add(new QueryOrderingProperty(new QueryPropertyImpl("END_TIME_"), Direction.ASCENDING));
 
-    return (List<String>) getDbEntityManager().selectList("selectHistoricBatchIdsForCleanup", parameterObject);
+    return (List<String>) getDbEntityManager().selectList("selectHistoricBatchIdsForCleanup",
+        parameterObject);
   }
 
   public void deleteHistoricBatchById(String id) {
@@ -90,7 +98,8 @@ public class HistoricBatchManager extends AbstractManager {
     commandContext.getHistoricIncidentManager().deleteHistoricIncidentsByBatchId(historicBatchIds);
     commandContext.getHistoricJobLogManager().deleteHistoricJobLogByBatchIds(historicBatchIds);
 
-    getDbEntityManager().deletePreserveOrder(HistoricBatchEntity.class, "deleteHistoricBatchByIds", historicBatchIds);
+    getDbEntityManager().deletePreserveOrder(HistoricBatchEntity.class, "deleteHistoricBatchByIds",
+        historicBatchIds);
 
   }
 
@@ -98,7 +107,7 @@ public class HistoricBatchManager extends AbstractManager {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = configuration.getHistoryLevel();
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.BATCH_START, batch)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.BATCH_START, batch)) {
 
       HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
         @Override
@@ -113,7 +122,7 @@ public class HistoricBatchManager extends AbstractManager {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = configuration.getHistoryLevel();
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.BATCH_END, batch)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.BATCH_END, batch)) {
 
       HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
         @Override
@@ -130,28 +139,37 @@ public class HistoricBatchManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<CleanableHistoricBatchReportResult> findCleanableHistoricBatchesReportByCriteria(CleanableHistoricBatchReportImpl query, Page page, Map<String, Integer> batchOperationsForHistoryCleanup) {
+  public List<CleanableHistoricBatchReportResult> findCleanableHistoricBatchesReportByCriteria(
+      CleanableHistoricBatchReportImpl query, Page page,
+      Map<String, Integer> batchOperationsForHistoryCleanup) {
     query.setCurrentTimestamp(ClockUtil.getCurrentTime());
     query.setParameter(batchOperationsForHistoryCleanup);
-    query.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("TYPE_"), Direction.ASCENDING));
+    query.getOrderingProperties()
+        .add(new QueryOrderingProperty(new QueryPropertyImpl("TYPE_"), Direction.ASCENDING));
     if (batchOperationsForHistoryCleanup.isEmpty()) {
-      return getDbEntityManager().selectList("selectOnlyFinishedBatchesReportEntities", query, page);
+      return getDbEntityManager().selectList("selectOnlyFinishedBatchesReportEntities", query,
+          page);
     } else {
       return getDbEntityManager().selectList("selectFinishedBatchesReportEntities", query, page);
     }
   }
 
-  public long findCleanableHistoricBatchesReportCountByCriteria(CleanableHistoricBatchReportImpl query, Map<String, Integer> batchOperationsForHistoryCleanup) {
+  public long findCleanableHistoricBatchesReportCountByCriteria(
+      CleanableHistoricBatchReportImpl query,
+      Map<String, Integer> batchOperationsForHistoryCleanup) {
     query.setCurrentTimestamp(ClockUtil.getCurrentTime());
     query.setParameter(batchOperationsForHistoryCleanup);
     if (batchOperationsForHistoryCleanup.isEmpty()) {
-      return (Long) getDbEntityManager().selectOne("selectOnlyFinishedBatchesReportEntitiesCount", query);
+      return (Long) getDbEntityManager().selectOne("selectOnlyFinishedBatchesReportEntitiesCount",
+          query);
     } else {
-      return (Long) getDbEntityManager().selectOne("selectFinishedBatchesReportEntitiesCount", query);
+      return (Long) getDbEntityManager().selectOne("selectFinishedBatchesReportEntitiesCount",
+          query);
     }
   }
 
-  public DbOperation deleteHistoricBatchesByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteHistoricBatchesByRemovalTime(Date removalTime, int minuteFrom,
+      int minuteTo, int batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -160,26 +178,25 @@ public class HistoricBatchManager extends AbstractManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(HistoricBatchEntity.class, "deleteHistoricBatchesByRemovalTime",
+    return getDbEntityManager().deletePreserveOrder(HistoricBatchEntity.class,
+        "deleteHistoricBatchesByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
   public void addRemovalTimeById(String id, Date removalTime) {
     CommandContext commandContext = Context.getCommandContext();
 
-    commandContext.getHistoricIncidentManager()
-      .addRemovalTimeToHistoricIncidentsByBatchId(id, removalTime);
+    commandContext.getHistoricIncidentManager().addRemovalTimeToHistoricIncidentsByBatchId(id,
+        removalTime);
 
-    commandContext.getHistoricJobLogManager()
-      .addRemovalTimeToJobLogByBatchId(id, removalTime);
+    commandContext.getHistoricJobLogManager().addRemovalTimeToJobLogByBatchId(id, removalTime);
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("id", id);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricBatchEntity.class, "updateHistoricBatchRemovalTimeById", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricBatchEntity.class,
+        "updateHistoricBatchRemovalTimeById", parameters);
   }
 
 }

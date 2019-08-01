@@ -34,7 +34,8 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
  * @author Ingo Richtsmeier
  *
  */
-public class HistoricDecisionInstanceEntity extends HistoryEvent implements HistoricDecisionInstance {
+public class HistoricDecisionInstanceEntity extends HistoryEvent
+    implements HistoricDecisionInstance {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -127,7 +128,7 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
 
   @Override
   public List<HistoricDecisionInputInstance> getInputs() {
-    if(inputs != null) {
+    if (inputs != null) {
       return inputs;
     } else {
       throw LOG.historicDecisionInputInstancesNotFetchedException();
@@ -136,7 +137,7 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
 
   @Override
   public List<HistoricDecisionOutputInstance> getOutputs() {
-    if(outputs != null) {
+    if (outputs != null) {
       return outputs;
     } else {
       throw LOG.historicDecisionOutputInstancesNotFetchedException();
@@ -152,21 +153,18 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
   }
 
   public void delete() {
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .delete(this);
+    Context.getCommandContext().getDbEntityManager().delete(this);
   }
 
   public void addInput(HistoricDecisionInputInstance decisionInputInstance) {
-    if(inputs == null) {
+    if (inputs == null) {
       inputs = new ArrayList<HistoricDecisionInputInstance>();
     }
     inputs.add(decisionInputInstance);
   }
 
   public void addOutput(HistoricDecisionOutputInstance decisionOutputInstance) {
-    if(outputs == null) {
+    if (outputs == null) {
       outputs = new ArrayList<HistoricDecisionOutputInstance>();
     }
     outputs.add(decisionOutputInstance);

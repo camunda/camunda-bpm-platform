@@ -37,12 +37,10 @@ import org.camunda.bpm.engine.impl.util.io.UrlStreamSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-
 /**
  * @author Tom Baeyens
  */
 public class Parse extends DefaultHandler {
-
 
   private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
@@ -74,7 +72,7 @@ public class Parse extends DefaultHandler {
   }
 
   public Parse sourceInputStream(InputStream inputStream) {
-    if (name==null) {
+    if (name == null) {
       name("inputStream");
     }
     setStreamSource(new InputStreamSource(inputStream));
@@ -86,7 +84,7 @@ public class Parse extends DefaultHandler {
   }
 
   public Parse sourceUrl(URL url) {
-    if (name==null) {
+    if (name == null) {
       name(url.toString());
     }
     setStreamSource(new UrlStreamSource(url));
@@ -102,7 +100,7 @@ public class Parse extends DefaultHandler {
   }
 
   public Parse sourceResource(String resource, ClassLoader classLoader) {
-    if (name==null) {
+    if (name == null) {
       name(resource);
     }
     setStreamSource(new ResourceStreamSource(resource, classLoader));
@@ -110,7 +108,7 @@ public class Parse extends DefaultHandler {
   }
 
   public Parse sourceString(String string) {
-    if (name==null) {
+    if (name == null) {
       name("string");
     }
     setStreamSource(new StringStreamSource(string));
@@ -123,7 +121,7 @@ public class Parse extends DefaultHandler {
   }
 
   protected void setStreamSource(StreamSource streamSource) {
-    if (this.streamSource!=null) {
+    if (this.streamSource != null) {
       throw LOG.multipleSourcesException(this.streamSource, streamSource);
     }
     this.streamSource = streamSource;
@@ -166,11 +164,11 @@ public class Parse extends DefaultHandler {
   }
 
   /*
-   * JAXP allows users to override the default value via system properties and
-   * a central properties file (see https://docs.oracle.com/javase/tutorial/jaxp/properties/scope.html).
-   * However, both are overridden by an explicit configuration in code, as we apply it.
-   * Since we want users to customize the value, we take the system property into account.
-   * The properties file is not supported at the moment.
+   * JAXP allows users to override the default value via system properties and a central properties
+   * file (see https://docs.oracle.com/javase/tutorial/jaxp/properties/scope.html). However, both
+   * are overridden by an explicit configuration in code, as we apply it. Since we want users to
+   * customize the value, we take the system property into account. The properties file is not
+   * supported at the moment.
    */
   protected String resolveAccessExternalSchemaProperty() {
     String systemProperty = System.getProperty(JAXP_ACCESS_EXTERNAL_SCHEMA_SYSTEM_PROPERTY);
@@ -242,8 +240,7 @@ public class Parse extends DefaultHandler {
     saxParserFactory.setValidating(true);
     try {
       saxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       LOG.unableToSetSchemaResource(e);
     }
     this.schemaResource = schemaResource;

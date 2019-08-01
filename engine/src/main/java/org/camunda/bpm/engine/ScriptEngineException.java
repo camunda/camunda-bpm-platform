@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine;
 
 /**
- * <p>Base exception resulting from a script engine interaction.</p>
+ * <p>
+ * Base exception resulting from a script engine interaction.
+ * </p>
  *
  * @author Sebastian Menski
  */

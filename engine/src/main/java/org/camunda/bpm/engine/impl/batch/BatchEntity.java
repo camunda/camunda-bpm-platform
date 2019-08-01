@@ -203,7 +203,8 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   public JobDefinitionEntity getSeedJobDefinition() {
     if (seedJobDefinition == null && seedJobDefinitionId != null) {
-      seedJobDefinition = Context.getCommandContext().getJobDefinitionManager().findById(seedJobDefinitionId);
+      seedJobDefinition = Context.getCommandContext().getJobDefinitionManager()
+          .findById(seedJobDefinitionId);
     }
 
     return seedJobDefinition;
@@ -211,7 +212,8 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   public JobDefinitionEntity getMonitorJobDefinition() {
     if (monitorJobDefinition == null && monitorJobDefinitionId != null) {
-      monitorJobDefinition = Context.getCommandContext().getJobDefinitionManager().findById(monitorJobDefinitionId);
+      monitorJobDefinition = Context.getCommandContext().getJobDefinitionManager()
+          .findById(monitorJobDefinitionId);
     }
 
     return monitorJobDefinition;
@@ -219,7 +221,8 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   public JobDefinitionEntity getBatchJobDefinition() {
     if (batchJobDefinition == null && batchJobDefinitionId != null) {
-      batchJobDefinition = Context.getCommandContext().getJobDefinitionManager().findById(batchJobDefinitionId);
+      batchJobDefinition = Context.getCommandContext().getJobDefinitionManager()
+          .findById(batchJobDefinitionId);
     }
 
     return batchJobDefinition;
@@ -235,7 +238,8 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   public BatchJobHandler<?> getBatchJobHandler() {
     if (batchJobHandler == null) {
-      batchJobHandler = Context.getCommandContext().getProcessEngineConfiguration().getBatchHandlers().get(type);
+      batchJobHandler = Context.getCommandContext().getProcessEngineConfiguration()
+          .getBatchHandlers().get(type);
     }
 
     return batchJobHandler;
@@ -293,9 +297,8 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
   }
 
   public void deleteSeedJob() {
-    List<JobEntity> seedJobs = Context.getCommandContext()
-      .getJobManager()
-      .findJobsByJobDefinitionId(seedJobDefinitionId);
+    List<JobEntity> seedJobs = Context.getCommandContext().getJobManager()
+        .findJobsByJobDefinitionId(seedJobDefinitionId);
 
     for (JobEntity job : seedJobs) {
       job.delete();
@@ -309,24 +312,20 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
       monitorJob.setDuedate(calculateMonitorJobDueDate());
     }
 
-    Context.getCommandContext()
-      .getJobManager().insertAndHintJobExecutor(monitorJob);
+    Context.getCommandContext().getJobManager().insertAndHintJobExecutor(monitorJob);
 
     return monitorJob;
   }
 
   protected Date calculateMonitorJobDueDate() {
-    int pollTime = Context.getCommandContext()
-      .getProcessEngineConfiguration()
-      .getBatchPollTime();
+    int pollTime = Context.getCommandContext().getProcessEngineConfiguration().getBatchPollTime();
     long dueTime = ClockUtil.getCurrentTime().getTime() + (pollTime * 1000);
     return new Date(dueTime);
   }
 
   public void deleteMonitorJob() {
-    List<JobEntity> monitorJobs = Context.getCommandContext()
-      .getJobManager()
-      .findJobsByJobDefinitionId(monitorJobDefinitionId);
+    List<JobEntity> monitorJobs = Context.getCommandContext().getJobManager()
+        .findJobsByJobDefinitionId(monitorJobDefinitionId);
 
     for (JobEntity monitorJob : monitorJobs) {
       monitorJob.delete();
@@ -366,39 +365,26 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
   }
 
   public void fireHistoricStartEvent() {
-    Context.getCommandContext()
-      .getHistoricBatchManager()
-      .createHistoricBatch(this);
+    Context.getCommandContext().getHistoricBatchManager().createHistoricBatch(this);
   }
 
   public void fireHistoricEndEvent() {
-    Context.getCommandContext()
-      .getHistoricBatchManager()
-      .completeHistoricBatch(this);
+    Context.getCommandContext().getHistoricBatchManager().completeHistoricBatch(this);
   }
 
   public boolean isCompleted() {
-    return Context.getCommandContext().getProcessEngineConfiguration()
-      .getManagementService()
-      .createJobQuery()
-      .jobDefinitionId(batchJobDefinitionId)
-      .count() == 0;
+    return Context.getCommandContext().getProcessEngineConfiguration().getManagementService()
+        .createJobQuery().jobDefinitionId(batchJobDefinitionId).count() == 0;
   }
 
   public String toString() {
-    return "BatchEntity{" +
-      "batchHandler=" + batchJobHandler +
-      ", id='" + id + '\'' +
-      ", type='" + type + '\'' +
-      ", size=" + totalJobs +
-      ", jobCreated=" + jobsCreated +
-      ", batchJobsPerSeed=" + batchJobsPerSeed +
-      ", invocationsPerBatchJob=" + invocationsPerBatchJob +
-      ", seedJobDefinitionId='" + seedJobDefinitionId + '\'' +
-      ", monitorJobDefinitionId='" + seedJobDefinitionId + '\'' +
-      ", batchJobDefinitionId='" + batchJobDefinitionId + '\'' +
-      ", configurationId='" + configuration.getByteArrayId() + '\'' +
-      '}';
+    return "BatchEntity{" + "batchHandler=" + batchJobHandler + ", id='" + id + '\'' + ", type='"
+        + type + '\'' + ", size=" + totalJobs + ", jobCreated=" + jobsCreated
+        + ", batchJobsPerSeed=" + batchJobsPerSeed + ", invocationsPerBatchJob="
+        + invocationsPerBatchJob + ", seedJobDefinitionId='" + seedJobDefinitionId + '\''
+        + ", monitorJobDefinitionId='" + seedJobDefinitionId + '\'' + ", batchJobDefinitionId='"
+        + batchJobDefinitionId + '\'' + ", configurationId='" + configuration.getByteArrayId()
+        + '\'' + '}';
   }
 
   @Override

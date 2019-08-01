@@ -42,8 +42,10 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
 
   @Override
   public void setUp() throws Exception {
-    processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
-    processEngineConfiguration.getJobHandlers().put(nestedCommandExceptionHandler.getType(), nestedCommandExceptionHandler);
+    processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(),
+        tweetExceptionHandler);
+    processEngineConfiguration.getJobHandlers().put(nestedCommandExceptionHandler.getType(),
+        nestedCommandExceptionHandler);
   }
 
   @Override
@@ -90,7 +92,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     tweetExceptionHandler.setExceptionsRemaining(600);
 
     // create 40 jobs
-    for(int i = 0; i < 40; i++) {
+    for (int i = 0; i < 40; i++) {
       createJob(TweetExceptionHandler.TYPE);
     }
 
@@ -134,7 +136,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     assertEquals(0, job.getRetries());
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/jobexecutor/jobFailingOnFlush.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/jobFailingOnFlush.bpmn20.xml")
   public void testJobRetriesDecrementedOnFailedFlush() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -157,13 +159,9 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
 
   public void testFailingTransactionListener() {
 
-    deployment(Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .serviceTask()
-          .camundaClass(FailingTransactionListenerDelegate.class.getName())
-          .camundaAsyncBefore()
-        .endEvent()
-        .done());
+    deployment(Bpmn.createExecutableProcess("testProcess").startEvent().serviceTask()
+        .camundaClass(FailingTransactionListenerDelegate.class.getName()).camundaAsyncBefore()
+        .endEvent().done());
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -185,7 +183,8 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
 
     String stacktrace = managementService.getJobExceptionStacktrace(job.getId());
     assertNotNull(stacktrace);
-    assertTrue("unexpected stacktrace, was <" + stacktrace + ">", stacktrace.contains("java.lang.RuntimeException: exception in transaction listener"));
+    assertTrue("unexpected stacktrace, was <" + stacktrace + ">",
+        stacktrace.contains("java.lang.RuntimeException: exception in transaction listener"));
   }
 
   protected void createJob(final String handlerType) {
@@ -209,36 +208,26 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        List<Job> jobs = processEngineConfiguration
-            .getManagementService()
-            .createJobQuery()
-            .list();
+        List<Job> jobs = processEngineConfiguration.getManagementService().createJobQuery().list();
 
         for (Job job : jobs) {
           new DeleteJobCmd(job.getId()).execute(commandContext);
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
         }
 
-        List<HistoricIncident> historicIncidents = processEngineConfiguration
-            .getHistoryService()
-            .createHistoricIncidentQuery()
-            .list();
+        List<HistoricIncident> historicIncidents = processEngineConfiguration.getHistoryService()
+            .createHistoricIncidentQuery().list();
 
         for (HistoricIncident historicIncident : historicIncidents) {
-          commandContext
-            .getDbEntityManager()
-            .delete((DbEntity) historicIncident);
+          commandContext.getDbEntityManager().delete((DbEntity) historicIncident);
         }
 
-        List<HistoricJobLog> historicJobLogs = processEngineConfiguration
-            .getHistoryService()
-            .createHistoricJobLogQuery()
-            .list();
+        List<HistoricJobLog> historicJobLogs = processEngineConfiguration.getHistoryService()
+            .createHistoricJobLogQuery().list();
 
         for (HistoricJobLog historicJobLog : historicJobLogs) {
-          commandContext
-            .getHistoricJobLogManager()
-            .deleteHistoricJobLogById(historicJobLog.getId());
+          commandContext.getHistoricJobLogManager()
+              .deleteHistoricJobLogById(historicJobLog.getId());
         }
 
         return null;

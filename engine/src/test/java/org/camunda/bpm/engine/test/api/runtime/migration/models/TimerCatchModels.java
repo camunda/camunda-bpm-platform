@@ -25,23 +25,11 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 public class TimerCatchModels {
 
   public static final BpmnModelInstance ONE_TIMER_CATCH_PROCESS = ProcessModels.newModel()
-    .startEvent()
-    .intermediateCatchEvent("timerCatch")
-      .timerWithDuration("PT10M")
-    .userTask("userTask")
-    .endEvent()
-    .done();
+      .startEvent().intermediateCatchEvent("timerCatch").timerWithDuration("PT10M")
+      .userTask("userTask").endEvent().done();
 
   public static final BpmnModelInstance SUBPROCESS_TIMER_CATCH_PROCESS = ProcessModels.newModel()
-      .startEvent()
-      .subProcess("subProcess")
-      .embeddedSubProcess()
-        .startEvent()
-        .intermediateCatchEvent("timerCatch")
-          .timerWithDuration("PT10M")
-        .userTask("userTask")
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+      .startEvent().subProcess("subProcess").embeddedSubProcess().startEvent()
+      .intermediateCatchEvent("timerCatch").timerWithDuration("PT10M").userTask("userTask")
+      .endEvent().subProcessDone().endEvent().done();
 }

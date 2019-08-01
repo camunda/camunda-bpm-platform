@@ -26,40 +26,32 @@ import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
  */
 public class ContextLogger extends ProcessEngineLogger {
 
-  public void debugExecutingAtomicOperation(CoreAtomicOperation<?> executionOperation, CoreExecution execution) {
-    logDebug(
-        "001",
-        "Executing atomic operation {} on {}", executionOperation, execution);
+  public void debugExecutingAtomicOperation(CoreAtomicOperation<?> executionOperation,
+      CoreExecution execution) {
+    logDebug("001", "Executing atomic operation {} on {}", executionOperation, execution);
   }
 
   public void debugException(Throwable throwable) {
-    logDebug(
-        "002",
-        "Exception while closing command context: {}",throwable.getMessage(), throwable);
+    logDebug("002", "Exception while closing command context: {}", throwable.getMessage(),
+        throwable);
   }
 
   public void infoException(Throwable throwable) {
-    logInfo(
-        "003",
-        "Exception while closing command context: {}",throwable.getMessage(), throwable);
+    logInfo("003", "Exception while closing command context: {}", throwable.getMessage(),
+        throwable);
   }
 
   public void errorException(Throwable throwable) {
-    logError(
-        "004",
-        "Exception while closing command context: {}",throwable.getMessage(), throwable);
+    logError("004", "Exception while closing command context: {}", throwable.getMessage(),
+        throwable);
   }
 
   public void exceptionWhileInvokingOnCommandFailed(Throwable t) {
-    logError(
-        "005",
-        "Exception while invoking onCommandFailed()", t);
+    logError("005", "Exception while invoking onCommandFailed()", t);
   }
 
   public void bpmnStackTrace(String string) {
-    logError(
-        "006",
-        string);
+    logError("006", string);
   }
 
 }

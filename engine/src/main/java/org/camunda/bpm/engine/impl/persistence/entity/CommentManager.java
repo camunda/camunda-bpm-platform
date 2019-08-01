@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -59,7 +58,8 @@ public class CommentManager extends AbstractHistoricManager {
 
     ListQueryParameterObject query = new ListQueryParameterObject();
     query.setParameter(taskId);
-    query.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("TIME_"), Direction.DESCENDING));
+    query.getOrderingProperties()
+        .add(new QueryOrderingProperty(new QueryPropertyImpl("TIME_"), Direction.DESCENDING));
 
     return getDbEntityManager().selectList("selectEventsByTaskId", query);
   }
@@ -88,7 +88,8 @@ public class CommentManager extends AbstractHistoricManager {
   }
 
   protected void deleteComments(Map<String, Object> parameters) {
-    getDbEntityManager().deletePreserveOrder(CommentEntity.class, "deleteCommentsByIds", parameters);
+    getDbEntityManager().deletePreserveOrder(CommentEntity.class, "deleteCommentsByIds",
+        parameters);
   }
 
   @SuppressWarnings("unchecked")
@@ -104,28 +105,32 @@ public class CommentManager extends AbstractHistoricManager {
     parameters.put("taskId", taskId);
     parameters.put("id", commentId);
 
-    return (CommentEntity) getDbEntityManager().selectOne("selectCommentByTaskIdAndCommentId", parameters);
+    return (CommentEntity) getDbEntityManager().selectOne("selectCommentByTaskIdAndCommentId",
+        parameters);
   }
 
-  public void addRemovalTimeToCommentsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToCommentsByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(CommentEntity.class, "updateCommentsByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(CommentEntity.class,
+        "updateCommentsByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToCommentsByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public void addRemovalTimeToCommentsByProcessInstanceId(String processInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(CommentEntity.class, "updateCommentsByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(CommentEntity.class,
+        "updateCommentsByProcessInstanceId", parameters);
   }
 
-  public DbOperation deleteCommentsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteCommentsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo,
+      int batchSize) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -134,9 +139,8 @@ public class CommentManager extends AbstractHistoricManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(CommentEntity.class, "deleteCommentsByRemovalTime",
-        new ListQueryParameterObject(parameters, 0, batchSize));
+    return getDbEntityManager().deletePreserveOrder(CommentEntity.class,
+        "deleteCommentsByRemovalTime", new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
 }

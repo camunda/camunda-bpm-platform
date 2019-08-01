@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.util.io;
 
 import java.io.InputStream;
 
-
 /**
  * @author Tom Baeyens
  */

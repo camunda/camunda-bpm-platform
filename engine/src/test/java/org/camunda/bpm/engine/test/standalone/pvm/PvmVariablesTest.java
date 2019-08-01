@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
 import org.junit.Test;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -35,13 +34,9 @@ public class PvmVariablesTest extends PvmTestCase {
 
   @Test
   public void testVariables() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("a")
-        .initial()
-        .behavior(new WaitState())
-      .endActivity()
-    .buildProcessDefinition();
-      
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("a")
+        .initial().behavior(new WaitState()).endActivity().buildProcessDefinition();
+
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.setVariable("amount", 500L);
     processInstance.setVariable("msg", "hello world");
@@ -53,7 +48,7 @@ public class PvmVariablesTest extends PvmTestCase {
     PvmExecution activityInstance = processInstance.findExecution("a");
     assertEquals(500L, activityInstance.getVariable("amount"));
     assertEquals("hello world", activityInstance.getVariable("msg"));
-    
+
     Map<String, Object> expectedVariables = new HashMap<String, Object>();
     expectedVariables.put("amount", 500L);
     expectedVariables.put("msg", "hello world");

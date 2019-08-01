@@ -34,25 +34,25 @@ import org.camunda.bpm.engine.history.DurationReportResult;
 public interface Report {
 
   /**
-   * <p>Executes the duration report query and returns a list of
-   * {@link DurationReportResult}s.</p>
+   * <p>
+   * Executes the duration report query and returns a list of {@link DurationReportResult}s.
+   * </p>
    *
-   * <p>Be aware that the resulting report must be interpreted by the
-   * caller itself.</p>
+   * <p>
+   * Be aware that the resulting report must be interpreted by the caller itself.
+   * </p>
    *
-   * @param periodUnit A {@link PeriodUnit period unit} to define
-   *          the granularity of the report.
+   * @param periodUnit
+   *          A {@link PeriodUnit period unit} to define the granularity of the report.
    *
    * @return a list of {@link DurationReportResult}s
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ_HISTORY} permission
-   *          on any {@link Resources#PROCESS_DEFINITION}.
+   *           If the user has no {@link Permissions#READ_HISTORY} permission on any
+   *           {@link Resources#PROCESS_DEFINITION}.
    * @throws NotValidException
-   *          When the given period unit is null.
+   *           When the given period unit is null.
    */
   List<DurationReportResult> duration(PeriodUnit periodUnit);
 
 }
-
-

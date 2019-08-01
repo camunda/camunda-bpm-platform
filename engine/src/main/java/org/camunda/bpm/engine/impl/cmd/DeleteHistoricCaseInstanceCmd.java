@@ -45,24 +45,27 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
   public Object execute(CommandContext commandContext) {
     ensureNotNull("caseInstanceId", caseInstanceId);
     // Check if case instance is still running
-    HistoricCaseInstance instance = commandContext
-      .getHistoricCaseInstanceManager()
-      .findHistoricCaseInstance(caseInstanceId);
+    HistoricCaseInstance instance = commandContext.getHistoricCaseInstanceManager()
+        .findHistoricCaseInstance(caseInstanceId);
 
-    ensureNotNull("No historic case instance found with id: " + caseInstanceId, "instance", instance);
+    ensureNotNull("No historic case instance found with id: " + caseInstanceId, "instance",
+        instance);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkDeleteHistoricCaseInstance(instance);
     }
 
-    ensureNotNull("Case instance is still running, cannot delete historic case instance: " + caseInstanceId, "instance.getCloseTime()", instance.getCloseTime());
-    
-    commandContext.getOperationLogManager().logCaseInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, 
-        caseInstanceId, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+    ensureNotNull(
+        "Case instance is still running, cannot delete historic case instance: " + caseInstanceId,
+        "instance.getCloseTime()", instance.getCloseTime());
 
-    commandContext
-      .getHistoricCaseInstanceManager()
-      .deleteHistoricCaseInstancesByIds(Arrays.asList(caseInstanceId));
+    commandContext.getOperationLogManager().logCaseInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, caseInstanceId,
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+
+    commandContext.getHistoricCaseInstanceManager()
+        .deleteHistoricCaseInstancesByIds(Arrays.asList(caseInstanceId));
 
     return null;
   }

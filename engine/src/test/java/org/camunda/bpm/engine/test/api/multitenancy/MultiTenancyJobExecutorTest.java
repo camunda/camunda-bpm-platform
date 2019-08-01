@@ -54,14 +54,9 @@ public class MultiTenancyJobExecutorTest {
 
   @Test
   public void setAuthenticatedTenantForTimerStartEvent() {
-    testRule.deployForTenant(TENANT_ID, Bpmn.createExecutableProcess("process")
-        .startEvent()
-          .timerWithDuration("PT1M")
-        .serviceTask()
-          .camundaClass(AssertingJavaDelegate.class.getName())
-        .userTask()
-        .endEvent()
-      .done());
+    testRule.deployForTenant(TENANT_ID,
+        Bpmn.createExecutableProcess("process").startEvent().timerWithDuration("PT1M").serviceTask()
+            .camundaClass(AssertingJavaDelegate.class.getName()).userTask().endEvent().done());
 
     AssertingJavaDelegate.addAsserts(hasAuthenticatedTenantId(TENANT_ID));
 
@@ -73,16 +68,13 @@ public class MultiTenancyJobExecutorTest {
 
   @Test
   public void setAuthenticatedTenantForIntermediateTimerEvent() {
-    testRule.deployForTenant(TENANT_ID, Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .intermediateCatchEvent()
-          .timerWithDuration("PT1M")
-        .serviceTask()
-          .camundaClass(AssertingJavaDelegate.class.getName())
-        .endEvent()
-      .done());
+    testRule.deployForTenant(TENANT_ID,
+        Bpmn.createExecutableProcess("process").startEvent().intermediateCatchEvent()
+            .timerWithDuration("PT1M").serviceTask()
+            .camundaClass(AssertingJavaDelegate.class.getName()).endEvent().done());
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
 
     AssertingJavaDelegate.addAsserts(hasAuthenticatedTenantId(TENANT_ID));
 
@@ -93,15 +85,12 @@ public class MultiTenancyJobExecutorTest {
 
   @Test
   public void setAuthenticatedTenantForAsyncJob() {
-    testRule.deployForTenant(TENANT_ID, Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .serviceTask()
-          .camundaAsyncBefore()
-          .camundaClass(AssertingJavaDelegate.class.getName())
-        .endEvent()
-      .done());
+    testRule.deployForTenant(TENANT_ID,
+        Bpmn.createExecutableProcess("process").startEvent().serviceTask().camundaAsyncBefore()
+            .camundaClass(AssertingJavaDelegate.class.getName()).endEvent().done());
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
 
     AssertingJavaDelegate.addAsserts(hasAuthenticatedTenantId(TENANT_ID));
 
@@ -111,15 +100,12 @@ public class MultiTenancyJobExecutorTest {
 
   @Test
   public void dontSetAuthenticatedTenantForJobWithoutTenant() {
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .serviceTask()
-          .camundaAsyncBefore()
-          .camundaClass(AssertingJavaDelegate.class.getName())
-        .endEvent()
-      .done());
+    testRule.deploy(
+        Bpmn.createExecutableProcess("process").startEvent().serviceTask().camundaAsyncBefore()
+            .camundaClass(AssertingJavaDelegate.class.getName()).endEvent().done());
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
 
     AssertingJavaDelegate.addAsserts(hasNoAuthenticatedTenantId());
 
@@ -129,15 +115,12 @@ public class MultiTenancyJobExecutorTest {
 
   @Test
   public void dontSetAuthenticatedTenantWhileManualJobExecution() {
-    testRule.deployForTenant(TENANT_ID, Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .serviceTask()
-          .camundaAsyncBefore()
-          .camundaClass(AssertingJavaDelegate.class.getName())
-        .endEvent()
-      .done());
+    testRule.deployForTenant(TENANT_ID,
+        Bpmn.createExecutableProcess("process").startEvent().serviceTask().camundaAsyncBefore()
+            .camundaClass(AssertingJavaDelegate.class.getName()).endEvent().done());
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("process");
 
     AssertingJavaDelegate.addAsserts(hasNoAuthenticatedTenantId());
 
@@ -145,7 +128,8 @@ public class MultiTenancyJobExecutorTest {
     testRule.assertProcessEnded(processInstance.getId());
   }
 
-  protected static DelegateExecutionAsserter hasAuthenticatedTenantId(final String expectedTenantId) {
+  protected static DelegateExecutionAsserter hasAuthenticatedTenantId(
+      final String expectedTenantId) {
     return new DelegateExecutionAsserter() {
 
       @Override

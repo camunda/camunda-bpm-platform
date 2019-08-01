@@ -33,7 +33,7 @@ public class ProcessInstanceStartListener extends HistoryExecutionListener {
 
   protected HistoryEvent createHistoryEvent(DelegateExecution execution) {
     ensureHistoryLevelInitialized();
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_START, execution)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_START, execution)) {
       return eventProducer.createProcessInstanceStartEvt(execution);
     } else {
       return null;

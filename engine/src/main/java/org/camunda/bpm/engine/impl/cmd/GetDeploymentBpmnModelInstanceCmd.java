@@ -30,10 +30,8 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
-
 /**
- * Gives access to a deploy BPMN model instance which can be accessed by
- * the BPMN model API.
+ * Gives access to a deploy BPMN model instance which can be accessed by the BPMN model API.
  *
  * @author Sebastian Menski
  */
@@ -44,7 +42,8 @@ public class GetDeploymentBpmnModelInstanceCmd implements Command<BpmnModelInsta
 
   public GetDeploymentBpmnModelInstanceCmd(String processDefinitionId) {
     if (processDefinitionId == null || processDefinitionId.length() < 1) {
-      throw new ProcessEngineException("The process definition id is mandatory, but '" + processDefinitionId + "' has been provided.");
+      throw new ProcessEngineException("The process definition id is mandatory, but '"
+          + processDefinitionId + "' has been provided.");
     }
     this.processDefinitionId = processDefinitionId;
   }
@@ -53,15 +52,19 @@ public class GetDeploymentBpmnModelInstanceCmd implements Command<BpmnModelInsta
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     final DeploymentCache deploymentCache = configuration.getDeploymentCache();
 
-    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+    ProcessDefinitionEntity processDefinition = deploymentCache
+        .findDeployedProcessDefinitionById(processDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessDefinition(processDefinition);
     }
 
-    BpmnModelInstance modelInstance = deploymentCache.findBpmnModelInstanceForProcessDefinition(processDefinitionId);
+    BpmnModelInstance modelInstance = deploymentCache
+        .findBpmnModelInstanceForProcessDefinition(processDefinitionId);
 
-    ensureNotNull("no BPMN model instance found for process definition id " + processDefinitionId, "modelInstance", modelInstance);
+    ensureNotNull("no BPMN model instance found for process definition id " + processDefinitionId,
+        "modelInstance", modelInstance);
     return modelInstance;
   }
 }

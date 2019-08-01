@@ -77,7 +77,7 @@ public class CustomPasswordPolicyTest {
     identityService.saveUser(user);
     thrown.expectMessage("password is null");
   }
-  
+
   @Test
   public void testCustomPasswordPolicyWithCompliantPassword() {
     User user = identityService.newUser("user");

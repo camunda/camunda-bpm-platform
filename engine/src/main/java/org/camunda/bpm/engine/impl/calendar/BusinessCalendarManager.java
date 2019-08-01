@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.calendar;
 
-
 /**
  * @author Tom Baeyens
  */

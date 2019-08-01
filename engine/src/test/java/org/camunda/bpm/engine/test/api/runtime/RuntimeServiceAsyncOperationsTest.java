@@ -48,7 +48,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 
-
 /**
  * @author Askar Akhmerov
  */
@@ -106,15 +105,15 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithList() throws Exception {
     // given
     List<String> processIds = startTestProcesses(2);
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null,
+        TESTING_INSTANCE_DELETE);
 
     executeSeedJob(batch);
     executeBatchJobs(batch);
@@ -125,8 +124,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertProcessInstancesAreDeleted();
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithLargeList() throws Exception {
     // given
@@ -134,7 +132,8 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     List<String> processIds = startTestProcesses(1100);
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null,
+        TESTING_INSTANCE_DELETE);
 
     createAndExecuteSeedJobs(batch.getSeedJobDefinitionId(), 2);
     executeBatchJobs(batch);
@@ -152,8 +151,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     }
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithListOnly() throws Exception {
     // given
@@ -171,8 +169,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertProcessInstancesAreDeleted();
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithFake() throws Exception {
     // given
@@ -180,7 +177,8 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     processIds.add("aFake");
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null,
+        TESTING_INSTANCE_DELETE);
 
     executeSeedJob(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
@@ -196,8 +194,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertProcessInstancesAreDeleted();
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithNullList() throws Exception {
     thrown.expect(ProcessEngineException.class);
@@ -207,28 +204,28 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithEmptyList() throws Exception {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("processInstanceIds is empty");
 
-    runtimeService.deleteProcessInstancesAsync(new ArrayList<String>(), null, TESTING_INSTANCE_DELETE);
+    runtimeService.deleteProcessInstancesAsync(new ArrayList<String>(), null,
+        TESTING_INSTANCE_DELETE);
 
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithQuery() throws Exception {
     // given
     List<String> processIds = startTestProcesses(2);
-    ProcessInstanceQuery processInstanceQuery = runtimeService
-        .createProcessInstanceQuery().processInstanceIds(new HashSet<String>(processIds));
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceIds(new HashSet<String>(processIds));
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(null, processInstanceQuery, TESTING_INSTANCE_DELETE);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(null, processInstanceQuery,
+        TESTING_INSTANCE_DELETE);
 
     executeSeedJob(batch);
     executeBatchJobs(batch);
@@ -239,17 +236,17 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertProcessInstancesAreDeleted();
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithQueryOnly() throws Exception {
     // given
     List<String> processIds = startTestProcesses(2);
-    ProcessInstanceQuery processInstanceQuery = runtimeService
-        .createProcessInstanceQuery().processInstanceIds(new HashSet<String>(processIds));
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceIds(new HashSet<String>(processIds));
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceQuery, TESTING_INSTANCE_DELETE);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceQuery,
+        TESTING_INSTANCE_DELETE);
 
     executeSeedJob(batch);
     executeBatchJobs(batch);
@@ -260,14 +257,13 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertProcessInstancesAreDeleted();
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithQueryWithoutDeleteReason() throws Exception {
     // given
     List<String> processIds = startTestProcesses(2);
-    ProcessInstanceQuery processInstanceQuery = runtimeService
-        .createProcessInstanceQuery().processInstanceIds(new HashSet<String>(processIds));
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceIds(new HashSet<String>(processIds));
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(null, processInstanceQuery, null);
@@ -281,8 +277,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertProcessInstancesAreDeleted();
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithNullQueryParameter() throws Exception {
     thrown.expect(ProcessEngineException.class);
@@ -291,8 +286,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     runtimeService.deleteProcessInstancesAsync(null, null, TESTING_INSTANCE_DELETE);
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
   public void testDeleteProcessInstancesAsyncWithInvalidQueryParameter() throws Exception {
     // given
@@ -317,18 +311,17 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     // given
     IncrementCounterListener.counter = 0;
 
-    BpmnModelInstance instance = ProcessModels.newModel(ONE_TASK_PROCESS)
-        .startEvent()
-        .userTask()
-          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, IncrementCounterListener.class.getName())
-        .endEvent()
-        .done();
+    BpmnModelInstance instance = ProcessModels.newModel(ONE_TASK_PROCESS).startEvent().userTask()
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END,
+            IncrementCounterListener.class.getName())
+        .endEvent().done();
 
     testRule.deploy(instance);
     List<String> processIds = startTestProcesses(1);
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE, true);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null,
+        TESTING_INSTANCE_DELETE, true);
     executeSeedJob(batch);
     executeBatchJobs(batch);
 
@@ -340,32 +333,28 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   public void testDeleteProcessInstancesAsyncWithSkipSubprocesses() {
 
     // given
-    BpmnModelInstance callingInstance = ProcessModels.newModel(ONE_TASK_PROCESS)
-        .startEvent()
-          .callActivity()
-            .calledElement("called")
-        .endEvent()
-        .done();
+    BpmnModelInstance callingInstance = ProcessModels.newModel(ONE_TASK_PROCESS).startEvent()
+        .callActivity().calledElement("called").endEvent().done();
 
-    BpmnModelInstance calledInstance = ProcessModels.newModel("called")
-        .startEvent()
-        .userTask()
-        .endEvent()
-        .done();
+    BpmnModelInstance calledInstance = ProcessModels.newModel("called").startEvent().userTask()
+        .endEvent().done();
 
     testRule.deploy(callingInstance, calledInstance);
     List<String> processIds = startTestProcesses(1);
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE, false, true);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null,
+        TESTING_INSTANCE_DELETE, false, true);
     executeSeedJob(batch);
     executeBatchJobs(batch);
 
     // then
-    ProcessInstance superInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processIds.get(0)).singleResult();
+    ProcessInstance superInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processIds.get(0)).singleResult();
     assertNull(superInstance);
 
-    ProcessInstance subInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("called").singleResult();
+    ProcessInstance subInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("called").singleResult();
     assertNotNull(subInstance);
   }
 
@@ -373,35 +362,30 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   public void testDeleteProcessInstancesAsyncWithoutSkipSubprocesses() {
 
     // given
-    BpmnModelInstance callingInstance = ProcessModels.newModel(ONE_TASK_PROCESS)
-        .startEvent()
-          .callActivity()
-            .calledElement("called")
-        .endEvent()
-        .done();
+    BpmnModelInstance callingInstance = ProcessModels.newModel(ONE_TASK_PROCESS).startEvent()
+        .callActivity().calledElement("called").endEvent().done();
 
-    BpmnModelInstance calledInstance = ProcessModels.newModel("called")
-        .startEvent()
-        .userTask()
-        .endEvent()
-        .done();
+    BpmnModelInstance calledInstance = ProcessModels.newModel("called").startEvent().userTask()
+        .endEvent().done();
 
     testRule.deploy(callingInstance, calledInstance);
     List<String> processIds = startTestProcesses(1);
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE, false, false);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null,
+        TESTING_INSTANCE_DELETE, false, false);
     executeSeedJob(batch);
     executeBatchJobs(batch);
 
     // then
-    ProcessInstance superInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processIds.get(0)).singleResult();
+    ProcessInstance superInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processIds.get(0)).singleResult();
     assertNull(superInstance);
 
-    ProcessInstance subInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("called").singleResult();
+    ProcessInstance subInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("called").singleResult();
     assertNull(subInstance);
   }
-
 
   @Test
   public void testInvokeListenersWhenDeletingProcessInstancesAsync() {
@@ -409,12 +393,10 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     // given
     IncrementCounterListener.counter = 0;
 
-    BpmnModelInstance instance = ProcessModels.newModel(ONE_TASK_PROCESS)
-        .startEvent()
-        .userTask()
-          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, IncrementCounterListener.class.getName())
-        .endEvent()
-        .done();
+    BpmnModelInstance instance = ProcessModels.newModel(ONE_TASK_PROCESS).startEvent().userTask()
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END,
+            IncrementCounterListener.class.getName())
+        .endEvent().done();
 
     migrationRule.deploy(instance);
     List<String> processIds = startTestProcesses(1);
@@ -432,21 +414,27 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   public void testDeleteProcessInstancesAsyncWithListInDifferentDeployments() {
     // given
     ProcessDefinition sourceDefinition1 = testRule
-        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "ONE_TASK_PROCESS"));
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "ONE_TASK_PROCESS"));
     ProcessDefinition sourceDefinition2 = testRule
-        .deployAndGetDefinition(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "TWO_TASKS_PROCESS"));
-    List<String> processInstanceIds = createProcessInstances(sourceDefinition1, sourceDefinition2, 15, 10);
+        .deployAndGetDefinition(modify(ProcessModels.TWO_TASKS_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "TWO_TASKS_PROCESS"));
+    List<String> processInstanceIds = createProcessInstances(sourceDefinition1, sourceDefinition2,
+        15, 10);
     final String firstDeploymentId = sourceDefinition1.getDeploymentId();
     final String secondDeploymentId = sourceDefinition2.getDeploymentId();
 
-    List<String> processInstanceIdsFromFirstDeployment = getProcessInstanceIdsByDeploymentId(firstDeploymentId);
-    List<String> processInstanceIdsFromSecondDeployment = getProcessInstanceIdsByDeploymentId(secondDeploymentId);
+    List<String> processInstanceIdsFromFirstDeployment = getProcessInstanceIdsByDeploymentId(
+        firstDeploymentId);
+    List<String> processInstanceIdsFromSecondDeployment = getProcessInstanceIdsByDeploymentId(
+        secondDeploymentId);
 
     engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
     engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(3);
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceIds, null, "test_reason");
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceIds, null,
+        "test_reason");
 
     String seedJobDefinitionId = batch.getSeedJobDefinitionId();
     // seed jobs
@@ -454,7 +442,8 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     createAndExecuteSeedJobs(seedJobDefinitionId, expectedSeedJobsCount);
 
     // then
-    List<Job> jobs = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
+    List<Job> jobs = managementService.createJobQuery()
+        .jobDefinitionId(batch.getBatchJobDefinitionId()).list();
 
     // execute jobs related to the first deployment
     List<String> jobIdsForFirstDeployment = getJobIdsByDeployment(jobs, firstDeploymentId);
@@ -464,10 +453,13 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     }
 
     // the process instances related to the first deployment should be deleted
-    assertEquals(0, runtimeService.createProcessInstanceQuery().deploymentId(firstDeploymentId).count());
-    assertHistoricTaskDeletionPresent(processInstanceIdsFromFirstDeployment, "test_reason", testRule);
+    assertEquals(0,
+        runtimeService.createProcessInstanceQuery().deploymentId(firstDeploymentId).count());
+    assertHistoricTaskDeletionPresent(processInstanceIdsFromFirstDeployment, "test_reason",
+        testRule);
     // and process instances related to the second deployment should not be deleted
-    assertEquals(processInstanceIdsFromSecondDeployment.size(), runtimeService.createProcessInstanceQuery().deploymentId(secondDeploymentId).count());
+    assertEquals(processInstanceIdsFromSecondDeployment.size(),
+        runtimeService.createProcessInstanceQuery().deploymentId(secondDeploymentId).count());
     assertHistoricTaskDeletionPresent(processInstanceIdsFromSecondDeployment, null, testRule);
 
     // execute jobs related to the second deployment
@@ -481,13 +473,16 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
-  private List<String> createProcessInstances(ProcessDefinition sourceDefinition1, ProcessDefinition sourceDefinition2, int instanceCountDef1, int instanceCountDef2) {
+  private List<String> createProcessInstances(ProcessDefinition sourceDefinition1,
+      ProcessDefinition sourceDefinition2, int instanceCountDef1, int instanceCountDef2) {
     List<String> processInstanceIds = new ArrayList<String>();
     for (int i = 0; i < instanceCountDef1; i++) {
-      ProcessInstance processInstance1 = runtimeService.startProcessInstanceById(sourceDefinition1.getId());
+      ProcessInstance processInstance1 = runtimeService
+          .startProcessInstanceById(sourceDefinition1.getId());
       processInstanceIds.add(processInstance1.getId());
       if (i < instanceCountDef2) {
-        ProcessInstance processInstance2 = runtimeService.startProcessInstanceById(sourceDefinition2.getId());
+        ProcessInstance processInstance2 = runtimeService
+            .startProcessInstanceById(sourceDefinition2.getId());
         processInstanceIds.add(processInstance2.getId());
       }
     }
@@ -495,7 +490,8 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   }
 
   private List<String> getProcessInstanceIdsByDeploymentId(final String deploymentId) {
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().deploymentId(deploymentId).list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
+        .deploymentId(deploymentId).list();
     List<String> processInstanceIds = new ArrayList<String>();
     for (ProcessInstance processInstance : processInstances) {
       processInstanceIds.add(processInstance.getId());
@@ -515,12 +511,13 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
   private void createAndExecuteSeedJobs(String seedJobDefinitionId, int expectedSeedJobsCount) {
     for (int i = 0; i <= expectedSeedJobsCount; i++) {
-      Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
+      Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId)
+          .singleResult();
       if (i != expectedSeedJobsCount) {
         assertNotNull(seedJob);
         managementService.executeJob(seedJob.getId());
       } else {
-        //the last seed job should not trigger another seed job
+        // the last seed job should not trigger another seed job
         assertNull(seedJob);
       }
     }

@@ -56,17 +56,15 @@ public class TaskAssignmentExtensionsTest extends PluggableProcessEngineTestCase
   @Deployment
   public void testAssigneeExtension() {
     runtimeService.startProcessInstanceByKey("assigneeExtension");
-    List<Task> tasks = taskService
-      .createTaskQuery()
-      .taskAssignee("kermit")
-      .list();
+    List<Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
     assertEquals(1, tasks.size());
     assertEquals("my task", tasks.get(0).getName());
   }
 
   public void testDuplicateAssigneeDeclaration() {
     try {
-      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testDuplicateAssigneeDeclaration");
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(),
+          "testDuplicateAssigneeDeclaration");
       repositoryService.createDeployment().addClasspathResource(resource).deploy();
       fail("Invalid BPMN 2.0 process should not parse, but it gets parsed sucessfully");
     } catch (ProcessEngineException e) {

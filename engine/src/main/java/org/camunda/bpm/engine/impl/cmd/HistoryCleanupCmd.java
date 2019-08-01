@@ -59,16 +59,17 @@ public class HistoryCleanupCmd implements Command<Job> {
   @Override
   public Job execute(CommandContext commandContext) {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext
+        .getProcessEngineConfiguration();
 
     authorizationManager.checkCamundaAdmin();
 
-    //validate
+    // validate
     if (!willBeScheduled()) {
       LOG.debugHistoryCleanupWrongConfiguration();
     }
 
-    //find job instance
+    // find job instance
     List<Job> historyCleanupJobs = getHistoryCleanupJobs();
 
     int degreeOfParallelism = processEngineConfiguration.getHistoryCleanupDegreeOfParallelism();
@@ -77,12 +78,10 @@ public class HistoryCleanupCmd implements Command<Job> {
     if (shouldCreateJobs(historyCleanupJobs)) {
       historyCleanupJobs = createJobs(degreeOfParallelism, minuteChunks);
 
-    }
-    else if (shouldReconfigureJobs(historyCleanupJobs)) {
+    } else if (shouldReconfigureJobs(historyCleanupJobs)) {
       historyCleanupJobs = reconfigureJobs(historyCleanupJobs, degreeOfParallelism, minuteChunks);
 
-    }
-    else if (shouldSuspendJobs(historyCleanupJobs)) {
+    } else if (shouldSuspendJobs(historyCleanupJobs)) {
       suspendJobs(historyCleanupJobs);
 
     }
@@ -120,10 +119,10 @@ public class HistoryCleanupCmd implements Command<Job> {
     PropertyManager propertyManager = commandContext.getPropertyManager();
     JobManager jobManager = commandContext.getJobManager();
 
-    //exclusive lock
+    // exclusive lock
     propertyManager.acquireExclusiveLockForHistoryCleanupJob();
 
-    //check again after lock
+    // check again after lock
     List<Job> historyCleanupJobs = getHistoryCleanupJobs();
 
     if (historyCleanupJobs.isEmpty()) {
@@ -138,7 +137,8 @@ public class HistoryCleanupCmd implements Command<Job> {
   }
 
   @SuppressWarnings("unchecked")
-  protected List<Job> reconfigureJobs(List<Job> historyCleanupJobs, int degreeOfParallelism, int[][] minuteChunks) {
+  protected List<Job> reconfigureJobs(List<Job> historyCleanupJobs, int degreeOfParallelism,
+      int[][] minuteChunks) {
     CommandContext commandContext = Context.getCommandContext();
     JobManager jobManager = commandContext.getJobManager();
 
@@ -147,7 +147,7 @@ public class HistoryCleanupCmd implements Command<Job> {
     for (int i = 0; i < size; i++) {
       JobEntity historyCleanupJob = (JobEntity) historyCleanupJobs.get(i);
 
-      //apply new configuration
+      // apply new configuration
       HistoryCleanupContext historyCleanupContext = createCleanupContext(minuteChunks[i]);
 
       HISTORY_CLEANUP_JOB_DECLARATION.reconfigure(historyCleanupContext, historyCleanupJob);
@@ -160,15 +160,14 @@ public class HistoryCleanupCmd implements Command<Job> {
     int delta = degreeOfParallelism - historyCleanupJobs.size();
 
     if (delta > 0) {
-      //create new job, as there are not enough of them
+      // create new job, as there are not enough of them
       for (int i = size; i < degreeOfParallelism; i++) {
         JobEntity job = createJob(minuteChunks[i]);
         jobManager.insertAndHintJobExecutor(job);
         historyCleanupJobs.add(job);
       }
-    }
-    else if (delta < 0) {
-      //remove jobs, if there are too much of them
+    } else if (delta < 0) {
+      // remove jobs, if there are too much of them
       ListIterator<Job> iterator = historyCleanupJobs.listIterator(size);
       while (iterator.hasNext()) {
         JobEntity job = (JobEntity) iterator.next();
@@ -181,7 +180,7 @@ public class HistoryCleanupCmd implements Command<Job> {
   }
 
   protected void suspendJobs(List<Job> jobs) {
-    for (Job job: jobs) {
+    for (Job job : jobs) {
       JobEntity jobInstance = (JobEntity) job;
       jobInstance.setSuspensionState(SuspensionState.SUSPENDED.getStateCode());
       jobInstance.setDuedate(null);
@@ -202,13 +201,8 @@ public class HistoryCleanupCmd implements Command<Job> {
 
   protected void writeUserOperationLog(CommandContext commandContext) {
     PropertyChange propertyChange = new PropertyChange("immediatelyDue", null, immediatelyDue);
-    commandContext.getOperationLogManager()
-      .logJobOperation(UserOperationLogEntry.OPERATION_TYPE_CREATE_HISTORY_CLEANUP_JOB,
-        null,
-        null,
-        null,
-        null,
-        null,
-        propertyChange);
+    commandContext.getOperationLogManager().logJobOperation(
+        UserOperationLogEntry.OPERATION_TYPE_CREATE_HISTORY_CLEANUP_JOB, null, null, null, null,
+        null, propertyChange);
   }
 }

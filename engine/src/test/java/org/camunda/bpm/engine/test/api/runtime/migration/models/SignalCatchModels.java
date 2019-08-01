@@ -27,23 +27,11 @@ public class SignalCatchModels {
   public static final String SIGNAL_NAME = "Signal";
 
   public static final BpmnModelInstance ONE_SIGNAL_CATCH_PROCESS = ProcessModels.newModel()
-    .startEvent()
-    .intermediateCatchEvent("signalCatch")
-      .signal(SIGNAL_NAME)
-    .userTask("userTask")
-    .endEvent()
-    .done();
+      .startEvent().intermediateCatchEvent("signalCatch").signal(SIGNAL_NAME).userTask("userTask")
+      .endEvent().done();
 
   public static final BpmnModelInstance SUBPROCESS_SIGNAL_CATCH_PROCESS = ProcessModels.newModel()
-      .startEvent()
-      .subProcess("subProcess")
-      .embeddedSubProcess()
-        .startEvent()
-        .intermediateCatchEvent("signalCatch")
-          .signal(SIGNAL_NAME)
-        .userTask("userTask")
-        .endEvent()
-      .subProcessDone()
-      .endEvent()
-      .done();
+      .startEvent().subProcess("subProcess").embeddedSubProcess().startEvent()
+      .intermediateCatchEvent("signalCatch").signal(SIGNAL_NAME).userTask("userTask").endEvent()
+      .subProcessDone().endEvent().done();
 }

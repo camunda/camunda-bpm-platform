@@ -25,13 +25,16 @@ import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 
 /**
- * <p>Resolves a {@link BeanELResolver} from the current process application.
- * This allows to cache resolvers on the process application level. Such a resolver
- * cannot be cached globally as {@link BeanELResolver} keeps a cache of classes
- * involved in expressions.</p>
+ * <p>
+ * Resolves a {@link BeanELResolver} from the current process application. This allows to cache
+ * resolvers on the process application level. Such a resolver cannot be cached globally as
+ * {@link BeanELResolver} keeps a cache of classes involved in expressions.
+ * </p>
  *
- * <p>If resolution is attempted outside the context of a process application,
- * then always a new resolver instance is returned (i.e. no caching in these cases).</p>
+ * <p>
+ * If resolution is attempted outside the context of a process application, then always a new
+ * resolver instance is returned (i.e. no caching in these cases).
+ * </p>
  *
  * @author Thorben Lindhauer
  */
@@ -39,15 +42,18 @@ public class ProcessApplicationBeanElResolverDelegate extends AbstractElResolver
 
   protected ELResolver getElResolverDelegate() {
 
-    ProcessApplicationReference processApplicationReference = Context.getCurrentProcessApplication();
-    if(processApplicationReference != null) {
+    ProcessApplicationReference processApplicationReference = Context
+        .getCurrentProcessApplication();
+    if (processApplicationReference != null) {
 
       try {
-        ProcessApplicationInterface processApplication = processApplicationReference.getProcessApplication();
+        ProcessApplicationInterface processApplication = processApplicationReference
+            .getProcessApplication();
         return processApplication.getBeanElResolver();
 
       } catch (ProcessApplicationUnavailableException e) {
-        throw new ProcessEngineException("Cannot access process application '"+processApplicationReference.getName()+"'", e);
+        throw new ProcessEngineException(
+            "Cannot access process application '" + processApplicationReference.getName() + "'", e);
       }
 
     } else {

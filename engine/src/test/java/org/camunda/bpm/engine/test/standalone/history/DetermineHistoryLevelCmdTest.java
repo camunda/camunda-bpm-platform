@@ -44,12 +44,12 @@ public class DetermineHistoryLevelCmdTest {
 
   private ProcessEngineImpl processEngineImpl;
 
-
   private static ProcessEngineConfigurationImpl config(final String historyLevel) {
     return config("false", historyLevel);
   }
 
-  private static ProcessEngineConfigurationImpl config(final String schemaUpdate, final String historyLevel) {
+  private static ProcessEngineConfigurationImpl config(final String schemaUpdate,
+      final String historyLevel) {
     StandaloneInMemProcessEngineConfiguration engineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     engineConfiguration.setProcessEngineName(UUID.randomUUID().toString());
     engineConfiguration.setDatabaseSchemaUpdate(schemaUpdate);
@@ -60,19 +60,19 @@ public class DetermineHistoryLevelCmdTest {
     return engineConfiguration;
   }
 
-
   @Test
   public void readLevelFullfromDB() throws Exception {
-    final ProcessEngineConfigurationImpl config = config("true", ProcessEngineConfiguration.HISTORY_FULL);
+    final ProcessEngineConfigurationImpl config = config("true",
+        ProcessEngineConfiguration.HISTORY_FULL);
 
     // init the db with level=full
     processEngineImpl = (ProcessEngineImpl) config.buildProcessEngine();
 
-    HistoryLevel historyLevel = config.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(config.getHistoryLevels()));
+    HistoryLevel historyLevel = config.getCommandExecutorSchemaOperations()
+        .execute(new DetermineHistoryLevelCmd(config.getHistoryLevels()));
 
     assertThat(historyLevel, CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_FULL));
   }
-
 
   @Test
   public void useDefaultLevelAudit() throws Exception {
@@ -84,8 +84,8 @@ public class DetermineHistoryLevelCmdTest {
     assertThat(config.getHistoryLevel(), CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
 
     // and this is written to the database
-    HistoryLevel databaseLevel =
-        config.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(config.getHistoryLevels()));
+    HistoryLevel databaseLevel = config.getCommandExecutorSchemaOperations()
+        .execute(new DetermineHistoryLevelCmd(config.getHistoryLevels()));
     assertThat(databaseLevel, CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
   }
 
@@ -113,10 +113,11 @@ public class DetermineHistoryLevelCmdTest {
     processEngineImpl = (ProcessEngineImpl) config.buildProcessEngine();
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("The configured history level with id='99' is not registered in this config.");
+    thrown.expectMessage(
+        "The configured history level with id='99' is not registered in this config.");
 
-    config.getCommandExecutorSchemaOperations().execute(
-        new DetermineHistoryLevelCmd(Collections.<HistoryLevel>emptyList()));
+    config.getCommandExecutorSchemaOperations()
+        .execute(new DetermineHistoryLevelCmd(Collections.<HistoryLevel> emptyList()));
   }
 
   @After

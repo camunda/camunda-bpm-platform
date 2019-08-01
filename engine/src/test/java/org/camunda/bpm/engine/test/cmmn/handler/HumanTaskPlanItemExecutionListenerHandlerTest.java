@@ -27,7 +27,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-
 /**
  * @author Thorben Lindhauer
  *
@@ -46,7 +45,8 @@ public class HumanTaskPlanItemExecutionListenerHandlerTest extends CmmnElementHa
 
   protected AbstractExecutionListenerSpec testSpecification;
 
-  public HumanTaskPlanItemExecutionListenerHandlerTest(AbstractExecutionListenerSpec testSpecification) {
+  public HumanTaskPlanItemExecutionListenerHandlerTest(
+      AbstractExecutionListenerSpec testSpecification) {
     this.testSpecification = testSpecification;
   }
 

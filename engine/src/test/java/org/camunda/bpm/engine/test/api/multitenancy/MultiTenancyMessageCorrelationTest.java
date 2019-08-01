@@ -46,20 +46,13 @@ public class MultiTenancyMessageCorrelationTest {
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  protected static final BpmnModelInstance MESSAGE_START_PROCESS = Bpmn.createExecutableProcess("messageStart")
-      .startEvent()
-        .message("message")
-      .userTask()
-      .endEvent()
+  protected static final BpmnModelInstance MESSAGE_START_PROCESS = Bpmn
+      .createExecutableProcess("messageStart").startEvent().message("message").userTask().endEvent()
       .done();
 
-  protected static final BpmnModelInstance MESSAGE_CATCH_PROCESS = Bpmn.createExecutableProcess("messageCatch")
-      .startEvent()
-      .intermediateCatchEvent()
-        .message("message")
-      .userTask()
-      .endEvent()
-      .done();
+  protected static final BpmnModelInstance MESSAGE_CATCH_PROCESS = Bpmn
+      .createExecutableProcess("messageCatch").startEvent().intermediateCatchEvent()
+      .message("message").userTask().endEvent().done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
@@ -69,7 +62,7 @@ public class MultiTenancyMessageCorrelationTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void correlateMessageToStartEventNoTenantIdSetForNonTenant() {
@@ -97,9 +90,8 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deploy(MESSAGE_START_PROCESS);
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .withoutTenantId()
-      .correlate();
+    engineRule.getRuntimeService().createMessageCorrelation("message").withoutTenantId()
+        .correlate();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.count(), is(1L));
@@ -111,9 +103,8 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
     testRule.deployForTenant(TENANT_TWO, MESSAGE_START_PROCESS);
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .tenantId(TENANT_ONE)
-      .correlate();
+    engineRule.getRuntimeService().createMessageCorrelation("message").tenantId(TENANT_ONE)
+        .correlate();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -149,12 +140,13 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deploy(MESSAGE_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionWithoutTenantId().execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionWithoutTenantId().execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .withoutTenantId()
-      .correlate();
+    engineRule.getRuntimeService().createMessageCorrelation("message").withoutTenantId()
+        .correlate();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.count(), is(1L));
@@ -166,12 +158,13 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .tenantId(TENANT_ONE)
-      .correlate();
+    engineRule.getRuntimeService().createMessageCorrelation("message").tenantId(TENANT_ONE)
+        .correlate();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -183,11 +176,11 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deploy(MESSAGE_START_PROCESS, MESSAGE_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionWithoutTenantId().execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionWithoutTenantId().execute();
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .withoutTenantId()
-      .correlateAll();
+    engineRule.getRuntimeService().createMessageCorrelation("message").withoutTenantId()
+        .correlateAll();
 
     List<Task> tasks = engineRule.getTaskService().createTaskQuery().list();
     assertThat(tasks.size(), is(2));
@@ -200,12 +193,13 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS, MESSAGE_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_TWO, MESSAGE_START_PROCESS, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .tenantId(TENANT_ONE)
-      .correlateAll();
+    engineRule.getRuntimeService().createMessageCorrelation("message").tenantId(TENANT_ONE)
+        .correlateAll();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
@@ -217,15 +211,18 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deploy(MESSAGE_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionWithoutTenantId().execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionWithoutTenantId().execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionWithoutTenantId().execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionWithoutTenantId().execute();
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .withoutTenantId()
-      .correlateAll();
+    engineRule.getRuntimeService().createMessageCorrelation("message").withoutTenantId()
+        .correlateAll();
 
     List<Task> tasks = engineRule.getTaskService().createTaskQuery().list();
     assertThat(tasks.size(), is(2));
@@ -238,15 +235,18 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .tenantId(TENANT_ONE)
-      .correlateAll();
+    engineRule.getRuntimeService().createMessageCorrelation("message").tenantId(TENANT_ONE)
+        .correlateAll();
 
     TaskQuery query = engineRule.getTaskService().createTaskQuery();
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(2L));
@@ -258,9 +258,8 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deploy(MESSAGE_START_PROCESS);
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .withoutTenantId()
-      .correlateStartMessage();
+    engineRule.getRuntimeService().createMessageCorrelation("message").withoutTenantId()
+        .correlateStartMessage();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.count(), is(1L));
@@ -272,9 +271,8 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
     testRule.deployForTenant(TENANT_TWO, MESSAGE_START_PROCESS);
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .tenantId(TENANT_ONE)
-      .correlateStartMessage();
+    engineRule.getRuntimeService().createMessageCorrelation("message").tenantId(TENANT_ONE)
+        .correlateStartMessage();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -298,8 +296,10 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     engineRule.getRuntimeService().createMessageCorrelation("message").correlateAll();
 
@@ -313,20 +313,26 @@ public class MultiTenancyMessageCorrelationTest {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_START_PROCESS);
     testRule.deployForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     engineRule.getRuntimeService().createMessageCorrelation("message").correlateAll();
 
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(engineRule.getTaskService().createTaskQuery().tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(
+        engineRule.getRuntimeService().createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
+    assertThat(engineRule.getTaskService().createTaskQuery().tenantIdIn(TENANT_TWO).count(),
+        is(1L));
   }
 
   public void failToCorrelateMessageToIntermediateCatchEventsForMultipleTenants() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
     testRule.deployForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     // declare expected exception
     thrown.expect(MismatchingMessageCorrelationException.class);
@@ -338,37 +344,38 @@ public class MultiTenancyMessageCorrelationTest {
   @Test
   public void testSubscriptionsWhenDeletingGroupsProcessDefinitionsByIds() {
     // given
-    String processDefId1 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, MESSAGE_START_PROCESS).getId();
-    String processDefId2 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, MESSAGE_START_PROCESS).getId();
-    String processDefId3 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, MESSAGE_START_PROCESS).getId();
+    String processDefId1 = testRule
+        .deployForTenantAndGetDefinition(TENANT_ONE, MESSAGE_START_PROCESS).getId();
+    String processDefId2 = testRule
+        .deployForTenantAndGetDefinition(TENANT_ONE, MESSAGE_START_PROCESS).getId();
+    String processDefId3 = testRule
+        .deployForTenantAndGetDefinition(TENANT_ONE, MESSAGE_START_PROCESS).getId();
 
     @SuppressWarnings("unused")
     String processDefId4 = testRule.deployAndGetDefinition(MESSAGE_START_PROCESS).getId();
     String processDefId5 = testRule.deployAndGetDefinition(MESSAGE_START_PROCESS).getId();
     String processDefId6 = testRule.deployAndGetDefinition(MESSAGE_START_PROCESS).getId();
 
-    BpmnModelInstance processAnotherKey = Bpmn.createExecutableProcess("anotherKey")
-        .startEvent()
-          .message("sophisticated message")
-        .userTask()
-        .endEvent()
-        .done();
+    BpmnModelInstance processAnotherKey = Bpmn.createExecutableProcess("anotherKey").startEvent()
+        .message("sophisticated message").userTask().endEvent().done();
 
-    String processDefId7 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey).getId();
-    String processDefId8 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey).getId();
-    String processDefId9 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey).getId();
+    String processDefId7 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey)
+        .getId();
+    String processDefId8 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey)
+        .getId();
+    String processDefId9 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey)
+        .getId();
 
     // assume
     assertEquals(3, engineRule.getRuntimeService().createEventSubscriptionQuery().count());
 
     // when
-    engineRule.getRepositoryService()
-              .deleteProcessDefinitions()
-              .byIds(processDefId8, processDefId5, processDefId3, processDefId9, processDefId1)
-              .delete();
+    engineRule.getRepositoryService().deleteProcessDefinitions()
+        .byIds(processDefId8, processDefId5, processDefId3, processDefId9, processDefId1).delete();
 
     // then
-    List<EventSubscription> list = engineRule.getRuntimeService().createEventSubscriptionQuery().list();
+    List<EventSubscription> list = engineRule.getRuntimeService().createEventSubscriptionQuery()
+        .list();
     assertEquals(3, list.size());
     for (EventSubscription eventSubscription : list) {
       EventSubscriptionEntity eventSubscriptionEntity = (EventSubscriptionEntity) eventSubscription;
@@ -379,7 +386,8 @@ public class MultiTenancyMessageCorrelationTest {
       } else if (eventSubscriptionEntity.getConfiguration().equals(processDefId7)) {
         assertEquals(TENANT_ONE, eventSubscription.getTenantId());
       } else {
-        fail("This process definition '" + eventSubscriptionEntity.getConfiguration() + "' and the respective event subscription should not exist.");
+        fail("This process definition '" + eventSubscriptionEntity.getConfiguration()
+            + "' and the respective event subscription should not exist.");
       }
     }
   }
@@ -391,7 +399,8 @@ public class MultiTenancyMessageCorrelationTest {
 
     // declare expected exception
     thrown.expect(MismatchingMessageCorrelationException.class);
-    thrown.expectMessage("Cannot correlate a message with name 'message' to a single process definition");
+    thrown.expectMessage(
+        "Cannot correlate a message with name 'message' to a single process definition");
 
     engineRule.getRuntimeService().createMessageCorrelation("message").correlate();
   }
@@ -403,7 +412,8 @@ public class MultiTenancyMessageCorrelationTest {
 
     // declare expected exception
     thrown.expect(MismatchingMessageCorrelationException.class);
-    thrown.expectMessage("Cannot correlate a message with name 'message' to a single process definition");
+    thrown.expectMessage(
+        "Cannot correlate a message with name 'message' to a single process definition");
 
     engineRule.getRuntimeService().createMessageCorrelation("message").correlateStartMessage();
   }
@@ -414,10 +424,8 @@ public class MultiTenancyMessageCorrelationTest {
     thrown.expect(BadUserRequestException.class);
     thrown.expectMessage("Cannot specify a tenant-id");
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .processInstanceId("id")
-      .withoutTenantId()
-      .correlate();
+    engineRule.getRuntimeService().createMessageCorrelation("message").processInstanceId("id")
+        .withoutTenantId().correlate();
   }
 
   @Test
@@ -426,10 +434,8 @@ public class MultiTenancyMessageCorrelationTest {
     thrown.expect(BadUserRequestException.class);
     thrown.expectMessage("Cannot specify a tenant-id");
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-    .processInstanceId("id")
-    .tenantId(TENANT_ONE)
-    .correlate();
+    engineRule.getRuntimeService().createMessageCorrelation("message").processInstanceId("id")
+        .tenantId(TENANT_ONE).correlate();
   }
 
   @Test
@@ -438,10 +444,8 @@ public class MultiTenancyMessageCorrelationTest {
     thrown.expect(BadUserRequestException.class);
     thrown.expectMessage("Cannot specify a tenant-id");
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .processDefinitionId("id")
-      .withoutTenantId()
-      .correlateStartMessage();
+    engineRule.getRuntimeService().createMessageCorrelation("message").processDefinitionId("id")
+        .withoutTenantId().correlateStartMessage();
   }
 
   @Test
@@ -450,10 +454,8 @@ public class MultiTenancyMessageCorrelationTest {
     thrown.expect(BadUserRequestException.class);
     thrown.expectMessage("Cannot specify a tenant-id");
 
-    engineRule.getRuntimeService().createMessageCorrelation("message")
-      .processDefinitionId("id")
-      .tenantId(TENANT_ONE)
-      .correlateStartMessage();
+    engineRule.getRuntimeService().createMessageCorrelation("message").processDefinitionId("id")
+        .tenantId(TENANT_ONE).correlateStartMessage();
   }
 
 }

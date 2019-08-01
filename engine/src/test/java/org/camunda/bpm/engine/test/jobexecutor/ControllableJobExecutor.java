@@ -34,9 +34,9 @@ import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl
 import org.camunda.bpm.engine.test.concurrency.ControllableThread;
 
 /**
- * Job executor that uses a {@link ControllableThread} for job acquisition. That means,
- * the job acquisition thread returns control with each iteration of acquiring jobs (specifically
- * between selecting jobs and returning them to the acquisition runnable).
+ * Job executor that uses a {@link ControllableThread} for job acquisition. That means, the job
+ * acquisition thread returns control with each iteration of acquiring jobs (specifically between
+ * selecting jobs and returning them to the acquisition runnable).
  *
  * @author Thorben Lindhauer
  */
@@ -55,19 +55,22 @@ public class ControllableJobExecutor extends JobExecutor {
     acquireJobsRunnable = new RecordingAcquireJobsRunnable(this);
     jobAcquisitionThread = new Thread(acquireJobsRunnable);
     acquisitionThreadControl = new ThreadControl(jobAcquisitionThread);
-    executionThreadControl = new ThreadControl(jobAcquisitionThread); // execution thread is same as acquisition thread
+    executionThreadControl = new ThreadControl(jobAcquisitionThread); // execution thread is same as
+                                                                      // acquisition thread
     acquireJobsCmdFactory = new ControllableJobAcquisitionCommandFactory();
   }
 
   /**
-   * <p>Creates the job executor and registers the given process engine
-   * with it.
+   * <p>
+   * Creates the job executor and registers the given process engine with it.
    *
-   * <p>Use this constructor if the process engine is not registered
-   * with the job executor when the process engine is bootstrapped.
+   * <p>
+   * Use this constructor if the process engine is not registered with the job executor when the
+   * process engine is bootstrapped.
    *
-   * <p>Note: this is a hack since it enables to use multiple job executors with
-   * the same engine which is not a supported feature (and for example clashes with
+   * <p>
+   * Note: this is a hack since it enables to use multiple job executors with the same engine which
+   * is not a supported feature (and for example clashes with
    * processEngineConfiguration#getJobExecutor)
    */
   public ControllableJobExecutor(ProcessEngineImpl processEngine) {
@@ -85,8 +88,11 @@ public class ControllableJobExecutor extends JobExecutor {
   }
 
   /**
-   * <p>true: behave like embedded job executor where shutdown waits for all jobs to end
-   * <p>false: behave like runtime container job executor where shutdown does not influence job execution
+   * <p>
+   * true: behave like embedded job executor where shutdown waits for all jobs to end
+   * <p>
+   * false: behave like runtime container job executor where shutdown does not influence job
+   * execution
    */
   public ControllableJobExecutor proceedAndWaitOnShutdown(boolean syncOnShutdown) {
     this.syncOnShutdown = syncOnShutdown;
@@ -148,7 +154,8 @@ public class ControllableJobExecutor extends JobExecutor {
 
       monitor.sync(); // wait till makeContinue() is called from test thread
 
-      AcquiredJobs acquiredJobs = new AcquireJobsCmd(ControllableJobExecutor.this, numJobsToAcquire).execute(commandContext);
+      AcquiredJobs acquiredJobs = new AcquireJobsCmd(ControllableJobExecutor.this, numJobsToAcquire)
+          .execute(commandContext);
 
       monitor.sync(); // wait till makeContinue() is called from test thread
 
@@ -156,17 +163,18 @@ public class ControllableJobExecutor extends JobExecutor {
     }
 
     protected void rethrowOptimisticLockingException(CommandContext commandContext) {
-      commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
+      commandContext.getDbEntityManager()
+          .registerOptimisticLockingListener(new OptimisticLockingListener() {
 
-        public Class<? extends DbEntity> getEntityType() {
-          return JobEntity.class;
-        }
+            public Class<? extends DbEntity> getEntityType() {
+              return JobEntity.class;
+            }
 
-        public void failedOperation(DbOperation operation) {
-          oleThrown = true;
-        }
+            public void failedOperation(DbOperation operation) {
+              oleThrown = true;
+            }
 
-      });
+          });
     }
 
   }

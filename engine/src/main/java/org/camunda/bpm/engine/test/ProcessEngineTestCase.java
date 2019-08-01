@@ -37,30 +37,35 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 import junit.framework.TestCase;
 
-
-/** Convenience for ProcessEngine and services initialization in the form of a JUnit base class.
+/**
+ * Convenience for ProcessEngine and services initialization in the form of a JUnit base class.
  *
- * <p>Usage: <code>public class YourTest extends ProcessEngineTestCase</code></p>
- *
- * <p>The ProcessEngine and the services available to subclasses through protected member fields.
- * The processEngine will be initialized by default with the camunda.cfg.xml resource
- * on the classpath.  To specify a different configuration file, override the
- * {@link #getConfigurationResource()} method.
- * Process engines will be cached statically.  The first time the setUp is called for a given
- * configuration resource, the process engine will be constructed.</p>
- *
- * <p>You can declare a deployment with the {@link Deployment} annotation.
- * This base class will make sure that this deployment gets deployed in the
- * setUp and {@link RepositoryService#deleteDeploymentCascade(String, boolean) cascade deleted}
- * in the tearDown.
+ * <p>
+ * Usage: <code>public class YourTest extends ProcessEngineTestCase</code>
  * </p>
  *
- * <p>This class also lets you {@link #setCurrentTime(Date) set the current time used by the
- * process engine}. This can be handy to control the exact time that is used by the engine
- * in order to verify e.g. e.g. due dates of timers.  Or start, end and duration times
- * in the history service.  In the tearDown, the internal clock will automatically be
- * reset to use the current system time rather then the time that was set during
- * a test method.  In other words, you don't have to clean up your own time messing mess ;-)
+ * <p>
+ * The ProcessEngine and the services available to subclasses through protected member fields. The
+ * processEngine will be initialized by default with the camunda.cfg.xml resource on the classpath.
+ * To specify a different configuration file, override the {@link #getConfigurationResource()}
+ * method. Process engines will be cached statically. The first time the setUp is called for a given
+ * configuration resource, the process engine will be constructed.
+ * </p>
+ *
+ * <p>
+ * You can declare a deployment with the {@link Deployment} annotation. This base class will make
+ * sure that this deployment gets deployed in the setUp and
+ * {@link RepositoryService#deleteDeploymentCascade(String, boolean) cascade deleted} in the
+ * tearDown.
+ * </p>
+ *
+ * <p>
+ * This class also lets you {@link #setCurrentTime(Date) set the current time used by the process
+ * engine}. This can be handy to control the exact time that is used by the engine in order to
+ * verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In
+ * the tearDown, the internal clock will automatically be reset to use the current system time
+ * rather then the time that was set during a test method. In other words, you don't have to clean
+ * up your own time messing mess ;-)
  * </p>
  *
  * @author Tom Baeyens
@@ -76,7 +81,8 @@ public class ProcessEngineTestCase extends TestCase {
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
-  @Deprecated protected HistoryService historicDataService;
+  @Deprecated
+  protected HistoryService historicDataService;
   protected HistoryService historyService;
   protected IdentityService identityService;
   protected ManagementService managementService;
@@ -99,12 +105,13 @@ public class ProcessEngineTestCase extends TestCase {
   protected void setUp() throws Exception {
     super.setUp();
 
-    if (processEngine==null) {
+    if (processEngine == null) {
       initializeProcessEngine();
       initializeServices();
     }
 
-    boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, getClass(), getName());
+    boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine,
+        getClass(), getName());
     // ignore test case when current history level is too low
     skipTest = !hasRequiredHistoryLevel;
 

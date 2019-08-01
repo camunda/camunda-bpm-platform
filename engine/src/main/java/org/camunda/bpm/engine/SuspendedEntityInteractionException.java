@@ -19,8 +19,8 @@ package org.camunda.bpm.engine;
 import org.camunda.bpm.engine.exception.NotAllowedException;
 
 /**
- * This exception is thrown, if an operation that requires a non-suspended entity (execution, task, process definition) 
- * is executed on a suspended one. 
+ * This exception is thrown, if an operation that requires a non-suspended entity (execution, task,
+ * process definition) is executed on a suspended one.
  * 
  * 
  * @author Thorben Lindhauer
@@ -32,5 +32,5 @@ public class SuspendedEntityInteractionException extends NotAllowedException {
   public SuspendedEntityInteractionException(String message) {
     super(message);
   }
-  
+
 }

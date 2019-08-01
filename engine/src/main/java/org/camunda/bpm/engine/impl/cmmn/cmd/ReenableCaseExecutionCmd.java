@@ -31,15 +31,18 @@ public class ReenableCaseExecutionCmd extends StateTransitionCaseExecutionCmd {
 
   private static final long serialVersionUID = 1L;
 
-  public ReenableCaseExecutionCmd(String caseExecutionId, Map<String, Object> variables, Map<String, Object> variablesLocal,
-      Collection<String> variableDeletions, Collection<String> variableLocalDeletions) {
+  public ReenableCaseExecutionCmd(String caseExecutionId, Map<String, Object> variables,
+      Map<String, Object> variablesLocal, Collection<String> variableDeletions,
+      Collection<String> variableLocalDeletions) {
     super(caseExecutionId, variables, variablesLocal, variableDeletions, variableLocalDeletions);
   }
+
   public ReenableCaseExecutionCmd(CaseExecutionCommandBuilderImpl builder) {
     super(builder);
   }
 
-  protected void performStateTransition(CommandContext commandContext, CaseExecutionEntity caseExecution) {
+  protected void performStateTransition(CommandContext commandContext,
+      CaseExecutionEntity caseExecution) {
     caseExecution.reenable();
   }
 

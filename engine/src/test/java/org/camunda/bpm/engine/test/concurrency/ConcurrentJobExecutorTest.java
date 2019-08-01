@@ -73,7 +73,6 @@ public class ConcurrentJobExecutorTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-
   protected RuntimeService runtimeService;
   protected RepositoryService repositoryService;
   protected ManagementService managementService;
@@ -82,13 +81,9 @@ public class ConcurrentJobExecutorTest {
   protected Thread testThread = Thread.currentThread();
   protected static ControllableThread activeThread;
 
-  protected static final BpmnModelInstance SIMPLE_ASYNC_PROCESS = Bpmn.createExecutableProcess("simpleAsyncProcess")
-      .startEvent()
-      .serviceTask()
-        .camundaExpression("${true}")
-        .camundaAsyncBefore()
-      .endEvent()
-      .done();
+  protected static final BpmnModelInstance SIMPLE_ASYNC_PROCESS = Bpmn
+      .createExecutableProcess("simpleAsyncProcess").startEvent().serviceTask()
+      .camundaExpression("${true}").camundaAsyncBefore().endEvent().done();
 
   @Before
   public void initServices() {
@@ -100,7 +95,7 @@ public class ConcurrentJobExecutorTest {
 
   @After
   public void deleteJobs() {
-    for(final Job job : managementService.createJobQuery().list()) {
+    for (final Job job : managementService.createJobQuery().list()) {
 
       processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
 
@@ -114,22 +109,16 @@ public class ConcurrentJobExecutorTest {
 
   @Test
   public void testCompetingJobExecutionDeleteJobDuringExecution() {
-    //given a simple process with a async service task
-    testRule.deploy(Bpmn
-            .createExecutableProcess("process")
-              .startEvent()
-              .serviceTask("task")
-                .camundaAsyncBefore()
-                .camundaExpression("${true}")
-              .endEvent()
-            .done());
+    // given a simple process with a async service task
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().serviceTask("task")
+        .camundaAsyncBefore().camundaExpression("${true}").endEvent().done());
     runtimeService.startProcessInstanceByKey("process");
     Job currentJob = managementService.createJobQuery().singleResult();
 
     // when a job is executed
     JobExecutionThread threadOne = new JobExecutionThread(currentJob.getId());
     threadOne.startAndWaitUntilControlIsReturned();
-    //and deleted in parallel
+    // and deleted in parallel
     managementService.deleteJob(currentJob.getId());
 
     // then the job fails with a OLE and the failed job listener throws no NPE
@@ -239,7 +228,7 @@ public class ConcurrentJobExecutorTest {
     assertNull(jobSuspensionThread.exception);
     assertNotNull(executionthread.exception);
 
-    //--------------------------------------------
+    // --------------------------------------------
 
     // given a waiting execution and a waiting suspension
     executionthread = new JobExecutionThread(job.getId());
@@ -280,7 +269,7 @@ public class ConcurrentJobExecutorTest {
     // but the job will also not be acquired
     assertEquals(0, acquisitionThread.acquiredJobs.size());
 
-    //--------------------------------------------
+    // --------------------------------------------
 
     // given a waiting acquisition and a waiting suspension
     acquisitionThread = new JobAcquisitionThread();
@@ -300,20 +289,17 @@ public class ConcurrentJobExecutorTest {
 
   @Test
   public void testCompletingSuspendedJobDuringRunningInstance() {
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .receiveTask()
-        .intermediateCatchEvent()
-          .timerWithDuration("PT0M")
-        .endEvent()
-        .done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().receiveTask()
+        .intermediateCatchEvent().timerWithDuration("PT0M").endEvent().done());
 
     // given
     // a process definition
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
     // a running instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
 
     // suspend the process definition (and the job definitions)
     repositoryService.suspendProcessDefinitionById(processDefinition.getId());
@@ -353,7 +339,8 @@ public class ConcurrentJobExecutorTest {
     executionThread.startAndWaitUntilControlIsReturned();
 
     // and the job priority is updated
-    JobDefinitionPriorityThread priorityThread = new JobDefinitionPriorityThread(jobDefinition.getId(), 42L, true);
+    JobDefinitionPriorityThread priorityThread = new JobDefinitionPriorityThread(
+        jobDefinition.getId(), 42L, true);
     priorityThread.startAndWaitUntilControlIsReturned();
 
     // and the priority threads commits first
@@ -388,11 +375,13 @@ public class ConcurrentJobExecutorTest {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // when suspending the jobs is attempted
-    JobSuspensionByJobDefinitionThread suspensionThread = new JobSuspensionByJobDefinitionThread(jobDefinition.getId());
+    JobSuspensionByJobDefinitionThread suspensionThread = new JobSuspensionByJobDefinitionThread(
+        jobDefinition.getId());
     suspensionThread.startAndWaitUntilControlIsReturned();
 
     // and updating the priority is attempted
-    JobDefinitionPriorityThread priorityUpdateThread = new JobDefinitionPriorityThread(jobDefinition.getId(), 42L, true);
+    JobDefinitionPriorityThread priorityUpdateThread = new JobDefinitionPriorityThread(
+        jobDefinition.getId(), 42L, true);
     priorityUpdateThread.startAndWaitUntilControlIsReturned();
 
     // and both commands overlap each other
@@ -407,7 +396,6 @@ public class ConcurrentJobExecutorTest {
       assertTrue(job.isSuspended());
     }
   }
-
 
   public class JobExecutionThread extends ControllableThread {
 
@@ -428,10 +416,12 @@ public class ConcurrentJobExecutorTest {
     public void run() {
       try {
         JobFailureCollector jobFailureCollector = new JobFailureCollector(jobId);
-        ExecuteJobHelper.executeJob(jobId, processEngineConfiguration.getCommandExecutorTxRequired(),jobFailureCollector, new ControlledCommand<Void>(activeThread, new ExecuteJobsCmd(jobId, jobFailureCollector)));
+        ExecuteJobHelper.executeJob(jobId,
+            processEngineConfiguration.getCommandExecutorTxRequired(), jobFailureCollector,
+            new ControlledCommand<Void>(activeThread,
+                new ExecuteJobsCmd(jobId, jobFailureCollector)));
 
-      }
-      catch (OptimisticLockingException e) {
+      } catch (OptimisticLockingException e) {
         this.exception = e;
       }
       LOG.debug(getName() + " ends");
@@ -441,22 +431,24 @@ public class ConcurrentJobExecutorTest {
   public class JobAcquisitionThread extends ControllableThread {
     OptimisticLockingException exception;
     AcquiredJobs acquiredJobs;
+
     @Override
     public synchronized void startAndWaitUntilControlIsReturned() {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     @Override
     public void run() {
       try {
         JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-        acquiredJobs = processEngineConfiguration.getCommandExecutorTxRequired()
-          .execute(new ControlledCommand<AcquiredJobs>(activeThread, new AcquireJobsCmd(jobExecutor)));
+        acquiredJobs = processEngineConfiguration.getCommandExecutorTxRequired().execute(
+            new ControlledCommand<AcquiredJobs>(activeThread, new AcquireJobsCmd(jobExecutor)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 
@@ -473,22 +465,22 @@ public class ConcurrentJobExecutorTest {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     @Override
     public void run() {
       try {
         processEngineConfiguration.getCommandExecutorTxRequired()
-          .execute(new ControlledCommand<Void>(activeThread, createSuspendJobCommand()));
+            .execute(new ControlledCommand<Void>(activeThread, createSuspendJobCommand()));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
 
     protected Command<Void> createSuspendJobCommand() {
       UpdateJobDefinitionSuspensionStateBuilderImpl builder = new UpdateJobDefinitionSuspensionStateBuilderImpl()
-        .byProcessDefinitionKey(processDefinitionKey)
-        .includeJobs(true);
+          .byProcessDefinitionKey(processDefinitionKey).includeJobs(true);
 
       return new SuspendJobDefinitionCmd(builder);
     }
@@ -507,20 +499,22 @@ public class ConcurrentJobExecutorTest {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     @Override
     public void run() {
       try {
         processEngineConfiguration.getCommandExecutorTxRequired()
-          .execute(new ControlledCommand<Void>(activeThread, createSuspendJobCommand()));
+            .execute(new ControlledCommand<Void>(activeThread, createSuspendJobCommand()));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
 
     protected SuspendJobCmd createSuspendJobCommand() {
-      UpdateJobSuspensionStateBuilderImpl builder = new UpdateJobSuspensionStateBuilderImpl().byJobDefinitionId(jobDefinitionId);
+      UpdateJobSuspensionStateBuilderImpl builder = new UpdateJobSuspensionStateBuilderImpl()
+          .byJobDefinitionId(jobDefinitionId);
       return new SuspendJobCmd(builder);
     }
   }
@@ -542,11 +536,13 @@ public class ConcurrentJobExecutorTest {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     @Override
     public void run() {
       try {
         processEngineConfiguration.getCommandExecutorTxRequired()
-          .execute(new ControlledCommand<Void>(activeThread, new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, cascade)));
+            .execute(new ControlledCommand<Void>(activeThread,
+                new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, cascade)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;

@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
-
 public class TimerStartEventJobHandler extends TimerEventJobHandler {
 
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
@@ -35,27 +34,29 @@ public class TimerStartEventJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    DeploymentCache deploymentCache = Context
-            .getProcessEngineConfiguration()
-            .getDeploymentCache();
+  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
+    DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
 
     String definitionKey = configuration.getTimerElementKey();
-    ProcessDefinition processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(definitionKey, tenantId);
+    ProcessDefinition processDefinition = deploymentCache
+        .findDeployedLatestProcessDefinitionByKeyAndTenantId(definitionKey, tenantId);
 
     try {
       startProcessInstance(commandContext, tenantId, processDefinition);
-    }
-    catch (RuntimeException e) {
+    } catch (RuntimeException e) {
       throw e;
     }
   }
 
-  protected void startProcessInstance(CommandContext commandContext, String tenantId, ProcessDefinition processDefinition) {
-    if(!processDefinition.isSuspended()) {
+  protected void startProcessInstance(CommandContext commandContext, String tenantId,
+      ProcessDefinition processDefinition) {
+    if (!processDefinition.isSuspended()) {
 
-      RuntimeService runtimeService = commandContext.getProcessEngineConfiguration().getRuntimeService();
-      runtimeService.createProcessInstanceByKey(processDefinition.getKey()).processDefinitionTenantId(tenantId).execute();
+      RuntimeService runtimeService = commandContext.getProcessEngineConfiguration()
+          .getRuntimeService();
+      runtimeService.createProcessInstanceByKey(processDefinition.getKey())
+          .processDefinitionTenantId(tenantId).execute();
 
     } else {
       LOG.ignoringSuspendedJob(processDefinition);

@@ -78,7 +78,6 @@ import org.camunda.bpm.engine.task.TaskReport;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -134,7 +133,8 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   }
 
   public void addCandidateGroup(String taskId, String groupId) {
-    commandExecutor.execute(new AddGroupIdentityLinkCmd(taskId, groupId, IdentityLinkType.CANDIDATE));
+    commandExecutor
+        .execute(new AddGroupIdentityLinkCmd(taskId, groupId, IdentityLinkType.CANDIDATE));
   }
 
   public void addUserIdentityLink(String taskId, String userId, String identityLinkType) {
@@ -146,11 +146,13 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   }
 
   public void deleteCandidateGroup(String taskId, String groupId) {
-    commandExecutor.execute(new DeleteGroupIdentityLinkCmd(taskId, groupId, IdentityLinkType.CANDIDATE));
+    commandExecutor
+        .execute(new DeleteGroupIdentityLinkCmd(taskId, groupId, IdentityLinkType.CANDIDATE));
   }
 
   public void deleteCandidateUser(String taskId, String userId) {
-    commandExecutor.execute(new DeleteUserIdentityLinkCmd(taskId, userId, IdentityLinkType.CANDIDATE));
+    commandExecutor
+        .execute(new DeleteUserIdentityLinkCmd(taskId, userId, IdentityLinkType.CANDIDATE));
   }
 
   public void deleteGroupIdentityLink(String taskId, String groupId, String identityLinkType) {
@@ -177,7 +179,8 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     commandExecutor.execute(new CompleteTaskCmd(taskId, variables, false, false));
   }
 
-  public VariableMap completeWithVariablesInReturn(String taskId, Map<String, Object> variables, boolean deserializeValues) {
+  public VariableMap completeWithVariablesInReturn(String taskId, Map<String, Object> variables,
+      boolean deserializeValues) {
     return commandExecutor.execute(new CompleteTaskCmd(taskId, variables, true, deserializeValues));
   }
 
@@ -194,7 +197,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   }
 
   public void setPriority(String taskId, int priority) {
-    commandExecutor.execute(new SetTaskPriorityCmd(taskId, priority) );
+    commandExecutor.execute(new SetTaskPriorityCmd(taskId, priority));
   }
 
   public TaskQuery createTaskQuery() {
@@ -233,16 +236,20 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     return getVariablesTyped(taskId, variableNames, true);
   }
 
-  public VariableMap getVariablesTyped(String taskId, Collection<String> variableNames, boolean deserializeValues) {
-    return commandExecutor.execute(new GetTaskVariablesCmd(taskId, variableNames, false, deserializeValues));
+  public VariableMap getVariablesTyped(String taskId, Collection<String> variableNames,
+      boolean deserializeValues) {
+    return commandExecutor
+        .execute(new GetTaskVariablesCmd(taskId, variableNames, false, deserializeValues));
   }
 
   public VariableMap getVariablesLocal(String taskId, Collection<String> variableNames) {
     return getVariablesLocalTyped(taskId, variableNames, true);
   }
 
-  public VariableMap getVariablesLocalTyped(String taskId, Collection<String> variableNames, boolean deserializeValues) {
-    return commandExecutor.execute(new GetTaskVariablesCmd(taskId, variableNames, true, deserializeValues));
+  public VariableMap getVariablesLocalTyped(String taskId, Collection<String> variableNames,
+      boolean deserializeValues) {
+    return commandExecutor
+        .execute(new GetTaskVariablesCmd(taskId, variableNames, true, deserializeValues));
   }
 
   public Object getVariable(String taskId, String variableName) {
@@ -257,7 +264,8 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     return getVariableTyped(taskId, variableName, false, true);
   }
 
-  public <T extends TypedValue> T getVariableTyped(String taskId, String variableName, boolean deserializeValue) {
+  public <T extends TypedValue> T getVariableTyped(String taskId, String variableName,
+      boolean deserializeValue) {
     return getVariableTyped(taskId, variableName, false, deserializeValue);
   }
 
@@ -265,13 +273,16 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     return getVariableTyped(taskId, variableName, true, true);
   }
 
-  public <T extends TypedValue> T getVariableLocalTyped(String taskId, String variableName, boolean deserializeValue) {
+  public <T extends TypedValue> T getVariableLocalTyped(String taskId, String variableName,
+      boolean deserializeValue) {
     return getVariableTyped(taskId, variableName, true, deserializeValue);
   }
 
   @SuppressWarnings("unchecked")
-  protected <T extends TypedValue> T getVariableTyped(String taskId, String variableName, boolean isLocal, boolean deserializeValue) {
-    return (T) commandExecutor.execute(new GetTaskVariableCmdTyped(taskId, variableName, isLocal, deserializeValue));
+  protected <T extends TypedValue> T getVariableTyped(String taskId, String variableName,
+      boolean isLocal, boolean deserializeValue) {
+    return (T) commandExecutor
+        .execute(new GetTaskVariableCmdTyped(taskId, variableName, isLocal, deserializeValue));
   }
 
   public void setVariable(String taskId, String variableName, Object value) {
@@ -296,7 +307,8 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     setVariables(taskId, variables, true);
   }
 
-  protected void setVariables(String taskId, Map<String, ? extends Object> variables, boolean local) {
+  protected void setVariables(String taskId, Map<String, ? extends Object> variables,
+      boolean local) {
     try {
       commandExecutor.execute(new SetTaskVariablesCmd(taskId, variables, local));
     } catch (ProcessEngineException ex) {
@@ -307,15 +319,18 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     }
   }
 
-  public void updateVariablesLocal(String taskId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
+  public void updateVariablesLocal(String taskId, Map<String, ? extends Object> modifications,
+      Collection<String> deletions) {
     updateVariables(taskId, modifications, deletions, true);
   }
 
-  public void updateVariables(String taskId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
+  public void updateVariables(String taskId, Map<String, ? extends Object> modifications,
+      Collection<String> deletions) {
     updateVariables(taskId, modifications, deletions, false);
   }
 
-  protected void updateVariables(String taskId, Map<String, ? extends Object> modifications, Collection<String> deletions, boolean local) {
+  protected void updateVariables(String taskId, Map<String, ? extends Object> modifications,
+      Collection<String> deletions, boolean local) {
     try {
       commandExecutor.execute(new PatchTaskVariablesCmd(taskId, modifications, deletions, local));
     } catch (ProcessEngineException ex) {
@@ -370,12 +385,16 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     return commandExecutor.execute(new GetProcessInstanceCommentsCmd(processInstanceId));
   }
 
-  public Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content) {
-    return commandExecutor.execute(new CreateAttachmentCmd(attachmentType, taskId, processInstanceId, attachmentName, attachmentDescription, content, null));
+  public Attachment createAttachment(String attachmentType, String taskId, String processInstanceId,
+      String attachmentName, String attachmentDescription, InputStream content) {
+    return commandExecutor.execute(new CreateAttachmentCmd(attachmentType, taskId,
+        processInstanceId, attachmentName, attachmentDescription, content, null));
   }
 
-  public Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, String url) {
-    return commandExecutor.execute(new CreateAttachmentCmd(attachmentType, taskId, processInstanceId, attachmentName, attachmentDescription, null, url));
+  public Attachment createAttachment(String attachmentType, String taskId, String processInstanceId,
+      String attachmentName, String attachmentDescription, String url) {
+    return commandExecutor.execute(new CreateAttachmentCmd(attachmentType, taskId,
+        processInstanceId, attachmentName, attachmentDescription, null, url));
   }
 
   public InputStream getAttachmentContent(String attachmentId) {

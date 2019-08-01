@@ -34,7 +34,6 @@ public class DefaultArtifactFactoryTest {
     Assert.assertNotNull(artifact);
   }
 
-
   public static class DummyArtifact {
     // no content
   }

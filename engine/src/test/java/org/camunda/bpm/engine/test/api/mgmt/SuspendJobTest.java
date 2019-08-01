@@ -42,7 +42,7 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn" })
   public void testSuspensionById_shouldSuspendJob() {
     // given
 
@@ -71,7 +71,7 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     assertTrue(suspendedJob.isSuspended());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn" })
   public void testSuspensionByJobDefinitionId_shouldSuspendJob() {
     // given
 
@@ -104,14 +104,15 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     assertTrue(suspendedJob.isSuspended());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn" })
   public void testSuspensionByProcessInstanceId_shouldSuspendJob() {
     // given
 
     // a running process instance with a failed job
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("fail", Boolean.TRUE);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("suspensionProcess", params);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("suspensionProcess",
+        params);
 
     // the job definition
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
@@ -137,11 +138,12 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     assertTrue(suspendedJob.isSuspended());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn" })
   public void testSuspensionByProcessDefinitionId_shouldSuspendJob() {
     // given
     // a deployed process definition
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
     // a running process instance with a failed job
     Map<String, Object> params = new HashMap<String, Object>();
@@ -168,11 +170,12 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     assertTrue(suspendedJob.isSuspended());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn" })
   public void testSuspensionByProcessDefinitionKey_shouldSuspendJob() {
     // given
     // a deployed process definition
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
     // a running process instance with a failed job
     Map<String, Object> params = new HashMap<String, Object>();
@@ -206,9 +209,10 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     // Deploy three processes and start for each deployment a process instance
     // with a failed job
     int nrOfProcessDefinitions = 3;
-    for (int i=0; i < nrOfProcessDefinitions; i++) {
+    for (int i = 0; i < nrOfProcessDefinitions; i++) {
       repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn").deploy();
+          .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn")
+          .deploy();
       Map<String, Object> params = new HashMap<String, Object>();
       params.put("fail", Boolean.TRUE);
       runtimeService.startProcessInstanceByKey(key, params);
@@ -226,12 +230,13 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     assertEquals(3, jobQuery.suspended().count());
 
     // Clean DB
-    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService
+        .createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn" })
   public void testSuspensionByIdUsingBuilder() {
     // given
 
@@ -246,10 +251,7 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
 
     // when
     // the job will be suspended
-    managementService
-      .updateJobSuspensionState()
-      .byJobId(job.getId())
-      .suspend();
+    managementService.updateJobSuspensionState().byJobId(job.getId()).suspend();
 
     // then
     // the job should be suspended
@@ -257,7 +259,7 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     assertEquals(1, jobQuery.suspended().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn" })
   public void testSuspensionByJobDefinitionIdUsingBuilder() {
     // given
 
@@ -273,10 +275,7 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
 
     // when
     // the job will be suspended
-    managementService
-      .updateJobSuspensionState()
-      .byJobDefinitionId(jobDefinition.getId())
-      .suspend();
+    managementService.updateJobSuspensionState().byJobDefinitionId(jobDefinition.getId()).suspend();
 
     // then
     // the job should be suspended
@@ -284,7 +283,7 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     assertEquals(1, jobQuery.suspended().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn" })
   public void testSuspensionByProcessInstanceIdUsingBuilder() {
     // given
 
@@ -298,10 +297,8 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
 
     // when
     // the job will be suspended
-    managementService
-      .updateJobSuspensionState()
-      .byProcessInstanceId(processInstance.getId())
-      .suspend();
+    managementService.updateJobSuspensionState().byProcessInstanceId(processInstance.getId())
+        .suspend();
 
     // then
     // the job should be suspended
@@ -309,7 +306,7 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     assertEquals(1, jobQuery.suspended().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn" })
   public void testSuspensionByProcessDefinitionIdUsingBuilder() {
     // given
 
@@ -321,14 +318,13 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.active().count());
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
 
     // when
     // the job will be suspended
-    managementService
-      .updateJobSuspensionState()
-      .byProcessDefinitionId(processDefinition.getId())
-      .suspend();
+    managementService.updateJobSuspensionState().byProcessDefinitionId(processDefinition.getId())
+        .suspend();
 
     // then
     // the job should be suspended
@@ -336,7 +332,7 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     assertEquals(1, jobQuery.suspended().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/SuspensionTest.testBase.bpmn" })
   public void testSuspensionByProcessDefinitionKeyUsingBuilder() {
     // given
 
@@ -350,10 +346,8 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
 
     // when
     // the job will be suspended
-    managementService
-      .updateJobSuspensionState()
-      .byProcessDefinitionKey("suspensionProcess")
-      .suspend();
+    managementService.updateJobSuspensionState().byProcessDefinitionKey("suspensionProcess")
+        .suspend();
 
     // then
     // the job should be suspended

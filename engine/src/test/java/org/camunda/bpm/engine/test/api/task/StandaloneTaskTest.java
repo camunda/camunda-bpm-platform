@@ -96,7 +96,7 @@ public class StandaloneTaskTest extends PluggableProcessEngineTestCase {
       taskService.saveTask(task2);
       fail("should get an exception here as the task was modified by someone else.");
     } catch (OptimisticLockingException expected) {
-      //  exception was thrown as expected
+      // exception was thrown as expected
     }
 
     taskService.deleteTask(taskId, true);
@@ -125,9 +125,10 @@ public class StandaloneTaskTest extends PluggableProcessEngineTestCase {
       taskService.saveTask(task);
       fail("it should not be possible to save a task with the generic resource id *");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Entity Task[*] has an invalid id: id cannot be *. * is a reserved identifier", e.getMessage());
+      assertTextPresent(
+          "Entity Task[*] has an invalid id: id cannot be *. * is a reserved identifier",
+          e.getMessage());
     }
   }
-
 
 }

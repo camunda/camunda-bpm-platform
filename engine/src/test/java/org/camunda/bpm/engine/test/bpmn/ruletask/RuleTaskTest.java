@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  * @author Bernd Ruecker
  */
@@ -29,8 +28,9 @@ public class RuleTaskTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testJavaDelegate() {
     DummyServiceTask.wasExecuted = false;
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("businessRuleTaskJavaDelegate");
-    
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("businessRuleTaskJavaDelegate");
+
     assertProcessEnded(processInstance.getId());
     assertTrue(DummyServiceTask.wasExecuted);
   }

@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 
-
 /**
  * @author Daniel Meyer
  * @author Joram Barrez
@@ -46,18 +45,22 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
   protected final String messageName;
   protected boolean exclusive = false;
 
-  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables) {
+  public MessageEventReceivedCmd(String messageName, String executionId,
+      Map<String, Object> processVariables) {
     this(messageName, executionId, processVariables, null);
   }
 
-  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, Map<String, Object> processVariablesLocal) {
+  public MessageEventReceivedCmd(String messageName, String executionId,
+      Map<String, Object> processVariables, Map<String, Object> processVariablesLocal) {
     this.executionId = executionId;
     this.messageName = messageName;
     this.processVariables = processVariables;
     this.processVariablesLocal = processVariablesLocal;
   }
 
-  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, Map<String, Object> processVariablesLocal, boolean exclusive) {
+  public MessageEventReceivedCmd(String messageName, String executionId,
+      Map<String, Object> processVariables, Map<String, Object> processVariablesLocal,
+      boolean exclusive) {
     this(messageName, executionId, processVariables, processVariablesLocal);
     this.exclusive = exclusive;
   }
@@ -66,25 +69,32 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
   public Void execute(CommandContext commandContext) {
     ensureNotNull("executionId", executionId);
 
-    EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
+    EventSubscriptionManager eventSubscriptionManager = commandContext
+        .getEventSubscriptionManager();
     List<EventSubscriptionEntity> eventSubscriptions = null;
     if (messageName != null) {
       eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByNameAndExecution(
-              EventType.MESSAGE.name(), messageName, executionId, exclusive);
+          EventType.MESSAGE.name(), messageName, executionId, exclusive);
     } else {
       eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByExecutionAndType(
           executionId, EventType.MESSAGE.name(), exclusive);
     }
 
-    ensureNotEmpty("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'", "eventSubscriptions", eventSubscriptions);
-    ensureNumberOfElements("More than one matching message subscription found for execution " + executionId, "eventSubscriptions", eventSubscriptions, 1);
+    ensureNotEmpty(
+        "Execution with id '" + executionId
+            + "' does not have a subscription to a message event with name '" + messageName + "'",
+        "eventSubscriptions", eventSubscriptions);
+    ensureNumberOfElements(
+        "More than one matching message subscription found for execution " + executionId,
+        "eventSubscriptions", eventSubscriptions, 1);
 
     // there can be only one:
     EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptions.get(0);
 
     // check authorization
     String processInstanceId = eventSubscriptionEntity.getProcessInstanceId();
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateProcessInstanceById(processInstanceId);
     }
 
@@ -92,6 +102,5 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
 
     return null;
   }
-
 
 }

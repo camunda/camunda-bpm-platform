@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.event;
 
-
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -29,7 +28,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-
 /**
  * @author Daniel Meyer
  */
@@ -41,45 +39,49 @@ public class CompensationEventHandler implements EventHandler {
   }
 
   @Override
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, String businessKey, CommandContext commandContext) {
+  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload,
+      Object localPayload, String businessKey, CommandContext commandContext) {
     eventSubscription.delete();
 
     String configuration = eventSubscription.getConfiguration();
-    ensureNotNull("Compensating execution not set for compensate event subscription with id " + eventSubscription.getId(), "configuration", configuration);
+    ensureNotNull("Compensating execution not set for compensate event subscription with id "
+        + eventSubscription.getId(), "configuration", configuration);
 
-    ExecutionEntity compensatingExecution = commandContext.getExecutionManager().findExecutionById(configuration);
+    ExecutionEntity compensatingExecution = commandContext.getExecutionManager()
+        .findExecutionById(configuration);
 
     ActivityImpl compensationHandler = eventSubscription.getActivity();
 
     // activate execution
     compensatingExecution.setActive(true);
 
-    if (compensatingExecution.getActivity().getActivityBehavior() instanceof CompositeActivityBehavior) {
-      compensatingExecution.getParent().setActivityInstanceId(compensatingExecution.getActivityInstanceId());
+    if (compensatingExecution.getActivity()
+        .getActivityBehavior() instanceof CompositeActivityBehavior) {
+      compensatingExecution.getParent()
+          .setActivityInstanceId(compensatingExecution.getActivityInstanceId());
     }
 
     if (compensationHandler.isScope() && !compensationHandler.isCompensationHandler()) {
       // descend into scope:
-      List<EventSubscriptionEntity> eventsForThisScope = compensatingExecution.getCompensateEventSubscriptions();
+      List<EventSubscriptionEntity> eventsForThisScope = compensatingExecution
+          .getCompensateEventSubscriptions();
       CompensationUtil.throwCompensationEvent(eventsForThisScope, compensatingExecution, false);
 
     } else {
       try {
 
-
         if (compensationHandler.isSubProcessScope() && compensationHandler.isTriggeredByEvent()) {
           compensatingExecution.executeActivity(compensationHandler);
-        }
-        else {
+        } else {
           // since we already have a scope execution, we don't need to create another one
           // for a simple scoped compensation handler
           compensatingExecution.setActivity(compensationHandler);
           compensatingExecution.performOperation(PvmAtomicOperation.ACTIVITY_START);
         }
 
-
       } catch (Exception e) {
-        throw new ProcessEngineException("Error while handling compensation event " + eventSubscription, e);
+        throw new ProcessEngineException(
+            "Error while handling compensation event " + eventSubscription, e);
       }
     }
   }

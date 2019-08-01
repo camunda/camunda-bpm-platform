@@ -50,7 +50,8 @@ public class JobAcquisitionTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configuration.setJobExecutor(new ControllableJobExecutor());
     }
   };
@@ -62,9 +63,8 @@ public class JobAcquisitionTest {
   @Before
   public void setUp() throws Exception {
     // two job executors with the default settings
-    jobExecutor1 = (ControllableJobExecutor)
-        ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
-        .getJobExecutor();
+    jobExecutor1 = (ControllableJobExecutor) ((ProcessEngineConfigurationImpl) engineRule
+        .getProcessEngine().getProcessEngineConfiguration()).getJobExecutor();
     jobExecutor1.setMaxJobsPerAcquisition(DEFAULT_NUM_JOBS_TO_ACQUIRE);
     acquisitionThread1 = jobExecutor1.getAcquisitionThreadControl();
 
@@ -105,7 +105,8 @@ public class JobAcquisitionTest {
 
     // then it has not performed waiting since it was able to acquire and execute all jobs
     Assert.assertEquals(0, engineRule.getManagementService().createJobQuery().active().count());
-    List<RecordedWaitEvent> jobExecutor1WaitEvents = jobExecutor1.getAcquireJobsRunnable().getWaitEvents();
+    List<RecordedWaitEvent> jobExecutor1WaitEvents = jobExecutor1.getAcquireJobsRunnable()
+        .getWaitEvents();
     Assert.assertEquals(1, jobExecutor1WaitEvents.size());
     Assert.assertEquals(0, jobExecutor1WaitEvents.get(0).getTimeBetweenAcquisitions());
 
@@ -114,7 +115,8 @@ public class JobAcquisitionTest {
 
     // then its acquisition cycle fails with OLEs
     // but the acquisition thread immediately tries again
-    List<RecordedWaitEvent> jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable().getWaitEvents();
+    List<RecordedWaitEvent> jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable()
+        .getWaitEvents();
     Assert.assertEquals(1, jobExecutor2WaitEvents.size());
     Assert.assertEquals(0, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
 

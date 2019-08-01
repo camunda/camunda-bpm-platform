@@ -46,7 +46,8 @@ import static org.junit.Assert.assertThat;
 public class HistoryCleanupSchedulerAttachmentsTest extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configure(configuration);
     }
   };
@@ -55,7 +56,8 @@ public class HistoryCleanupSchedulerAttachmentsTest extends AbstractHistoryClean
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -74,10 +76,8 @@ public class HistoryCleanupSchedulerAttachmentsTest extends AbstractHistoryClean
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .userTask("userTask").name("userTask")
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().userTask("userTask").name("userTask").endEvent()
+      .done();
 
   protected final Date END_DATE = new Date(1363608000000L);
 
@@ -88,10 +88,8 @@ public class HistoryCleanupSchedulerAttachmentsTest extends AbstractHistoryClean
 
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -124,10 +122,8 @@ public class HistoryCleanupSchedulerAttachmentsTest extends AbstractHistoryClean
 
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     ClockUtil.setCurrentTime(END_DATE);
 

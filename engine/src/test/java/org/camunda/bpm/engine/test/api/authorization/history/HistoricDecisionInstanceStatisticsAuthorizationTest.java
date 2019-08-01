@@ -67,16 +67,11 @@ public class HistoricDecisionInstanceStatisticsAuthorizationTest {
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-        scenario()
-            .withoutAuthorizations()
-            .failsDueToRequired(
-                grant(Resources.DECISION_REQUIREMENTS_DEFINITION, "dish", "userId", Permissions.READ)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.DECISION_REQUIREMENTS_DEFINITION, "drd", "userId", Permissions.READ)
-            ).succeeds()
-    );
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.DECISION_REQUIREMENTS_DEFINITION, "dish", "userId", Permissions.READ)),
+        scenario().withAuthorizations(
+            grant(Resources.DECISION_REQUIREMENTS_DEFINITION, "drd", "userId", Permissions.READ))
+            .succeeds());
   }
 
   @Before
@@ -89,10 +84,12 @@ public class HistoricDecisionInstanceStatisticsAuthorizationTest {
     authRule.createUserAndGroup("userId", "groupId");
 
     decisionService.evaluateDecisionTableByKey("dish-decision")
-        .variables(Variables.createVariables().putValue("temperature", 21).putValue("dayType", "Weekend"))
+        .variables(
+            Variables.createVariables().putValue("temperature", 21).putValue("dayType", "Weekend"))
         .evaluate();
 
-    decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
+    decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery()
+        .singleResult();
   }
 
   @After
@@ -102,16 +99,13 @@ public class HistoricDecisionInstanceStatisticsAuthorizationTest {
 
   @Test
   public void testCreateStatistics() {
-    //given
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("drd", "*")
-        .start();
+    // given
+    authRule.init(scenario).withUser("userId").bindResource("drd", "*").start();
 
     // when
-    historyService.createHistoricDecisionInstanceStatisticsQuery(
-        decisionRequirementsDefinition.getId()).list();
+    historyService
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId())
+        .list();
 
     // then
     authRule.assertScenario(scenario);

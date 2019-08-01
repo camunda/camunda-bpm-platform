@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 public class AsyncMigrationValidator implements MigratingTransitionInstanceValidator {
 
   @Override
-  public void validate(MigratingTransitionInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+  public void validate(MigratingTransitionInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
       MigratingTransitionInstanceValidationReportImpl instanceReport) {
     ActivityImpl targetActivity = (ActivityImpl) migratingInstance.getTargetScope();
 
@@ -32,8 +33,7 @@ public class AsyncMigrationValidator implements MigratingTransitionInstanceValid
         if (!targetActivity.isAsyncAfter()) {
           instanceReport.addFailure("Target activity is not asyncAfter");
         }
-      }
-      else {
+      } else {
         if (!targetActivity.isAsyncBefore()) {
           instanceReport.addFailure("Target activity is not asyncBefore");
         }

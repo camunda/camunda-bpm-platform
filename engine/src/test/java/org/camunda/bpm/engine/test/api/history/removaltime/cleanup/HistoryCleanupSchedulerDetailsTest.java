@@ -49,8 +49,10 @@ import static org.junit.Assert.assertThat;
 public class HistoryCleanupSchedulerDetailsTest extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      return configure(configuration, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE_DETAIL);
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
+      return configure(configuration, HistoryEventTypes.VARIABLE_INSTANCE_UPDATE,
+          HistoryEventTypes.VARIABLE_INSTANCE_UPDATE_DETAIL);
     }
   };
 
@@ -58,7 +60,8 @@ public class HistoryCleanupSchedulerDetailsTest extends AbstractHistoryCleanupSc
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -77,10 +80,8 @@ public class HistoryCleanupSchedulerDetailsTest extends AbstractHistoryCleanupSc
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .userTask("userTask").name("userTask")
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().userTask("userTask").name("userTask").endEvent()
+      .done();
 
   @Test
   public void shouldScheduleToNow() {
@@ -90,10 +91,11 @@ public class HistoryCleanupSchedulerDetailsTest extends AbstractHistoryCleanupSc
     ClockUtil.setCurrentTime(END_DATE);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY,
-      Variables.putValue("aVariableName", Variables.stringValue("aVariableValue")));
+        Variables.putValue("aVariableName", Variables.stringValue("aVariableValue")));
 
     for (int i = 0; i < 5; i++) {
-      runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue" + i));
+      runtimeService.setVariable(processInstance.getId(), "aVariableName",
+          Variables.stringValue("anotherVariableValue" + i));
     }
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -122,10 +124,11 @@ public class HistoryCleanupSchedulerDetailsTest extends AbstractHistoryCleanupSc
     ClockUtil.setCurrentTime(END_DATE);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY,
-      Variables.putValue("aVariableName", Variables.stringValue("aVariableValue")));
+        Variables.putValue("aVariableName", Variables.stringValue("aVariableValue")));
 
     for (int i = 0; i < 5; i++) {
-      runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue" + i));
+      runtimeService.setVariable(processInstance.getId(), "aVariableName",
+          Variables.stringValue("anotherVariableValue" + i));
     }
 
     String taskId = taskService.createTaskQuery().singleResult().getId();

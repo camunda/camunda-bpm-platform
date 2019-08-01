@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.camunda.bpm.engine.test.api.runtime;
+
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -39,21 +40,24 @@ public class VariableInstanceQueryForOracleTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-  
+
   @Test
   public void testQueryWhen0InstancesActive() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume
+        .assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
 
     // then
-    List<VariableInstance> variables = engineRule.getRuntimeService().createVariableInstanceQuery().list();
+    List<VariableInstance> variables = engineRule.getRuntimeService().createVariableInstanceQuery()
+        .list();
     assertEquals(0, variables.size());
   }
 
   @Test
   public void testQueryWhen1InstanceActive() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume
+        .assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
     RuntimeService runtimeService = engineRule.getRuntimeService();
     testRule.deploy(ProcessModels.TWO_TASKS_PROCESS);
 
@@ -71,7 +75,8 @@ public class VariableInstanceQueryForOracleTest {
   @Test
   public void testQueryWhen1000InstancesActive() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume
+        .assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
     RuntimeService runtimeService = engineRule.getRuntimeService();
     testRule.deploy(ProcessModels.TWO_TASKS_PROCESS);
     String[] ids = new String[1000];
@@ -80,7 +85,8 @@ public class VariableInstanceQueryForOracleTest {
     for (int i = 0; i < 1000; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process",
           Variables.createVariables().putValue("foo", "bar"));
-      String activityInstanceId = runtimeService.getActivityInstance(processInstance.getId()).getId();
+      String activityInstanceId = runtimeService.getActivityInstance(processInstance.getId())
+          .getId();
       ids[i] = activityInstanceId;
     }
 
@@ -93,7 +99,8 @@ public class VariableInstanceQueryForOracleTest {
   @Test
   public void testQueryWhen1001InstancesActive() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume
+        .assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
     RuntimeService runtimeService = engineRule.getRuntimeService();
     testRule.deploy(ProcessModels.TWO_TASKS_PROCESS);
     String[] ids = new String[1001];
@@ -102,7 +109,8 @@ public class VariableInstanceQueryForOracleTest {
     for (int i = 0; i < 1001; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process",
           Variables.createVariables().putValue("foo", "bar"));
-      String activityInstanceId = runtimeService.getActivityInstance(processInstance.getId()).getId();
+      String activityInstanceId = runtimeService.getActivityInstance(processInstance.getId())
+          .getId();
       ids[i] = activityInstanceId;
     }
 
@@ -115,7 +123,8 @@ public class VariableInstanceQueryForOracleTest {
   @Test
   public void testQueryWhen2001InstancesActive() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume
+        .assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
     RuntimeService runtimeService = engineRule.getRuntimeService();
     testRule.deploy(ProcessModels.TWO_TASKS_PROCESS);
     String[] ids = new String[2001];
@@ -124,7 +133,8 @@ public class VariableInstanceQueryForOracleTest {
     for (int i = 0; i < 2001; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process",
           Variables.createVariables().putValue("foo", "bar"));
-      String activityInstanceId = runtimeService.getActivityInstance(processInstance.getId()).getId();
+      String activityInstanceId = runtimeService.getActivityInstance(processInstance.getId())
+          .getId();
       ids[i] = activityInstanceId;
     }
 

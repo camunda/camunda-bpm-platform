@@ -25,7 +25,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 
 /**
- * <p>{@link ProcessEnginePlugin} enabling the process application event listener support.</p>
+ * <p>
+ * {@link ProcessEnginePlugin} enabling the process application event listener support.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -33,8 +35,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 public class ProcessApplicationEventListenerPlugin extends AbstractProcessEnginePlugin {
 
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    List<BpmnParseListener> preParseListeners = processEngineConfiguration.getCustomPreBPMNParseListeners();
-    if(preParseListeners == null) {
+    List<BpmnParseListener> preParseListeners = processEngineConfiguration
+        .getCustomPreBPMNParseListeners();
+    if (preParseListeners == null) {
       preParseListeners = new ArrayList<BpmnParseListener>();
       processEngineConfiguration.setCustomPreBPMNParseListeners(preParseListeners);
     }

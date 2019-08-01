@@ -64,21 +64,22 @@ public class HistoryCleanupOnEngineBootstrapTest {
     // given
     // create history cleanup job
     ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/batchwindow.camunda.cfg.xml")
-      .buildProcessEngine()
-      .close();
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/history/batchwindow.camunda.cfg.xml")
+        .buildProcessEngine().close();
 
     // when
     // suspend history cleanup job
     ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/no-batchwindow.camunda.cfg.xml")
-      .buildProcessEngine()
-      .close();
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/history/no-batchwindow.camunda.cfg.xml")
+        .buildProcessEngine().close();
 
     // then
     // reconfigure history cleanup job
     ProcessEngineConfiguration processEngineConfiguration = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/batchwindow.camunda.cfg.xml");
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/history/batchwindow.camunda.cfg.xml");
     processEngineConfiguration.setProcessEngineName(ENGINE_NAME);
     ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
 
@@ -91,9 +92,9 @@ public class HistoryCleanupOnEngineBootstrapTest {
   public void testDecreaseNumberOfHistoryCleanupJobs() {
     // given
     // create history cleanup job
-    ProcessEngine engine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/history-cleanup-parallelism-default.camunda.cfg.xml")
-      .buildProcessEngine();
+    ProcessEngine engine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(
+        "org/camunda/bpm/engine/test/history/history-cleanup-parallelism-default.camunda.cfg.xml")
+        .buildProcessEngine();
 
     // assume
     ManagementService managementService = engine.getManagementService();
@@ -103,8 +104,9 @@ public class HistoryCleanupOnEngineBootstrapTest {
 
     // when
     engine = ProcessEngineConfiguration
-    .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/history-cleanup-parallelism-less.camunda.cfg.xml")
-      .buildProcessEngine();
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/history/history-cleanup-parallelism-less.camunda.cfg.xml")
+        .buildProcessEngine();
 
     // then
     // reconfigure history cleanup job
@@ -122,9 +124,9 @@ public class HistoryCleanupOnEngineBootstrapTest {
   public void testIncreaseNumberOfHistoryCleanupJobs() {
     // given
     // create history cleanup job
-    ProcessEngine engine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/history-cleanup-parallelism-default.camunda.cfg.xml")
-      .buildProcessEngine();
+    ProcessEngine engine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(
+        "org/camunda/bpm/engine/test/history/history-cleanup-parallelism-default.camunda.cfg.xml")
+        .buildProcessEngine();
 
     // assume
     ManagementService managementService = engine.getManagementService();
@@ -134,8 +136,9 @@ public class HistoryCleanupOnEngineBootstrapTest {
 
     // when
     engine = ProcessEngineConfiguration
-    .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/history-cleanup-parallelism-more.camunda.cfg.xml")
-      .buildProcessEngine();
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/history/history-cleanup-parallelism-more.camunda.cfg.xml")
+        .buildProcessEngine();
 
     // then
     // reconfigure history cleanup job
@@ -149,29 +152,21 @@ public class HistoryCleanupOnEngineBootstrapTest {
 
       if (minuteFrom == 0) {
         assertEquals(6, minuteTo);
-      }
-      else if (minuteFrom == 7) {
+      } else if (minuteFrom == 7) {
         assertEquals(13, minuteTo);
-      }
-      else if (minuteFrom == 14) {
+      } else if (minuteFrom == 14) {
         assertEquals(20, minuteTo);
-      }
-      else if (minuteFrom == 21) {
+      } else if (minuteFrom == 21) {
         assertEquals(27, minuteTo);
-      }
-      else if (minuteFrom == 28) {
+      } else if (minuteFrom == 28) {
         assertEquals(34, minuteTo);
-      }
-      else if (minuteFrom == 35) {
+      } else if (minuteFrom == 35) {
         assertEquals(41, minuteTo);
-      }
-      else if (minuteFrom == 42) {
+      } else if (minuteFrom == 42) {
         assertEquals(48, minuteTo);
-      }
-      else if (minuteFrom == 49) {
+      } else if (minuteFrom == 49) {
         assertEquals(59, minuteTo);
-      }
-      else {
+      } else {
         fail("unexpected minute from " + minuteFrom);
       }
     }
@@ -184,25 +179,26 @@ public class HistoryCleanupOnEngineBootstrapTest {
     thrown.expect(Exception.class);
     thrown.expectMessage("startTime");
 
-    ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/history-cleanup-batch-window-map-wrong-values.camunda.cfg.xml")
-      .buildProcessEngine();
+    ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(
+        "org/camunda/bpm/engine/test/history/history-cleanup-batch-window-map-wrong-values.camunda.cfg.xml")
+        .buildProcessEngine();
   }
 
   @Test
   public void testBatchWindowMapInXmlConfig() throws ParseException {
     // given
-    //we're on Monday
+    // we're on Monday
     ClockUtil.setCurrentTime(sdf.parse("2018-05-14T22:00:00"));
 
-    //when
-    //we configure batch window only for Wednesday and start the server
+    // when
+    // we configure batch window only for Wednesday and start the server
     ProcessEngine engine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/history-cleanup-batch-window-map.camunda.cfg.xml")
-      .buildProcessEngine();
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/history/history-cleanup-batch-window-map.camunda.cfg.xml")
+        .buildProcessEngine();
 
-    //then
-    //history cleanup is scheduled for Wednesday
+    // then
+    // history cleanup is scheduled for Wednesday
     List<Job> historyCleanupJobs = engine.getHistoryService().findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
     assertEquals(1, historyCleanupJobs.size());
@@ -211,14 +207,14 @@ public class HistoryCleanupOnEngineBootstrapTest {
 
     engine.close();
 
-    //when
-    //we reconfigure batch window with default values
-    engine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/history-cleanup-batch-window-default.camunda.cfg.xml")
-      .buildProcessEngine();
+    // when
+    // we reconfigure batch window with default values
+    engine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(
+        "org/camunda/bpm/engine/test/history/history-cleanup-batch-window-default.camunda.cfg.xml")
+        .buildProcessEngine();
 
-    //then
-    //history cleanup is scheduled for today
+    // then
+    // history cleanup is scheduled for today
     historyCleanupJobs = engine.getHistoryService().findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
     assertEquals(1, historyCleanupJobs.size());
@@ -231,19 +227,23 @@ public class HistoryCleanupOnEngineBootstrapTest {
   @Test
   public void testHistoryCleanupJobScheduled() throws ParseException {
 
-    final ProcessEngineConfigurationImpl standaloneInMemProcessEngineConfiguration = (ProcessEngineConfigurationImpl)ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
+    final ProcessEngineConfigurationImpl standaloneInMemProcessEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+        .createStandaloneInMemProcessEngineConfiguration();
     standaloneInMemProcessEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
     standaloneInMemProcessEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
-    standaloneInMemProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName() + "testHistoryCleanupJobScheduled");
+    standaloneInMemProcessEngineConfiguration.setJdbcUrl(
+        "jdbc:h2:mem:camunda" + getClass().getSimpleName() + "testHistoryCleanupJobScheduled");
 
-    ProcessEngine engine = standaloneInMemProcessEngineConfiguration
-      .buildProcessEngine();
+    ProcessEngine engine = standaloneInMemProcessEngineConfiguration.buildProcessEngine();
 
     final List<Job> historyCleanupJobs = engine.getHistoryService().findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
-    final ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
+    final ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engine
+        .getProcessEngineConfiguration();
     for (Job historyCleanupJob : historyCleanupJobs) {
-      assertEquals(processEngineConfiguration.getBatchWindowManager().getCurrentOrNextBatchWindow(ClockUtil.getCurrentTime(), processEngineConfiguration).getStart(), historyCleanupJob.getDuedate());
+      assertEquals(processEngineConfiguration.getBatchWindowManager()
+          .getCurrentOrNextBatchWindow(ClockUtil.getCurrentTime(), processEngineConfiguration)
+          .getStart(), historyCleanupJob.getDuedate());
     }
 
     closeProcessEngine(engine);
@@ -251,38 +251,45 @@ public class HistoryCleanupOnEngineBootstrapTest {
 
   @Test
   public void testBatchWindowOneDayOfWeek() throws ParseException {
-    ClockUtil.setCurrentTime(sdf.parse("2018-05-14T22:00:00"));       //monday
-    //given
-    final ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl)ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
-    //we have batch window only once per week - Monday afternoon
-    configuration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("18:00", "20:00"));
-    configuration.setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName() + "testBatchWindowOneDayOfWeek");
+    ClockUtil.setCurrentTime(sdf.parse("2018-05-14T22:00:00")); // monday
+    // given
+    final ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+        .createStandaloneInMemProcessEngineConfiguration();
+    // we have batch window only once per week - Monday afternoon
+    configuration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY,
+        new BatchWindowConfiguration("18:00", "20:00"));
+    configuration.setJdbcUrl(
+        "jdbc:h2:mem:camunda" + getClass().getSimpleName() + "testBatchWindowOneDayOfWeek");
 
-    //when
-    //we're on Monday evening
-    //and we bootstrap the engine
+    // when
+    // we're on Monday evening
+    // and we bootstrap the engine
     ProcessEngine engine = configuration.buildProcessEngine();
 
-    //then
-    //job is scheduled for next week Monday
+    // then
+    // job is scheduled for next week Monday
     List<Job> historyCleanupJobs = engine.getHistoryService().findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
     assertEquals(1, historyCleanupJobs.size());
-    assertEquals(sdf.parse("2018-05-21T18:00:00"), historyCleanupJobs.get(0).getDuedate());     //monday next week
+    assertEquals(sdf.parse("2018-05-21T18:00:00"), historyCleanupJobs.get(0).getDuedate()); // monday
+                                                                                            // next
+                                                                                            // week
     assertEquals(false, historyCleanupJobs.get(0).isSuspended());
 
-    //when
-    //we're on Monday evening next week, right aftre the end of batch window
-    ClockUtil.setCurrentTime(sdf.parse("2018-05-21T20:00:01"));       //monday
-    //we force history job to be rescheduled
+    // when
+    // we're on Monday evening next week, right aftre the end of batch window
+    ClockUtil.setCurrentTime(sdf.parse("2018-05-21T20:00:01")); // monday
+    // we force history job to be rescheduled
     engine.getManagementService().executeJob(historyCleanupJobs.get(0).getId());
 
-    //then
-    //job is scheduled for next week Monday
+    // then
+    // job is scheduled for next week Monday
     historyCleanupJobs = engine.getHistoryService().findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
     assertEquals(1, historyCleanupJobs.size());
-    assertEquals(sdf.parse("2018-05-28T18:00:00"), historyCleanupJobs.get(0).getDuedate());     //monday next week
+    assertEquals(sdf.parse("2018-05-28T18:00:00"), historyCleanupJobs.get(0).getDuedate()); // monday
+                                                                                            // next
+                                                                                            // week
     assertEquals(false, historyCleanupJobs.get(0).isSuspended());
 
     closeProcessEngine(engine);
@@ -290,62 +297,65 @@ public class HistoryCleanupOnEngineBootstrapTest {
 
   @Test
   public void testBatchWindow24Hours() throws ParseException {
-    //given
-    final ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl)ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
-    //we have batch window for 24 hours
-    configuration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("06:00", "06:00"));
-    configuration.setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName() + "testBatchWindow24Hours");
+    // given
+    final ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+        .createStandaloneInMemProcessEngineConfiguration();
+    // we have batch window for 24 hours
+    configuration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY,
+        new BatchWindowConfiguration("06:00", "06:00"));
+    configuration
+        .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName() + "testBatchWindow24Hours");
 
-    //when
-    //we're on Monday early morning
-    ClockUtil.setCurrentTime(sdf.parse("2018-05-14T05:00:00"));       //monday
-    //and we bootstrap the engine
+    // when
+    // we're on Monday early morning
+    ClockUtil.setCurrentTime(sdf.parse("2018-05-14T05:00:00")); // monday
+    // and we bootstrap the engine
     ProcessEngine engine = configuration.buildProcessEngine();
 
-    //then
-    //job is scheduled for Monday 06 AM
+    // then
+    // job is scheduled for Monday 06 AM
     List<Job> historyCleanupJobs = engine.getHistoryService().findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
     assertEquals(1, historyCleanupJobs.size());
     assertEquals(sdf.parse("2018-05-14T06:00:00"), historyCleanupJobs.get(0).getDuedate());
     assertEquals(false, historyCleanupJobs.get(0).isSuspended());
 
-    //when
-    //we're on Monday afternoon
+    // when
+    // we're on Monday afternoon
     ClockUtil.setCurrentTime(sdf.parse("2018-05-14T15:00:00"));
-    //we force history job to be rescheduled
+    // we force history job to be rescheduled
     engine.getManagementService().executeJob(historyCleanupJobs.get(0).getId());
 
-    //then
-    //job is still within current batch window
+    // then
+    // job is still within current batch window
     historyCleanupJobs = engine.getHistoryService().findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
     assertEquals(1, historyCleanupJobs.size());
     assertTrue(sdf.parse("2018-05-15T06:00:00").after(historyCleanupJobs.get(0).getDuedate()));
     assertEquals(false, historyCleanupJobs.get(0).isSuspended());
 
-    //when
-    //we're on Tuesday early morning close to the end of batch window
+    // when
+    // we're on Tuesday early morning close to the end of batch window
     ClockUtil.setCurrentTime(sdf.parse("2018-05-15T05:59:00"));
-    //we force history job to be rescheduled
+    // we force history job to be rescheduled
     engine.getManagementService().executeJob(historyCleanupJobs.get(0).getId());
 
-    //then
-    //job is still within current batch window
+    // then
+    // job is still within current batch window
     historyCleanupJobs = engine.getHistoryService().findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
     assertEquals(1, historyCleanupJobs.size());
     assertTrue(sdf.parse("2018-05-15T06:00:00").after(historyCleanupJobs.get(0).getDuedate()));
     assertEquals(false, historyCleanupJobs.get(0).isSuspended());
 
-    //when
-    //we're on Tuesday early morning shortly after the end of batch window
+    // when
+    // we're on Tuesday early morning shortly after the end of batch window
     ClockUtil.setCurrentTime(sdf.parse("2018-05-15T06:01:00"));
-    //we force history job to be rescheduled
+    // we force history job to be rescheduled
     engine.getManagementService().executeJob(historyCleanupJobs.get(0).getId());
 
-    //then
-    //job is rescheduled till next Monday
+    // then
+    // job is rescheduled till next Monday
     historyCleanupJobs = engine.getHistoryService().findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
     assertEquals(1, historyCleanupJobs.size());
@@ -355,26 +365,28 @@ public class HistoryCleanupOnEngineBootstrapTest {
     closeProcessEngine(engine);
   }
 
-  protected HistoryCleanupJobHandlerConfiguration getHistoryCleanupJobHandlerConfiguration(Job job) {
+  protected HistoryCleanupJobHandlerConfiguration getHistoryCleanupJobHandlerConfiguration(
+      Job job) {
     return HistoryCleanupJobHandlerConfiguration
-          .fromJson(JsonUtil.asObject(((JobEntity) job).getJobHandlerConfigurationRaw()));
+        .fromJson(JsonUtil.asObject(((JobEntity) job).getJobHandlerConfigurationRaw()));
   }
 
   protected void closeProcessEngine(ProcessEngine processEngine) {
-    ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) processEngine
+        .getProcessEngineConfiguration();
     final HistoryService historyService = processEngine.getHistoryService();
     configuration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
         List<Job> jobs = historyService.findHistoryCleanupJobs();
-        for (Job job: jobs) {
+        for (Job job : jobs) {
           commandContext.getJobManager().deleteJob((JobEntity) job);
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
         }
 
-        //cleanup "detached" historic job logs
+        // cleanup "detached" historic job logs
         final List<HistoricJobLog> list = historyService.createHistoricJobLogQuery().list();
-        for (HistoricJobLog jobLog: list) {
+        for (HistoricJobLog jobLog : list) {
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobLog.getJobId());
         }
 

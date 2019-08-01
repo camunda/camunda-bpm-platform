@@ -37,10 +37,9 @@ public class GetProcessApplicationForDeploymentCmd implements Command<String> {
     commandContext.getAuthorizationManager().checkCamundaAdmin();
 
     ProcessApplicationReference reference = Context.getProcessEngineConfiguration()
-      .getProcessApplicationManager()
-      .getProcessApplicationForDeployment(deploymentId);
+        .getProcessApplicationManager().getProcessApplicationForDeployment(deploymentId);
 
-    if(reference != null) {
+    if (reference != null) {
       return reference.getName();
     } else {
       return null;

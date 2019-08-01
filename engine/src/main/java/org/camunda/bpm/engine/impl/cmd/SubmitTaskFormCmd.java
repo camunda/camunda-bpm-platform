@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -52,7 +51,8 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
   protected boolean returnVariables;
   protected boolean deserializeValues;
 
-  public SubmitTaskFormCmd(String taskId, Map<String, Object> properties, boolean returnVariables, boolean deserializeValues) {
+  public SubmitTaskFormCmd(String taskId, Map<String, Object> properties, boolean returnVariables,
+      boolean deserializeValues) {
     this.taskId = taskId;
     this.properties = Variables.fromMap(properties);
     this.returnVariables = returnVariables;
@@ -65,12 +65,13 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
     TaskEntity task = taskManager.findTaskById(taskId);
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkTaskWork(task);
     }
 
     TaskDefinition taskDefinition = task.getTaskDefinition();
-    if(taskDefinition != null) {
+    if (taskDefinition != null) {
       TaskFormHandler taskFormHandler = taskDefinition.getTaskFormHandler();
       taskFormHandler.submitFormVariables(properties, task);
     } else {
@@ -81,7 +82,8 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
     ExecutionEntity execution = task.getProcessInstance();
     ExecutionVariableSnapshotObserver variablesListener = null;
     if (returnVariables && execution != null) {
-      variablesListener = new ExecutionVariableSnapshotObserver(execution, false, deserializeValues);
+      variablesListener = new ExecutionVariableSnapshotObserver(execution, false,
+          deserializeValues);
     }
 
     // complete or resolve the task
@@ -93,16 +95,13 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);
     }
 
-    if (returnVariables)
-    {
+    if (returnVariables) {
       if (variablesListener != null) {
         return variablesListener.getVariables();
       } else {
         return task.getCaseDefinitionId() == null ? null : task.getVariablesTyped(false);
       }
-    }
-    else
-    {
+    } else {
       return null;
     }
   }

@@ -156,10 +156,12 @@ public class DecisionDefinitionDeployerTest {
   @Deployment
   @Test
   public void longDecisionDefinitionKey() {
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
 
     assertFalse(decisionDefinition.getId().startsWith("o123456789"));
-    assertEquals("o123456789o123456789o123456789o123456789o123456789o123456789o123456789", decisionDefinition.getKey());
+    assertEquals("o123456789o123456789o123456789o123456789o123456789o123456789o123456789",
+        decisionDefinition.getKey());
   }
 
   @Test
@@ -170,22 +172,19 @@ public class DecisionDefinitionDeployerTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("duplicateDecision");
 
-    repositoryService.createDeployment()
-            .addClasspathResource(resourceName1)
-            .addClasspathResource(resourceName2)
-            .name("duplicateIds")
-            .deploy();
+    repositoryService.createDeployment().addClasspathResource(resourceName1)
+        .addClasspathResource(resourceName2).name("duplicateIds").deploy();
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDiagramResource.dmn11.xml",
-    "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDiagramResource.png"
-  })
+      "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDiagramResource.dmn11.xml",
+      "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDiagramResource.png" })
   @Test
   public void getDecisionDiagramResource() {
     String resourcePrefix = "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDiagramResource";
 
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
 
     assertEquals(resourcePrefix + ".dmn11.xml", decisionDefinition.getResourceName());
     assertEquals("decision", decisionDefinition.getKey());
@@ -193,26 +192,28 @@ public class DecisionDefinitionDeployerTest {
     String diagramResourceName = decisionDefinition.getDiagramResourceName();
     assertEquals(resourcePrefix + ".png", diagramResourceName);
 
-    InputStream diagramStream = repositoryService.getResourceAsStream(decisionDefinition.getDeploymentId(), diagramResourceName);
+    InputStream diagramStream = repositoryService
+        .getResourceAsStream(decisionDefinition.getDeploymentId(), diagramResourceName);
     final byte[] diagramBytes = IoUtil.readInputStream(diagramStream, "diagram stream");
     assertEquals(2540, diagramBytes.length);
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testMultipleDecisionDiagramResource.dmn11.xml",
-    "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testMultipleDecisionDiagramResource.decision1.png",
-    "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testMultipleDecisionDiagramResource.decision2.png",
-    "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testMultipleDecisionDiagramResource.decision3.png"
-  })
+      "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testMultipleDecisionDiagramResource.dmn11.xml",
+      "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testMultipleDecisionDiagramResource.decision1.png",
+      "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testMultipleDecisionDiagramResource.decision2.png",
+      "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testMultipleDecisionDiagramResource.decision3.png" })
   @Test
   public void multipleDiagramResourcesProvided() {
     String resourcePrefix = "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testMultipleDecisionDiagramResource.";
 
-    DecisionDefinitionQuery decisionDefinitionQuery = repositoryService.createDecisionDefinitionQuery();
+    DecisionDefinitionQuery decisionDefinitionQuery = repositoryService
+        .createDecisionDefinitionQuery();
     assertEquals(3, decisionDefinitionQuery.count());
 
     for (DecisionDefinition decisionDefinition : decisionDefinitionQuery.list()) {
-      assertEquals(resourcePrefix + decisionDefinition.getKey() + ".png", decisionDefinition.getDiagramResourceName());
+      assertEquals(resourcePrefix + decisionDefinition.getKey() + ".png",
+          decisionDefinition.getDiagramResourceName());
     }
   }
 
@@ -221,7 +222,8 @@ public class DecisionDefinitionDeployerTest {
     String deploymentId = testRule.deploy(DRD_SCORE_RESOURCE).getId();
 
     // there should be one decision requirements definition
-    DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
+    DecisionRequirementsDefinitionQuery query = repositoryService
+        .createDecisionRequirementsDefinitionQuery();
     assertEquals(1, query.count());
 
     DecisionRequirementsDefinition decisionRequirementsDefinition = query.singleResult();
@@ -236,21 +238,24 @@ public class DecisionDefinitionDeployerTest {
     assertNull(decisionRequirementsDefinition.getDiagramResourceName());
 
     // both decisions should have a reference to the decision requirements definition
-    List<DecisionDefinition> decisions = repositoryService.createDecisionDefinitionQuery().orderByDecisionDefinitionKey().asc().list();
+    List<DecisionDefinition> decisions = repositoryService.createDecisionDefinitionQuery()
+        .orderByDecisionDefinitionKey().asc().list();
     assertEquals(2, decisions.size());
 
     DecisionDefinition firstDecision = decisions.get(0);
     assertEquals("score-decision", firstDecision.getKey());
-    assertEquals(decisionRequirementsDefinition.getId(), firstDecision.getDecisionRequirementsDefinitionId());
+    assertEquals(decisionRequirementsDefinition.getId(),
+        firstDecision.getDecisionRequirementsDefinitionId());
     assertEquals("score", firstDecision.getDecisionRequirementsDefinitionKey());
 
     DecisionDefinition secondDecision = decisions.get(1);
     assertEquals("score-result", secondDecision.getKey());
-    assertEquals(decisionRequirementsDefinition.getId(), secondDecision.getDecisionRequirementsDefinitionId());
+    assertEquals(decisionRequirementsDefinition.getId(),
+        secondDecision.getDecisionRequirementsDefinitionId());
     assertEquals("score", secondDecision.getDecisionRequirementsDefinitionKey());
   }
 
-  @Deployment( resources = DMN_CHECK_ORDER_RESOURCE )
+  @Deployment(resources = DMN_CHECK_ORDER_RESOURCE)
   @Test
   public void noDrdForSingleDecisionDeployment() {
     // when the DMN file contains only a single decision definition
@@ -259,33 +264,38 @@ public class DecisionDefinitionDeployerTest {
     // then no decision requirements definition should be created
     assertEquals(0, repositoryService.createDecisionRequirementsDefinitionQuery().count());
     // and the decision should not be linked to a decision requirements definition
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
     assertNull(decisionDefinition.getDecisionRequirementsDefinitionId());
     assertNull(decisionDefinition.getDecisionRequirementsDefinitionKey());
   }
 
-  @Deployment( resources = { DRD_SCORE_RESOURCE, DRD_DISH_RESOURCE })
+  @Deployment(resources = { DRD_SCORE_RESOURCE, DRD_DISH_RESOURCE })
   @Test
   public void multipleDrdDeployment() {
     // there should be two decision requirements definitions
     List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService
-        .createDecisionRequirementsDefinitionQuery()
-        .orderByDecisionRequirementsDefinitionCategory()
-        .asc()
-        .list();
+        .createDecisionRequirementsDefinitionQuery().orderByDecisionRequirementsDefinitionCategory()
+        .asc().list();
 
     assertEquals(2, decisionRequirementsDefinitions.size());
     assertEquals("score", decisionRequirementsDefinitions.get(0).getKey());
     assertEquals("dish", decisionRequirementsDefinitions.get(1).getKey());
 
     // the decisions should have a reference to the decision requirements definition
-    List<DecisionDefinition> decisions = repositoryService.createDecisionDefinitionQuery().orderByDecisionDefinitionCategory().asc().list();
+    List<DecisionDefinition> decisions = repositoryService.createDecisionDefinitionQuery()
+        .orderByDecisionDefinitionCategory().asc().list();
     assertEquals(5, decisions.size());
-    assertEquals(decisionRequirementsDefinitions.get(0).getId(), decisions.get(0).getDecisionRequirementsDefinitionId());
-    assertEquals(decisionRequirementsDefinitions.get(0).getId(), decisions.get(1).getDecisionRequirementsDefinitionId());
-    assertEquals(decisionRequirementsDefinitions.get(1).getId(), decisions.get(2).getDecisionRequirementsDefinitionId());
-    assertEquals(decisionRequirementsDefinitions.get(1).getId(), decisions.get(3).getDecisionRequirementsDefinitionId());
-    assertEquals(decisionRequirementsDefinitions.get(1).getId(), decisions.get(4).getDecisionRequirementsDefinitionId());
+    assertEquals(decisionRequirementsDefinitions.get(0).getId(),
+        decisions.get(0).getDecisionRequirementsDefinitionId());
+    assertEquals(decisionRequirementsDefinitions.get(0).getId(),
+        decisions.get(1).getDecisionRequirementsDefinitionId());
+    assertEquals(decisionRequirementsDefinitions.get(1).getId(),
+        decisions.get(2).getDecisionRequirementsDefinitionId());
+    assertEquals(decisionRequirementsDefinitions.get(1).getId(),
+        decisions.get(3).getDecisionRequirementsDefinitionId());
+    assertEquals(decisionRequirementsDefinitions.get(1).getId(),
+        decisions.get(4).getDecisionRequirementsDefinitionId());
   }
 
   @Test
@@ -294,11 +304,8 @@ public class DecisionDefinitionDeployerTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("definitions");
 
-    repositoryService.createDeployment()
-            .addClasspathResource(DRD_SCORE_RESOURCE)
-            .addClasspathResource(DRD_SCORE_V2_RESOURCE)
-            .name("duplicateIds")
-            .deploy();
+    repositoryService.createDeployment().addClasspathResource(DRD_SCORE_RESOURCE)
+        .addClasspathResource(DRD_SCORE_V2_RESOURCE).name("duplicateIds").deploy();
   }
 
   @Test
@@ -318,7 +325,8 @@ public class DecisionDefinitionDeployerTest {
     String deploymentIdDrd = testRule.deploy(DRD_SCORE_RESOURCE).getId();
 
     // there should be one decision requirements definition
-    DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
+    DecisionRequirementsDefinitionQuery query = repositoryService
+        .createDecisionRequirementsDefinitionQuery();
     assertEquals(1, query.count());
 
     DecisionRequirementsDefinition decisionRequirementsDefinition = query.singleResult();
@@ -326,9 +334,8 @@ public class DecisionDefinitionDeployerTest {
     assertEquals(deploymentIdDrd, decisionRequirementsDefinition.getDeploymentId());
 
     // and two deployed decisions with different versions
-    List<DecisionDefinition> decisions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey("score-decision")
-        .orderByDecisionDefinitionVersion().asc()
-        .list();
+    List<DecisionDefinition> decisions = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey("score-decision").orderByDecisionDefinitionVersion().asc().list();
 
     assertEquals(2, decisions.size());
 
@@ -340,7 +347,8 @@ public class DecisionDefinitionDeployerTest {
     DecisionDefinition secondDecision = decisions.get(1);
     assertEquals(2, secondDecision.getVersion());
     assertEquals(deploymentIdDrd, secondDecision.getDeploymentId());
-    assertEquals(decisionRequirementsDefinition.getId(),secondDecision.getDecisionRequirementsDefinitionId());
+    assertEquals(decisionRequirementsDefinition.getId(),
+        secondDecision.getDecisionRequirementsDefinitionId());
   }
 
   @Test
@@ -349,7 +357,8 @@ public class DecisionDefinitionDeployerTest {
     DmnModelInstance dmnModelInstance = createDmnModelInstance();
 
     // when
-    testRule.deploy(repositoryService.createDeployment().addModelInstance("foo.dmn", dmnModelInstance));
+    testRule
+        .deploy(repositoryService.createDeployment().addModelInstance("foo.dmn", dmnModelInstance));
 
     // then
     assertNotNull(repositoryService.createDecisionDefinitionQuery()
@@ -362,7 +371,8 @@ public class DecisionDefinitionDeployerTest {
     DmnModelInstance dmnModelInstance = createDmnModelInstanceNegativeHistoryTimeToLive();
 
     try {
-      testRule.deploy(repositoryService.createDeployment().addModelInstance("foo.dmn", dmnModelInstance));
+      testRule.deploy(
+          repositoryService.createDeployment().addModelInstance("foo.dmn", dmnModelInstance));
       fail("Exception for negative time to live value is expected.");
     } catch (ProcessEngineException ex) {
       assertTrue(ex.getCause().getMessage().contains("negative value is not allowed"));
@@ -434,11 +444,13 @@ public class DecisionDefinitionDeployerTest {
     DmnModelInstance dmnModelInstance = createDmnModelInstance();
 
     // when decision model is deployed
-    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().addModelInstance("foo.dmn", dmnModelInstance);
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
+        .addModelInstance("foo.dmn", dmnModelInstance);
     DeploymentWithDefinitions deployment = testRule.deploy(deploymentBuilder);
 
     // then deployment contains definition
-    List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
+    List<DecisionDefinition> deployedDecisionDefinitions = deployment
+        .getDeployedDecisionDefinitions();
     assertEquals(1, deployedDecisionDefinitions.size());
     assertNull(deployment.getDeployedDecisionRequirementsDefinitions());
     assertNull(deployment.getDeployedProcessDefinitions());
@@ -446,7 +458,7 @@ public class DecisionDefinitionDeployerTest {
 
     // and persisted definition are equal to deployed definition
     DecisionDefinition persistedDecisionDef = repositoryService.createDecisionDefinitionQuery()
-      .decisionDefinitionResourceName("foo.dmn").singleResult();
+        .decisionDefinitionResourceName("foo.dmn").singleResult();
     assertEquals(persistedDecisionDef.getId(), deployedDecisionDefinitions.get(0).getId());
   }
 
@@ -462,7 +474,8 @@ public class DecisionDefinitionDeployerTest {
     modelInstance.setDefinitions(definitions);
 
     // when decision model is deployed
-    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().addModelInstance("foo.dmn", modelInstance);
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
+        .addModelInstance("foo.dmn", modelInstance);
     DeploymentWithDefinitions deployment = testRule.deploy(deploymentBuilder);
 
     // then deployment contains no definitions
@@ -471,9 +484,8 @@ public class DecisionDefinitionDeployerTest {
 
     // and there are no persisted definitions
     assertNull(repositoryService.createDecisionDefinitionQuery()
-      .decisionDefinitionResourceName("foo.dmn").singleResult());
+        .decisionDefinitionResourceName("foo.dmn").singleResult());
   }
-
 
   @Test
   public void testDeployAndGetDRDDefinition() throws Exception {
@@ -482,31 +494,38 @@ public class DecisionDefinitionDeployerTest {
     DeploymentWithDefinitions deployment = testRule.deploy(DRD_SCORE_RESOURCE);
 
     // then deployment contains definitions
-    List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
+    List<DecisionDefinition> deployedDecisionDefinitions = deployment
+        .getDeployedDecisionDefinitions();
     assertEquals(2, deployedDecisionDefinitions.size());
 
-    List<DecisionRequirementsDefinition> deployedDecisionRequirementsDefinitions = deployment.getDeployedDecisionRequirementsDefinitions();
+    List<DecisionRequirementsDefinition> deployedDecisionRequirementsDefinitions = deployment
+        .getDeployedDecisionRequirementsDefinitions();
     assertEquals(1, deployedDecisionRequirementsDefinitions.size());
 
     assertNull(deployment.getDeployedProcessDefinitions());
     assertNull(deployment.getDeployedCaseDefinitions());
 
     // and persisted definitions are equal to deployed definitions
-    DecisionRequirementsDefinition persistedDecisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery()
-      .decisionRequirementsDefinitionResourceName(DRD_SCORE_RESOURCE).singleResult();
-    assertEquals(persistedDecisionRequirementsDefinition.getId(), deployedDecisionRequirementsDefinitions.get(0).getId());
+    DecisionRequirementsDefinition persistedDecisionRequirementsDefinition = repositoryService
+        .createDecisionRequirementsDefinitionQuery()
+        .decisionRequirementsDefinitionResourceName(DRD_SCORE_RESOURCE).singleResult();
+    assertEquals(persistedDecisionRequirementsDefinition.getId(),
+        deployedDecisionRequirementsDefinitions.get(0).getId());
 
-    List<DecisionDefinition> persistedDecisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionResourceName(DRD_SCORE_RESOURCE).list();
+    List<DecisionDefinition> persistedDecisionDefinitions = repositoryService
+        .createDecisionDefinitionQuery().decisionDefinitionResourceName(DRD_SCORE_RESOURCE).list();
     assertEquals(deployedDecisionDefinitions.size(), persistedDecisionDefinitions.size());
   }
 
   @Test
   public void testDeployDecisionDefinitionWithIntegerHistoryTimeToLive() {
     // when
-    DeploymentWithDefinitions deployment = testRule.deploy("org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithIntegerHistoryTimeToLive.dmn11.xml");
+    DeploymentWithDefinitions deployment = testRule.deploy(
+        "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithIntegerHistoryTimeToLive.dmn11.xml");
 
     // then
-    List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
+    List<DecisionDefinition> deployedDecisionDefinitions = deployment
+        .getDeployedDecisionDefinitions();
     assertEquals(deployedDecisionDefinitions.size(), 1);
     Integer historyTimeToLive = deployedDecisionDefinitions.get(0).getHistoryTimeToLive();
     assertNotNull(historyTimeToLive);
@@ -516,10 +535,12 @@ public class DecisionDefinitionDeployerTest {
   @Test
   public void testDeployDecisionDefinitionWithStringHistoryTimeToLive() {
     // when
-    DeploymentWithDefinitions deployment = testRule.deploy("org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithStringHistoryTimeToLive.dmn11.xml");
+    DeploymentWithDefinitions deployment = testRule.deploy(
+        "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithStringHistoryTimeToLive.dmn11.xml");
 
     // then
-    List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
+    List<DecisionDefinition> deployedDecisionDefinitions = deployment
+        .getDeployedDecisionDefinitions();
     assertEquals(deployedDecisionDefinitions.size(), 1);
     Integer historyTimeToLive = deployedDecisionDefinitions.get(0).getHistoryTimeToLive();
     assertNotNull(historyTimeToLive);
@@ -529,7 +550,8 @@ public class DecisionDefinitionDeployerTest {
   @Test
   public void testDeployDecisionDefinitionWithMalformedStringHistoryTimeToLive() {
     try {
-      testRule.deploy("org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithMalformedHistoryTimeToLive.dmn11.xml");
+      testRule.deploy(
+          "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithMalformedHistoryTimeToLive.dmn11.xml");
       fail("Exception expected");
     } catch (ProcessEngineException e) {
       assertTrue(e.getCause().getMessage().contains("Cannot parse historyTimeToLive"));
@@ -538,13 +560,15 @@ public class DecisionDefinitionDeployerTest {
 
   @Test
   public void testDeployDecisionDefinitionWithEmptyHistoryTimeToLive() {
-      DeploymentWithDefinitions deployment = testRule.deploy("org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithEmptyHistoryTimeToLive.dmn11.xml");
+    DeploymentWithDefinitions deployment = testRule.deploy(
+        "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithEmptyHistoryTimeToLive.dmn11.xml");
 
-      // then
-      List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
-      assertEquals(deployedDecisionDefinitions.size(), 1);
-      Integer historyTimeToLive = deployedDecisionDefinitions.get(0).getHistoryTimeToLive();
-      assertNull(historyTimeToLive);
+    // then
+    List<DecisionDefinition> deployedDecisionDefinitions = deployment
+        .getDeployedDecisionDefinitions();
+    assertEquals(deployedDecisionDefinitions.size(), 1);
+    Integer historyTimeToLive = deployedDecisionDefinitions.get(0).getHistoryTimeToLive();
+    assertNull(historyTimeToLive);
   }
 
 }

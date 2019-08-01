@@ -19,9 +19,6 @@ package org.camunda.bpm.engine.impl.pvm.runtime;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 
-
-
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer

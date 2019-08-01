@@ -50,7 +50,8 @@ public class ProcessApplicationManager {
   protected Map<String, DefaultProcessApplicationRegistration> registrationsByDeploymentId = new HashMap<String, DefaultProcessApplicationRegistration>();
 
   public ProcessApplicationReference getProcessApplicationForDeployment(String deploymentId) {
-    DefaultProcessApplicationRegistration registration = registrationsByDeploymentId.get(deploymentId);
+    DefaultProcessApplicationRegistration registration = registrationsByDeploymentId
+        .get(deploymentId);
     if (registration != null) {
       return registration.getReference();
     } else {
@@ -58,9 +59,11 @@ public class ProcessApplicationManager {
     }
   }
 
-  public synchronized ProcessApplicationRegistration registerProcessApplicationForDeployments(Set<String> deploymentsToRegister, ProcessApplicationReference reference) {
+  public synchronized ProcessApplicationRegistration registerProcessApplicationForDeployments(
+      Set<String> deploymentsToRegister, ProcessApplicationReference reference) {
     // create process application registration
-    DefaultProcessApplicationRegistration registration = createProcessApplicationRegistration(deploymentsToRegister, reference);
+    DefaultProcessApplicationRegistration registration = createProcessApplicationRegistration(
+        deploymentsToRegister, reference);
     // register with job executor
     createJobExecutorRegistrations(deploymentsToRegister);
     logRegistration(deploymentsToRegister, reference);
@@ -71,7 +74,8 @@ public class ProcessApplicationManager {
     registrationsByDeploymentId.clear();
   }
 
-  public synchronized void unregisterProcessApplicationForDeployments(Set<String> deploymentIds, boolean removeProcessesFromCache) {
+  public synchronized void unregisterProcessApplicationForDeployments(Set<String> deploymentIds,
+      boolean removeProcessesFromCache) {
     removeJobExecutorRegistrations(deploymentIds);
     removeProcessApplicationRegistration(deploymentIds, removeProcessesFromCache);
   }
@@ -80,10 +84,12 @@ public class ProcessApplicationManager {
     return !registrationsByDeploymentId.isEmpty();
   }
 
-  protected DefaultProcessApplicationRegistration createProcessApplicationRegistration(Set<String> deploymentsToRegister, ProcessApplicationReference reference) {
+  protected DefaultProcessApplicationRegistration createProcessApplicationRegistration(
+      Set<String> deploymentsToRegister, ProcessApplicationReference reference) {
     final String processEngineName = Context.getProcessEngineConfiguration().getProcessEngineName();
 
-    DefaultProcessApplicationRegistration registration = new DefaultProcessApplicationRegistration(reference, deploymentsToRegister, processEngineName);
+    DefaultProcessApplicationRegistration registration = new DefaultProcessApplicationRegistration(
+        reference, deploymentsToRegister, processEngineName);
     // add to registration map
     for (String deploymentId : deploymentsToRegister) {
       registrationsByDeploymentId.put(deploymentId, registration);
@@ -91,20 +97,18 @@ public class ProcessApplicationManager {
     return registration;
   }
 
-  protected void removeProcessApplicationRegistration(final Set<String> deploymentIds, boolean removeProcessesFromCache) {
+  protected void removeProcessApplicationRegistration(final Set<String> deploymentIds,
+      boolean removeProcessesFromCache) {
     for (String deploymentId : deploymentIds) {
       try {
-        if(removeProcessesFromCache) {
-          Context.getProcessEngineConfiguration()
-            .getDeploymentCache()
-            .removeDeployment(deploymentId);
+        if (removeProcessesFromCache) {
+          Context.getProcessEngineConfiguration().getDeploymentCache()
+              .removeDeployment(deploymentId);
         }
-      }
-      catch (Throwable t) {
+      } catch (Throwable t) {
         LOG.couldNotRemoveDefinitionsFromCache(t);
-      }
-      finally {
-        if(deploymentId != null) {
+      } finally {
+        if (deploymentId != null) {
           registrationsByDeploymentId.remove(deploymentId);
         }
       }
@@ -113,28 +117,27 @@ public class ProcessApplicationManager {
 
   protected void createJobExecutorRegistrations(Set<String> deploymentIds) {
     try {
-      final DeploymentFailListener deploymentFailListener = new DeploymentFailListener(deploymentIds,
-        Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew());
-      Context.getCommandContext()
-        .getTransactionContext()
-        .addTransactionListener(TransactionState.ROLLED_BACK, deploymentFailListener);
+      final DeploymentFailListener deploymentFailListener = new DeploymentFailListener(
+          deploymentIds, Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew());
+      Context.getCommandContext().getTransactionContext()
+          .addTransactionListener(TransactionState.ROLLED_BACK, deploymentFailListener);
 
-      Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
+      Set<String> registeredDeployments = Context.getProcessEngineConfiguration()
+          .getRegisteredDeployments();
       registeredDeployments.addAll(deploymentIds);
 
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileRegisteringDeploymentsWithJobExecutor(e);
     }
   }
 
   protected void removeJobExecutorRegistrations(Set<String> deploymentIds) {
     try {
-      Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
+      Set<String> registeredDeployments = Context.getProcessEngineConfiguration()
+          .getRegisteredDeployments();
       registeredDeployments.removeAll(deploymentIds);
 
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       LOG.exceptionWhileUnregisteringDeploymentsWithJobExecutor(e);
     }
   }
@@ -160,16 +163,16 @@ public class ProcessApplicationManager {
       List<CaseDefinition> caseDefinitions = new ArrayList<CaseDefinition>();
 
       CommandContext commandContext = Context.getCommandContext();
-      ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      ProcessEngineConfigurationImpl processEngineConfiguration = Context
+          .getProcessEngineConfiguration();
       boolean cmmnEnabled = processEngineConfiguration.isCmmnEnabled();
 
       for (String deploymentId : deploymentIds) {
 
-        DeploymentEntity deployment = commandContext
-          .getDbEntityManager()
-          .selectById(DeploymentEntity.class, deploymentId);
+        DeploymentEntity deployment = commandContext.getDbEntityManager()
+            .selectById(DeploymentEntity.class, deploymentId);
 
-        if(deployment != null) {
+        if (deployment != null) {
 
           processDefinitions.addAll(getDeployedProcessDefinitionArtifacts(deployment));
 
@@ -188,13 +191,13 @@ public class ProcessApplicationManager {
 
       LOG.registrationSummary(builder.toString());
 
-    }
-    catch(Throwable e) {
+    } catch (Throwable e) {
       LOG.exceptionWhileLoggingRegistrationSummary(e);
     }
   }
 
-  protected List<ProcessDefinition> getDeployedProcessDefinitionArtifacts(DeploymentEntity deployment) {
+  protected List<ProcessDefinition> getDeployedProcessDefinitionArtifacts(
+      DeploymentEntity deployment) {
     CommandContext commandContext = Context.getCommandContext();
 
     // in case deployment was created by this command
@@ -226,8 +229,9 @@ public class ProcessApplicationManager {
 
   }
 
-  protected void logProcessDefinitionRegistrations(StringBuilder builder, List<ProcessDefinition> processDefinitions) {
-    if(processDefinitions.isEmpty()) {
+  protected void logProcessDefinitionRegistrations(StringBuilder builder,
+      List<ProcessDefinition> processDefinitions) {
+    if (processDefinitions.isEmpty()) {
       builder.append("Deployment does not provide any process definitions.");
 
     } else {
@@ -247,8 +251,9 @@ public class ProcessApplicationManager {
     }
   }
 
-  protected void logCaseDefinitionRegistrations(StringBuilder builder, List<CaseDefinition> caseDefinitions) {
-    if(caseDefinitions.isEmpty()) {
+  protected void logCaseDefinitionRegistrations(StringBuilder builder,
+      List<CaseDefinition> caseDefinitions) {
+    if (caseDefinitions.isEmpty()) {
       builder.append("Deployment does not provide any case definitions.");
 
     } else {
@@ -271,8 +276,9 @@ public class ProcessApplicationManager {
 
   public String getRegistrationSummary() {
     StringBuilder builder = new StringBuilder();
-    for (Entry<String, DefaultProcessApplicationRegistration> entry : registrationsByDeploymentId.entrySet()) {
-      if(builder.length()>0) {
+    for (Entry<String, DefaultProcessApplicationRegistration> entry : registrationsByDeploymentId
+        .entrySet()) {
+      if (builder.length() > 0) {
         builder.append(", ");
       }
       builder.append(entry.getKey());

@@ -35,7 +35,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 public class JobExecutorExceptionLoggingHandlerTest {
-  
+
   public ProcessEngineRule engineRule = new ProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
@@ -44,7 +44,7 @@ public class JobExecutorExceptionLoggingHandlerTest {
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected ExecuteJobHelper.ExceptionLoggingHandler originalHandler;
-  
+
   @Before
   public void init() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
@@ -59,15 +59,12 @@ public class JobExecutorExceptionLoggingHandlerTest {
 
   @Test
   public void shouldBeAbleToReplaceLoggingHandler() {
- // given
+    // given
     CollectingHandler collectingHandler = new CollectingHandler();
     ExecuteJobHelper.LOGGING_HANDLER = collectingHandler;
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("failingDelegate")
-        .startEvent()
-        .serviceTask()
-          .camundaClass("org.camunda.bpm.engine.test.jobexecutor.FailingDelegate")
-          .camundaAsyncBefore()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("failingDelegate").startEvent()
+        .serviceTask().camundaClass("org.camunda.bpm.engine.test.jobexecutor.FailingDelegate")
+        .camundaAsyncBefore().done();
     testRule.deploy(modelInstance);
 
     // when

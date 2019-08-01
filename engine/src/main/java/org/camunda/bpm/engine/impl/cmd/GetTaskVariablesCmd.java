@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -41,7 +40,8 @@ public class GetTaskVariablesCmd implements Command<VariableMap>, Serializable {
   protected boolean isLocal;
   protected boolean deserializeValues;
 
-  public GetTaskVariablesCmd(String taskId, Collection<String> variableNames, boolean isLocal, boolean deserializeValues) {
+  public GetTaskVariablesCmd(String taskId, Collection<String> variableNames, boolean isLocal,
+      boolean deserializeValues) {
     this.taskId = taskId;
     this.variableNames = variableNames;
     this.isLocal = isLocal;
@@ -51,10 +51,7 @@ public class GetTaskVariablesCmd implements Command<VariableMap>, Serializable {
   public VariableMap execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
 
-    TaskEntity task = Context
-      .getCommandContext()
-      .getTaskManager()
-      .findTaskById(taskId);
+    TaskEntity task = Context.getCommandContext().getTaskManager().findTaskById(taskId);
 
     ensureNotNull("task " + taskId + " doesn't exist", "task", task);
 
@@ -70,7 +67,8 @@ public class GetTaskVariablesCmd implements Command<VariableMap>, Serializable {
   }
 
   protected void checkGetTaskVariables(TaskEntity task, CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadTaskVariable(task);
     }
   }

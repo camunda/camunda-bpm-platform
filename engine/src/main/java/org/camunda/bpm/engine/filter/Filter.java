@@ -40,7 +40,8 @@ public interface Filter {
   String getName();
 
   /**
-   * @param name the name of the filter
+   * @param name
+   *          the name of the filter
    * @return this filter
    */
   Filter setName(String name);
@@ -51,7 +52,8 @@ public interface Filter {
   String getOwner();
 
   /**
-   * @param owner the owner of the filter
+   * @param owner
+   *          the owner of the filter
    * @return this filter
    */
   Filter setOwner(String owner);
@@ -62,16 +64,18 @@ public interface Filter {
   <T extends Query<?, ?>> T getQuery();
 
   /**
-   * @param query the saved query as query object
+   * @param query
+   *          the saved query as query object
    * @return this filter
    */
   <T extends Query<?, ?>> Filter setQuery(T query);
 
   /**
-   * Extends the query with the additional query. The query of the filter is therefore modified
-   * and if the filter is saved the query is updated.
+   * Extends the query with the additional query. The query of the filter is therefore modified and
+   * if the filter is saved the query is updated.
    *
-   * @param extendingQuery the query to extend the filter with
+   * @param extendingQuery
+   *          the query to extend the filter with
    * @return a copy of this filter with the extended query
    */
   <T extends Query<?, ?>> Filter extend(T extendingQuery);
@@ -82,7 +86,8 @@ public interface Filter {
   Map<String, Object> getProperties();
 
   /**
-   * @param properties the properties to set as map
+   * @param properties
+   *          the properties to set as map
    * @return this filter
    */
   Filter setProperties(Map<String, Object> properties);

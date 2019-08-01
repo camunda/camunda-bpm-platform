@@ -57,27 +57,28 @@ public class FallbackSerializerFactoryTest {
   public void testFallbackSerializer() {
     // given
     // that the process engine is configured with a fallback serializer factory
-     ProcessEngineConfigurationImpl engineConfiguration = new StandaloneInMemProcessEngineConfiguration()
-       .setJdbcUrl("jdbc:h2:mem:camunda-forceclose")
-       .setProcessEngineName("engine-forceclose");
+    ProcessEngineConfigurationImpl engineConfiguration = new StandaloneInMemProcessEngineConfiguration()
+        .setJdbcUrl("jdbc:h2:mem:camunda-forceclose").setProcessEngineName("engine-forceclose");
 
-     engineConfiguration.setFallbackSerializerFactory(new ExampleSerializerFactory());
+    engineConfiguration.setFallbackSerializerFactory(new ExampleSerializerFactory());
 
-     processEngine = engineConfiguration.buildProcessEngine();
-     deployOneTaskProcess(processEngine);
+    processEngine = engineConfiguration.buildProcessEngine();
+    deployOneTaskProcess(processEngine);
 
-     // when setting a variable that no regular serializer can handle
-     ObjectValue objectValue = Variables.objectValue("foo").serializationDataFormat(ExampleSerializer.FORMAT).create();
+    // when setting a variable that no regular serializer can handle
+    ObjectValue objectValue = Variables.objectValue("foo")
+        .serializationDataFormat(ExampleSerializer.FORMAT).create();
 
-     ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess",
-         Variables.createVariables().putValueTyped("var", objectValue));
+    ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey(
+        "oneTaskProcess", Variables.createVariables().putValueTyped("var", objectValue));
 
-     ObjectValue fetchedValue = processEngine.getRuntimeService().getVariableTyped(pi.getId(), "var", true);
+    ObjectValue fetchedValue = processEngine.getRuntimeService().getVariableTyped(pi.getId(), "var",
+        true);
 
-     // then the fallback serializer is used
-     Assert.assertNotNull(fetchedValue);
-     Assert.assertEquals(ExampleSerializer.FORMAT, fetchedValue.getSerializationDataFormat());
-     Assert.assertEquals("foo", fetchedValue.getValue());
+    // then the fallback serializer is used
+    Assert.assertNotNull(fetchedValue);
+    Assert.assertEquals(ExampleSerializer.FORMAT, fetchedValue.getSerializationDataFormat());
+    Assert.assertEquals("foo", fetchedValue.getValue());
   }
 
   @Test
@@ -85,28 +86,30 @@ public class FallbackSerializerFactoryTest {
     // given
     // that the process engine is configured with a serializer for a certain format
     // and a fallback serializer factory for the same format
-     ProcessEngineConfigurationImpl engineConfiguration = new StandaloneInMemProcessEngineConfiguration()
-       .setJdbcUrl("jdbc:h2:mem:camunda-forceclose")
-       .setProcessEngineName("engine-forceclose");
+    ProcessEngineConfigurationImpl engineConfiguration = new StandaloneInMemProcessEngineConfiguration()
+        .setJdbcUrl("jdbc:h2:mem:camunda-forceclose").setProcessEngineName("engine-forceclose");
 
-     engineConfiguration.setCustomPreVariableSerializers(Arrays.<TypedValueSerializer>asList(new ExampleConstantSerializer()));
-     engineConfiguration.setFallbackSerializerFactory(new ExampleSerializerFactory());
+    engineConfiguration.setCustomPreVariableSerializers(
+        Arrays.<TypedValueSerializer> asList(new ExampleConstantSerializer()));
+    engineConfiguration.setFallbackSerializerFactory(new ExampleSerializerFactory());
 
-     processEngine = engineConfiguration.buildProcessEngine();
-     deployOneTaskProcess(processEngine);
+    processEngine = engineConfiguration.buildProcessEngine();
+    deployOneTaskProcess(processEngine);
 
-     // when setting a variable that no regular serializer can handle
-     ObjectValue objectValue = Variables.objectValue("foo").serializationDataFormat(ExampleSerializer.FORMAT).create();
+    // when setting a variable that no regular serializer can handle
+    ObjectValue objectValue = Variables.objectValue("foo")
+        .serializationDataFormat(ExampleSerializer.FORMAT).create();
 
-     ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess",
-         Variables.createVariables().putValueTyped("var", objectValue));
+    ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey(
+        "oneTaskProcess", Variables.createVariables().putValueTyped("var", objectValue));
 
-     ObjectValue fetchedValue = processEngine.getRuntimeService().getVariableTyped(pi.getId(), "var", true);
+    ObjectValue fetchedValue = processEngine.getRuntimeService().getVariableTyped(pi.getId(), "var",
+        true);
 
-     // then the fallback serializer is used
-     Assert.assertNotNull(fetchedValue);
-     Assert.assertEquals(ExampleSerializer.FORMAT, fetchedValue.getSerializationDataFormat());
-     Assert.assertEquals(ExampleConstantSerializer.DESERIALIZED_VALUE, fetchedValue.getValue());
+    // then the fallback serializer is used
+    Assert.assertNotNull(fetchedValue);
+    Assert.assertEquals(ExampleSerializer.FORMAT, fetchedValue.getSerializationDataFormat());
+    Assert.assertEquals(ExampleConstantSerializer.DESERIALIZED_VALUE, fetchedValue.getValue());
   }
 
   public static class ExampleSerializerFactory implements VariableSerializerFactory {
@@ -149,7 +152,8 @@ public class FallbackSerializerFactoryTest {
       return ExampleSerializer.FORMAT;
     }
 
-    protected Object deserializeFromByteArray(byte[] bytes, String objectTypeName) throws Exception {
+    protected Object deserializeFromByteArray(byte[] bytes, String objectTypeName)
+        throws Exception {
       // deserialize everything to a constant string
       return DESERIALIZED_VALUE;
     }
@@ -157,10 +161,8 @@ public class FallbackSerializerFactoryTest {
   }
 
   protected void deployOneTaskProcess(ProcessEngine engine) {
-    deployment = engine.getRepositoryService()
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-        .deploy()
+    deployment = engine.getRepositoryService().createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml").deploy()
         .getId();
   }
 }

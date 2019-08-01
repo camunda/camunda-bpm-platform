@@ -31,28 +31,31 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
-
 /**
  * @author Christian Lipphardt (camunda)
  */
 public class HistoricVariableInstanceManager extends AbstractHistoricManager {
 
-  public void deleteHistoricVariableInstanceByVariableInstanceId(String historicVariableInstanceId) {
+  public void deleteHistoricVariableInstanceByVariableInstanceId(
+      String historicVariableInstanceId) {
     if (isHistoryEnabled()) {
-      HistoricVariableInstanceEntity historicVariableInstance = findHistoricVariableInstanceByVariableInstanceId(historicVariableInstanceId);
+      HistoricVariableInstanceEntity historicVariableInstance = findHistoricVariableInstanceByVariableInstanceId(
+          historicVariableInstanceId);
       if (historicVariableInstance != null) {
         historicVariableInstance.delete();
       }
     }
   }
-  
-  public void deleteHistoricVariableInstanceByProcessInstanceIds(List<String> historicProcessInstanceIds) {
+
+  public void deleteHistoricVariableInstanceByProcessInstanceIds(
+      List<String> historicProcessInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceIds", historicProcessInstanceIds);
     deleteHistoricVariableInstances(parameters);
   }
 
-  public void deleteHistoricVariableInstancesByTaskProcessInstanceIds(List<String> historicProcessInstanceIds) {
+  public void deleteHistoricVariableInstancesByTaskProcessInstanceIds(
+      List<String> historicProcessInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("taskProcessInstanceIds", historicProcessInstanceIds);
     deleteHistoricVariableInstances(parameters);
@@ -62,28 +65,34 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
     deleteHistoricVariableInstancesByProcessCaseInstanceId(null, historicCaseInstanceId);
   }
 
-  public void deleteHistoricVariableInstancesByCaseInstanceIds(List<String> historicCaseInstanceIds) {
+  public void deleteHistoricVariableInstancesByCaseInstanceIds(
+      List<String> historicCaseInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("caseInstanceIds", historicCaseInstanceIds);
     deleteHistoricVariableInstances(parameters);
   }
 
   protected void deleteHistoricVariableInstances(Map<String, Object> parameters) {
-    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricVariableInstanceByteArraysByIds", parameters);
-    getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByIds", parameters);
+    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class,
+        "deleteHistoricVariableInstanceByteArraysByIds", parameters);
+    getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class,
+        "deleteHistoricVariableInstanceByIds", parameters);
   }
 
-  protected void deleteHistoricVariableInstancesByProcessCaseInstanceId(String historicProcessInstanceId, String historicCaseInstanceId) {
-    ensureOnlyOneNotNull("Only the process instance or case instance id should be set", historicProcessInstanceId, historicCaseInstanceId);
+  protected void deleteHistoricVariableInstancesByProcessCaseInstanceId(
+      String historicProcessInstanceId, String historicCaseInstanceId) {
+    ensureOnlyOneNotNull("Only the process instance or case instance id should be set",
+        historicProcessInstanceId, historicCaseInstanceId);
     if (isHistoryEnabled()) {
 
       // delete entries in DB
       List<HistoricVariableInstance> historicVariableInstances;
       if (historicProcessInstanceId != null) {
-        historicVariableInstances = findHistoricVariableInstancesByProcessInstanceId(historicProcessInstanceId);
-      }
-      else {
-        historicVariableInstances = findHistoricVariableInstancesByCaseInstanceId(historicCaseInstanceId);
+        historicVariableInstances = findHistoricVariableInstancesByProcessInstanceId(
+            historicProcessInstanceId);
+      } else {
+        historicVariableInstances = findHistoricVariableInstancesByCaseInstanceId(
+            historicCaseInstanceId);
       }
 
       for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
@@ -91,11 +100,14 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
       }
 
       // delete entries in Cache
-      List <HistoricVariableInstanceEntity> cachedHistoricVariableInstances = getDbEntityManager().getCachedEntitiesByType(HistoricVariableInstanceEntity.class);
+      List<HistoricVariableInstanceEntity> cachedHistoricVariableInstances = getDbEntityManager()
+          .getCachedEntitiesByType(HistoricVariableInstanceEntity.class);
       for (HistoricVariableInstanceEntity historicVariableInstance : cachedHistoricVariableInstances) {
         // make sure we only delete the right ones (as we cannot make a proper query in the cache)
-        if ((historicProcessInstanceId != null && historicProcessInstanceId.equals(historicVariableInstance.getProcessInstanceId()))
-            || (historicCaseInstanceId != null && historicCaseInstanceId.equals(historicVariableInstance.getCaseInstanceId()))) {
+        if ((historicProcessInstanceId != null
+            && historicProcessInstanceId.equals(historicVariableInstance.getProcessInstanceId()))
+            || (historicCaseInstanceId != null
+                && historicCaseInstanceId.equals(historicVariableInstance.getCaseInstanceId()))) {
           historicVariableInstance.delete();
         }
       }
@@ -103,66 +115,81 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricVariableInstance> findHistoricVariableInstancesByProcessInstanceId(String processInstanceId) {
-    return getDbEntityManager().selectList("selectHistoricVariablesByProcessInstanceId", processInstanceId);
+  public List<HistoricVariableInstance> findHistoricVariableInstancesByProcessInstanceId(
+      String processInstanceId) {
+    return getDbEntityManager().selectList("selectHistoricVariablesByProcessInstanceId",
+        processInstanceId);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricVariableInstance> findHistoricVariableInstancesByCaseInstanceId(String caseInstanceId) {
-    return getDbEntityManager().selectList("selectHistoricVariablesByCaseInstanceId", caseInstanceId);
+  public List<HistoricVariableInstance> findHistoricVariableInstancesByCaseInstanceId(
+      String caseInstanceId) {
+    return getDbEntityManager().selectList("selectHistoricVariablesByCaseInstanceId",
+        caseInstanceId);
   }
 
-  public long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
+  public long findHistoricVariableInstanceCountByQueryCriteria(
+      HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
     configureQuery(historicProcessVariableQuery);
-    return (Long) getDbEntityManager().selectOne("selectHistoricVariableInstanceCountByQueryCriteria", historicProcessVariableQuery);
+    return (Long) getDbEntityManager().selectOne(
+        "selectHistoricVariableInstanceCountByQueryCriteria", historicProcessVariableQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery, Page page) {
+  public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(
+      HistoricVariableInstanceQueryImpl historicProcessVariableQuery, Page page) {
     configureQuery(historicProcessVariableQuery);
-    return getDbEntityManager().selectList("selectHistoricVariableInstanceByQueryCriteria", historicProcessVariableQuery, page);
+    return getDbEntityManager().selectList("selectHistoricVariableInstanceByQueryCriteria",
+        historicProcessVariableQuery, page);
   }
 
-  public HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId) {
-    return (HistoricVariableInstanceEntity) getDbEntityManager().selectOne("selectHistoricVariableInstanceByVariableInstanceId", variableInstanceId);
+  public HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(
+      String variableInstanceId) {
+    return (HistoricVariableInstanceEntity) getDbEntityManager()
+        .selectOne("selectHistoricVariableInstanceByVariableInstanceId", variableInstanceId);
   }
 
   public void deleteHistoricVariableInstancesByTaskId(String taskId) {
     if (isHistoryEnabled()) {
-      HistoricVariableInstanceQuery historicProcessVariableQuery = new HistoricVariableInstanceQueryImpl().taskIdIn(taskId);
+      HistoricVariableInstanceQuery historicProcessVariableQuery = new HistoricVariableInstanceQueryImpl()
+          .taskIdIn(taskId);
       List<HistoricVariableInstance> historicProcessVariables = historicProcessVariableQuery.list();
-      for(HistoricVariableInstance historicProcessVariable : historicProcessVariables) {
+      for (HistoricVariableInstance historicProcessVariable : historicProcessVariables) {
         ((HistoricVariableInstanceEntity) historicProcessVariable).delete();
       }
     }
   }
 
-  public void addRemovalTimeToVariableInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToVariableInstancesByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricVariableInstanceEntity.class, "updateHistoricVariableInstancesByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricVariableInstanceEntity.class,
+        "updateHistoricVariableInstancesByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToVariableInstancesByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public void addRemovalTimeToVariableInstancesByProcessInstanceId(String processInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricVariableInstanceEntity.class, "updateHistoricVariableInstancesByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricVariableInstanceEntity.class,
+        "updateHistoricVariableInstancesByProcessInstanceId", parameters);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int
-          maxResults) {
-    return getDbEntityManager().selectListWithRawParameter("selectHistoricVariableInstanceByNativeQuery", parameterMap, firstResult, maxResults);
+  public List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return getDbEntityManager().selectListWithRawParameter(
+        "selectHistoricVariableInstanceByNativeQuery", parameterMap, firstResult, maxResults);
   }
 
   public long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbEntityManager().selectOne("selectHistoricVariableInstanceCountByNativeQuery", parameterMap);
+    return (Long) getDbEntityManager().selectOne("selectHistoricVariableInstanceCountByNativeQuery",
+        parameterMap);
   }
 
   protected void configureQuery(HistoricVariableInstanceQueryImpl query) {
@@ -170,7 +197,8 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
     getTenantManager().configureQuery(query);
   }
 
-  public DbOperation deleteHistoricVariableInstancesByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteHistoricVariableInstancesByRemovalTime(Date removalTime, int minuteFrom,
+      int minuteTo, int batchSize) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -179,8 +207,8 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstancesByRemovalTime",
+    return getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class,
+        "deleteHistoricVariableInstancesByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 }

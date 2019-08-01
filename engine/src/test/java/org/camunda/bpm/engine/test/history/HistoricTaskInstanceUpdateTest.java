@@ -23,13 +23,11 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
-
 /**
  * @author Frederik Heremans
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class HistoricTaskInstanceUpdateTest extends PluggableProcessEngineTestCase {
-
 
   @Deployment
   public void testHistoricTaskInstanceUpdate() {
@@ -47,7 +45,8 @@ public class HistoricTaskInstanceUpdateTest extends PluggableProcessEngineTestCa
     taskService.complete(task.getId());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().count());
 
-    HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
+    HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
+        .singleResult();
     assertEquals("Updated name", historicTaskInstance.getName());
     assertEquals("Updated description", historicTaskInstance.getDescription());
     assertEquals("gonzo", historicTaskInstance.getAssignee());

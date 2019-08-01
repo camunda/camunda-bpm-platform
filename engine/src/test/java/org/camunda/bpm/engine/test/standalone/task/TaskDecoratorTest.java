@@ -48,23 +48,19 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     task = (TaskEntity) taskService.newTask();
     taskService.saveTask(task);
 
-    expressionManager = processEngineConfiguration
-        .getExpressionManager();
+    expressionManager = processEngineConfiguration.getExpressionManager();
 
     taskDefinition = new TaskDefinition(null);
     taskDecorator = new TaskDecorator(taskDefinition, expressionManager);
   }
 
   public void tearDown() {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new DeleteTaskCommand(task));
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new DeleteTaskCommand(task));
   }
 
   protected void decorate(TaskEntity task, TaskDecorator decorator) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new DecorateTaskCommand(task, decorator));
+    processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new DecorateTaskCommand(task, decorator));
   }
 
   public void testDecorateName() {
@@ -409,8 +405,8 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     protected TaskDecorator decorator;
 
     public DecorateTaskCommand(TaskEntity task, TaskDecorator decorator) {
-     this.task = task;
-     this.decorator = decorator;
+      this.task = task;
+      this.decorator = decorator;
     }
 
     public Void execute(CommandContext commandContext) {
@@ -425,13 +421,11 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     protected TaskEntity task;
 
     public DeleteTaskCommand(TaskEntity task) {
-     this.task = task;
+      this.task = task;
     }
 
     public Void execute(CommandContext commandContext) {
-      commandContext
-        .getTaskManager()
-        .deleteTask(task, null, true, false);
+      commandContext.getTaskManager().deleteTask(task, null, true, false);
 
       return null;
     }

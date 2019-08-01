@@ -29,7 +29,8 @@ public class VariableEvent {
   protected String eventName;
   protected AbstractVariableScope sourceScope;
 
-  public VariableEvent(VariableInstance variableInstance, String eventName, AbstractVariableScope sourceScope) {
+  public VariableEvent(VariableInstance variableInstance, String eventName,
+      AbstractVariableScope sourceScope) {
     this.variableInstance = variableInstance;
     this.eventName = eventName;
     this.sourceScope = sourceScope;

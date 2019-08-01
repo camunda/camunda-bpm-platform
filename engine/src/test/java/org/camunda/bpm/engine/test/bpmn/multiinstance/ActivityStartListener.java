@@ -19,12 +19,11 @@ package org.camunda.bpm.engine.test.bpmn.multiinstance;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 
-
 /**
  * @author Joram Barrez
  */
 public class ActivityStartListener implements ExecutionListener {
-  
+
   public void notify(DelegateExecution execution) throws Exception {
     Integer counter = (Integer) execution.getVariable("executionListenerCounter");
     if (counter == null) {

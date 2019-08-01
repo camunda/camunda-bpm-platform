@@ -26,16 +26,15 @@ import java.util.Set;
 public interface HasDbReferences {
 
   /**
-   * @return the ids of the entities that this entity references. Should
-   *   only return ids for entities of the same type
+   * @return the ids of the entities that this entity references. Should only return ids for
+   *         entities of the same type
    */
   Set<String> getReferencedEntityIds();
 
   /**
-   * @return a map of the ids and the entities' classes that this
-   * entity references. It's used when trying to determine if there
-   * was an Optimistic Locking occurrence on an INSERT or UPDATE of
-   * an object of this type.
+   * @return a map of the ids and the entities' classes that this entity references. It's used when
+   *         trying to determine if there was an Optimistic Locking occurrence on an INSERT or
+   *         UPDATE of an object of this type.
    */
   Map<String, Class> getReferencedEntitiesIdAndClass();
 }

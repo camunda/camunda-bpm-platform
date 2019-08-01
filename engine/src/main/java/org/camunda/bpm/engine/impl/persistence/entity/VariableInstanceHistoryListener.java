@@ -29,13 +29,16 @@ import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
  * @author Thorben Lindhauer
  *
  */
-public class VariableInstanceHistoryListener implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
+public class VariableInstanceHistoryListener
+    implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
 
   public static final VariableInstanceHistoryListener INSTANCE = new VariableInstanceHistoryListener();
 
   @Override
-  public void onCreate(final VariableInstanceEntity variableInstance, final AbstractVariableScope sourceScope) {
-    if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_CREATE, variableInstance) && !variableInstance.isTransient()) {
+  public void onCreate(final VariableInstanceEntity variableInstance,
+      final AbstractVariableScope sourceScope) {
+    if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_CREATE,
+        variableInstance) && !variableInstance.isTransient()) {
       HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
         @Override
         public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
@@ -46,8 +49,10 @@ public class VariableInstanceHistoryListener implements VariableInstanceLifecycl
   }
 
   @Override
-  public void onDelete(final VariableInstanceEntity variableInstance, final AbstractVariableScope sourceScope) {
-    if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_DELETE, variableInstance) && !variableInstance.isTransient()) {
+  public void onDelete(final VariableInstanceEntity variableInstance,
+      final AbstractVariableScope sourceScope) {
+    if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_DELETE,
+        variableInstance) && !variableInstance.isTransient()) {
       HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
         @Override
         public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
@@ -58,8 +63,10 @@ public class VariableInstanceHistoryListener implements VariableInstanceLifecycl
   }
 
   @Override
-  public void onUpdate(final VariableInstanceEntity variableInstance, final AbstractVariableScope sourceScope) {
-    if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE, variableInstance) && !variableInstance.isTransient()) {
+  public void onUpdate(final VariableInstanceEntity variableInstance,
+      final AbstractVariableScope sourceScope) {
+    if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE,
+        variableInstance) && !variableInstance.isTransient()) {
       HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
         @Override
         public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {

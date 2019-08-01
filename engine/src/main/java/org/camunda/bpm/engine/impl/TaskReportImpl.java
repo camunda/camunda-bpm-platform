@@ -42,10 +42,9 @@ public class TaskReportImpl implements Serializable, TaskReport {
     this.commandExecutor = commandExecutor;
   }
 
-  protected List<TaskCountByCandidateGroupResult> createTaskCountByCandidateGroupReport(CommandContext commandContext) {
-    return commandContext
-        .getTaskReportManager()
-        .createTaskCountByCandidateGroupReport(this);
+  protected List<TaskCountByCandidateGroupResult> createTaskCountByCandidateGroupReport(
+      CommandContext commandContext) {
+    return commandContext.getTaskReportManager().createTaskCountByCandidateGroupReport(this);
   }
 
   public TenantCheck getTenantCheck() {

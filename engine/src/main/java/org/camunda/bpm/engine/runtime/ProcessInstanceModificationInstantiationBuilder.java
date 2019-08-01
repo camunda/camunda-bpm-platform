@@ -16,12 +16,11 @@
  */
 package org.camunda.bpm.engine.runtime;
 
-
 /**
  * @author Thorben Lindhauer
  */
-public interface ProcessInstanceModificationInstantiationBuilder extends
-  ProcessInstanceModificationBuilder,
-  ActivityInstantiationBuilder<ProcessInstanceModificationInstantiationBuilder> {
+public interface ProcessInstanceModificationInstantiationBuilder
+    extends ProcessInstanceModificationBuilder,
+    ActivityInstantiationBuilder<ProcessInstanceModificationInstantiationBuilder> {
 
 }

@@ -27,8 +27,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 /**
- * <p>A {@link TaskListener} implementation that delegates to a
- * {@link HistoryEventProducer}.
+ * <p>
+ * A {@link TaskListener} implementation that delegates to a {@link HistoryEventProducer}.
  *
  * @author Daniel Meyer
  *
@@ -46,7 +46,7 @@ public abstract class HistoryTaskListener implements TaskListener {
 
     // get the event handler
     final HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration()
-      .getHistoryEventHandler();
+        .getHistoryEventHandler();
 
     ExecutionEntity execution = ((TaskEntity) task).getExecution();
 
@@ -55,7 +55,7 @@ public abstract class HistoryTaskListener implements TaskListener {
       // delegate creation of the history event to the producer
       HistoryEvent historyEvent = createHistoryEvent(task, execution);
 
-      if(historyEvent != null) {
+      if (historyEvent != null) {
         // pass the event to the handler
         historyEventHandler.handleEvent(historyEvent);
       }
@@ -63,7 +63,7 @@ public abstract class HistoryTaskListener implements TaskListener {
     }
 
   }
-  
+
   protected void ensureHistoryLevelInitialized() {
     if (historyLevel == null) {
       historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();

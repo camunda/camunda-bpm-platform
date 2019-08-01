@@ -26,42 +26,43 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.slf4j.Logger;
 
-
 /**
  * @author Tom Baeyens
  */
 public class CompetingProcessCompletionTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   static ControllableThread activeThread;
 
   public class CompleteTaskThread extends ControllableThread {
     String taskId;
     OptimisticLockingException exception;
+
     public CompleteTaskThread(String taskId) {
       this.taskId = taskId;
     }
+
     public synchronized void startAndWaitUntilControlIsReturned() {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     public void run() {
       try {
-        processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new CompleteTaskCmd(taskId, null)));
+        processEngineConfiguration.getCommandExecutorTxRequired()
+            .execute(new ControlledCommand(activeThread, new CompleteTaskCmd(taskId, null)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 
   /**
-   * This test requires a minimum of three concurrent executions to avoid
-   * that all threads attempt compaction by which synchronization happens "by accident"
+   * This test requires a minimum of three concurrent executions to avoid that all threads attempt
+   * compaction by which synchronization happens "by accident"
    */
   @Deployment
   public void testCompetingEnd() throws Exception {
@@ -85,7 +86,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
+    assertTextPresent("was updated by another transaction concurrently",
+        threadTwo.exception.getMessage());
   }
 
 }

@@ -23,20 +23,23 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import java.util.Date;
 import java.util.List;
 
-public class OptimizeHistoricDecisionInstanceQueryCmd implements Command<List<HistoricDecisionInstance>> {
+public class OptimizeHistoricDecisionInstanceQueryCmd
+    implements Command<List<HistoricDecisionInstance>> {
 
   protected Date evaluatedAfter;
   protected Date evaluatedAt;
   protected int maxResults;
 
-  public OptimizeHistoricDecisionInstanceQueryCmd(Date evaluatedAfter, Date evaluatedAt, int maxResults) {
+  public OptimizeHistoricDecisionInstanceQueryCmd(Date evaluatedAfter, Date evaluatedAt,
+      int maxResults) {
     this.evaluatedAfter = evaluatedAfter;
     this.evaluatedAt = evaluatedAt;
     this.maxResults = maxResults;
   }
 
   public List<HistoricDecisionInstance> execute(CommandContext commandContext) {
-    return commandContext.getOptimizeManager().getHistoricDecisionInstances(evaluatedAfter, evaluatedAt, maxResults);
+    return commandContext.getOptimizeManager().getHistoricDecisionInstances(evaluatedAfter,
+        evaluatedAt, maxResults);
   }
 
 }

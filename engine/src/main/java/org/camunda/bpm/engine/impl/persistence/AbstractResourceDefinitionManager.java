@@ -27,12 +27,14 @@ public interface AbstractResourceDefinitionManager<T> {
 
   T findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId);
 
-  T findDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId);
+  T findDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion,
+      String tenantId);
 
   T findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey);
 
   T getCachedResourceDefinitionEntity(String definitionId);
 
-  T findDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId);
+  T findDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag,
+      String tenantId);
 
 }

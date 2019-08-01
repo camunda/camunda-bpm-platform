@@ -20,7 +20,8 @@ import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 public class BatchUtil {
-  public static int calculateBatchSize(ProcessEngineConfigurationImpl engineConfiguration, BatchConfiguration batchConfiguration) {
+  public static int calculateBatchSize(ProcessEngineConfigurationImpl engineConfiguration,
+      BatchConfiguration batchConfiguration) {
     int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
     int processInstanceCount = batchConfiguration.getIds().size();
 

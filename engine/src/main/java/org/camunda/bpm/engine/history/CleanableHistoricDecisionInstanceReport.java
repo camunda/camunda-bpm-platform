@@ -23,26 +23,30 @@ import org.camunda.bpm.engine.query.Query;
  * Defines a report query for finished decision instances.
  *
  */
-public interface CleanableHistoricDecisionInstanceReport extends Query<CleanableHistoricDecisionInstanceReport, CleanableHistoricDecisionInstanceReportResult>{
+public interface CleanableHistoricDecisionInstanceReport extends
+    Query<CleanableHistoricDecisionInstanceReport, CleanableHistoricDecisionInstanceReportResult> {
 
   /**
    * Only takes historic decision instances into account for the given decision definition ids.
    *
-   * @throws NotValidException if one of the given ids is null
+   * @throws NotValidException
+   *           if one of the given ids is null
    */
   CleanableHistoricDecisionInstanceReport decisionDefinitionIdIn(String... decisionDefinitionIds);
 
   /**
    * Only takes historic decision instances into account for the given decision definition keys.
    *
-   * @throws NotValidException if one of the given keys is null
+   * @throws NotValidException
+   *           if one of the given keys is null
    */
   CleanableHistoricDecisionInstanceReport decisionDefinitionKeyIn(String... decisionDefinitionKeys);
 
   /**
    * Only select historic decision instances with one of the given tenant ids.
    *
-   * @throws NotValidException if one of the given ids is null
+   * @throws NotValidException
+   *           if one of the given ids is null
    */
   CleanableHistoricDecisionInstanceReport tenantIdIn(String... tenantIds);
 
@@ -57,7 +61,8 @@ public interface CleanableHistoricDecisionInstanceReport extends Query<Cleanable
   CleanableHistoricDecisionInstanceReport compact();
 
   /**
-   * Order by finished decision instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Order by finished decision instances amount (needs to be followed by {@link #asc()} or
+   * {@link #desc()}).
    */
   CleanableHistoricDecisionInstanceReport orderByFinished();
 

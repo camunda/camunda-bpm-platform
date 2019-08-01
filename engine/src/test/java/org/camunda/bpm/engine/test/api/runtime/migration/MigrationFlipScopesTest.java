@@ -42,24 +42,24 @@ public class MigrationFlipScopesTest {
   @Test
   public void testCannotFlipAncestorScopes() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
 
     // when
     try {
       rule.getRuntimeService()
-        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("outerSubProcess", "innerSubProcess")
-        .mapActivities("innerSubProcess", "outerSubProcess")
-        .mapActivities("userTask", "userTask")
-        .build();
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .mapActivities("outerSubProcess", "innerSubProcess")
+          .mapActivities("innerSubProcess", "outerSubProcess").mapActivities("userTask", "userTask")
+          .build();
 
       Assert.fail("should not validate");
     } catch (MigrationPlanValidationException e) {
       MigrationPlanValidationReportAssert.assertThat(e.getValidationReport())
-        .hasInstructionFailures("innerSubProcess",
-          "The closest mapped ancestor 'outerSubProcess' is mapped to scope 'innerSubProcess' which is not an ancestor of target scope 'outerSubProcess'"
-        );
+          .hasInstructionFailures("innerSubProcess",
+              "The closest mapped ancestor 'outerSubProcess' is mapped to scope 'innerSubProcess' which is not an ancestor of target scope 'outerSubProcess'");
     }
   }
 }

@@ -32,10 +32,10 @@ public class CaseActivityInstanceUpdateListener extends HistoryCaseExecutionList
 
   protected HistoryEvent createHistoryEvent(DelegateCaseExecution caseExecution) {
     ensureHistoryLevelInitialized();
-    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE, caseExecution)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE,
+        caseExecution)) {
       return eventProducer.createCaseActivityInstanceUpdateEvt(caseExecution);
-    }
-    else {
+    } else {
       return null;
     }
   }

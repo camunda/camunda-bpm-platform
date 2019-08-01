@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.event;
 
-
-
 /**
  * @author Thorben Lindhauer
  *

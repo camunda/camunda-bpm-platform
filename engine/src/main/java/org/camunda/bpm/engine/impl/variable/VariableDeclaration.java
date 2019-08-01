@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -40,35 +39,33 @@ public class VariableDeclaration implements Serializable {
   protected String link;
   protected Expression linkExpression;
 
-
   public void initialize(VariableScope innerScopeInstance, VariableScope outerScopeInstance) {
-    if (sourceVariableName!=null) {
+    if (sourceVariableName != null) {
       if (outerScopeInstance.hasVariable(sourceVariableName)) {
         Object value = outerScopeInstance.getVariable(sourceVariableName);
         innerScopeInstance.setVariable(destinationVariableName, value);
       } else {
-        throw new ProcessEngineException("Couldn't create variable '"
-                + destinationVariableName + "', since the source variable '"
-                + sourceVariableName + "does not exist");
+        throw new ProcessEngineException("Couldn't create variable '" + destinationVariableName
+            + "', since the source variable '" + sourceVariableName + "does not exist");
       }
     }
 
-    if (sourceExpression!=null) {
+    if (sourceExpression != null) {
       Object value = sourceExpression.getValue(outerScopeInstance);
       innerScopeInstance.setVariable(destinationVariableName, value);
     }
 
-    if (link!=null) {
+    if (link != null) {
       if (outerScopeInstance.hasVariable(sourceVariableName)) {
         Object value = outerScopeInstance.getVariable(sourceVariableName);
         innerScopeInstance.setVariable(destinationVariableName, value);
       } else {
-        throw new ProcessEngineException("Couldn't create variable '" + destinationVariableName + "', since the source variable '" + sourceVariableName
-                + "does not exist");
+        throw new ProcessEngineException("Couldn't create variable '" + destinationVariableName
+            + "', since the source variable '" + sourceVariableName + "does not exist");
       }
     }
 
-    if (linkExpression!=null) {
+    if (linkExpression != null) {
       Object value = sourceExpression.getValue(outerScopeInstance);
       innerScopeInstance.setVariable(destinationVariableName, value);
     }
@@ -77,30 +74,32 @@ public class VariableDeclaration implements Serializable {
 
   public void destroy(VariableScope innerScopeInstance, VariableScope outerScopeInstance) {
 
-    if (destinationVariableName!=null) {
+    if (destinationVariableName != null) {
       if (innerScopeInstance.hasVariable(sourceVariableName)) {
         Object value = innerScopeInstance.getVariable(sourceVariableName);
         outerScopeInstance.setVariable(destinationVariableName, value);
       } else {
-        throw new ProcessEngineException("Couldn't destroy variable " + sourceVariableName + ", since it does not exist");
+        throw new ProcessEngineException(
+            "Couldn't destroy variable " + sourceVariableName + ", since it does not exist");
       }
     }
 
-    if (destinationExpression!=null) {
+    if (destinationExpression != null) {
       Object value = destinationExpression.getValue(innerScopeInstance);
       outerScopeInstance.setVariable(destinationVariableName, value);
     }
 
-    if (link!=null) {
+    if (link != null) {
       if (innerScopeInstance.hasVariable(sourceVariableName)) {
         Object value = innerScopeInstance.getVariable(sourceVariableName);
         outerScopeInstance.setVariable(destinationVariableName, value);
       } else {
-        throw new ProcessEngineException("Couldn't destroy variable " + sourceVariableName + ", since it does not exist");
+        throw new ProcessEngineException(
+            "Couldn't destroy variable " + sourceVariableName + ", since it does not exist");
       }
     }
 
-    if (linkExpression!=null) {
+    if (linkExpression != null) {
       Object value = sourceExpression.getValue(innerScopeInstance);
       outerScopeInstance.setVariable(destinationVariableName, value);
     }

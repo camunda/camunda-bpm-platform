@@ -27,9 +27,7 @@ public class CreateTenantQueryCmd implements Command<TenantQuery>, Serializable 
   private static final long serialVersionUID = 1L;
 
   public TenantQuery execute(CommandContext commandContext) {
-    return commandContext
-      .getReadOnlyIdentityProvider()
-      .createTenantQuery();
+    return commandContext.getReadOnlyIdentityProvider().createTenantQuery();
   }
 
 }

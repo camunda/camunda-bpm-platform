@@ -20,10 +20,12 @@ package org.camunda.bpm.engine.test.api.runtime.migration.util;
  * @author Thorben Lindhauer
  *
  */
-public interface MigratingBpmnEventTrigger extends BpmnEventTrigger, MigratingBpmnEventTriggerAssert {
+public interface MigratingBpmnEventTrigger
+    extends BpmnEventTrigger, MigratingBpmnEventTriggerAssert {
 
   /**
-   * Returns a new trigger that triggers the same event in the context of a different activity (e.g. because the activity has changed during migration)
+   * Returns a new trigger that triggers the same event in the context of a different activity (e.g.
+   * because the activity has changed during migration)
    */
   MigratingBpmnEventTrigger inContextOf(String activityId);
 }

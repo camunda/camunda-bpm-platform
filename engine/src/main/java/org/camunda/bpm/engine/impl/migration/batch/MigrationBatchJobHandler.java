@@ -36,12 +36,13 @@ import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import java.util.List;
 
 /**
- * Job handler for batch migration jobs. The batch migration job
- * migrates a list of process instances.
+ * Job handler for batch migration jobs. The batch migration job migrates a list of process
+ * instances.
  */
 public class MigrationBatchJobHandler extends AbstractBatchJobHandler<MigrationBatchConfiguration> {
 
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_PROCESS_INSTANCE_MIGRATION);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(
+      Batch.TYPE_PROCESS_INSTANCE_MIGRATION);
 
   public String getType() {
     return Batch.TYPE_PROCESS_INSTANCE_MIGRATION;
@@ -56,35 +57,34 @@ public class MigrationBatchJobHandler extends AbstractBatchJobHandler<MigrationB
   }
 
   @Override
-  protected MigrationBatchConfiguration createJobConfiguration(MigrationBatchConfiguration configuration, List<String> processIdsForJob) {
-    return new MigrationBatchConfiguration(
-        processIdsForJob,
-        configuration.getMigrationPlan(),
-        configuration.isSkipCustomListeners(),
-        configuration.isSkipIoMappings()
-    );
+  protected MigrationBatchConfiguration createJobConfiguration(
+      MigrationBatchConfiguration configuration, List<String> processIdsForJob) {
+    return new MigrationBatchConfiguration(processIdsForJob, configuration.getMigrationPlan(),
+        configuration.isSkipCustomListeners(), configuration.isSkipIoMappings());
   }
 
   @Override
   protected void postProcessJob(MigrationBatchConfiguration configuration, JobEntity job) {
     CommandContext commandContext = Context.getCommandContext();
-    String sourceProcessDefinitionId = configuration.getMigrationPlan().getSourceProcessDefinitionId();
+    String sourceProcessDefinitionId = configuration.getMigrationPlan()
+        .getSourceProcessDefinitionId();
 
-    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, sourceProcessDefinitionId);
+    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext,
+        sourceProcessDefinitionId);
     job.setDeploymentId(processDefinition.getDeploymentId());
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
+  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
+    ByteArrayEntity configurationEntity = commandContext.getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    MigrationBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    MigrationBatchConfiguration batchConfiguration = readConfiguration(
+        configurationEntity.getBytes());
 
     MigrationPlanExecutionBuilder executionBuilder = commandContext.getProcessEngineConfiguration()
-        .getRuntimeService()
-        .newMigration(batchConfiguration.getMigrationPlan())
+        .getRuntimeService().newMigration(batchConfiguration.getMigrationPlan())
         .processInstanceIds(batchConfiguration.getIds());
 
     if (batchConfiguration.isSkipCustomListeners()) {
@@ -94,16 +94,18 @@ public class MigrationBatchJobHandler extends AbstractBatchJobHandler<MigrationB
       executionBuilder.skipIoMappings();
     }
 
-    // uses internal API in order to skip writing user operation log (CommandContext#disableUserOperationLog
-    // is not sufficient with legacy engine config setting "restrictUserOperationLogToAuthenticatedUsers" = false)
+    // uses internal API in order to skip writing user operation log
+    // (CommandContext#disableUserOperationLog
+    // is not sufficient with legacy engine config setting
+    // "restrictUserOperationLogToAuthenticatedUsers" = false)
     ((MigrationPlanExecutionBuilderImpl) executionBuilder).execute(false);
 
     commandContext.getByteArrayManager().delete(configurationEntity);
   }
 
-  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String processDefinitionId) {
-    return commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache()
+  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext,
+      String processDefinitionId) {
+    return commandContext.getProcessEngineConfiguration().getDeploymentCache()
         .findDeployedProcessDefinitionById(processDefinitionId);
   }
 

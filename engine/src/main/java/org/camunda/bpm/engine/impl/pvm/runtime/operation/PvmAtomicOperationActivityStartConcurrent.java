@@ -18,13 +18,13 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
  * @author Daniel Meyer
  * @author Roman Smirnov
  *
  */
-public class PvmAtomicOperationActivityStartConcurrent extends PvmAtomicOperationCreateConcurrentExecution {
+public class PvmAtomicOperationActivityStartConcurrent
+    extends PvmAtomicOperationCreateConcurrentExecution {
 
   protected void concurrentExecutionCreated(PvmExecutionImpl propagatingExecution) {
     propagatingExecution.setActivityInstanceId(null);

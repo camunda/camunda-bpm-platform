@@ -44,10 +44,8 @@ public class MigratingActivityInstanceVisitor extends MigratingProcessElementIns
         || instance instanceof MigratingTransitionInstance;
   }
 
-  protected void instantiateScopes(
-      MigratingScopeInstance ancestorScopeInstance,
-      MigratingScopeInstanceBranch executionBranch,
-      List<ScopeImpl> scopesToInstantiate) {
+  protected void instantiateScopes(MigratingScopeInstance ancestorScopeInstance,
+      MigratingScopeInstanceBranch executionBranch, List<ScopeImpl> scopesToInstantiate) {
 
     if (scopesToInstantiate.isEmpty()) {
       return;
@@ -58,8 +56,8 @@ public class MigratingActivityInstanceVisitor extends MigratingProcessElementIns
 
     ExecutionEntity newParentExecution = ancestorActivityInstance.createAttachableExecution();
 
-    Map<PvmActivity, PvmExecutionImpl> createdExecutions =
-        newParentExecution.instantiateScopes((List) scopesToInstantiate, skipCustomListeners, skipIoMappings);
+    Map<PvmActivity, PvmExecutionImpl> createdExecutions = newParentExecution
+        .instantiateScopes((List) scopesToInstantiate, skipCustomListeners, skipIoMappings);
 
     for (ScopeImpl scope : scopesToInstantiate) {
       ExecutionEntity createdExecution = (ExecutionEntity) createdExecutions.get(scope);

@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -32,7 +31,7 @@ public class GetUserAccountCmd implements Command<Account>, Serializable {
   protected String userId;
   protected String userPassword;
   protected String accountName;
-  
+
   public GetUserAccountCmd(String userId, String userPassword, String accountName) {
     this.userId = userId;
     this.userPassword = userPassword;
@@ -40,8 +39,7 @@ public class GetUserAccountCmd implements Command<Account>, Serializable {
   }
 
   public Account execute(CommandContext commandContext) {
-    return commandContext
-      .getIdentityInfoManager()
-      .findUserAccountByUserIdAndKey(userId, userPassword, accountName);
+    return commandContext.getIdentityInfoManager().findUserAccountByUserIdAndKey(userId,
+        userPassword, accountName);
   }
 }

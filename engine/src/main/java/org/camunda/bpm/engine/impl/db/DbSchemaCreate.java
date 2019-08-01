@@ -19,17 +19,15 @@ package org.camunda.bpm.engine.impl.db;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
-
 /**
  * @author Tom Baeyens
  */
 public class DbSchemaCreate {
 
   public static void main(String[] args) {
-    ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResourceDefault()
-      .setDatabaseSchemaUpdate(ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE)
-      .buildProcessEngine();
+    ProcessEngineConfiguration.createProcessEngineConfigurationFromResourceDefault()
+        .setDatabaseSchemaUpdate(ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE)
+        .buildProcessEngine();
   }
 
 }

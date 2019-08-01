@@ -19,12 +19,11 @@ package org.camunda.bpm.engine.test.bpmn.multiinstance;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 
-
 /**
  * @author Joram Barrez
  */
 public class TaskCompletionListener implements TaskListener {
-  
+
   public void notify(DelegateTask delegateTask) {
     Integer counter = (Integer) delegateTask.getVariable("taskListenerCounter");
     if (counter == null) {

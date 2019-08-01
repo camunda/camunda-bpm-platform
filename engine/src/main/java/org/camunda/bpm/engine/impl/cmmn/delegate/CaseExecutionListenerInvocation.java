@@ -30,7 +30,8 @@ public class CaseExecutionListenerInvocation extends DelegateInvocation {
   protected final CaseExecutionListener listenerInstance;
   protected final DelegateCaseExecution caseExecution;
 
-  public CaseExecutionListenerInvocation(CaseExecutionListener listenerInstance, DelegateCaseExecution caseExecution) {
+  public CaseExecutionListenerInvocation(CaseExecutionListener listenerInstance,
+      DelegateCaseExecution caseExecution) {
     super(caseExecution, null);
     this.listenerInstance = listenerInstance;
     this.caseExecution = caseExecution;

@@ -85,7 +85,8 @@ public class DecisionServiceUserOperationLogTest {
   @Test
   public void logCreationOnEvaluateDecisionTableById() {
     // given
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
 
     // when
     identityService.setAuthenticatedUserId(USER_ID);
@@ -100,8 +101,9 @@ public class DecisionServiceUserOperationLogTest {
   @Test
   public void logCreationOnEvaluateDecisionTableByKey() {
     // given
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
-    
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
@@ -117,8 +119,9 @@ public class DecisionServiceUserOperationLogTest {
     testRule.deploy(DMN_DECISION_TABLE_V2);
 
     // given
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().latestVersion().singleResult();
-    
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .latestVersion().singleResult();
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
@@ -134,11 +137,13 @@ public class DecisionServiceUserOperationLogTest {
     testRule.deploy(DMN_DECISION_TABLE_V2);
 
     // given
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().decisionDefinitionVersion(1).singleResult();
-    
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionVersion(1).singleResult();
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
-    decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, 1, createVariables());
+    decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, 1,
+        createVariables());
     identityService.clearAuthentication();
 
     // then
@@ -151,11 +156,13 @@ public class DecisionServiceUserOperationLogTest {
     testRule.deploy(DMN_DECISION_TABLE_V2);
 
     // given
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().latestVersion().singleResult();
-    
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .latestVersion().singleResult();
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
-    decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, null, createVariables());
+    decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, null,
+        createVariables());
     identityService.clearAuthentication();
 
     // then
@@ -166,11 +173,13 @@ public class DecisionServiceUserOperationLogTest {
   @Test
   public void logCreationOnEvaluateDecisionById() {
     // given
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
-    
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
-    decisionService.evaluateDecisionById(decisionDefinition.getId()).variables(createVariables()).evaluate();
+    decisionService.evaluateDecisionById(decisionDefinition.getId()).variables(createVariables())
+        .evaluate();
     identityService.clearAuthentication();
 
     // then
@@ -181,11 +190,13 @@ public class DecisionServiceUserOperationLogTest {
   @Test
   public void logCreationOnEvaluateDecisionByKey() {
     // given
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
-    
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .singleResult();
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
-    decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).variables(createVariables()).evaluate();
+    decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).variables(createVariables())
+        .evaluate();
     identityService.clearAuthentication();
 
     // then
@@ -198,11 +209,13 @@ public class DecisionServiceUserOperationLogTest {
     testRule.deploy(DMN_DECISION_LITERAL_EXPRESSION_V2);
 
     // given
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().latestVersion().singleResult();
-    
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .latestVersion().singleResult();
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
-    decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).variables(createVariables()).evaluate();
+    decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).variables(createVariables())
+        .evaluate();
     identityService.clearAuthentication();
 
     // then
@@ -215,11 +228,13 @@ public class DecisionServiceUserOperationLogTest {
     testRule.deploy(DMN_DECISION_LITERAL_EXPRESSION_V2);
 
     // given
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().decisionDefinitionVersion(1).singleResult();
-    
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionVersion(1).singleResult();
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
-    decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).version(1).variables(createVariables()).evaluate();
+    decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).version(1)
+        .variables(createVariables()).evaluate();
     identityService.clearAuthentication();
 
     // then
@@ -232,11 +247,13 @@ public class DecisionServiceUserOperationLogTest {
     testRule.deploy(DMN_DECISION_LITERAL_EXPRESSION_V2);
 
     // given
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().latestVersion().singleResult();
-    
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery()
+        .latestVersion().singleResult();
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
-    decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).version(null).variables(createVariables()).evaluate();
+    decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).version(null)
+        .variables(createVariables()).evaluate();
     identityService.clearAuthentication();
 
     // then
@@ -254,7 +271,8 @@ public class DecisionServiceUserOperationLogTest {
   }
 
   protected void assertLogEntry(String property, Object newValue) {
-    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().property(property).singleResult();
+    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().property(property)
+        .singleResult();
     assertThat(entry, notNullValue());
     assertThat(entry.getOrgValue(), nullValue());
     assertThat(entry.getNewValue(), is(String.valueOf(newValue)));

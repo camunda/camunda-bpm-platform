@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 
 @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-public class VariableInstanceQueryVariableIgnoreCaseTest extends AbstractVariableIgnoreCaseTest<VariableInstanceQueryImpl, VariableInstance> {
+public class VariableInstanceQueryVariableIgnoreCaseTest
+    extends AbstractVariableIgnoreCaseTest<VariableInstanceQueryImpl, VariableInstance> {
 
   RuntimeService runtimeService;
 

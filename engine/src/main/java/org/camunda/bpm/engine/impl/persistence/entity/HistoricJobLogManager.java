@@ -47,7 +47,8 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
   // select /////////////////////////////////////////////////////////////////
 
   public HistoricJobLogEventEntity findHistoricJobLogById(String historicJobLogId) {
-    return (HistoricJobLogEventEntity) getDbEntityManager().selectOne("selectHistoricJobLog", historicJobLogId);
+    return (HistoricJobLogEventEntity) getDbEntityManager().selectOne("selectHistoricJobLog",
+        historicJobLogId);
   }
 
   @SuppressWarnings("unchecked")
@@ -56,7 +57,8 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricJobLog> findHistoricJobLogsByQueryCriteria(HistoricJobLogQueryImpl query, Page page) {
+  public List<HistoricJobLog> findHistoricJobLogsByQueryCriteria(HistoricJobLogQueryImpl query,
+      Page page) {
     configureQuery(query);
     return getDbEntityManager().selectList("selectHistoricJobLogByQueryCriteria", query, page);
   }
@@ -68,22 +70,24 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
 
   // update ///////////////////////////////////////////////////////////////////
 
-  public void addRemovalTimeToJobLogByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToJobLogByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricJobLogEventEntity.class, "updateJobLogByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricJobLogEventEntity.class,
+        "updateJobLogByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToJobLogByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public void addRemovalTimeToJobLogByProcessInstanceId(String processInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricJobLogEventEntity.class, "updateJobLogByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricJobLogEventEntity.class,
+        "updateJobLogByProcessInstanceId", parameters);
   }
 
   public void addRemovalTimeToJobLogByBatchId(String batchId, Date removalTime) {
@@ -91,11 +95,11 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
     parameters.put("batchId", batchId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricJobLogEventEntity.class, "updateJobLogByBatchId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricJobLogEventEntity.class,
+        "updateJobLogByBatchId", parameters);
 
-    getDbEntityManager()
-      .updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByBatchId", parameters);
+    getDbEntityManager().updatePreserveOrder(ByteArrayEntity.class, "updateByteArraysByBatchId",
+        parameters);
   }
 
   // delete ///////////////////////////////////////////////////////////////////
@@ -110,51 +114,59 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
   public void deleteHistoricJobLogByJobId(String jobId) {
     if (isHistoryEnabled()) {
       deleteExceptionByteArrayByParameterMap("jobId", jobId);
-      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByJobId", jobId);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByJobId",
+          jobId);
     }
   }
 
   public void deleteHistoricJobLogsByProcessInstanceIds(List<String> processInstanceIds) {
     deleteExceptionByteArrayByParameterMap("processInstanceIdIn", processInstanceIds.toArray());
-    getDbEntityManager().deletePreserveOrder(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByProcessInstanceIds", processInstanceIds);
+    getDbEntityManager().deletePreserveOrder(HistoricJobLogEventEntity.class,
+        "deleteHistoricJobLogByProcessInstanceIds", processInstanceIds);
   }
 
   public void deleteHistoricJobLogsByProcessDefinitionId(String processDefinitionId) {
     if (isHistoryEnabled()) {
       deleteExceptionByteArrayByParameterMap("processDefinitionId", processDefinitionId);
-      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByProcessDefinitionId", processDefinitionId);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class,
+          "deleteHistoricJobLogByProcessDefinitionId", processDefinitionId);
     }
   }
 
   public void deleteHistoricJobLogsByDeploymentId(String deploymentId) {
     if (isHistoryEnabled()) {
       deleteExceptionByteArrayByParameterMap("deploymentId", deploymentId);
-      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByDeploymentId", deploymentId);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class,
+          "deleteHistoricJobLogByDeploymentId", deploymentId);
     }
   }
 
   public void deleteHistoricJobLogsByHandlerType(String handlerType) {
     if (isHistoryEnabled()) {
       deleteExceptionByteArrayByParameterMap("handlerType", handlerType);
-      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByHandlerType", handlerType);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class,
+          "deleteHistoricJobLogByHandlerType", handlerType);
     }
   }
 
   public void deleteHistoricJobLogsByJobDefinitionId(String jobDefinitionId) {
     if (isHistoryEnabled()) {
       deleteExceptionByteArrayByParameterMap("jobDefinitionId", jobDefinitionId);
-      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByJobDefinitionId", jobDefinitionId);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class,
+          "deleteHistoricJobLogByJobDefinitionId", jobDefinitionId);
     }
   }
 
   public void deleteHistoricJobLogByBatchIds(List<String> historicBatchIds) {
     if (isHistoryEnabled()) {
       deleteExceptionByteArrayByParameterMap("historicBatchIdIn", historicBatchIds);
-      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByBatchIds", historicBatchIds);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByBatchIds",
+          historicBatchIds);
     }
   }
 
-  public DbOperation deleteJobLogByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteJobLogByRemovalTime(Date removalTime, int minuteFrom, int minuteTo,
+      int batchSize) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -163,9 +175,8 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(HistoricJobLogEventEntity.class, "deleteJobLogByRemovalTime",
-        new ListQueryParameterObject(parameters, 0, batchSize));
+    return getDbEntityManager().deletePreserveOrder(HistoricJobLogEventEntity.class,
+        "deleteJobLogByRemovalTime", new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
   // byte array delete ////////////////////////////////////////////////////////
@@ -174,7 +185,8 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
     EnsureUtil.ensureNotNull(key, value);
     Map<String, Object> parameterMap = new HashMap<String, Object>();
     parameterMap.put(key, value);
-    getDbEntityManager().delete(ByteArrayEntity.class, "deleteExceptionByteArraysByIds", parameterMap);
+    getDbEntityManager().delete(ByteArrayEntity.class, "deleteExceptionByteArraysByIds",
+        parameterMap);
   }
 
   // fire history events ///////////////////////////////////////////////////////
@@ -222,7 +234,6 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
       });
     }
   }
-
 
   // helper /////////////////////////////////////////////////////////
 

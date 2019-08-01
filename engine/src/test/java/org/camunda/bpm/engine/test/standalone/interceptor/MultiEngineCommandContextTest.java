@@ -45,8 +45,7 @@ public class MultiEngineCommandContextTest {
   public void closeEngine1() {
     try {
       engine1.close();
-    }
-    finally {
+    } finally {
       engine1 = null;
     }
   }
@@ -55,8 +54,7 @@ public class MultiEngineCommandContextTest {
   public void closeEngine2() {
     try {
       engine2.close();
-    }
-    finally {
+    } finally {
       engine2 = null;
     }
   }
@@ -69,23 +67,19 @@ public class MultiEngineCommandContextTest {
   @Test
   public void shouldOpenNewCommandContextWhenInteractingAccrossEngines() {
 
-    BpmnModelInstance process1 = Bpmn.createExecutableProcess("process1")
-        .startEvent()
-        .serviceTask()
-          .camundaInputParameter("engineName", "engine2")
-          .camundaInputParameter("processKey", "process2")
-          .camundaClass(StartProcessInstanceOnEngineDelegate.class.getName())
-        .endEvent()
-        .done();
+    BpmnModelInstance process1 = Bpmn.createExecutableProcess("process1").startEvent().serviceTask()
+        .camundaInputParameter("engineName", "engine2")
+        .camundaInputParameter("processKey", "process2")
+        .camundaClass(StartProcessInstanceOnEngineDelegate.class.getName()).endEvent().done();
 
-    BpmnModelInstance process2 = Bpmn.createExecutableProcess("process2")
-        .startEvent()
-        .endEvent()
+    BpmnModelInstance process2 = Bpmn.createExecutableProcess("process2").startEvent().endEvent()
         .done();
 
     // given
-    engine1.getRepositoryService().createDeployment().addModelInstance("process1.bpmn", process1).deploy();
-    engine2.getRepositoryService().createDeployment().addModelInstance("process2.bpmn", process2).deploy();
+    engine1.getRepositoryService().createDeployment().addModelInstance("process1.bpmn", process1)
+        .deploy();
+    engine2.getRepositoryService().createDeployment().addModelInstance("process2.bpmn", process2)
+        .deploy();
 
     // if
     engine1.getRuntimeService().startProcessInstanceByKey("process1");
@@ -94,32 +88,26 @@ public class MultiEngineCommandContextTest {
   @Test
   public void shouldOpenNewCommandContextWhenInteractingWithOtherEngineAndBack() {
 
-    BpmnModelInstance process1 = Bpmn.createExecutableProcess("process1")
-        .startEvent()
-        .serviceTask()
-          .camundaInputParameter("engineName", "engine2")
-          .camundaInputParameter("processKey", "process2")
-          .camundaClass(StartProcessInstanceOnEngineDelegate.class.getName())
-        .endEvent()
-        .done();
+    BpmnModelInstance process1 = Bpmn.createExecutableProcess("process1").startEvent().serviceTask()
+        .camundaInputParameter("engineName", "engine2")
+        .camundaInputParameter("processKey", "process2")
+        .camundaClass(StartProcessInstanceOnEngineDelegate.class.getName()).endEvent().done();
 
-    BpmnModelInstance process2 = Bpmn.createExecutableProcess("process2")
-        .startEvent()
-        .serviceTask()
-          .camundaInputParameter("engineName", "engine1")
-          .camundaInputParameter("processKey", "process3")
-          .camundaClass(StartProcessInstanceOnEngineDelegate.class.getName())
-        .done();
+    BpmnModelInstance process2 = Bpmn.createExecutableProcess("process2").startEvent().serviceTask()
+        .camundaInputParameter("engineName", "engine1")
+        .camundaInputParameter("processKey", "process3")
+        .camundaClass(StartProcessInstanceOnEngineDelegate.class.getName()).done();
 
-    BpmnModelInstance process3 = Bpmn.createExecutableProcess("process3")
-        .startEvent()
-        .endEvent()
+    BpmnModelInstance process3 = Bpmn.createExecutableProcess("process3").startEvent().endEvent()
         .done();
 
     // given
-    engine1.getRepositoryService().createDeployment().addModelInstance("process1.bpmn", process1).deploy();
-    engine2.getRepositoryService().createDeployment().addModelInstance("process2.bpmn", process2).deploy();
-    engine1.getRepositoryService().createDeployment().addModelInstance("process3.bpmn", process3).deploy();
+    engine1.getRepositoryService().createDeployment().addModelInstance("process1.bpmn", process1)
+        .deploy();
+    engine2.getRepositoryService().createDeployment().addModelInstance("process2.bpmn", process2)
+        .deploy();
+    engine1.getRepositoryService().createDeployment().addModelInstance("process3.bpmn", process3)
+        .deploy();
 
     // if
     engine1.getRuntimeService().startProcessInstanceByKey("process1");

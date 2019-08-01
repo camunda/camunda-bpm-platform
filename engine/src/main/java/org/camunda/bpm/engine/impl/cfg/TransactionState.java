@@ -16,15 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.cfg;
 
-
 /**
  * @author Tom Baeyens
  */
 public enum TransactionState {
 
-  COMMITTED,
-  ROLLED_BACK,
-  COMMITTING,
-  ROLLINGBACK
+  COMMITTED, ROLLED_BACK, COMMITTING, ROLLINGBACK
 
 }

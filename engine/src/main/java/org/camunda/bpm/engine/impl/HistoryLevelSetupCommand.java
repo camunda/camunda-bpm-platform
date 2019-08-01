@@ -34,11 +34,13 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
 
   public Void execute(CommandContext commandContext) {
 
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
 
     checkStartupLockExists(commandContext);
 
-    HistoryLevel databaseHistoryLevel = new DetermineHistoryLevelCmd(processEngineConfiguration.getHistoryLevels()).execute(commandContext);
+    HistoryLevel databaseHistoryLevel = new DetermineHistoryLevelCmd(
+        processEngineConfiguration.getHistoryLevels()).execute(commandContext);
     determineAutoHistoryLevel(processEngineConfiguration, databaseHistoryLevel);
 
     HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
@@ -46,7 +48,8 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
     if (databaseHistoryLevel == null) {
 
       commandContext.getPropertyManager().acquireExclusiveLockForStartup();
-      databaseHistoryLevel = new DetermineHistoryLevelCmd(processEngineConfiguration.getHistoryLevels()).execute(commandContext);
+      databaseHistoryLevel = new DetermineHistoryLevelCmd(
+          processEngineConfiguration.getHistoryLevels()).execute(commandContext);
 
       if (databaseHistoryLevel == null) {
         LOG.noHistoryLevelPropertyFound();
@@ -54,8 +57,8 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
       }
     } else {
       if (configuredHistoryLevel.getId() != databaseHistoryLevel.getId()) {
-        throw new ProcessEngineException("historyLevel mismatch: configuration says " + configuredHistoryLevel
-            + " and database says " + databaseHistoryLevel);
+        throw new ProcessEngineException("historyLevel mismatch: configuration says "
+            + configuredHistoryLevel + " and database says " + databaseHistoryLevel);
       }
     }
 
@@ -63,9 +66,11 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
   }
 
   public static void dbCreateHistoryLevel(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
-    PropertyEntity property = new PropertyEntity("historyLevel", Integer.toString(configuredHistoryLevel.getId()));
+    PropertyEntity property = new PropertyEntity("historyLevel",
+        Integer.toString(configuredHistoryLevel.getId()));
     commandContext.getSession(DbEntityManager.class).insert(property);
     LOG.creatingHistoryLevelPropertyInDatabase(configuredHistoryLevel);
   }
@@ -77,17 +82,18 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
   public static Integer databaseHistoryLevel(CommandContext commandContext) {
 
     try {
-      PropertyEntity historyLevelProperty =  commandContext.getPropertyManager().findPropertyById("historyLevel");
+      PropertyEntity historyLevelProperty = commandContext.getPropertyManager()
+          .findPropertyById("historyLevel");
       return historyLevelProperty != null ? new Integer(historyLevelProperty.getValue()) : null;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       LOG.couldNotSelectHistoryLevel(e.getMessage());
       return null;
     }
 
   }
 
-  protected void determineAutoHistoryLevel(ProcessEngineConfigurationImpl engineConfiguration, HistoryLevel databaseHistoryLevel) {
+  protected void determineAutoHistoryLevel(ProcessEngineConfigurationImpl engineConfiguration,
+      HistoryLevel databaseHistoryLevel) {
     HistoryLevel configuredHistoryLevel = engineConfiguration.getHistoryLevel();
 
     if (configuredHistoryLevel == null
@@ -96,15 +102,15 @@ public final class HistoryLevelSetupCommand implements Command<Void> {
       // automatically determine history level or use default AUDIT
       if (databaseHistoryLevel != null) {
         engineConfiguration.setHistoryLevel(databaseHistoryLevel);
-      }
-      else {
+      } else {
         engineConfiguration.setHistoryLevel(engineConfiguration.getDefaultHistoryLevel());
       }
     }
   }
 
   protected void checkStartupLockExists(CommandContext commandContext) {
-    PropertyEntity historyStartupProperty = commandContext.getPropertyManager().findPropertyById("startup.lock");
+    PropertyEntity historyStartupProperty = commandContext.getPropertyManager()
+        .findPropertyById("startup.lock");
     if (historyStartupProperty == null) {
       LOG.noStartupLockPropertyFound();
     }

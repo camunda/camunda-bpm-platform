@@ -42,10 +42,8 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
 
   @Override
   protected void setUp() {
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .endEvent()
-    .done();
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .endEvent().done();
 
     deployment(oneTaskProcess);
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
@@ -57,54 +55,46 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
   }
 
   public void testQueryNoTenantIdSet() {
-    HistoricProcessInstanceQuery query = historyService.
-        createHistoricProcessInstanceQuery();
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
-    HistoricProcessInstanceQuery query = historyService
-        .createHistoricProcessInstanceQuery()
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = historyService
-        .createHistoricProcessInstanceQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = historyService.createHistoricProcessInstanceQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    HistoricProcessInstanceQuery query = historyService
-        .createHistoricProcessInstanceQuery()
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    HistoricProcessInstanceQuery query = historyService
-        .createHistoricProcessInstanceQuery()
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
   }
 
   public void testQueryByWithoutTenantId() {
-    HistoricProcessInstanceQuery query = historyService
-      .createHistoricProcessInstanceQuery()
-      .withoutTenantId();
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
+        .withoutTenantId();
 
     assertThat(query.count(), is(1L));
   }
 
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricProcessInstanceQuery()
-        .tenantIdIn((String) null);
+      historyService.createHistoricProcessInstanceQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -112,11 +102,9 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
   }
 
   public void testQuerySortingAsc() {
-    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc()
-        .list();
+    List<HistoricProcessInstance> historicProcessInstances = historyService
+        .createHistoricProcessInstanceQuery().tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId()
+        .asc().list();
 
     assertThat(historicProcessInstances.size(), is(2));
     assertThat(historicProcessInstances.get(0).getTenantId(), is(TENANT_ONE));
@@ -124,11 +112,9 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
   }
 
   public void testQuerySortingDesc() {
-    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .desc()
-        .list();
+    List<HistoricProcessInstance> historicProcessInstances = historyService
+        .createHistoricProcessInstanceQuery().tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId()
+        .desc().list();
 
     assertThat(historicProcessInstances.size(), is(2));
     assertThat(historicProcessInstances.get(0).getTenantId(), is(TENANT_TWO));
@@ -174,14 +160,12 @@ public class MultiTenancyHistoricProcessInstanceQueryTest extends PluggableProce
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {
     return runtimeService.createProcessInstanceByKey("testProcess")
-        .processDefinitionTenantId(tenant)
-        .execute();
+        .processDefinitionTenantId(tenant).execute();
   }
 
   protected ProcessInstance startProcessInstance() {
     return runtimeService.createProcessInstanceByKey("testProcess")
-      .processDefinitionWithoutTenantId()
-      .execute();
+        .processDefinitionWithoutTenantId().execute();
   }
 
 }

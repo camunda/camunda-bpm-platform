@@ -31,9 +31,9 @@ public class HandleExternalTaskFailureCmd extends HandleExternalTaskCmd {
   protected long retryDuration;
   protected int retries;
 
-  public HandleExternalTaskFailureCmd(String externalTaskId, String workerId,
-                                      String errorMessage, int retries, long retryDuration) {
-    this(externalTaskId,workerId,errorMessage,null,retries,retryDuration);
+  public HandleExternalTaskFailureCmd(String externalTaskId, String workerId, String errorMessage,
+      int retries, long retryDuration) {
+    this(externalTaskId, workerId, errorMessage, null, retries, retryDuration);
   }
 
   /**
@@ -46,8 +46,8 @@ public class HandleExternalTaskFailureCmd extends HandleExternalTaskCmd {
    * @param retries
    * @param retryDuration
    */
-  public HandleExternalTaskFailureCmd(String externalTaskId, String workerId,
-                                      String errorMessage, String errorDetails, int retries, long retryDuration) {
+  public HandleExternalTaskFailureCmd(String externalTaskId, String workerId, String errorMessage,
+      String errorDetails, int retries, long retryDuration) {
     super(externalTaskId, workerId);
     this.errorMessage = errorMessage;
     this.errorDetails = errorDetails;
@@ -69,6 +69,7 @@ public class HandleExternalTaskFailureCmd extends HandleExternalTaskCmd {
 
   @Override
   public String getErrorMessageOnWrongWorkerAccess() {
-    return "Failure of External Task " + externalTaskId + " cannot be reported by worker '" + workerId;
+    return "Failure of External Task " + externalTaskId + " cannot be reported by worker '"
+        + workerId;
   }
 }

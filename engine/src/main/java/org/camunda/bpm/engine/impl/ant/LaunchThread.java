@@ -25,7 +25,6 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -35,7 +34,7 @@ public class LaunchThread extends Thread {
   String[] cmd;
   File dir;
   String msg;
-  
+
   public LaunchThread(Task task, String[] cmd, File dir, String msg) {
     this.task = task;
     this.cmd = cmd;
@@ -44,7 +43,7 @@ public class LaunchThread extends Thread {
   }
 
   public static void launch(Task task, String[] cmd, File dir, String launchCompleteText) {
-    if (cmd==null) {
+    if (cmd == null) {
       throw new BuildException("cmd is null");
     }
     try {
@@ -52,13 +51,13 @@ public class LaunchThread extends Thread {
       launchThread.start();
       launchThread.join();
     } catch (Exception e) {
-      throw new BuildException("couldn't launch cmd: "+cmdString(cmd), e);
+      throw new BuildException("couldn't launch cmd: " + cmdString(cmd), e);
     }
   }
-  
+
   private static String cmdString(String[] cmd) {
-    StringBuilder cmdText = new  StringBuilder();
-    for(String cmdPart: cmd) {
+    StringBuilder cmdText = new StringBuilder();
+    for (String cmdPart : cmd) {
       cmdText.append(cmdPart);
       cmdText.append(" ");
     }
@@ -66,36 +65,33 @@ public class LaunchThread extends Thread {
   }
 
   public void run() {
-    task.log("launching cmd '"+cmdString(cmd)+"' in dir '"+dir+"'");
-    if (msg!=null) {
-      task.log("waiting for launch completion msg '"+msg+"'...");
+    task.log("launching cmd '" + cmdString(cmd) + "' in dir '" + dir + "'");
+    if (msg != null) {
+      task.log("waiting for launch completion msg '" + msg + "'...");
     } else {
       task.log("not waiting for a launch completion msg.");
     }
-    ProcessBuilder processBuilder = new ProcessBuilder(cmd)
-      .redirectErrorStream(true)
-      .directory(dir);
-    
+    ProcessBuilder processBuilder = new ProcessBuilder(cmd).redirectErrorStream(true)
+        .directory(dir);
+
     InputStream consoleStream = null;
     try {
       Process process = processBuilder.start();
-      
+
       consoleStream = process.getInputStream();
       BufferedReader consoleReader = new BufferedReader(new InputStreamReader(consoleStream));
       String consoleLine = "";
-      while ( (consoleLine!=null)
-              && (msg==null || consoleLine.indexOf(msg)==-1)
-            ) {
+      while ((consoleLine != null) && (msg == null || consoleLine.indexOf(msg) == -1)) {
         consoleLine = consoleReader.readLine();
-        
-        if (consoleLine!=null) {
+
+        if (consoleLine != null) {
           task.log("  " + consoleLine);
         } else {
           task.log("launched process completed");
         }
       }
     } catch (Exception e) {
-      throw new BuildException("couldn't launch "+cmdString(cmd), e);
+      throw new BuildException("couldn't launch " + cmdString(cmd), e);
     } finally {
       IoUtil.closeSilently(consoleStream);
     }

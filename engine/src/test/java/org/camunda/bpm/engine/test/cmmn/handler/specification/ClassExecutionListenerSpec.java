@@ -37,7 +37,8 @@ public class ClassExecutionListenerSpec extends AbstractExecutionListenerSpec {
     super(eventName);
   }
 
-  protected void configureCaseExecutionListener(CmmnModelInstance modelInstance, CamundaCaseExecutionListener listener) {
+  protected void configureCaseExecutionListener(CmmnModelInstance modelInstance,
+      CamundaCaseExecutionListener listener) {
     listener.setCamundaClass(CLASS_NAME);
   }
 
@@ -55,6 +56,5 @@ public class ClassExecutionListenerSpec extends AbstractExecutionListenerSpec {
       matchingFieldSpec.verify(declaration);
     }
   }
-
 
 }

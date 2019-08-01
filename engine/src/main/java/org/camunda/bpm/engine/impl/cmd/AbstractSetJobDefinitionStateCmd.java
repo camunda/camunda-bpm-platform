@@ -47,9 +47,7 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
   protected boolean isProcessDefinitionTenantIdSet = false;
 
   public AbstractSetJobDefinitionStateCmd(UpdateJobDefinitionSuspensionStateBuilderImpl builder) {
-    super(
-        builder.isIncludeJobs(),
-        builder.getExecutionDate());
+    super(builder.isIncludeJobs(), builder.getExecutionDate());
 
     this.jobDefinitionId = builder.getJobDefinitionId();
     this.processDefinitionId = builder.getProcessDefinitionId();
@@ -62,14 +60,16 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
   @Override
   protected void checkParameters(CommandContext commandContext) {
     if (jobDefinitionId == null && processDefinitionId == null && processDefinitionKey == null) {
-      throw new ProcessEngineException("Job definition id, process definition id nor process definition key cannot be null");
+      throw new ProcessEngineException(
+          "Job definition id, process definition id nor process definition key cannot be null");
     }
   }
 
   @Override
   protected void checkAuthorization(CommandContext commandContext) {
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       if (jobDefinitionId != null) {
 
         JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
@@ -106,7 +106,8 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
   }
 
   @Override
-  protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
+  protected void updateSuspensionState(CommandContext commandContext,
+      SuspensionState suspensionState) {
     JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
     JobManager jobManager = commandContext.getJobManager();
 
@@ -114,18 +115,24 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
       jobDefinitionManager.updateJobDefinitionSuspensionStateById(jobDefinitionId, suspensionState);
 
     } else if (processDefinitionId != null) {
-      jobDefinitionManager.updateJobDefinitionSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
-      jobManager.updateStartTimerJobSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
+      jobDefinitionManager.updateJobDefinitionSuspensionStateByProcessDefinitionId(
+          processDefinitionId, suspensionState);
+      jobManager.updateStartTimerJobSuspensionStateByProcessDefinitionId(processDefinitionId,
+          suspensionState);
 
     } else if (processDefinitionKey != null) {
 
       if (!isProcessDefinitionTenantIdSet) {
-        jobDefinitionManager.updateJobDefinitionSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
-        jobManager.updateStartTimerJobSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+        jobDefinitionManager.updateJobDefinitionSuspensionStateByProcessDefinitionKey(
+            processDefinitionKey, suspensionState);
+        jobManager.updateStartTimerJobSuspensionStateByProcessDefinitionKey(processDefinitionKey,
+            suspensionState);
 
       } else {
-        jobDefinitionManager.updateJobDefinitionSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
-        jobManager.updateStartTimerJobSuspensionStateByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, suspensionState);
+        jobDefinitionManager.updateJobDefinitionSuspensionStateByProcessDefinitionKeyAndTenantId(
+            processDefinitionKey, processDefinitionTenantId, suspensionState);
+        jobManager.updateStartTimerJobSuspensionStateByProcessDefinitionKeyAndTenantId(
+            processDefinitionKey, processDefinitionTenantId, suspensionState);
       }
     }
   }
@@ -134,18 +141,22 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
   protected JobHandlerConfiguration getJobHandlerConfiguration() {
 
     if (jobDefinitionId != null) {
-      return JobDefinitionSuspensionStateConfiguration.byJobDefinitionId(jobDefinitionId, isIncludeSubResources());
+      return JobDefinitionSuspensionStateConfiguration.byJobDefinitionId(jobDefinitionId,
+          isIncludeSubResources());
 
     } else if (processDefinitionId != null) {
-      return JobDefinitionSuspensionStateConfiguration.byProcessDefinitionId(processDefinitionId, isIncludeSubResources());
+      return JobDefinitionSuspensionStateConfiguration.byProcessDefinitionId(processDefinitionId,
+          isIncludeSubResources());
 
     } else {
 
       if (!isProcessDefinitionTenantIdSet) {
-        return JobDefinitionSuspensionStateConfiguration.byProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
+        return JobDefinitionSuspensionStateConfiguration
+            .byProcessDefinitionKey(processDefinitionKey, isIncludeSubResources());
 
       } else {
-        return JobDefinitionSuspensionStateConfiguration.ByProcessDefinitionKeyAndTenantId(processDefinitionKey, processDefinitionTenantId, isIncludeSubResources());
+        return JobDefinitionSuspensionStateConfiguration.ByProcessDefinitionKeyAndTenantId(
+            processDefinitionKey, processDefinitionTenantId, isIncludeSubResources());
       }
     }
 
@@ -153,9 +164,10 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
 
   @Override
   protected void logUserOperation(CommandContext commandContext) {
-    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
-    commandContext.getOperationLogManager().logJobDefinitionOperation(getLogEntryOperation(), jobDefinitionId,
-      processDefinitionId, processDefinitionKey, propertyChange);
+    PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null,
+        getNewSuspensionState().getName());
+    commandContext.getOperationLogManager().logJobDefinitionOperation(getLogEntryOperation(),
+        jobDefinitionId, processDefinitionId, processDefinitionKey, propertyChange);
   }
 
   protected UpdateJobSuspensionStateBuilderImpl createJobCommandBuilder() {
@@ -181,8 +193,8 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
   }
 
   /**
-   * Subclasses should return the type of the {@link JobHandler} here. it will be used when
-   * the user provides an execution date on which the actual state change will happen.
+   * Subclasses should return the type of the {@link JobHandler} here. it will be used when the user
+   * provides an execution date on which the actual state change will happen.
    */
   @Override
   protected abstract String getDelayedExecutionJobHandlerType();
@@ -194,5 +206,6 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
     return getNextCommand(jobCommandBuilder);
   }
 
-  protected abstract AbstractSetJobStateCmd getNextCommand(UpdateJobSuspensionStateBuilderImpl jobCommandBuilder);
+  protected abstract AbstractSetJobStateCmd getNextCommand(
+      UpdateJobSuspensionStateBuilderImpl jobCommandBuilder);
 }

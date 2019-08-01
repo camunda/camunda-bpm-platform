@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine.impl.digest;
 
 /**
- * <p>{@link PasswordEncryptor} implementation using base64 encoded SHA-512 password hashes</p>
+ * <p>
+ * {@link PasswordEncryptor} implementation using base64 encoded SHA-512 password hashes
+ * </p>
  *
  */
 public class Sha512HashDigest extends Base64EncodedHashDigest implements PasswordEncryptor {
@@ -26,5 +28,5 @@ public class Sha512HashDigest extends Base64EncodedHashDigest implements Passwor
   public String hashAlgorithmName() {
     return "SHA-512";
   }
-  
+
 }

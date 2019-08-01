@@ -31,8 +31,9 @@ public abstract class StateTransitionCaseExecutionCmd extends CaseExecutionVaria
 
   private static final long serialVersionUID = 1L;
 
-  public StateTransitionCaseExecutionCmd(String caseExecutionId, Map<String, Object> variables, Map<String, Object> variablesLocal,
-        Collection<String> variableDeletions, Collection<String> variableLocalDeletions) {
+  public StateTransitionCaseExecutionCmd(String caseExecutionId, Map<String, Object> variables,
+      Map<String, Object> variablesLocal, Collection<String> variableDeletions,
+      Collection<String> variableLocalDeletions) {
     super(caseExecutionId, variables, variablesLocal, variableDeletions, variableLocalDeletions);
   }
 
@@ -50,10 +51,7 @@ public abstract class StateTransitionCaseExecutionCmd extends CaseExecutionVaria
     return null;
   }
 
-  protected abstract void performStateTransition(CommandContext commandContext, CaseExecutionEntity caseExecution);
-
-
-
-
+  protected abstract void performStateTransition(CommandContext commandContext,
+      CaseExecutionEntity caseExecution);
 
 }

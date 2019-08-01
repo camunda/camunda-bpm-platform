@@ -45,7 +45,8 @@ public class CustomHistoryLevelRemovalTime implements HistoryLevel {
       }
     }
 
-    return eventType.equals(HistoryEventTypes.PROCESS_INSTANCE_END) || isRootProcessInstance(entity);
+    return eventType.equals(HistoryEventTypes.PROCESS_INSTANCE_END)
+        || isRootProcessInstance(entity);
   }
 
   public void setEventTypes(HistoryEventTypes... eventTypes) {

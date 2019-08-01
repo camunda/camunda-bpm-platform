@@ -39,7 +39,8 @@ public class SimpleDbSqlSession extends DbSqlSession {
     super(dbSqlSessionFactory);
   }
 
-  public SimpleDbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection, String catalog, String schema) {
+  public SimpleDbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection,
+      String catalog, String schema) {
     super(dbSqlSessionFactory, connection, catalog, schema);
   }
 
@@ -61,7 +62,8 @@ public class SimpleDbSqlSession extends DbSqlSession {
 
       if (operation.getState() != State.APPLIED) {
         List<DbOperation> remainingOperations = operations.subList(i + 1, operations.size());
-        return FlushResult.withFailuresAndRemaining(Collections.singletonList(operation), remainingOperations);
+        return FlushResult.withFailuresAndRemaining(Collections.singletonList(operation),
+            remainingOperations);
       }
     }
 
@@ -78,7 +80,8 @@ public class SimpleDbSqlSession extends DbSqlSession {
     // get statement
     String insertStatement = dbSqlSessionFactory.getInsertStatement(dbEntity);
     insertStatement = dbSqlSessionFactory.mapStatement(insertStatement);
-    ensureNotNull("no insert statement for " + dbEntity.getClass() + " in the ibatis mapping files", "insertStatement", insertStatement);
+    ensureNotNull("no insert statement for " + dbEntity.getClass() + " in the ibatis mapping files",
+        "insertStatement", insertStatement);
 
     // execute the insert
     try {
@@ -98,7 +101,8 @@ public class SimpleDbSqlSession extends DbSqlSession {
 
     // get statement
     String deleteStatement = dbSqlSessionFactory.getDeleteStatement(dbEntity.getClass());
-    ensureNotNull("no delete statement for " + dbEntity.getClass() + " in the ibatis mapping files", "deleteStatement", deleteStatement);
+    ensureNotNull("no delete statement for " + dbEntity.getClass() + " in the ibatis mapping files",
+        "deleteStatement", deleteStatement);
 
     LOG.executeDatabaseOperation("DELETE", dbEntity);
 
@@ -133,7 +137,8 @@ public class SimpleDbSqlSession extends DbSqlSession {
     final DbEntity dbEntity = operation.getEntity();
 
     String updateStatement = dbSqlSessionFactory.getUpdateStatement(dbEntity);
-    ensureNotNull("no update statement for " + dbEntity.getClass() + " in the ibatis mapping files", "updateStatement", updateStatement);
+    ensureNotNull("no update statement for " + dbEntity.getClass() + " in the ibatis mapping files",
+        "updateStatement", updateStatement);
 
     LOG.executeDatabaseOperation("UPDATE", dbEntity);
 

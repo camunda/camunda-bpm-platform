@@ -25,7 +25,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -49,14 +48,14 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
     units.put("year", Calendar.YEAR);
     units.put("years", Calendar.YEAR);
   }
-  
+
   public Date resolveDuedate(String duedate) {
     return resolveDuedate(duedate, null);
   }
-  
+
   public Date resolveDuedate(String duedate, Date startDate) {
     Date resolvedDuedate = startDate == null ? ClockUtil.getCurrentTime() : startDate;
-    
+
     String[] tokens = duedate.split(" and ");
     for (String token : tokens) {
       resolvedDuedate = addSingleUnitQuantity(resolvedDuedate, token);
@@ -67,24 +66,21 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
 
   protected Date addSingleUnitQuantity(Date startDate, String singleUnitQuantity) {
     int spaceIndex = singleUnitQuantity.indexOf(" ");
-    if (spaceIndex==-1 || singleUnitQuantity.length() < spaceIndex+1) {
-      throw new ProcessEngineException("invalid duedate format: "+singleUnitQuantity);
+    if (spaceIndex == -1 || singleUnitQuantity.length() < spaceIndex + 1) {
+      throw new ProcessEngineException("invalid duedate format: " + singleUnitQuantity);
     }
-    
+
     String quantityText = singleUnitQuantity.substring(0, spaceIndex);
     Integer quantity = new Integer(quantityText);
-    
-    String unitText = singleUnitQuantity
-      .substring(spaceIndex+1)
-      .trim()
-      .toLowerCase();
-    
+
+    String unitText = singleUnitQuantity.substring(spaceIndex + 1).trim().toLowerCase();
+
     int unit = units.get(unitText);
 
-    GregorianCalendar calendar = new GregorianCalendar(); 
+    GregorianCalendar calendar = new GregorianCalendar();
     calendar.setTime(startDate);
     calendar.add(unit, quantity);
-    
+
     return calendar.getTime();
   }
 }

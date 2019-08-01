@@ -30,10 +30,7 @@ public class BaseCallableElement {
   protected String deploymentId;
 
   public enum CallableElementBinding {
-    LATEST("latest"),
-    DEPLOYMENT("deployment"),
-    VERSION("version"),
-    VERSION_TAG("versionTag");
+    LATEST("latest"), DEPLOYMENT("deployment"), VERSION("version"), VERSION_TAG("versionTag");
 
     private String value;
 
@@ -50,7 +47,7 @@ public class BaseCallableElement {
     Object result = definitionKeyValueProvider.getValue(variableScope);
 
     if (result != null && !(result instanceof String)) {
-      throw new ClassCastException("Cannot cast '"+result+"' to String");
+      throw new ClassCastException("Cannot cast '" + result + "' to String");
     }
 
     return (String) result;
@@ -101,7 +98,8 @@ public class BaseCallableElement {
       } else if (result instanceof Integer) {
         return (Integer) result;
       } else {
-        throw new ProcessEngineException("It is not possible to transform '"+result+"' into an integer.");
+        throw new ProcessEngineException(
+            "It is not possible to transform '" + result + "' into an integer.");
       }
     }
 
@@ -123,13 +121,13 @@ public class BaseCallableElement {
       if (result instanceof String) {
         return (String) result;
       } else {
-        throw new ProcessEngineException("It is not possible to transform '"+result+"' into a string.");
+        throw new ProcessEngineException(
+            "It is not possible to transform '" + result + "' into a string.");
       }
     }
 
     return null;
   }
-
 
   public ParameterValueProvider getVersionTagValueProvider() {
     return versionTagValueProvider;

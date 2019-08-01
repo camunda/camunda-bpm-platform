@@ -33,7 +33,8 @@ public class MigrationInstructionImpl implements MigrationInstruction {
     this(sourceActivityId, targetActivityId, false);
   }
 
-  public MigrationInstructionImpl(String sourceActivityId, String targetActivityId, boolean updateEventTrigger) {
+  public MigrationInstructionImpl(String sourceActivityId, String targetActivityId,
+      boolean updateEventTrigger) {
     this.sourceActivityId = sourceActivityId;
     this.targetActivityId = targetActivityId;
     this.updateEventTrigger = updateEventTrigger;
@@ -56,11 +57,9 @@ public class MigrationInstructionImpl implements MigrationInstruction {
   }
 
   public String toString() {
-    return "MigrationInstructionImpl{" +
-      "sourceActivityId='" + sourceActivityId + '\'' +
-      ", targetActivityId='" + targetActivityId + '\'' +
-      ", updateEventTrigger='" + updateEventTrigger + '\'' +
-      '}';
+    return "MigrationInstructionImpl{" + "sourceActivityId='" + sourceActivityId + '\''
+        + ", targetActivityId='" + targetActivityId + '\'' + ", updateEventTrigger='"
+        + updateEventTrigger + '\'' + '}';
   }
 
 }

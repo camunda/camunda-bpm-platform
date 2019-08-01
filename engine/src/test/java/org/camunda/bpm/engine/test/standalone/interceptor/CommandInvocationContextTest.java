@@ -25,8 +25,8 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 public class CommandInvocationContextTest extends PluggableProcessEngineTestCase {
 
   /**
-   * Test that the command invocation context always holds the correct command;
-   * in outer commands as well as nested commands.
+   * Test that the command invocation context always holds the correct command; in outer commands as
+   * well as nested commands.
    */
   public void testGetCurrentCommand() {
     Command<?> outerCommand = new SelfAssertingCommand(new SelfAssertingCommand(null));
@@ -46,7 +46,8 @@ public class CommandInvocationContextTest extends PluggableProcessEngineTestCase
       assertEquals(this, Context.getCommandInvocationContext().getCommand());
 
       if (innerCommand != null) {
-        CommandExecutor commandExecutor = Context.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+        CommandExecutor commandExecutor = Context.getProcessEngineConfiguration()
+            .getCommandExecutorTxRequired();
         commandExecutor.execute(innerCommand);
 
         // should still be correct after command invocation

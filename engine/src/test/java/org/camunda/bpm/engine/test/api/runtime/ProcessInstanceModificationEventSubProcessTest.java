@@ -48,32 +48,22 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcessTask").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
     assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .beginScope("eventSubProcess")
-          .activity("eventSubProcessTask")
-        .endScope()
-      .done());
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1")
+            .beginScope("eventSubProcess").activity("eventSubProcessTask").endScope().done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child(null).concurrent().noScope()
-            .child("eventSubProcessTask").scope()
-        .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up()
+            .child(null).concurrent().noScope().child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task1", "task2", "eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -86,30 +76,22 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
-      .startBeforeActivity("eventSubProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
+        .startBeforeActivity("eventSubProcessTask").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("eventSubProcess")
-          .activity("eventSubProcessTask")
-        .endScope()
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("eventSubProcess").activity("eventSubProcessTask").endScope().done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("eventSubProcessTask").scope()
-        .done());
+        .matches(describeExecutionTree(null).scope().child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -121,29 +103,21 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventProcessStart")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventProcessStart").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("eventSubProcess")
-          .activity("eventSubProcessTask")
-        .endScope()
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("eventSubProcess").activity("eventSubProcessTask").endScope().done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("eventSubProcessTask").scope()
-        .done());
+        .matches(describeExecutionTree(null).scope().child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -154,29 +128,21 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcess")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcess").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("eventSubProcess")
-          .activity("eventSubProcessTask")
-        .endScope()
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("eventSubProcess").activity("eventSubProcessTask").endScope().done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("eventSubProcessTask").scope()
-        .done());
+        .matches(describeExecutionTree(null).scope().child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -187,32 +153,22 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcessTask").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
     assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .beginScope("eventSubProcess")
-          .activity("eventSubProcessTask")
-        .endScope()
-      .done());
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1")
+            .beginScope("eventSubProcess").activity("eventSubProcessTask").endScope().done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child(null).concurrent().noScope()
-            .child("eventSubProcessTask").scope()
-        .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up()
+            .child(null).concurrent().noScope().child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task1", "eventSubProcessTask", "task2");
     assertProcessEnded(processInstanceId);
@@ -225,30 +181,22 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
-      .startBeforeActivity("eventSubProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
+        .startBeforeActivity("eventSubProcessTask").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("eventSubProcess")
-          .activity("eventSubProcessTask")
-        .endScope()
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("eventSubProcess").activity("eventSubProcessTask").endScope().done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("eventSubProcessTask").scope()
-        .done());
+        .matches(describeExecutionTree(null).scope().child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -259,32 +207,22 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventProcessStart")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventProcessStart").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
     assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .beginScope("eventSubProcess")
-          .activity("eventSubProcessTask")
-        .endScope()
-      .done());
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1")
+            .beginScope("eventSubProcess").activity("eventSubProcessTask").endScope().done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child(null).concurrent().noScope()
-            .child("eventSubProcessTask").scope()
-        .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up()
+            .child(null).concurrent().noScope().child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task1", "task2", "eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -295,32 +233,22 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcess")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcess").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
     assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .beginScope("eventSubProcess")
-          .activity("eventSubProcessTask")
-        .endScope()
-      .done());
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1")
+            .beginScope("eventSubProcess").activity("eventSubProcessTask").endScope().done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child(null).concurrent().noScope()
-            .child("eventSubProcessTask").scope()
-        .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up()
+            .child(null).concurrent().noScope().child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task1", "eventSubProcessTask", "task2");
     assertProcessEnded(processInstanceId);
@@ -331,33 +259,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcessTask").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-          .beginScope("subProcess")
-            .beginScope("eventSubProcess")
-              .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("task1").beginScope("subProcess").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child(null).concurrent().noScope()
-            .child(null).scope()
-              .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("task1")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task1", "eventSubProcessTask", "task2");
     assertProcessEnded(processInstanceId);
@@ -368,33 +286,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventProcessStart")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventProcessStart").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-          .beginScope("subProcess")
-            .beginScope("eventSubProcess")
-              .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("task1").beginScope("subProcess").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child(null).concurrent().noScope()
-            .child(null).scope()
-              .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("task1")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("eventSubProcessTask", "task1", "task2");
     assertProcessEnded(processInstanceId);
@@ -405,33 +313,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcess")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcess").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-          .beginScope("subProcess")
-            .beginScope("eventSubProcess")
-              .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("task1").beginScope("subProcess").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child(null).concurrent().noScope()
-            .child(null).scope()
-              .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("task1")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task1", "eventSubProcessTask", "task2");
     assertProcessEnded(processInstanceId);
@@ -445,33 +343,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcessTask").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("subProcess")
-          .activity("task2")
-          .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("subProcess").activity("task2").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child(null).scope()
-            .child("task2").concurrent().noScope().up()
-            .child(null).concurrent().noScope()
-              .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).scope()
+        .child("task2").concurrent().noScope().up().child(null).concurrent().noScope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task2", "eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -485,30 +373,22 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventProcessStart")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventProcessStart").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("subProcess")
-          .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("subProcess").beginScope("eventSubProcess").activity("eventSubProcessTask")
+            .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child(null).scope()
-            .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).scope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -522,30 +402,22 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcess")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcess").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("subProcess")
-          .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("subProcess").beginScope("eventSubProcess").activity("eventSubProcessTask")
+            .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child(null).scope()
-            .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).scope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -556,33 +428,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcessTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcessTask").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .beginScope("subProcess")
-          .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("task1").beginScope("subProcess").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child(null).concurrent().noScope()
-            .child(null).scope()
-              .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("task1")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task1", "eventSubProcessTask", "task2");
     assertProcessEnded(processInstanceId);
@@ -593,33 +455,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventProcessStart")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventProcessStart").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .beginScope("subProcess")
-          .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("task1").beginScope("subProcess").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child(null).concurrent().noScope()
-            .child(null).scope()
-              .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("task1")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task1", "task2", "eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -630,33 +482,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcess")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcess").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .beginScope("subProcess")
-          .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("task1").beginScope("subProcess").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child(null).concurrent().noScope()
-            .child(null).scope()
-              .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("task1")
+        .concurrent().noScope().up().child(null).concurrent().noScope().child(null).scope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task1", "task2", "eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -671,34 +513,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcessTask")
-      .execute();
-
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcessTask").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("subProcess")
-          .activity("task2")
-          .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("subProcess").activity("task2").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child(null).scope()
-            .child("task2").concurrent().noScope().up()
-            .child(null).concurrent().noScope()
-              .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).scope()
+        .child("task2").concurrent().noScope().up().child(null).concurrent().noScope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task2", "eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -712,33 +543,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventProcessStart")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventProcessStart").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("subProcess")
-          .activity("task2")
-          .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("subProcess").activity("task2").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child(null).scope()
-            .child("task2").concurrent().noScope().up()
-            .child(null).concurrent().noScope()
-              .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).scope()
+        .child("task2").concurrent().noScope().up().child(null).concurrent().noScope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task2", "eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -752,33 +573,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("eventSubProcess")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("eventSubProcess").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-          .beginScope("subProcess")
-            .activity("task2")
-            .beginScope("eventSubProcess")
-              .activity("eventSubProcessTask")
-        .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginScope("subProcess").activity("task2").beginScope("eventSubProcess")
+            .activity("eventSubProcessTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child(null).scope()
-            .child("task2").concurrent().noScope().up()
-            .child(null).concurrent().noScope()
-              .child("eventSubProcessTask").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).scope()
+        .child("task2").concurrent().noScope().up().child(null).concurrent().noScope()
+        .child("eventSubProcessTask").scope().done());
 
     completeTasksInOrder("task2", "eventSubProcessTask");
     assertProcessEnded(processInstanceId);
@@ -786,7 +597,8 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 
   @Deployment
   public void testTimerJobPreservationOnCancellationAndStart() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerEventSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("timerEventSubProcess");
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
@@ -794,11 +606,9 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(timerJob);
 
     // when the process instance is bare intermediately due to cancellation
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "task"))
-      .startBeforeActivity("task")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "task")).startBeforeActivity("task")
+        .execute();
 
     // then it is still the same job
 
@@ -810,24 +620,21 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 
   }
 
-
   @Deployment(resources = CANCEL_AND_RESTART)
   public void testProcessInstanceModificationInEventSubProcessCancellationAndRestart() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ProcessWithEventSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("ProcessWithEventSubProcess");
 
     // assume
-    Task task = taskService.createTaskQuery()
-        .processInstanceId(processInstance.getId())
-        .taskDefinitionKey("UserTaskEventSubProcess")
-        .singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .taskDefinitionKey("UserTaskEventSubProcess").singleResult();
     assertNotNull(task);
 
     // when
     runtimeService.createProcessInstanceModification(processInstance.getId())
-      .cancelAllForActivity("UserTaskEventSubProcess")
-      .startAfterActivity("UserTaskEventSubProcess")
-      .execute();
+        .cancelAllForActivity("UserTaskEventSubProcess")
+        .startAfterActivity("UserTaskEventSubProcess").execute();
 
     assertNull(runtimeService.createProcessInstanceQuery().singleResult());
   }
@@ -841,10 +648,11 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
   }
 
   /**
-   * Important that only the direct children are considered here. If you change this,
-   * the test assertions are not as tight anymore.
+   * Important that only the direct children are considered here. If you change this, the test
+   * assertions are not as tight anymore.
    */
-  protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance, String activityId) {
+  protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance,
+      String activityId) {
     for (ActivityInstance childInstance : activityInstance.getChildActivityInstances()) {
       if (childInstance.getActivityId().equals(activityId)) {
         return childInstance;

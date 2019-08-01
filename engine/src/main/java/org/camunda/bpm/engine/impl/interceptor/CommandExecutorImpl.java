@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.interceptor;
 
 import org.camunda.bpm.engine.impl.context.Context;
 
-
 /**
  * @author Tom Baeyens
  */

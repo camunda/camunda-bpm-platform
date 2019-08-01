@@ -27,20 +27,16 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class MilestoneTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithoutEntryCriterias.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithoutEntryCriterias.cmmn" })
   public void testWithoutEntryCriterias() {
     // given
 
     // when
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // then
-    CaseInstance caseInstance = caseService
-        .createCaseInstanceQuery()
-        .caseInstanceId(caseInstanceId)
+    CaseInstance caseInstance = caseService.createCaseInstanceQuery().caseInstanceId(caseInstanceId)
         .singleResult();
 
     assertTrue(caseInstance.isCompleted());
@@ -50,132 +46,94 @@ public class MilestoneTest extends PluggableProcessEngineTestCase {
     assertTrue((Boolean) occurVariable);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithEntryCriteria.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithEntryCriteria.cmmn" })
   public void testWithEntryCriteria() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    CaseExecution milestone = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_Milestone_1")
+    CaseExecution milestone = caseService.createCaseExecutionQuery().activityId("PI_Milestone_1")
         .singleResult();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     assertTrue(milestone.isAvailable());
 
     // then
     assertNull(caseService.getVariable(caseInstanceId, "occur"));
 
-    milestone = caseService
-        .createCaseExecutionQuery()
-        .available()
-        .singleResult();
+    milestone = caseService.createCaseExecutionQuery().available().singleResult();
 
     assertTrue(milestone.isAvailable());
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
     Object occurVariable = caseService.getVariable(caseInstanceId, "occur");
     assertNotNull(occurVariable);
     assertTrue((Boolean) occurVariable);
 
-    milestone = caseService
-        .createCaseExecutionQuery()
-        .available()
-        .singleResult();
+    milestone = caseService.createCaseExecutionQuery().available().singleResult();
 
     assertNull(milestone);
 
-    CaseInstance caseInstance = caseService
-        .createCaseInstanceQuery()
-        .caseInstanceId(caseInstanceId)
+    CaseInstance caseInstance = caseService.createCaseInstanceQuery().caseInstanceId(caseInstanceId)
         .singleResult();
 
     assertTrue(caseInstance.isCompleted());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithMultipleEntryCriterias.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithMultipleEntryCriterias.cmmn" })
   public void testWithMultipleEntryCriterias() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    CaseExecution milestone = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_Milestone_1")
+    CaseExecution milestone = caseService.createCaseExecutionQuery().activityId("PI_Milestone_1")
         .singleResult();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_2")
+        .singleResult().getId();
 
     assertTrue(milestone.isAvailable());
 
     // then
     assertNull(caseService.getVariable(caseInstanceId, "occur"));
 
-    milestone = caseService
-        .createCaseExecutionQuery()
-        .available()
-        .singleResult();
+    milestone = caseService.createCaseExecutionQuery().available().singleResult();
 
     assertTrue(milestone.isAvailable());
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
     Object occurVariable = caseService.getVariable(caseInstanceId, "occur");
     assertNotNull(occurVariable);
     assertTrue((Boolean) occurVariable);
 
-    milestone = caseService
-        .createCaseExecutionQuery()
-        .available()
-        .singleResult();
+    milestone = caseService.createCaseExecutionQuery().available().singleResult();
 
     assertNull(milestone);
 
-    CaseInstance caseInstance = caseService
-        .createCaseInstanceQuery()
-        .caseInstanceId(caseInstanceId)
+    CaseInstance caseInstance = caseService.createCaseInstanceQuery().caseInstanceId(caseInstanceId)
         .singleResult();
 
     assertTrue(caseInstance.isActive());
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithEntryCriteria.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/milestone/MilestoneTest.testWithEntryCriteria.cmmn" })
   public void testActivityType() {
     // given
-    caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    caseService.withCaseDefinitionByKey("case").create().getId();
 
     // when
-    CaseExecution milestone = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_Milestone_1")
+    CaseExecution milestone = caseService.createCaseExecutionQuery().activityId("PI_Milestone_1")
         .singleResult();
 
     // then

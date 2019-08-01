@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine;
 
 /**
- * <p>Exception resulting from a error during a script compilation.</p>
+ * <p>
+ * Exception resulting from a error during a script compilation.
+ * </p>
  *
  * @author Sebastian Menski
  */

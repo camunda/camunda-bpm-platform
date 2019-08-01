@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -42,14 +41,14 @@ public class While implements ActivityBehavior {
 
     Integer value = (Integer) execution.getVariable(variableName);
 
-    if (value==null) {
+    if (value == null) {
       execution.setVariable(variableName, from);
       execution.leaveActivityViaTransition(more);
 
     } else {
-      value = value+1;
+      value = value + 1;
 
-      if (value<to) {
+      if (value < to) {
         execution.setVariable(variableName, value);
         execution.leaveActivityViaTransition(more);
 

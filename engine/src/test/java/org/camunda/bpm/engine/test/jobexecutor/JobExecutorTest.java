@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -69,17 +68,12 @@ public class JobExecutorTest extends JobExecutorTestCase {
 
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
-        List<HistoricJobLog> historicJobLogs = processEngineConfiguration
-            .getHistoryService()
-            .createHistoricJobLogQuery()
-            .list();
+        List<HistoricJobLog> historicJobLogs = processEngineConfiguration.getHistoryService()
+            .createHistoricJobLogQuery().list();
 
         for (HistoricJobLog historicJobLog : historicJobLogs) {
-          commandContext
-            .getHistoricJobLogManager()
-            .deleteHistoricJobLogById(historicJobLog.getId());
-
-
+          commandContext.getHistoricJobLogManager()
+              .deleteHistoricJobLogById(historicJobLog.getId());
 
         }
         return null;
@@ -88,18 +82,18 @@ public class JobExecutorTest extends JobExecutorTestCase {
   }
 
   public void testJobExecutorHintConfiguration() {
-    ProcessEngineConfiguration engineConfig1 =
-        ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
+    ProcessEngineConfiguration engineConfig1 = ProcessEngineConfiguration
+        .createStandaloneInMemProcessEngineConfiguration();
 
     assertTrue("default setting is true", engineConfig1.isHintJobExecutor());
 
-    ProcessEngineConfiguration engineConfig2 =
-        ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration().setHintJobExecutor(false);
+    ProcessEngineConfiguration engineConfig2 = ProcessEngineConfiguration
+        .createStandaloneInMemProcessEngineConfiguration().setHintJobExecutor(false);
 
     assertFalse(engineConfig2.isHintJobExecutor());
 
-    ProcessEngineConfiguration engineConfig3 =
-        ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration().setHintJobExecutor(true);
+    ProcessEngineConfiguration engineConfig3 = ProcessEngineConfiguration
+        .createStandaloneInMemProcessEngineConfiguration().setHintJobExecutor(true);
 
     assertTrue(engineConfig3.isHintJobExecutor());
   }

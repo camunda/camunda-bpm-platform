@@ -52,19 +52,28 @@ public interface HistoricCaseInstance {
   /** The difference between {@link #getCloseTime()} and {@link #getCreateTime()}. */
   Long getDurationInMillis();
 
-  /** The authenticated user that created this case instance.
-   * @see IdentityService#setAuthenticatedUserId(String) */
+  /**
+   * The authenticated user that created this case instance.
+   * 
+   * @see IdentityService#setAuthenticatedUserId(String)
+   */
   String getCreateUserId();
 
-  /** The case instance id of a potential super case instance or null if no super case instance exists. */
+  /**
+   * The case instance id of a potential super case instance or null if no super case instance
+   * exists.
+   */
   String getSuperCaseInstanceId();
 
-  /** The process instance id of a potential super process instance or null if no super process instance exists. */
+  /**
+   * The process instance id of a potential super process instance or null if no super process
+   * instance exists.
+   */
   String getSuperProcessInstanceId();
 
   /**
-   * The id of the tenant this historic case instance belongs to. Can be <code>null</code>
-   * if the historic case instance belongs to no single tenant.
+   * The id of the tenant this historic case instance belongs to. Can be <code>null</code> if the
+   * historic case instance belongs to no single tenant.
    */
   String getTenantId();
 

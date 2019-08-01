@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -51,12 +50,16 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
   }
 
   public Object execute(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-    ensureNotNull("Process Definition '" + processDefinitionId + "' not found", "processDefinition", processDefinition);
+    ProcessDefinitionEntity processDefinition = deploymentCache
+        .findDeployedProcessDefinitionById(processDefinitionId);
+    ensureNotNull("Process Definition '" + processDefinitionId + "' not found", "processDefinition",
+        processDefinition);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessDefinition(processDefinition);
     }
 
@@ -65,12 +68,11 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
       return null;
     }
 
-    FormEngine formEngine = Context
-      .getProcessEngineConfiguration()
-      .getFormEngines()
-      .get(formEngineName);
+    FormEngine formEngine = Context.getProcessEngineConfiguration().getFormEngines()
+        .get(formEngineName);
 
-    ensureNotNull("No formEngine '" + formEngineName + "' defined process engine configuration", "formEngine", formEngine);
+    ensureNotNull("No formEngine '" + formEngineName + "' defined process engine configuration",
+        "formEngine", formEngine);
 
     StartFormData startForm = startFormHandler.createStartFormData(processDefinition);
 

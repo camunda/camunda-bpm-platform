@@ -27,9 +27,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 public class IsIdentityServiceReadOnlyCmd implements Command<Boolean> {
 
   public Boolean execute(CommandContext commandContext) {
-    
+
     return !commandContext.getSessionFactories().containsKey(WritableIdentityProvider.class);
-    
+
   }
 
 }

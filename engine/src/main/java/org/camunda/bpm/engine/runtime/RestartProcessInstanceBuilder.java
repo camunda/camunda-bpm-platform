@@ -31,21 +31,26 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
  *
  */
 
-public interface RestartProcessInstanceBuilder extends InstantiationBuilder<RestartProcessInstanceBuilder> {
+public interface RestartProcessInstanceBuilder
+    extends InstantiationBuilder<RestartProcessInstanceBuilder> {
 
   /**
-   * @param query a query which selects the historic process instances to restart.
-   *   Query results are restricted to process instances for which the user has {@link Permissions#READ_HISTORY} permission.
+   * @param query
+   *          a query which selects the historic process instances to restart. Query results are
+   *          restricted to process instances for which the user has
+   *          {@link Permissions#READ_HISTORY} permission.
    */
   RestartProcessInstanceBuilder historicProcessInstanceQuery(HistoricProcessInstanceQuery query);
 
   /**
-   * @param processInstanceIds the process instance ids to restart.
+   * @param processInstanceIds
+   *          the process instance ids to restart.
    */
   RestartProcessInstanceBuilder processInstanceIds(String... processInstanceIds);
 
   /**
-   * @param processInstanceIds the process instance ids to restart.
+   * @param processInstanceIds
+   *          the process instance ids to restart.
    */
   RestartProcessInstanceBuilder processInstanceIds(List<String> processInstanceIds);
 
@@ -75,16 +80,18 @@ public interface RestartProcessInstanceBuilder extends InstantiationBuilder<Rest
   void execute();
 
   /**
-   * Executes the restart asynchronously as batch. The returned batch
-   * can be used to track the progress of the restart.
+   * Executes the restart asynchronously as batch. The returned batch can be used to track the
+   * progress of the restart.
    *
    * @return the batch which executes the restart asynchronously.
    *
    * @throws AuthorizationException
-   *   if the user has not all of the following permissions
-   *   <ul>
-   *     <li>{@link Permissions#CREATE} or {@link BatchPermissions#CREATE_BATCH_RESTART_PROCESS_INSTANCES} permission on {@link Resources#BATCH}</li>
-   *   </ul>
+   *           if the user has not all of the following permissions
+   *           <ul>
+   *           <li>{@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_RESTART_PROCESS_INSTANCES} permission on
+   *           {@link Resources#BATCH}</li>
+   *           </ul>
    */
   Batch executeAsync();
 

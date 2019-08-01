@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.pvm;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 
-
 /**
  * @author Tom Baeyens
  */

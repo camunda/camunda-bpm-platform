@@ -24,13 +24,14 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * Combination of flow scope and execution walker. Walks the flow scope
- * hierarchy upwards from the given execution to the top level process instance.
+ * Combination of flow scope and execution walker. Walks the flow scope hierarchy upwards from the
+ * given execution to the top level process instance.
  *
  * @author Philipp Ossler
  *
  */
-public class ActivityExecutionHierarchyWalker extends SingleReferenceWalker<ActivityExecutionTuple> {
+public class ActivityExecutionHierarchyWalker
+    extends SingleReferenceWalker<ActivityExecutionTuple> {
 
   private Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping;
 
@@ -80,10 +81,9 @@ public class ActivityExecutionHierarchyWalker extends SingleReferenceWalker<Acti
 
   protected static PvmScope getCurrentFlowScope(ActivityExecution execution) {
     ScopeImpl scope = null;
-    if(execution.getTransition() != null) {
+    if (execution.getTransition() != null) {
       scope = execution.getTransition().getDestination().getFlowScope();
-    }
-    else {
+    } else {
       scope = (ScopeImpl) execution.getActivity();
     }
 
@@ -98,15 +98,18 @@ public class ActivityExecutionHierarchyWalker extends SingleReferenceWalker<Acti
     return addPreVisitor(new ScopeVisitorWrapper(visitor));
   }
 
-  public ReferenceWalker<ActivityExecutionTuple> addScopePostVisitor(TreeVisitor<PvmScope> visitor) {
+  public ReferenceWalker<ActivityExecutionTuple> addScopePostVisitor(
+      TreeVisitor<PvmScope> visitor) {
     return addPostVisitor(new ScopeVisitorWrapper(visitor));
   }
 
-  public ReferenceWalker<ActivityExecutionTuple> addExecutionPreVisitor(TreeVisitor<ActivityExecution> visitor) {
+  public ReferenceWalker<ActivityExecutionTuple> addExecutionPreVisitor(
+      TreeVisitor<ActivityExecution> visitor) {
     return addPreVisitor(new ExecutionVisitorWrapper(visitor));
   }
 
-  public ReferenceWalker<ActivityExecutionTuple> addExecutionPostVisitor(TreeVisitor<ActivityExecution> visitor) {
+  public ReferenceWalker<ActivityExecutionTuple> addExecutionPostVisitor(
+      TreeVisitor<ActivityExecution> visitor) {
     return addPostVisitor(new ExecutionVisitorWrapper(visitor));
   }
 

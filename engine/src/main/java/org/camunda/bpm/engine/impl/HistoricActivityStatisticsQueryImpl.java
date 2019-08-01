@@ -32,7 +32,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author Roman Smirnov
  *
  */
-public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricActivityStatisticsQuery, HistoricActivityStatistics> implements HistoricActivityStatisticsQuery {
+public class HistoricActivityStatisticsQueryImpl
+    extends AbstractQuery<HistoricActivityStatisticsQuery, HistoricActivityStatistics>
+    implements HistoricActivityStatisticsQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -47,7 +49,8 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
   protected Date finishedBefore;
   protected Date finishedAfter;
 
-  public HistoricActivityStatisticsQueryImpl(String processDefinitionId, CommandExecutor commandExecutor) {
+  public HistoricActivityStatisticsQueryImpl(String processDefinitionId,
+      CommandExecutor commandExecutor) {
     super(commandExecutor);
     this.processDefinitionId = processDefinitionId;
   }
@@ -97,23 +100,20 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return
-      commandContext
-        .getHistoricStatisticsManager()
+    return commandContext.getHistoricStatisticsManager()
         .getHistoricStatisticsCountGroupedByActivity(this);
   }
 
   public List<HistoricActivityStatistics> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return
-      commandContext
-        .getHistoricStatisticsManager()
+    return commandContext.getHistoricStatisticsManager()
         .getHistoricStatisticsGroupedByActivity(this, page);
   }
 
   protected void checkQueryOk() {
     super.checkQueryOk();
-    ensureNotNull("No valid process definition id supplied", "processDefinitionId", processDefinitionId);
+    ensureNotNull("No valid process definition id supplied", "processDefinitionId",
+        processDefinitionId);
   }
 
   // getters /////////////////////////////////////////////////

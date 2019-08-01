@@ -51,8 +51,7 @@ public class FilterManager extends AbstractManager {
       checkAuthorization(CREATE, FILTER, ANY);
       getDbEntityManager().insert((FilterEntity) filter);
       createDefaultAuthorizations(filter);
-    }
-    else {
+    } else {
       checkAuthorization(UPDATE, FILTER, filter.getId());
       getDbEntityManager().merge((FilterEntity) filter);
     }
@@ -96,7 +95,7 @@ public class FilterManager extends AbstractManager {
   // authorization utils /////////////////////////////////
 
   protected void createDefaultAuthorizations(Filter filter) {
-    if(isAuthorizationEnabled()) {
+    if (isAuthorizationEnabled()) {
       saveDefaultAuthorizations(getResourceAuthorizationProvider().newFilter(filter));
     }
   }

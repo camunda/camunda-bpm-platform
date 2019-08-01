@@ -26,6 +26,6 @@ import java.lang.annotation.Target;
 public @interface WatchLogger {
 
   public String[] loggerNames() default {};
-  
+
   public String level();
 }

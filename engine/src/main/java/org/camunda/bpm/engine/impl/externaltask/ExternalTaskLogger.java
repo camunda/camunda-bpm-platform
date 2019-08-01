@@ -26,17 +26,20 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public class ExternalTaskLogger extends ProcessEngineLogger {
-  
+
   /**
    * Logs that the priority could not be determined in the given context.
    * 
-   * @param execution the context that is used for determining the priority
-   * @param value the default value
-   * @param e the exception which was catched
+   * @param execution
+   *          the context that is used for determining the priority
+   * @param value
+   *          the default value
+   * @param e
+   *          the exception which was catched
    */
-  public void couldNotDeterminePriority(ExecutionEntity execution, Object value, ProcessEngineException e) {
-    logWarn(
-        "001",
+  public void couldNotDeterminePriority(ExecutionEntity execution, Object value,
+      ProcessEngineException e) {
+    logWarn("001",
         "Could not determine priority for external task created in context of execution {}. Using default priority {}",
         execution, value, e);
   }

@@ -24,13 +24,15 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 public class DatabaseHelper {
 
-  public static Integer getTransactionIsolationLevel(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  public static Integer getTransactionIsolationLevel(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     final Integer[] transactionIsolation = new Integer[1];
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
       @Override
       public Object execute(CommandContext commandContext) {
         try {
-          transactionIsolation[0] = commandContext.getDbSqlSession().getSqlSession().getConnection().getTransactionIsolation();
+          transactionIsolation[0] = commandContext.getDbSqlSession().getSqlSession().getConnection()
+              .getTransactionIsolation();
         } catch (SQLException e) {
 
         }

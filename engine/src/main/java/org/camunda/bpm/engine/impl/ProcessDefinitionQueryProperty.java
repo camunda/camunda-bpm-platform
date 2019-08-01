@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.engine.query.QueryProperty;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 
-
 /**
  * Contains the possible properties that can be used in a {@link ProcessDefinitionQuery}.
  *
@@ -28,7 +27,8 @@ import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 public interface ProcessDefinitionQueryProperty {
 
   public static final QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl("KEY_");
-  public static final QueryProperty PROCESS_DEFINITION_CATEGORY = new QueryPropertyImpl("CATEGORY_");
+  public static final QueryProperty PROCESS_DEFINITION_CATEGORY = new QueryPropertyImpl(
+      "CATEGORY_");
   public static final QueryProperty PROCESS_DEFINITION_ID = new QueryPropertyImpl("ID_");
   public static final QueryProperty PROCESS_DEFINITION_VERSION = new QueryPropertyImpl("VERSION_");
   public static final QueryProperty PROCESS_DEFINITION_NAME = new QueryPropertyImpl("NAME_");

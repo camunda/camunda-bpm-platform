@@ -36,8 +36,7 @@ import org.junit.Test;
 
 public class DmnExpressionLanguageTest {
 
-  private static final String JUEL_EXPRESSIONS_WITH_PROPERTIES_DMN =
-      "org/camunda/bpm/engine/test/dmn/el/DmnExpressionLanguageTest.dmn";
+  private static final String JUEL_EXPRESSIONS_WITH_PROPERTIES_DMN = "org/camunda/bpm/engine/test/dmn/el/DmnExpressionLanguageTest.dmn";
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -60,7 +59,8 @@ public class DmnExpressionLanguageTest {
     inputs.putValue("a", mapVar);
     inputs.putValue("b", "B_FROM_CONTEXT");
 
-    DmnDecisionTableResult result = decisionService.evaluateDecisionTableByKey("decision_1", inputs);
+    DmnDecisionTableResult result = decisionService.evaluateDecisionTableByKey("decision_1",
+        inputs);
 
     assertThat(result.getSingleEntry()).isEqualTo("B_FROM_MAP");
   }
@@ -75,7 +75,8 @@ public class DmnExpressionLanguageTest {
     listVar.add("0_FROM_LIST");
     inputs.putValue("a", listVar);
 
-    DmnDecisionTableResult result = decisionService.evaluateDecisionTableByKey("decision_1", inputs);
+    DmnDecisionTableResult result = decisionService.evaluateDecisionTableByKey("decision_1",
+        inputs);
 
     assertThat(result.getSingleEntry()).isEqualTo("0_FROM_LIST");
   }

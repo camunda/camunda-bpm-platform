@@ -36,9 +36,7 @@ public class StartProcessInstanceOnEngineDelegate implements JavaDelegate {
     String engineName = (String) execution.getVariable("engineName");
     String processKeyName = (String) execution.getVariable("processKey");
 
-    ENGINES.get(engineName)
-      .getRuntimeService()
-      .startProcessInstanceByKey(processKeyName);
+    ENGINES.get(engineName).getRuntimeService().startProcessInstanceByKey(processKeyName);
 
   }
 

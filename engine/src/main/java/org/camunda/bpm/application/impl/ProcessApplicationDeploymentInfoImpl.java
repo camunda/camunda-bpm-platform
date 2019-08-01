@@ -18,7 +18,6 @@ package org.camunda.bpm.application.impl;
 
 import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
 
-
 /**
  * @author Daniel Meyer
  *
@@ -44,6 +43,5 @@ public class ProcessApplicationDeploymentInfoImpl implements ProcessApplicationD
   public void setDeploymentId(String deploymentId) {
     this.deploymentId = deploymentId;
   }
-
 
 }

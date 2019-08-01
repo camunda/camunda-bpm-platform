@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.scope;
 
-
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 
 /**

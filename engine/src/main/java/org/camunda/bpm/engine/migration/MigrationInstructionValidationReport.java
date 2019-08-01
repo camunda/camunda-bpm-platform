@@ -21,8 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 /**
- * Collects the validation failures for a single migration
- * instruction.
+ * Collects the validation failures for a single migration instruction.
  */
 public interface MigrationInstructionValidationReport {
 

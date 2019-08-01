@@ -52,11 +52,16 @@ public class DelegateVariableInstanceSpec {
     assertEquals(expectedActivityInstanceId, instance.getActivityInstanceId());
 
     assertEquals(expectedSourceExecution.getId(), instance.getSourceExecution().getId());
-    assertEquals(expectedSourceExecution.getActivityId(), instance.getSourceExecution().getActivityId());
-    assertEquals(expectedSourceExecution.getActivityName(), instance.getSourceExecution().getActivityName());
-    assertEquals(expectedSourceExecution.getCaseDefinitionId(), instance.getSourceExecution().getCaseDefinitionId());
-    assertEquals(expectedSourceExecution.getCaseInstanceId(), instance.getSourceExecution().getCaseInstanceId());
-    assertEquals(expectedSourceExecution.getParentId(), instance.getSourceExecution().getParentId());
+    assertEquals(expectedSourceExecution.getActivityId(),
+        instance.getSourceExecution().getActivityId());
+    assertEquals(expectedSourceExecution.getActivityName(),
+        instance.getSourceExecution().getActivityName());
+    assertEquals(expectedSourceExecution.getCaseDefinitionId(),
+        instance.getSourceExecution().getCaseDefinitionId());
+    assertEquals(expectedSourceExecution.getCaseInstanceId(),
+        instance.getSourceExecution().getCaseInstanceId());
+    assertEquals(expectedSourceExecution.getParentId(),
+        instance.getSourceExecution().getParentId());
   }
 
   public static DelegateVariableInstanceSpec fromCaseExecution(CaseExecution caseExecution) {

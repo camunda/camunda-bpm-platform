@@ -50,7 +50,8 @@ public class ReuseEntityCacheTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configuration.setJobExecutor(new ControllableJobExecutor());
     }
   };
@@ -67,19 +68,11 @@ public class ReuseEntityCacheTest {
   protected ThreadControl acquisitionThreadControl;
 
   protected static final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .serviceTask()
-        .camundaClass(CreateEntitiesDelegate.class.getName())
-        .camundaAsyncBefore()
-        .camundaExclusive(true)
-      .serviceTask().camundaClass(UpdateEntitiesDelegate.class.getName())
-        .camundaAsyncBefore()
-        .camundaExclusive(true)
-      .serviceTask().camundaClass(RemoveEntitiesDelegate.class.getName())
-        .camundaAsyncBefore()
-        .camundaExclusive(true)
-      .endEvent()
-      .done();
+      .startEvent().serviceTask().camundaClass(CreateEntitiesDelegate.class.getName())
+      .camundaAsyncBefore().camundaExclusive(true).serviceTask()
+      .camundaClass(UpdateEntitiesDelegate.class.getName()).camundaAsyncBefore()
+      .camundaExclusive(true).serviceTask().camundaClass(RemoveEntitiesDelegate.class.getName())
+      .camundaAsyncBefore().camundaExclusive(true).endEvent().done();
 
   @Before
   public void setUp() {
@@ -103,11 +96,8 @@ public class ReuseEntityCacheTest {
   @Test
   public void testFlushOrderWithEntityCacheReuse() {
     // given
-    Deployment deployment = engineRule
-        .getRepositoryService()
-        .createDeployment()
-        .addModelInstance("foo.bpmn", PROCESS)
-        .deploy();
+    Deployment deployment = engineRule.getRepositoryService().createDeployment()
+        .addModelInstance("foo.bpmn", PROCESS).deploy();
     engineRule.manageDeployment(deployment);
 
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
@@ -139,7 +129,8 @@ public class ReuseEntityCacheTest {
   }
 
   protected ProcessEngineConfigurationImpl getEngineConfig() {
-    return (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+    return (ProcessEngineConfigurationImpl) engineRule.getProcessEngine()
+        .getProcessEngineConfiguration();
   }
 
   public static class CreateEntitiesDelegate implements JavaDelegate {

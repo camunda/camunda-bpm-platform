@@ -21,8 +21,8 @@ import java.util.Date;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * A single process variable containing the last value when its process instance has finished.
- * It is only available when HISTORY_LEVEL is set >= AUDIT
+ * A single process variable containing the last value when its process instance has finished. It is
+ * only available when HISTORY_LEVEL is set >= AUDIT
  *
  * @author Christian Lipphardt (camunda)
  * @author ruecker
@@ -62,16 +62,22 @@ public interface HistoricVariableInstance {
   /**
    * Returns the name of this variable instance.
    *
-   * <p>Deprecated since 7.2: use {@link #getName()} instead.</p>
+   * <p>
+   * Deprecated since 7.2: use {@link #getName()} instead.
+   * </p>
    *
    */
-   @Deprecated
+  @Deprecated
   String getVariableName();
 
   /**
-   * <p>Returns the name of the type of this variable instance</p>
+   * <p>
+   * Returns the name of the type of this variable instance
+   * </p>
    *
-   * <p>Deprecated since 7.2: use {@link #getTypeName()} instead.</p>
+   * <p>
+   * Deprecated since 7.2: use {@link #getTypeName()} instead.
+   * </p>
    *
    */
   @Deprecated
@@ -140,13 +146,14 @@ public interface HistoricVariableInstance {
 
   /**
    * If the variable value could not be loaded, this returns the error message.
+   * 
    * @return an error message indicating why the variable value could not be loaded.
    */
   String getErrorMessage();
 
   /**
-   * The id of the tenant this variable belongs to. Can be <code>null</code>
-   * if the variable belongs to no single tenant.
+   * The id of the tenant this variable belongs to. Can be <code>null</code> if the variable belongs
+   * to no single tenant.
    */
   String getTenantId();
 

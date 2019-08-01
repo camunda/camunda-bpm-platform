@@ -21,7 +21,6 @@ import java.util.Date;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -34,13 +33,12 @@ public class DurationBusinessCalendar implements BusinessCalendar {
   public Date resolveDuedate(String duedate) {
     return resolveDuedate(duedate, null);
   }
-  
+
   public Date resolveDuedate(String duedate, Date startDate) {
     try {
       DurationHelper dh = new DurationHelper(duedate, startDate);
       return dh.getDateAfter(startDate);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileResolvingDuedate(duedate, e);
     }
   }

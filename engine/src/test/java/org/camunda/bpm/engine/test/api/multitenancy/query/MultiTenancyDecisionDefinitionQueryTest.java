@@ -46,83 +46,66 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
   }
 
   public void testQueryNoTenantIdSet() {
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery();
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = repositoryService.
-        createDecisionDefinitionQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = repositoryService.createDecisionDefinitionQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByDefinitionsWithoutTenantId() {
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
         .withoutTenantId();
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIdsIncludeDefinitionsWithoutTenantId() {
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
-        .tenantIdIn(TENANT_ONE)
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
+        .tenantIdIn(TENANT_ONE).includeDecisionDefinitionsWithoutTenantId();
+
+    assertThat(query.count(), is(2L));
+
+    query = repositoryService.createDecisionDefinitionQuery().tenantIdIn(TENANT_TWO)
         .includeDecisionDefinitionsWithoutTenantId();
 
     assertThat(query.count(), is(2L));
 
-    query = repositoryService
-        .createDecisionDefinitionQuery()
-        .tenantIdIn(TENANT_TWO)
-        .includeDecisionDefinitionsWithoutTenantId();
-
-    assertThat(query.count(), is(2L));
-
-    query = repositoryService
-        .createDecisionDefinitionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
+    query = repositoryService.createDecisionDefinitionQuery().tenantIdIn(TENANT_ONE, TENANT_TWO)
         .includeDecisionDefinitionsWithoutTenantId();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByKey() {
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
         .decisionDefinitionKey(DECISION_DEFINITION_KEY);
     // one definition for each tenant
     assertThat(query.count(), is(3L));
 
-    query = repositoryService
-        .createDecisionDefinitionQuery()
-        .decisionDefinitionKey(DECISION_DEFINITION_KEY)
-        .withoutTenantId();
+    query = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY).withoutTenantId();
     // one definition without tenant id
     assertThat(query.count(), is(1L));
 
-    query = repositoryService
-        .createDecisionDefinitionQuery()
-        .decisionDefinitionKey(DECISION_DEFINITION_KEY)
-        .tenantIdIn(TENANT_ONE);
+    query = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY).tenantIdIn(TENANT_ONE);
     // one definition for tenant one
     assertThat(query.count(), is(1L));
   }
@@ -131,14 +114,13 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     // deploy a second version for tenant one
     deploymentForTenant(TENANT_ONE, DMN);
 
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
-        .decisionDefinitionKey(DECISION_DEFINITION_KEY)
-        .latestVersion();
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY).latestVersion();
     // one definition for each tenant
     assertThat(query.count(), is(3L));
 
-    Map<String, DecisionDefinition> decisionDefinitionsForTenant = getDecisionDefinitionsForTenant(query.list());
+    Map<String, DecisionDefinition> decisionDefinitionsForTenant = getDecisionDefinitionsForTenant(
+        query.list());
     assertThat(decisionDefinitionsForTenant.get(TENANT_ONE).getVersion(), is(2));
     assertThat(decisionDefinitionsForTenant.get(TENANT_TWO).getVersion(), is(1));
     assertThat(decisionDefinitionsForTenant.get(null).getVersion(), is(1));
@@ -148,11 +130,8 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     // deploy a second version for tenant one
     deploymentForTenant(TENANT_ONE, DMN);
 
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
-        .decisionDefinitionKey(DECISION_DEFINITION_KEY)
-        .latestVersion()
-        .tenantIdIn(TENANT_ONE);
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY).latestVersion().tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
@@ -160,11 +139,8 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(decisionDefinition.getTenantId(), is(TENANT_ONE));
     assertThat(decisionDefinition.getVersion(), is(2));
 
-    query = repositoryService
-        .createDecisionDefinitionQuery()
-        .decisionDefinitionKey(DECISION_DEFINITION_KEY)
-        .latestVersion()
-        .tenantIdIn(TENANT_TWO);
+    query = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY).latestVersion().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
 
@@ -177,17 +153,14 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     // deploy a second version for tenant one
     deploymentForTenant(TENANT_ONE, DMN);
 
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
-        .decisionDefinitionKey(DECISION_DEFINITION_KEY)
-        .latestVersion()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc();
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY).latestVersion()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc();
     // one definition for each tenant
     assertThat(query.count(), is(2L));
 
-    Map<String, DecisionDefinition> decisionDefinitionsForTenant = getDecisionDefinitionsForTenant(query.list());
+    Map<String, DecisionDefinition> decisionDefinitionsForTenant = getDecisionDefinitionsForTenant(
+        query.list());
     assertThat(decisionDefinitionsForTenant.get(TENANT_ONE).getVersion(), is(2));
     assertThat(decisionDefinitionsForTenant.get(TENANT_TWO).getVersion(), is(1));
   }
@@ -196,11 +169,8 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     // deploy a second version without tenant id
     deployment(DMN);
 
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
-        .decisionDefinitionKey(DECISION_DEFINITION_KEY)
-        .latestVersion()
-        .withoutTenantId();
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY).latestVersion().withoutTenantId();
 
     assertThat(query.count(), is(1L));
 
@@ -216,24 +186,21 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     deploymentForTenant(TENANT_ONE, DMN);
     deploymentForTenant(TENANT_ONE, DMN);
 
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
-        .decisionDefinitionKey(DECISION_DEFINITION_KEY)
-        .latestVersion()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .includeDecisionDefinitionsWithoutTenantId();
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY).latestVersion()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).includeDecisionDefinitionsWithoutTenantId();
 
     assertThat(query.count(), is(3L));
 
-    Map<String, DecisionDefinition> decisionDefinitionsForTenant = getDecisionDefinitionsForTenant(query.list());
+    Map<String, DecisionDefinition> decisionDefinitionsForTenant = getDecisionDefinitionsForTenant(
+        query.list());
     assertThat(decisionDefinitionsForTenant.get(TENANT_ONE).getVersion(), is(3));
     assertThat(decisionDefinitionsForTenant.get(TENANT_TWO).getVersion(), is(1));
     assertThat(decisionDefinitionsForTenant.get(null).getVersion(), is(2));
   }
 
   public void testQueryByNonExistingTenantId() {
-    DecisionDefinitionQuery query = repositoryService
-        .createDecisionDefinitionQuery()
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -241,8 +208,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
 
   public void testFailQueryByTenantIdNull() {
     try {
-      repositoryService.createDecisionDefinitionQuery()
-        .tenantIdIn((String) null);
+      repositoryService.createDecisionDefinitionQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -251,12 +217,8 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
 
   public void testQuerySortingAsc() {
     // exclude definitions without tenant id because of database-specific ordering
-    List<DecisionDefinition> decisionDefinitions = repositoryService
-        .createDecisionDefinitionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc()
-        .list();
+    List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc().list();
 
     assertThat(decisionDefinitions.size(), is(2));
     assertThat(decisionDefinitions.get(0).getTenantId(), is(TENANT_ONE));
@@ -265,12 +227,8 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
 
   public void testQuerySortingDesc() {
     // exclude definitions without tenant id because of database-specific ordering
-    List<DecisionDefinition> decisionDefinitions = repositoryService
-        .createDecisionDefinitionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .desc()
-        .list();
+    List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().desc().list();
 
     assertThat(decisionDefinitions.size(), is(2));
     assertThat(decisionDefinitions.get(0).getTenantId(), is(TENANT_TWO));
@@ -292,7 +250,8 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.count(), is(2L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeDecisionDefinitionsWithoutTenantId().count(), is(2L));
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeDecisionDefinitionsWithoutTenantId()
+        .count(), is(2L));
   }
 
   public void testQueryAuthenticatedTenants() {
@@ -314,7 +273,8 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
     assertThat(query.count(), is(3L));
   }
 
-  protected Map<String, DecisionDefinition> getDecisionDefinitionsForTenant(List<DecisionDefinition> decisionDefinitions) {
+  protected Map<String, DecisionDefinition> getDecisionDefinitionsForTenant(
+      List<DecisionDefinition> decisionDefinitions) {
     Map<String, DecisionDefinition> definitionsForTenant = new HashMap<String, DecisionDefinition>();
 
     for (DecisionDefinition definition : decisionDefinitions) {

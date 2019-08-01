@@ -38,29 +38,32 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
   private EntityManager entityManager;
   private boolean handleTransactions;
   private boolean closeEntityManager;
-  
-  public EntityManagerSessionImpl(EntityManagerFactory entityManagerFactory, EntityManager entityManager, 
-          boolean handleTransactions, boolean closeEntityManager) {
+
+  public EntityManagerSessionImpl(EntityManagerFactory entityManagerFactory,
+      EntityManager entityManager, boolean handleTransactions, boolean closeEntityManager) {
     this(entityManagerFactory, handleTransactions, closeEntityManager);
     this.entityManager = entityManager;
   }
-  
-  public EntityManagerSessionImpl(EntityManagerFactory entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
+
+  public EntityManagerSessionImpl(EntityManagerFactory entityManagerFactory,
+      boolean handleTransactions, boolean closeEntityManager) {
     this.entityManagerFactory = entityManagerFactory;
     this.handleTransactions = handleTransactions;
     this.closeEntityManager = closeEntityManager;
   }
 
   public void flush() {
-    if (entityManager != null && (!handleTransactions || isTransactionActive()) ) {
+    if (entityManager != null && (!handleTransactions || isTransactionActive())) {
       try {
         entityManager.flush();
       } catch (IllegalStateException ise) {
         throw new ProcessEngineException("Error while flushing EntityManager, illegal state", ise);
       } catch (TransactionRequiredException tre) {
-        throw new ProcessEngineException("Cannot flush EntityManager, an active transaction is required", tre);
+        throw new ProcessEngineException(
+            "Cannot flush EntityManager, an active transaction is required", tre);
       } catch (PersistenceException pe) {
-        throw new ProcessEngineException("Error while flushing EntityManager: " + pe.getMessage(), pe);
+        throw new ProcessEngineException("Error while flushing EntityManager: " + pe.getMessage(),
+            pe);
       }
     }
   }
@@ -77,7 +80,9 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
       try {
         entityManager.close();
       } catch (IllegalStateException ise) {
-        throw new ProcessEngineException("Error while closing EntityManager, may have already been closed or it is container-managed", ise);
+        throw new ProcessEngineException(
+            "Error while closing EntityManager, may have already been closed or it is container-managed",
+            ise);
       }
     }
   }
@@ -85,8 +90,8 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
   public EntityManager getEntityManager() {
     if (entityManager == null) {
       entityManager = getEntityManagerFactory().createEntityManager();
-      
-      if(handleTransactions) {
+
+      if (handleTransactions) {
         // Add transaction listeners, if transactions should be handled
         TransactionListener jpaTransactionCommitListener = new TransactionListener() {
           public void execute(CommandContext commandContext) {
@@ -95,7 +100,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
             }
           }
         };
-        
+
         TransactionListener jpaTransactionRollbackListener = new TransactionListener() {
           public void execute(CommandContext commandContext) {
             if (isTransactionActive()) {
@@ -105,8 +110,10 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
         };
 
         TransactionContext transactionContext = Context.getCommandContext().getTransactionContext();
-        transactionContext.addTransactionListener(TransactionState.COMMITTED, jpaTransactionCommitListener);
-        transactionContext.addTransactionListener(TransactionState.ROLLED_BACK, jpaTransactionRollbackListener);
+        transactionContext.addTransactionListener(TransactionState.COMMITTED,
+            jpaTransactionCommitListener);
+        transactionContext.addTransactionListener(TransactionState.ROLLED_BACK,
+            jpaTransactionRollbackListener);
 
         // Also, start a transaction, if one isn't started already
         if (!isTransactionActive()) {
@@ -114,7 +121,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
         }
       }
     }
-    
+
     return entityManager;
   }
 

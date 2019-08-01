@@ -120,7 +120,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
 
     try {
 
-       transformRootElement();
+      transformRootElement();
 
     } catch (Exception e) {
       // ALL unexpected exceptions should bubble up since they are not handled
@@ -179,7 +179,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
   }
 
   protected void transformCasePlanModel(CasePlanModel casePlanModel) {
-    CasePlanModelHandler transformer = (CasePlanModelHandler) getPlanItemHandler(CasePlanModel.class);
+    CasePlanModelHandler transformer = (CasePlanModelHandler) getPlanItemHandler(
+        CasePlanModel.class);
     CmmnActivity newActivity = transformer.handleElement(casePlanModel, context);
     context.setParent(newActivity);
 
@@ -189,7 +190,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     transformer.initializeExitCriterias(casePlanModel, newActivity, context);
 
     for (CmmnTransformListener transformListener : transformListeners) {
-      transformListener.transformCasePlanModel((org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel) casePlanModel, newActivity);
+      transformListener.transformCasePlanModel(
+          (org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel) casePlanModel, newActivity);
     }
   }
 
@@ -315,7 +317,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
         } else if (definition instanceof Milestone) {
           transformListener.transformMilestone(planItem, (Milestone) definition, newActivity);
         } else if (definition instanceof EventListener) {
-          transformListener.transformEventListener(planItem, (EventListener) definition, newActivity);
+          transformListener.transformEventListener(planItem, (EventListener) definition,
+              newActivity);
         }
       }
     }
@@ -348,8 +351,10 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
   }
 
   @SuppressWarnings("unchecked")
-  protected <V extends CmmnElement> CmmnElementHandler<V, CmmnActivity> getDefinitionHandler(Class<V> cls) {
-    return (CmmnElementHandler<V, CmmnActivity>) getHandlerRegistry().getDefinitionElementHandlers().get(cls);
+  protected <V extends CmmnElement> CmmnElementHandler<V, CmmnActivity> getDefinitionHandler(
+      Class<V> cls) {
+    return (CmmnElementHandler<V, CmmnActivity>) getHandlerRegistry().getDefinitionElementHandlers()
+        .get(cls);
   }
 
   protected ItemHandler getPlanItemHandler(Class<? extends PlanItemDefinition> cls) {

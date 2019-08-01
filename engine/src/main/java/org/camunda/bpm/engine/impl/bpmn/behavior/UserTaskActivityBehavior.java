@@ -38,12 +38,14 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
  * @author Joram Barrez
  * @author Roman Smirnov
  */
-public class UserTaskActivityBehavior extends TaskActivityBehavior implements MigrationObserverBehavior {
+public class UserTaskActivityBehavior extends TaskActivityBehavior
+    implements MigrationObserverBehavior {
 
   protected TaskDecorator taskDecorator;
 
   @Deprecated
-  public UserTaskActivityBehavior(ExpressionManager expressionManager, TaskDefinition taskDefinition) {
+  public UserTaskActivityBehavior(ExpressionManager expressionManager,
+      TaskDefinition taskDefinition) {
     this.taskDecorator = new TaskDecorator(taskDefinition, expressionManager);
   }
 
@@ -57,15 +59,14 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Mi
 
     taskDecorator.decorate(task, execution);
 
-    Context.getCommandContext()
-      .getHistoricTaskInstanceManager()
-      .createHistoricTask(task);
+    Context.getCommandContext().getHistoricTaskInstanceManager().createHistoricTask(task);
 
     // All properties set, now firing 'create' event
     task.fireEvent(TaskListener.EVENTNAME_CREATE);
   }
 
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
     leave(execution);
   }
 
@@ -76,11 +77,13 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Mi
   }
 
   @Override
-  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
+  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext,
+      MigratingActivityInstance migratingInstance) {
     ExecutionEntity execution = migratingInstance.resolveRepresentativeExecution();
 
     for (TaskEntity task : execution.getTasks()) {
-      migratingInstance.addMigratingDependentInstance(new MigratingUserTaskInstance(task, migratingInstance));
+      migratingInstance
+          .addMigratingDependentInstance(new MigratingUserTaskInstance(task, migratingInstance));
       parseContext.consume(task);
 
       Collection<VariableInstanceEntity> variables = task.getVariablesInternal();

@@ -34,12 +34,12 @@ public class ActivityInstanceUpdateListener extends HistoryTaskListener {
 
   protected HistoryEvent createHistoryEvent(DelegateTask task, ExecutionEntity execution) {
     ensureHistoryLevelInitialized();
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE, execution)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_UPDATE,
+        execution)) {
       return eventProducer.createActivityInstanceUpdateEvt(execution, task);
     } else {
       return null;
     }
   }
-
 
 }

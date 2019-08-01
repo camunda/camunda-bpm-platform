@@ -25,9 +25,13 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>A reference to an EJB process application.</p>
+ * <p>
+ * A reference to an EJB process application.
+ * </p>
  *
- * <p>An EJB process application is an EJB Session Bean that can be looked up in JNDI.</p>
+ * <p>
+ * An EJB process application is an EJB Session Bean that can be looked up in JNDI.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -51,18 +55,19 @@ public class EjbProcessApplicationReference implements ProcessApplicationReferen
     return processApplicationName;
   }
 
-  public ProcessApplicationInterface getProcessApplication() throws ProcessApplicationUnavailableException {
+  public ProcessApplicationInterface getProcessApplication()
+      throws ProcessApplicationUnavailableException {
     try {
       // check whether process application is still deployed
       selfReference.getName();
-    }
-    catch(EJBException e) {
+    } catch (EJBException e) {
       throw LOG.processApplicationUnavailableException(processApplicationName, e);
     }
     return selfReference;
   }
 
-  public void processEngineStopping(ProcessEngine processEngine) throws ProcessApplicationUnavailableException {
+  public void processEngineStopping(ProcessEngine processEngine)
+      throws ProcessApplicationUnavailableException {
     // do nothing.
   }
 

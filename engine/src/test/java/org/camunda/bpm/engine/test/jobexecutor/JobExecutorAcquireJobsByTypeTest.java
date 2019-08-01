@@ -72,10 +72,8 @@ public class JobExecutorAcquireJobsByTypeTest extends AbstractJobExecutorAcquire
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/jobexecutor/processWithTimerCatch.bpmn20.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/jobexecutor/processWithTimerCatch.bpmn20.xml" })
   public void testTimerJobsArePreferred() {
     // first start process with timer job
     runtimeService.startProcessInstanceByKey("testProcess");

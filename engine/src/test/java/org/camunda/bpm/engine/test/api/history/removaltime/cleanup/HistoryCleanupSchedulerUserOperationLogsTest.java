@@ -45,10 +45,12 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Tassilo Weidner
  */
-public class HistoryCleanupSchedulerUserOperationLogsTest extends AbstractHistoryCleanupSchedulerTest {
+public class HistoryCleanupSchedulerUserOperationLogsTest
+    extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configure(configuration, HistoryEventTypes.USER_OPERATION_LOG);
     }
   };
@@ -57,7 +59,8 @@ public class HistoryCleanupSchedulerUserOperationLogsTest extends AbstractHistor
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -65,9 +68,7 @@ public class HistoryCleanupSchedulerUserOperationLogsTest extends AbstractHistor
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-      .startEvent().camundaAsyncBefore()
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().camundaAsyncBefore().endEvent().done();
 
   @Before
   public void init() {
@@ -91,11 +92,9 @@ public class HistoryCleanupSchedulerUserOperationLogsTest extends AbstractHistor
 
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
-    for (int i = 0; i<5; i++) {
+    for (int i = 0; i < 5; i++) {
       identityService.setAuthenticatedUserId("aUserId");
       managementService.setJobRetries(jobId, 65);
       identityService.clearAuthentication();
@@ -127,11 +126,9 @@ public class HistoryCleanupSchedulerUserOperationLogsTest extends AbstractHistor
 
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
-    for (int i = 0; i<5; i++) {
+    for (int i = 0; i < 5; i++) {
       identityService.setAuthenticatedUserId("aUserId");
       managementService.setJobRetries(jobId, 65);
       identityService.clearAuthentication();

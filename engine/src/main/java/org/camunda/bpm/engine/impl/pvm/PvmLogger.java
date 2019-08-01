@@ -28,62 +28,53 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 public class PvmLogger extends ProcessEngineLogger {
 
   public void notTakingTranistion(PvmTransition outgoingTransition) {
-    logDebug(
-        "001", "Not taking transition '{}', outgoing execution has ended.", outgoingTransition);
+    logDebug("001", "Not taking transition '{}', outgoing execution has ended.",
+        outgoingTransition);
   }
 
-  public void debugExecutesActivity(PvmExecutionImpl execution, ActivityImpl activity, String name) {
-    logDebug(
-        "002", "{} executed activity {}: {}", execution, activity, name);
+  public void debugExecutesActivity(PvmExecutionImpl execution, ActivityImpl activity,
+      String name) {
+    logDebug("002", "{} executed activity {}: {}", execution, activity, name);
   }
 
   public void debugLeavesActivityInstance(PvmExecutionImpl execution, String activityInstanceId) {
-    logDebug(
-        "003", "Execution {} leaves activity instance {}", execution, activityInstanceId);
+    logDebug("003", "Execution {} leaves activity instance {}", execution, activityInstanceId);
   }
 
   public void debugDestroyScope(PvmExecutionImpl execution, PvmExecutionImpl propagatingExecution) {
-    logDebug(
-        "004",
-        "Execution {} leaves parent scope {}", execution, propagatingExecution);
+    logDebug("004", "Execution {} leaves parent scope {}", execution, propagatingExecution);
   }
 
   public void destroying(PvmExecutionImpl pvmExecutionImpl) {
-    logDebug(
-        "005", "Detroying scope {}", pvmExecutionImpl);
+    logDebug("005", "Detroying scope {}", pvmExecutionImpl);
   }
 
   public void removingEventScope(PvmExecutionImpl childExecution) {
-    logDebug(
-        "006", "Removeing event scope {}", childExecution);
+    logDebug("006", "Removeing event scope {}", childExecution);
   }
 
   public void interruptingExecution(String reason, boolean skipCustomListeners) {
-    logDebug(
-        "007", "Interrupting execution execution {}, {}", reason, skipCustomListeners);
+    logDebug("007", "Interrupting execution execution {}, {}", reason, skipCustomListeners);
   }
 
-  public void debugEnterActivityInstance(PvmExecutionImpl pvmExecutionImpl, String parentActivityInstanceId) {
-    logDebug(
-        "008", "Enter activity instance {} parent: {}", pvmExecutionImpl, parentActivityInstanceId);
+  public void debugEnterActivityInstance(PvmExecutionImpl pvmExecutionImpl,
+      String parentActivityInstanceId) {
+    logDebug("008", "Enter activity instance {} parent: {}", pvmExecutionImpl,
+        parentActivityInstanceId);
   }
 
   public void exceptionWhileCompletingSupProcess(PvmExecutionImpl execution, Exception e) {
-    logError(
-        "009", "Exception while completing subprocess of execution {}", execution, e);
+    logError("009", "Exception while completing subprocess of execution {}", execution, e);
   }
 
   public void createScope(PvmExecutionImpl execution, PvmExecutionImpl propagatingExecution) {
-    logDebug(
-        "010", "Create scope: parent exection {} continues as  {}", execution, propagatingExecution);
+    logDebug("010", "Create scope: parent exection {} continues as  {}", execution,
+        propagatingExecution);
   }
 
   public ProcessEngineException scopeNotFoundException(String activityId, String executionId) {
-    return new ProcessEngineException(exceptionMessage(
-        "011",
-        "Scope with specified activity Id {} and execution {} not found",
-        activityId,executionId
-    ));
+    return new ProcessEngineException(exceptionMessage("011",
+        "Scope with specified activity Id {} and execution {} not found", activityId, executionId));
   }
 
 }

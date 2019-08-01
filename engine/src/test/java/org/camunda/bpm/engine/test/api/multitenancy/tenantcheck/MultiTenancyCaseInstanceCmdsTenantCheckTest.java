@@ -70,7 +70,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   protected IdentityService identityService;
   protected CaseService caseService;
@@ -305,7 +305,7 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
   @Test
   public void terminateCaseInstanceNoAuthenticatedTenants() {
-    
+
     identityService.setAuthentication("user", null, null);
 
     thrown.expect(ProcessEngineException.class);
@@ -329,18 +329,18 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
   @Test
   public void terminateCaseExecutionDisabledTenantCheck() {
-    
+
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
     caseService.terminateCaseExecution(caseInstanceId);
-    
+
     HistoricCaseInstance historicCaseInstance = getHistoricCaseInstance();
 
     assertThat(historicCaseInstance, notNullValue());
     assertThat(historicCaseInstance.isTerminated(), is(true));
   }
-  
+
   @Test
   public void getVariablesNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
@@ -504,7 +504,8 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
 
   protected String createCaseInstance(String tenantId) {
     VariableMap variables = Variables.putValue(VARIABLE_NAME, VARIABLE_VALUE);
-    CaseInstanceBuilder builder = caseService.withCaseDefinitionByKey("twoTaskCase").setVariables(variables);
+    CaseInstanceBuilder builder = caseService.withCaseDefinitionByKey("twoTaskCase")
+        .setVariables(variables);
     if (tenantId == null) {
       return builder.create().getId();
     } else {
@@ -517,11 +518,13 @@ public class MultiTenancyCaseInstanceCmdsTenantCheckTest {
   }
 
   protected HistoricCaseActivityInstance getHistoricCaseActivityInstance() {
-    return historyService.createHistoricCaseActivityInstanceQuery().caseActivityId(ACTIVITY_ID).singleResult();
+    return historyService.createHistoricCaseActivityInstanceQuery().caseActivityId(ACTIVITY_ID)
+        .singleResult();
   }
 
   protected HistoricCaseInstance getHistoricCaseInstance() {
-    return historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+    return historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId)
+        .singleResult();
   }
 
 }

@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.history;
 
-
 /**
  * @author Roman Smirnov
  *

@@ -35,7 +35,6 @@ import org.camunda.commons.utils.cache.Cache;
 
 import java.util.List;
 
-
 /**
  * @author Tom Baeyens
  * @author Falko Menge
@@ -53,21 +52,27 @@ public class DeploymentCache {
   protected CacheDeployer cacheDeployer = new CacheDeployer();
 
   public DeploymentCache(CacheFactory factory, int cacheCapacity) {
-    processDefinitionEntityCache = new ProcessDefinitionCache(factory, cacheCapacity, cacheDeployer);
+    processDefinitionEntityCache = new ProcessDefinitionCache(factory, cacheCapacity,
+        cacheDeployer);
     caseDefinitionCache = new CaseDefinitionCache(factory, cacheCapacity, cacheDeployer);
     decisionDefinitionCache = new DecisionDefinitionCache(factory, cacheCapacity, cacheDeployer);
-    decisionRequirementsDefinitionCache = new DecisionRequirementsDefinitionCache(factory, cacheCapacity, cacheDeployer);
+    decisionRequirementsDefinitionCache = new DecisionRequirementsDefinitionCache(factory,
+        cacheCapacity, cacheDeployer);
 
-    bpmnModelInstanceCache = new BpmnModelInstanceCache(factory, cacheCapacity, processDefinitionEntityCache);
-    cmmnModelInstanceCache = new CmmnModelInstanceCache(factory, cacheCapacity, caseDefinitionCache);
-    dmnModelInstanceCache = new DmnModelInstanceCache(factory, cacheCapacity, decisionDefinitionCache);
+    bpmnModelInstanceCache = new BpmnModelInstanceCache(factory, cacheCapacity,
+        processDefinitionEntityCache);
+    cmmnModelInstanceCache = new CmmnModelInstanceCache(factory, cacheCapacity,
+        caseDefinitionCache);
+    dmnModelInstanceCache = new DmnModelInstanceCache(factory, cacheCapacity,
+        decisionDefinitionCache);
   }
 
   public void deploy(final DeploymentEntity deployment) {
     cacheDeployer.deploy(deployment);
   }
 
-  // PROCESS DEFINITION ////////////////////////////////////////////////////////////////////////////////
+  // PROCESS DEFINITION
+  // ////////////////////////////////////////////////////////////////////////////////
 
   public ProcessDefinitionEntity findProcessDefinitionFromCache(String processDefinitionId) {
     return processDefinitionEntityCache.findDefinitionFromCache(processDefinitionId);
@@ -79,37 +84,50 @@ public class DeploymentCache {
 
   /**
    * @return the latest version of the process definition with the given key (from any tenant)
-   * @throws ProcessEngineException if more than one tenant has a process definition with the given key
+   * @throws ProcessEngineException
+   *           if more than one tenant has a process definition with the given key
    * @see #findDeployedLatestProcessDefinitionByKeyAndTenantId(String, String)
    */
-  public ProcessDefinitionEntity findDeployedLatestProcessDefinitionByKey(String processDefinitionKey) {
+  public ProcessDefinitionEntity findDeployedLatestProcessDefinitionByKey(
+      String processDefinitionKey) {
     return processDefinitionEntityCache.findDeployedLatestDefinitionByKey(processDefinitionKey);
   }
 
   /**
    * @return the latest version of the process definition with the given key and tenant id
    */
-  public ProcessDefinitionEntity findDeployedLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
-    return processDefinitionEntityCache.findDeployedLatestDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+  public ProcessDefinitionEntity findDeployedLatestProcessDefinitionByKeyAndTenantId(
+      String processDefinitionKey, String tenantId) {
+    return processDefinitionEntityCache
+        .findDeployedLatestDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
   }
 
-  public ProcessDefinitionEntity findDeployedProcessDefinitionByKeyVersionAndTenantId(final String processDefinitionKey, final Integer processDefinitionVersion, final String tenantId) {
-    return processDefinitionEntityCache.findDeployedDefinitionByKeyVersionAndTenantId(processDefinitionKey, processDefinitionVersion, tenantId);
+  public ProcessDefinitionEntity findDeployedProcessDefinitionByKeyVersionAndTenantId(
+      final String processDefinitionKey, final Integer processDefinitionVersion,
+      final String tenantId) {
+    return processDefinitionEntityCache.findDeployedDefinitionByKeyVersionAndTenantId(
+        processDefinitionKey, processDefinitionVersion, tenantId);
   }
 
-  public ProcessDefinitionEntity findDeployedProcessDefinitionByKeyVersionTagAndTenantId(String processDefinitionKey, String processDefinitionVersionTag, String tenantId) {
-    return processDefinitionEntityCache.findDeployedDefinitionByKeyVersionTagAndTenantId(processDefinitionKey, processDefinitionVersionTag, tenantId);
+  public ProcessDefinitionEntity findDeployedProcessDefinitionByKeyVersionTagAndTenantId(
+      String processDefinitionKey, String processDefinitionVersionTag, String tenantId) {
+    return processDefinitionEntityCache.findDeployedDefinitionByKeyVersionTagAndTenantId(
+        processDefinitionKey, processDefinitionVersionTag, tenantId);
   }
 
-  public ProcessDefinitionEntity findDeployedProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey) {
-    return processDefinitionEntityCache.findDeployedDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+  public ProcessDefinitionEntity findDeployedProcessDefinitionByDeploymentAndKey(
+      String deploymentId, String processDefinitionKey) {
+    return processDefinitionEntityCache.findDeployedDefinitionByDeploymentAndKey(deploymentId,
+        processDefinitionKey);
   }
 
-  public ProcessDefinitionEntity resolveProcessDefinition(ProcessDefinitionEntity processDefinition) {
+  public ProcessDefinitionEntity resolveProcessDefinition(
+      ProcessDefinitionEntity processDefinition) {
     return processDefinitionEntityCache.resolveDefinition(processDefinition);
   }
 
-  public BpmnModelInstance findBpmnModelInstanceForProcessDefinition(ProcessDefinitionEntity processDefinitionEntity) {
+  public BpmnModelInstance findBpmnModelInstanceForProcessDefinition(
+      ProcessDefinitionEntity processDefinitionEntity) {
     return bpmnModelInstanceCache.findBpmnModelInstanceForDefinition(processDefinitionEntity);
   }
 
@@ -131,7 +149,8 @@ public class DeploymentCache {
     bpmnModelInstanceCache.clear();
   }
 
-  // CASE DEFINITION ////////////////////////////////////////////////////////////////////////////////
+  // CASE DEFINITION
+  // ////////////////////////////////////////////////////////////////////////////////
 
   public CaseDefinitionEntity findCaseDefinitionFromCache(String caseDefinitionId) {
     return caseDefinitionCache.findDefinitionFromCache(caseDefinitionId);
@@ -143,7 +162,8 @@ public class DeploymentCache {
 
   /**
    * @return the latest version of the case definition with the given key (from any tenant)
-   * @throws ProcessEngineException if more than one tenant has a case definition with the given key
+   * @throws ProcessEngineException
+   *           if more than one tenant has a case definition with the given key
    * @see #findDeployedLatestCaseDefinitionByKeyAndTenantId(String, String)
    */
   public CaseDefinitionEntity findDeployedLatestCaseDefinitionByKey(String caseDefinitionKey) {
@@ -153,16 +173,22 @@ public class DeploymentCache {
   /**
    * @return the latest version of the case definition with the given key and tenant id
    */
-  public CaseDefinitionEntity findDeployedLatestCaseDefinitionByKeyAndTenantId(String caseDefinitionKey, String tenantId) {
-    return caseDefinitionCache.findDeployedLatestDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
+  public CaseDefinitionEntity findDeployedLatestCaseDefinitionByKeyAndTenantId(
+      String caseDefinitionKey, String tenantId) {
+    return caseDefinitionCache.findDeployedLatestDefinitionByKeyAndTenantId(caseDefinitionKey,
+        tenantId);
   }
 
-  public CaseDefinitionEntity findDeployedCaseDefinitionByKeyVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
-    return caseDefinitionCache.findDeployedDefinitionByKeyVersionAndTenantId(caseDefinitionKey, caseDefinitionVersion, tenantId);
+  public CaseDefinitionEntity findDeployedCaseDefinitionByKeyVersionAndTenantId(
+      String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
+    return caseDefinitionCache.findDeployedDefinitionByKeyVersionAndTenantId(caseDefinitionKey,
+        caseDefinitionVersion, tenantId);
   }
 
-  public CaseDefinitionEntity findDeployedCaseDefinitionByDeploymentAndKey(String deploymentId, String caseDefinitionKey) {
-    return caseDefinitionCache.findDeployedDefinitionByDeploymentAndKey(deploymentId, caseDefinitionKey);
+  public CaseDefinitionEntity findDeployedCaseDefinitionByDeploymentAndKey(String deploymentId,
+      String caseDefinitionKey) {
+    return caseDefinitionCache.findDeployedDefinitionByDeploymentAndKey(deploymentId,
+        caseDefinitionKey);
   }
 
   public CaseDefinitionEntity getCaseDefinitionById(String caseDefinitionId) {
@@ -191,7 +217,8 @@ public class DeploymentCache {
     cmmnModelInstanceCache.clear();
   }
 
-  // DECISION DEFINITION ////////////////////////////////////////////////////////////////////////////
+  // DECISION DEFINITION
+  // ////////////////////////////////////////////////////////////////////////////
 
   public DecisionDefinitionEntity findDecisionDefinitionFromCache(String decisionDefinitionId) {
     return decisionDefinitionCache.findDefinitionFromCache(decisionDefinitionId);
@@ -201,31 +228,43 @@ public class DeploymentCache {
     return decisionDefinitionCache.findDeployedDefinitionById(decisionDefinitionId);
   }
 
-  public DecisionDefinition findDeployedLatestDecisionDefinitionByKey(String decisionDefinitionKey) {
+  public DecisionDefinition findDeployedLatestDecisionDefinitionByKey(
+      String decisionDefinitionKey) {
     return decisionDefinitionCache.findDeployedLatestDefinitionByKey(decisionDefinitionKey);
   }
 
-  public DecisionDefinition findDeployedLatestDecisionDefinitionByKeyAndTenantId(String decisionDefinitionKey, String tenantId) {
-    return decisionDefinitionCache.findDeployedLatestDefinitionByKeyAndTenantId(decisionDefinitionKey, tenantId);
+  public DecisionDefinition findDeployedLatestDecisionDefinitionByKeyAndTenantId(
+      String decisionDefinitionKey, String tenantId) {
+    return decisionDefinitionCache
+        .findDeployedLatestDefinitionByKeyAndTenantId(decisionDefinitionKey, tenantId);
   }
 
-  public DecisionDefinition findDeployedDecisionDefinitionByDeploymentAndKey(String deploymentId, String decisionDefinitionKey) {
-    return decisionDefinitionCache.findDeployedDefinitionByDeploymentAndKey(deploymentId, decisionDefinitionKey);
+  public DecisionDefinition findDeployedDecisionDefinitionByDeploymentAndKey(String deploymentId,
+      String decisionDefinitionKey) {
+    return decisionDefinitionCache.findDeployedDefinitionByDeploymentAndKey(deploymentId,
+        decisionDefinitionKey);
   }
 
-  public DecisionDefinition findDeployedDecisionDefinitionByKeyAndVersion(String decisionDefinitionKey, Integer decisionDefinitionVersion) {
-    return decisionDefinitionCache.findDeployedDefinitionByKeyAndVersion(decisionDefinitionKey, decisionDefinitionVersion);
+  public DecisionDefinition findDeployedDecisionDefinitionByKeyAndVersion(
+      String decisionDefinitionKey, Integer decisionDefinitionVersion) {
+    return decisionDefinitionCache.findDeployedDefinitionByKeyAndVersion(decisionDefinitionKey,
+        decisionDefinitionVersion);
   }
 
-  public DecisionDefinition findDeployedDecisionDefinitionByKeyVersionAndTenantId(String decisionDefinitionKey, Integer decisionDefinitionVersion, String tenantId) {
-    return decisionDefinitionCache.findDeployedDefinitionByKeyVersionAndTenantId(decisionDefinitionKey, decisionDefinitionVersion, tenantId);
+  public DecisionDefinition findDeployedDecisionDefinitionByKeyVersionAndTenantId(
+      String decisionDefinitionKey, Integer decisionDefinitionVersion, String tenantId) {
+    return decisionDefinitionCache.findDeployedDefinitionByKeyVersionAndTenantId(
+        decisionDefinitionKey, decisionDefinitionVersion, tenantId);
   }
 
-  public DecisionDefinition findDeployedDecisionDefinitionByKeyVersionTagAndTenantId(String decisionDefinitionKey, String decisionDefinitionVersionTag, String tenantId) {
-    return decisionDefinitionCache.findDeployedDefinitionByKeyVersionTagAndTenantId(decisionDefinitionKey, decisionDefinitionVersionTag, tenantId);
+  public DecisionDefinition findDeployedDecisionDefinitionByKeyVersionTagAndTenantId(
+      String decisionDefinitionKey, String decisionDefinitionVersionTag, String tenantId) {
+    return decisionDefinitionCache.findDeployedDefinitionByKeyVersionTagAndTenantId(
+        decisionDefinitionKey, decisionDefinitionVersionTag, tenantId);
   }
 
-  public DecisionDefinitionEntity resolveDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
+  public DecisionDefinitionEntity resolveDecisionDefinition(
+      DecisionDefinitionEntity decisionDefinition) {
     return decisionDefinitionCache.resolveDefinition(decisionDefinition);
   }
 
@@ -247,21 +286,28 @@ public class DeploymentCache {
     dmnModelInstanceCache.clear();
   }
 
-  //DECISION REQUIREMENT DEFINITION ////////////////////////////////////////////////////////////////////////////
+  // DECISION REQUIREMENT DEFINITION
+  // ////////////////////////////////////////////////////////////////////////////
 
-  public void addDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
+  public void addDecisionRequirementsDefinition(
+      DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
     decisionRequirementsDefinitionCache.addDefinition(decisionRequirementsDefinition);
   }
 
-  public DecisionRequirementsDefinitionEntity findDecisionRequirementsDefinitionFromCache(String decisionRequirementsDefinitionId) {
-    return decisionRequirementsDefinitionCache.findDefinitionFromCache(decisionRequirementsDefinitionId);
+  public DecisionRequirementsDefinitionEntity findDecisionRequirementsDefinitionFromCache(
+      String decisionRequirementsDefinitionId) {
+    return decisionRequirementsDefinitionCache
+        .findDefinitionFromCache(decisionRequirementsDefinitionId);
   }
 
-  public DecisionRequirementsDefinitionEntity findDeployedDecisionRequirementsDefinitionById(String decisionRequirementsDefinitionId) {
-    return decisionRequirementsDefinitionCache.findDeployedDefinitionById(decisionRequirementsDefinitionId);
+  public DecisionRequirementsDefinitionEntity findDeployedDecisionRequirementsDefinitionById(
+      String decisionRequirementsDefinitionId) {
+    return decisionRequirementsDefinitionCache
+        .findDeployedDefinitionById(decisionRequirementsDefinitionId);
   }
 
-  public DecisionRequirementsDefinitionEntity resolveDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
+  public DecisionRequirementsDefinitionEntity resolveDecisionRequirementsDefinition(
+      DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
     return decisionRequirementsDefinitionCache.resolveDefinition(decisionRequirementsDefinition);
   }
 
@@ -309,10 +355,10 @@ public class DeploymentCache {
 
   public void removeDeployment(String deploymentId) {
     bpmnModelInstanceCache.removeAllDefinitionsByDeploymentId(deploymentId);
-    if(Context.getProcessEngineConfiguration().isCmmnEnabled()) {
+    if (Context.getProcessEngineConfiguration().isCmmnEnabled()) {
       cmmnModelInstanceCache.removeAllDefinitionsByDeploymentId(deploymentId);
     }
-    if(Context.getProcessEngineConfiguration().isDmnEnabled()) {
+    if (Context.getProcessEngineConfiguration().isDmnEnabled()) {
       dmnModelInstanceCache.removeAllDefinitionsByDeploymentId(deploymentId);
     }
     removeAllDecisionRequirementsDefinitionsByDeploymentId(deploymentId);
@@ -322,15 +368,14 @@ public class DeploymentCache {
     // remove all decision requirements definitions for a specific deployment
 
     List<DecisionRequirementsDefinition> allDefinitionsForDeployment = new DecisionRequirementsDefinitionQueryImpl()
-        .deploymentId(deploymentId)
-        .list();
+        .deploymentId(deploymentId).list();
 
     for (DecisionRequirementsDefinition decisionRequirementsDefinition : allDefinitionsForDeployment) {
       try {
         removeDecisionDefinition(decisionRequirementsDefinition.getId());
       } catch (Exception e) {
-        ProcessEngineLogger.PERSISTENCE_LOGGER
-            .removeEntryFromDeploymentCacheFailure("decision requirement", decisionRequirementsDefinition.getId(), e);
+        ProcessEngineLogger.PERSISTENCE_LOGGER.removeEntryFromDeploymentCacheFailure(
+            "decision requirement", decisionRequirementsDefinition.getId(), e);
       }
     }
   }
@@ -340,13 +385,15 @@ public class DeploymentCache {
     CachePurgeReport result = new CachePurgeReport();
     Cache<String, ProcessDefinitionEntity> processDefinitionCache = getProcessDefinitionCache();
     if (!processDefinitionCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeReport.PROCESS_DEF_CACHE, processDefinitionCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.PROCESS_DEF_CACHE,
+          processDefinitionCache.keySet());
       processDefinitionCache.clear();
     }
 
     Cache<String, BpmnModelInstance> bpmnModelInstanceCache = getBpmnModelInstanceCache();
     if (!bpmnModelInstanceCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeReport.BPMN_MODEL_INST_CACHE, bpmnModelInstanceCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.BPMN_MODEL_INST_CACHE,
+          bpmnModelInstanceCache.keySet());
       bpmnModelInstanceCache.clear();
     }
 
@@ -358,7 +405,8 @@ public class DeploymentCache {
 
     Cache<String, CmmnModelInstance> cmmnModelInstanceCache = getCmmnModelInstanceCache();
     if (!cmmnModelInstanceCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeReport.CASE_MODEL_INST_CACHE, cmmnModelInstanceCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.CASE_MODEL_INST_CACHE,
+          cmmnModelInstanceCache.keySet());
       cmmnModelInstanceCache.clear();
     }
 
@@ -370,13 +418,15 @@ public class DeploymentCache {
 
     Cache<String, DmnModelInstance> dmnModelInstanceCache = getDmnDefinitionCache();
     if (!dmnModelInstanceCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeReport.DMN_MODEL_INST_CACHE, dmnModelInstanceCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.DMN_MODEL_INST_CACHE,
+          dmnModelInstanceCache.keySet());
       dmnModelInstanceCache.clear();
     }
 
     Cache<String, DecisionRequirementsDefinitionEntity> decisionRequirementsDefinitionCache = getDecisionRequirementsDefinitionCache();
     if (!decisionRequirementsDefinitionCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeReport.DMN_REQ_DEF_CACHE, decisionRequirementsDefinitionCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.DMN_REQ_DEF_CACHE,
+          decisionRequirementsDefinitionCache.keySet());
       decisionRequirementsDefinitionCache.clear();
     }
 

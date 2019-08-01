@@ -94,7 +94,8 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
   }
 
   @Override
-  public <T extends ModelElementInstance> T newInstance(ModelElementType modelElementType, String s) {
+  public <T extends ModelElementInstance> T newInstance(ModelElementType modelElementType,
+      String s) {
     return modelInstance.newInstance(modelElementType, s);
   }
 
@@ -110,12 +111,14 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     return modelInstance.getModelElementsByType(referencingType);
   }
 
-  public <T extends ModelElementInstance> Collection<T> getModelElementsByType(Class<T> referencingClass) {
+  public <T extends ModelElementInstance> Collection<T> getModelElementsByType(
+      Class<T> referencingClass) {
     return modelInstance.getModelElementsByType(referencingClass);
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends AbstractBaseElementBuilder> T getBuilderForElementById(String id, Class<T> builderClass) {
+  public <T extends AbstractBaseElementBuilder> T getBuilderForElementById(String id,
+      Class<T> builderClass) {
     BaseElement modelElementById = modelInstance.getModelElementById(id);
     return (T) modelElementById.builder();
   }
@@ -280,7 +283,8 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
   public ModifiableBpmnModelInstance asyncBeforeInnerMiActivity(String activityId) {
     Activity activity = modelInstance.getModelElementById(activityId);
 
-    MultiInstanceLoopCharacteristics miCharacteristics = (MultiInstanceLoopCharacteristics) activity.getUniqueChildElementByType(MultiInstanceLoopCharacteristics.class);
+    MultiInstanceLoopCharacteristics miCharacteristics = (MultiInstanceLoopCharacteristics) activity
+        .getUniqueChildElementByType(MultiInstanceLoopCharacteristics.class);
     miCharacteristics.setCamundaAsyncBefore(true);
 
     return this;
@@ -289,7 +293,8 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
   public ModifiableBpmnModelInstance asyncAfterInnerMiActivity(String activityId) {
     Activity activity = modelInstance.getModelElementById(activityId);
 
-    MultiInstanceLoopCharacteristics miCharacteristics = (MultiInstanceLoopCharacteristics) activity.getUniqueChildElementByType(MultiInstanceLoopCharacteristics.class);
+    MultiInstanceLoopCharacteristics miCharacteristics = (MultiInstanceLoopCharacteristics) activity
+        .getUniqueChildElementByType(MultiInstanceLoopCharacteristics.class);
     miCharacteristics.setCamundaAsyncAfter(true);
 
     return this;

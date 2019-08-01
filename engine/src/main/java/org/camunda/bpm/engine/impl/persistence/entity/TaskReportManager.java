@@ -35,36 +35,46 @@ import java.util.List;
 public class TaskReportManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
-  public List<TaskCountByCandidateGroupResult> createTaskCountByCandidateGroupReport(TaskReportImpl query) {
+  public List<TaskCountByCandidateGroupResult> createTaskCountByCandidateGroupReport(
+      TaskReportImpl query) {
     configureQuery(query);
-    return getDbEntityManager().selectListWithRawParameter("selectTaskCountByCandidateGroupReportQuery", query, 0, Integer.MAX_VALUE);
+    return getDbEntityManager().selectListWithRawParameter(
+        "selectTaskCountByCandidateGroupReportQuery", query, 0, Integer.MAX_VALUE);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricTaskInstanceReportResult> selectHistoricTaskInstanceCountByTaskNameReport(HistoricTaskInstanceReportImpl query) {
+  public List<HistoricTaskInstanceReportResult> selectHistoricTaskInstanceCountByTaskNameReport(
+      HistoricTaskInstanceReportImpl query) {
     configureQuery(query);
-    return getDbEntityManager().selectListWithRawParameter("selectHistoricTaskInstanceCountByTaskNameReport", query, 0, Integer.MAX_VALUE);
+    return getDbEntityManager().selectListWithRawParameter(
+        "selectHistoricTaskInstanceCountByTaskNameReport", query, 0, Integer.MAX_VALUE);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricTaskInstanceReportResult> selectHistoricTaskInstanceCountByProcDefKeyReport(HistoricTaskInstanceReportImpl query) {
+  public List<HistoricTaskInstanceReportResult> selectHistoricTaskInstanceCountByProcDefKeyReport(
+      HistoricTaskInstanceReportImpl query) {
     configureQuery(query);
-    return getDbEntityManager().selectListWithRawParameter("selectHistoricTaskInstanceCountByProcDefKeyReport", query, 0, Integer.MAX_VALUE);
+    return getDbEntityManager().selectListWithRawParameter(
+        "selectHistoricTaskInstanceCountByProcDefKeyReport", query, 0, Integer.MAX_VALUE);
   }
 
   @SuppressWarnings("unchecked")
-  public List<DurationReportResult> createHistoricTaskDurationReport(HistoricTaskInstanceReportImpl query) {
+  public List<DurationReportResult> createHistoricTaskDurationReport(
+      HistoricTaskInstanceReportImpl query) {
     configureQuery(query);
-    return getDbEntityManager().selectListWithRawParameter("selectHistoricTaskInstanceDurationReport", query, 0, Integer.MAX_VALUE);
+    return getDbEntityManager().selectListWithRawParameter(
+        "selectHistoricTaskInstanceDurationReport", query, 0, Integer.MAX_VALUE);
   }
 
   protected void configureQuery(HistoricTaskInstanceReportImpl parameter) {
-    getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY, Resources.TASK, Authorization.ANY);
+    getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY, Resources.TASK,
+        Authorization.ANY);
     getTenantManager().configureTenantCheck(parameter.getTenantCheck());
   }
 
   protected void configureQuery(TaskReportImpl parameter) {
-    getAuthorizationManager().checkAuthorization(Permissions.READ, Resources.TASK, Authorization.ANY);
+    getAuthorizationManager().checkAuthorization(Permissions.READ, Resources.TASK,
+        Authorization.ANY);
     getTenantManager().configureTenantCheck(parameter.getTenantCheck());
   }
 

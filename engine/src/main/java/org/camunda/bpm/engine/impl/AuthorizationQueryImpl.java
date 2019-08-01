@@ -34,7 +34,8 @@ import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
  * @author Daniel Meyer
  *
  */
-public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Authorization> implements AuthorizationQuery {
+public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Authorization>
+    implements AuthorizationQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -63,16 +64,18 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   }
 
   public AuthorizationQuery userIdIn(String... userIdIn) {
-    if(groupIds != null) {
-      throw new ProcessEngineException("Cannot query for user and group authorizations at the same time.");
+    if (groupIds != null) {
+      throw new ProcessEngineException(
+          "Cannot query for user and group authorizations at the same time.");
     }
     this.userIds = userIdIn;
     return this;
   }
 
   public AuthorizationQuery groupIdIn(String... groupIdIn) {
-    if(userIds != null) {
-      throw new ProcessEngineException("Cannot query for user and group authorizations at the same time.");
+    if (userIds != null) {
+      throw new ProcessEngineException(
+          "Cannot query for user and group authorizations at the same time.");
     }
     this.groupIds = groupIdIn;
     return this;
@@ -113,38 +116,34 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext.getAuthorizationManager()
-      .selectAuthorizationCountByQueryCriteria(this);
+    return commandContext.getAuthorizationManager().selectAuthorizationCountByQueryCriteria(this);
   }
 
   public List<Authorization> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext.getAuthorizationManager()
-        .selectAuthorizationByQueryCriteria(this);
+    return commandContext.getAuthorizationManager().selectAuthorizationByQueryCriteria(this);
   }
 
   @Override
   protected boolean hasExcludingConditions() {
-    return super.hasExcludingConditions()
-        || containsIncompatiblePermissions()
+    return super.hasExcludingConditions() || containsIncompatiblePermissions()
         || containsIncompatibleResourceType();
   }
 
   /**
-   * check whether there are any compatible resources
-   * for all of the filtered permission parameters
+   * check whether there are any compatible resources for all of the filtered permission parameters
    */
   private boolean containsIncompatiblePermissions() {
     return queryByPermission && resourcesIntersection.isEmpty();
   }
 
   /**
-   * check whether the permissions' resources
-   * are compatible to the filtered resource parameter
+   * check whether the permissions' resources are compatible to the filtered resource parameter
    */
   private boolean containsIncompatibleResourceType() {
     if (queryByResourceType && queryByPermission) {
-      Resource[] resources = resourcesIntersection.toArray(new Resource[resourcesIntersection.size()]);
+      Resource[] resources = resourcesIntersection
+          .toArray(new Resource[resourcesIntersection.size()]);
       return !ResourceTypeUtil.resourceIsContainedInArray(resourceType, resources);
     }
     return false;

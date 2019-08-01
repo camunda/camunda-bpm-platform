@@ -18,13 +18,14 @@ package org.camunda.bpm.engine.management;
 
 import org.camunda.bpm.engine.query.Query;
 
-public interface DeploymentStatisticsQuery extends Query<DeploymentStatisticsQuery, DeploymentStatistics> {
+public interface DeploymentStatisticsQuery
+    extends Query<DeploymentStatisticsQuery, DeploymentStatistics> {
 
   /**
    * Include an aggregation of failed jobs in the result.
    */
   DeploymentStatisticsQuery includeFailedJobs();
-  
+
   /**
    * Include an aggregation of incidents in the result.
    */

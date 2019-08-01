@@ -54,8 +54,8 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
   }
 
   /**
-   * Tests that an expression for a call activity output parameter is resolved
-   * in the context of the called process definition's application.
+   * Tests that an expression for a call activity output parameter is resolved in the context of the
+   * called process definition's application.
    */
   public void testCallActivityOutputExpression() {
     // given an instance of the calling process that calls the called process
@@ -71,8 +71,8 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
   }
 
   /**
-   * Tests that an expression on an outgoing flow leaving a call activity
-   * is resolved in the context of the calling process definition's application.
+   * Tests that an expression on an outgoing flow leaving a call activity is resolved in the context
+   * of the calling process definition's application.
    */
   public void testCallActivityConditionalOutgoingFlow() {
     // given an instance of the calling process that calls the called process
@@ -82,7 +82,8 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
     Task calledProcessTask = taskService.createTaskQuery().singleResult();
     taskService.complete(calledProcessTask.getId());
 
-    // then the conditional flow expression was resolved in the context of the calling process application, so
+    // then the conditional flow expression was resolved in the context of the calling process
+    // application, so
     // the following task has been reached successfully
     Task afterCallActivityTask = taskService.createTaskQuery().singleResult();
     assertNotNull(afterCallActivityTask);

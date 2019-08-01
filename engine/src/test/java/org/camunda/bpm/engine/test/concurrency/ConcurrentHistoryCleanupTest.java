@@ -28,10 +28,14 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.util.DatabaseHelper;
 
 /**
- * <p>Tests the call to history cleanup simultaneously.</p>
+ * <p>
+ * Tests the call to history cleanup simultaneously.
+ * </p>
  *
- * <p><b>Note:</b> the test is not executed on H2 because it doesn't support the
- * exclusive lock on table.</p>
+ * <p>
+ * <b>Note:</b> the test is not executed on H2 because it doesn't support the exclusive lock on
+ * table.
+ * </p>
  *
  * @author Svetlana Dorokhova
  */
@@ -39,28 +43,32 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
 
   @Override
   public void tearDown() throws Exception {
-    ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+        .getCommandExecutorTxRequired().execute(new Command<Void>() {
+          public Void execute(CommandContext commandContext) {
 
-        List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
-        if (jobs.size() > 0) {
-          String jobId = jobs.get(0).getId();
-          commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-        }
+            List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
+            if (jobs.size() > 0) {
+              String jobId = jobs.get(0).getId();
+              commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
+              commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+            }
 
-        return null;
-      }
-    });
+            return null;
+          }
+        });
     super.tearDown();
   }
 
   @Override
   protected void runTest() throws Throwable {
-    final Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
+    final Integer transactionIsolationLevel = DatabaseHelper
+        .getTransactionIsolationLevel(processEngineConfiguration);
     String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
 
-    if (DbSqlSessionFactory.H2.equals(databaseType) || DbSqlSessionFactory.MARIADB.equals(databaseType) || (transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {
+    if (DbSqlSessionFactory.H2.equals(databaseType)
+        || DbSqlSessionFactory.MARIADB.equals(databaseType) || (transactionIsolationLevel != null
+            && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {
       // skip test method - if database is H2
     } else {
       // invoke the test method
@@ -87,7 +95,7 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
     thread2.waitForSync();
     thread2.waitUntilDone();
 
-    //only one history cleanup job exists -> no exception
+    // only one history cleanup job exists -> no exception
     List<Job> historyCleanupJobs = processEngine.getHistoryService().findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
     assertEquals(1, historyCleanupJobs.size());
@@ -100,11 +108,11 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
   protected static class ControllableHistoryCleanupCommand extends ControllableCommand<Void> {
 
     public Void execute(CommandContext commandContext) {
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync(); // thread will block here until makeContinue() is called form main thread
 
       new HistoryCleanupCmd(true).execute(commandContext);
 
-      monitor.sync();  // thread will block here until waitUntilDone() is called form main thread
+      monitor.sync(); // thread will block here until waitUntilDone() is called form main thread
 
       return null;
     }

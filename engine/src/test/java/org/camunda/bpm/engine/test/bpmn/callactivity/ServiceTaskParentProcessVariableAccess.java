@@ -26,9 +26,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 public class ServiceTaskParentProcessVariableAccess implements JavaDelegate {
 
   public void execute(DelegateExecution execution) throws Exception {
-	  execution
-	    .getProcessInstance()
-	    .getSuperExecution().setVariable("greeting", "hello");
+    execution.getProcessInstance().getSuperExecution().setVariable("greeting", "hello");
   }
 
 }

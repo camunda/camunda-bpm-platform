@@ -35,28 +35,33 @@ import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse.COMPENSATE_EVENT
  */
 public class TestBPMNParseListener extends AbstractBpmnParseListener {
 
-  public void parseRootElement(Element rootElement, List<ProcessDefinitionEntity> processDefinitions) {
+  public void parseRootElement(Element rootElement,
+      List<ProcessDefinitionEntity> processDefinitions) {
     // Change the key of all deployed process-definitions
     for (ProcessDefinitionEntity entity : processDefinitions) {
       entity.setKey(entity.getKey() + "-modified");
     }
   }
 
-  public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
+  public void parseStartEvent(Element startEventElement, ScopeImpl scope,
+      ActivityImpl startEventActivity) {
     // Change activity behavior
     startEventActivity.setActivityBehavior(new TestNoneStartEventActivityBehavior());
   }
 
-  public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+  public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope,
+      ActivityImpl activity) {
     // Change activity behavior
-    Element compensateEventDefinitionElement = intermediateEventElement.element(COMPENSATE_EVENT_DEFINITION);
+    Element compensateEventDefinitionElement = intermediateEventElement
+        .element(COMPENSATE_EVENT_DEFINITION);
     if (compensateEventDefinitionElement != null) {
       final String activityRef = compensateEventDefinitionElement.attribute("activityRef");
       CompensateEventDefinition compensateEventDefinition = new CompensateEventDefinition();
       compensateEventDefinition.setActivityRef(activityRef);
       compensateEventDefinition.setWaitForCompletion(false);
 
-      activity.setActivityBehavior(new TestCompensationEventActivityBehavior(compensateEventDefinition));
+      activity.setActivityBehavior(
+          new TestCompensationEventActivityBehavior(compensateEventDefinition));
     }
   }
 
@@ -75,7 +80,8 @@ public class TestBPMNParseListener extends AbstractBpmnParseListener {
 
   public class TestCompensationEventActivityBehavior extends CompensationEventActivityBehavior {
 
-    public TestCompensationEventActivityBehavior(CompensateEventDefinition compensateEventDefinition) {
+    public TestCompensationEventActivityBehavior(
+        CompensateEventDefinition compensateEventDefinition) {
       super(compensateEventDefinition);
     }
   }

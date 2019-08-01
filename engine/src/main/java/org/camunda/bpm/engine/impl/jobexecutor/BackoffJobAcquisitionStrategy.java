@@ -21,27 +21,37 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>Determines the number of jobs to acquire and the time to wait between acquisition cycles
- * by an exponential backoff strategy.
+ * <p>
+ * Determines the number of jobs to acquire and the time to wait between acquisition cycles by an
+ * exponential backoff strategy.
  *
- * <p>Manages two kinds of backoff times:
- *   <ul>
- *     <li>idle time: Wait for a certain amount of time when no jobs are available
- *     <li>backoff time: Wait for a certain amount of time when jobs are available
- *       but could not successfully be acquired
- *   </ul>
- * Both times are calculated by applying an exponential backoff. This means, when the respective conditions
- * repeatedly hold, the time increases exponentially from one acquisition cycle to the next.
+ * <p>
+ * Manages two kinds of backoff times:
+ * <ul>
+ * <li>idle time: Wait for a certain amount of time when no jobs are available
+ * <li>backoff time: Wait for a certain amount of time when jobs are available but could not
+ * successfully be acquired
+ * </ul>
+ * Both times are calculated by applying an exponential backoff. This means, when the respective
+ * conditions repeatedly hold, the time increases exponentially from one acquisition cycle to the
+ * next.
  *
- * <p>This implementation manages idle and backoff time in terms of levels. The initial backoff level is 0,
- * meaning that no backoff is applied. In case the condition for increasing backoff applies, the backoff
- * level is incremented. The actual time to wait is then computed as follows
+ * <p>
+ * This implementation manages idle and backoff time in terms of levels. The initial backoff level
+ * is 0, meaning that no backoff is applied. In case the condition for increasing backoff applies,
+ * the backoff level is incremented. The actual time to wait is then computed as follows
  *
- * <pre>timeToWait = baseBackoffTime * (backoffFactor ^ (backoffLevel - 1))</pre>
+ * <pre>
+ * timeToWait = baseBackoffTime * (backoffFactor ^ (backoffLevel - 1))
+ * </pre>
  *
- * <p>Accordingly, the maximum possible backoff level is
+ * <p>
+ * Accordingly, the maximum possible backoff level is
  *
- * <pre>maximumLevel = floor( log( backoffFactor, maximumBackoffTime / baseBackoffTime) ) + 1</pre>
+ * <pre>
+ * maximumLevel = floor(log(backoffFactor, maximumBackoffTime / baseBackoffTime)) + 1
+ * </pre>
+ * 
  * (where log(a, b) is the logarithm of b to the base of a)
  *
  * @author Thorben Lindhauer
@@ -74,8 +84,7 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
   protected boolean applyJitter = false;
 
   /*
-   * Keeping a history of recent acquisitions without locking failure
-   * for backoff level decrease
+   * Keeping a history of recent acquisitions without locking failure for backoff level decrease
    */
   protected int numAcquisitionsWithoutLockingFailure = 0;
   protected int backoffDecreaseThreshold;
@@ -85,21 +94,15 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
   protected Map<String, Integer> jobsToAcquire = new HashMap<String, Integer>();
 
   /*
-   * Backing off when the execution resources (queue) are saturated
-   * in order to not busy wait for free resources
+   * Backing off when the execution resources (queue) are saturated in order to not busy wait for
+   * free resources
    */
   protected boolean executionSaturated = false;
   protected long executionSaturationWaitTime = DEFAULT_EXECUTION_SATURATION_WAIT_TIME;
 
-  public BackoffJobAcquisitionStrategy(
-      long baseIdleWaitTime,
-      float idleIncreaseFactor,
-      long maxIdleTime,
-      long baseBackoffWaitTime,
-      float backoffIncreaseFactor,
-      long maxBackoffTime,
-      int backoffDecreaseThreshold,
-      int baseNumJobsToAcquire) {
+  public BackoffJobAcquisitionStrategy(long baseIdleWaitTime, float idleIncreaseFactor,
+      long maxIdleTime, long baseBackoffWaitTime, float backoffIncreaseFactor, long maxBackoffTime,
+      int backoffDecreaseThreshold, int baseNumJobsToAcquire) {
 
     this.baseIdleWaitTime = baseIdleWaitTime;
     this.idleIncreaseFactor = idleIncreaseFactor;
@@ -118,26 +121,22 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
   }
 
   public BackoffJobAcquisitionStrategy(JobExecutor jobExecutor) {
-    this(jobExecutor.getWaitTimeInMillis(),
-        jobExecutor.getWaitIncreaseFactor(),
-        jobExecutor.getMaxWait(),
-        jobExecutor.getBackoffTimeInMillis(),
-        jobExecutor.getWaitIncreaseFactor(),
-        jobExecutor.getMaxBackoff(),
-        jobExecutor.getBackoffDecreaseThreshold(),
-        jobExecutor.getMaxJobsPerAcquisition());
+    this(jobExecutor.getWaitTimeInMillis(), jobExecutor.getWaitIncreaseFactor(),
+        jobExecutor.getMaxWait(), jobExecutor.getBackoffTimeInMillis(),
+        jobExecutor.getWaitIncreaseFactor(), jobExecutor.getMaxBackoff(),
+        jobExecutor.getBackoffDecreaseThreshold(), jobExecutor.getMaxJobsPerAcquisition());
   }
 
   protected void initializeMaxLevels() {
-    if (baseIdleWaitTime > 0 && maxIdleWaitTime > 0 && idleIncreaseFactor > 0 && maxIdleWaitTime >= baseIdleWaitTime) {
+    if (baseIdleWaitTime > 0 && maxIdleWaitTime > 0 && idleIncreaseFactor > 0
+        && maxIdleWaitTime >= baseIdleWaitTime) {
       // the maximum level that produces an idle time <= maxIdleTime:
       // see class docs for an explanation
       maxIdleLevel = (int) log(idleIncreaseFactor, maxIdleWaitTime / baseIdleWaitTime) + 1;
 
       // + 1 to get the minimum level that produces an idle time > maxIdleTime
       maxIdleLevel += 1;
-    }
-    else {
+    } else {
       maxIdleLevel = 0;
     }
 
@@ -145,12 +144,12 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
         && maxBackoffWaitTime >= baseBackoffWaitTime) {
       // the maximum level that produces a backoff time < maxBackoffTime:
       // see class docs for an explanation
-      maxBackoffLevel = (int) log(backoffIncreaseFactor, maxBackoffWaitTime / baseBackoffWaitTime) + 1;
+      maxBackoffLevel = (int) log(backoffIncreaseFactor, maxBackoffWaitTime / baseBackoffWaitTime)
+          + 1;
 
       // + 1 to get the minimum level that produces a backoff time > maxBackoffTime
       maxBackoffLevel += 1;
-    }
-    else {
+    } else {
       maxBackoffLevel = 0;
     }
   }
@@ -171,11 +170,13 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
    * @return true, if all acquired jobs (spanning all engines) were rejected for execution
    */
   protected boolean allSubmittedJobsRejected(JobAcquisitionContext context) {
-    for (Map.Entry<String, AcquiredJobs> acquiredJobsForEngine : context.getAcquiredJobsByEngine().entrySet()) {
+    for (Map.Entry<String, AcquiredJobs> acquiredJobsForEngine : context.getAcquiredJobsByEngine()
+        .entrySet()) {
       String engineName = acquiredJobsForEngine.getKey();
 
       List<List<String>> acquiredJobBatches = acquiredJobsForEngine.getValue().getJobIdBatches();
-      List<List<String>> resubmittedJobBatches = context.getAdditionalJobsByEngine().get(engineName);
+      List<List<String>> resubmittedJobBatches = context.getAdditionalJobsByEngine()
+          .get(engineName);
       List<List<String>> rejectedJobBatches = context.getRejectedJobsByEngine().get(engineName);
 
       int numJobsSubmittedForExecution = acquiredJobBatches.size();
@@ -200,14 +201,12 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
   protected void reconfigureIdleLevel(JobAcquisitionContext context) {
     if (context.isJobAdded()) {
       idleLevel = 0;
-    }
-    else {
+    } else {
       if (context.areAllEnginesIdle() || context.getAcquisitionException() != null) {
         if (idleLevel < maxIdleLevel) {
           idleLevel++;
         }
-      }
-      else {
+      } else {
         idleLevel = 0;
       }
     }
@@ -222,8 +221,7 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
       if (backoffLevel < maxBackoffLevel) {
         backoffLevel++;
       }
-    }
-    else {
+    } else {
       applyJitter = false;
       numAcquisitionsWithoutLockingFailure++;
       if (numAcquisitionsWithoutLockingFailure >= backoffDecreaseThreshold && backoffLevel > 0) {
@@ -236,11 +234,14 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
   protected void reconfigureNumberOfJobsToAcquire(JobAcquisitionContext context) {
     // calculate the number of jobs to acquire next time
     jobsToAcquire.clear();
-    for (Map.Entry<String, AcquiredJobs> acquiredJobsEntry : context.getAcquiredJobsByEngine().entrySet()) {
+    for (Map.Entry<String, AcquiredJobs> acquiredJobsEntry : context.getAcquiredJobsByEngine()
+        .entrySet()) {
       String engineName = acquiredJobsEntry.getKey();
 
-      int numJobsToAcquire = (int) (baseNumJobsToAcquire * Math.pow(backoffIncreaseFactor, backoffLevel));
-      List<List<String>> rejectedJobBatchesForEngine = context.getRejectedJobsByEngine().get(engineName);
+      int numJobsToAcquire = (int) (baseNumJobsToAcquire
+          * Math.pow(backoffIncreaseFactor, backoffLevel));
+      List<List<String>> rejectedJobBatchesForEngine = context.getRejectedJobsByEngine()
+          .get(engineName);
       if (rejectedJobBatchesForEngine != null) {
         numJobsToAcquire -= rejectedJobBatchesForEngine.size();
       }
@@ -254,14 +255,11 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
   public long getWaitTime() {
     if (idleLevel > 0) {
       return calculateIdleTime();
-    }
-    else if (backoffLevel > 0) {
+    } else if (backoffLevel > 0) {
       return calculateBackoffTime();
-    }
-    else if (executionSaturated) {
+    } else if (executionSaturated) {
       return executionSaturationWaitTime;
-    }
-    else {
+    } else {
       return 0;
     }
   }
@@ -271,8 +269,7 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
       return 0;
     } else if (idleLevel >= maxIdleLevel) {
       return maxIdleWaitTime;
-    }
-    else {
+    } else {
       return (long) (baseIdleWaitTime * Math.pow(idleIncreaseFactor, idleLevel - 1));
     }
   }
@@ -284,9 +281,9 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
       backoffTime = 0;
     } else if (backoffLevel >= maxBackoffLevel) {
       backoffTime = maxBackoffWaitTime;
-    }
-    else {
-      backoffTime = (long) (baseBackoffWaitTime * Math.pow(backoffIncreaseFactor, backoffLevel - 1));
+    } else {
+      backoffTime = (long) (baseBackoffWaitTime
+          * Math.pow(backoffIncreaseFactor, backoffLevel - 1));
     }
 
     if (applyJitter) {
@@ -303,8 +300,7 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
     Integer numJobsToAcquire = jobsToAcquire.get(processEngine);
     if (numJobsToAcquire != null) {
       return numJobsToAcquire;
-    }
-    else {
+    } else {
       return baseNumJobsToAcquire;
     }
   }

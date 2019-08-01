@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Container for history entities which belongs to a decision evaluation. Only
- * the containing history entities should be persisted.
+ * Container for history entities which belongs to a decision evaluation. Only the containing
+ * history entities should be persisted.
  */
 public class HistoricDecisionEvaluationEvent extends HistoryEvent {
 
@@ -35,7 +35,8 @@ public class HistoricDecisionEvaluationEvent extends HistoryEvent {
     return rootHistoricDecisionInstance;
   }
 
-  public void setRootHistoricDecisionInstance(HistoricDecisionInstanceEntity rootHistoricDecisionInstance) {
+  public void setRootHistoricDecisionInstance(
+      HistoricDecisionInstanceEntity rootHistoricDecisionInstance) {
     this.rootHistoricDecisionInstance = rootHistoricDecisionInstance;
   }
 
@@ -43,7 +44,8 @@ public class HistoricDecisionEvaluationEvent extends HistoryEvent {
     return requiredHistoricDecisionInstances;
   }
 
-  public void setRequiredHistoricDecisionInstances(Collection<HistoricDecisionInstanceEntity> requiredHistoricDecisionInstances) {
+  public void setRequiredHistoricDecisionInstances(
+      Collection<HistoricDecisionInstanceEntity> requiredHistoricDecisionInstances) {
     this.requiredHistoricDecisionInstances = requiredHistoricDecisionInstances;
   }
 

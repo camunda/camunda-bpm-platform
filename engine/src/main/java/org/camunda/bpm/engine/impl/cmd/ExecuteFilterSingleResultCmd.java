@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.query.Query;
 /**
  * @author Sebastian Menski
  */
-public class ExecuteFilterSingleResultCmd extends AbstractExecuteFilterCmd implements Command<Object> {
+public class ExecuteFilterSingleResultCmd extends AbstractExecuteFilterCmd
+    implements Command<Object> {
 
   private static final long serialVersionUID = 1L;
 

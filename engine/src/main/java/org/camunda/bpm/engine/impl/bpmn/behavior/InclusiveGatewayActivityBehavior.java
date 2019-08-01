@@ -32,8 +32,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
- * Implementation of the Inclusive Gateway/OR gateway/inclusive data-based
- * gateway as defined in the BPMN specification.
+ * Implementation of the Inclusive Gateway/OR gateway/inclusive data-based gateway as defined in the
+ * BPMN specification.
  *
  * @author Tijs Rademakers
  * @author Tom Van Buskirk
@@ -53,14 +53,17 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
       LOG.activityActivation(activity.getId());
 
-      List<ActivityExecution> joinedExecutions = execution.findInactiveConcurrentExecutions(activity);
+      List<ActivityExecution> joinedExecutions = execution
+          .findInactiveConcurrentExecutions(activity);
       String defaultSequenceFlow = (String) execution.getActivity().getProperty("default");
       List<PvmTransition> transitionsToTake = new ArrayList<PvmTransition>();
 
       // find matching non-default sequence flows
       for (PvmTransition outgoingTransition : execution.getActivity().getOutgoingTransitions()) {
-        if (defaultSequenceFlow == null || !outgoingTransition.getId().equals(defaultSequenceFlow)) {
-          Condition condition = (Condition) outgoingTransition.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
+        if (defaultSequenceFlow == null
+            || !outgoingTransition.getId().equals(defaultSequenceFlow)) {
+          Condition condition = (Condition) outgoingTransition
+              .getProperty(BpmnParse.PROPERTYNAME_CONDITION);
           if (condition == null || condition.evaluate(execution)) {
             transitionsToTake.add(outgoingTransition);
           }
@@ -70,9 +73,11 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
       // if none found, add default flow
       if (transitionsToTake.isEmpty()) {
         if (defaultSequenceFlow != null) {
-          PvmTransition defaultTransition = execution.getActivity().findOutgoingTransition(defaultSequenceFlow);
+          PvmTransition defaultTransition = execution.getActivity()
+              .findOutgoingTransition(defaultSequenceFlow);
           if (defaultTransition == null) {
-            throw LOG.missingDefaultFlowException(execution.getActivity().getId(), defaultSequenceFlow);
+            throw LOG.missingDefaultFlowException(execution.getActivity().getId(),
+                defaultSequenceFlow);
           }
 
           transitionsToTake.add(defaultTransition);
@@ -108,12 +113,12 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     int numExecutionsGuaranteedToActivate = gatewayActivity.getIncomingTransitions().size();
     ActivityExecution scopeExecution = execution.isScope() ? execution : execution.getParent();
 
-    List<ActivityExecution> executionsAtGateway = execution.findInactiveConcurrentExecutions(gatewayActivity);
+    List<ActivityExecution> executionsAtGateway = execution
+        .findInactiveConcurrentExecutions(gatewayActivity);
 
     if (executionsAtGateway.size() >= numExecutionsGuaranteedToActivate) {
       return true;
-    }
-    else {
+    } else {
       Collection<ActivityExecution> executionsNotAtGateway = getLeafExecutions(scopeExecution);
       executionsNotAtGateway.removeAll(executionsAtGateway);
 
@@ -138,7 +143,8 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     }
   }
 
-  protected boolean isReachable(PvmActivity srcActivity, PvmActivity targetActivity, Set<PvmActivity> visitedActivities) {
+  protected boolean isReachable(PvmActivity srcActivity, PvmActivity targetActivity,
+      Set<PvmActivity> visitedActivities) {
     if (srcActivity.equals(targetActivity)) {
       return true;
     }
@@ -168,8 +174,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
           }
         }
 
-      }
-      else {
+      } else {
 
         ScopeImpl flowScope = srcActivity.getFlowScope();
         if (flowScope != null && flowScope instanceof PvmActivity) {
@@ -179,8 +184,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
       }
 
       return false;
-    }
-    else {
+    } else {
       for (PvmTransition pvmTransition : outgoingTransitions) {
         PvmActivity destinationActivity = pvmTransition.getDestination();
         if (destinationActivity != null && !visitedActivities.contains(destinationActivity)) {

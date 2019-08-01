@@ -39,13 +39,9 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  protected static final BpmnModelInstance MESSAGE_CATCH_PROCESS = Bpmn.createExecutableProcess("messageCatch")
-      .startEvent()
-      .intermediateCatchEvent()
-        .message("message")
-      .userTask()
-      .endEvent()
-      .done();
+  protected static final BpmnModelInstance MESSAGE_CATCH_PROCESS = Bpmn
+      .createExecutableProcess("messageCatch").startEvent().intermediateCatchEvent()
+      .message("message").userTask().endEvent().done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
@@ -55,7 +51,7 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void correlateReceivedMessageToIntermediateCatchEventNoAuthenticatedTenants() {
@@ -64,9 +60,8 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
     engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").execute();
 
     Execution execution = engineRule.getRuntimeService().createExecutionQuery()
-      .processDefinitionKey("messageCatch")
-      .messageEventSubscriptionName("message")
-      .singleResult();
+        .processDefinitionKey("messageCatch").messageEventSubscriptionName("message")
+        .singleResult();
 
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
@@ -87,9 +82,8 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
     engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").execute();
 
     Execution execution = engineRule.getRuntimeService().createExecutionQuery()
-      .processDefinitionKey("messageCatch")
-      .messageEventSubscriptionName("message")
-      .singleResult();
+        .processDefinitionKey("messageCatch").messageEventSubscriptionName("message")
+        .singleResult();
 
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
@@ -110,14 +104,14 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     Execution execution = engineRule.getRuntimeService().createExecutionQuery()
-      .processDefinitionKey("messageCatch")
-      .messageEventSubscriptionName("message")
-      .tenantIdIn(TENANT_ONE)
-      .singleResult();
+        .processDefinitionKey("messageCatch").messageEventSubscriptionName("message")
+        .tenantIdIn(TENANT_ONE).singleResult();
 
     engineRule.getRuntimeService().messageEventReceived("message", execution.getId());
 
@@ -131,13 +125,12 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
   public void failToCorrelateReceivedMessageToIntermediateCatchEventNoAuthenticatedTenants() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch")
+        .processDefinitionTenantId(TENANT_ONE).execute();
 
     Execution execution = engineRule.getRuntimeService().createExecutionQuery()
-      .processDefinitionKey("messageCatch")
-      .messageEventSubscriptionName("message")
-      .tenantIdIn(TENANT_ONE)
-      .singleResult();
+        .processDefinitionKey("messageCatch").messageEventSubscriptionName("message")
+        .tenantIdIn(TENANT_ONE).singleResult();
 
     // declare expected exception
     thrown.expect(ProcessEngineException.class);

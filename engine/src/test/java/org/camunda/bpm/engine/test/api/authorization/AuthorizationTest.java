@@ -141,7 +141,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
 
   // authorization ///////////////////////////////////////////////////////
 
-  protected Authorization createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
+  protected Authorization createGrantAuthorization(Resource resource, String resourceId,
+      String userId, Permission... permissions) {
     Authorization authorization = createGrantAuthorization(resource, resourceId);
     authorization.setUserId(userId);
     for (Permission permission : permissions) {
@@ -150,8 +151,9 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     saveAuthorization(authorization);
     return authorization;
   }
-  
-  protected Authorization createGrantAuthorizationWithoutAuthentication(Resource resource, String resourceId, String userId, Permission... permissions) {
+
+  protected Authorization createGrantAuthorizationWithoutAuthentication(Resource resource,
+      String resourceId, String userId, Permission... permissions) {
     Authentication currentAuthentication = identityService.getCurrentAuthentication();
     identityService.clearAuthentication();
     try {
@@ -161,7 +163,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  protected void createGrantAuthorizationGroup(Resource resource, String resourceId, String groupId, Permission... permissions) {
+  protected void createGrantAuthorizationGroup(Resource resource, String resourceId, String groupId,
+      Permission... permissions) {
     Authorization authorization = createGrantAuthorization(resource, resourceId);
     authorization.setGroupId(groupId);
     for (Permission permission : permissions) {
@@ -169,8 +172,9 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     }
     saveAuthorization(authorization);
   }
-  
-  protected void createRevokeAuthorizationWithoutAuthentication(Resource resource, String resourceId, String userId, Permission... permissions) {
+
+  protected void createRevokeAuthorizationWithoutAuthentication(Resource resource,
+      String resourceId, String userId, Permission... permissions) {
     Authentication currentAuthentication = identityService.getCurrentAuthentication();
     identityService.clearAuthentication();
     try {
@@ -180,7 +184,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  protected void createRevokeAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
+  protected void createRevokeAuthorization(Resource resource, String resourceId, String userId,
+      Permission... permissions) {
     Authorization authorization = createRevokeAuthorization(resource, resourceId);
     authorization.setUserId(userId);
     for (Permission permission : permissions) {
@@ -235,7 +240,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     return startProcessInstanceByKey(key, null);
   }
 
-  protected ProcessInstance startProcessInstanceByKey(final String key, final Map<String, Object> variables) {
+  protected ProcessInstance startProcessInstanceByKey(final String key,
+      final Map<String, Object> variables) {
     return runWithoutAuthorization(new Callable<ProcessInstance>() {
       public ProcessInstance call() throws Exception {
         return runtimeService.startProcessInstanceByKey(key, variables);
@@ -257,7 +263,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     return createCaseInstanceByKey(key, null);
   }
 
-  protected CaseInstance createCaseInstanceByKey(final String key, final Map<String, Object> variables) {
+  protected CaseInstance createCaseInstanceByKey(final String key,
+      final Map<String, Object> variables) {
     return runWithoutAuthorization(new Callable<CaseInstance>() {
       public CaseInstance call() throws Exception {
         return caseService.createCaseInstanceByKey(key, variables);
@@ -328,7 +335,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     });
   }
 
-  protected void setTaskVariables(final String taskId, final Map<String, ? extends Object> variables) {
+  protected void setTaskVariables(final String taskId,
+      final Map<String, ? extends Object> variables) {
     runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
         taskService.setVariables(taskId, variables);
@@ -337,7 +345,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     });
   }
 
-  protected void setTaskVariablesLocal(final String taskId, final Map<String, ? extends Object> variables) {
+  protected void setTaskVariablesLocal(final String taskId,
+      final Map<String, ? extends Object> variables) {
     runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
         taskService.setVariablesLocal(taskId, variables);
@@ -364,7 +373,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     });
   }
 
-  protected void setExecutionVariable(final String executionId, final String name, final Object value) {
+  protected void setExecutionVariable(final String executionId, final String name,
+      final Object value) {
     runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
         runtimeService.setVariable(executionId, name, value);
@@ -373,7 +383,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     });
   }
 
-  protected void setExecutionVariableLocal(final String executionId, final String name, final Object value) {
+  protected void setExecutionVariableLocal(final String executionId, final String name,
+      final Object value) {
     runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
         runtimeService.setVariableLocal(executionId, name, value);
@@ -382,7 +393,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     });
   }
 
-  protected void setCaseVariable(final String caseExecution, final String name, final Object value) {
+  protected void setCaseVariable(final String caseExecution, final String name,
+      final Object value) {
     runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
         caseService.setVariable(caseExecution, name, value);
@@ -391,7 +403,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     });
   }
 
-  protected void setCaseVariableLocal(final String caseExecution, final String name, final Object value) {
+  protected void setCaseVariableLocal(final String caseExecution, final String name,
+      final Object value) {
     runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
         caseService.setVariableLocal(caseExecution, name, value);
@@ -403,10 +416,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected ProcessDefinition selectProcessDefinitionByKey(final String processDefinitionKey) {
     return runWithoutAuthorization(new Callable<ProcessDefinition>() {
       public ProcessDefinition call() throws Exception {
-        return repositoryService
-            .createProcessDefinitionQuery()
-            .processDefinitionKey(processDefinitionKey)
-            .singleResult();
+        return repositoryService.createProcessDefinitionQuery()
+            .processDefinitionKey(processDefinitionKey).singleResult();
       }
     });
   }
@@ -414,9 +425,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected ProcessInstance selectSingleProcessInstance() {
     return runWithoutAuthorization(new Callable<ProcessInstance>() {
       public ProcessInstance call() throws Exception {
-        return runtimeService
-            .createProcessInstanceQuery()
-            .singleResult();
+        return runtimeService.createProcessInstanceQuery().singleResult();
       }
     });
   }
@@ -529,7 +538,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     });
   }
 
-  protected void suspendJobDefinitionIncludingJobsByProcessDefinitionId(final String processDefinitionId) {
+  protected void suspendJobDefinitionIncludingJobsByProcessDefinitionId(
+      final String processDefinitionId) {
     runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
         managementService.suspendJobDefinitionByProcessDefinitionId(processDefinitionId, true);
@@ -538,7 +548,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     });
   }
 
-  protected void suspendJobDefinitionIncludingJobsByProcessDefinitionKey(final String processDefinitionKey) {
+  protected void suspendJobDefinitionIncludingJobsByProcessDefinitionKey(
+      final String processDefinitionKey) {
     runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
         managementService.suspendJobDefinitionByProcessDefinitionKey(processDefinitionKey, true);
@@ -565,7 +576,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
 
   protected void deleteDeployment(final String deploymentId, final boolean cascade) {
     Authentication authentication = identityService.getCurrentAuthentication();
-    try  {
+    try {
       identityService.clearAuthentication();
       runWithoutAuthorization(new Callable<Void>() {
         public Void call() throws Exception {
@@ -593,7 +604,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected void executeAvailableJobs(final String key) {
     runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
-        List<Job> jobs = managementService.createJobQuery().processDefinitionKey(key).withRetriesLeft().list();
+        List<Job> jobs = managementService.createJobQuery().processDefinitionKey(key)
+            .withRetriesLeft().list();
 
         if (jobs.isEmpty()) {
           enableAuthorization();
@@ -603,7 +615,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
         for (Job job : jobs) {
           try {
             managementService.executeJob(job.getId());
-          } catch (Exception e) {}
+          } catch (Exception e) {
+          }
         }
 
         executeAvailableJobs(key);
@@ -615,10 +628,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected DecisionDefinition selectDecisionDefinitionByKey(final String decisionDefinitionKey) {
     return runWithoutAuthorization(new Callable<DecisionDefinition>() {
       public DecisionDefinition call() throws Exception {
-        return repositoryService
-            .createDecisionDefinitionQuery()
-            .decisionDefinitionKey(decisionDefinitionKey)
-            .singleResult();
+        return repositoryService.createDecisionDefinitionQuery()
+            .decisionDefinitionKey(decisionDefinitionKey).singleResult();
       }
     });
   }
@@ -631,7 +642,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
 
     if (countExpected == 1) {
       assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
+    } else if (countExpected > 1) {
       verifySingleResultFails(query);
     } else if (countExpected == 0) {
       assertNull(query.singleResult());
@@ -642,13 +653,14 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   public Permission getDefaultTaskPermissionForUser() {
     // get the default task assignee permission
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
-      .getProcessEngineConfiguration();
+        .getProcessEngineConfiguration();
 
     return processEngineConfiguration.getDefaultUserPermissionForTask();
   }

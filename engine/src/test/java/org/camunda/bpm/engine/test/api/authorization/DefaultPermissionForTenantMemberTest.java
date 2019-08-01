@@ -86,17 +86,14 @@ public class DefaultPermissionForTenantMemberTest {
 
     identityService.createTenantUserMembership(TENANT_ONE, USER_ID);
 
-    assertEquals(1, authorizationService.createAuthorizationQuery()
-      .userIdIn(USER_ID)
-      .resourceType(Resources.TENANT)
-      .resourceId(TENANT_ONE)
-      .hasPermission(Permissions.READ).count());
+    assertEquals(1,
+        authorizationService.createAuthorizationQuery().userIdIn(USER_ID)
+            .resourceType(Resources.TENANT).resourceId(TENANT_ONE).hasPermission(Permissions.READ)
+            .count());
 
     identityService.setAuthenticatedUserId(USER_ID);
 
-    assertEquals(TENANT_ONE,identityService.createTenantQuery()
-     .singleResult()
-     .getId());
+    assertEquals(TENANT_ONE, identityService.createTenantQuery().singleResult().getId());
   }
 
   @Test
@@ -106,15 +103,12 @@ public class DefaultPermissionForTenantMemberTest {
 
     identityService.deleteTenantUserMembership(TENANT_ONE, USER_ID);
 
-    assertEquals(0, authorizationService.createAuthorizationQuery()
-      .userIdIn(USER_ID)
-      .resourceType(Resources.TENANT)
-      .hasPermission(Permissions.READ).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery().userIdIn(USER_ID)
+        .resourceType(Resources.TENANT).hasPermission(Permissions.READ).count());
 
     identityService.setAuthenticatedUserId(USER_ID);
 
-    assertEquals(0,identityService.createTenantQuery()
-     .count());
+    assertEquals(0, identityService.createTenantQuery().count());
   }
 
   @Test
@@ -125,17 +119,13 @@ public class DefaultPermissionForTenantMemberTest {
     identityService.createTenantUserMembership(TENANT_ONE, USER_ID);
     identityService.createTenantUserMembership(TENANT_TWO, USER_ID);
 
-    assertEquals(2, authorizationService.createAuthorizationQuery()
-      .userIdIn(USER_ID)
-      .resourceType(Resources.TENANT)
-      .hasPermission(Permissions.READ).count());
+    assertEquals(2, authorizationService.createAuthorizationQuery().userIdIn(USER_ID)
+        .resourceType(Resources.TENANT).hasPermission(Permissions.READ).count());
 
     identityService.deleteTenantUserMembership(TENANT_ONE, USER_ID);
 
-    assertEquals(1, authorizationService.createAuthorizationQuery()
-      .userIdIn(USER_ID)
-      .resourceType(Resources.TENANT)
-      .hasPermission(Permissions.READ).count());
+    assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn(USER_ID)
+        .resourceType(Resources.TENANT).hasPermission(Permissions.READ).count());
   }
 
   @Test
@@ -143,17 +133,14 @@ public class DefaultPermissionForTenantMemberTest {
 
     identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ID);
 
-    assertEquals(1, authorizationService.createAuthorizationQuery()
-      .groupIdIn(GROUP_ID)
-      .resourceType(Resources.TENANT)
-      .resourceId(TENANT_ONE)
-      .hasPermission(Permissions.READ).count());
+    assertEquals(1,
+        authorizationService.createAuthorizationQuery().groupIdIn(GROUP_ID)
+            .resourceType(Resources.TENANT).resourceId(TENANT_ONE).hasPermission(Permissions.READ)
+            .count());
 
     identityService.setAuthentication(USER_ID, Collections.singletonList(GROUP_ID));
 
-    assertEquals(TENANT_ONE,identityService.createTenantQuery()
-      .singleResult()
-      .getId());
+    assertEquals(TENANT_ONE, identityService.createTenantQuery().singleResult().getId());
   }
 
   @Test
@@ -163,15 +150,12 @@ public class DefaultPermissionForTenantMemberTest {
 
     identityService.deleteTenantGroupMembership(TENANT_ONE, GROUP_ID);
 
-    assertEquals(0, authorizationService.createAuthorizationQuery()
-      .groupIdIn(GROUP_ID)
-      .resourceType(Resources.TENANT)
-      .hasPermission(Permissions.READ).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn(GROUP_ID)
+        .resourceType(Resources.TENANT).hasPermission(Permissions.READ).count());
 
     identityService.setAuthentication(USER_ID, Collections.singletonList(GROUP_ID));
 
-    assertEquals(0,identityService.createTenantQuery()
-     .count());
+    assertEquals(0, identityService.createTenantQuery().count());
   }
 
   @Test
@@ -182,17 +166,13 @@ public class DefaultPermissionForTenantMemberTest {
     identityService.createTenantGroupMembership(TENANT_ONE, GROUP_ID);
     identityService.createTenantGroupMembership(TENANT_TWO, GROUP_ID);
 
-    assertEquals(2, authorizationService.createAuthorizationQuery()
-      .groupIdIn(GROUP_ID)
-      .resourceType(Resources.TENANT)
-      .hasPermission(Permissions.READ).count());
+    assertEquals(2, authorizationService.createAuthorizationQuery().groupIdIn(GROUP_ID)
+        .resourceType(Resources.TENANT).hasPermission(Permissions.READ).count());
 
     identityService.deleteTenantGroupMembership(TENANT_ONE, GROUP_ID);
 
-    assertEquals(1, authorizationService.createAuthorizationQuery()
-      .groupIdIn(GROUP_ID)
-      .resourceType(Resources.TENANT)
-      .hasPermission(Permissions.READ).count());
+    assertEquals(1, authorizationService.createAuthorizationQuery().groupIdIn(GROUP_ID)
+        .resourceType(Resources.TENANT).hasPermission(Permissions.READ).count());
   }
 
   protected Tenant createTenant(String tenantId) {

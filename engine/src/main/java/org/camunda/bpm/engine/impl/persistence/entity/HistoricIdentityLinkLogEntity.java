@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEnt
  * @author Deivarayan Azhagappan
  *
  */
-public class HistoricIdentityLinkLogEntity extends HistoricIdentityLinkLogEventEntity implements HistoricIdentityLinkLog{
-	private static final long serialVersionUID = 1L;
+public class HistoricIdentityLinkLogEntity extends HistoricIdentityLinkLogEventEntity
+    implements HistoricIdentityLinkLog {
+  private static final long serialVersionUID = 1L;
 }

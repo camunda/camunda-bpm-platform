@@ -23,28 +23,30 @@ import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonObject;
 
-public class SetExternalTaskRetriesBatchConfigurationJsonConverter extends JsonObjectConverter<SetRetriesBatchConfiguration> {
+public class SetExternalTaskRetriesBatchConfigurationJsonConverter
+    extends JsonObjectConverter<SetRetriesBatchConfiguration> {
 
   public static final SetExternalTaskRetriesBatchConfigurationJsonConverter INSTANCE = new SetExternalTaskRetriesBatchConfigurationJsonConverter();
 
   public static final String EXTERNAL_TASK_IDS = "externalTaskIds";
   public static final String RETRIES = "retries";
-  
+
   @Override
   public JsonObject toJsonObject(SetRetriesBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
-    
+
     JsonUtil.addListField(json, EXTERNAL_TASK_IDS, configuration.getIds());
     JsonUtil.addField(json, RETRIES, configuration.getRetries());
-    
+
     return json;
   }
 
   @Override
   public SetRetriesBatchConfiguration toObject(JsonObject json) {
-    return new SetRetriesBatchConfiguration(readExternalTaskIds(json), JsonUtil.getInt(json, RETRIES));
+    return new SetRetriesBatchConfiguration(readExternalTaskIds(json),
+        JsonUtil.getInt(json, RETRIES));
   }
-  
+
   protected List<String> readExternalTaskIds(JsonObject json) {
     return JsonUtil.asStringList(JsonUtil.getArray(json, EXTERNAL_TASK_IDS));
   }

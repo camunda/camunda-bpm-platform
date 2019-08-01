@@ -37,19 +37,12 @@ public class CaseExecutionReactivateTest extends PvmTestCase {
     // given ///////////////////////////////////////////////////////////////
 
     // a case definition
-    CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .createActivity("X")
-        .behavior(new StageActivityBehavior())
-        .createActivity("A")
-          .behavior(new TaskWaitState())
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-        .endActivity()
-        .createActivity("B")
-          .behavior(new TaskWaitState())
-          .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-        .endActivity()
-      .endActivity()
-      .buildCaseDefinition();
+    CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1").createActivity("X")
+        .behavior(new StageActivityBehavior()).createActivity("A").behavior(new TaskWaitState())
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .endActivity().createActivity("B").behavior(new TaskWaitState())
+        .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
+        .endActivity().endActivity().buildCaseDefinition();
 
     // an active case instance
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();

@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 
-
 /**
  * Command for retrieving start or task form keys.
  *
@@ -54,24 +53,29 @@ public class GetFormKeyCmd implements Command<String> {
   public GetFormKeyCmd(String processDefinitionId, String taskDefinitionKey) {
     setProcessDefinitionId(processDefinitionId);
     if (taskDefinitionKey == null || taskDefinitionKey.length() < 1) {
-      throw new ProcessEngineException("The task definition key is mandatory, but '" + taskDefinitionKey + "' has been provided.");
+      throw new ProcessEngineException("The task definition key is mandatory, but '"
+          + taskDefinitionKey + "' has been provided.");
     }
     this.taskDefinitionKey = taskDefinitionKey;
   }
 
   protected void setProcessDefinitionId(String processDefinitionId) {
     if (processDefinitionId == null || processDefinitionId.length() < 1) {
-      throw new ProcessEngineException("The process definition id is mandatory, but '" + processDefinitionId + "' has been provided.");
+      throw new ProcessEngineException("The process definition id is mandatory, but '"
+          + processDefinitionId + "' has been provided.");
     }
     this.processDefinitionId = processDefinitionId;
   }
 
   public String execute(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+    ProcessDefinitionEntity processDefinition = deploymentCache
+        .findDeployedProcessDefinitionById(processDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessDefinition(processDefinition);
     }
 

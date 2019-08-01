@@ -42,7 +42,8 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
   public void handle(MigratingInstanceParseContext parseContext, ActivityInstance element) {
     MigratingActivityInstance migratingInstance = null;
 
-    MigrationInstruction applyingInstruction = parseContext.getInstructionFor(element.getActivityId());
+    MigrationInstruction applyingInstruction = parseContext
+        .getInstructionFor(element.getActivityId());
     ScopeImpl sourceScope = null;
     ScopeImpl targetScope = null;
     ExecutionEntity representativeExecution = parseContext.getMapping().getExecution(element);
@@ -50,8 +51,7 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
     if (element.getId().equals(element.getProcessInstanceId())) {
       sourceScope = parseContext.getSourceProcessDefinition();
       targetScope = parseContext.getTargetProcessDefinition();
-    }
-    else {
+    } else {
       sourceScope = parseContext.getSourceProcessDefinition().findActivity(element.getActivityId());
 
       if (applyingInstruction != null) {
@@ -60,15 +60,11 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
       }
     }
 
-    migratingInstance = parseContext.getMigratingProcessInstance()
-        .addActivityInstance(
-          applyingInstruction,
-          element,
-          sourceScope,
-          targetScope,
-          representativeExecution);
+    migratingInstance = parseContext.getMigratingProcessInstance().addActivityInstance(
+        applyingInstruction, element, sourceScope, targetScope, representativeExecution);
 
-    MigratingActivityInstance parentInstance = parseContext.getMigratingActivityInstanceById(element.getParentActivityInstanceId());
+    MigratingActivityInstance parentInstance = parseContext
+        .getMigratingActivityInstanceById(element.getParentActivityInstanceId());
 
     if (parentInstance != null) {
       migratingInstance.setParent(parentInstance);
@@ -76,7 +72,8 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
 
     CoreActivityBehavior<?> sourceActivityBehavior = sourceScope.getActivityBehavior();
     if (sourceActivityBehavior instanceof MigrationObserverBehavior) {
-      ((MigrationObserverBehavior) sourceActivityBehavior).onParseMigratingInstance(parseContext, migratingInstance);
+      ((MigrationObserverBehavior) sourceActivityBehavior).onParseMigratingInstance(parseContext,
+          migratingInstance);
     }
 
     parseContext.submit(migratingInstance);
@@ -86,43 +83,50 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
     parseDependentInstances(parseContext, migratingInstance);
   }
 
-  public void parseTransitionInstances(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
-    for (TransitionInstance transitionInstance : migratingInstance.getActivityInstance().getChildTransitionInstances()) {
+  public void parseTransitionInstances(MigratingInstanceParseContext parseContext,
+      MigratingActivityInstance migratingInstance) {
+    for (TransitionInstance transitionInstance : migratingInstance.getActivityInstance()
+        .getChildTransitionInstances()) {
       parseContext.handleTransitionInstance(transitionInstance);
     }
   }
 
-  public void parseDependentInstances(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
-    parseContext.handleDependentVariables(migratingInstance, collectActivityInstanceVariables(migratingInstance));
-    parseContext.handleDependentActivityInstanceJobs(migratingInstance, collectActivityInstanceJobs(migratingInstance));
-    parseContext.handleDependentEventSubscriptions(migratingInstance, collectActivityInstanceEventSubscriptions(migratingInstance));
+  public void parseDependentInstances(MigratingInstanceParseContext parseContext,
+      MigratingActivityInstance migratingInstance) {
+    parseContext.handleDependentVariables(migratingInstance,
+        collectActivityInstanceVariables(migratingInstance));
+    parseContext.handleDependentActivityInstanceJobs(migratingInstance,
+        collectActivityInstanceJobs(migratingInstance));
+    parseContext.handleDependentEventSubscriptions(migratingInstance,
+        collectActivityInstanceEventSubscriptions(migratingInstance));
   }
 
-  protected List<VariableInstanceEntity> collectActivityInstanceVariables(MigratingActivityInstance instance) {
+  protected List<VariableInstanceEntity> collectActivityInstanceVariables(
+      MigratingActivityInstance instance) {
     List<VariableInstanceEntity> variables = new ArrayList<VariableInstanceEntity>();
     ExecutionEntity representativeExecution = instance.resolveRepresentativeExecution();
     ExecutionEntity parentExecution = representativeExecution.getParent();
 
-    // decide for representative execution and parent execution whether to none/all/concurrentLocal variables
+    // decide for representative execution and parent execution whether to none/all/concurrentLocal
+    // variables
     // belong to this activity instance
     boolean addAllRepresentativeExecutionVariables = instance.getSourceScope().isScope()
         || representativeExecution.isConcurrent();
 
     if (addAllRepresentativeExecutionVariables) {
       variables.addAll(representativeExecution.getVariablesInternal());
-    }
-    else {
+    } else {
       variables.addAll(getConcurrentLocalVariables(representativeExecution));
     }
 
-    boolean addAnyParentExecutionVariables = parentExecution != null && instance.getSourceScope().isScope();
+    boolean addAnyParentExecutionVariables = parentExecution != null
+        && instance.getSourceScope().isScope();
     if (addAnyParentExecutionVariables) {
       boolean addAllParentExecutionVariables = parentExecution.isConcurrent();
 
       if (addAllParentExecutionVariables) {
         variables.addAll(parentExecution.getVariablesInternal());
-      }
-      else {
+      } else {
         variables.addAll(getConcurrentLocalVariables(parentExecution));
       }
     }
@@ -130,26 +134,27 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
     return variables;
   }
 
-  protected List<EventSubscriptionEntity> collectActivityInstanceEventSubscriptions(MigratingActivityInstance migratingInstance) {
+  protected List<EventSubscriptionEntity> collectActivityInstanceEventSubscriptions(
+      MigratingActivityInstance migratingInstance) {
 
     if (migratingInstance.getSourceScope().isScope()) {
       return migratingInstance.resolveRepresentativeExecution().getEventSubscriptions();
-    }
-    else {
+    } else {
       return Collections.emptyList();
     }
   }
 
-  protected List<JobEntity> collectActivityInstanceJobs(MigratingActivityInstance migratingInstance) {
+  protected List<JobEntity> collectActivityInstanceJobs(
+      MigratingActivityInstance migratingInstance) {
     if (migratingInstance.getSourceScope().isScope()) {
       return migratingInstance.resolveRepresentativeExecution().getJobs();
-    }
-    else {
+    } else {
       return Collections.emptyList();
     }
   }
 
-  public static List<VariableInstanceEntity> getConcurrentLocalVariables(ExecutionEntity execution) {
+  public static List<VariableInstanceEntity> getConcurrentLocalVariables(
+      ExecutionEntity execution) {
     List<VariableInstanceEntity> variables = new ArrayList<VariableInstanceEntity>();
 
     for (VariableInstanceEntity variable : execution.getVariablesInternal()) {
@@ -160,6 +165,5 @@ public class ActivityInstanceHandler implements MigratingInstanceParseHandler<Ac
 
     return variables;
   }
-
 
 }

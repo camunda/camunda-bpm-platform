@@ -37,7 +37,9 @@ import org.camunda.bpm.engine.impl.util.CompareUtil;
 /**
  * @author Sebastian Menski
  */
-public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricCaseInstanceQuery, HistoricCaseInstance> implements HistoricCaseInstanceQuery {
+public class HistoricCaseInstanceQueryImpl
+    extends AbstractVariableQueryImpl<HistoricCaseInstanceQuery, HistoricCaseInstance>
+    implements HistoricCaseInstanceQuery {
 
   private static final long serialVersionUID = 1L;
   protected String caseInstanceId;
@@ -142,7 +144,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   public HistoricCaseInstanceQuery closedAfter(Date date) {
-    if (state!= null && (!state.equals(CaseExecutionState.CLOSED.getStateCode()))) {
+    if (state != null && (!state.equals(CaseExecutionState.CLOSED.getStateCode()))) {
       throw new NotValidException("Already querying for case instance state '" + state + "'");
     }
 
@@ -152,7 +154,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   public HistoricCaseInstanceQuery closedBefore(Date date) {
-    if (state!= null && (!state.equals(CaseExecutionState.CLOSED.getStateCode()))) {
+    if (state != null && (!state.equals(CaseExecutionState.CLOSED.getStateCode()))) {
       throw new NotValidException("Already querying for case instance state '" + state + "'");
     }
 
@@ -162,8 +164,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   public HistoricCaseInstanceQuery superCaseInstanceId(String superCaseInstanceId) {
-	  this.superCaseInstanceId = superCaseInstanceId;
-	  return this;
+    this.superCaseInstanceId = superCaseInstanceId;
+    return this;
   }
 
   public HistoricCaseInstanceQuery subCaseInstanceId(String subCaseInstanceId) {
@@ -195,37 +197,43 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   public HistoricCaseInstanceQuery active() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'",
+        "state", state);
     this.state = CaseExecutionState.ACTIVE.getStateCode();
     return this;
   }
 
   public HistoricCaseInstanceQuery completed() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'",
+        "state", state);
     this.state = CaseExecutionState.COMPLETED.getStateCode();
     return this;
   }
 
   public HistoricCaseInstanceQuery terminated() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'",
+        "state", state);
     this.state = CaseExecutionState.TERMINATED.getStateCode();
     return this;
   }
 
   public HistoricCaseInstanceQuery failed() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'",
+        "state", state);
     this.state = CaseExecutionState.FAILED.getStateCode();
     return this;
   }
 
   public HistoricCaseInstanceQuery suspended() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'",
+        "state", state);
     this.state = CaseExecutionState.SUSPENDED.getStateCode();
     return this;
   }
 
   public HistoricCaseInstanceQuery closed() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'",
+        "state", state);
     this.state = CaseExecutionState.CLOSED.getStateCode();
     return this;
   }
@@ -266,26 +274,24 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
-      .getHistoricCaseInstanceManager()
-      .findHistoricCaseInstanceCountByQueryCriteria(this);
+    return commandContext.getHistoricCaseInstanceManager()
+        .findHistoricCaseInstanceCountByQueryCriteria(this);
   }
 
   public List<HistoricCaseInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
-      .getHistoricCaseInstanceManager()
-      .findHistoricCaseInstancesByQueryCriteria(this, page);
+    return commandContext.getHistoricCaseInstanceManager()
+        .findHistoricCaseInstancesByQueryCriteria(this, page);
   }
 
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions()
-      || CompareUtil.areNotInAscendingOrder(createdAfter, createdBefore)
-      || CompareUtil.areNotInAscendingOrder(closedAfter, closedBefore)
-      || CompareUtil.elementIsNotContainedInList(caseInstanceId, caseInstanceIds)
-      || CompareUtil.elementIsContainedInList(caseDefinitionKey, caseKeyNotIn);
+        || CompareUtil.areNotInAscendingOrder(createdAfter, createdBefore)
+        || CompareUtil.areNotInAscendingOrder(closedAfter, closedBefore)
+        || CompareUtil.elementIsNotContainedInList(caseInstanceId, caseInstanceIds)
+        || CompareUtil.elementIsContainedInList(caseDefinitionKey, caseKeyNotIn);
   }
 
   public String getBusinessKey() {

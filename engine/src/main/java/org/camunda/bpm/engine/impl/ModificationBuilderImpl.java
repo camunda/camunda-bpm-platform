@@ -49,7 +49,7 @@ public class ModificationBuilderImpl implements ModificationBuilder {
 
   public ModificationBuilderImpl(CommandExecutor commandExecutor, String processDefinitionId) {
     this.commandExecutor = commandExecutor;
-    ensureNotNull(NotValidException.class,"processDefinitionId", processDefinitionId);
+    ensureNotNull(NotValidException.class, "processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     processInstanceIds = new ArrayList<String>();
     instructions = new ArrayList<AbstractProcessInstanceModificationCommand>();
@@ -82,10 +82,12 @@ public class ModificationBuilderImpl implements ModificationBuilder {
   }
 
   @Override
-  public ModificationBuilder cancelAllForActivity(String activityId, boolean cancelCurrentActiveActivityInstances) {
+  public ModificationBuilder cancelAllForActivity(String activityId,
+      boolean cancelCurrentActiveActivityInstances) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     ActivityCancellationCmd activityCancellationCmd = new ActivityCancellationCmd(activityId);
-    activityCancellationCmd.setCancelCurrentActiveActivityInstances(cancelCurrentActiveActivityInstances);
+    activityCancellationCmd
+        .setCancelCurrentActiveActivityInstances(cancelCurrentActiveActivityInstances);
     instructions.add(activityCancellationCmd);
     return this;
   }
@@ -100,8 +102,7 @@ public class ModificationBuilderImpl implements ModificationBuilder {
   public ModificationBuilder processInstanceIds(String... processInstanceIds) {
     if (processInstanceIds == null) {
       this.processInstanceIds = Collections.emptyList();
-    }
-    else {
+    } else {
       this.processInstanceIds = Arrays.asList(processInstanceIds);
     }
     return this;

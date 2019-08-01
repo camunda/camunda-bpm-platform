@@ -44,14 +44,15 @@ public class DiscoverBpmPlatformPluginsStep extends DeploymentOperationStep {
     BpmPlatformPlugins plugins = BpmPlatformPlugins.load(getPluginsClassloader());
 
     JmxManagedBpmPlatformPlugins jmxManagedPlugins = new JmxManagedBpmPlatformPlugins(plugins);
-    serviceContainer.startService(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_PLATFORM_PLUGINS, jmxManagedPlugins);
+    serviceContainer.startService(ServiceTypes.BPM_PLATFORM,
+        RuntimeContainerDelegateImpl.SERVICE_NAME_PLATFORM_PLUGINS, jmxManagedPlugins);
 
   }
 
   protected ClassLoader getPluginsClassloader() {
 
     ClassLoader pluginsClassLoader = ClassLoaderUtil.getContextClassloader();
-    if(pluginsClassLoader == null) {
+    if (pluginsClassLoader == null) {
       // if context classloader is null, use classloader which loaded the camunda-engine jar.
       pluginsClassLoader = BpmPlatform.class.getClassLoader();
     }

@@ -49,7 +49,8 @@ import static org.junit.Assert.*;
 public class DeploymentCacheCfgTest {
 
   protected ProcessEngineBootstrapRule cacheFactoryBootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       // apply configuration options here
       configuration.setCacheCapacity(2);
       configuration.setCacheFactory(new MyCacheFactory());
@@ -58,12 +59,14 @@ public class DeploymentCacheCfgTest {
     }
   };
 
-  protected ProvidedProcessEngineRule cacheFactoryEngineRule = new ProvidedProcessEngineRule(cacheFactoryBootstrapRule);
+  protected ProvidedProcessEngineRule cacheFactoryEngineRule = new ProvidedProcessEngineRule(
+      cacheFactoryBootstrapRule);
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(cacheFactoryEngineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(cacheFactoryBootstrapRule).around(cacheFactoryEngineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(cacheFactoryBootstrapRule)
+      .around(cacheFactoryEngineRule).around(testRule);
   RepositoryService repositoryService;
   ProcessEngineConfigurationImpl processEngineConfiguration;
   RuntimeService runtimeService;
@@ -98,32 +101,26 @@ public class DeploymentCacheCfgTest {
     // Accordingly, one process should not be contained in the cache anymore at the end.
 
     // given
-    List<BpmnModelInstance> modelInstances =  createProcesses(3);
+    List<BpmnModelInstance> modelInstances = createProcesses(3);
     deploy(modelInstances);
     String processDefinitionIdZero = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("Process0")
-        .singleResult()
-        .getId();
+        .processDefinitionKey("Process0").singleResult().getId();
     String processDefinitionIdOne = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("Process1")
-        .singleResult()
-        .getId();
+        .processDefinitionKey("Process1").singleResult().getId();
     String processDefinitionIdTwo = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("Process2")
-        .singleResult()
-        .getId();
+        .processDefinitionKey("Process2").singleResult().getId();
 
     // when
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
     // then
     int numberOfProcessesInCache = 0;
-    numberOfProcessesInCache +=
-        deploymentCache.getProcessDefinitionCache().get(processDefinitionIdZero) == null ? 0 : 1;
-    numberOfProcessesInCache +=
-        deploymentCache.getProcessDefinitionCache().get(processDefinitionIdOne) == null ? 0 : 1;
-    numberOfProcessesInCache +=
-        deploymentCache.getProcessDefinitionCache().get(processDefinitionIdTwo) == null ? 0 : 1;
+    numberOfProcessesInCache += deploymentCache.getProcessDefinitionCache()
+        .get(processDefinitionIdZero) == null ? 0 : 1;
+    numberOfProcessesInCache += deploymentCache.getProcessDefinitionCache()
+        .get(processDefinitionIdOne) == null ? 0 : 1;
+    numberOfProcessesInCache += deploymentCache.getProcessDefinitionCache()
+        .get(processDefinitionIdTwo) == null ? 0 : 1;
 
     assertEquals(2, numberOfProcessesInCache);
   }
@@ -136,14 +133,13 @@ public class DeploymentCacheCfgTest {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
 
     // when
-    repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey(ProcessModels.PROCESS_KEY)
-        .singleResult()
-        .getId();
+    repositoryService.createProcessDefinitionQuery().processDefinitionKey(ProcessModels.PROCESS_KEY)
+        .singleResult().getId();
 
     // then
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-    BpmnModelInstance modelInstance = deploymentCache.getBpmnModelInstanceCache().get(pi.getProcessDefinitionId());
+    BpmnModelInstance modelInstance = deploymentCache.getBpmnModelInstanceCache()
+        .get(pi.getProcessDefinitionId());
     assertNull(modelInstance);
   }
 
@@ -156,14 +152,13 @@ public class DeploymentCacheCfgTest {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
 
     // when
-    repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey(ProcessModels.PROCESS_KEY)
-        .singleResult()
-        .getId();
+    repositoryService.createProcessDefinitionQuery().processDefinitionKey(ProcessModels.PROCESS_KEY)
+        .singleResult().getId();
 
     // then
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-    BpmnModelInstance modelInstance = deploymentCache.getBpmnModelInstanceCache().get(pi.getProcessDefinitionId());
+    BpmnModelInstance modelInstance = deploymentCache.getBpmnModelInstanceCache()
+        .get(pi.getProcessDefinitionId());
     assertNotNull(modelInstance);
   }
 
@@ -176,8 +171,7 @@ public class DeploymentCacheCfgTest {
 
     // when
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey(ProcessModels.PROCESS_KEY)
-        .singleResult();
+        .processDefinitionKey(ProcessModels.PROCESS_KEY).singleResult();
 
     // then
     assertNull(processDefinition.getDescription());
@@ -193,8 +187,7 @@ public class DeploymentCacheCfgTest {
 
     // when
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey(ProcessModels.PROCESS_KEY)
-        .singleResult();
+        .processDefinitionKey(ProcessModels.PROCESS_KEY).singleResult();
 
     // then
     assertNotNull(processDefinition.getDescription());
@@ -210,7 +203,8 @@ public class DeploymentCacheCfgTest {
     deploy(modelInstances);
 
     // when we start a process that was already removed from the cache
-    assertNotNull(repositoryService.createProcessDefinitionQuery().processDefinitionKey("Process0").singleResult());
+    assertNotNull(repositoryService.createProcessDefinitionQuery().processDefinitionKey("Process0")
+        .singleResult());
     runtimeService.startProcessInstanceByKey("Process0");
 
     // then we should be able to complete the process
@@ -262,12 +256,13 @@ public class DeploymentCacheCfgTest {
   }
 
   @Test
-  public void testSequentialCallActivityAsynchronousWithUnfinishedExecution() throws InterruptedException {
+  public void testSequentialCallActivityAsynchronousWithUnfinishedExecution()
+      throws InterruptedException {
 
     // given a number process definitions which call each other by call activities (0->1->2->0->4),
     // which stops after the first repetition of 0
     List<BpmnModelInstance> modelInstances = createSequentialCallActivityProcessAsync();
-    Deployment deployment =  deploy(modelInstances);
+    Deployment deployment = deploy(modelInstances);
 
     // when we start the first process 0
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -303,7 +298,8 @@ public class DeploymentCacheCfgTest {
   }
 
   protected Deployment deploy(List<BpmnModelInstance> modelInstances) {
-    DeploymentBuilder deploymentbuilder = processEngineConfiguration.getRepositoryService().createDeployment();
+    DeploymentBuilder deploymentbuilder = processEngineConfiguration.getRepositoryService()
+        .createDeployment();
 
     for (int i = 0; i < modelInstances.size(); i++) {
       deploymentbuilder.addModelInstance("process" + i + ".bpmn", modelInstances.get(i));
@@ -313,7 +309,8 @@ public class DeploymentCacheCfgTest {
   }
 
   protected Deployment deploy(BpmnModelInstance modelInstance) {
-    DeploymentBuilder deploymentbuilder = processEngineConfiguration.getRepositoryService().createDeployment();
+    DeploymentBuilder deploymentbuilder = processEngineConfiguration.getRepositoryService()
+        .createDeployment();
     deploymentbuilder.addModelInstance("process0.bpmn", modelInstance);
     return testRule.deploy(deploymentbuilder);
   }
@@ -326,6 +323,5 @@ public class DeploymentCacheCfgTest {
     }
     return result;
   }
-
 
 }

@@ -73,11 +73,9 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
   private AuthorizationService authorizationService;
   private TaskService taskService;
 
-
   @Before
   public void init() {
-    ProcessEngineConfigurationImpl config =
-      engineRule.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl config = engineRule.getProcessEngineConfiguration();
     optimizeService = config.getOptimizeService();
     identityService = engineRule.getIdentityService();
     runtimeService = engineRule.getRuntimeService();
@@ -106,13 +104,9 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
 
   @Test
   public void allNecessaryInformationIsAvailable() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-        .name("task")
-      .endEvent("endEvent")
-      .done();
+        .startEvent("startEvent").userTask("userTask").name("task").endEvent("endEvent").done();
     testHelper.deploy(simpleDefinition);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -120,8 +114,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     taskService.addCandidateUser(taskId, userId);
 
     // when
-    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs =
-      optimizeService.getHistoricIdentityLinkLogs(pastDate(), null, 10);
+    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs = optimizeService
+        .getHistoricIdentityLinkLogs(pastDate(), null, 10);
 
     // then
     assertThat(identityLinkLogs.size(), is(1));
@@ -130,13 +124,9 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
 
   @Test
   public void performCandidateOperations() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-        .name("task")
-      .endEvent("endEvent")
-      .done();
+        .startEvent("startEvent").userTask("userTask").name("task").endEvent("endEvent").done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -157,8 +147,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     ClockUtil.setCurrentTime(nowPlus8Seconds);
 
     // when
-    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs =
-      optimizeService.getHistoricIdentityLinkLogs(pastDate(), null, 10);
+    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs = optimizeService
+        .getHistoricIdentityLinkLogs(pastDate(), null, 10);
 
     // then
     assertThat(identityLinkLogs.size(), is(4));
@@ -178,13 +168,9 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
 
   @Test
   public void performAssigneeOperations() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent("startEvent")
-      .userTask("userTask")
-        .name("task")
-      .endEvent("endEvent")
-      .done();
+        .startEvent("startEvent").userTask("userTask").name("task").endEvent("endEvent").done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
     identityService.setAuthenticatedUserId(assignerId);
@@ -196,8 +182,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     unclaimAllUserTasks();
 
     // when
-    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs =
-      optimizeService.getHistoricIdentityLinkLogs(pastDate(), null, 10);
+    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs = optimizeService
+        .getHistoricIdentityLinkLogs(pastDate(), null, 10);
 
     // then
     assertThat(identityLinkLogs.size(), is(2));
@@ -212,12 +198,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
   @Test
   public void occurredAfterParameterWorks() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-        .camundaAssignee(userId)
-      .endEvent()
-      .done();
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("userTask").camundaAssignee(userId).endEvent().done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -234,8 +216,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     taskService.addCandidateUser(taskId, userId);
 
     // when
-    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs =
-      optimizeService.getHistoricIdentityLinkLogs(now, null, 10);
+    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs = optimizeService
+        .getHistoricIdentityLinkLogs(now, null, 10);
 
     // then
     assertThat(identityLinkLogs.size(), is(2));
@@ -244,11 +226,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
   @Test
   public void occurredAtParameterWorks() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-      .endEvent()
-      .done();
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("userTask").endEvent().done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -265,8 +244,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     taskService.addCandidateUser(taskId, userId);
 
     // when
-    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs =
-      optimizeService.getHistoricIdentityLinkLogs(null, now, 10);
+    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs = optimizeService
+        .getHistoricIdentityLinkLogs(null, now, 10);
 
     // then
     assertThat(identityLinkLogs.size(), is(1));
@@ -275,11 +254,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
   @Test
   public void occurredAfterAndOccurredAtParameterWorks() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-      .endEvent()
-      .done();
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("userTask").endEvent().done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -296,8 +272,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     taskService.addCandidateUser(taskId, userId);
 
     // when
-    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs =
-      optimizeService.getHistoricIdentityLinkLogs(now, now, 10);
+    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs = optimizeService
+        .getHistoricIdentityLinkLogs(now, now, 10);
 
     // then
     assertThat(identityLinkLogs.size(), is(0));
@@ -305,12 +281,9 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
 
   @Test
   public void maxResultsParameterWorks() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask().endEvent().done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -321,8 +294,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     taskService.addCandidateUser(taskId, userId);
 
     // when
-    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs =
-      optimizeService.getHistoricIdentityLinkLogs(pastDate(), null, 3);
+    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs = optimizeService
+        .getHistoricIdentityLinkLogs(pastDate(), null, 3);
 
     // then
     assertThat(identityLinkLogs.size(), is(3));
@@ -331,11 +304,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
   @Test
   public void resultIsSortedByTimestamp() {
     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("userTask")
-      .endEvent()
-      .done();
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("userTask").endEvent().done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -352,8 +322,8 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     taskService.addCandidateUser(taskId, userId);
 
     // when
-    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs =
-      optimizeService.getHistoricIdentityLinkLogs(pastDate(), null, 4);
+    List<OptimizeHistoricIdentityLinkLogEntity> identityLinkLogs = optimizeService
+        .getHistoricIdentityLinkLogs(pastDate(), null, 4);
 
     // then
     assertThat(identityLinkLogs.size(), is(3));
@@ -390,16 +360,18 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     identityService.saveGroup(group);
   }
 
-  private void assertThatIdentityLinksHaveAllImportantInformation(OptimizeHistoricIdentityLinkLogEntity identityLinkLog,
-                                                                  ProcessInstance processInstance) {
+  private void assertThatIdentityLinksHaveAllImportantInformation(
+      OptimizeHistoricIdentityLinkLogEntity identityLinkLog, ProcessInstance processInstance) {
     assertThat(identityLinkLog, notNullValue());
     assertThat(identityLinkLog.getUserId(), is(userId));
-    assertThat(identityLinkLog.getTaskId(), is(taskService.createTaskQuery().singleResult().getId()));
+    assertThat(identityLinkLog.getTaskId(),
+        is(taskService.createTaskQuery().singleResult().getId()));
     assertThat(identityLinkLog.getType(), is(IdentityLinkType.CANDIDATE));
     assertThat(identityLinkLog.getAssignerId(), is(assignerId));
     assertThat(identityLinkLog.getGroupId(), nullValue());
     assertThat(identityLinkLog.getOperationType(), is(IDENTITY_LINK_ADD));
-    assertThat(identityLinkLog.getProcessDefinitionId(), is(processInstance.getProcessDefinitionId()));
+    assertThat(identityLinkLog.getProcessDefinitionId(),
+        is(processInstance.getProcessDefinitionId()));
     assertThat(identityLinkLog.getProcessDefinitionKey(), is("process"));
     assertThat(identityLinkLog.getProcessInstanceId(), is(processInstance.getId()));
   }

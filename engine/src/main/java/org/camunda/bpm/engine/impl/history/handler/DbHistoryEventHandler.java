@@ -31,8 +31,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEn
 import org.camunda.bpm.engine.repository.ResourceTypes;
 
 /**
- * <p>History event handler that writes history events to the process engine
- * database using the DbEntityManager.</p>
+ * <p>
+ * History event handler that writes history events to the process engine database using the
+ * DbEntityManager.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -43,7 +45,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
     if (historyEvent instanceof HistoricVariableUpdateEventEntity) {
       insertHistoricVariableUpdateEntity((HistoricVariableUpdateEventEntity) historyEvent);
-    } else if(historyEvent instanceof HistoricDecisionEvaluationEvent) {
+    } else if (historyEvent instanceof HistoricDecisionEvaluationEvent) {
       insertHistoricDecisionEvaluationEvent((HistoricDecisionEvaluationEvent) historyEvent);
     } else {
       insertOrUpdate(historyEvent);
@@ -62,20 +64,21 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
     final DbEntityManager dbEntityManager = getDbEntityManager();
 
-    if(isInitialEvent(historyEvent)) {
+    if (isInitialEvent(historyEvent)) {
       dbEntityManager.insert(historyEvent);
     } else {
-      if(dbEntityManager.getCachedEntity(historyEvent.getClass(), historyEvent.getId()) == null) {
+      if (dbEntityManager.getCachedEntity(historyEvent.getClass(), historyEvent.getId()) == null) {
         if (historyEvent instanceof HistoricScopeInstanceEvent) {
           // if this is a scope, get start time from existing event in DB
-          HistoricScopeInstanceEvent existingEvent = (HistoricScopeInstanceEvent) dbEntityManager.selectById(historyEvent.getClass(), historyEvent.getId());
-          if(existingEvent != null) {
+          HistoricScopeInstanceEvent existingEvent = (HistoricScopeInstanceEvent) dbEntityManager
+              .selectById(historyEvent.getClass(), historyEvent.getId());
+          if (existingEvent != null) {
             HistoricScopeInstanceEvent historicScopeInstanceEvent = (HistoricScopeInstanceEvent) historyEvent;
             historicScopeInstanceEvent.setStartTime(existingEvent.getStartTime());
           }
         }
-        if(historyEvent.getId() == null) {
-//          dbSqlSession.insert(historyEvent);
+        if (historyEvent.getId() == null) {
+          // dbSqlSession.insert(historyEvent);
         } else {
           dbEntityManager.merge(historyEvent);
         }
@@ -83,25 +86,23 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
     }
   }
 
-
   /** customized insert behavior for HistoricVariableUpdateEventEntity */
-  protected void insertHistoricVariableUpdateEntity(HistoricVariableUpdateEventEntity historyEvent) {
+  protected void insertHistoricVariableUpdateEntity(
+      HistoricVariableUpdateEventEntity historyEvent) {
     DbEntityManager dbEntityManager = getDbEntityManager();
 
     // insert update only if history level = FULL
-    if(shouldWriteHistoricDetail(historyEvent)) {
+    if (shouldWriteHistoricDetail(historyEvent)) {
 
       // insert byte array entity (if applicable)
       byte[] byteValue = historyEvent.getByteValue();
-      if(byteValue != null) {
-        ByteArrayEntity byteArrayEntity = new ByteArrayEntity(historyEvent.getVariableName(), byteValue, ResourceTypes.HISTORY);
+      if (byteValue != null) {
+        ByteArrayEntity byteArrayEntity = new ByteArrayEntity(historyEvent.getVariableName(),
+            byteValue, ResourceTypes.HISTORY);
         byteArrayEntity.setRootProcessInstanceId(historyEvent.getRootProcessInstanceId());
         byteArrayEntity.setRemovalTime(historyEvent.getRemovalTime());
 
-        Context
-        .getCommandContext()
-        .getByteArrayManager()
-        .insertByteArray(byteArrayEntity);
+        Context.getCommandContext().getByteArrayManager().insertByteArray(byteArrayEntity);
         historyEvent.setByteArrayId(byteArrayEntity.getId());
 
       }
@@ -110,28 +111,34 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
     // always insert/update HistoricProcessVariableInstance
     if (historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_CREATE)) {
-      HistoricVariableInstanceEntity persistentObject = new HistoricVariableInstanceEntity(historyEvent);
+      HistoricVariableInstanceEntity persistentObject = new HistoricVariableInstanceEntity(
+          historyEvent);
       dbEntityManager.insert(persistentObject);
 
     } else if (historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE)
         || historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_MIGRATE)) {
-      HistoricVariableInstanceEntity historicVariableInstanceEntity = dbEntityManager.selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
-      if(historicVariableInstanceEntity != null) {
+      HistoricVariableInstanceEntity historicVariableInstanceEntity = dbEntityManager
+          .selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
+      if (historicVariableInstanceEntity != null) {
         historicVariableInstanceEntity.updateFromEvent(historyEvent);
         historicVariableInstanceEntity.setState(HistoricVariableInstance.STATE_CREATED);
 
       } else {
         // #CAM-1344 / #SUPPORT-688
-        // this is a FIX for process instances which were started in camunda fox 6.1 and migrated to camunda BPM 7.0.
-        // in fox 6.1 the HistoricVariable instances were flushed to the DB when the process instance completed.
+        // this is a FIX for process instances which were started in camunda fox 6.1 and migrated to
+        // camunda BPM 7.0.
+        // in fox 6.1 the HistoricVariable instances were flushed to the DB when the process
+        // instance completed.
         // Since fox 6.2 we populate the HistoricVariable table as we go.
-        HistoricVariableInstanceEntity persistentObject = new HistoricVariableInstanceEntity(historyEvent);
+        HistoricVariableInstanceEntity persistentObject = new HistoricVariableInstanceEntity(
+            historyEvent);
         dbEntityManager.insert(persistentObject);
       }
 
-    } else if(historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_DELETE)) {
-      HistoricVariableInstanceEntity historicVariableInstanceEntity = dbEntityManager.selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
-      if(historicVariableInstanceEntity != null) {
+    } else if (historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_DELETE)) {
+      HistoricVariableInstanceEntity historicVariableInstanceEntity = dbEntityManager
+          .selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
+      if (historicVariableInstanceEntity != null) {
         historicVariableInstanceEntity.setState(HistoricVariableInstance.STATE_DELETED);
       }
     }
@@ -141,18 +148,14 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
     return Context.getProcessEngineConfiguration().getHistoryLevel()
         .isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE_DETAIL, historyEvent)
-      && !historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_MIGRATE);
+        && !historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_MIGRATE);
   }
-
 
   protected void insertHistoricDecisionEvaluationEvent(HistoricDecisionEvaluationEvent event) {
 
-    Context
-      .getCommandContext()
-      .getHistoricDecisionInstanceManager()
-      .insertHistoricDecisionInstances(event);
+    Context.getCommandContext().getHistoricDecisionInstanceManager()
+        .insertHistoricDecisionInstances(event);
   }
-
 
   protected boolean isInitialEvent(HistoryEvent historyEvent) {
     return historyEvent.getEventType() == null
@@ -165,8 +168,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
         || historyEvent.isEventOfType(HistoryEventTypes.DMN_DECISION_EVALUATE)
         || historyEvent.isEventOfType(HistoryEventTypes.BATCH_START)
         || historyEvent.isEventOfType(HistoryEventTypes.IDENTITY_LINK_ADD)
-        || historyEvent.isEventOfType(HistoryEventTypes.IDENTITY_LINK_DELETE)
-        ;
+        || historyEvent.isEventOfType(HistoryEventTypes.IDENTITY_LINK_DELETE);
   }
 
   protected DbEntityManager getDbEntityManager() {

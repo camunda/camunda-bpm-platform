@@ -26,8 +26,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Represents a test suite for the metrics interval query to check if the
- * timestamps are read in a correct time zone.
+ * Represents a test suite for the metrics interval query to check if the timestamps are read in a
+ * correct time zone.
  *
  * This was a problem before the column MILLISECONDS_ was added.
  *
@@ -37,25 +37,26 @@ public class MetricsIntervalTimezoneTest extends AbstractMetricsIntervalTest {
 
   @Test
   public void testTimestampIsInCorrectTimezone() {
-    //given generated metric data started at DEFAULT_INTERVAL ends at 3 * DEFAULT_INTERVAL
+    // given generated metric data started at DEFAULT_INTERVAL ends at 3 * DEFAULT_INTERVAL
 
-    //when metric query is executed (hint last interval is returned as first)
+    // when metric query is executed (hint last interval is returned as first)
     List<MetricIntervalValue> metrics = managementService.createMetricsQuery().limit(1).interval();
 
-    //then metric interval time should be less than FIRST_INTERVAL + 3 * DEFAULT_INTERVAL
+    // then metric interval time should be less than FIRST_INTERVAL + 3 * DEFAULT_INTERVAL
     long metricIntervalTime = metrics.get(0).getTimestamp().getTime();
-    Assert.assertTrue(metricIntervalTime < firstInterval.plusMinutes(3 * DEFAULT_INTERVAL).getMillis());
-    //and larger than first interval time, if not than we have a timezone problem
+    Assert.assertTrue(
+        metricIntervalTime < firstInterval.plusMinutes(3 * DEFAULT_INTERVAL).getMillis());
+    // and larger than first interval time, if not than we have a timezone problem
     Assert.assertTrue(metricIntervalTime > firstInterval.getMillis());
 
-    //when current time is used and metric is reported
+    // when current time is used and metric is reported
     Date currentTime = new Date();
     MetricsRegistry metricsRegistry = processEngineConfiguration.getMetricsRegistry();
     ClockUtil.setCurrentTime(currentTime);
     metricsRegistry.markOccurrence(ACTIVTY_INSTANCE_START, 1);
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
-    //then current time should be larger than metric interval time
+    // then current time should be larger than metric interval time
     List<MetricIntervalValue> m2 = managementService.createMetricsQuery().limit(1).interval();
     Assert.assertTrue(m2.get(0).getTimestamp().getTime() < currentTime.getTime());
   }

@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 public class BatchUtilTest {
-  
+
   private ProcessEngineConfigurationImpl engineConfiguration;
   private BatchConfiguration batchConfiguration;
   private List<String> ids;
@@ -41,7 +41,7 @@ public class BatchUtilTest {
     ids = Mockito.mock(List.class);
     when(batchConfiguration.getIds()).thenReturn(ids);
   }
-  
+
   @Test
   public void shouldReturnCorrectSizeUneven() {
     when(ids.size()).thenReturn(5);
@@ -76,8 +76,10 @@ public class BatchUtilTest {
     when(engineConfiguration.getInvocationsPerBatchJob()).thenReturn(0);
     testConfiguration(engineConfiguration, batchConfiguration, 0);
   }
-  
-  private void testConfiguration(ProcessEngineConfigurationImpl engineConfiguration, BatchConfiguration batchConfiguration, int expectedResult) {
-    assertEquals(expectedResult, BatchUtil.calculateBatchSize(engineConfiguration, batchConfiguration));
+
+  private void testConfiguration(ProcessEngineConfigurationImpl engineConfiguration,
+      BatchConfiguration batchConfiguration, int expectedResult) {
+    assertEquals(expectedResult,
+        BatchUtil.calculateBatchSize(engineConfiguration, batchConfiguration));
   }
 }

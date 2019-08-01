@@ -28,7 +28,8 @@ import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesPr
  * @author Thorben Lindhauer
  *
  */
-public class VariableCollectionProvider<T extends CoreVariableInstance> implements VariablesProvider<T> {
+public class VariableCollectionProvider<T extends CoreVariableInstance>
+    implements VariablesProvider<T> {
 
   protected Collection<T> variables;
 
@@ -40,8 +41,7 @@ public class VariableCollectionProvider<T extends CoreVariableInstance> implemen
   public Collection<T> provideVariables() {
     if (variables == null) {
       return new ArrayList<T>();
-    }
-    else {
+    } else {
       return variables;
     }
   }
@@ -64,7 +64,7 @@ public class VariableCollectionProvider<T extends CoreVariableInstance> implemen
   }
 
   public static <T extends CoreVariableInstance> VariableCollectionProvider<T> emptyVariables() {
-    return new VariableCollectionProvider<T>(Collections.<T>emptySet());
+    return new VariableCollectionProvider<T>(Collections.<T> emptySet());
   }
 
 }

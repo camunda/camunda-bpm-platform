@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.DateValue;
 
-
 /**
  * Serializes Dates as long values
  *
@@ -43,7 +42,7 @@ public class DateValueSerializer extends PrimitiveValueSerializer<DateValue> {
   public DateValue readValue(ValueFields valueFields) {
     Long longValue = valueFields.getLongValue();
     Date dateValue = null;
-    if (longValue!=null) {
+    if (longValue != null) {
       dateValue = new Date(longValue);
     }
     return Variables.dateValue(dateValue);

@@ -25,8 +25,8 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
- * A script which is dynamically determined during the execution.
- * Therefore it has to be executed in the context of an atomic operation.
+ * A script which is dynamically determined during the execution. Therefore it has to be executed in
+ * the context of an atomic operation.
  *
  * @author Sebastian Menski
  */
@@ -39,14 +39,15 @@ public abstract class DynamicExecutableScript extends ExecutableScript {
     this.scriptExpression = scriptExpression;
   }
 
-  public Object evaluate(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
+  public Object evaluate(ScriptEngine scriptEngine, VariableScope variableScope,
+      Bindings bindings) {
     String source = getScriptSource(variableScope);
     try {
       return scriptEngine.eval(source, bindings);
-    }
-    catch (ScriptException e) {
+    } catch (ScriptException e) {
       String activityIdMessage = getActivityIdExceptionMessage(variableScope);
-      throw new ScriptEvaluationException("Unable to evaluate script" + activityIdMessage + ": " + e.getMessage(), e);
+      throw new ScriptEvaluationException(
+          "Unable to evaluate script" + activityIdMessage + ": " + e.getMessage(), e);
     }
   }
 

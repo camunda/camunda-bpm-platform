@@ -21,11 +21,9 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
 
-
 /**
- * A {@link FunctionMapper} implemenation which delegates to a list of
- * mappers. When a function is resolved, the list of mappers is iterated
- * and the first one to return a method is used.
+ * A {@link FunctionMapper} implemenation which delegates to a list of mappers. When a function is
+ * resolved, the list of mappers is iterated and the first one to return a method is used.
  *
  * @author Daniel Meyer
  */
@@ -40,7 +38,7 @@ public class CompositeFunctionMapper extends FunctionMapper {
   public Method resolveFunction(String prefix, String localName) {
     for (FunctionMapper mapper : delegateMappers) {
       Method resolvedFunction = mapper.resolveFunction(prefix, localName);
-      if(resolvedFunction != null) {
+      if (resolvedFunction != null) {
         return resolvedFunction;
       }
     }

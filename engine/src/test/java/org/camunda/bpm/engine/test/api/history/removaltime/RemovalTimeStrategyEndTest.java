@@ -76,53 +76,41 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
   @Before
   public void setUp() {
-    processEngineConfiguration
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
-      .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
-      .initHistoryRemovalTime();
+    processEngineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
+        .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
+        .initHistoryRemovalTime();
   }
 
   protected final String CALLED_PROCESS_KEY = "calledProcess";
-  protected final BpmnModelInstance CALLED_PROCESS = Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-    .startEvent()
-      .userTask("userTask").name("userTask")
-    .endEvent().done();
+  protected final BpmnModelInstance CALLED_PROCESS = Bpmn
+      .createExecutableProcess(CALLED_PROCESS_KEY).startEvent().userTask("userTask")
+      .name("userTask").endEvent().done();
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
-  protected final BpmnModelInstance CALLING_PROCESS = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .callActivity()
-        .calledElement(CALLED_PROCESS_KEY)
-    .endEvent().done();
+  protected final BpmnModelInstance CALLING_PROCESS = Bpmn
+      .createExecutableProcess(CALLING_PROCESS_KEY).camundaHistoryTimeToLive(5).startEvent()
+      .callActivity().calledElement(CALLED_PROCESS_KEY).endEvent().done();
 
   protected final Date START_DATE = new Date(1363607000000L);
   protected final Date END_DATE = new Date(1363608000000L);
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldResolveHistoricDecisionInstance() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .businessRuleTask()
-          .camundaAsyncAfter()
-          .camundaDecisionRef("dish-decision")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").camundaHistoryTimeToLive(5).startEvent()
+        .businessRuleTask().camundaAsyncAfter().camundaDecisionRef("dish-decision").endEvent()
+        .done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey("process",
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     ClockUtil.setCurrentTime(END_DATE);
 
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().list();
 
     // assume
     assertThat(historicDecisionInstances.get(0).getRemovalTime(), nullValue());
@@ -145,34 +133,26 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldResolveHistoricDecisionInputInstance() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .businessRuleTask()
-          .camundaAsyncAfter()
-          .camundaDecisionRef("dish-decision")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").camundaHistoryTimeToLive(5).startEvent()
+        .businessRuleTask().camundaAsyncAfter().camundaDecisionRef("dish-decision").endEvent()
+        .done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey("process",
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     ClockUtil.setCurrentTime(END_DATE);
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeInputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeInputs()
+        .singleResult();
 
-    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance.getInputs();
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = historicDecisionInstance
+        .getInputs();
 
     // assume
     assertThat(historicDecisionInputInstances.get(0).getRemovalTime(), nullValue());
@@ -184,9 +164,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     managementService.executeJob(jobId);
 
     historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeInputs()
-      .singleResult();
+        .rootDecisionInstancesOnly().includeInputs().singleResult();
 
     historicDecisionInputInstances = historicDecisionInstance.getInputs();
 
@@ -198,34 +176,26 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   public void shouldResolveHistoricDecisionOutputInstance() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .businessRuleTask()
-          .camundaAsyncAfter()
-          .camundaDecisionRef("dish-decision")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").camundaHistoryTimeToLive(5).startEvent()
+        .businessRuleTask().camundaAsyncAfter().camundaDecisionRef("dish-decision").endEvent()
+        .done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey("process",
-      Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     ClockUtil.setCurrentTime(END_DATE);
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeOutputs()
+        .singleResult();
 
-    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = historicDecisionInstance
+        .getOutputs();
 
     // assume
     assertThat(historicDecisionOutputInstances.get(0).getRemovalTime(), nullValue());
@@ -236,9 +206,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     managementService.executeJob(jobId);
 
     historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
+        .rootDecisionInstancesOnly().includeOutputs().singleResult();
 
     historicDecisionOutputInstances = historicDecisionInstance.getOutputs();
 
@@ -259,9 +227,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-      .activeActivityIdIn("userTask")
-      .singleResult();
+    HistoricProcessInstance historicProcessInstance = historyService
+        .createHistoricProcessInstanceQuery().activeActivityIdIn("userTask").singleResult();
 
     // assume
     assertThat(historicProcessInstance.getRemovalTime(), nullValue());
@@ -274,8 +241,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     taskService.complete(taskId);
 
     historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-      .processDefinitionKey(CALLED_PROCESS_KEY)
-      .singleResult();
+        .processDefinitionKey(CALLED_PROCESS_KEY).singleResult();
 
     Date removalTime = addDays(END_DATE, 5);
 
@@ -298,9 +264,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     ClockUtil.setCurrentTime(END_DATE);
 
-    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
-      .activityId("userTask")
-      .singleResult();
+    HistoricActivityInstance historicActivityInstance = historyService
+        .createHistoricActivityInstanceQuery().activityId("userTask").singleResult();
 
     // assume
     assertThat(historicActivityInstance.getRemovalTime(), nullValue());
@@ -309,8 +274,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     taskService.complete(taskId);
 
     historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
-      .activityId("userTask")
-      .singleResult();
+        .activityId("userTask").singleResult();
 
     Date removalTime = addDays(END_DATE, 5);
 
@@ -329,7 +293,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
+    HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
+        .singleResult();
 
     // assume
     assertThat(historicTaskInstance.getRemovalTime(), nullValue());
@@ -359,12 +324,14 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     ClockUtil.setCurrentTime(START_DATE);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("aVariableName", Variables.stringValue("aVariableValue")));
+        Variables.createVariables().putValue("aVariableName",
+            Variables.stringValue("aVariableValue")));
 
-    runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
+    runtimeService.setVariable(processInstance.getId(), "aVariableName",
+        Variables.stringValue("anotherVariableValue"));
 
-    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricVariableInstance historicVariableInstance = historyService
+        .createHistoricVariableInstanceQuery().singleResult();
 
     // assume
     assertThat(historicVariableInstance.getRemovalTime(), nullValue());
@@ -394,14 +361,14 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     ClockUtil.setCurrentTime(START_DATE);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("aVariableName", Variables.stringValue("aVariableValue")));
+        Variables.createVariables().putValue("aVariableName",
+            Variables.stringValue("aVariableValue")));
 
-    runtimeService.setVariable(processInstance.getId(), "aVariableName", Variables.stringValue("anotherVariableValue"));
+    runtimeService.setVariable(processInstance.getId(), "aVariableName",
+        Variables.stringValue("anotherVariableValue"));
 
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery()
-      .variableUpdates()
-      .list();
+        .variableUpdates().list();
 
     // assume
     assertThat(historicDetails.get(0).getRemovalTime(), nullValue());
@@ -414,9 +381,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // when
     taskService.complete(taskId);
 
-    historicDetails = historyService.createHistoricDetailQuery()
-      .variableUpdates()
-      .list();
+    historicDetails = historyService.createHistoricDetailQuery().variableUpdates().list();
 
     Date removalTime = addDays(END_DATE, 5);
 
@@ -440,7 +405,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     formService.submitStartForm(processDefinitionId, properties);
 
-    HistoricDetail historicDetail = historyService.createHistoricDetailQuery().formFields().singleResult();
+    HistoricDetail historicDetail = historyService.createHistoricDetailQuery().formFields()
+        .singleResult();
 
     // assume
     assertThat(historicDetail.getRemovalTime(), nullValue());
@@ -465,14 +431,10 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // given
     testRule.deploy(CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-    .startEvent()
-      .scriptTask()
-        .camundaAsyncBefore()
-        .scriptFormat("groovy")
+    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY).startEvent().scriptTask()
+        .camundaAsyncBefore().scriptFormat("groovy")
         .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException()")
-      .userTask()
-    .endEvent().done());
+        .userTask().endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
@@ -484,7 +446,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     try {
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
     List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
 
@@ -516,14 +479,10 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // given
     testRule.deploy(CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-    .startEvent()
-      .scriptTask()
-        .camundaAsyncBefore()
-        .scriptFormat("groovy")
+    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY).startEvent().scriptTask()
+        .camundaAsyncBefore().scriptFormat("groovy")
         .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException()")
-      .userTask()
-    .endEvent().done());
+        .userTask().endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
@@ -535,7 +494,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     try {
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
     String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
 
@@ -558,9 +518,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     repositoryService.suspendProcessDefinitionByKey(CALLED_PROCESS_KEY, true, new Date());
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     managementService.setJobRetries(jobId, 0);
 
@@ -583,28 +541,21 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   @Test
   public void shouldResolveExternalTaskLog() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
-      .startEvent()
-        .serviceTask().camundaExternalTask("anExternalTaskTopic")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess").startEvent().serviceTask()
+        .camundaExternalTask("anExternalTaskTopic").endEvent().done());
 
-    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .callActivity()
-          .calledElement("calledProcess")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess").camundaHistoryTimeToLive(5)
+        .startEvent().callActivity().calledElement("calledProcess").endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey("callingProcess");
 
     LockedExternalTask externalTask = externalTaskService.fetchAndLock(1, "aWorkerId")
-      .topic("anExternalTaskTopic", 3000)
-      .execute()
-      .get(0);
+        .topic("anExternalTaskTopic", 3000).execute().get(0);
 
-    HistoricExternalTaskLog externalTaskLog = historyService.createHistoricExternalTaskLogQuery().singleResult();
+    HistoricExternalTaskLog externalTaskLog = historyService.createHistoricExternalTaskLogQuery()
+        .singleResult();
 
     // assume
     assertThat(externalTaskLog.getRemovalTime(), nullValue());
@@ -616,7 +567,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     Date removalTime = addDays(END_DATE, 5);
 
-    List<HistoricExternalTaskLog> externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
+    List<HistoricExternalTaskLog> externalTaskLogs = historyService
+        .createHistoricExternalTaskLogQuery().list();
 
     // then
     assertThat(externalTaskLogs.get(0).getRemovalTime(), is(removalTime));
@@ -629,31 +581,24 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   @Test
   public void shouldResolveExternalTaskLogWithTimestampPreserved() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
-      .startEvent()
-        .serviceTask().camundaExternalTask("anExternalTaskTopic")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess").startEvent().serviceTask()
+        .camundaExternalTask("anExternalTaskTopic").endEvent().done());
 
-    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .callActivity()
-          .calledElement("calledProcess")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess").camundaHistoryTimeToLive(5)
+        .startEvent().callActivity().calledElement("calledProcess").endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey("callingProcess");
 
     LockedExternalTask externalTask = externalTaskService.fetchAndLock(1, "aWorkerId")
-      .topic("anExternalTaskTopic", 3000)
-      .execute()
-      .get(0);
+        .topic("anExternalTaskTopic", 3000).execute().get(0);
 
     // when
     externalTaskService.complete(externalTask.getId(), "aWorkerId");
 
-    List<HistoricExternalTaskLog> externalTaskLogs = historyService.createHistoricExternalTaskLogQuery().list();
+    List<HistoricExternalTaskLog> externalTaskLogs = historyService
+        .createHistoricExternalTaskLogQuery().list();
 
     // then
     assertThat(externalTaskLogs.get(0).getTimestamp(), is(START_DATE));
@@ -665,22 +610,19 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // given
     testRule.deploy(CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-      .startEvent().camundaAsyncBefore()
-        .userTask("userTask").name("userTask")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY).startEvent()
+        .camundaAsyncBefore().userTask("userTask").name("userTask").endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     try {
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
     List<HistoricJobLog> jobLog = historyService.createHistoricJobLogQuery().list();
 
@@ -712,22 +654,19 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // given
     testRule.deploy(CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-      .startEvent().camundaAsyncBefore()
-        .userTask("userTask").name("userTask")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY).startEvent()
+        .camundaAsyncBefore().userTask("userTask").name("userTask").endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     try {
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
@@ -746,24 +685,21 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // given
     testRule.deploy(CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-      .startEvent().camundaAsyncBefore()
-        .userTask("userTask").name("userTask")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY).startEvent()
+        .camundaAsyncBefore().userTask("userTask").name("userTask").endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     identityService.setAuthenticatedUserId("aUserId");
     managementService.setJobRetries(jobId, 65);
     identityService.clearAuthentication();
 
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery()
+        .singleResult();
 
     // assume
     assertThat(userOperationLog.getRemovalTime(), nullValue());
@@ -788,17 +724,11 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   @Test
   public void shouldResolveUserOperationLog_SetExternalTaskRetries() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
-      .startEvent()
-        .serviceTask().camundaExternalTask("anExternalTaskTopic")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess").startEvent().serviceTask()
+        .camundaExternalTask("anExternalTaskTopic").endEvent().done());
 
-    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .callActivity()
-          .calledElement("calledProcess")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess").camundaHistoryTimeToLive(5)
+        .startEvent().callActivity().calledElement("calledProcess").endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
@@ -810,15 +740,14 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     externalTaskService.setRetries(externalTaskId, 65);
     identityService.clearAuthentication();
 
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery()
+        .singleResult();
 
     // assume
     assertThat(userOperationLog.getRemovalTime(), nullValue());
 
     LockedExternalTask externalTask = externalTaskService.fetchAndLock(1, "aWorkerId")
-      .topic("anExternalTaskTopic", 2000)
-      .execute()
-      .get(0);
+        .topic("anExternalTaskTopic", 2000).execute().get(0);
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -850,7 +779,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     taskService.claim(taskId, "aUserId");
     identityService.clearAuthentication();
 
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery()
+        .singleResult();
 
     // assume
     assertThat(userOperationLog.getRemovalTime(), nullValue());
@@ -879,13 +809,15 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask").singleResult().getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     identityService.setAuthenticatedUserId("aUserId");
     taskService.createAttachment(null, null, processInstanceId, null, null, "http://camunda.com");
     identityService.clearAuthentication();
 
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery()
+        .singleResult();
 
     // assume
     assertThat(userOperationLog.getRemovalTime(), nullValue());
@@ -919,7 +851,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask").singleResult().getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     identityService.setAuthenticatedUserId("aUserId");
     taskService.createAttachment(null, null, processInstanceId, null, null, "http://camunda.com");
@@ -930,7 +863,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // when
     taskService.complete(taskId);
 
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery()
+        .singleResult();
 
     // then
     assertThat(userOperationLog.getTimestamp(), is(START_DATE));
@@ -951,7 +885,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     taskService.addCandidateUser(taskId, "aUserId");
 
-    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    HistoricIdentityLinkLog historicIdentityLinkLog = historyService
+        .createHistoricIdentityLinkLogQuery().singleResult();
 
     // assume
     assertThat(historicIdentityLinkLog.getRemovalTime(), nullValue());
@@ -990,7 +925,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // when
     taskService.complete(taskId);
 
-    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    HistoricIdentityLinkLog historicIdentityLinkLog = historyService
+        .createHistoricIdentityLinkLogQuery().singleResult();
 
     // then
     assertThat(historicIdentityLinkLog.getTime(), is(START_DATE));
@@ -1007,7 +943,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // when
     taskService.addCandidateUser(aTask.getId(), "aUserId");
 
-    HistoricIdentityLinkLog historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().singleResult();
+    HistoricIdentityLinkLog historicIdentityLinkLog = historyService
+        .createHistoricIdentityLinkLogQuery().singleResult();
 
     // assume
     assertThat(historicIdentityLinkLog, notNullValue());
@@ -1031,10 +968,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     taskService.createComment(null, processInstanceId, "aMessage");
 
@@ -1102,10 +1037,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     ClockUtil.setCurrentTime(START_DATE);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
     taskService.createComment("aNonExistentTaskId", processInstanceId, "aMessage");
 
@@ -1117,7 +1050,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     // when
     taskService.complete(taskId);
-    
+
     // then
     assertThat(comment.getRemovalTime(), nullValue());
   }
@@ -1166,12 +1099,11 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
-    String attachmentId = taskService.createAttachment(null, null, processInstanceId, null, null, "http://camunda.com").getId();
+    String attachmentId = taskService
+        .createAttachment(null, null, processInstanceId, null, null, "http://camunda.com").getId();
 
     Attachment attachment = taskService.getAttachment(attachmentId);
 
@@ -1206,7 +1138,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
-    String attachmentId = taskService.createAttachment(null, taskId, null, null, null, "http://camunda.com").getId();
+    String attachmentId = taskService
+        .createAttachment(null, taskId, null, null, null, "http://camunda.com").getId();
 
     Attachment attachment = taskService.getAttachment(attachmentId);
 
@@ -1237,12 +1170,12 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String processInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+    String processInstanceId = runtimeService.createProcessInstanceQuery().activityIdIn("userTask")
+        .singleResult().getId();
 
-    String attachmentId = taskService.createAttachment(null, "aWrongTaskId", processInstanceId, null, null, "http://camunda.com").getId();
+    String attachmentId = taskService
+        .createAttachment(null, "aWrongTaskId", processInstanceId, null, null, "http://camunda.com")
+        .getId();
 
     Attachment attachment = taskService.getAttachment(attachmentId);
 
@@ -1268,11 +1201,11 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String taskId = taskService.createTaskQuery()
-      .singleResult()
-      .getId();
+    String taskId = taskService.createTaskQuery().singleResult().getId();
 
-    String attachmentId = taskService.createAttachment(null, taskId, "aWrongProcessInstanceId", null, null, "http://camunda.com").getId();
+    String attachmentId = taskService
+        .createAttachment(null, taskId, "aWrongProcessInstanceId", null, null, "http://camunda.com")
+        .getId();
 
     Attachment attachment = taskService.getAttachment(attachmentId);
 
@@ -1305,7 +1238,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
-    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment(null, taskId, null, null, null, new ByteArrayInputStream("hello world".getBytes()));
+    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment(null, taskId,
+        null, null, null, new ByteArrayInputStream("hello world".getBytes()));
 
     ByteArrayEntity byteArray = findByteArrayById(attachment.getContentId());
 
@@ -1337,11 +1271,10 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     String calledProcessInstanceId = runtimeService.createProcessInstanceQuery()
-      .activityIdIn("userTask")
-      .singleResult()
-      .getId();
+        .activityIdIn("userTask").singleResult().getId();
 
-    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment(null, null, calledProcessInstanceId, null, null, new ByteArrayInputStream("hello world".getBytes()));
+    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment(null, null,
+        calledProcessInstanceId, null, null, new ByteArrayInputStream("hello world".getBytes()));
 
     ByteArrayEntity byteArray = findByteArrayById(attachment.getContentId());
 
@@ -1374,9 +1307,11 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    runtimeService.setVariable(processInstance.getId(), "aVariableName", new ByteArrayInputStream("hello world".getBytes()));
+    runtimeService.setVariable(processInstance.getId(), "aVariableName",
+        new ByteArrayInputStream("hello world".getBytes()));
 
-    HistoricVariableInstanceEntity historicVariableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricVariableInstanceEntity historicVariableInstance = (HistoricVariableInstanceEntity) historyService
+        .createHistoricVariableInstanceQuery().singleResult();
 
     ByteArrayEntity byteArray = findByteArrayById(historicVariableInstance.getByteArrayId());
 
@@ -1408,15 +1343,14 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     ClockUtil.setCurrentTime(START_DATE);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("aVariableName", Variables.stringValue("aVariableValue")));
+        Variables.createVariables().putValue("aVariableName",
+            Variables.stringValue("aVariableValue")));
 
-    runtimeService.setVariable(processInstance.getId(), "aVariableName", new ByteArrayInputStream("hello world".getBytes()));
+    runtimeService.setVariable(processInstance.getId(), "aVariableName",
+        new ByteArrayInputStream("hello world".getBytes()));
 
-    HistoricDetailVariableInstanceUpdateEntity historicDetails = (HistoricDetailVariableInstanceUpdateEntity) historyService.createHistoricDetailQuery()
-      .variableUpdates()
-      .variableTypeIn("Bytes")
-      .singleResult();
+    HistoricDetailVariableInstanceUpdateEntity historicDetails = (HistoricDetailVariableInstanceUpdateEntity) historyService
+        .createHistoricDetailQuery().variableUpdates().variableTypeIn("Bytes").singleResult();
 
     ByteArrayEntity byteArray = findByteArrayById(historicDetails.getByteArrayValueId());
 
@@ -1443,29 +1377,25 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     // given
     testRule.deploy(CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-      .startEvent()
-        .scriptTask()
-          .camundaAsyncBefore()
-          .scriptFormat("groovy")
-          .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess(CALLED_PROCESS_KEY).startEvent().scriptTask()
+        .camundaAsyncBefore().scriptFormat("groovy")
+        .scriptText(
+            "if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
+        .endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     try {
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
-    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity) historyService.createHistoricJobLogQuery()
-      .failureLog()
-      .singleResult();
+    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity) historyService
+        .createHistoricJobLogQuery().failureLog().singleResult();
 
     ByteArrayEntity byteArray = findByteArrayById(jobLog.getExceptionByteArrayId());
 
@@ -1479,7 +1409,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     try {
       // when
       managementService.executeJob(jobId);
-    } catch (Exception ignored) { }
+    } catch (Exception ignored) {
+    }
 
     Date removalTime = addDays(END_DATE, 5);
 
@@ -1492,35 +1423,26 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   @Test
   public void shouldResolveByteArray_ExternalTaskLog() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
-      .startEvent()
-        .serviceTask().camundaExternalTask("aTopicName")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("calledProcess").startEvent().serviceTask()
+        .camundaExternalTask("aTopicName").endEvent().done());
 
-    testRule.deploy(Bpmn.createExecutableProcess("callingProcess")
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .callActivity()
-          .calledElement("calledProcess")
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcess").camundaHistoryTimeToLive(5)
+        .startEvent().callActivity().calledElement("calledProcess").endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey("callingProcess");
 
     String taskId = externalTaskService.fetchAndLock(5, "aWorkerId")
-      .topic("aTopicName", Integer.MAX_VALUE)
-      .execute()
-      .get(0)
-      .getId();
+        .topic("aTopicName", Integer.MAX_VALUE).execute().get(0).getId();
 
     externalTaskService.handleFailure(taskId, "aWorkerId", null, "errorDetails", 5, 3000L);
 
-    HistoricExternalTaskLogEntity externalTaskLog = (HistoricExternalTaskLogEntity) historyService.createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .singleResult();
+    HistoricExternalTaskLogEntity externalTaskLog = (HistoricExternalTaskLogEntity) historyService
+        .createHistoricExternalTaskLogQuery().failureLog().singleResult();
 
-    ByteArrayEntity byteArrayEntity = findByteArrayById(externalTaskLog.getErrorDetailsByteArrayId());
+    ByteArrayEntity byteArrayEntity = findByteArrayById(
+        externalTaskLog.getErrorDetailsByteArrayId());
 
     // assume
     assertThat(byteArrayEntity.getRemovalTime(), nullValue());
@@ -1539,32 +1461,27 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
   public void shouldResolveByteArray_DecisionInput() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .businessRuleTask().camundaDecisionRef("testDecision")
-        .userTask()
-      .endEvent().done());
+    testRule.deploy(
+        Bpmn.createExecutableProcess(CALLING_PROCESS_KEY).camundaHistoryTimeToLive(5).startEvent()
+            .businessRuleTask().camundaDecisionRef("testDecision").userTask().endEvent().done());
 
     ClockUtil.setCurrentTime(START_DATE);
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("pojo", new TestPojo("okay", 13.37)));
+        Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeInputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeInputs()
+        .singleResult();
 
-    HistoricDecisionInputInstanceEntity historicDecisionInputInstanceEntity = (HistoricDecisionInputInstanceEntity) historicDecisionInstance.getInputs().get(0);
+    HistoricDecisionInputInstanceEntity historicDecisionInputInstanceEntity = (HistoricDecisionInputInstanceEntity) historicDecisionInstance
+        .getInputs().get(0);
 
-    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionInputInstanceEntity.getByteArrayValueId());
+    ByteArrayEntity byteArrayEntity = findByteArrayById(
+        historicDecisionInputInstanceEntity.getByteArrayValueId());
 
     // assume
     assertThat(byteArrayEntity.getRemovalTime(), nullValue());
@@ -1585,32 +1502,27 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
   public void shouldResolveByteArray_DecisionOutput() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
 
-    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .businessRuleTask().camundaDecisionRef("testDecision")
-        .userTask()
-      .endEvent().done());
+    testRule.deploy(
+        Bpmn.createExecutableProcess(CALLING_PROCESS_KEY).camundaHistoryTimeToLive(5).startEvent()
+            .businessRuleTask().camundaDecisionRef("testDecision").userTask().endEvent().done());
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("pojo", new TestPojo("okay", 13.37)));
+        Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeOutputs()
+        .singleResult();
 
-    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0);
+    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance
+        .getOutputs().get(0);
 
-    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
+    ByteArrayEntity byteArrayEntity = findByteArrayById(
+        historicDecisionOutputInstanceEntity.getByteArrayValueId());
 
     // assume
     assertThat(byteArrayEntity.getRemovalTime(), nullValue());
@@ -1631,32 +1543,28 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/api/history/removaltime/HistoricRootProcessInstanceTest.shouldResolveByteArray_DecisionOutputLiteralExpression.dmn"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/history/removaltime/HistoricRootProcessInstanceTest.shouldResolveByteArray_DecisionOutputLiteralExpression.dmn" })
   public void shouldResolveByteArray_DecisionOutputLiteralExpression() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
 
-    testRule.deploy(Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-      .camundaHistoryTimeToLive(5)
-      .startEvent()
-        .businessRuleTask().camundaDecisionRef("testDecision")
-        .userTask()
-      .endEvent().done());
+    testRule.deploy(
+        Bpmn.createExecutableProcess(CALLING_PROCESS_KEY).camundaHistoryTimeToLive(5).startEvent()
+            .businessRuleTask().camundaDecisionRef("testDecision").userTask().endEvent().done());
 
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY,
-      Variables.createVariables()
-        .putValue("pojo", new TestPojo("okay", 13.37)));
+        Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
 
-    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery()
-      .rootDecisionInstancesOnly()
-      .includeOutputs()
-      .singleResult();
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery().rootDecisionInstancesOnly().includeOutputs()
+        .singleResult();
 
-    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance.getOutputs().get(0);
+    HistoricDecisionOutputInstanceEntity historicDecisionOutputInstanceEntity = (HistoricDecisionOutputInstanceEntity) historicDecisionInstance
+        .getOutputs().get(0);
 
-    ByteArrayEntity byteArrayEntity = findByteArrayById(historicDecisionOutputInstanceEntity.getByteArrayValueId());
+    ByteArrayEntity byteArrayEntity = findByteArrayById(
+        historicDecisionOutputInstanceEntity.getByteArrayValueId());
 
     // assume
     assertThat(byteArrayEntity.getRemovalTime(), nullValue());
@@ -1688,7 +1596,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
 
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -1721,7 +1630,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
 
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     ClockUtil.setCurrentTime(END_DATE);
 
@@ -1752,22 +1662,17 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     FailingExecutionListener.shouldFail = true;
 
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask()
-        .camundaExecutionListenerClass("end", FailingExecutionListener.class)
-      .endEvent()
-      .done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().userTask()
+        .camundaExecutionListenerClass("end", FailingExecutionListener.class).endEvent().done());
 
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     ClockUtil.setCurrentTime(END_DATE);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     managementService.executeJob(jobId);
 
@@ -1775,7 +1680,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     for (Job job : jobs) {
       try {
         managementService.executeJob(job.getId());
-      } catch (RuntimeException ignored) { }
+      } catch (RuntimeException ignored) {
+      }
     }
 
     jobs = managementService.createJobQuery().list();
@@ -1783,9 +1689,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
       managementService.executeJob(job.getId());
     }
 
-    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity)historyService.createHistoricJobLogQuery()
-      .failureLog()
-      .singleResult();
+    HistoricJobLogEventEntity jobLog = (HistoricJobLogEventEntity) historyService
+        .createHistoricJobLogQuery().failureLog().singleResult();
 
     String byteArrayId = jobLog.getExceptionByteArrayId();
 
@@ -1816,7 +1721,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     String processInstanceId = runtimeService.startProcessInstanceByKey(CALLED_PROCESS_KEY).getId();
 
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     String jobId = managementService.createJobQuery().singleResult().getId();
     managementService.executeJob(jobId);
@@ -1852,7 +1758,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     ClockUtil.setCurrentTime(START_DATE);
 
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
 
@@ -1889,7 +1796,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     ClockUtil.setCurrentTime(START_DATE);
 
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
 
@@ -1902,18 +1810,14 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     managementService.executeJob(jobLog.getJobId());
 
     String jobId = managementService.createJobQuery()
-      .jobDefinitionId(batch.getBatchJobDefinitionId())
-      .singleResult()
-      .getId();
+        .jobDefinitionId(batch.getBatchJobDefinitionId()).singleResult().getId();
 
     managementService.setJobRetries(jobId, 0);
 
     managementService.deleteJob(jobId);
 
-    jobId = managementService.createJobQuery()
-      .jobDefinitionId(batch.getMonitorJobDefinitionId())
-      .singleResult()
-      .getId();
+    jobId = managementService.createJobQuery().jobDefinitionId(batch.getMonitorJobDefinitionId())
+        .singleResult().getId();
 
     managementService.executeJob(jobId);
 
@@ -1939,7 +1843,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     ClockUtil.setCurrentTime(START_DATE);
 
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
 
@@ -1949,15 +1854,11 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     managementService.executeJob(jobLog.getJobId());
 
     String jobId = managementService.createJobQuery()
-      .jobDefinitionId(batch.getBatchJobDefinitionId())
-      .singleResult()
-      .getId();
+        .jobDefinitionId(batch.getBatchJobDefinitionId()).singleResult().getId();
     managementService.executeJob(jobId);
 
-    jobId = managementService.createJobQuery()
-      .jobDefinitionId(batch.getMonitorJobDefinitionId())
-      .singleResult()
-      .getId();
+    jobId = managementService.createJobQuery().jobDefinitionId(batch.getMonitorJobDefinitionId())
+        .singleResult().getId();
     managementService.setJobRetries(jobId, 0);
     managementService.executeJob(jobId);
 
@@ -1986,7 +1887,8 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
 
     ClockUtil.setCurrentTime(START_DATE);
 
-    Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     HistoricJobLog jobLog = historyService.createHistoricJobLogQuery().singleResult();
 

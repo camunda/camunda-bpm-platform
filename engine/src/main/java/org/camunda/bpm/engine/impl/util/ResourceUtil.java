@@ -33,11 +33,13 @@ public final class ResourceUtil {
 
   /**
    * Parse a camunda:resource attribute and loads the resource depending on the url scheme.
-   * Supported URL schemes are <code>classpath://</code> and <code>deployment://</code>.
-   * If the scheme is omitted <code>classpath://</code> is assumed.
+   * Supported URL schemes are <code>classpath://</code> and <code>deployment://</code>. If the
+   * scheme is omitted <code>classpath://</code> is assumed.
    *
-   * @param resourcePath the path to the resource to load
-   * @param deployment the deployment to load resources from
+   * @param resourcePath
+   *          the path to the resource to load
+   * @param deployment
+   *          the deployment to load resources from
    * @return the resource content as {@link String}
    */
   public static String loadResourceContent(String resourcePath, DeploymentEntity deployment) {
@@ -64,8 +66,7 @@ public final class ResourceUtil {
       } finally {
         IoUtil.closeSilently(resourceAsStream);
       }
-    }
-    else if (resourceType.equals("deployment")) {
+    } else if (resourceType.equals("deployment")) {
       ResourceEntity resourceEntity = deployment.getResource(resourceLocation);
       if (resourceEntity != null) {
         resourceBytes = resourceEntity.getBytes();
@@ -74,8 +75,7 @@ public final class ResourceUtil {
 
     if (resourceBytes != null) {
       return new String(resourceBytes, Charset.forName("UTF-8"));
-    }
-    else {
+    } else {
       throw LOG.cannotFindResource(resourcePath);
     }
   }

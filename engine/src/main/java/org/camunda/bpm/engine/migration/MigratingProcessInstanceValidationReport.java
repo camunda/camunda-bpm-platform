@@ -19,12 +19,11 @@ package org.camunda.bpm.engine.migration;
 import java.util.List;
 
 /**
- * Collects general failures  and the migrating activity instance validation
- * reports for a migrating process instance.
+ * Collects general failures and the migrating activity instance validation reports for a migrating
+ * process instance.
  *
- * A general failures is that the state of the process instance doesn't allow
- * the migration independent from an specific activity instance. For example
- * if non migrated jobs exist.
+ * A general failures is that the state of the process instance doesn't allow the migration
+ * independent from an specific activity instance. For example if non migrated jobs exist.
  */
 public interface MigratingProcessInstanceValidationReport {
 

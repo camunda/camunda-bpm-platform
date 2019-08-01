@@ -28,14 +28,13 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 
-
 /**
  * @author Joram Barrez
  * @author Frederik Heremans
  * @author Daniel Meyer
  */
 public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery, Execution>
-  implements ExecutionQuery {
+    implements ExecutionQuery {
 
   private static final long serialVersionUID = 1L;
   protected String processDefinitionId;
@@ -118,7 +117,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
       // event name is optional for message events
       ensureNotNull("event name", eventName);
     }
-    if(eventSubscriptions == null) {
+    if (eventSubscriptions == null) {
       eventSubscriptions = new ArrayList<EventSubscriptionQueryValue>();
     }
     eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType.name()));
@@ -182,7 +181,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
 
-  //ordering ////////////////////////////////////////////////////
+  // ordering ////////////////////////////////////////////////////
 
   public ExecutionQueryImpl orderByProcessInstanceId() {
     orderBy(ExecutionQueryProperty.PROCESS_INSTANCE_ID);
@@ -190,12 +189,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   }
 
   public ExecutionQueryImpl orderByProcessDefinitionId() {
-    orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION, ExecutionQueryProperty.PROCESS_DEFINITION_ID));
+    orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION,
+        ExecutionQueryProperty.PROCESS_DEFINITION_ID));
     return this;
   }
 
   public ExecutionQueryImpl orderByProcessDefinitionKey() {
-    orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION, ExecutionQueryProperty.PROCESS_DEFINITION_KEY));
+    orderBy(new QueryOrderingProperty(QueryOrderingProperty.RELATION_PROCESS_DEFINITION,
+        ExecutionQueryProperty.PROCESS_DEFINITION_KEY));
     return this;
   }
 
@@ -204,15 +205,13 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
 
-  //results ////////////////////////////////////////////////////
+  // results ////////////////////////////////////////////////////
 
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
-      .getExecutionManager()
-      .findExecutionCountByQueryCriteria(this);
+    return commandContext.getExecutionManager().findExecutionCountByQueryCriteria(this);
   }
 
   @Override
@@ -220,12 +219,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   public List<Execution> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return (List) commandContext
-      .getExecutionManager()
-      .findExecutionsByQueryCriteria(this, page);
+    return (List) commandContext.getExecutionManager().findExecutionsByQueryCriteria(this, page);
   }
 
-  //getters ////////////////////////////////////////////////////
+  // getters ////////////////////////////////////////////////////
 
   public String getProcessDefinitionKey() {
     return processDefinitionKey;

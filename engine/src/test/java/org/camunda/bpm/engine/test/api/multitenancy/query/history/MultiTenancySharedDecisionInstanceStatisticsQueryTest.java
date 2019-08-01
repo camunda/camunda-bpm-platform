@@ -42,7 +42,6 @@ import java.util.Arrays;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-
 /**
  * @author Askar Akhmerov
  */
@@ -71,7 +70,8 @@ public class MultiTenancySharedDecisionInstanceStatisticsQueryTest {
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
 
       tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ONE);
       configuration.setTenantIdProvider(tenantIdProvider);
@@ -93,49 +93,47 @@ public class MultiTenancySharedDecisionInstanceStatisticsQueryTest {
     testRule.deploy(DISH_DRG_DMN);
 
     decisionService.evaluateDecisionByKey(DISH_DECISION)
-        .variables(Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
+        .variables(
+            Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
         .evaluate();
   }
 
   @Test
   public void testQueryNoAuthenticatedTenants() {
-    DecisionRequirementsDefinition decisionRequirementsDefinition =
-        repositoryService.createDecisionRequirementsDefinitionQuery()
-            .singleResult();
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
+        .createDecisionRequirementsDefinitionQuery().singleResult();
 
     identityService.setAuthentication(USER_ID, null, null);
 
-    HistoricDecisionInstanceStatisticsQuery query = historyService.
-        createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
+    HistoricDecisionInstanceStatisticsQuery query = historyService
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
 
     assertThat(query.count(), is(0L));
   }
 
   @Test
   public void testQueryAuthenticatedTenant() {
-    DecisionRequirementsDefinition decisionRequirementsDefinition =
-        repositoryService.createDecisionRequirementsDefinitionQuery()
-            .singleResult();
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
+        .createDecisionRequirementsDefinitionQuery().singleResult();
 
     identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
 
-    HistoricDecisionInstanceStatisticsQuery query = historyService.
-        createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
+    HistoricDecisionInstanceStatisticsQuery query = historyService
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
 
     assertThat(query.count(), is(3L));
   }
 
   @Test
   public void testQueryDisabledTenantCheck() {
-    DecisionRequirementsDefinition decisionRequirementsDefinition =
-        repositoryService.createDecisionRequirementsDefinitionQuery()
-            .singleResult();
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
+        .createDecisionRequirementsDefinitionQuery().singleResult();
 
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
     identityService.setAuthentication(USER_ID, null, null);
 
-    HistoricDecisionInstanceStatisticsQuery query = historyService.
-        createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
+    HistoricDecisionInstanceStatisticsQuery query = historyService
+        .createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
 
     assertThat(query.count(), is(3L));
   }

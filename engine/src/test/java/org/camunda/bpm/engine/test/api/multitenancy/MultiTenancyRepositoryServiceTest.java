@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -67,7 +66,7 @@ public class MultiTenancyRepositoryServiceTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected ProcessEngineConfiguration processEngineConfiguration;
@@ -80,12 +79,9 @@ public class MultiTenancyRepositoryServiceTest {
 
   @Test
   public void deploymentWithoutTenantId() {
-    createDeploymentBuilder()
-      .deploy();
+    createDeploymentBuilder().deploy();
 
-    Deployment deployment = repositoryService
-        .createDeploymentQuery()
-        .singleResult();
+    Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
 
     assertThat(deployment, is(notNullValue()));
     assertThat(deployment.getTenantId(), is(nullValue()));
@@ -93,13 +89,9 @@ public class MultiTenancyRepositoryServiceTest {
 
   @Test
   public void deploymentWithTenantId() {
-    createDeploymentBuilder()
-      .tenantId(TENANT_ONE)
-      .deploy();
+    createDeploymentBuilder().tenantId(TENANT_ONE).deploy();
 
-    Deployment deployment = repositoryService
-        .createDeploymentQuery()
-        .singleResult();
+    Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
 
     assertThat(deployment, is(notNullValue()));
     assertThat(deployment.getTenantId(), is(TENANT_ONE));
@@ -107,25 +99,14 @@ public class MultiTenancyRepositoryServiceTest {
 
   @Test
   public void processDefinitionVersionWithTenantId() {
-    createDeploymentBuilder()
-      .tenantId(TENANT_ONE)
-      .deploy();
+    createDeploymentBuilder().tenantId(TENANT_ONE).deploy();
 
-    createDeploymentBuilder()
-      .tenantId(TENANT_ONE)
-      .deploy();
+    createDeploymentBuilder().tenantId(TENANT_ONE).deploy();
 
-    createDeploymentBuilder()
-      .tenantId(TENANT_TWO)
-      .deploy();
+    createDeploymentBuilder().tenantId(TENANT_TWO).deploy();
 
-    List<ProcessDefinition> processDefinitions = repositoryService
-        .createProcessDefinitionQuery()
-        .orderByTenantId()
-        .asc()
-        .orderByProcessDefinitionVersion()
-        .asc()
-        .list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .orderByTenantId().asc().orderByProcessDefinitionVersion().asc().list();
 
     assertThat(processDefinitions.size(), is(3));
     // process definition was deployed twice for tenant one
@@ -138,18 +119,12 @@ public class MultiTenancyRepositoryServiceTest {
   @Test
   public void deploymentWithDuplicateFilteringForSameTenant() {
     // given: a deployment with tenant ID
-    createDeploymentBuilder()
-      .enableDuplicateFiltering(false)
-      .name("twice")
-      .tenantId(TENANT_ONE)
-      .deploy();
+    createDeploymentBuilder().enableDuplicateFiltering(false).name("twice").tenantId(TENANT_ONE)
+        .deploy();
 
     // if the same process is deployed with the same tenant ID again
-    createDeploymentBuilder()
-      .enableDuplicateFiltering(false)
-      .name("twice")
-      .tenantId(TENANT_ONE)
-      .deploy();
+    createDeploymentBuilder().enableDuplicateFiltering(false).name("twice").tenantId(TENANT_ONE)
+        .deploy();
 
     // then it does not create a new deployment
     assertThat(repositoryService.createDeploymentQuery().count(), is(1L));
@@ -158,18 +133,12 @@ public class MultiTenancyRepositoryServiceTest {
   @Test
   public void deploymentWithDuplicateFilteringForDifferentTenants() {
     // given: a deployment with tenant ID
-    createDeploymentBuilder()
-      .enableDuplicateFiltering(false)
-      .name("twice")
-      .tenantId(TENANT_ONE)
-      .deploy();
+    createDeploymentBuilder().enableDuplicateFiltering(false).name("twice").tenantId(TENANT_ONE)
+        .deploy();
 
     // if the same process is deployed with the another tenant ID
-    createDeploymentBuilder()
-      .enableDuplicateFiltering(false)
-      .name("twice")
-      .tenantId(TENANT_TWO)
-      .deploy();
+    createDeploymentBuilder().enableDuplicateFiltering(false).name("twice").tenantId(TENANT_TWO)
+        .deploy();
 
     // then a new deployment is created
     assertThat(repositoryService.createDeploymentQuery().count(), is(2L));
@@ -178,17 +147,11 @@ public class MultiTenancyRepositoryServiceTest {
   @Test
   public void deploymentWithDuplicateFilteringIgnoreDeploymentForNoTenant() {
     // given: a deployment without tenant ID
-    createDeploymentBuilder()
-      .enableDuplicateFiltering(false)
-      .name("twice")
-      .deploy();
+    createDeploymentBuilder().enableDuplicateFiltering(false).name("twice").deploy();
 
     // if the same process is deployed with tenant ID
-    createDeploymentBuilder()
-      .enableDuplicateFiltering(false)
-      .name("twice")
-      .tenantId(TENANT_ONE)
-      .deploy();
+    createDeploymentBuilder().enableDuplicateFiltering(false).name("twice").tenantId(TENANT_ONE)
+        .deploy();
 
     // then a new deployment is created
     assertThat(repositoryService.createDeploymentQuery().count(), is(2L));
@@ -197,17 +160,11 @@ public class MultiTenancyRepositoryServiceTest {
   @Test
   public void deploymentWithDuplicateFilteringIgnoreDeploymentForTenant() {
     // given: a deployment with tenant ID
-    createDeploymentBuilder()
-      .enableDuplicateFiltering(false)
-      .name("twice")
-      .tenantId(TENANT_ONE)
-      .deploy();
+    createDeploymentBuilder().enableDuplicateFiltering(false).name("twice").tenantId(TENANT_ONE)
+        .deploy();
 
     // if the same process is deployed without tenant ID
-    createDeploymentBuilder()
-      .enableDuplicateFiltering(false)
-      .name("twice")
-      .deploy();
+    createDeploymentBuilder().enableDuplicateFiltering(false).name("twice").deploy();
 
     // then a new deployment is created
     assertThat(repositoryService.createDeploymentQuery().count(), is(2L));
@@ -222,14 +179,13 @@ public class MultiTenancyRepositoryServiceTest {
     testRule.deployForTenant(TENANT_TWO, emptyProcess);
     testRule.deployForTenant(TENANT_TWO, emptyProcess);
 
-    List<ProcessDefinition> latestProcessDefinitions = repositoryService.createProcessDefinitionQuery()
-      .latestVersion()
-      .orderByTenantId()
-      .asc()
-      .list();
+    List<ProcessDefinition> latestProcessDefinitions = repositoryService
+        .createProcessDefinitionQuery().latestVersion().orderByTenantId().asc().list();
 
-    ProcessDefinitionEntity previousDefinitionTenantOne = getPreviousDefinition((ProcessDefinitionEntity) latestProcessDefinitions.get(0));
-    ProcessDefinitionEntity previousDefinitionTenantTwo = getPreviousDefinition((ProcessDefinitionEntity) latestProcessDefinitions.get(1));
+    ProcessDefinitionEntity previousDefinitionTenantOne = getPreviousDefinition(
+        (ProcessDefinitionEntity) latestProcessDefinitions.get(0));
+    ProcessDefinitionEntity previousDefinitionTenantTwo = getPreviousDefinition(
+        (ProcessDefinitionEntity) latestProcessDefinitions.get(1));
 
     assertThat(previousDefinitionTenantOne.getVersion(), is(2));
     assertThat(previousDefinitionTenantOne.getTenantId(), is(TENANT_ONE));
@@ -248,13 +204,12 @@ public class MultiTenancyRepositoryServiceTest {
     testRule.deployForTenant(TENANT_TWO, CMMN);
 
     List<CaseDefinition> latestCaseDefinitions = repositoryService.createCaseDefinitionQuery()
-      .latestVersion()
-      .orderByTenantId()
-      .asc()
-      .list();
+        .latestVersion().orderByTenantId().asc().list();
 
-    CaseDefinitionEntity previousDefinitionTenantOne = getPreviousDefinition((CaseDefinitionEntity) latestCaseDefinitions.get(0));
-    CaseDefinitionEntity previousDefinitionTenantTwo = getPreviousDefinition((CaseDefinitionEntity) latestCaseDefinitions.get(1));
+    CaseDefinitionEntity previousDefinitionTenantOne = getPreviousDefinition(
+        (CaseDefinitionEntity) latestCaseDefinitions.get(0));
+    CaseDefinitionEntity previousDefinitionTenantTwo = getPreviousDefinition(
+        (CaseDefinitionEntity) latestCaseDefinitions.get(1));
 
     assertThat(previousDefinitionTenantOne.getVersion(), is(2));
     assertThat(previousDefinitionTenantOne.getTenantId(), is(TENANT_ONE));
@@ -273,13 +228,12 @@ public class MultiTenancyRepositoryServiceTest {
     testRule.deployForTenant(TENANT_TWO, DMN);
 
     List<DecisionDefinition> latestDefinitions = repositoryService.createDecisionDefinitionQuery()
-      .latestVersion()
-      .orderByTenantId()
-      .asc()
-      .list();
+        .latestVersion().orderByTenantId().asc().list();
 
-    DecisionDefinitionEntity previousDefinitionTenantOne = getPreviousDefinition((DecisionDefinitionEntity) latestDefinitions.get(0));
-    DecisionDefinitionEntity previousDefinitionTenantTwo = getPreviousDefinition((DecisionDefinitionEntity) latestDefinitions.get(1));
+    DecisionDefinitionEntity previousDefinitionTenantOne = getPreviousDefinition(
+        (DecisionDefinitionEntity) latestDefinitions.get(0));
+    DecisionDefinitionEntity previousDefinitionTenantTwo = getPreviousDefinition(
+        (DecisionDefinitionEntity) latestDefinitions.get(1));
 
     assertThat(previousDefinitionTenantOne.getVersion(), is(2));
     assertThat(previousDefinitionTenantOne.getTenantId(), is(TENANT_ONE));
@@ -289,25 +243,24 @@ public class MultiTenancyRepositoryServiceTest {
   }
 
   protected <T extends ResourceDefinitionEntity> T getPreviousDefinition(final T definitionEntity) {
-    return ((ProcessEngineConfigurationImpl) processEngineConfiguration).getCommandExecutorTxRequired().execute(new Command<T>() {
+    return ((ProcessEngineConfigurationImpl) processEngineConfiguration)
+        .getCommandExecutorTxRequired().execute(new Command<T>() {
 
-      @SuppressWarnings("unchecked")
-      @Override
-      public T execute(CommandContext commandContext) {
-        return (T) definitionEntity.getPreviousDefinition();
-      }
-    });
+          @SuppressWarnings("unchecked")
+          @Override
+          public T execute(CommandContext commandContext) {
+            return (T) definitionEntity.getPreviousDefinition();
+          }
+        });
   }
 
   protected DeploymentBuilder createDeploymentBuilder() {
-    return repositoryService
-        .createDeployment()
-        .addModelInstance("testProcess.bpmn", emptyProcess);
+    return repositoryService.createDeployment().addModelInstance("testProcess.bpmn", emptyProcess);
   }
 
   @After
   public void tearDown() throws Exception {
-    for(Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+    for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
   }

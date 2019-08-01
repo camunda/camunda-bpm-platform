@@ -37,7 +37,6 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
   protected static final String RESOURCE_NAME = "path/to/my/process.bpmn";
   protected static final String PROCESS_KEY = "process";
 
-
   protected void tearDown() throws Exception {
     super.tearDown();
 
@@ -49,27 +48,26 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
   public void testCreateDeployment() {
     // when
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
     // then
-    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+        .singleResult();
     assertNotNull(userOperationLogEntry);
 
     assertEquals(EntityTypes.DEPLOYMENT, userOperationLogEntry.getEntityType());
     assertEquals(deployment.getId(), userOperationLogEntry.getDeploymentId());
 
-    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, userOperationLogEntry.getOperationType());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE,
+        userOperationLogEntry.getOperationType());
 
     assertEquals("duplicateFilterEnabled", userOperationLogEntry.getProperty());
     assertNull(userOperationLogEntry.getOrgValue());
     assertFalse(Boolean.valueOf(userOperationLogEntry.getNewValue()));
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
-    
+
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertNull(userOperationLogEntry.getJobDefinitionId());
@@ -85,27 +83,27 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     EmbeddedProcessApplication application = new EmbeddedProcessApplication();
 
     // when
-    Deployment deployment = repositoryService
-        .createDeployment(application.getReference())
+    Deployment deployment = repositoryService.createDeployment(application.getReference())
         .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
     // then
-    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery().singleResult();
+    UserOperationLogEntry userOperationLogEntry = historyService.createUserOperationLogQuery()
+        .singleResult();
     assertNotNull(userOperationLogEntry);
 
     assertEquals(EntityTypes.DEPLOYMENT, userOperationLogEntry.getEntityType());
     assertEquals(deployment.getId(), userOperationLogEntry.getDeploymentId());
 
-    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, userOperationLogEntry.getOperationType());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE,
+        userOperationLogEntry.getOperationType());
 
     assertEquals("duplicateFilterEnabled", userOperationLogEntry.getProperty());
     assertNull(userOperationLogEntry.getOrgValue());
     assertFalse(Boolean.valueOf(userOperationLogEntry.getNewValue()));
 
     assertEquals(USER_ID, userOperationLogEntry.getUserId());
-    
+
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, userOperationLogEntry.getCategory());
 
     assertNull(userOperationLogEntry.getJobDefinitionId());
@@ -121,50 +119,53 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
 
     // when
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, model)
-        .enableDuplicateFiltering(false)
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, model).enableDuplicateFiltering(false).deploy();
 
     // then
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     assertEquals(2, query.count());
 
     // (1): duplicate filter enabled property
-    UserOperationLogEntry logDuplicateFilterEnabledProperty = query.property("duplicateFilterEnabled").singleResult();
+    UserOperationLogEntry logDuplicateFilterEnabledProperty = query
+        .property("duplicateFilterEnabled").singleResult();
     assertNotNull(logDuplicateFilterEnabledProperty);
 
     assertEquals(EntityTypes.DEPLOYMENT, logDuplicateFilterEnabledProperty.getEntityType());
     assertEquals(deployment.getId(), logDuplicateFilterEnabledProperty.getDeploymentId());
-    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, logDuplicateFilterEnabledProperty.getOperationType());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE,
+        logDuplicateFilterEnabledProperty.getOperationType());
 
     assertEquals(USER_ID, logDuplicateFilterEnabledProperty.getUserId());
-    
-    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logDuplicateFilterEnabledProperty.getCategory());
+
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR,
+        logDuplicateFilterEnabledProperty.getCategory());
 
     assertEquals("duplicateFilterEnabled", logDuplicateFilterEnabledProperty.getProperty());
     assertNull(logDuplicateFilterEnabledProperty.getOrgValue());
     assertTrue(Boolean.valueOf(logDuplicateFilterEnabledProperty.getNewValue()));
 
     // (2): deploy changed only
-    UserOperationLogEntry logDeployChangedOnlyProperty = query.property("deployChangedOnly").singleResult();
+    UserOperationLogEntry logDeployChangedOnlyProperty = query.property("deployChangedOnly")
+        .singleResult();
     assertNotNull(logDeployChangedOnlyProperty);
 
     assertEquals(EntityTypes.DEPLOYMENT, logDeployChangedOnlyProperty.getEntityType());
     assertEquals(deployment.getId(), logDeployChangedOnlyProperty.getDeploymentId());
-    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, logDeployChangedOnlyProperty.getOperationType());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE,
+        logDeployChangedOnlyProperty.getOperationType());
     assertEquals(USER_ID, logDeployChangedOnlyProperty.getUserId());
-    
-    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logDeployChangedOnlyProperty.getCategory());
+
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR,
+        logDeployChangedOnlyProperty.getCategory());
 
     assertEquals("deployChangedOnly", logDeployChangedOnlyProperty.getProperty());
     assertNull(logDeployChangedOnlyProperty.getOrgValue());
     assertFalse(Boolean.valueOf(logDeployChangedOnlyProperty.getNewValue()));
 
     // (3): operation id
-    assertEquals(logDuplicateFilterEnabledProperty.getOperationId(), logDeployChangedOnlyProperty.getOperationId());
+    assertEquals(logDuplicateFilterEnabledProperty.getOperationId(),
+        logDeployChangedOnlyProperty.getOperationId());
   }
 
   public void testPropertiesDuplicateFilteringAndDeployChangedOnly() {
@@ -172,60 +173,59 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
 
     // when
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, model)
-        .enableDuplicateFiltering(true)
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, model).enableDuplicateFiltering(true).deploy();
 
     // then
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
     assertEquals(2, query.count());
 
     // (1): duplicate filter enabled property
-    UserOperationLogEntry logDuplicateFilterEnabledProperty = query.property("duplicateFilterEnabled").singleResult();
+    UserOperationLogEntry logDuplicateFilterEnabledProperty = query
+        .property("duplicateFilterEnabled").singleResult();
     assertNotNull(logDuplicateFilterEnabledProperty);
     assertEquals(EntityTypes.DEPLOYMENT, logDuplicateFilterEnabledProperty.getEntityType());
     assertEquals(deployment.getId(), logDuplicateFilterEnabledProperty.getDeploymentId());
-    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, logDuplicateFilterEnabledProperty.getOperationType());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE,
+        logDuplicateFilterEnabledProperty.getOperationType());
     assertEquals(USER_ID, logDuplicateFilterEnabledProperty.getUserId());
-    
-    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logDuplicateFilterEnabledProperty.getCategory());
+
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR,
+        logDuplicateFilterEnabledProperty.getCategory());
 
     assertEquals("duplicateFilterEnabled", logDuplicateFilterEnabledProperty.getProperty());
     assertNull(logDuplicateFilterEnabledProperty.getOrgValue());
     assertTrue(Boolean.valueOf(logDuplicateFilterEnabledProperty.getNewValue()));
 
     // (2): deploy changed only
-    UserOperationLogEntry logDeployChangedOnlyProperty = query.property("deployChangedOnly").singleResult();
+    UserOperationLogEntry logDeployChangedOnlyProperty = query.property("deployChangedOnly")
+        .singleResult();
     assertNotNull(logDeployChangedOnlyProperty);
 
     assertEquals(EntityTypes.DEPLOYMENT, logDeployChangedOnlyProperty.getEntityType());
     assertEquals(deployment.getId(), logDeployChangedOnlyProperty.getDeploymentId());
-    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE, logDeployChangedOnlyProperty.getOperationType());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_CREATE,
+        logDeployChangedOnlyProperty.getOperationType());
     assertEquals(USER_ID, logDeployChangedOnlyProperty.getUserId());
-    
-    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, logDeployChangedOnlyProperty.getCategory());
+
+    assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR,
+        logDeployChangedOnlyProperty.getCategory());
 
     assertEquals("deployChangedOnly", logDeployChangedOnlyProperty.getProperty());
     assertNull(logDeployChangedOnlyProperty.getOrgValue());
     assertTrue(Boolean.valueOf(logDeployChangedOnlyProperty.getNewValue()));
 
     // (3): operation id
-    assertEquals(logDuplicateFilterEnabledProperty.getOperationId(), logDeployChangedOnlyProperty.getOperationId());
+    assertEquals(logDuplicateFilterEnabledProperty.getOperationId(),
+        logDeployChangedOnlyProperty.getOperationId());
   }
 
   public void testDeleteDeploymentCascadingShouldKeepCreateUserOperationLog() {
     // given
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
-    UserOperationLogQuery query = historyService
-        .createUserOperationLogQuery()
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE);
 
     assertEquals(1, query.count());
@@ -239,14 +239,10 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
   public void testDeleteDeploymentWithoutCascadingShouldKeepCreateUserOperationLog() {
     // given
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
-    UserOperationLogQuery query = historyService
-        .createUserOperationLogQuery()
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE);
 
     assertEquals(1, query.count());
@@ -260,14 +256,10 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
   public void testDeleteDeployment() {
     // given
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
-    UserOperationLogQuery query = historyService
-        .createUserOperationLogQuery()
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE);
 
     // when
@@ -289,7 +281,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertFalse(Boolean.valueOf(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
-    
+
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, log.getCategory());
 
     assertNull(log.getJobDefinitionId());
@@ -302,14 +294,10 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
   public void testDeleteDeploymentCascading() {
     // given
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
-    UserOperationLogQuery query = historyService
-        .createUserOperationLogQuery()
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE);
 
     // when
@@ -331,7 +319,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertTrue(Boolean.valueOf(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
-    
+
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, log.getCategory());
 
     assertNull(log.getJobDefinitionId());
@@ -342,21 +330,15 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertNull(log.getCaseDefinitionId());
   }
 
-
   public void testDeleteProcessDefinitionCascadingShouldKeepCreateUserOperationLog() {
     // given
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
     ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery()
-                                                 .deploymentId(deployment.getId())
-                                                 .singleResult();
+        .deploymentId(deployment.getId()).singleResult();
 
-    UserOperationLogQuery query = historyService
-        .createUserOperationLogQuery()
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE);
 
     assertEquals(1, query.count());
@@ -370,18 +352,13 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
   public void testDeleteProcessDefinitiontWithoutCascadingShouldKeepCreateUserOperationLog() {
     // given
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
     ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery()
-                                                 .deploymentId(deployment.getId())
-                                                 .singleResult();
+        .deploymentId(deployment.getId()).singleResult();
 
-    UserOperationLogQuery query = historyService
-        .createUserOperationLogQuery()
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE);
 
     assertEquals(1, query.count());
@@ -395,18 +372,13 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
   public void testDeleteProcessDefinition() {
     // given
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
     ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery()
-                                                 .deploymentId(deployment.getId())
-                                                 .singleResult();
+        .deploymentId(deployment.getId()).singleResult();
 
-    UserOperationLogQuery query = historyService
-        .createUserOperationLogQuery()
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE);
 
     // when
@@ -430,7 +402,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertFalse(Boolean.valueOf(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
-    
+
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, log.getCategory());
 
     assertNull(log.getJobDefinitionId());
@@ -441,18 +413,13 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
 
   public void testDeleteProcessDefinitionCascading() {
     // given
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .name(DEPLOYMENT_NAME)
-        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY))
-        .deploy();
+    Deployment deployment = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, createProcessWithServiceTask(PROCESS_KEY)).deploy();
 
     ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery()
-                                                 .deploymentId(deployment.getId())
-                                                 .singleResult();
+        .deploymentId(deployment.getId()).singleResult();
 
-    UserOperationLogQuery query = historyService
-        .createUserOperationLogQuery()
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE);
 
     // when
@@ -476,7 +443,7 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
     assertTrue(Boolean.valueOf(log.getNewValue()));
 
     assertEquals(USER_ID, log.getUserId());
-    
+
     assertEquals(UserOperationLogEntry.CATEGORY_OPERATOR, log.getCategory());
 
     assertNull(log.getJobDefinitionId());
@@ -486,12 +453,8 @@ public class UserOperationLogDeploymentTest extends AbstractUserOperationLogTest
   }
 
   protected BpmnModelInstance createProcessWithServiceTask(String key) {
-    return Bpmn.createExecutableProcess(key)
-      .startEvent()
-      .serviceTask()
-        .camundaExpression("${true}")
-      .endEvent()
-    .done();
+    return Bpmn.createExecutableProcess(key).startEvent().serviceTask().camundaExpression("${true}")
+        .endEvent().done();
   }
 
 }

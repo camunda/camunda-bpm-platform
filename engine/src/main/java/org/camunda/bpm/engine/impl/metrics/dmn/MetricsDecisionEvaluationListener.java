@@ -25,12 +25,12 @@ import org.camunda.bpm.engine.management.Metrics;
 public class MetricsDecisionEvaluationListener implements DmnDecisionEvaluationListener {
 
   public void notify(DmnDecisionEvaluationEvent evaluationEvent) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
 
     if (processEngineConfiguration != null && processEngineConfiguration.isMetricsEnabled()) {
-      processEngineConfiguration
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.EXECUTED_DECISION_ELEMENTS, evaluationEvent.getExecutedDecisionElements());
+      processEngineConfiguration.getMetricsRegistry().markOccurrence(
+          Metrics.EXECUTED_DECISION_ELEMENTS, evaluationEvent.getExecutedDecisionElements());
     }
   }
 

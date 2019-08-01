@@ -32,16 +32,18 @@ import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_H
 import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
 public class JobManager extends AbstractManager {
 
-  public static QueryOrderingProperty JOB_PRIORITY_ORDERING_PROPERTY = new QueryOrderingProperty(null, JobQueryProperty.PRIORITY);
-  public static QueryOrderingProperty JOB_TYPE_ORDERING_PROPERTY = new QueryOrderingProperty(null, JobQueryProperty.TYPE);
-  public static QueryOrderingProperty JOB_DUEDATE_ORDERING_PROPERTY = new QueryOrderingProperty(null, JobQueryProperty.DUEDATE);
+  public static QueryOrderingProperty JOB_PRIORITY_ORDERING_PROPERTY = new QueryOrderingProperty(
+      null, JobQueryProperty.PRIORITY);
+  public static QueryOrderingProperty JOB_TYPE_ORDERING_PROPERTY = new QueryOrderingProperty(null,
+      JobQueryProperty.TYPE);
+  public static QueryOrderingProperty JOB_DUEDATE_ORDERING_PROPERTY = new QueryOrderingProperty(
+      null, JobQueryProperty.DUEDATE);
 
   static {
     JOB_PRIORITY_ORDERING_PROPERTY.setDirection(Direction.DESCENDING);
@@ -95,14 +97,15 @@ public class JobManager extends AbstractManager {
   }
 
   public void reschedule(JobEntity jobEntity, Date newDuedate) {
-    ((EverLivingJobEntity)jobEntity).init(Context.getCommandContext(), true);
+    ((EverLivingJobEntity) jobEntity).init(Context.getCommandContext(), true);
     jobEntity.setSuspensionState(SuspensionState.ACTIVE.getStateCode());
     jobEntity.setDuedate(newDuedate);
     hintJobExecutorIfNeeded(jobEntity, newDuedate);
   }
 
   private void hintJobExecutorIfNeeded(JobEntity jobEntity, Date duedate) {
-    // Check if this timer fires before the next time the job executor will check for new timers to fire.
+    // Check if this timer fires before the next time the job executor will check for new timers to
+    // fire.
     // This is highly unlikely because normally waitTimeInMillis is 5000 (5 seconds)
     // and timers are usually set further in the future
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
@@ -120,23 +123,21 @@ public class JobManager extends AbstractManager {
 
     JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
     TransactionListener transactionListener = null;
-    if(!job.isSuspended()
-            && job.isExclusive()
-            && jobExecutorContext != null
-            && jobExecutorContext.isExecutingExclusiveJob()
-            && areInSameProcessInstance(job, jobExecutorContext.getCurrentJob())) {
+    if (!job.isSuspended() && job.isExclusive() && jobExecutorContext != null
+        && jobExecutorContext.isExecutingExclusiveJob()
+        && areInSameProcessInstance(job, jobExecutorContext.getCurrentJob())) {
       // lock job & add to the queue of the current processor
       Date currentTime = ClockUtil.getCurrentTime();
-      job.setLockExpirationTime(new Date(currentTime.getTime() + jobExecutor.getLockTimeInMillis()));
+      job.setLockExpirationTime(
+          new Date(currentTime.getTime() + jobExecutor.getLockTimeInMillis()));
       job.setLockOwner(jobExecutor.getLockOwner());
       transactionListener = new ExclusiveJobAddedNotification(job.getId(), jobExecutorContext);
     } else {
       // notify job executor:
       transactionListener = new MessageAddedNotification(jobExecutor);
     }
-    Context.getCommandContext()
-      .getTransactionContext()
-      .addTransactionListener(TransactionState.COMMITTED, transactionListener);
+    Context.getCommandContext().getTransactionContext()
+        .addTransactionListener(TransactionState.COMMITTED, transactionListener);
   }
 
   protected boolean areInSameProcessInstance(JobEntity job1, JobEntity job2) {
@@ -151,12 +152,10 @@ public class JobManager extends AbstractManager {
   }
 
   public void cancelTimers(ExecutionEntity execution) {
-    List<TimerEntity> timers = Context
-      .getCommandContext()
-      .getJobManager()
-      .findTimersByExecutionId(execution.getId());
+    List<TimerEntity> timers = Context.getCommandContext().getJobManager()
+        .findTimersByExecutionId(execution.getId());
 
-    for (TimerEntity timer: timers) {
+    for (TimerEntity timer : timers) {
       timer.delete();
     }
   }
@@ -167,13 +166,15 @@ public class JobManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<AcquirableJobEntity> findNextJobsToExecute(Page page) {
-    Map<String,Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<String, Object>();
     Date now = ClockUtil.getCurrentTime();
     params.put("now", now);
     params.put("alwaysSetDueDate", isEnsureJobDueDateNotNull());
-    params.put("deploymentAware", Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware());
+    params.put("deploymentAware",
+        Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware());
     if (Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware()) {
-      Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
+      Set<String> registeredDeployments = Context.getProcessEngineConfiguration()
+          .getRegisteredDeployments();
       if (!registeredDeployments.isEmpty()) {
         params.put("deploymentIds", registeredDeployments);
       }
@@ -235,18 +236,20 @@ public class JobManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<JobEntity> findJobsByConfiguration(String jobHandlerType, String jobHandlerConfiguration, String tenantId) {
+  public List<JobEntity> findJobsByConfiguration(String jobHandlerType,
+      String jobHandlerConfiguration, String tenantId) {
     Map<String, String> params = new HashMap<String, String>();
     params.put("handlerType", jobHandlerType);
     params.put("handlerConfiguration", jobHandlerConfiguration);
     params.put("tenantId", tenantId);
 
     if (TimerCatchIntermediateEventJobHandler.TYPE.equals(jobHandlerType)
-      || TimerExecuteNestedActivityJobHandler.TYPE.equals(jobHandlerType)
-      || TimerStartEventJobHandler.TYPE.equals(jobHandlerType)
-      || TimerStartEventSubprocessJobHandler.TYPE.equals(jobHandlerType)) {
+        || TimerExecuteNestedActivityJobHandler.TYPE.equals(jobHandlerType)
+        || TimerStartEventJobHandler.TYPE.equals(jobHandlerType)
+        || TimerStartEventSubprocessJobHandler.TYPE.equals(jobHandlerType)) {
 
-      String queryValue = jobHandlerConfiguration + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
+      String queryValue = jobHandlerConfiguration + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER
+          + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
       params.put("handlerConfigurationWithFollowUpJobCreatedProperty", queryValue);
     }
 
@@ -262,72 +265,90 @@ public class JobManager extends AbstractManager {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("jobId", jobId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateJobSuspensionStateByJobDefinitionId(String jobDefinitionId, SuspensionState suspensionState) {
+  public void updateJobSuspensionStateByJobDefinitionId(String jobDefinitionId,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateJobSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
+  public void updateJobSuspensionStateByProcessInstanceId(String processInstanceId,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateJobSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
+  public void updateJobSuspensionStateByProcessDefinitionId(String processDefinitionId,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateStartTimerJobSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
+  public void updateStartTimerJobSuspensionStateByProcessDefinitionId(String processDefinitionId,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionId", processDefinitionId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     parameters.put("handlerType", TimerStartEventJobHandler.TYPE);
-    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
+  public void updateJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", false);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateJobSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
+  public void updateJobSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey,
+      String processDefinitionTenantId, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", true);
     parameters.put("processDefinitionTenantId", processDefinitionTenantId);
     parameters.put("suspensionState", suspensionState.getStateCode());
-    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateStartTimerJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
+  public void updateStartTimerJobSuspensionStateByProcessDefinitionKey(String processDefinitionKey,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", false);
     parameters.put("suspensionState", suspensionState.getStateCode());
     parameters.put("handlerType", TimerStartEventJobHandler.TYPE);
-    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
-  public void updateStartTimerJobSuspensionStateByProcessDefinitionKeyAndTenantId(String processDefinitionKey, String processDefinitionTenantId, SuspensionState suspensionState) {
+  public void updateStartTimerJobSuspensionStateByProcessDefinitionKeyAndTenantId(
+      String processDefinitionKey, String processDefinitionTenantId,
+      SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("isProcessDefinitionTenantIdSet", true);
     parameters.put("processDefinitionTenantId", processDefinitionTenantId);
     parameters.put("suspensionState", suspensionState.getStateCode());
     parameters.put("handlerType", TimerStartEventJobHandler.TYPE);
-    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
+    getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters",
+        configureParameterizedQuery(parameters));
   }
 
   public void updateFailedJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {

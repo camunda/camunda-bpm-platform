@@ -53,9 +53,9 @@ public class DecisionRequirementsDefinitionAuthorizationTest {
 
   protected static final String DMN_FILE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
   protected static final String DRD_FILE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.png";
- 
+
   protected static final String DEFINITION_KEY = "dish";
- 
+
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
 
@@ -70,19 +70,16 @@ public class DecisionRequirementsDefinitionAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ)),
-      scenario()
-        .withAuthorizations(
-          grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ))
-          .succeeds(),
-      scenario()
-          .withAuthorizations(
-            grant(DECISION_REQUIREMENTS_DEFINITION, "*", "userId", Permissions.READ))
-            .succeeds()
-      );
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ)),
+        scenario()
+            .withAuthorizations(
+                grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ))
+            .succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(DECISION_REQUIREMENTS_DEFINITION, "*", "userId", Permissions.READ))
+            .succeeds());
   }
 
   @Before
@@ -101,14 +98,15 @@ public class DecisionRequirementsDefinitionAuthorizationTest {
   public void getDecisionRequirementsDefinition() {
 
     String decisionRequirementsDefinitionId = repositoryService
-      .createDecisionRequirementsDefinitionQuery()
-      .decisionRequirementsDefinitionKey(DEFINITION_KEY)
-      .singleResult().getId();
-    
-    // when
-    authRule.init(scenario).withUser("userId").bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
+        .createDecisionRequirementsDefinitionQuery()
+        .decisionRequirementsDefinitionKey(DEFINITION_KEY).singleResult().getId();
 
-    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
+    // when
+    authRule.init(scenario).withUser("userId")
+        .bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
+
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService
+        .getDecisionRequirementsDefinition(decisionRequirementsDefinitionId);
 
     if (authRule.assertScenario(scenario)) {
       assertNotNull(decisionRequirementsDefinition);
@@ -121,14 +119,15 @@ public class DecisionRequirementsDefinitionAuthorizationTest {
 
     // given
     String decisionRequirementsDefinitionId = repositoryService
-      .createDecisionRequirementsDefinitionQuery()
-      .decisionRequirementsDefinitionKey(DEFINITION_KEY)
-      .singleResult().getId();
+        .createDecisionRequirementsDefinitionQuery()
+        .decisionRequirementsDefinitionKey(DEFINITION_KEY).singleResult().getId();
 
     // when
-    authRule.init(scenario).withUser("userId").bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
 
-    InputStream decisionRequirementsModel = repositoryService.getDecisionRequirementsModel(decisionRequirementsDefinitionId);
+    InputStream decisionRequirementsModel = repositoryService
+        .getDecisionRequirementsModel(decisionRequirementsDefinitionId);
 
     if (authRule.assertScenario(scenario)) {
       assertNotNull(decisionRequirementsModel);
@@ -141,14 +140,15 @@ public class DecisionRequirementsDefinitionAuthorizationTest {
 
     // given
     String decisionRequirementsDefinitionId = repositoryService
-      .createDecisionRequirementsDefinitionQuery()
-      .decisionRequirementsDefinitionKey(DEFINITION_KEY)
-      .singleResult().getId();
+        .createDecisionRequirementsDefinitionQuery()
+        .decisionRequirementsDefinitionKey(DEFINITION_KEY).singleResult().getId();
 
     // when
-    authRule.init(scenario).withUser("userId").bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("decisionRequirementsDefinitionKey", DEFINITION_KEY).start();
 
-    InputStream decisionRequirementsDiagram = repositoryService.getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
+    InputStream decisionRequirementsDiagram = repositoryService
+        .getDecisionRequirementsDiagram(decisionRequirementsDefinitionId);
 
     if (authRule.assertScenario(scenario)) {
       assertNotNull(decisionRequirementsDiagram);

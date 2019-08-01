@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl
 import org.camunda.bpm.engine.test.jobexecutor.ControllableJobExecutor;
 import org.camunda.bpm.engine.variable.Variables;
 
-
 /**
  * @author Thorben Lindhauer
  *
@@ -65,11 +64,12 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // then
-    long acquisitionAttempts = managementService.createMetricsQuery().name(Metrics.JOB_ACQUISITION_ATTEMPT).sum();
+    long acquisitionAttempts = managementService.createMetricsQuery()
+        .name(Metrics.JOB_ACQUISITION_ATTEMPT).sum();
     assertTrue(acquisitionAttempts >= 1);
 
-    long acquiredJobs = managementService.createMetricsQuery()
-        .name(Metrics.JOB_ACQUIRED_SUCCESS).sum();
+    long acquiredJobs = managementService.createMetricsQuery().name(Metrics.JOB_ACQUIRED_SUCCESS)
+        .sum();
     assertEquals(3, acquiredJobs);
   }
 
@@ -81,9 +81,11 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     }
 
     // replace job executor
-    ControllableJobExecutor jobExecutor1 = new ControllableJobExecutor((ProcessEngineImpl) processEngine);
+    ControllableJobExecutor jobExecutor1 = new ControllableJobExecutor(
+        (ProcessEngineImpl) processEngine);
     processEngineConfiguration.setJobExecutor(jobExecutor1);
-    ControllableJobExecutor jobExecutor2 = new ControllableJobExecutor((ProcessEngineImpl) processEngine);
+    ControllableJobExecutor jobExecutor2 = new ControllableJobExecutor(
+        (ProcessEngineImpl) processEngine);
 
     ThreadControl jobAcquisitionThread1 = jobExecutor1.getAcquisitionThreadControl();
     ThreadControl jobAcquisitionThread2 = jobExecutor2.getAcquisitionThreadControl();
@@ -99,18 +101,21 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
 
     // thread 1 is able to acquire all jobs
     jobAcquisitionThread1.makeContinueAndWaitForSync();
-    // thread 2 cannot acquire any jobs since they have been locked (and executed) by thread1 meanwhile
+    // thread 2 cannot acquire any jobs since they have been locked (and executed) by thread1
+    // meanwhile
     jobAcquisitionThread2.makeContinueAndWaitForSync();
 
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // then
-    long acquisitionAttempts = managementService.createMetricsQuery().name(Metrics.JOB_ACQUISITION_ATTEMPT).sum();
-    // each job executor twice (since the controllable thread always waits when already acquiring jobs)
+    long acquisitionAttempts = managementService.createMetricsQuery()
+        .name(Metrics.JOB_ACQUISITION_ATTEMPT).sum();
+    // each job executor twice (since the controllable thread always waits when already acquiring
+    // jobs)
     assertEquals(2 + 2, acquisitionAttempts);
 
-    long acquiredJobs = managementService.createMetricsQuery()
-        .name(Metrics.JOB_ACQUIRED_SUCCESS).sum();
+    long acquiredJobs = managementService.createMetricsQuery().name(Metrics.JOB_ACQUIRED_SUCCESS)
+        .sum();
     assertEquals(3, acquiredJobs);
 
     long acquiredJobsFailure = managementService.createMetricsQuery()
@@ -195,7 +200,8 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     waitForJobExecutorToProcessAllJobs(5000L);
 
     // then all of them were rejected by the job executor which is reflected by the metric
-    long numRejectedJobs = managementService.createMetricsQuery().name(Metrics.JOB_EXECUTION_REJECTED).sum();
+    long numRejectedJobs = managementService.createMetricsQuery()
+        .name(Metrics.JOB_EXECUTION_REJECTED).sum();
 
     assertEquals(3, numRejectedJobs);
   }
@@ -204,7 +210,8 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
 
     public RejectingJobExecutor() {
       BlockingQueue<Runnable> threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
-      threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 0L, TimeUnit.MILLISECONDS, threadPoolQueue) {
+      threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 0L,
+          TimeUnit.MILLISECONDS, threadPoolQueue) {
 
         @Override
         public void execute(Runnable command) {

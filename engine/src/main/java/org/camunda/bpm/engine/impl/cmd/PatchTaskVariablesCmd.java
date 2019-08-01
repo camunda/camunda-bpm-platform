@@ -33,7 +33,8 @@ public class PatchTaskVariablesCmd extends AbstractPatchVariablesCmd {
 
   private static final long serialVersionUID = 1L;
 
-  public PatchTaskVariablesCmd(String taskId, Map<String, ? extends Object> modifications, Collection<String> deletions, boolean isLocal) {
+  public PatchTaskVariablesCmd(String taskId, Map<String, ? extends Object> modifications,
+      Collection<String> deletions, boolean isLocal) {
     super(taskId, modifications, deletions, isLocal);
   }
 
@@ -46,7 +47,7 @@ public class PatchTaskVariablesCmd extends AbstractPatchVariablesCmd {
   }
 
   public void logVariableOperation(CommandContext commandContext) {
-    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), null, entityId,
-      PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), null,
+        entityId, PropertyChange.EMPTY_CHANGE);
   }
 }

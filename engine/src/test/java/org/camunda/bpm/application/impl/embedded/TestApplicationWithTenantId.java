@@ -19,10 +19,8 @@ package org.camunda.bpm.application.impl.embedded;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 
-@ProcessApplication(
-    name="test-app",
-    deploymentDescriptors={"org/camunda/bpm/application/impl/embedded/deployment-with-tenant-ids.xml"}
-)
+@ProcessApplication(name = "test-app", deploymentDescriptors = {
+    "org/camunda/bpm/application/impl/embedded/deployment-with-tenant-ids.xml" })
 public class TestApplicationWithTenantId extends EmbeddedProcessApplication {
 
 }

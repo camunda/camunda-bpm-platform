@@ -40,21 +40,23 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
- * <p>Creates an activity instance tree according to the following strategy:
+ * <p>
+ * Creates an activity instance tree according to the following strategy:
  *
  * <ul>
- *   <li> Event scope executions are not considered at all
- *   <li> For every leaf execution, generate an activity/transition instance;
- *   the activity instance id is set in the leaf execution and the parent instance id is set in the parent execution
- *   <li> For every non-leaf scope execution, generate an activity instance;
- *   the activity instance id is always set in the parent execution and the parent activity
- *   instance id is always set in the parent's parent (because of tree compactation, we ensure
- *   that an activity instance id for a scope activity is always stored in the corresponding scope execution's parent,
- *   unless the execution is a leaf)
- *   <li> Compensation is an exception to the above procedure: A compensation throw event is not a scope, however the compensating executions
- *   are added as child executions of the (probably non-scope) execution executing the throw event. Logically, the compensating executions
- *   are children of the scope execution the throwing event is executed in. Due to this oddity, the activity instance id are stored on different
- *   executions
+ * <li>Event scope executions are not considered at all
+ * <li>For every leaf execution, generate an activity/transition instance; the activity instance id
+ * is set in the leaf execution and the parent instance id is set in the parent execution
+ * <li>For every non-leaf scope execution, generate an activity instance; the activity instance id
+ * is always set in the parent execution and the parent activity instance id is always set in the
+ * parent's parent (because of tree compactation, we ensure that an activity instance id for a scope
+ * activity is always stored in the corresponding scope execution's parent, unless the execution is
+ * a leaf)
+ * <li>Compensation is an exception to the above procedure: A compensation throw event is not a
+ * scope, however the compensating executions are added as child executions of the (probably
+ * non-scope) execution executing the throw event. Logically, the compensating executions are
+ * children of the scope execution the throwing event is executed in. Due to this oddity, the
+ * activity instance id are stored on different executions
  * </ul>
  *
  * @author Thorben Lindhauer
@@ -83,7 +85,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     List<ExecutionEntity> leaves = filterLeaves(nonEventScopeExecutions);
     // Leaves must be ordered in a predictable way (e.g. by ID)
     // in order to return a stable execution tree with every repeated invocation of this command.
-    // For legacy process instances, there may miss scope executions for activities that are now a scope.
+    // For legacy process instances, there may miss scope executions for activities that are now a
+    // scope.
     // In this situation, there may be multiple scope candidates for the same instance id; which one
     // can depend on the order the leaves are iterated.
     orderById(leaves);
@@ -95,11 +98,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     }
 
     // create act instance for process instance
-    ActivityInstanceImpl processActInst = createActivityInstance(
-      processInstance,
-      processInstance.getProcessDefinition(),
-      processInstanceId,
-      null);
+    ActivityInstanceImpl processActInst = createActivityInstance(processInstance,
+        processInstance.getProcessDefinition(), processInstanceId, null);
     Map<String, ActivityInstanceImpl> activityInstances = new HashMap<String, ActivityInstanceImpl>();
     activityInstances.put(processInstanceId, processActInst);
 
@@ -112,30 +112,29 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
         continue;
       }
 
-      Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = leaf.createActivityExecutionMapping();
-      Map<ScopeImpl, PvmExecutionImpl> scopeInstancesToCreate = new HashMap<ScopeImpl, PvmExecutionImpl>(activityExecutionMapping);
+      Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = leaf
+          .createActivityExecutionMapping();
+      Map<ScopeImpl, PvmExecutionImpl> scopeInstancesToCreate = new HashMap<ScopeImpl, PvmExecutionImpl>(
+          activityExecutionMapping);
 
       // create an activity/transition instance for each leaf that executes a non-scope activity
       // and does not throw compensation
       if (leaf.getActivityInstanceId() != null) {
 
-        if (!CompensationBehavior.isCompensationThrowing(leaf) || LegacyBehavior.isCompensationThrowing(leaf, activityExecutionMapping)) {
+        if (!CompensationBehavior.isCompensationThrowing(leaf)
+            || LegacyBehavior.isCompensationThrowing(leaf, activityExecutionMapping)) {
           String parentActivityInstanceId = null;
 
-          parentActivityInstanceId = activityExecutionMapping
-              .get(leaf.getActivity().getFlowScope())
+          parentActivityInstanceId = activityExecutionMapping.get(leaf.getActivity().getFlowScope())
               .getParentActivityInstanceId();
 
-          ActivityInstanceImpl leafInstance = createActivityInstance(leaf,
-              leaf.getActivity(),
-              leaf.getActivityInstanceId(),
-              parentActivityInstanceId);
+          ActivityInstanceImpl leafInstance = createActivityInstance(leaf, leaf.getActivity(),
+              leaf.getActivityInstanceId(), parentActivityInstanceId);
           activityInstances.put(leafInstance.getId(), leafInstance);
 
           scopeInstancesToCreate.remove(leaf.getActivity());
         }
-      }
-      else {
+      } else {
         TransitionInstanceImpl transitionInstance = createTransitionInstance(leaf);
         transitionInstances.put(transitionInstance.getId(), transitionInstance);
 
@@ -146,7 +145,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       scopeInstancesToCreate.remove(leaf.getProcessDefinition());
 
       // create an activity instance for each scope (including compensation throwing executions)
-      for (Map.Entry<ScopeImpl, PvmExecutionImpl> scopeExecutionEntry : scopeInstancesToCreate.entrySet()) {
+      for (Map.Entry<ScopeImpl, PvmExecutionImpl> scopeExecutionEntry : scopeInstancesToCreate
+          .entrySet()) {
         ScopeImpl scope = scopeExecutionEntry.getKey();
         PvmExecutionImpl scopeExecution = scopeExecutionEntry.getValue();
 
@@ -154,22 +154,17 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
         String parentActivityInstanceId = null;
 
         activityInstanceId = scopeExecution.getParentActivityInstanceId();
-        parentActivityInstanceId = activityExecutionMapping
-            .get(scope.getFlowScope())
+        parentActivityInstanceId = activityExecutionMapping.get(scope.getFlowScope())
             .getParentActivityInstanceId();
 
         if (activityInstances.containsKey(activityInstanceId)) {
           continue;
-        }
-        else {
+        } else {
           // regardless of the tree structure (compacted or not), the scope's activity instance id
           // is the activity instance id of the parent execution and the parent activity instance id
           // of that is the actual parent activity instance id
-          ActivityInstanceImpl scopeInstance = createActivityInstance(
-              scopeExecution,
-              scope,
-              activityInstanceId,
-              parentActivityInstanceId);
+          ActivityInstanceImpl scopeInstance = createActivityInstance(scopeExecution, scope,
+              activityInstanceId, parentActivityInstanceId);
           activityInstances.put(activityInstanceId, scopeInstance);
         }
       }
@@ -182,7 +177,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
   }
 
   protected void checkGetActivityInstance(String processInstanceId, CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessInstance(processInstanceId);
     }
   }
@@ -191,8 +187,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     Collections.sort(leaves, ExecutionIdComparator.INSTANCE);
   }
 
-  protected ActivityInstanceImpl createActivityInstance(PvmExecutionImpl scopeExecution, ScopeImpl scope,
-      String activityInstanceId, String parentActivityInstanceId) {
+  protected ActivityInstanceImpl createActivityInstance(PvmExecutionImpl scopeExecution,
+      ScopeImpl scope, String activityInstanceId, String parentActivityInstanceId) {
     ActivityInstanceImpl actInst = new ActivityInstanceImpl();
 
     actInst.setId(activityInstanceId);
@@ -210,8 +206,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
     if (scope.getId().equals(scopeExecution.getProcessDefinition().getId())) {
       actInst.setActivityType("processDefinition");
-    }
-    else {
+    } else {
       actInst.setActivityType((String) scope.getProperty("type"));
     }
 
@@ -256,16 +251,16 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
   protected void populateChildInstances(Map<String, ActivityInstanceImpl> activityInstances,
       Map<String, TransitionInstanceImpl> transitionInstances) {
-    Map<ActivityInstanceImpl, List<ActivityInstanceImpl>> childActivityInstances
-      = new HashMap<ActivityInstanceImpl, List<ActivityInstanceImpl>>();
-    Map<ActivityInstanceImpl, List<TransitionInstanceImpl>> childTransitionInstances
-      = new HashMap<ActivityInstanceImpl, List<TransitionInstanceImpl>>();
+    Map<ActivityInstanceImpl, List<ActivityInstanceImpl>> childActivityInstances = new HashMap<ActivityInstanceImpl, List<ActivityInstanceImpl>>();
+    Map<ActivityInstanceImpl, List<TransitionInstanceImpl>> childTransitionInstances = new HashMap<ActivityInstanceImpl, List<TransitionInstanceImpl>>();
 
     for (ActivityInstanceImpl instance : activityInstances.values()) {
       if (instance.getParentActivityInstanceId() != null) {
-        ActivityInstanceImpl parentInstance = activityInstances.get(instance.getParentActivityInstanceId());
+        ActivityInstanceImpl parentInstance = activityInstances
+            .get(instance.getParentActivityInstanceId());
         if (parentInstance == null) {
-          throw new ProcessEngineException("No parent activity instance with id " + instance.getParentActivityInstanceId() + " generated");
+          throw new ProcessEngineException("No parent activity instance with id "
+              + instance.getParentActivityInstanceId() + " generated");
         }
         putListElement(childActivityInstances, parentInstance, instance);
       }
@@ -273,31 +268,35 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
     for (TransitionInstanceImpl instance : transitionInstances.values()) {
       if (instance.getParentActivityInstanceId() != null) {
-        ActivityInstanceImpl parentInstance = activityInstances.get(instance.getParentActivityInstanceId());
+        ActivityInstanceImpl parentInstance = activityInstances
+            .get(instance.getParentActivityInstanceId());
         if (parentInstance == null) {
-          throw new ProcessEngineException("No parent activity instance with id " + instance.getParentActivityInstanceId() + " generated");
+          throw new ProcessEngineException("No parent activity instance with id "
+              + instance.getParentActivityInstanceId() + " generated");
         }
         putListElement(childTransitionInstances, parentInstance, instance);
       }
     }
 
-    for (Map.Entry<ActivityInstanceImpl, List<ActivityInstanceImpl>> entry :
-        childActivityInstances.entrySet()) {
+    for (Map.Entry<ActivityInstanceImpl, List<ActivityInstanceImpl>> entry : childActivityInstances
+        .entrySet()) {
       ActivityInstanceImpl instance = entry.getKey();
       List<ActivityInstanceImpl> childInstances = entry.getValue();
       if (childInstances != null) {
-        instance.setChildActivityInstances(childInstances.toArray(new ActivityInstanceImpl[childInstances.size()]));
+        instance.setChildActivityInstances(
+            childInstances.toArray(new ActivityInstanceImpl[childInstances.size()]));
       }
     }
 
-    for (Map.Entry<ActivityInstanceImpl, List<TransitionInstanceImpl>> entry :
-      childTransitionInstances.entrySet()) {
-    ActivityInstanceImpl instance = entry.getKey();
-    List<TransitionInstanceImpl> childInstances = entry.getValue();
-    if (childTransitionInstances != null) {
-      instance.setChildTransitionInstances(childInstances.toArray(new TransitionInstanceImpl[childInstances.size()]));
+    for (Map.Entry<ActivityInstanceImpl, List<TransitionInstanceImpl>> entry : childTransitionInstances
+        .entrySet()) {
+      ActivityInstanceImpl instance = entry.getKey();
+      List<TransitionInstanceImpl> childInstances = entry.getValue();
+      if (childTransitionInstances != null) {
+        instance.setChildTransitionInstances(
+            childInstances.toArray(new TransitionInstanceImpl[childInstances.size()]));
+      }
     }
-  }
 
   }
 
@@ -324,15 +323,18 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     List<ExecutionEntity> leaves = new ArrayList<ExecutionEntity>();
     for (ExecutionEntity execution : executionList) {
       // although executions executing throwing compensation events are not leaves in the tree,
-      // they are treated as leaves since their child executions are logical children of their parent scope execution
-      if (execution.getNonEventScopeExecutions().isEmpty() || CompensationBehavior.isCompensationThrowing(execution)) {
+      // they are treated as leaves since their child executions are logical children of their
+      // parent scope execution
+      if (execution.getNonEventScopeExecutions().isEmpty()
+          || CompensationBehavior.isCompensationThrowing(execution)) {
         leaves.add(execution);
       }
     }
     return leaves;
   }
 
-  protected List<ExecutionEntity> filterNonEventScopeExecutions(List<ExecutionEntity> executionList) {
+  protected List<ExecutionEntity> filterNonEventScopeExecutions(
+      List<ExecutionEntity> executionList) {
     List<ExecutionEntity> nonEventScopeExecutions = new ArrayList<ExecutionEntity>();
     for (ExecutionEntity execution : executionList) {
       if (!execution.isEventScope()) {
@@ -342,15 +344,17 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     return nonEventScopeExecutions;
   }
 
-  protected List<ExecutionEntity> loadProcessInstance(String processInstanceId, CommandContext commandContext) {
+  protected List<ExecutionEntity> loadProcessInstance(String processInstanceId,
+      CommandContext commandContext) {
 
     List<ExecutionEntity> result = null;
 
     // first try to load from cache
     // check whether the process instance is already (partially) loaded in command context
-    List<ExecutionEntity> cachedExecutions = commandContext.getDbEntityManager().getCachedEntitiesByType(ExecutionEntity.class);
+    List<ExecutionEntity> cachedExecutions = commandContext.getDbEntityManager()
+        .getCachedEntitiesByType(ExecutionEntity.class);
     for (ExecutionEntity executionEntity : cachedExecutions) {
-      if(processInstanceId.equals(executionEntity.getProcessInstanceId())) {
+      if (processInstanceId.equals(executionEntity.getProcessInstanceId())) {
         // found one execution from process instance
         result = new ArrayList<ExecutionEntity>();
         ExecutionEntity processInstance = executionEntity.getProcessInstance();
@@ -361,7 +365,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       }
     }
 
-    if(result == null) {
+    if (result == null) {
       // if the process instance could not be found in cache, load from database
       result = loadFromDb(processInstanceId, commandContext);
     }
@@ -369,10 +373,13 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     return result;
   }
 
-  protected List<ExecutionEntity> loadFromDb(final String processInstanceId, final CommandContext commandContext) {
+  protected List<ExecutionEntity> loadFromDb(final String processInstanceId,
+      final CommandContext commandContext) {
 
-    List<ExecutionEntity> executions = commandContext.getExecutionManager().findExecutionsByProcessInstanceId(processInstanceId);
-    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    List<ExecutionEntity> executions = commandContext.getExecutionManager()
+        .findExecutionsByProcessInstanceId(processInstanceId);
+    ExecutionEntity processInstance = commandContext.getExecutionManager()
+        .findExecutionById(processInstanceId);
 
     // initialize parent/child sets
     if (processInstance != null) {
@@ -386,12 +393,15 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
    * Loads all executions that are part of this process instance tree from the dbSqlSession cache.
    * (optionally querying the db if a child is not already loaded.
    *
-   * @param execution the current root execution (already contained in childExecutions)
-   * @param childExecutions the list in which all child executions should be collected
+   * @param execution
+   *          the current root execution (already contained in childExecutions)
+   * @param childExecutions
+   *          the list in which all child executions should be collected
    */
-  protected void loadChildExecutionsFromCache(ExecutionEntity execution, List<ExecutionEntity> childExecutions) {
+  protected void loadChildExecutionsFromCache(ExecutionEntity execution,
+      List<ExecutionEntity> childExecutions) {
     List<ExecutionEntity> childrenOfThisExecution = execution.getExecutions();
-    if(childrenOfThisExecution != null) {
+    if (childrenOfThisExecution != null) {
       childExecutions.addAll(childrenOfThisExecution);
       for (ExecutionEntity child : childrenOfThisExecution) {
         loadChildExecutionsFromCache(child, childExecutions);
@@ -409,7 +419,5 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     }
 
   }
-
-
 
 }

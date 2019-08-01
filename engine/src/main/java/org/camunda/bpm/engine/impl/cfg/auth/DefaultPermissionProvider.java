@@ -33,12 +33,12 @@ public class DefaultPermissionProvider implements PermissionProvider {
   public Permission getPermissionForName(String name, int resourceType) {
     return ResourceTypeUtil.getPermissionByNameAndResourceType(name, resourceType);
   }
-  
+
   @Override
   public Permission[] getPermissionsForResource(int resourceType) {
     return ResourceTypeUtil.getPermissionsByResourceType(resourceType);
   }
-  
+
   @Override
   public String getNameForResource(int resourceType) {
     Resource resourceByType = ResourceTypeUtil.getResourceByType(resourceType);

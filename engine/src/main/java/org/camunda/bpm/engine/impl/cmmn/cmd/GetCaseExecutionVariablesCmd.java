@@ -42,7 +42,8 @@ public class GetCaseExecutionVariablesCmd implements Command<VariableMap>, Seria
   protected boolean isLocal;
   protected boolean deserializeValues;
 
-  public GetCaseExecutionVariablesCmd(String caseExecutionId, Collection<String> variableNames, boolean isLocal, boolean deserializeValues) {
+  public GetCaseExecutionVariablesCmd(String caseExecutionId, Collection<String> variableNames,
+      boolean isLocal, boolean deserializeValues) {
     this.caseExecutionId = caseExecutionId;
     this.variableNames = variableNames;
     this.isLocal = isLocal;
@@ -52,13 +53,14 @@ public class GetCaseExecutionVariablesCmd implements Command<VariableMap>, Seria
   public VariableMap execute(CommandContext commandContext) {
     ensureNotNull("caseExecutionId", caseExecutionId);
 
-    CaseExecutionEntity caseExecution = commandContext
-      .getCaseExecutionManager()
-      .findCaseExecutionById(caseExecutionId);
+    CaseExecutionEntity caseExecution = commandContext.getCaseExecutionManager()
+        .findCaseExecutionById(caseExecutionId);
 
-    ensureNotNull(CaseExecutionNotFoundException.class, "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
+    ensureNotNull(CaseExecutionNotFoundException.class,
+        "case execution " + caseExecutionId + " doesn't exist", "caseExecution", caseExecution);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadCaseInstance(caseExecution);
     }
 

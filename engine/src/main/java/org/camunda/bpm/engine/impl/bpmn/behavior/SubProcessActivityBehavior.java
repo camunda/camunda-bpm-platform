@@ -26,27 +26,29 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 
-
 /**
- * Implementation of the BPMN 2.0 subprocess (formally known as 'embedded' subprocess):
- * a subprocess defined within another process definition.
+ * Implementation of the BPMN 2.0 subprocess (formally known as 'embedded' subprocess): a subprocess
+ * defined within another process definition.
  *
  * @author Joram Barrez
  */
-public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior implements CompositeActivityBehavior {
+public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior
+    implements CompositeActivityBehavior {
 
   @Override
   public void execute(ActivityExecution execution) throws Exception {
     PvmActivity activity = execution.getActivity();
     PvmActivity initialActivity = activity.getProperties().get(BpmnProperties.INITIAL_ACTIVITY);
 
-    ensureNotNull("No initial activity found for subprocess " + execution.getActivity().getId(), "initialActivity", initialActivity);
+    ensureNotNull("No initial activity found for subprocess " + execution.getActivity().getId(),
+        "initialActivity", initialActivity);
 
     execution.executeActivity(initialActivity);
   }
 
   @Override
-  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
+  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution,
+      ActivityExecution endedExecution) {
     // join
     endedExecution.remove();
     scopeExecution.tryPruneLastConcurrentChild();

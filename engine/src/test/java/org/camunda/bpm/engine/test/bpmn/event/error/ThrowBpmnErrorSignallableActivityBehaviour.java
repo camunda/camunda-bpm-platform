@@ -25,9 +25,10 @@ public class ThrowBpmnErrorSignallableActivityBehaviour extends AbstractBpmnActi
   @Override
   public void execute(ActivityExecution execution) throws Exception {
   }
-  
+
   @Override
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
     throw new BpmnError("23", "Testing bpmn error in SignallableActivityBehaviour#signal");
   }
 }

@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
-
 /**
  * @author Tom Baeyens
  * @author Falko Menge
@@ -63,8 +62,8 @@ public abstract class DeleteIdentityLinkCmd implements Command<Void>, Serializab
     // Special treatment for assignee and owner: group cannot be used and userId may be null
     if (IdentityLinkType.ASSIGNEE.equals(type) || IdentityLinkType.OWNER.equals(type)) {
       if (groupId != null) {
-        throw new ProcessEngineException("Incompatible usage: cannot use type '" + type
-          + "' together with a groupId");
+        throw new ProcessEngineException(
+            "Incompatible usage: cannot use type '" + type + "' together with a groupId");
       }
     } else {
       if (userId == null && groupId == null) {
@@ -94,7 +93,8 @@ public abstract class DeleteIdentityLinkCmd implements Command<Void>, Serializab
   }
 
   protected void checkDeleteIdentityLink(TaskEntity task, CommandContext commandContext) {
-     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkTaskAssign(task);
     }
   }

@@ -25,7 +25,9 @@ import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>Deployment operation step responsible for stopping all job acquisitions</p>
+ * <p>
+ * Deployment operation step responsible for stopping all job acquisitions
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -42,13 +44,13 @@ public class StopJobExecutorStep extends DeploymentOperationStep {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
 
-    Set<String> jobExecutorServiceNames = serviceContainer.getServiceNames(ServiceTypes.JOB_EXECUTOR);
+    Set<String> jobExecutorServiceNames = serviceContainer
+        .getServiceNames(ServiceTypes.JOB_EXECUTOR);
 
     for (String serviceName : jobExecutorServiceNames) {
       try {
         serviceContainer.stopService(serviceName);
-      }
-      catch(Exception e) {
+      } catch (Exception e) {
         LOG.exceptionWhileStopping("Job Executor Service", serviceName, e);
       }
     }

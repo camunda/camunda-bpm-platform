@@ -31,18 +31,19 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 
-
 /**
- * <p>A {@link Bindings} implementation which wraps an existing binding and enhances the key / value map with
- * <strong>read-only</strong> access to:
+ * <p>
+ * A {@link Bindings} implementation which wraps an existing binding and enhances the key / value
+ * map with <strong>read-only</strong> access to:
  * <ul>
  * <li>variables provided in a {@link VariableScope},</li>
  * <li>additional bindings provided through a set of {@link Resolver Resolvers}.</li>
  * </ul>
  *
- * <p><strong>Note on backwards compatibility:</strong> before 7.2 the Script
- * bindings behaved in a way that all script variables were automatically exposed
- * as process variables. You can enable this behavior by setting {@link #autoStoreScriptVariables}.
+ * <p>
+ * <strong>Note on backwards compatibility:</strong> before 7.2 the Script bindings behaved in a way
+ * that all script variables were automatically exposed as process variables. You can enable this
+ * behavior by setting {@link #autoStoreScriptVariables}.
  * </p>
  *
  *
@@ -52,27 +53,20 @@ import org.camunda.bpm.engine.impl.context.Context;
 public class ScriptBindings implements Bindings {
 
   /**
-   * The script engine implementations put some key/value pairs into the binding.
-   * This list contains those keys, such that they wouldn't be stored as process variable.
+   * The script engine implementations put some key/value pairs into the binding. This list contains
+   * those keys, such that they wouldn't be stored as process variable.
    *
    * This list contains the keywords for JUEL, Javascript and Groovy.
    */
-  protected static final Set<String> UNSTORED_KEYS =
-    new HashSet<String>(Arrays.asList(
-      "out",
-      "out:print",
-      "lang:import",
-      "context",
-      "elcontext",
-      "print",
-      "println",
-      "S", // Spin Internal Variable
+  protected static final Set<String> UNSTORED_KEYS = new HashSet<String>(Arrays.asList("out",
+      "out:print", "lang:import", "context", "elcontext", "print", "println", "S", // Spin Internal
+                                                                                   // Variable
       "XML", // Spin Internal Variable
       "JSON", // Spin Internal Variable
-      ScriptEngine.ARGV, // jRuby is only setting this variable and execution instead of exporting any other variables
-      "execution",
-      "__doc__" // do not export python doc string
-      ));
+      ScriptEngine.ARGV, // jRuby is only setting this variable and execution instead of exporting
+                         // any other variables
+      "execution", "__doc__" // do not export python doc string
+  ));
 
   protected List<Resolver> scriptResolvers;
   protected VariableScope variableScope;
@@ -82,7 +76,8 @@ public class ScriptBindings implements Bindings {
   /** if true, all script variables will be set in the variable scope. */
   protected boolean autoStoreScriptVariables;
 
-  public ScriptBindings(List<Resolver> scriptResolvers, VariableScope variableScope, Bindings wrappedBindings) {
+  public ScriptBindings(List<Resolver> scriptResolvers, VariableScope variableScope,
+      Bindings wrappedBindings) {
     this.scriptResolvers = scriptResolvers;
     this.variableScope = variableScope;
     this.wrappedBindings = wrappedBindings;
@@ -90,15 +85,16 @@ public class ScriptBindings implements Bindings {
   }
 
   protected boolean isAutoStoreScriptVariablesEnabled() {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if(processEngineConfiguration != null) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
+    if (processEngineConfiguration != null) {
       return processEngineConfiguration.isAutoStoreScriptVariables();
     }
     return false;
   }
 
   public boolean containsKey(Object key) {
-    for (Resolver scriptResolver: scriptResolvers) {
+    for (Resolver scriptResolver : scriptResolvers) {
       if (scriptResolver.containsKey(key)) {
         return true;
       }
@@ -109,11 +105,11 @@ public class ScriptBindings implements Bindings {
   public Object get(Object key) {
     Object result = null;
 
-    if(wrappedBindings.containsKey(key)) {
+    if (wrappedBindings.containsKey(key)) {
       result = wrappedBindings.get(key);
 
     } else {
-      for (Resolver scriptResolver: scriptResolvers) {
+      for (Resolver scriptResolver : scriptResolvers) {
         if (scriptResolver.containsKey(key)) {
           result = scriptResolver.get(key);
         }
@@ -125,7 +121,7 @@ public class ScriptBindings implements Bindings {
 
   public Object put(String name, Object value) {
 
-    if(autoStoreScriptVariables) {
+    if (autoStoreScriptVariables) {
       if (!UNSTORED_KEYS.contains(name)) {
         Object oldValue = variableScope.getVariable(name);
         variableScope.setVariable(name, value);
@@ -152,7 +148,7 @@ public class ScriptBindings implements Bindings {
     return calculateBindingMap().values();
   }
 
-  public void putAll(Map< ? extends String, ? extends Object> toMerge) {
+  public void putAll(Map<? extends String, ? extends Object> toMerge) {
     for (java.util.Map.Entry<? extends String, ? extends Object> entry : toMerge.entrySet()) {
       put(entry.getKey(), entry.getValue());
     }

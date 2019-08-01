@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.identity;
 
 import java.util.Map;
 
-
 /**
  * @author Tom Baeyens
  * 
@@ -31,7 +30,10 @@ public interface Account {
   String NAME_MAIL = "Mail";
 
   String getName();
+
   String getUsername();
+
   String getPassword();
+
   Map<String, String> getDetails();
 }

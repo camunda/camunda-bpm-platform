@@ -26,7 +26,8 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 public interface ParameterValueProvider {
 
   /**
-   * @param variableScope the scope in which the value is to be resolved.
+   * @param variableScope
+   *          the scope in which the value is to be resolved.
    * @return the value
    */
   Object getValue(VariableScope variableScope);

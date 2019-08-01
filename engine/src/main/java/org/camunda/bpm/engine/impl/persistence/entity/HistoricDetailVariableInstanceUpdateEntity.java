@@ -32,11 +32,11 @@ import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
 /**
  * @author Tom Baeyens
  */
-public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariableUpdateEventEntity implements ValueFields, HistoricVariableUpdate, DbEntityLifecycleAware {
+public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariableUpdateEventEntity
+    implements ValueFields, HistoricVariableUpdate, DbEntityLifecycleAware {
 
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
@@ -60,9 +60,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
   @Override
   public void delete() {
 
-    DbEntityManager dbEntityManger = Context
-        .getCommandContext()
-        .getDbEntityManager();
+    DbEntityManager dbEntityManger = Context.getCommandContext().getDbEntityManager();
 
     dbEntityManger.delete(this);
 
@@ -86,6 +84,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
   public String getSerializerName() {
     return typedValueField.getSerializerName();
   }
+
   @Override
   public void setSerializerName(String serializerName) {
     typedValueField.setSerializerName(serializerName);
@@ -130,25 +129,14 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[variableName=" + variableName
-           + ", variableInstanceId=" + variableInstanceId
-           + ", revision=" + revision
-           + ", serializerName=" + serializerName
-           + ", longValue=" + longValue
-           + ", doubleValue=" + doubleValue
-           + ", textValue=" + textValue
-           + ", textValue2=" + textValue2
-           + ", byteArrayId=" + byteArrayId
-           + ", activityInstanceId=" + activityInstanceId
-           + ", eventType=" + eventType
-           + ", executionId=" + executionId
-           + ", id=" + id
-           + ", processDefinitionId=" + processInstanceId
-           + ", processInstanceId=" + processInstanceId
-           + ", taskId=" + taskId
-           + ", timestamp=" + timestamp
-           + "]";
+    return this.getClass().getSimpleName() + "[variableName=" + variableName
+        + ", variableInstanceId=" + variableInstanceId + ", revision=" + revision
+        + ", serializerName=" + serializerName + ", longValue=" + longValue + ", doubleValue="
+        + doubleValue + ", textValue=" + textValue + ", textValue2=" + textValue2 + ", byteArrayId="
+        + byteArrayId + ", activityInstanceId=" + activityInstanceId + ", eventType=" + eventType
+        + ", executionId=" + executionId + ", id=" + id + ", processDefinitionId="
+        + processInstanceId + ", processInstanceId=" + processInstanceId + ", taskId=" + taskId
+        + ", timestamp=" + timestamp + "]";
   }
 
 }

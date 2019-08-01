@@ -35,7 +35,8 @@ import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
  * @author Roman Smirnov
  *
  */
-public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecutionQuery, CaseExecution> implements CaseExecutionQuery {
+public class CaseExecutionQueryImpl extends
+    AbstractVariableQueryImpl<CaseExecutionQuery, CaseExecution> implements CaseExecutionQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -202,17 +203,14 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
-      .getCaseExecutionManager()
-      .findCaseExecutionCountByQueryCriteria(this);
+    return commandContext.getCaseExecutionManager().findCaseExecutionCountByQueryCriteria(this);
   }
 
   public List<CaseExecution> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
-    List<CaseExecution> result = commandContext
-      .getCaseExecutionManager()
-      .findCaseExecutionsByQueryCriteria(this, page);
+    List<CaseExecution> result = commandContext.getCaseExecutionManager()
+        .findCaseExecutionsByQueryCriteria(this, page);
 
     for (CaseExecution caseExecution : result) {
       CaseExecutionEntity caseExecutionEntity = (CaseExecutionEntity) caseExecution;

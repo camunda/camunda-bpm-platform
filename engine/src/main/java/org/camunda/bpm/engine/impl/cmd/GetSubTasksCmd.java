@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.task.Task;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -38,9 +37,7 @@ public class GetSubTasksCmd implements Command<List<Task>>, Serializable {
   }
 
   public List<Task> execute(CommandContext commandContext) {
-    return new TaskQueryImpl()
-      .taskParentTaskId(parentTaskId)
-      .list();
+    return new TaskQueryImpl().taskParentTaskId(parentTaskId).list();
   }
 
 }

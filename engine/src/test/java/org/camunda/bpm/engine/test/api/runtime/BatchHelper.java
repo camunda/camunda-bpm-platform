@@ -51,38 +51,32 @@ public abstract class BatchHelper {
 
   public Job getJobForDefinition(JobDefinition jobDefinition) {
     if (jobDefinition != null) {
-      return getManagementService()
-        .createJobQuery().jobDefinitionId(jobDefinition.getId()).singleResult();
-    }
-    else {
+      return getManagementService().createJobQuery().jobDefinitionId(jobDefinition.getId())
+          .singleResult();
+    } else {
       return null;
     }
   }
 
   public List<Job> getJobsForDefinition(JobDefinition jobDefinition) {
-    return getManagementService()
-      .createJobQuery().jobDefinitionId(jobDefinition.getId()).list();
+    return getManagementService().createJobQuery().jobDefinitionId(jobDefinition.getId()).list();
   }
 
   public void executeJob(Job job) {
     assertNotNull("Job to execute does not exist", job);
     try {
       getManagementService().executeJob(job.getId());
-    }
-    catch (BadUserRequestException e) {
+    } catch (BadUserRequestException e) {
       throw e;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       // ignore
     }
   }
 
   public JobDefinition getSeedJobDefinition(Batch batch) {
-    return getManagementService()
-      .createJobDefinitionQuery()
-      .jobDefinitionId(batch.getSeedJobDefinitionId())
-      .jobType(BatchSeedJobHandler.TYPE)
-      .singleResult();
+    return getManagementService().createJobDefinitionQuery()
+        .jobDefinitionId(batch.getSeedJobDefinitionId()).jobType(BatchSeedJobHandler.TYPE)
+        .singleResult();
   }
 
   public Job getSeedJob(Batch batch) {
@@ -94,8 +88,9 @@ public abstract class BatchHelper {
   }
 
   public JobDefinition getMonitorJobDefinition(Batch batch) {
-    return getManagementService()
-      .createJobDefinitionQuery().jobDefinitionId(batch.getMonitorJobDefinitionId()).jobType(BatchMonitorJobHandler.TYPE).singleResult();
+    return getManagementService().createJobDefinitionQuery()
+        .jobDefinitionId(batch.getMonitorJobDefinitionId()).jobType(BatchMonitorJobHandler.TYPE)
+        .singleResult();
   }
 
   public Job getMonitorJob(Batch batch) {
@@ -166,46 +161,29 @@ public abstract class BatchHelper {
   }
 
   public HistoricBatch getHistoricBatch(Batch batch) {
-    return getHistoryService()
-      .createHistoricBatchQuery()
-      .batchId(batch.getId())
-      .singleResult();
+    return getHistoryService().createHistoricBatchQuery().batchId(batch.getId()).singleResult();
   }
+
   public List<HistoricJobLog> getHistoricSeedJobLog(Batch batch) {
-    return getHistoryService()
-      .createHistoricJobLogQuery()
-      .jobDefinitionId(batch.getSeedJobDefinitionId())
-      .orderPartiallyByOccurrence()
-      .asc()
-      .list();
+    return getHistoryService().createHistoricJobLogQuery()
+        .jobDefinitionId(batch.getSeedJobDefinitionId()).orderPartiallyByOccurrence().asc().list();
   }
 
   public List<HistoricJobLog> getHistoricMonitorJobLog(Batch batch) {
-    return getHistoryService()
-      .createHistoricJobLogQuery()
-      .jobDefinitionId(batch.getMonitorJobDefinitionId())
-      .orderPartiallyByOccurrence()
-      .asc()
-      .list();
+    return getHistoryService().createHistoricJobLogQuery()
+        .jobDefinitionId(batch.getMonitorJobDefinitionId()).orderPartiallyByOccurrence().asc()
+        .list();
   }
 
   public List<HistoricJobLog> getHistoricMonitorJobLog(Batch batch, Job monitorJob) {
-    return getHistoryService()
-      .createHistoricJobLogQuery()
-      .jobDefinitionId(batch.getMonitorJobDefinitionId())
-      .jobId(monitorJob.getId())
-      .orderPartiallyByOccurrence()
-      .asc()
-      .list();
+    return getHistoryService().createHistoricJobLogQuery()
+        .jobDefinitionId(batch.getMonitorJobDefinitionId()).jobId(monitorJob.getId())
+        .orderPartiallyByOccurrence().asc().list();
   }
 
   public List<HistoricJobLog> getHistoricBatchJobLog(Batch batch) {
-    return getHistoryService()
-      .createHistoricJobLogQuery()
-      .jobDefinitionId(batch.getBatchJobDefinitionId())
-      .orderPartiallyByOccurrence()
-      .asc()
-      .list();
+    return getHistoryService().createHistoricJobLogQuery()
+        .jobDefinitionId(batch.getBatchJobDefinitionId()).orderPartiallyByOccurrence().asc().list();
   }
 
   public Date addSeconds(Date date, int seconds) {
@@ -239,8 +217,7 @@ public abstract class BatchHelper {
   protected ManagementService getManagementService() {
     if (engineRule != null) {
       return engineRule.getManagementService();
-    }
-    else {
+    } else {
       return testCase.getProcessEngine().getManagementService();
     }
   }
@@ -248,8 +225,7 @@ public abstract class BatchHelper {
   protected HistoryService getHistoryService() {
     if (engineRule != null) {
       return engineRule.getHistoryService();
-    }
-    else {
+    } else {
       return testCase.getProcessEngine().getHistoryService();
     }
   }

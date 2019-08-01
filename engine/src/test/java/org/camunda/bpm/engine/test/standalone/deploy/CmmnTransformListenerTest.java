@@ -51,9 +51,12 @@ public class CmmnTransformListenerTest extends ResourceProcessEngineTestCase {
   @Deployment
   public void testListenerInvocation() {
     // Check if case definition has different key
-    assertEquals(0, repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testCase").count());
-    assertEquals(0, repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testCase-modified").count());
-    assertEquals(1, repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testCase-modified-modified").count());
+    assertEquals(0,
+        repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testCase").count());
+    assertEquals(0, repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("testCase-modified").count());
+    assertEquals(1, repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionKey("testCase-modified-modified").count());
 
     assertEquals(1, numberOfRegistered(Definitions.class));
     assertEquals(1, numberOfRegistered(Case.class));

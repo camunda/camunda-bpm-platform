@@ -55,27 +55,36 @@ public abstract class AbstractCorrelateMessageCmd {
     this.messageName = builder.getMessageName();
   }
 
-  protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder, boolean variablesEnabled, boolean deserializeVariableValues) {
+  protected AbstractCorrelateMessageCmd(MessageCorrelationBuilderImpl builder,
+      boolean variablesEnabled, boolean deserializeVariableValues) {
     this(builder);
     this.variablesEnabled = variablesEnabled;
     this.deserializeVariableValues = deserializeVariableValues;
   }
 
-  protected void triggerExecution(CommandContext commandContext, CorrelationHandlerResult correlationResult) {
+  protected void triggerExecution(CommandContext commandContext,
+      CorrelationHandlerResult correlationResult) {
     String executionId = correlationResult.getExecutionEntity().getId();
 
-    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId, builder.getPayloadProcessInstanceVariables(), builder.getPayloadProcessInstanceVariablesLocal(), builder.isExclusiveCorrelation());
+    MessageEventReceivedCmd command = new MessageEventReceivedCmd(messageName, executionId,
+        builder.getPayloadProcessInstanceVariables(),
+        builder.getPayloadProcessInstanceVariablesLocal(), builder.isExclusiveCorrelation());
     command.execute(commandContext);
   }
 
-  protected ProcessInstance instantiateProcess(CommandContext commandContext, CorrelationHandlerResult correlationResult) {
-    ProcessDefinitionEntity processDefinitionEntity = correlationResult.getProcessDefinitionEntity();
+  protected ProcessInstance instantiateProcess(CommandContext commandContext,
+      CorrelationHandlerResult correlationResult) {
+    ProcessDefinitionEntity processDefinitionEntity = correlationResult
+        .getProcessDefinitionEntity();
 
-    ActivityImpl messageStartEvent = processDefinitionEntity.findActivity(correlationResult.getStartEventActivityId());
-    ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(builder.getBusinessKey(), messageStartEvent);
+    ActivityImpl messageStartEvent = processDefinitionEntity
+        .findActivity(correlationResult.getStartEventActivityId());
+    ExecutionEntity processInstance = processDefinitionEntity
+        .createProcessInstance(builder.getBusinessKey(), messageStartEvent);
 
     if (variablesEnabled) {
-      variablesListener = new ExecutionVariableSnapshotObserver(processInstance, false, deserializeVariableValues);
+      variablesListener = new ExecutionVariableSnapshotObserver(processInstance, false,
+          deserializeVariableValues);
     }
 
     processInstance.setVariablesLocal(builder.getPayloadProcessInstanceVariablesLocal());
@@ -88,7 +97,8 @@ public abstract class AbstractCorrelateMessageCmd {
   protected void checkAuthorization(CorrelationHandlerResult correlation) {
     CommandContext commandContext = Context.getCommandContext();
 
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       if (MessageCorrelationResultType.Execution.equals(correlation.getResultType())) {
         ExecutionEntity execution = correlation.getExecutionEntity();
         checker.checkUpdateProcessInstanceById(execution.getProcessInstanceId());
@@ -101,12 +111,15 @@ public abstract class AbstractCorrelateMessageCmd {
     }
   }
 
-  protected MessageCorrelationResultImpl createMessageCorrelationResult(final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
-    MessageCorrelationResultImpl resultWithVariables = new MessageCorrelationResultImpl(handlerResult);
+  protected MessageCorrelationResultImpl createMessageCorrelationResult(
+      final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
+    MessageCorrelationResultImpl resultWithVariables = new MessageCorrelationResultImpl(
+        handlerResult);
     if (MessageCorrelationResultType.Execution.equals(handlerResult.getResultType())) {
       ExecutionEntity execution = findProcessInstanceExecution(commandContext, handlerResult);
       if (variablesEnabled && execution != null) {
-        variablesListener = new ExecutionVariableSnapshotObserver(execution, false, deserializeVariableValues);
+        variablesListener = new ExecutionVariableSnapshotObserver(execution, false,
+            deserializeVariableValues);
       }
       triggerExecution(commandContext, handlerResult);
     } else {
@@ -121,8 +134,10 @@ public abstract class AbstractCorrelateMessageCmd {
     return resultWithVariables;
   }
 
-  protected ExecutionEntity findProcessInstanceExecution(final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
-    ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(handlerResult.getExecution().getProcessInstanceId());
+  protected ExecutionEntity findProcessInstanceExecution(final CommandContext commandContext,
+      final CorrelationHandlerResult handlerResult) {
+    ExecutionEntity execution = commandContext.getExecutionManager()
+        .findExecutionById(handlerResult.getExecution().getProcessInstanceId());
     return execution;
   }
 

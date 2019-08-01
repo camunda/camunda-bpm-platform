@@ -24,16 +24,20 @@ import org.camunda.bpm.container.impl.RuntimeContainerDelegateImpl;
 import org.camunda.bpm.engine.ProcessEngine;
 
 /**
- * <p>The {@link RuntimeContainerDelegate} in an SPI that allows the process engine to integrate with the
- * runtime container in which it is deployed. Examples of "runtime containers" are
+ * <p>
+ * The {@link RuntimeContainerDelegate} in an SPI that allows the process engine to integrate with
+ * the runtime container in which it is deployed. Examples of "runtime containers" are
  * <ul>
- *  <li>JBoss AS 7 (Module Service Container),</li>
- *  <li>The JMX Container,</li>
- *  <li>An OSGi Runtime,</li>
- *  <li>...</li>
+ * <li>JBoss AS 7 (Module Service Container),</li>
+ * <li>The JMX Container,</li>
+ * <li>An OSGi Runtime,</li>
+ * <li>...</li>
  * </ul>
  *
- * <p>The current {@link RuntimeContainerDelegate} can be obtained through the static {@link #INSTANCE} field.</p>
+ * <p>
+ * The current {@link RuntimeContainerDelegate} can be obtained through the static {@link #INSTANCE}
+ * field.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -44,13 +48,20 @@ public interface RuntimeContainerDelegate {
   public static RuntimeContainerDelegateInstance INSTANCE = new RuntimeContainerDelegateInstance();
 
   /**
-   * <p>Adds a managed {@link ProcessEngine} to the runtime container.</p>
-   * <p>Process Engines registered through this method are returned by the {@link ProcessEngineService}.</p>
+   * <p>
+   * Adds a managed {@link ProcessEngine} to the runtime container.
+   * </p>
+   * <p>
+   * Process Engines registered through this method are returned by the
+   * {@link ProcessEngineService}.
+   * </p>
    */
   public void registerProcessEngine(ProcessEngine processEngine);
 
   /**
-   * <p>Unregisters a managed {@link ProcessEngine} instance from the Runtime Container.</p>
+   * <p>
+   * Unregisters a managed {@link ProcessEngine} instance from the Runtime Container.
+   * </p>
    */
   public void unregisterProcessEngine(ProcessEngine processEngine);
 
@@ -92,7 +103,8 @@ public interface RuntimeContainerDelegate {
   public static class RuntimeContainerDelegateInstance {
 
     // hide
-    private RuntimeContainerDelegateInstance() {}
+    private RuntimeContainerDelegateInstance() {
+    }
 
     private RuntimeContainerDelegate delegate = new RuntimeContainerDelegateImpl();
 

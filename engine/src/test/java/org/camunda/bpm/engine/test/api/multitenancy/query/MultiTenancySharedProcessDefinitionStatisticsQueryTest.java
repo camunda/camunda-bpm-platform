@@ -59,7 +59,8 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
 
       tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ONE);
       configuration.setTenantIdProvider(tenantIdProvider);
@@ -80,17 +81,13 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
   protected ProcessEngineConfiguration processEngineConfiguration;
 
-  protected static final BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess(ONE_TASK_PROCESS_DEFINITION_KEY)
-    .startEvent()
-    .userTask()
-    .done();
+  protected static final BpmnModelInstance oneTaskProcess = Bpmn
+      .createExecutableProcess(ONE_TASK_PROCESS_DEFINITION_KEY).startEvent().userTask().done();
 
-  protected static final BpmnModelInstance failingProcess = Bpmn.createExecutableProcess(FAILED_JOBS_PROCESS_DEFINITION_KEY)
-    .startEvent()
-    .serviceTask()
+  protected static final BpmnModelInstance failingProcess = Bpmn
+      .createExecutableProcess(FAILED_JOBS_PROCESS_DEFINITION_KEY).startEvent().serviceTask()
       .camundaClass("org.camunda.bpm.engine.test.api.multitenancy.FailingDelegate")
-      .camundaAsyncBefore()
-    .done();
+      .camundaAsyncBefore().done();
 
   @Rule
   public RuleChain tenantRuleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -102,7 +99,7 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
     managementService = engineRule.getManagementService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
   }
-  
+
   @Test
   public void activeProcessInstancesCountWithNoAuthenticatedTenant() {
 
@@ -111,52 +108,49 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
     startProcessInstances(ONE_TASK_PROCESS_DEFINITION_KEY);
 
     identityService.setAuthentication("user", null, null);
-    
+
     List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
-      .createProcessDefinitionStatisticsQuery()
-      .list();
- 
+        .createProcessDefinitionStatisticsQuery().list();
+
     // then
     assertEquals(1, processDefinitionsStatistics.size());
     // user must see only the process instances that belongs to no tenant
     assertEquals(1, processDefinitionsStatistics.get(0).getInstances());
-    
+
   }
 
   @Test
   public void activeProcessInstancesCountWithAuthenticatedTenant() {
 
     testRule.deploy(oneTaskProcess);
-    
+
     startProcessInstances(ONE_TASK_PROCESS_DEFINITION_KEY);
-    
+
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-    
+
     List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
-      .createProcessDefinitionStatisticsQuery()
-      .list();
- 
+        .createProcessDefinitionStatisticsQuery().list();
+
     // then
     assertEquals(1, processDefinitionsStatistics.size());
-    // user can see the process instances that belongs to tenant1 and instances that have no tenant  
+    // user can see the process instances that belongs to tenant1 and instances that have no tenant
     assertEquals(2, processDefinitionsStatistics.get(0).getInstances());
-    
+
   }
 
   @Test
   public void activeProcessInstancesCountWithDisabledTenantCheck() {
 
     testRule.deploy(oneTaskProcess);
-    
+
     startProcessInstances(ONE_TASK_PROCESS_DEFINITION_KEY);
-    
+
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
-    
+
     List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
-      .createProcessDefinitionStatisticsQuery()
-      .list();
- 
+        .createProcessDefinitionStatisticsQuery().list();
+
     // then
     assertEquals(1, processDefinitionsStatistics.size());
     assertEquals(3, processDefinitionsStatistics.get(0).getInstances());
@@ -168,48 +162,44 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
     testRule.deploy(oneTaskProcess);
 
     startProcessInstances(ONE_TASK_PROCESS_DEFINITION_KEY);
-    
+
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
-    
+
     List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
-      .createProcessDefinitionStatisticsQuery()
-      .list();
- 
+        .createProcessDefinitionStatisticsQuery().list();
+
     // then
     assertEquals(1, processDefinitionsStatistics.size());
-    // user can see all the active process instances 
+    // user can see all the active process instances
     assertEquals(3, processDefinitionsStatistics.get(0).getInstances());
-    
+
   }
 
   @Test
   public void failedJobsCountWithWithNoAuthenticatedTenant() {
 
     testRule.deploy(failingProcess);
-    
+
     startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
 
     testRule.executeAvailableJobs();
 
     identityService.setAuthentication("user", null, null);
 
-    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
-        managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeFailedJobs()
-        .list();
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+        .createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
 
     // then
     assertEquals(1, processDefinitionsStatistics.size());
     assertEquals(1, processDefinitionsStatistics.get(0).getFailedJobs());
-    
+
   }
 
   @Test
   public void failedJobsCountWithWithDisabledTenantCheck() {
 
     testRule.deploy(failingProcess);
-    
+
     startProcessInstances(FAILED_JOBS_PROCESS_DEFINITION_KEY);
 
     testRule.executeAvailableJobs();
@@ -217,16 +207,13 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
-        managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeFailedJobs()
-        .list();
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+        .createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
 
     // then
     assertEquals(1, processDefinitionsStatistics.size());
     assertEquals(3, processDefinitionsStatistics.get(0).getFailedJobs());
-    
+
   }
 
   @Test
@@ -240,11 +227,8 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
-        managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeFailedJobs()
-        .list();
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+        .createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
 
     // then
     assertEquals(1, processDefinitionsStatistics.size());
@@ -262,11 +246,8 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
-    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
-        managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeFailedJobs()
-        .list();
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+        .createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
 
     // then
     assertEquals(1, processDefinitionsStatistics.size());
@@ -284,16 +265,14 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
     identityService.setAuthentication("user", null, null);
 
-    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
-        managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeIncidents()
-        .list();
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+        .createProcessDefinitionStatisticsQuery().includeIncidents().list();
 
     // then
     assertEquals(1, processDefinitionsStatistics.size());
-    
-    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0).getIncidentStatistics();
+
+    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0)
+        .getIncidentStatistics();
     assertEquals(1, incidentStatistics.size());
     assertEquals(1, incidentStatistics.get(0).getIncidentCount());
   }
@@ -310,16 +289,14 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
-        managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeIncidents()
-        .list();
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+        .createProcessDefinitionStatisticsQuery().includeIncidents().list();
 
     // then
     assertEquals(1, processDefinitionsStatistics.size());
-    
-    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0).getIncidentStatistics();
+
+    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0)
+        .getIncidentStatistics();
     assertEquals(1, incidentStatistics.size());
     assertEquals(3, incidentStatistics.get(0).getIncidentCount());
   }
@@ -335,16 +312,14 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
-        managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeIncidents()
-        .list();
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+        .createProcessDefinitionStatisticsQuery().includeIncidents().list();
 
     // then
     assertEquals(1, processDefinitionsStatistics.size());
-    
-    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0).getIncidentStatistics();
+
+    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0)
+        .getIncidentStatistics();
     assertEquals(1, incidentStatistics.size());
     assertEquals(2, incidentStatistics.get(0).getIncidentCount());
   }
@@ -360,15 +335,13 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
-    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
-        managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeIncidents()
-        .list();
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+        .createProcessDefinitionStatisticsQuery().includeIncidents().list();
 
     // then
     assertEquals(1, processDefinitionsStatistics.size());
-    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0).getIncidentStatistics();
+    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0)
+        .getIncidentStatistics();
     assertEquals(1, incidentStatistics.size());
     assertEquals(3, incidentStatistics.get(0).getIncidentCount());
   }
@@ -384,16 +357,14 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
-        managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeIncidentsForType("failedJob")
-        .list();
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+        .createProcessDefinitionStatisticsQuery().includeIncidentsForType("failedJob").list();
 
     // then
     assertEquals(1, processDefinitionsStatistics.size());
-    
-    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0).getIncidentStatistics();
+
+    List<IncidentStatistics> incidentStatistics = processDefinitionsStatistics.get(0)
+        .getIncidentStatistics();
     assertEquals(1, incidentStatistics.size());
     assertEquals(2, incidentStatistics.get(0).getIncidentCount());
   }
@@ -409,20 +380,17 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    List<ProcessDefinitionStatistics> processDefinitionsStatistics =
-        managementService
-        .createProcessDefinitionStatisticsQuery()
-        .includeFailedJobs()
-        .includeIncidents()
-        .list();
+    List<ProcessDefinitionStatistics> processDefinitionsStatistics = managementService
+        .createProcessDefinitionStatisticsQuery().includeFailedJobs().includeIncidents().list();
 
     // then
     assertEquals(1, processDefinitionsStatistics.size());
     ProcessDefinitionStatistics processDefinitionStatistics = processDefinitionsStatistics.get(0);
     assertEquals(2, processDefinitionStatistics.getInstances());
     assertEquals(2, processDefinitionStatistics.getFailedJobs());
-    
-    List<IncidentStatistics> incidentStatistics = processDefinitionStatistics.getIncidentStatistics();
+
+    List<IncidentStatistics> incidentStatistics = processDefinitionStatistics
+        .getIncidentStatistics();
     assertEquals(1, incidentStatistics.size());
     assertEquals(2, incidentStatistics.get(0).getIncidentCount());
   }
@@ -433,9 +401,9 @@ public class MultiTenancySharedProcessDefinitionStatisticsQueryTest {
 
     setTenantIdProvider(TENANT_ONE);
     runtimeService.startProcessInstanceByKey(key);
-    
+
     setTenantIdProvider(TENANT_TWO);
-    runtimeService.startProcessInstanceByKey(key);  
+    runtimeService.startProcessInstanceByKey(key);
   }
 
   protected void setTenantIdProvider(String tenantId) {

@@ -38,13 +38,13 @@ public class GetHistoricJobLogExceptionStacktraceCmd implements Command<String> 
   public String execute(CommandContext commandContext) {
     ensureNotNull("historicJobLogId", historicJobLogId);
 
-    HistoricJobLogEventEntity job = commandContext
-        .getHistoricJobLogManager()
+    HistoricJobLogEventEntity job = commandContext.getHistoricJobLogManager()
         .findHistoricJobLogById(historicJobLogId);
 
     ensureNotNull("No historic job log found with id " + historicJobLogId, "historicJobLog", job);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadHistoricJobLog(job);
     }
 

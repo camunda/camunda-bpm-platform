@@ -19,19 +19,21 @@ package org.camunda.bpm.engine.batch;
 import org.camunda.bpm.engine.ManagementService;
 
 /**
- * <p>A batch represents a number of jobs which
- * execute a number of commands asynchronously.
  * <p>
- * <p>Batches have three types of jobs:
+ * A batch represents a number of jobs which execute a number of commands asynchronously.
+ * <p>
+ * <p>
+ * Batches have three types of jobs:
  * <ul>
  * <li>Seed jobs: Create execution jobs
  * <li>Execution jobs: Execute the actual action
- * <li>Monitor jobs: Manage the batch once all execution jobs have been created
- * (e.g. responsible for deletion of the Batch after completion).
+ * <li>Monitor jobs: Manage the batch once all execution jobs have been created (e.g. responsible
+ * for deletion of the Batch after completion).
  * </ul>
  * <p>
- * <p>All three job types have independent job definitions. They can be controlled individually
- * (e.g. suspension) and are independently represented in the historic job log.
+ * <p>
+ * All three job types have independent job definitions. They can be controlled individually (e.g.
+ * suspension) and are independently represented in the historic job log.
  */
 public interface Batch {
 
@@ -105,14 +107,14 @@ public interface Batch {
 
   /**
    * <p>
-   * Indicates whether this batch is suspended. If a batch is suspended,
-   * the batch jobs will not be acquired by the job executor.
+   * Indicates whether this batch is suspended. If a batch is suspended, the batch jobs will not be
+   * acquired by the job executor.
    * </p>
    * <p>
    * <p>
-   * <strong>Note:</strong> It is still possible to manually suspend and activate
-   * jobs and job definitions using the {@link ManagementService}, which will
-   * not change the suspension state of the batch.
+   * <strong>Note:</strong> It is still possible to manually suspend and activate jobs and job
+   * definitions using the {@link ManagementService}, which will not change the suspension state of
+   * the batch.
    * </p>
    *
    * @return true if this batch is currently suspended, false otherwise

@@ -20,9 +20,10 @@ import org.camunda.bpm.application.impl.metadata.ProcessesXmlParse;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.xml.Parser;
 
-
 /**
- * <p>A SAX Parser for the bpm-platform.xml file</p>
+ * <p>
+ * A SAX Parser for the bpm-platform.xml file
+ * </p>
  *
  * @author Daniel Meyer
  *

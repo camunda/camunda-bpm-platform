@@ -89,25 +89,25 @@ public class CleanableHistoricProcessInstanceReportTest {
       taskService.deleteTask(task.getId(), true);
     }
 
-    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> historicProcessInstances = historyService
+        .createHistoricProcessInstanceQuery().list();
     for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
       historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
     }
   }
 
   protected BpmnModelInstance createProcessWithUserTask(String key) {
-    return Bpmn.createExecutableProcess(key)
-        .startEvent()
-        .userTask(key + "_task1")
-          .name(key + " Task 1")
-        .endEvent()
-        .done();
+    return Bpmn.createExecutableProcess(key).startEvent().userTask(key + "_task1")
+        .name(key + " Task 1").endEvent().done();
   }
 
-  protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).list();
+  protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive,
+      int instanceCount) {
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(key).list();
     assertEquals(1, processDefinitions.size());
-    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitions.get(0).getId(), historyTimeToLive);
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitions.get(0).getId(),
+        historyTimeToLive);
 
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, daysInThePast));
@@ -134,13 +134,20 @@ public class CleanableHistoricProcessInstanceReportTest {
     prepareProcessInstances(THIRD_PROCESS_DEFINITION_KEY, -6, null, 10);
     prepareProcessInstances(FOURTH_PROCESS_DEFINITION_KEY, -6, 0, 10);
 
-    repositoryService.deleteProcessDefinition(
-        repositoryService.createProcessDefinitionQuery().processDefinitionKey(SECOND_PROCESS_DEFINITION_KEY).singleResult().getId(), false);
+    repositoryService.deleteProcessDefinition(repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(SECOND_PROCESS_DEFINITION_KEY).singleResult().getId(), false);
 
     // when
-    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
-    CleanableHistoricProcessInstanceReportResult secondReportResult = historyService.createCleanableHistoricProcessInstanceReport().processDefinitionIdIn(repositoryService.createProcessDefinitionQuery().processDefinitionKey(THIRD_PROCESS_DEFINITION_KEY).singleResult().getId()).singleResult();
-    CleanableHistoricProcessInstanceReportResult thirdReportResult = historyService.createCleanableHistoricProcessInstanceReport().processDefinitionKeyIn(FOURTH_PROCESS_DEFINITION_KEY).singleResult();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricProcessInstanceReport().list();
+    CleanableHistoricProcessInstanceReportResult secondReportResult = historyService
+        .createCleanableHistoricProcessInstanceReport()
+        .processDefinitionIdIn(repositoryService.createProcessDefinitionQuery()
+            .processDefinitionKey(THIRD_PROCESS_DEFINITION_KEY).singleResult().getId())
+        .singleResult();
+    CleanableHistoricProcessInstanceReportResult thirdReportResult = historyService
+        .createCleanableHistoricProcessInstanceReport()
+        .processDefinitionKeyIn(FOURTH_PROCESS_DEFINITION_KEY).singleResult();
 
     // then
     assertEquals(3, reportResults.size());
@@ -157,7 +164,8 @@ public class CleanableHistoricProcessInstanceReportTest {
     checkResultNumbers(thirdReportResult, 10, 10);
   }
 
-  private void checkResultNumbers(CleanableHistoricProcessInstanceReportResult result, int expectedCleanable, int expectedFinished) {
+  private void checkResultNumbers(CleanableHistoricProcessInstanceReportResult result,
+      int expectedCleanable, int expectedFinished) {
     assertEquals(expectedCleanable, result.getCleanableProcessInstanceCount());
     assertEquals(expectedFinished, result.getFinishedProcessInstanceCount());
   }
@@ -168,7 +176,8 @@ public class CleanableHistoricProcessInstanceReportTest {
     prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricProcessInstanceReport().list();
     long count = historyService.createCleanableHistoricProcessInstanceReport().count();
 
     // then
@@ -185,7 +194,8 @@ public class CleanableHistoricProcessInstanceReportTest {
     prepareProcessInstances(PROCESS_DEFINITION_KEY, 0, 5, 5);
 
     // when
-    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -200,7 +210,8 @@ public class CleanableHistoricProcessInstanceReportTest {
     prepareProcessInstances(PROCESS_DEFINITION_KEY, 0, 0, 5);
 
     // when
-    CleanableHistoricProcessInstanceReportResult result = historyService.createCleanableHistoricProcessInstanceReport().singleResult();
+    CleanableHistoricProcessInstanceReportResult result = historyService
+        .createCleanableHistoricProcessInstanceReport().singleResult();
 
     // then
     checkResultNumbers(result, 10, 10);
@@ -213,7 +224,8 @@ public class CleanableHistoricProcessInstanceReportTest {
     prepareProcessInstances(PROCESS_DEFINITION_KEY, 0, null, 5);
 
     // when
-    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -223,7 +235,8 @@ public class CleanableHistoricProcessInstanceReportTest {
 
   @Test
   public void testReportByInvalidProcessDefinitionId() {
-    CleanableHistoricProcessInstanceReport report = historyService.createCleanableHistoricProcessInstanceReport();
+    CleanableHistoricProcessInstanceReport report = historyService
+        .createCleanableHistoricProcessInstanceReport();
 
     try {
       report.processDefinitionIdIn(null);
@@ -242,7 +255,8 @@ public class CleanableHistoricProcessInstanceReportTest {
 
   @Test
   public void testReportByInvalidProcessDefinitionKey() {
-    CleanableHistoricProcessInstanceReport report = historyService.createCleanableHistoricProcessInstanceReport();
+    CleanableHistoricProcessInstanceReport report = historyService
+        .createCleanableHistoricProcessInstanceReport();
 
     try {
       report.processDefinitionKeyIn(null);
@@ -262,16 +276,19 @@ public class CleanableHistoricProcessInstanceReportTest {
   @Test
   public void testReportCompact() {
     // given
-    List<ProcessDefinition> pdList = repositoryService.createProcessDefinitionQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).list();
+    List<ProcessDefinition> pdList = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY).list();
     assertEquals(1, pdList.size());
     runtimeService.startProcessInstanceById(pdList.get(0).getId());
 
-    List<CleanableHistoricProcessInstanceReportResult> resultWithZeros = historyService.createCleanableHistoricProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> resultWithZeros = historyService
+        .createCleanableHistoricProcessInstanceReport().list();
     assertEquals(1, resultWithZeros.size());
     assertEquals(0, resultWithZeros.get(0).getFinishedProcessInstanceCount());
 
     // when
-    long resultCountWithoutZeros = historyService.createCleanableHistoricProcessInstanceReport().compact().count();
+    long resultCountWithoutZeros = historyService.createCleanableHistoricProcessInstanceReport()
+        .compact().count();
 
     // then
     assertEquals(0, resultCountWithoutZeros);
@@ -288,10 +305,7 @@ public class CleanableHistoricProcessInstanceReportTest {
 
     // when
     List<CleanableHistoricProcessInstanceReportResult> reportResult = historyService
-      .createCleanableHistoricProcessInstanceReport()
-      .orderByFinished()
-      .asc()
-      .list();
+        .createCleanableHistoricProcessInstanceReport().orderByFinished().asc().list();
 
     // then
     assertEquals(3, reportResult.size());
@@ -311,10 +325,7 @@ public class CleanableHistoricProcessInstanceReportTest {
 
     // when
     List<CleanableHistoricProcessInstanceReportResult> reportResult = historyService
-      .createCleanableHistoricProcessInstanceReport()
-      .orderByFinished()
-      .desc()
-      .list();
+        .createCleanableHistoricProcessInstanceReport().orderByFinished().desc().list();
 
     // then
     assertEquals(3, reportResult.size());

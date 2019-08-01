@@ -40,6 +40,4 @@ public class CancelAcquiredJobTest extends PluggableProcessEngineTestCase {
 
   }
 
-
-
 }

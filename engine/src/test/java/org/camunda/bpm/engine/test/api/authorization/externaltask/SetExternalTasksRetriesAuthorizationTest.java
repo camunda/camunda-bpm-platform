@@ -57,31 +57,26 @@ public class SetExternalTasksRetriesAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-      .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId2", "userId", Permissions.UPDATE))
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId1", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.UPDATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId1", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId2", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds()
-      );
+        scenario()
+            .withAuthorizations(grant(Resources.PROCESS_INSTANCE, "processInstanceId2", "userId",
+                Permissions.UPDATE))
+            .withoutAuthorizations().failsDueToRequired(
+                grant(Resources.PROCESS_INSTANCE, "processInstanceId1", "userId",
+                    Permissions.UPDATE),
+                grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId",
+                    Permissions.UPDATE_INSTANCE)),
+        scenario().withAuthorizations(
+            grant(Resources.PROCESS_INSTANCE, "processInstanceId1", "userId", Permissions.UPDATE),
+            grant(Resources.PROCESS_INSTANCE, "processInstanceId2", "userId", Permissions.UPDATE))
+            .succeeds(),
+        scenario().withAuthorizations(
+            grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)).succeeds(),
+        scenario().withAuthorizations(grant(Resources.PROCESS_DEFINITION, "processDefinitionKey",
+            "userId", Permissions.UPDATE_INSTANCE)).succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
+            .succeeds());
   }
 
   @Before
@@ -99,23 +94,22 @@ public class SetExternalTasksRetriesAuthorizationTest {
   public void testSetRetrieSync() {
 
     // given
-    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance1 = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("oneExternalTaskProcess");
     List<ExternalTask> tasks = engineRule.getExternalTaskService().createExternalTaskQuery().list();
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("processInstanceId1", processInstance1.getId())
-      .bindResource("processInstanceId2", processInstance2.getId())
-      .bindResource("processDefinitionKey", "oneExternalTaskProcess")
-      .start();
-    
+    authRule.init(scenario).withUser("userId")
+        .bindResource("processInstanceId1", processInstance1.getId())
+        .bindResource("processInstanceId2", processInstance2.getId())
+        .bindResource("processDefinitionKey", "oneExternalTaskProcess").start();
+
     ArrayList<String> externalTaskIds = new ArrayList<String>();
     externalTaskIds.add(tasks.get(0).getId());
     externalTaskIds.add(tasks.get(1).getId());
-    
+
     engineRule.getExternalTaskService().setRetries(externalTaskIds, 5);
 
     // then

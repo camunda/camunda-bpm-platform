@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Thorben Lindhauer
  *
  */
-public class PvmAtomicOperationActivityInitStackNotifyListenerReturn extends PvmAtomicOperationActivityInstanceStart {
+public class PvmAtomicOperationActivityInitStackNotifyListenerReturn
+    extends PvmAtomicOperationActivityInstanceStart {
 
   public String getCanonicalName() {
     return "activity-init-stack-notify-listener-return";
@@ -36,7 +37,7 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerReturn extends Pvm
   protected ScopeImpl getScope(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
 
-    if (activity!=null) {
+    if (activity != null) {
       return activity;
     } else {
       PvmExecutionImpl parent = execution.getParent();
@@ -61,8 +62,7 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerReturn extends Pvm
     if (instantiationStack.getActivities().isEmpty()) {
       // done
       return;
-    }
-    else {
+    } else {
       // else instantiate the activity stack further
       execution.setActivity(null);
       execution.performOperation(ACTIVITY_INIT_STACK_AND_RETURN);

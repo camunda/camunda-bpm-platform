@@ -37,7 +37,8 @@ public class ExecutionTreeProcessDefinitionIdAssertion implements ExecutionTreeA
 
     if (!nonMatchingExecutions.isEmpty()) {
       StringBuilder sb = new StringBuilder();
-      sb.append("Expected all executions to have process definition id " + expectedProcessDefinitionId + "\n");
+      sb.append("Expected all executions to have process definition id "
+          + expectedProcessDefinitionId + "\n");
       sb.append("Actual Tree: \n");
       sb.append(tree);
       sb.append("\nExecutions with unexpected process definition id:\n");
@@ -68,7 +69,8 @@ public class ExecutionTreeProcessDefinitionIdAssertion implements ExecutionTreeA
     return unmatchedExecutions;
   }
 
-  public static ExecutionTreeProcessDefinitionIdAssertion processDefinitionId(String expectedProcessDefinitionId) {
+  public static ExecutionTreeProcessDefinitionIdAssertion processDefinitionId(
+      String expectedProcessDefinitionId) {
     ExecutionTreeProcessDefinitionIdAssertion assertion = new ExecutionTreeProcessDefinitionIdAssertion();
     assertion.expectedProcessDefinitionId = expectedProcessDefinitionId;
 

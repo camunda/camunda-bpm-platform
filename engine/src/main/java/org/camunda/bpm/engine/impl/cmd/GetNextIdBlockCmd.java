@@ -21,26 +21,23 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 
-
 /**
  * @author Tom Baeyens
  */
 public class GetNextIdBlockCmd implements Command<IdBlock> {
-  
+
   private static final long serialVersionUID = 1L;
   protected int idBlockSize;
-  
+
   public GetNextIdBlockCmd(int idBlockSize) {
     this.idBlockSize = idBlockSize;
   }
 
   public IdBlock execute(CommandContext commandContext) {
-    PropertyEntity property = commandContext
-      .getPropertyManager()
-      .findPropertyById("next.dbid");
+    PropertyEntity property = commandContext.getPropertyManager().findPropertyById("next.dbid");
     long oldValue = Long.parseLong(property.getValue());
-    long newValue = oldValue+idBlockSize;
+    long newValue = oldValue + idBlockSize;
     property.setValue(Long.toString(newValue));
-    return new IdBlock(oldValue, newValue-1);
+    return new IdBlock(oldValue, newValue - 1);
   }
 }

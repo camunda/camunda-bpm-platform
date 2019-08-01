@@ -27,7 +27,8 @@ import org.junit.runners.Parameterized;
  * @author Christopher Zell
  */
 @RunWith(Parameterized.class)
-public class HandleExternalTaskFailureAuthorizationTest extends HandleExternalTaskAuthorizationTest {
+public class HandleExternalTaskFailureAuthorizationTest
+    extends HandleExternalTaskAuthorizationTest {
 
   @Override
   public void testExternalTaskApi(LockedExternalTask task) {
@@ -36,8 +37,8 @@ public class HandleExternalTaskFailureAuthorizationTest extends HandleExternalTa
 
   @Override
   public void assertExternalTaskResults() {
-    ExternalTask externalTask = engineRule.getExternalTaskService()
-      .createExternalTaskQuery().singleResult();
+    ExternalTask externalTask = engineRule.getExternalTaskService().createExternalTaskQuery()
+        .singleResult();
 
     Assert.assertEquals(5, (int) externalTask.getRetries());
     Assert.assertEquals("error", externalTask.getErrorMessage());

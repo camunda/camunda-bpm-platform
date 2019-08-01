@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.bpmn.event.timer;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Kristin Polenz
  */

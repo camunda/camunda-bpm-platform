@@ -39,8 +39,10 @@ public class InstantiationStack {
     this.activities = activities;
   }
 
-  public InstantiationStack(List<PvmActivity> activities, PvmActivity targetActivity, PvmTransition targetTransition) {
-    EnsureUtil.ensureOnlyOneNotNull("target must be either a transition or an activity", targetActivity, targetTransition);
+  public InstantiationStack(List<PvmActivity> activities, PvmActivity targetActivity,
+      PvmTransition targetTransition) {
+    EnsureUtil.ensureOnlyOneNotNull("target must be either a transition or an activity",
+        targetActivity, targetTransition);
     this.activities = activities;
     // TODO: make this a subclass that contains targetActivity and targetTransition?!
     this.targetActivity = targetActivity;

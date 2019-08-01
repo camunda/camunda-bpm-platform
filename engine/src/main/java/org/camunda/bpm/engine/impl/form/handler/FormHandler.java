@@ -23,13 +23,13 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.variable.VariableMap;
 
-
 /**
  * @author Tom Baeyens
  */
 public interface FormHandler {
 
-  void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse);
+  void parseConfiguration(Element activityElement, DeploymentEntity deployment,
+      ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse);
 
   void submitFormVariables(VariableMap properties, VariableScope variableScope);
 }

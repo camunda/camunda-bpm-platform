@@ -37,11 +37,10 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testJavaServiceDelegation() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("javaServiceDelegation", CollectionUtil.singletonMap("input", "Activiti BPM Engine"));
-    Execution execution = runtimeService.createExecutionQuery()
-      .processInstanceId(pi.getId())
-      .activityId("waitState")
-      .singleResult();
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("javaServiceDelegation",
+        CollectionUtil.singletonMap("input", "Activiti BPM Engine"));
+    Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId())
+        .activityId("waitState").singleResult();
     assertEquals("ACTIVITI BPM ENGINE", runtimeService.getVariable(execution.getId(), "input"));
   }
 
@@ -50,10 +49,8 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
     // Process contains 2 service-tasks using field-injection. One should use the exposed setter,
     // the other is using the private field.
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("fieldInjection");
-    Execution execution = runtimeService.createExecutionQuery()
-      .processInstanceId(pi.getId())
-      .activityId("waitState")
-      .singleResult();
+    Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId())
+        .activityId("waitState").singleResult();
 
     assertEquals("HELLO WORLD", runtimeService.getVariable(execution.getId(), "var"));
     assertEquals("HELLO SETTER", runtimeService.getVariable(execution.getId(), "setterVar"));
@@ -67,10 +64,8 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
     vars.put("genderBean", new GenderBean());
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("expressionFieldInjection", vars);
-    Execution execution = runtimeService.createExecutionQuery()
-      .processInstanceId(pi.getId())
-      .activityId("waitState")
-      .singleResult();
+    Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId())
+        .activityId("waitState").singleResult();
 
     assertEquals("timrek .rM olleH", runtimeService.getVariable(execution.getId(), "var2"));
     assertEquals("elam :si redneg ruoY", runtimeService.getVariable(execution.getId(), "var1"));
@@ -82,7 +77,8 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
       runtimeService.startProcessInstanceByKey("unexistingClassDelegation");
       fail();
     } catch (ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("Exception while instantiating class 'org.camunda.bpm.engine.test.BogusClass'"));
+      assertTrue(e.getMessage().contains(
+          "Exception while instantiating class 'org.camunda.bpm.engine.test.BogusClass'"));
       assertNotNull(e.getCause());
       assertTrue(e.getCause() instanceof ClassLoadingException);
     }
@@ -90,7 +86,9 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
 
   public void testIllegalUseOfResultVariableName() {
     try {
-      repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/servicetask/JavaServiceTaskTest.testIllegalUseOfResultVariableName.bpmn20.xml").deploy();
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/servicetask/JavaServiceTaskTest.testIllegalUseOfResultVariableName.bpmn20.xml")
+          .deploy();
       fail();
     } catch (ProcessEngineException e) {
       assertTrue(e.getMessage().contains("resultVariable"));
@@ -118,16 +116,21 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testGetBusinessKeyFromDelegateExecution() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("businessKeyProcess", "1234567890");
-    assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("businessKeyProcess").count());
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("businessKeyProcess",
+        "1234567890");
+    assertEquals(1, runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("businessKeyProcess").count());
 
     // Check if business-key was available from the process
-    String key = (String) runtimeService.getVariable(processInstance.getId(), "businessKeySetOnExecution");
+    String key = (String) runtimeService.getVariable(processInstance.getId(),
+        "businessKeySetOnExecution");
     assertNotNull(key);
     assertEquals("1234567890", key);
 
-    // check if BaseDelegateExecution#getBusinessKey() behaves like DelegateExecution#getProcessBusinessKey()
-    String key2 = (String) runtimeService.getVariable(processInstance.getId(), "businessKeyAsProcessBusinessKey");
+    // check if BaseDelegateExecution#getBusinessKey() behaves like
+    // DelegateExecution#getProcessBusinessKey()
+    String key2 = (String) runtimeService.getVariable(processInstance.getId(),
+        "businessKeyAsProcessBusinessKey");
     assertEquals(key2, key);
   }
 

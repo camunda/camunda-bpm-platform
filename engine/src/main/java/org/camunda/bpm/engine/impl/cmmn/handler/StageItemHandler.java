@@ -31,7 +31,8 @@ import org.camunda.bpm.model.cmmn.instance.Stage;
  */
 public class StageItemHandler extends ItemHandler {
 
-  protected void initializeAutoComplete(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeAutoComplete(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     PlanItemDefinition definition = getDefinition(element);
     if (definition instanceof Stage) {
       Stage stage = (Stage) definition;

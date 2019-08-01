@@ -25,8 +25,8 @@ import java.util.concurrent.locks.LockSupport;
  * Implementation Notes:
  * <ul>
  * <li>{@link #await(long)} may spuriously return before the deadline is reached.</li>
- * <li>if {@link #signal()} is called before the consumer thread calls {@link #await(long)},
- * the next call to {@link #await(long)} returns immediately.</li>
+ * <li>if {@link #signal()} is called before the consumer thread calls {@link #await(long)}, the
+ * next call to {@link #await(long)} returns immediately.</li>
  * </ul>
  */
 public class SingleConsumerCondition {
@@ -49,7 +49,8 @@ public class SingleConsumerCondition {
 
   public void await(long millis) {
     if (Thread.currentThread() != consumer) {
-      throw new RuntimeException("Wrong usage of SingleConsumerCondition: can only await in consumer thread.");
+      throw new RuntimeException(
+          "Wrong usage of SingleConsumerCondition: can only await in consumer thread.");
     }
 
     // NOTE: may spuriously return before deadline

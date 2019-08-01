@@ -24,52 +24,70 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 
-public interface ModificationBuilder extends InstantiationBuilder<ModificationBuilder>{
+public interface ModificationBuilder extends InstantiationBuilder<ModificationBuilder> {
 
   /**
-   * <p><i>Submits the instruction:</i></p>
+   * <p>
+   * <i>Submits the instruction:</i>
+   * </p>
    *
-   * <p>Cancel all instances of the given activity in an arbitrary order, which are:
+   * <p>
+   * Cancel all instances of the given activity in an arbitrary order, which are:
    * <ul>
-   *   <li>activity instances of that activity
-   *   <li>transition instances entering or leaving that activity
-   * </ul></p>
+   * <li>activity instances of that activity
+   * <li>transition instances entering or leaving that activity
+   * </ul>
+   * </p>
    *
-   * <p>The cancellation order of the instances is arbitrary</p>
+   * <p>
+   * The cancellation order of the instances is arbitrary
+   * </p>
    *
-   * @param activityId the activity for which all instances should be cancelled
+   * @param activityId
+   *          the activity for which all instances should be cancelled
    */
   ModificationBuilder cancelAllForActivity(String activityId);
 
   /**
-   * <p><i>Submits the instruction:</i></p>
+   * <p>
+   * <i>Submits the instruction:</i>
+   * </p>
    *
-   * <p>Cancel all instances of the given activity in an arbitrary order, which are:
+   * <p>
+   * Cancel all instances of the given activity in an arbitrary order, which are:
    * <ul>
-   *   <li>activity instances of that activity
-   *   <li>transition instances entering or leaving that activity
-   * </ul></p>
+   * <li>activity instances of that activity
+   * <li>transition instances entering or leaving that activity
+   * </ul>
+   * </p>
    *
-   * <p>The cancellation order of the instances is arbitrary</p>
+   * <p>
+   * The cancellation order of the instances is arbitrary
+   * </p>
    *
-   * @param activityId the activity for which all instances should be cancelled
+   * @param activityId
+   *          the activity for which all instances should be cancelled
    * @param cancelCurrentActiveActivityInstances
    */
-  ModificationBuilder cancelAllForActivity(String activityId, boolean cancelCurrentActiveActivityInstances);
+  ModificationBuilder cancelAllForActivity(String activityId,
+      boolean cancelCurrentActiveActivityInstances);
 
   /**
-   * @param processInstanceIds the process instance ids to modify.
+   * @param processInstanceIds
+   *          the process instance ids to modify.
    */
   ModificationBuilder processInstanceIds(List<String> processInstanceIds);
 
   /**
-   * @param processInstanceIds the process instance ids to modify.
+   * @param processInstanceIds
+   *          the process instance ids to modify.
    */
   ModificationBuilder processInstanceIds(String... processInstanceIds);
 
   /**
-   * @param processInstanceQuery a query which selects the process instances to modify.
-   *   Query results are restricted to process instances for which the user has {@link Permissions#READ} permission.
+   * @param processInstanceQuery
+   *          a query which selects the process instances to modify. Query results are restricted to
+   *          process instances for which the user has {@link Permissions#READ} permission.
    */
   ModificationBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery);
 
@@ -87,25 +105,28 @@ public interface ModificationBuilder extends InstantiationBuilder<ModificationBu
    * Execute the modification synchronously.
    *
    * @throws AuthorizationException
-   *   if the user has not all of the following permissions
-   *   <ul>
-   *      <li>if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
-   *   </ul>
+   *           if the user has not all of the following permissions
+   *           <ul>
+   *           <li>if the user has no {@link Permissions#UPDATE} permission on
+   *           {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE}
+   *           permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *           </ul>
    */
   void execute();
 
   /**
-   * Execute the modification asynchronously as batch. The returned batch
-   * can be used to track the progress of the modification.
+   * Execute the modification asynchronously as batch. The returned batch can be used to track the
+   * progress of the modification.
    *
    * @return the batch which executes the modification asynchronously.
    *
    * @throws AuthorizationException
-   *   if the user has not all of the following permissions
-   *   <ul>
-   *     <li>{@link Permissions#CREATE} or {@link BatchPermissions#CREATE_BATCH_MODIFY_PROCESS_INSTANCES} permission on {@link Resources#BATCH}</li>
-   *   </ul>
+   *           if the user has not all of the following permissions
+   *           <ul>
+   *           <li>{@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_MODIFY_PROCESS_INSTANCES} permission on
+   *           {@link Resources#BATCH}</li>
+   *           </ul>
    */
   Batch executeAsync();
 }
-

@@ -40,13 +40,15 @@ import static org.camunda.bpm.engine.impl.util.StringUtil.isCompositeExpression;
 public abstract class CallingTaskItemHandler extends TaskItemHandler {
 
   @Override
-  protected void initializeActivity(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeActivity(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     super.initializeActivity(element, activity, context);
 
     initializeCallableElement(element, activity, context);
   }
 
-  protected void initializeCallableElement(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
+  protected void initializeCallableElement(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context) {
     Deployment deployment = context.getDeployment();
     String deploymentId = null;
     if (deployment != null) {
@@ -57,7 +59,8 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
     callableElement.setDeploymentId(deploymentId);
 
     // set callableElement on behavior
-    CallingTaskActivityBehavior behavior = (CallingTaskActivityBehavior) activity.getActivityBehavior();
+    CallingTaskActivityBehavior behavior = (CallingTaskActivityBehavior) activity
+        .getActivityBehavior();
     behavior.setCallableElement(callableElement);
 
     // definition key
@@ -73,14 +76,17 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
     initializeTenantId(element, activity, context, callableElement);
   }
 
-  protected void initializeDefinitionKey(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, BaseCallableElement callableElement) {
+  protected void initializeDefinitionKey(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context, BaseCallableElement callableElement) {
     ExpressionManager expressionManager = context.getExpressionManager();
     String definitionKey = getDefinitionKey(element, activity, context);
-    ParameterValueProvider definitionKeyProvider = createParameterValueProvider(definitionKey, expressionManager);
+    ParameterValueProvider definitionKeyProvider = createParameterValueProvider(definitionKey,
+        expressionManager);
     callableElement.setDefinitionKeyValueProvider(definitionKeyProvider);
   }
 
-  protected void initializeBinding(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, BaseCallableElement callableElement) {
+  protected void initializeBinding(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context, BaseCallableElement callableElement) {
     String binding = getBinding(element, activity, context);
 
     if (CallableElementBinding.DEPLOYMENT.getValue().equals(binding)) {
@@ -92,14 +98,17 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
     }
   }
 
-  protected void initializeVersion(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, BaseCallableElement callableElement) {
+  protected void initializeVersion(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context, BaseCallableElement callableElement) {
     ExpressionManager expressionManager = context.getExpressionManager();
     String version = getVersion(element, activity, context);
-    ParameterValueProvider versionProvider = createParameterValueProvider(version, expressionManager);
+    ParameterValueProvider versionProvider = createParameterValueProvider(version,
+        expressionManager);
     callableElement.setVersionValueProvider(versionProvider);
   }
 
-  protected void initializeTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, BaseCallableElement callableElement) {
+  protected void initializeTenantId(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context, BaseCallableElement callableElement) {
     ParameterValueProvider tenantIdProvider;
 
     ExpressionManager expressionManager = context.getExpressionManager();
@@ -113,7 +122,8 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
     callableElement.setTenantIdProvider(tenantIdProvider);
   }
 
-  protected ParameterValueProvider createParameterValueProvider(String value, ExpressionManager expressionManager) {
+  protected ParameterValueProvider createParameterValueProvider(String value,
+      ExpressionManager expressionManager) {
     if (value == null) {
       return new NullValueProvider();
 
@@ -128,12 +138,16 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
 
   protected abstract BaseCallableElement createCallableElement();
 
-  protected abstract String getDefinitionKey(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context);
+  protected abstract String getDefinitionKey(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context);
 
-  protected abstract String getBinding(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context);
+  protected abstract String getBinding(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context);
 
-  protected abstract String getVersion(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context);
+  protected abstract String getVersion(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context);
 
-  protected abstract String getTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context);
+  protected abstract String getTenantId(CmmnElement element, CmmnActivity activity,
+      CmmnHandlerContext context);
 
 }

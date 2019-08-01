@@ -58,42 +58,36 @@ public class MultiTenancyTaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Test
   public void testQueryByTenantId() {
-    TaskQuery query = taskService.createTaskQuery()
-      .tenantIdIn(TENANT_ONE);
+    TaskQuery query = taskService.createTaskQuery().tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = taskService.createTaskQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = taskService.createTaskQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   @Test
   public void testQueryByTenantIds() {
-    TaskQuery query = taskService.createTaskQuery()
-      .tenantIdIn(TENANT_ONE, TENANT_TWO);
+    TaskQuery query = taskService.createTaskQuery().tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
 
-    query = taskService.createTaskQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_NON_EXISTING);
+    query = taskService.createTaskQuery().tenantIdIn(TENANT_ONE, TENANT_NON_EXISTING);
 
     assertThat(query.count(), is(1L));
   }
 
   @Test
   public void testQueryByTasksWithoutTenantId() {
-    TaskQuery query = taskService.createTaskQuery()
-      .withoutTenantId();
+    TaskQuery query = taskService.createTaskQuery().withoutTenantId();
 
     assertThat(query.count(), is(1L));
   }
 
   @Test
   public void testQueryByNonExistingTenantId() {
-    TaskQuery query = taskService.createTaskQuery()
-      .tenantIdIn(TENANT_NON_EXISTING);
+    TaskQuery query = taskService.createTaskQuery().tenantIdIn(TENANT_NON_EXISTING);
 
     assertThat(query.count(), is(0L));
   }
@@ -101,23 +95,18 @@ public class MultiTenancyTaskQueryTest extends PluggableProcessEngineTestCase {
   @Test
   public void testQueryByTenantIdNullFails() {
     try {
-      assertEquals(0, taskService.createTaskQuery()
-          .tenantIdIn((String)null));
+      assertEquals(0, taskService.createTaskQuery().tenantIdIn((String) null));
 
       fail("Exception expected");
-    }
-    catch(NullValueException e) {
+    } catch (NullValueException e) {
       // expected
     }
   }
 
   public void testQuerySortingAsc() {
     // exclude tasks without tenant id because of database-specific ordering
-    List<Task> tasks = taskService.createTaskQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc()
-        .list();
+    List<Task> tasks = taskService.createTaskQuery().tenantIdIn(TENANT_ONE, TENANT_TWO)
+        .orderByTenantId().asc().list();
 
     assertThat(tasks.size(), is(2));
     assertThat(tasks.get(0).getTenantId(), is(TENANT_ONE));
@@ -126,11 +115,8 @@ public class MultiTenancyTaskQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQuerySortingDesc() {
     // exclude tasks without tenant id because of database-specific ordering
-    List<Task> tasks = taskService.createTaskQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .desc()
-        .list();
+    List<Task> tasks = taskService.createTaskQuery().tenantIdIn(TENANT_ONE, TENANT_TWO)
+        .orderByTenantId().desc().list();
 
     assertThat(tasks.size(), is(2));
     assertThat(tasks.get(0).getTenantId(), is(TENANT_TWO));

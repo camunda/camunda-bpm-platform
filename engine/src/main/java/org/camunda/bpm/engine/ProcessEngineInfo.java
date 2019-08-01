@@ -16,7 +16,8 @@
  */
 package org.camunda.bpm.engine;
 
-/** Represents information about the initialization of the process engine. 
+/**
+ * Represents information about the initialization of the process engine.
  * 
  * @see ProcessEngines
  * @author Tom Baeyens
@@ -34,8 +35,8 @@ public interface ProcessEngineInfo {
   String getResourceUrl();
 
   /**
-   * Returns the exception stacktrace in case an exception occurred while initializing
-   * the engine. When no exception occured, null is returned.
+   * Returns the exception stacktrace in case an exception occurred while initializing the engine.
+   * When no exception occured, null is returned.
    */
   String getException();
 

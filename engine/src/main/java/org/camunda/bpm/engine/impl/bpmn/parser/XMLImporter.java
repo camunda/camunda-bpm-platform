@@ -28,8 +28,10 @@ public interface XMLImporter {
   /**
    * Imports the definitions in the XML declared in element
    * 
-   * @param element the declarations to be imported
-   * @param parse the parse who called this importer
+   * @param element
+   *          the declarations to be imported
+   * @param parse
+   *          the parse who called this importer
    */
   void importFrom(Element element, BpmnParse parse);
 }

@@ -20,7 +20,7 @@ import java.util.Comparator;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
-public class LogEventComparator implements Comparator<ILoggingEvent>{
+public class LogEventComparator implements Comparator<ILoggingEvent> {
 
   @Override
   public int compare(ILoggingEvent o1, ILoggingEvent o2) {

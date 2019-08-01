@@ -37,7 +37,8 @@ public class ProcessApplicationScanningUtil {
    *          the URL to the META-INF/processes.xml file
    * @return a Map of process definitions
    */
-  public static Map<String, byte[]> findResources(ClassLoader classLoader, String paResourceRootPath, URL metaFileUrl) {
+  public static Map<String, byte[]> findResources(ClassLoader classLoader,
+      String paResourceRootPath, URL metaFileUrl) {
     return findResources(classLoader, paResourceRootPath, metaFileUrl, null);
   }
 
@@ -53,26 +54,27 @@ public class ProcessApplicationScanningUtil {
    *          a list of additional suffixes for resources
    * @return a Map of process definitions
    */
-  public static Map<String, byte[]> findResources(ClassLoader classLoader, String paResourceRootPath, URL metaFileUrl, String[] additionalResourceSuffixes) {
+  public static Map<String, byte[]> findResources(ClassLoader classLoader,
+      String paResourceRootPath, URL metaFileUrl, String[] additionalResourceSuffixes) {
     ProcessApplicationScanner scanner = null;
 
     try {
       // check if we must use JBoss VFS
       classLoader.loadClass("org.jboss.vfs.VFS");
       scanner = new VfsProcessApplicationScanner();
-    }
-    catch (Throwable t) {
+    } catch (Throwable t) {
       scanner = new ClassPathProcessApplicationScanner();
     }
 
-    return scanner.findResources(classLoader, paResourceRootPath, metaFileUrl, additionalResourceSuffixes);
+    return scanner.findResources(classLoader, paResourceRootPath, metaFileUrl,
+        additionalResourceSuffixes);
 
   }
 
   public static boolean isDeployable(String filename) {
     return hasSuffix(filename, BpmnDeployer.BPMN_RESOURCE_SUFFIXES)
-      || hasSuffix(filename, CmmnDeployer.CMMN_RESOURCE_SUFFIXES)
-      || hasSuffix(filename, DecisionDefinitionDeployer.DMN_RESOURCE_SUFFIXES);
+        || hasSuffix(filename, CmmnDeployer.CMMN_RESOURCE_SUFFIXES)
+        || hasSuffix(filename, DecisionDefinitionDeployer.DMN_RESOURCE_SUFFIXES);
   }
 
   public static boolean isDeployable(String filename, String[] additionalResourceSuffixes) {
@@ -94,11 +96,15 @@ public class ProcessApplicationScanningUtil {
 
   public static boolean isDiagram(String fileName, String modelFileName) {
     // process resources
-    boolean isBpmnDiagram = checkDiagram(fileName, modelFileName, BpmnDeployer.DIAGRAM_SUFFIXES, BpmnDeployer.BPMN_RESOURCE_SUFFIXES);
+    boolean isBpmnDiagram = checkDiagram(fileName, modelFileName, BpmnDeployer.DIAGRAM_SUFFIXES,
+        BpmnDeployer.BPMN_RESOURCE_SUFFIXES);
     // case resources
-    boolean isCmmnDiagram = checkDiagram(fileName, modelFileName, CmmnDeployer.DIAGRAM_SUFFIXES, CmmnDeployer.CMMN_RESOURCE_SUFFIXES);
+    boolean isCmmnDiagram = checkDiagram(fileName, modelFileName, CmmnDeployer.DIAGRAM_SUFFIXES,
+        CmmnDeployer.CMMN_RESOURCE_SUFFIXES);
     // decision resources
-    boolean isDmnDiagram = checkDiagram(fileName, modelFileName, DecisionDefinitionDeployer.DIAGRAM_SUFFIXES, DecisionDefinitionDeployer.DMN_RESOURCE_SUFFIXES);
+    boolean isDmnDiagram = checkDiagram(fileName, modelFileName,
+        DecisionDefinitionDeployer.DIAGRAM_SUFFIXES,
+        DecisionDefinitionDeployer.DMN_RESOURCE_SUFFIXES);
 
     return isBpmnDiagram || isCmmnDiagram || isDmnDiagram;
   }
@@ -106,16 +112,22 @@ public class ProcessApplicationScanningUtil {
   /**
    * Checks, whether a filename is a diagram for the given modelFileName.
    *
-   * @param fileName filename to check.
-   * @param modelFileName model file name.
-   * @param diagramSuffixes suffixes of the diagram files.
-   * @param modelSuffixes suffixes of model files.
+   * @param fileName
+   *          filename to check.
+   * @param modelFileName
+   *          model file name.
+   * @param diagramSuffixes
+   *          suffixes of the diagram files.
+   * @param modelSuffixes
+   *          suffixes of model files.
    * @return true, if a file is a diagram for the model.
    */
-  protected static boolean checkDiagram(String fileName, String modelFileName, String[] diagramSuffixes, String[] modelSuffixes) {
+  protected static boolean checkDiagram(String fileName, String modelFileName,
+      String[] diagramSuffixes, String[] modelSuffixes) {
     for (String modelSuffix : modelSuffixes) {
       if (modelFileName.endsWith(modelSuffix)) {
-        String caseFilePrefix = modelFileName.substring(0, modelFileName.length() - modelSuffix.length());
+        String caseFilePrefix = modelFileName.substring(0,
+            modelFileName.length() - modelSuffix.length());
         if (fileName.startsWith(caseFilePrefix)) {
           for (String diagramResourceSuffix : diagramSuffixes) {
             if (fileName.endsWith(diagramResourceSuffix)) {

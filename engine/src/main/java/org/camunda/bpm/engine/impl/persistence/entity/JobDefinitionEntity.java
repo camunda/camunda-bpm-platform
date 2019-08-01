@@ -33,7 +33,8 @@ import org.camunda.bpm.engine.management.JobDefinition;
  * @author Daniel Meyer
  *
  */
-public class JobDefinitionEntity implements JobDefinition, HasDbRevision, HasDbReferences, DbEntity, Serializable {
+public class JobDefinitionEntity
+    implements JobDefinition, HasDbRevision, HasDbReferences, DbEntity, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -43,15 +44,14 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, HasDbR
   protected String processDefinitionId;
   protected String processDefinitionKey;
 
-  /* Note: this is the id of the activity which is the cause that a Job is created.
-   * If the Job corresponds to an event scope, it may or may not correspond to the
-   * activity which defines the event scope.
+  /*
+   * Note: this is the id of the activity which is the cause that a Job is created. If the Job
+   * corresponds to an event scope, it may or may not correspond to the activity which defines the
+   * event scope.
    *
-   * Example:
-   * user task with attached timer event:
-   * - timer event scope = user task
-   * - activity which causes the job to be created = timer event.
-   * => Job definition activityId will be activityId of the timer event, not the activityId of the user task.
+   * Example: user task with attached timer event: - timer event scope = user task - activity which
+   * causes the job to be created = timer event. => Job definition activityId will be activityId of
+   * the timer event, not the activityId of the user task.
    */
   protected String activityId;
 

@@ -34,16 +34,22 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 
 /**
- * <p>Manager for JSR-223 {@link ScriptEngine} handling.</p>
+ * <p>
+ * Manager for JSR-223 {@link ScriptEngine} handling.
+ * </p>
  *
- * <p><strong>Resolving a script engine:</strong>
- * This class supports resolving a script engine for a given 'language name' (eg. 'groovy').
- * If the configuration option {@link #enableScriptEngineCaching} is set to true,
- * the class will attempt to cache 'cachable' script engines. We assume a {@link ScriptEngine} is
- * 'cachable' if it declares to be threadsafe (see {@link #isCachable(ScriptEngine)})</p>
+ * <p>
+ * <strong>Resolving a script engine:</strong> This class supports resolving a script engine for a
+ * given 'language name' (eg. 'groovy'). If the configuration option
+ * {@link #enableScriptEngineCaching} is set to true, the class will attempt to cache 'cachable'
+ * script engines. We assume a {@link ScriptEngine} is 'cachable' if it declares to be threadsafe
+ * (see {@link #isCachable(ScriptEngine)})
+ * </p>
  *
- * <p><strong>Custom Bindings:</strong> this class supports custom {@link Bindings}
- * implementations through the {@link #scriptBindingsFactory}. See {@link ScriptBindingsFactory}.</p>
+ * <p>
+ * <strong>Custom Bindings:</strong> this class supports custom {@link Bindings} implementations
+ * through the {@link #scriptBindingsFactory}. See {@link ScriptBindingsFactory}.
+ * </p>
  * </p>
  *
  * @author Tom Baeyens
@@ -86,11 +92,14 @@ public class ScriptingEngines implements DmnScriptEngineResolver {
   }
 
   /**
-   * Loads the given script engine by language name. Will throw an exception if no script engine can be loaded for the given language name.
+   * Loads the given script engine by language name. Will throw an exception if no script engine can
+   * be loaded for the given language name.
    *
-   * @param language the name of the script language to lookup an implementation for
+   * @param language
+   *          the name of the script language to lookup an implementation for
    * @return the script engine
-   * @throws ProcessEngineException if no such engine can be found.
+   * @throws ProcessEngineException
+   *           if no such engine can be found.
    */
   public ScriptEngine getScriptEngineForLanguage(String language) {
 
@@ -103,12 +112,12 @@ public class ScriptingEngines implements DmnScriptEngineResolver {
 
     ScriptEngine engine = null;
     if (config.isEnableFetchScriptEngineFromProcessApplication()) {
-      if(pa != null) {
+      if (pa != null) {
         engine = getPaScriptEngine(language, pa);
       }
     }
 
-    if(engine == null) {
+    if (engine == null) {
       engine = getGlobalScriptEngine(language);
     }
 
@@ -122,27 +131,32 @@ public class ScriptingEngines implements DmnScriptEngineResolver {
 
       if (rawObject instanceof AbstractProcessApplication) {
         AbstractProcessApplication abstractProcessApplication = (AbstractProcessApplication) rawObject;
-        return abstractProcessApplication.getScriptEngineForName(language, enableScriptEngineCaching);
+        return abstractProcessApplication.getScriptEngineForName(language,
+            enableScriptEngineCaching);
       }
       return null;
-    }
-    catch (ProcessApplicationUnavailableException e) {
+    } catch (ProcessApplicationUnavailableException e) {
       throw new ProcessEngineException("Process Application is unavailable.", e);
     }
   }
 
   protected ScriptEngine getGlobalScriptEngine(String language) {
 
-    ScriptEngine scriptEngine = scriptEngineResolver.getScriptEngine(language, enableScriptEngineCaching);
+    ScriptEngine scriptEngine = scriptEngineResolver.getScriptEngine(language,
+        enableScriptEngineCaching);
 
-    ensureNotNull("Can't find scripting engine for '" + language + "'", "scriptEngine", scriptEngine);
+    ensureNotNull("Can't find scripting engine for '" + language + "'", "scriptEngine",
+        scriptEngine);
 
     return scriptEngine;
   }
 
-  /** override to build a spring aware ScriptingEngines
+  /**
+   * override to build a spring aware ScriptingEngines
+   * 
    * @param engineBindin
-   * @param scriptEngine */
+   * @param scriptEngine
+   */
   public Bindings createBindings(ScriptEngine scriptEngine, VariableScope variableScope) {
     return scriptBindingsFactory.createBindings(variableScope, scriptEngine.createBindings());
   }

@@ -23,12 +23,15 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResultType;
 
 /**
- * <p>The result of a message correlation. A message may be correlated to either
- * a waiting execution (BPMN receive message event) or a process definition
- * (BPMN message start event). The type of the correlation (execution vs.
- * processDefinition) can be obtained using {@link #getResultType()}</p>
+ * <p>
+ * The result of a message correlation. A message may be correlated to either a waiting execution
+ * (BPMN receive message event) or a process definition (BPMN message start event). The type of the
+ * correlation (execution vs. processDefinition) can be obtained using {@link #getResultType()}
+ * </p>
  *
- * <p>Correlation is performed by a {@link CorrelationHandler}.</p>
+ * <p>
+ * Correlation is performed by a {@link CorrelationHandler}.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -52,7 +55,8 @@ public class CorrelationHandlerResult {
     return messageCorrelationResult;
   }
 
-  public static CorrelationHandlerResult matchedProcessDefinition(ProcessDefinitionEntity processDefinitionEntity, String startEventActivityId) {
+  public static CorrelationHandlerResult matchedProcessDefinition(
+      ProcessDefinitionEntity processDefinitionEntity, String startEventActivityId) {
     CorrelationHandlerResult messageCorrelationResult = new CorrelationHandlerResult();
     messageCorrelationResult.processDefinitionEntity = processDefinitionEntity;
     messageCorrelationResult.startEventActivityId = startEventActivityId;

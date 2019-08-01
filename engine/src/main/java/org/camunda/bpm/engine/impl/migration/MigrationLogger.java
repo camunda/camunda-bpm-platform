@@ -35,114 +35,92 @@ import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
  */
 public class MigrationLogger extends ProcessEngineLogger {
 
-  public MigrationPlanValidationException failingMigrationPlanValidation(MigrationPlanValidationReportImpl validationReport) {
+  public MigrationPlanValidationException failingMigrationPlanValidation(
+      MigrationPlanValidationReportImpl validationReport) {
     StringBuilder sb = new StringBuilder();
     validationReport.writeTo(sb);
-    return new MigrationPlanValidationException(exceptionMessage(
-      "001",
-      "{}",
-      sb.toString()),
-      validationReport);
+    return new MigrationPlanValidationException(exceptionMessage("001", "{}", sb.toString()),
+        validationReport);
   }
 
-  public ProcessEngineException processDefinitionOfInstanceDoesNotMatchMigrationPlan(ExecutionEntity processInstance, String processDefinitionId) {
-    return new ProcessEngineException(exceptionMessage(
-      "002",
-      "Process instance '{}' cannot be migrated. Its process definition '{}' does not match the source process definition of the migration plan '{}'",
-      processInstance.getId(), processInstance.getProcessDefinitionId(), processDefinitionId
-    ));
+  public ProcessEngineException processDefinitionOfInstanceDoesNotMatchMigrationPlan(
+      ExecutionEntity processInstance, String processDefinitionId) {
+    return new ProcessEngineException(exceptionMessage("002",
+        "Process instance '{}' cannot be migrated. Its process definition '{}' does not match the source process definition of the migration plan '{}'",
+        processInstance.getId(), processInstance.getProcessDefinitionId(), processDefinitionId));
   }
 
   public ProcessEngineException processInstanceDoesNotExist(String processInstanceId) {
-    return new ProcessEngineException(exceptionMessage(
-      "003",
-      "Process instance '{}' cannot be migrated. The process instance does not exist",
-      processInstanceId
-    ));
+    return new ProcessEngineException(exceptionMessage("003",
+        "Process instance '{}' cannot be migrated. The process instance does not exist",
+        processInstanceId));
   }
 
-  public MigratingProcessInstanceValidationException failingMigratingProcessInstanceValidation(MigratingProcessInstanceValidationReportImpl validationReport) {
+  public MigratingProcessInstanceValidationException failingMigratingProcessInstanceValidation(
+      MigratingProcessInstanceValidationReportImpl validationReport) {
     StringBuilder sb = new StringBuilder();
     validationReport.writeTo(sb);
-    return new MigratingProcessInstanceValidationException(exceptionMessage(
-      "004",
-      "{}",
-      sb.toString()),
-      validationReport);
+    return new MigratingProcessInstanceValidationException(
+        exceptionMessage("004", "{}", sb.toString()), validationReport);
   }
 
-  public ProcessEngineException cannotBecomeSubordinateInNonScope(MigratingActivityInstance activityInstance) {
-    return new ProcessEngineException(exceptionMessage(
-      "005",
-      "{}",
-      "Cannot attach a subordinate to activity instance '{}'. Activity '{}' is not a scope",
-      activityInstance.getActivityInstance().getId(),
-      activityInstance.getActivityInstance().getActivityId()));
+  public ProcessEngineException cannotBecomeSubordinateInNonScope(
+      MigratingActivityInstance activityInstance) {
+    return new ProcessEngineException(exceptionMessage("005", "{}",
+        "Cannot attach a subordinate to activity instance '{}'. Activity '{}' is not a scope",
+        activityInstance.getActivityInstance().getId(),
+        activityInstance.getActivityInstance().getActivityId()));
   }
 
-  public ProcessEngineException cannotDestroySubordinateInNonScope(MigratingActivityInstance activityInstance) {
-    return new ProcessEngineException(exceptionMessage(
-        "006",
-        "{}",
+  public ProcessEngineException cannotDestroySubordinateInNonScope(
+      MigratingActivityInstance activityInstance) {
+    return new ProcessEngineException(exceptionMessage("006", "{}",
         "Cannot destroy a subordinate of activity instance '{}'. Activity '{}' is not a scope",
         activityInstance.getActivityInstance().getId(),
         activityInstance.getActivityInstance().getActivityId()));
   }
 
-  public ProcessEngineException cannotAttachToTransitionInstance(MigratingInstance attachingInstance) {
-    return new ProcessEngineException(exceptionMessage(
-        "007",
-        "{}",
-        "Cannot attach instance '{}' to a transition instance",
-        attachingInstance));
+  public ProcessEngineException cannotAttachToTransitionInstance(
+      MigratingInstance attachingInstance) {
+    return new ProcessEngineException(exceptionMessage("007", "{}",
+        "Cannot attach instance '{}' to a transition instance", attachingInstance));
   }
 
-  public BadUserRequestException processDefinitionDoesNotExist(String processDefinitionId, String type) {
-    return new BadUserRequestException(exceptionMessage(
-      "008",
-      "{} process definition with id '{}' does not exist",
-      type, processDefinitionId
-    ));
+  public BadUserRequestException processDefinitionDoesNotExist(String processDefinitionId,
+      String type) {
+    return new BadUserRequestException(exceptionMessage("008",
+        "{} process definition with id '{}' does not exist", type, processDefinitionId));
   }
 
-  public ProcessEngineException cannotMigrateBetweenTenants(String sourceTenantId, String targetTenantId) {
-    return new ProcessEngineException(exceptionMessage(
-        "09",
+  public ProcessEngineException cannotMigrateBetweenTenants(String sourceTenantId,
+      String targetTenantId) {
+    return new ProcessEngineException(exceptionMessage("09",
         "Cannot migrate process instances between processes of different tenants ('{}' != '{}')",
-        sourceTenantId,
-        targetTenantId));
+        sourceTenantId, targetTenantId));
   }
 
-  public ProcessEngineException cannotMigrateInstanceBetweenTenants(String processInstanceId, String sourceTenantId, String targetTenantId) {
+  public ProcessEngineException cannotMigrateInstanceBetweenTenants(String processInstanceId,
+      String sourceTenantId, String targetTenantId) {
 
     String detailMessage = null;
     if (sourceTenantId != null) {
-      detailMessage = exceptionMessage(
-          "010",
+      detailMessage = exceptionMessage("010",
           "Cannot migrate process instance '{}' to a process definition of a different tenant ('{}' != '{}')",
-          processInstanceId,
-          sourceTenantId,
-          targetTenantId);
-    }
-    else {
-      detailMessage = exceptionMessage(
-          "010",
+          processInstanceId, sourceTenantId, targetTenantId);
+    } else {
+      detailMessage = exceptionMessage("010",
           "Cannot migrate process instance '{}' without tenant to a process definition with a tenant ('{}')",
-          processInstanceId,
-          targetTenantId);
+          processInstanceId, targetTenantId);
     }
 
     return new ProcessEngineException(detailMessage);
   }
 
-  public ProcessEngineException cannotHandleChild(MigratingScopeInstance scopeInstance, MigratingProcessElementInstance childCandidate) {
+  public ProcessEngineException cannotHandleChild(MigratingScopeInstance scopeInstance,
+      MigratingProcessElementInstance childCandidate) {
     return new ProcessEngineException(
-        exceptionMessage(
-            "011",
-            "Scope instance of type {} cannot have child of type {}",
-            scopeInstance.getClass().getSimpleName(),
-            childCandidate.getClass().getSimpleName())
-        );
+        exceptionMessage("011", "Scope instance of type {} cannot have child of type {}",
+            scopeInstance.getClass().getSimpleName(), childCandidate.getClass().getSimpleName()));
   }
 
 }

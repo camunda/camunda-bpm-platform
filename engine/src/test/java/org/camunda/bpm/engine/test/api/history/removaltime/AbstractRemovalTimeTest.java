@@ -97,10 +97,8 @@ public abstract class AbstractRemovalTimeTest {
   @AfterClass
   public static void tearDownAfterAll() {
     if (processEngineConfiguration != null) {
-      processEngineConfiguration
-        .setHistoryRemovalTimeProvider(null)
-        .setHistoryRemovalTimeStrategy(null)
-        .initHistoryRemovalTime();
+      processEngineConfiguration.setHistoryRemovalTimeProvider(null)
+          .setHistoryRemovalTimeStrategy(null).initHistoryRemovalTime();
 
       processEngineConfiguration.setBatchOperationHistoryTimeToLive(null);
       processEngineConfiguration.setBatchOperationsForHistoryCleanup(null);
@@ -112,12 +110,14 @@ public abstract class AbstractRemovalTimeTest {
   }
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
     return commandExecutor.execute(new GetByteArrayCommand(byteArrayId));
   }
 
   protected void clearAttachment(final Attachment attachment) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
         commandContext.getAttachmentManager().delete((AttachmentEntity) attachment);
@@ -127,7 +127,8 @@ public abstract class AbstractRemovalTimeTest {
   }
 
   protected void clearCommentByTaskId(final String taskId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
         commandContext.getCommentManager().deleteCommentsByTaskId(taskId);
@@ -137,28 +138,33 @@ public abstract class AbstractRemovalTimeTest {
   }
 
   protected void clearCommentByProcessInstanceId(final String processInstanceId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
-        commandContext.getCommentManager().deleteCommentsByProcessInstanceIds(Collections.singletonList(processInstanceId));
+        commandContext.getCommentManager()
+            .deleteCommentsByProcessInstanceIds(Collections.singletonList(processInstanceId));
         return null;
       }
     });
   }
 
   protected void clearHistoricTaskInst(final String taskId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
         commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstanceById(taskId);
-        commandContext.getHistoricIdentityLinkManager().deleteHistoricIdentityLinksLogByTaskId(taskId);
+        commandContext.getHistoricIdentityLinkManager()
+            .deleteHistoricIdentityLinksLogByTaskId(taskId);
         return null;
       }
     });
   }
 
   protected void clearJobLog(final String jobId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
         commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
@@ -168,10 +174,12 @@ public abstract class AbstractRemovalTimeTest {
   }
 
   protected void clearHistoricIncident(final HistoricIncident historicIncident) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricIncidentManager().delete((HistoricIncidentEntity) historicIncident);
+        commandContext.getHistoricIncidentManager()
+            .delete((HistoricIncidentEntity) historicIncident);
         return null;
       }
     });

@@ -23,11 +23,11 @@ import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
  * @author Tom Baeyens
  */
-public class PvmAtomicOperationTransitionNotifyListenerStart extends PvmAtomicOperationActivityInstanceStart {
+public class PvmAtomicOperationTransitionNotifyListenerStart
+    extends PvmAtomicOperationActivityInstanceStart {
 
   protected ScopeImpl getScope(PvmExecutionImpl execution) {
     return execution.getActivity();
@@ -43,7 +43,8 @@ public class PvmAtomicOperationTransitionNotifyListenerStart extends PvmAtomicOp
 
     TransitionImpl transition = execution.getTransition();
     PvmActivity destination;
-    if (transition == null) { // this is null after async cont. -> transition is not stored in execution
+    if (transition == null) { // this is null after async cont. -> transition is not stored in
+                              // execution
       destination = execution.getActivity();
     } else {
       destination = transition.getDestination();

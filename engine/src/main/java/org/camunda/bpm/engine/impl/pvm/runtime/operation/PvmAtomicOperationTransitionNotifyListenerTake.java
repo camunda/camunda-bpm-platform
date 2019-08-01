@@ -18,11 +18,11 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
  * @author Tom Baeyens
  */
-public class PvmAtomicOperationTransitionNotifyListenerTake extends AbstractPvmAtomicOperationTransitionNotifyListenerTake {
+public class PvmAtomicOperationTransitionNotifyListenerTake
+    extends AbstractPvmAtomicOperationTransitionNotifyListenerTake {
 
   public boolean isAsync(PvmExecutionImpl execution) {
     return execution.getActivity().isAsyncAfter();

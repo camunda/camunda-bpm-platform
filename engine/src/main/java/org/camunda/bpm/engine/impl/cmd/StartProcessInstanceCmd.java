@@ -35,7 +35,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class StartProcessInstanceCmd implements Command<ProcessInstanceWithVariables>, Serializable {
+public class StartProcessInstanceCmd
+    implements Command<ProcessInstanceWithVariables>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -47,29 +48,30 @@ public class StartProcessInstanceCmd implements Command<ProcessInstanceWithVaria
 
   public ProcessInstanceWithVariables execute(CommandContext commandContext) {
 
-    ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(instantiationBuilder, false).execute(commandContext);
+    ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(
+        instantiationBuilder, false).execute(commandContext);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateProcessInstance(processDefinition);
     }
 
     // Start the process instance
-    ExecutionEntity processInstance = processDefinition.createProcessInstance(instantiationBuilder.getBusinessKey(),
-        instantiationBuilder.getCaseInstanceId());
+    ExecutionEntity processInstance = processDefinition.createProcessInstance(
+        instantiationBuilder.getBusinessKey(), instantiationBuilder.getCaseInstanceId());
 
     if (instantiationBuilder.getTenantId() != null) {
       processInstance.setTenantId(instantiationBuilder.getTenantId());
     }
 
-    final ExecutionVariableSnapshotObserver variablesListener = new ExecutionVariableSnapshotObserver(processInstance);
+    final ExecutionVariableSnapshotObserver variablesListener = new ExecutionVariableSnapshotObserver(
+        processInstance);
 
     processInstance.start(instantiationBuilder.getVariables());
 
     commandContext.getOperationLogManager().logProcessInstanceOperation(
-        UserOperationLogEntry.OPERATION_TYPE_CREATE,
-        processInstance.getId(),
-        processInstance.getProcessDefinitionId(),
-        processInstance.getProcessDefinition().getKey(),
+        UserOperationLogEntry.OPERATION_TYPE_CREATE, processInstance.getId(),
+        processInstance.getProcessDefinitionId(), processInstance.getProcessDefinition().getKey(),
         Collections.singletonList(PropertyChange.EMPTY_CHANGE));
 
     return new ProcessInstanceWithVariablesImpl(processInstance, variablesListener.getVariables());

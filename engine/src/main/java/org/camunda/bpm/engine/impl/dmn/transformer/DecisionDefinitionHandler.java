@@ -31,12 +31,15 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
   }
 
   @Override
-  protected DmnDecisionImpl createFromDecision(DmnElementTransformContext context, Decision decision) {
-    DecisionDefinitionEntity decisionDefinition = (DecisionDefinitionEntity) super.createFromDecision(context, decision);
+  protected DmnDecisionImpl createFromDecision(DmnElementTransformContext context,
+      Decision decision) {
+    DecisionDefinitionEntity decisionDefinition = (DecisionDefinitionEntity) super.createFromDecision(
+        context, decision);
 
     String category = context.getModelInstance().getDefinitions().getNamespace();
     decisionDefinition.setCategory(category);
-    decisionDefinition.setHistoryTimeToLive(ParseUtil.parseHistoryTimeToLive(decision.getCamundaHistoryTimeToLiveString()));
+    decisionDefinition.setHistoryTimeToLive(
+        ParseUtil.parseHistoryTimeToLive(decision.getCamundaHistoryTimeToLiveString()));
     decisionDefinition.setVersionTag(decision.getVersionTag());
 
     return decisionDefinition;

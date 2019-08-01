@@ -18,7 +18,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
 
-public class CleanableHistoricBatchesReportResultEntity implements CleanableHistoricBatchReportResult {
+public class CleanableHistoricBatchesReportResultEntity
+    implements CleanableHistoricBatchReportResult {
 
   protected String batchType;
   protected Integer historyTimeToLive;
@@ -63,11 +64,8 @@ public class CleanableHistoricBatchesReportResultEntity implements CleanableHist
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-        + "[batchType = " + batchType
-        + ", historyTimeToLive = " + historyTimeToLive
-        + ", finishedBatchesCount = " + finishedBatchesCount
-        + ", cleanableBatchesCount = " + cleanableBatchesCount
-        + "]";
+    return this.getClass().getSimpleName() + "[batchType = " + batchType + ", historyTimeToLive = "
+        + historyTimeToLive + ", finishedBatchesCount = " + finishedBatchesCount
+        + ", cleanableBatchesCount = " + cleanableBatchesCount + "]";
   }
 }

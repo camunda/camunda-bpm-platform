@@ -34,7 +34,8 @@ public class AuthorizationSpec {
   protected String userId;
   protected Permission[] permissions;
 
-  public static AuthorizationSpec auth(int type, Resource resource, String resourceId, String userId, Permission... permissions) {
+  public static AuthorizationSpec auth(int type, Resource resource, String resourceId,
+      String userId, Permission... permissions) {
     AuthorizationSpec spec = new AuthorizationSpec();
     spec.type = type;
     spec.resource = resource;
@@ -44,19 +45,23 @@ public class AuthorizationSpec {
     return spec;
   }
 
-  public static AuthorizationSpec global(Resource resource, String resourceId, String userId, Permission... permissions) {
+  public static AuthorizationSpec global(Resource resource, String resourceId, String userId,
+      Permission... permissions) {
     return auth(Authorization.AUTH_TYPE_GLOBAL, resource, resourceId, userId, permissions);
   }
 
-  public static AuthorizationSpec grant(Resource resource, String resourceId, String userId, Permission... permissions) {
+  public static AuthorizationSpec grant(Resource resource, String resourceId, String userId,
+      Permission... permissions) {
     return auth(Authorization.AUTH_TYPE_GRANT, resource, resourceId, userId, permissions);
   }
 
-  public static AuthorizationSpec revoke(Resource resource, String resourceId, String userId, Permission... permissions) {
+  public static AuthorizationSpec revoke(Resource resource, String resourceId, String userId,
+      Permission... permissions) {
     return auth(Authorization.AUTH_TYPE_REVOKE, resource, resourceId, userId, permissions);
   }
 
-  public Authorization instantiate(AuthorizationService authorizationService, Map<String, String> replacements) {
+  public Authorization instantiate(AuthorizationService authorizationService,
+      Map<String, String> replacements) {
     Authorization authorization = authorizationService.createNewAuthorization(type);
 
     // TODO: group id is missing
@@ -64,8 +69,7 @@ public class AuthorizationSpec {
 
     if (replacements.containsKey(resourceId)) {
       authorization.setResourceId(replacements.get(resourceId));
-    }
-    else {
+    } else {
       authorization.setResourceId(resourceId);
     }
     authorization.setUserId(userId);

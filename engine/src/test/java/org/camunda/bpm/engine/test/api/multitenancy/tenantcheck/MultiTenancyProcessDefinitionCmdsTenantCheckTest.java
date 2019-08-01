@@ -241,32 +241,35 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
   @Test
   public void failToDeleteProcessDefinitionNoAuthenticatedTenant() {
-    //given deployment with a process definition
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-    //and user with no tenant authentication
+    // given deployment with a process definition
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .list();
+    // and user with no tenant authentication
     identityService.setAuthentication("user", null, null);
 
     // declare expected exception
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot delete the process definition");
 
-    //deletion should end in exception, since tenant authorization is missing
+    // deletion should end in exception, since tenant authorization is missing
     repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId());
   }
 
   @Test
   public void testDeleteProcessDefinitionWithAuthenticatedTenant() {
-    //given deployment with two process definitions
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, "org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml");
-    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId());
+    // given deployment with two process definitions
+    Deployment deployment = testRule.deployForTenant(TENANT_ONE,
+        "org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml");
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(deployment.getId());
     List<ProcessDefinition> processDefinitions = processDefinitionQuery.list();
-    //and user with tenant authentication
+    // and user with tenant authentication
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    //when delete process definition with authenticated user
+    // when delete process definition with authenticated user
     repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId());
 
-    //then process definition should be deleted
+    // then process definition should be deleted
     identityService.clearAuthentication();
     assertThat(processDefinitionQuery.count(), is(1L));
     assertThat(processDefinitionQuery.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -274,44 +277,52 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
   @Test
   public void testDeleteCascadeProcessDefinitionWithAuthenticatedTenant() {
-    //given deployment with a process definition and process instance
-    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done();
+    // given deployment with a process definition and process instance
+    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask()
+        .endEvent().done();
     testRule.deployForTenant(TENANT_ONE, bpmnModel);
-    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
-    ProcessDefinition processDefinition = processDefinitionQuery.processDefinitionKey("process").singleResult();
-    engineRule.getRuntimeService().createProcessInstanceByKey("process").executeWithVariablesInReturn();
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService
+        .createProcessDefinitionQuery();
+    ProcessDefinition processDefinition = processDefinitionQuery.processDefinitionKey("process")
+        .singleResult();
+    engineRule.getRuntimeService().createProcessInstanceByKey("process")
+        .executeWithVariablesInReturn();
 
-    //and user with tenant authentication
+    // and user with tenant authentication
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    //when the corresponding process definition is cascading deleted from the deployment
+    // when the corresponding process definition is cascading deleted from the deployment
     repositoryService.deleteProcessDefinition(processDefinition.getId(), true);
 
-    //then exist no process instance and one definition
+    // then exist no process instance and one definition
     identityService.clearAuthentication();
     assertEquals(0, engineRule.getRuntimeService().createProcessInstanceQuery().count());
-    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY
+        .getId()) {
       assertEquals(0, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
     }
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
   public void testDeleteProcessDefinitionDisabledTenantCheck() {
-    //given deployment with two process definitions
-    Deployment deployment = testRule.deployForTenant(TENANT_ONE, "org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml");
-    //tenant check disabled
+    // given deployment with two process definitions
+    Deployment deployment = testRule.deployForTenant(TENANT_ONE,
+        "org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml");
+    // tenant check disabled
     processEngineConfiguration.setTenantCheckEnabled(false);
-    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId());
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery()
+        .deploymentId(deployment.getId());
     List<ProcessDefinition> processDefinitions = processDefinitionQuery.list();
-    //user with no authentication
+    // user with no authentication
     identityService.setAuthentication("user", null, null);
 
-    //when process definition should be deleted without tenant check
+    // when process definition should be deleted without tenant check
     repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId());
 
-    //then process definition is deleted
+    // then process definition is deleted
     identityService.clearAuthentication();
     assertThat(processDefinitionQuery.count(), is(1L));
     assertThat(processDefinitionQuery.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -319,28 +330,35 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
   @Test
   public void testDeleteCascadeProcessDefinitionDisabledTenantCheck() {
-    //given deployment with a process definition and process instances
-    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done();
+    // given deployment with a process definition and process instances
+    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask()
+        .endEvent().done();
     testRule.deployForTenant(TENANT_ONE, bpmnModel);
-    //tenant check disabled
+    // tenant check disabled
     processEngineConfiguration.setTenantCheckEnabled(false);
-    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
-    ProcessDefinition processDefinition = processDefinitionQuery.processDefinitionKey("process").singleResult();
-    engineRule.getRuntimeService().createProcessInstanceByKey("process").executeWithVariablesInReturn();
-    //user with no authentication
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService
+        .createProcessDefinitionQuery();
+    ProcessDefinition processDefinition = processDefinitionQuery.processDefinitionKey("process")
+        .singleResult();
+    engineRule.getRuntimeService().createProcessInstanceByKey("process")
+        .executeWithVariablesInReturn();
+    // user with no authentication
     identityService.setAuthentication("user", null, null);
 
-    //when the corresponding process definition is cascading deleted from the deployment
+    // when the corresponding process definition is cascading deleted from the deployment
     repositoryService.deleteProcessDefinition(processDefinition.getId(), true);
 
-    //then exist no process instance and one definition, because test case deployes per default one definition
+    // then exist no process instance and one definition, because test case deployes per default one
+    // definition
     identityService.clearAuthentication();
     assertEquals(0, engineRule.getRuntimeService().createProcessInstanceQuery().count());
-    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY
+        .getId()) {
       assertEquals(0, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
     }
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
@@ -357,10 +375,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     thrown.expectMessage("No process definition found");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("process")
-      .withoutTenantId()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("process").withoutTenantId().delete();
   }
 
   @Test
@@ -372,13 +387,12 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     }
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("process")
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("process").delete();
 
     // then
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
@@ -391,15 +405,13 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("process")
-      .withTenantId(TENANT_ONE)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("process").withTenantId(TENANT_ONE).delete();
 
     // then
     identityService.clearAuthentication();
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
@@ -414,17 +426,15 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("process")
-      .withTenantId(TENANT_ONE)
-      .cascade()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("process").withTenantId(TENANT_ONE).cascade()
+        .delete();
 
     // then
     identityService.clearAuthentication();
     assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
@@ -438,15 +448,13 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("process")
-      .withTenantId(TENANT_ONE)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("process").withTenantId(TENANT_ONE).delete();
 
     // then
     identityService.clearAuthentication();
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
@@ -461,17 +469,15 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("process")
-      .withTenantId(TENANT_ONE)
-      .cascade()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("process").withTenantId(TENANT_ONE).cascade()
+        .delete();
 
     // then
     identityService.clearAuthentication();
     assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
@@ -490,9 +496,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     thrown.expectMessage("Cannot delete the process definition");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIds)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIds).delete();
   }
 
   @Test
@@ -507,14 +511,13 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIds)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIds).delete();
 
     // then
     identityService.clearAuthentication();
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
@@ -531,16 +534,14 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIds)
-      .cascade()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIds).cascade().delete();
 
     // then
     identityService.clearAuthentication();
     assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
@@ -556,14 +557,13 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIds)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIds).delete();
 
     // then
     identityService.clearAuthentication();
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
@@ -580,16 +580,14 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIds)
-      .cascade()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIds).cascade().delete();
 
     // then
     identityService.clearAuthentication();
     assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
-    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(),
+        is(1L));
   }
 
   @Test
@@ -630,9 +628,9 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
   private String[] findProcessDefinitionIdsByKey(String processDefinitionKey) {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-      .processDefinitionKey(processDefinitionKey).list();
+        .processDefinitionKey(processDefinitionKey).list();
     List<String> processDefinitionIds = new ArrayList<String>();
-    for (ProcessDefinition processDefinition: processDefinitions) {
+    for (ProcessDefinition processDefinition : processDefinitions) {
       processDefinitionIds.add(processDefinition.getId());
     }
 
@@ -641,19 +639,12 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
   private void deployProcessDefinitionWithTenant() {
     testRule.deployForTenant(TENANT_ONE,
-      Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask()
-        .endEvent()
-        .done());
+        Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done());
   }
 
   private void deployProcessDefinitionWithoutTenant() {
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask()
-        .endEvent()
-        .done());
+    testRule
+        .deploy(Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done());
   }
 
 }

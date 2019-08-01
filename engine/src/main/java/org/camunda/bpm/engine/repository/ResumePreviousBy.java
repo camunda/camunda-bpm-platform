@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.engine.repository;
 
-
 /**
- * Contains the constants for the possible values the property {@link ProcessApplicationDeploymentBuilder#resumePreviousVersionsBy(String)}.
+ * Contains the constants for the possible values the property
+ * {@link ProcessApplicationDeploymentBuilder#resumePreviousVersionsBy(String)}.
  */
 public enum ResumePreviousBy {
   ;

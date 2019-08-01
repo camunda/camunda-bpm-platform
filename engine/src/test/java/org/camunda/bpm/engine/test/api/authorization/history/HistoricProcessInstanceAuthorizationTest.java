@@ -59,7 +59,8 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/authorization/messageStartEventProcess.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/authorization/messageStartEventProcess.bpmn20.xml")
+            .getId();
     super.setUp();
   }
 
@@ -214,7 +215,8 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     verifyQueryResults(query, 3);
 
     disableAuthorization();
-    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
+        .list();
     for (HistoricProcessInstance instance : instances) {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }
@@ -260,10 +262,8 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // then
     disableAuthorization();
-    long count = historyService
-        .createHistoricProcessInstanceQuery()
-        .processInstanceId(processInstanceId)
-        .count();
+    long count = historyService.createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId).count();
     assertEquals(0, count);
     enableAuthorization();
   }
@@ -283,10 +283,8 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // then
     disableAuthorization();
-    long count = historyService
-        .createHistoricProcessInstanceQuery()
-        .processInstanceId(processInstanceId)
-        .count();
+    long count = historyService.createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId).count();
     assertEquals(0, count);
     enableAuthorization();
   }
@@ -310,10 +308,8 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // then
     disableAuthorization();
-    long count = historyService
-        .createHistoricProcessInstanceQuery()
-        .processInstanceId(processInstanceId)
-        .count();
+    long count = historyService.createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId).count();
     assertEquals(0, count);
     enableAuthorization();
   }
@@ -330,10 +326,9 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     try {
       // when
-      historyService
-          .createHistoricProcessInstanceReport()
-          .duration(PeriodUnit.MONTH);
-      fail("Exception expected: It should not be possible to create a historic process instance report");
+      historyService.createHistoricProcessInstanceReport().duration(PeriodUnit.MONTH);
+      fail(
+          "Exception expected: It should not be possible to create a historic process instance report");
     } catch (AuthorizationException e) {
       // then
       List<MissingAuthorization> missingAuthorizations = e.getMissingAuthorizations();
@@ -357,8 +352,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(PeriodUnit.MONTH);
 
     // then
@@ -377,8 +371,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(PeriodUnit.MONTH);
 
     // then
@@ -396,12 +389,11 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // when
     try {
-      historyService
-        .createHistoricProcessInstanceReport()
-        .duration(PeriodUnit.MONTH);
+      historyService.createHistoricProcessInstanceReport().duration(PeriodUnit.MONTH);
 
       // then
-      fail("Exception expected: It should not be possible to create a historic process instance report");
+      fail(
+          "Exception expected: It should not be possible to create a historic process instance report");
     } catch (AuthorizationException e) {
 
     }
@@ -420,10 +412,8 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, READ_HISTORY);
 
     // when
-    List<DurationReportResult> result = historyService
-      .createHistoricProcessInstanceReport()
-      .processDefinitionKeyIn(PROCESS_KEY, MESSAGE_START_PROCESS_KEY)
-      .duration(PeriodUnit.MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionKeyIn(PROCESS_KEY, MESSAGE_START_PROCESS_KEY).duration(PeriodUnit.MONTH);
 
     // then
     assertEquals(1, result.size());
@@ -442,13 +432,13 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // when
     try {
-      historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionKeyIn(PROCESS_KEY, MESSAGE_START_PROCESS_KEY)
-        .duration(PeriodUnit.MONTH);
+      historyService.createHistoricProcessInstanceReport()
+          .processDefinitionKeyIn(PROCESS_KEY, MESSAGE_START_PROCESS_KEY)
+          .duration(PeriodUnit.MONTH);
 
       // then
-      fail("Exception expected: It should not be possible to create a historic process instance report");
+      fail(
+          "Exception expected: It should not be possible to create a historic process instance report");
     } catch (AuthorizationException e) {
 
     }
@@ -467,10 +457,10 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, READ_HISTORY);
 
     // when
-    List<DurationReportResult> result = historyService
-      .createHistoricProcessInstanceReport()
-      .processDefinitionIdIn(processInstance1.getProcessDefinitionId(), processInstance2.getProcessDefinitionId())
-      .duration(PeriodUnit.MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionIdIn(processInstance1.getProcessDefinitionId(),
+            processInstance2.getProcessDefinitionId())
+        .duration(PeriodUnit.MONTH);
 
     // then
     assertEquals(1, result.size());
@@ -489,13 +479,14 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // when
     try {
-      historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionIdIn(processInstance1.getProcessDefinitionId(), processInstance2.getProcessDefinitionId())
-        .duration(PeriodUnit.MONTH);
+      historyService.createHistoricProcessInstanceReport()
+          .processDefinitionIdIn(processInstance1.getProcessDefinitionId(),
+              processInstance2.getProcessDefinitionId())
+          .duration(PeriodUnit.MONTH);
 
       // then
-      fail("Exception expected: It should not be possible to create a historic process instance report");
+      fail(
+          "Exception expected: It should not be possible to create a historic process instance report");
     } catch (AuthorizationException e) {
 
     }
@@ -514,11 +505,10 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, READ_HISTORY);
 
     // when
-    List<DurationReportResult> result = historyService
-      .createHistoricProcessInstanceReport()
-      .processDefinitionKeyIn(PROCESS_KEY)
-      .processDefinitionIdIn(processInstance2.getProcessDefinitionId())
-      .duration(PeriodUnit.MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionKeyIn(PROCESS_KEY)
+        .processDefinitionIdIn(processInstance2.getProcessDefinitionId())
+        .duration(PeriodUnit.MONTH);
 
     // then
     assertEquals(0, result.size());
@@ -537,14 +527,13 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // when
     try {
-    historyService
-      .createHistoricProcessInstanceReport()
-      .processDefinitionKeyIn(PROCESS_KEY)
-      .processDefinitionIdIn(processInstance2.getProcessDefinitionId())
-      .duration(PeriodUnit.MONTH);
+      historyService.createHistoricProcessInstanceReport().processDefinitionKeyIn(PROCESS_KEY)
+          .processDefinitionIdIn(processInstance2.getProcessDefinitionId())
+          .duration(PeriodUnit.MONTH);
 
       // then
-      fail("Exception expected: It should not be possible to create a historic process instance report");
+      fail(
+          "Exception expected: It should not be possible to create a historic process instance report");
     } catch (AuthorizationException e) {
 
     }
@@ -552,10 +541,8 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
   public void testReportWithQueryCriterionProcessInstanceIdInWrongProcessDefinitionId() {
     // when
-    List<DurationReportResult> result = historyService
-      .createHistoricProcessInstanceReport()
-      .processDefinitionIdIn("aWrongProcessDefinitionId")
-      .duration(PeriodUnit.MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionIdIn("aWrongProcessDefinitionId").duration(PeriodUnit.MONTH);
 
     // then
     assertEquals(0, result.size());
@@ -565,10 +552,13 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     // given
     prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
 
-    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, Permissions.READ, Permissions.READ_HISTORY);
-    createGrantAuthorizationGroup(PROCESS_DEFINITION, PROCESS_KEY, groupId, Permissions.READ, Permissions.READ_HISTORY);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, Permissions.READ,
+        Permissions.READ_HISTORY);
+    createGrantAuthorizationGroup(PROCESS_DEFINITION, PROCESS_KEY, groupId, Permissions.READ,
+        Permissions.READ_HISTORY);
 
-    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -583,7 +573,8 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, Permissions.READ);
 
     // when
-    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -596,7 +587,8 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, Permissions.READ_HISTORY);
 
     // when
-    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -607,7 +599,8 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
 
     // when
-    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService
+        .createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -619,10 +612,12 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
 
-  protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
+  protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive,
+      int instanceCount) {
     ProcessDefinition processDefinition = selectProcessDefinitionByKey(key);
     disableAuthorization();
-    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), historyTimeToLive);
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(),
+        historyTimeToLive);
     enableAuthorization();
 
     Date oldCurrentTime = ClockUtil.getCurrentTime();

@@ -38,9 +38,9 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
   protected static final int NR_OF_VALUES_IN_TEXTFIELD2 = 2;
 
   /**
-   * The separator to be able to store encoding and mimetype inside the same
-   * text field. Please be aware that the separator only works when it is a
-   * character that is not allowed in the first component.
+   * The separator to be able to store encoding and mimetype inside the same text field. Please be
+   * aware that the separator only works when it is a character that is not allowed in the first
+   * component.
    */
   protected static final String MIMETYPE_ENCODING_SEPARATOR = "#";
 
@@ -58,13 +58,15 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
     } else if (value.getMimeType() != null && value.getEncoding() == null) {
       valueFields.setTextValue2(value.getMimeType() + MIMETYPE_ENCODING_SEPARATOR);
     } else if (value.getMimeType() != null && value.getEncoding() != null) {
-      valueFields.setTextValue2(value.getMimeType() + MIMETYPE_ENCODING_SEPARATOR + value.getEncoding());
+      valueFields
+          .setTextValue2(value.getMimeType() + MIMETYPE_ENCODING_SEPARATOR + value.getEncoding());
     }
   }
 
   @Override
   public FileValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    throw new UnsupportedOperationException("Currently no automatic conversation from UntypedValue to FileValue");
+    throw new UnsupportedOperationException(
+        "Currently no automatic conversation from UntypedValue to FileValue");
   }
 
   @Override
@@ -80,7 +82,8 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
     }
     // to ensure the same array size all the time
     if (valueFields.getTextValue2() != null) {
-      String[] split = Arrays.copyOf(valueFields.getTextValue2().split(MIMETYPE_ENCODING_SEPARATOR, NR_OF_VALUES_IN_TEXTFIELD2), NR_OF_VALUES_IN_TEXTFIELD2);
+      String[] split = Arrays.copyOf(valueFields.getTextValue2().split(MIMETYPE_ENCODING_SEPARATOR,
+          NR_OF_VALUES_IN_TEXTFIELD2), NR_OF_VALUES_IN_TEXTFIELD2);
 
       String mimeType = returnNullIfEmptyString(split[0]);
       String encoding = returnNullIfEmptyString(split[1]);

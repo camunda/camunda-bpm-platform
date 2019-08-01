@@ -22,18 +22,15 @@ import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Tom Baeyens
  */
 public class CreateUserQueryCmd implements Command<UserQuery>, Serializable {
-  
+
   private static final long serialVersionUID = 1L;
 
   public UserQuery execute(CommandContext commandContext) {
-    return commandContext
-      .getReadOnlyIdentityProvider()
-      .createUserQuery();
+    return commandContext.getReadOnlyIdentityProvider().createUserQuery();
   }
 
 }

@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
-
-
 /**
  * @author Daniel Meyer
  *
@@ -47,93 +45,102 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
   public String getSerializerName() {
     return serializerName;
   }
+
   public void setSerializerName(String serializerName) {
     this.serializerName = serializerName;
   }
+
   public String getVariableName() {
     return variableName;
   }
+
   public void setVariableName(String variableName) {
     this.variableName = variableName;
   }
+
   public Long getLongValue() {
     return longValue;
   }
+
   public void setLongValue(Long longValue) {
     this.longValue = longValue;
   }
+
   public Double getDoubleValue() {
     return doubleValue;
   }
+
   public void setDoubleValue(Double doubleValue) {
     this.doubleValue = doubleValue;
   }
+
   public String getTextValue() {
     return textValue;
   }
+
   public void setTextValue(String textValue) {
     this.textValue = textValue;
   }
+
   public String getTextValue2() {
     return textValue2;
   }
+
   public void setTextValue2(String textValue2) {
     this.textValue2 = textValue2;
   }
+
   public byte[] getByteValue() {
     return byteValue;
   }
+
   public void setByteValue(byte[] byteValue) {
     this.byteValue = byteValue;
   }
+
   public int getRevision() {
     return revision;
   }
+
   public void setRevision(int revision) {
     this.revision = revision;
   }
+
   public void setByteArrayId(String id) {
     byteArrayId = id;
   }
+
   public String getByteArrayId() {
     return byteArrayId;
   }
+
   public String getVariableInstanceId() {
     return variableInstanceId;
   }
+
   public void setVariableInstanceId(String variableInstanceId) {
     this.variableInstanceId = variableInstanceId;
   }
+
   public String getScopeActivityInstanceId() {
     return scopeActivityInstanceId;
   }
+
   public void setScopeActivityInstanceId(String scopeActivityInstanceId) {
     this.scopeActivityInstanceId = scopeActivityInstanceId;
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[variableName=" + variableName
-           + ", variableInstanceId=" + variableInstanceId
-           + ", revision=" + revision
-           + ", serializerName=" + serializerName
-           + ", longValue=" + longValue
-           + ", doubleValue=" + doubleValue
-           + ", textValue=" + textValue
-           + ", textValue2=" + textValue2
-           + ", byteArrayId=" + byteArrayId
-           + ", activityInstanceId=" + activityInstanceId
-           + ", scopeActivityInstanceId=" + scopeActivityInstanceId
-           + ", eventType=" + eventType
-           + ", executionId=" + executionId
-           + ", id=" + id
-           + ", processDefinitionId=" + processInstanceId
-           + ", processInstanceId=" + processInstanceId
-           + ", taskId=" + taskId
-           + ", timestamp=" + timestamp
-           + ", tenantId=" + tenantId
-           + "]";
+    return this.getClass().getSimpleName() + "[variableName=" + variableName
+        + ", variableInstanceId=" + variableInstanceId + ", revision=" + revision
+        + ", serializerName=" + serializerName + ", longValue=" + longValue + ", doubleValue="
+        + doubleValue + ", textValue=" + textValue + ", textValue2=" + textValue2 + ", byteArrayId="
+        + byteArrayId + ", activityInstanceId=" + activityInstanceId + ", scopeActivityInstanceId="
+        + scopeActivityInstanceId + ", eventType=" + eventType + ", executionId=" + executionId
+        + ", id=" + id + ", processDefinitionId=" + processInstanceId + ", processInstanceId="
+        + processInstanceId + ", taskId=" + taskId + ", timestamp=" + timestamp + ", tenantId="
+        + tenantId + "]";
   }
 
 }

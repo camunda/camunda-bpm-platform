@@ -54,14 +54,16 @@ public class FlushResult {
   }
 
   public static FlushResult allApplied() {
-    return new FlushResult(Collections.<DbOperation>emptyList(), Collections.<DbOperation>emptyList());
+    return new FlushResult(Collections.<DbOperation> emptyList(),
+        Collections.<DbOperation> emptyList());
   }
 
   public static FlushResult withFailures(List<DbOperation> failedOperations) {
-    return new FlushResult(failedOperations, Collections.<DbOperation>emptyList());
+    return new FlushResult(failedOperations, Collections.<DbOperation> emptyList());
   }
 
-  public static FlushResult withFailuresAndRemaining(List<DbOperation> failedOperations, List<DbOperation> remainingOperations) {
+  public static FlushResult withFailuresAndRemaining(List<DbOperation> failedOperations,
+      List<DbOperation> remainingOperations) {
     return new FlushResult(failedOperations, remainingOperations);
   }
 }

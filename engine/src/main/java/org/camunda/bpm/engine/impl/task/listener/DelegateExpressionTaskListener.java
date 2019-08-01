@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.task.delegate.TaskListenerInvocation;
 
-
 /**
  * @author Joram Barrez
  */
@@ -38,7 +37,8 @@ public class DelegateExpressionTaskListener implements TaskListener {
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;
 
-  public DelegateExpressionTaskListener(Expression expression, List<FieldDeclaration> fieldDeclarations) {
+  public DelegateExpressionTaskListener(Expression expression,
+      List<FieldDeclaration> fieldDeclarations) {
     this.expression = expression;
     this.fieldDeclarations = fieldDeclarations;
   }
@@ -57,21 +57,21 @@ public class DelegateExpressionTaskListener implements TaskListener {
 
     if (delegate instanceof TaskListener) {
       try {
-        Context.getProcessEngineConfiguration()
-          .getDelegateInterceptor()
-          .handleInvocation(new TaskListenerInvocation((TaskListener)delegate, delegateTask));
-      }catch (Exception e) {
-        throw new ProcessEngineException("Exception while invoking TaskListener: "+e.getMessage(), e);
+        Context.getProcessEngineConfiguration().getDelegateInterceptor()
+            .handleInvocation(new TaskListenerInvocation((TaskListener) delegate, delegateTask));
+      } catch (Exception e) {
+        throw new ProcessEngineException("Exception while invoking TaskListener: " + e.getMessage(),
+            e);
       }
     } else {
       throw new ProcessEngineException("Delegate expression " + expression
-              + " did not resolve to an implementation of " + TaskListener.class );
+          + " did not resolve to an implementation of " + TaskListener.class);
     }
   }
 
   /**
-   * returns the expression text for this task listener. Comes in handy if you want to
-   * check which listeners you already have.
+   * returns the expression text for this task listener. Comes in handy if you want to check which
+   * listeners you already have.
    */
   public String getExpressionText() {
     return expression.getExpressionText();

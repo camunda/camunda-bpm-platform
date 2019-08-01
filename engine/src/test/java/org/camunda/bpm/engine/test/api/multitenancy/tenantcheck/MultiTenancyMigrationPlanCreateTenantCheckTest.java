@@ -51,15 +51,16 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
   @Test
   public void canCreateMigrationPlanForDefinitionsOfAuthenticatedTenant() {
     // given
-    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-
+    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
     // when
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
+        .mapEqualActivities().build();
 
     // then
     Assert.assertNotNull(migrationPlan);
@@ -68,8 +69,10 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
   @Test
   public void cannotCreateMigrationPlanForDefinitionsOfNonAuthenticatedTenantsCase1() {
     // given
-    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_TWO));
 
     // then
@@ -78,16 +81,18 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
         + "' because it belongs to no authenticated tenant");
 
     // when
-    engineRule.getRuntimeService().createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
-      .mapEqualActivities()
-      .build();
+    engineRule.getRuntimeService()
+        .createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
+        .mapEqualActivities().build();
   }
 
   @Test
   public void cannotCreateMigrationPlanForDefinitionsOfNonAuthenticatedTenantsCase2() {
     // given
-    ProcessDefinition tenant1Definition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant1Definition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_TWO));
 
     // then
@@ -96,16 +101,18 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
         + "' because it belongs to no authenticated tenant");
 
     // when
-    engineRule.getRuntimeService().createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
-      .mapEqualActivities()
-      .build();
+    engineRule.getRuntimeService()
+        .createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
+        .mapEqualActivities().build();
   }
 
   @Test
   public void cannotCreateMigrationPlanForDefinitionsOfNonAuthenticatedTenantsCase3() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
     // then
@@ -114,42 +121,44 @@ public class MultiTenancyMigrationPlanCreateTenantCheckTest {
         + "' because it belongs to no authenticated tenant");
 
     // when
-    engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
   }
-
 
   @Test
   public void canCreateMigrationPlanForSharedDefinitionsWithNoAuthenticatedTenants() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
     // when
     engineRule.getIdentityService().setAuthentication("user", null, null);
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+        .mapEqualActivities().build();
 
     // then
     Assert.assertNotNull(migrationPlan);
   }
 
-
   @Test
   public void canCreateMigrationPlanWithDisabledTenantCheck() {
 
     // given
-    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant1Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition tenant2Definition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
     // when
     engineRule.getIdentityService().setAuthentication("user", null, null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    MigrationPlan migrationPlan = engineRule.getRuntimeService().createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
-      .mapEqualActivities()
-      .build();
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
+        .createMigrationPlan(tenant1Definition.getId(), tenant2Definition.getId())
+        .mapEqualActivities().build();
 
     // then
     Assert.assertNotNull(migrationPlan);

@@ -38,7 +38,8 @@ public class GetDeployedStartFormCmd extends AbstractGetDeployedFormCmd {
   protected String processDefinitionId;
 
   public GetDeployedStartFormCmd(String processDefinitionId) {
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Process definition id cannot be null", "processDefinitionId", processDefinitionId);
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Process definition id cannot be null",
+        "processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
   }
 
@@ -54,10 +55,13 @@ public class GetDeployedStartFormCmd extends AbstractGetDeployedFormCmd {
 
   @Override
   protected void checkAuthorization(CommandContext commandContext) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    ProcessDefinitionEntity processDefinition = deploymentCache
+        .findDeployedProcessDefinitionById(processDefinitionId);
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessDefinition(processDefinition);
     }
   }

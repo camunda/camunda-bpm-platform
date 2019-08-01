@@ -39,7 +39,6 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
-
 /**
  * @author Tom Baeyens
  * @author Frederik Heremans
@@ -49,12 +48,14 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testHistoricTaskInstance() throws Exception {
-    String processInstanceId = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest").getId();
+    String processInstanceId = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest")
+        .getId();
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 
     // Set priority to non-default value
-    Task runtimeTask = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+    Task runtimeTask = taskService.createTaskQuery().processInstanceId(processInstanceId)
+        .singleResult();
     runtimeTask.setPriority(1234);
 
     // Set due-date
@@ -65,11 +66,13 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     String taskId = runtimeTask.getId();
     String taskDefinitionKey = runtimeTask.getTaskDefinitionKey();
 
-    HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
+    HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
+        .singleResult();
     assertEquals(taskId, historicTaskInstance.getId());
     assertEquals(1234, historicTaskInstance.getPriority());
     assertEquals("Clean up", historicTaskInstance.getName());
-    assertEquals("Schedule an engineering meeting for next week with the new hire.", historicTaskInstance.getDescription());
+    assertEquals("Schedule an engineering meeting for next week with the new hire.",
+        historicTaskInstance.getDescription());
     assertEquals(dueDate, historicTaskInstance.getDueDate());
     assertEquals("kermit", historicTaskInstance.getAssignee());
     assertEquals(taskDefinitionKey, historicTaskInstance.getTaskDefinitionKey());
@@ -81,7 +84,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertNull(historicTaskInstance.getCaseExecutionId());
 
     // the activity instance id is set
-    assertEquals(((TaskEntity)runtimeTask).getExecution().getActivityInstanceId(), historicTaskInstance.getActivityInstanceId());
+    assertEquals(((TaskEntity) runtimeTask).getExecution().getActivityInstanceId(),
+        historicTaskInstance.getActivityInstanceId());
 
     runtimeService.setVariable(processInstanceId, "deadline", "yesterday");
 
@@ -97,7 +101,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(taskId, historicTaskInstance.getId());
     assertEquals(1234, historicTaskInstance.getPriority());
     assertEquals("Clean up", historicTaskInstance.getName());
-    assertEquals("Schedule an engineering meeting for next week with the new hire.", historicTaskInstance.getDescription());
+    assertEquals("Schedule an engineering meeting for next week with the new hire.",
+        historicTaskInstance.getDescription());
     assertEquals(dueDate, historicTaskInstance.getDueDate());
     assertEquals("kermit", historicTaskInstance.getAssignee());
     assertEquals(TaskEntity.DELETE_REASON_COMPLETED, historicTaskInstance.getDeleteReason());
@@ -105,7 +110,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertNotNull(historicTaskInstance.getEndTime());
     assertNotNull(historicTaskInstance.getDurationInMillis());
     assertTrue(historicTaskInstance.getDurationInMillis() >= 1000);
-    assertTrue(((HistoricTaskInstanceEntity)historicTaskInstance).getDurationRaw() >= 1000);
+    assertTrue(((HistoricTaskInstanceEntity) historicTaskInstance).getDurationRaw() >= 1000);
 
     assertNull(historicTaskInstance.getCaseDefinitionId());
     assertNull(historicTaskInstance.getCaseInstanceId());
@@ -124,10 +129,12 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testHistoricTaskInstanceQuery() throws Exception {
     // First instance is finished
-    ProcessInstance finishedInstance = runtimeService.startProcessInstanceByKey("HistoricTaskQueryTest");
+    ProcessInstance finishedInstance = runtimeService
+        .startProcessInstanceByKey("HistoricTaskQueryTest");
 
     // Set priority to non-default value
-    Task task = taskService.createTaskQuery().processInstanceId(finishedInstance.getId()).singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(finishedInstance.getId())
+        .singleResult();
     task.setPriority(1234);
     Date dueDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("01/02/2003 04:05:06");
     task.setDueDate(dueDate);
@@ -140,66 +147,95 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
     // Task id
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(taskId).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskId("unexistingtaskid").count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().taskId("unexistingtaskid").count());
 
     // Name
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskName("Clean_up").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskName("unexistingname").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskNameLike("Clean\\_u%").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskNameLike("%lean\\_up").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskNameLike("%lean\\_u%").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskNameLike("%unexistingname%").count());
-
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().taskName("unexistingname").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskNameLike("Clean\\_u%").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskNameLike("%lean\\_up").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskNameLike("%lean\\_u%").count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().taskNameLike("%unexistingname%").count());
 
     // Description
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescription("Historic task_description").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDescription("unexistingdescription").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%task\\_description").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("Historic task%").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%task%").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%unexistingdescripton%").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .taskDescription("Historic task_description").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskDescription("unexistingdescription").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .taskDescriptionLike("%task\\_description").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .taskDescriptionLike("Historic task%").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%task%").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskDescriptionLike("%unexistingdescripton%").count());
 
     // Execution id
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().executionId(finishedInstance.getId()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().executionId("unexistingexecution").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .executionId(finishedInstance.getId()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .executionId("unexistingexecution").count());
 
     // Process instance id
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processInstanceId(finishedInstance.getId()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processInstanceId("unexistingid").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processInstanceId(finishedInstance.getId()).count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().processInstanceId("unexistingid").count());
 
     // Process definition id
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processDefinitionId(finishedInstance.getProcessDefinitionId()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processDefinitionId("unexistingdefinitionid").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processDefinitionId(finishedInstance.getProcessDefinitionId()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .processDefinitionId("unexistingdefinitionid").count());
 
     // Process definition name
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processDefinitionName("Historic task query test process").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processDefinitionName("unexistingdefinitionname").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processDefinitionName("Historic task query test process").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .processDefinitionName("unexistingdefinitionname").count());
 
     // Process definition key
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processDefinitionKey("HistoricTaskQueryTest").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processDefinitionKey("unexistingdefinitionkey").count());
-
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .processDefinitionKey("HistoricTaskQueryTest").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .processDefinitionKey("unexistingdefinitionkey").count());
 
     // Assignee
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssignee("ker_mit").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskAssignee("johndoe").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%er\\_mit").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("ker\\_mi%").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%er\\_mi%").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%johndoe%").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskAssignee("ker_mit").count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().taskAssignee("johndoe").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%er\\_mit").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("ker\\_mi%").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%er\\_mi%").count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%johndoe%").count());
 
     // Delete reason
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDeleteReason(TaskEntity.DELETE_REASON_COMPLETED).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDeleteReason("deleted").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .taskDeleteReason(TaskEntity.DELETE_REASON_COMPLETED).count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().taskDeleteReason("deleted").count());
 
     // Task definition ID
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("task").count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("unexistingkey").count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("task").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskDefinitionKey("unexistingkey").count());
 
     // Task priority
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskPriority(1234).count());
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskPriority(5678).count());
-
 
     // Due date
     Calendar anHourAgo = Calendar.getInstance();
@@ -211,22 +247,33 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     anHourLater.add(Calendar.HOUR, 1);
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDueDate(dueDate).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDueDate(anHourAgo.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDueDate(anHourLater.getTime()).count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().taskDueDate(anHourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskDueDate(anHourLater.getTime()).count());
 
     // Due date before
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDueBefore(anHourLater.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDueBefore(anHourAgo.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .taskDueBefore(anHourLater.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskDueBefore(anHourAgo.getTime()).count());
 
     // Due date after
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDueAfter(anHourAgo.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDueAfter(anHourLater.getTime()).count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskDueAfter(anHourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskDueAfter(anHourLater.getTime()).count());
 
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDueDate(dueDate).taskDueBefore(anHourLater.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDueDate(dueDate).taskDueBefore(anHourAgo.getTime()).count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDueDate(dueDate).taskDueAfter(anHourAgo.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDueDate(dueDate).taskDueAfter(anHourLater.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDueBefore(anHourAgo.getTime()).taskDueAfter(anHourLater.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDueDate(dueDate)
+        .taskDueBefore(anHourLater.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDueDate(dueDate)
+        .taskDueBefore(anHourAgo.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDueDate(dueDate)
+        .taskDueAfter(anHourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDueDate(dueDate)
+        .taskDueAfter(anHourLater.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskDueBefore(anHourAgo.getTime()).taskDueAfter(anHourLater.getTime()).count());
 
     Calendar hourAgo = Calendar.getInstance();
     hourAgo.add(Calendar.HOUR_OF_DAY, -1);
@@ -234,22 +281,32 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
 
     // Start/end dates
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().finishedBefore(hourAgo.getTime()).count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().finishedBefore(hourFromNow.getTime()).count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().finishedAfter(hourAgo.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().finishedAfter(hourFromNow.getTime()).count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().startedBefore(hourFromNow.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().startedBefore(hourAgo.getTime()).count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().startedAfter(hourAgo.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().startedAfter(hourFromNow.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().startedAfter(hourFromNow.getTime()).startedBefore(hourAgo.getTime()).count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().finishedBefore(hourAgo.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .finishedBefore(hourFromNow.getTime()).count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().finishedAfter(hourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .finishedAfter(hourFromNow.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .startedBefore(hourFromNow.getTime()).count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().startedBefore(hourAgo.getTime()).count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().startedAfter(hourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .startedAfter(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .startedAfter(hourFromNow.getTime()).startedBefore(hourAgo.getTime()).count());
 
     // Finished and Unfinished - Add anther other instance that has a running task (unfinished)
     runtimeService.startProcessInstanceByKey("HistoricTaskQueryTest");
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().finished().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().unfinished().count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().unfinished().finished().count());
+    assertEquals(0,
+        historyService.createHistoricTaskInstanceQuery().unfinished().finished().count());
   }
 
   @Deployment
@@ -259,15 +316,15 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
       Map<String, Object> variables = new HashMap<String, Object>();
       variables.put("hallo", "steffen");
 
-      String processInstanceId = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest", variables).getId();
+      String processInstanceId = runtimeService
+          .startProcessInstanceByKey("HistoricTaskInstanceTest", variables).getId();
 
-      Task runtimeTask = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+      Task runtimeTask = taskService.createTaskQuery().processInstanceId(processInstanceId)
+          .singleResult();
       String taskId = runtimeTask.getId();
 
-      HistoricTaskInstance historicTaskInstance = historyService
-          .createHistoricTaskInstanceQuery()
-          .processVariableValueEquals("hallo", "steffen")
-          .singleResult();
+      HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
+          .processVariableValueEquals("hallo", "steffen").singleResult();
 
       assertNotNull(historicTaskInstance);
       assertEquals(taskId, historicTaskInstance.getId());
@@ -306,7 +363,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     variables.put("assignee", "jonny");
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
-    HistoricActivityInstance hai = historyService.createHistoricActivityInstanceQuery().activityId("task").singleResult();
+    HistoricActivityInstance hai = historyService.createHistoricActivityInstanceQuery()
+        .activityId("task").singleResult();
     assertEquals("jonny", hai.getAssignee());
 
     HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
@@ -355,8 +413,10 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testHistoricTaskInstanceQueryProcessFinished() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoTaskHistoricTaskQueryTest");
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("TwoTaskHistoricTaskQueryTest");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     // Running task on running process should be available
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().processUnfinished().count());
@@ -373,51 +433,86 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().processUnfinished().count());
     assertEquals(2, historyService.createHistoricTaskInstanceQuery().processFinished().count());
 
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processUnfinished().processFinished().count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processUnfinished()
+        .processFinished().count());
   }
 
   @Deployment
   public void testHistoricTaskInstanceQuerySorting() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("HistoricTaskQueryTest");
 
-    String taskId = taskService.createTaskQuery().processInstanceId(instance.getId()).singleResult().getId();
+    String taskId = taskService.createTaskQuery().processInstanceId(instance.getId()).singleResult()
+        .getId();
     taskService.complete(taskId);
 
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByDeleteReason().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByExecutionId().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByHistoricActivityInstanceId().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByHistoricActivityInstanceStartTime().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByProcessDefinitionId().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByProcessInstanceId().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskDescription().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskName().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskDefinitionKey().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByDeleteReason().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByExecutionId().asc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .orderByHistoricActivityInstanceId().asc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .orderByHistoricActivityInstanceStartTime().asc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByProcessDefinitionId()
+        .asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByProcessInstanceId().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskDescription().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskName().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskDefinitionKey().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().asc().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskId().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskDueDate().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskFollowUpDate().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseDefinitionId().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseInstanceId().asc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseExecutionId().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskDueDate().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskFollowUpDate().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByCaseDefinitionId().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByCaseInstanceId().asc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByCaseExecutionId().asc().count());
 
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByDeleteReason().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByExecutionId().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByHistoricActivityInstanceId().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByHistoricActivityInstanceStartTime().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByProcessDefinitionId().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByProcessInstanceId().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskDescription().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskName().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskDefinitionKey().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskId().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskDueDate().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByTaskFollowUpDate().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseDefinitionId().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseInstanceId().desc().count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByCaseExecutionId().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByDeleteReason().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByExecutionId().desc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .orderByHistoricActivityInstanceId().desc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .orderByHistoricActivityInstanceStartTime().desc().count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().orderByProcessDefinitionId()
+        .desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByProcessInstanceId().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskDescription().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskName().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskDefinitionKey().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskId().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskDueDate().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByTaskFollowUpDate().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByCaseDefinitionId().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByCaseInstanceId().desc().count());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().orderByCaseExecutionId().desc().count());
   }
 
   public void testInvalidSorting() {
@@ -443,7 +538,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml" })
   public void testHistoricTaskInstanceQueryByFollowUpDate() throws Exception {
     Calendar otherDate = Calendar.getInstance();
 
@@ -460,37 +556,48 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     taskService.saveTask(task);
 
     // test that follow-up date was written to historic database
-    assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult().getFollowUpDate());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(followUpDate).count());
+    assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId())
+        .singleResult().getFollowUpDate());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(followUpDate).count());
 
     otherDate.setTime(followUpDate);
 
     otherDate.add(Calendar.YEAR, 1);
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(otherDate.getTime()).count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpBefore(otherDate.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpAfter(otherDate.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpAfter(otherDate.getTime()).taskFollowUpDate(followUpDate).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskFollowUpDate(otherDate.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .taskFollowUpBefore(otherDate.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskFollowUpAfter(otherDate.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskFollowUpAfter(otherDate.getTime()).taskFollowUpDate(followUpDate).count());
 
     otherDate.add(Calendar.YEAR, -2);
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpAfter(otherDate.getTime()).count());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpBefore(otherDate.getTime()).count());
-    assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult().getFollowUpDate());
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskFollowUpBefore(otherDate.getTime()).taskFollowUpDate(followUpDate).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
+        .taskFollowUpAfter(otherDate.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskFollowUpBefore(otherDate.getTime()).count());
+    assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId())
+        .singleResult().getFollowUpDate());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery()
+        .taskFollowUpBefore(otherDate.getTime()).taskFollowUpDate(followUpDate).count());
 
     taskService.complete(task.getId());
 
-    assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult().getFollowUpDate());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(followUpDate).count());
+    assertEquals(followUpDate, historyService.createHistoricTaskInstanceQuery().taskId(task.getId())
+        .singleResult().getFollowUpDate());
+    assertEquals(1,
+        historyService.createHistoricTaskInstanceQuery().taskFollowUpDate(followUpDate).count());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml" })
   public void testHistoricTaskInstanceQueryByActivityInstanceId() throws Exception {
     runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
 
     String activityInstanceId = historyService.createHistoricActivityInstanceQuery()
-        .activityId("task")
-        .singleResult()
-        .getId();
+        .activityId("task").singleResult().getId();
 
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
         .activityInstanceIdIn(activityInstanceId);
@@ -499,22 +606,17 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.list().size());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml" })
   public void testHistoricTaskInstanceQueryByActivityInstanceIds() throws Exception {
     ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
     ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
 
     String activityInstanceId1 = historyService.createHistoricActivityInstanceQuery()
-        .processInstanceId(pi1.getId())
-        .activityId("task")
-        .singleResult()
-        .getId();
+        .processInstanceId(pi1.getId()).activityId("task").singleResult().getId();
 
     String activityInstanceId2 = historyService.createHistoricActivityInstanceQuery()
-        .processInstanceId(pi2.getId())
-        .activityId("task")
-        .singleResult()
-        .getId();
+        .processInstanceId(pi2.getId()).activityId("task").singleResult().getId();
 
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
         .activityInstanceIdIn(activityInstanceId1, activityInstanceId2);
@@ -523,7 +625,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(2, query.list().size());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testHistoricTaskInstance.bpmn20.xml" })
   public void testHistoricTaskInstanceQueryByInvalidActivityInstanceId() {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -533,39 +636,33 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     try {
       query.activityInstanceIdIn(null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
     try {
-      query.activityInstanceIdIn((String)null);
+      query.activityInstanceIdIn((String) null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
     try {
       String[] values = { "a", null, "b" };
       query.activityInstanceIdIn(values);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testQueryByCaseDefinitionId() {
     // given
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
-    String caseInstanceId = caseService
-        .withCaseDefinition(caseDefinitionId)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinition(caseDefinitionId).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -601,27 +698,18 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testQueryByCaseDefinitionKey() {
     // given
     String key = "oneTaskCase";
 
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .caseDefinitionKey(key)
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().caseDefinitionKey(key)
+        .singleResult().getId();
 
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey(key)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey(key).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -657,26 +745,18 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testQueryByCaseDefinitionName() {
     // given
-    CaseDefinition caseDefinition = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult();
+    CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
     String caseDefinitionName = caseDefinition.getName();
     String caseDefinitionId = caseDefinition.getId();
 
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("oneTaskCase")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("oneTaskCase").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -712,27 +792,18 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testQueryByCaseInstanceId() {
     // given
     String key = "oneTaskCase";
 
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .caseDefinitionKey(key)
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().caseDefinitionKey(key)
+        .singleResult().getId();
 
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey(key)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey(key).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -751,25 +822,14 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(humanTaskId, task.getCaseExecutionId());
   }
 
-
-
-  @Deployment(resources=
-    {
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testQueryByCaseInstanceIdHierarchy.cmmn",
-      "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testQueryByCaseInstanceIdHierarchy.bpmn20.xml"
-    })
+      "org/camunda/bpm/engine/test/history/HistoricTaskInstanceTest.testQueryByCaseInstanceIdHierarchy.bpmn20.xml" })
   public void testQueryByCaseInstanceIdHierarchy() {
     // given
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_ProcessTask_1")
-        .singleResult()
-        .getId();
+    caseService.createCaseExecutionQuery().activityId("PI_ProcessTask_1").singleResult().getId();
 
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -817,27 +877,18 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testQueryByCaseExecutionId() {
     // given
     String key = "oneTaskCase";
 
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .caseDefinitionKey(key)
-        .singleResult()
-        .getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().caseDefinitionKey(key)
+        .singleResult().getId();
 
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey(key)
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey(key).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // then
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
@@ -878,9 +929,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     task.setCaseInstanceId("aCaseInstanceId");
     taskService.saveTask(task);
 
-    HistoricTaskInstance hti = historyService
-        .createHistoricTaskInstanceQuery()
-        .taskId(task.getId())
+    HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().taskId(task.getId())
         .singleResult();
 
     assertEquals("aCaseInstanceId", hti.getCaseInstanceId());
@@ -888,10 +937,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     task.setCaseInstanceId("anotherCaseInstanceId");
     taskService.saveTask(task);
 
-    hti = historyService
-        .createHistoricTaskInstanceQuery()
-        .taskId(task.getId())
-        .singleResult();
+    hti = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
 
     assertEquals("anotherCaseInstanceId", hti.getCaseInstanceId());
 
@@ -907,11 +953,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     String processInstanceId = runtimeService.startProcessInstanceByKey(key).getId();
 
     // when
-    HistoricTaskInstance task = historyService
-        .createHistoricTaskInstanceQuery()
-        .processInstanceId(processInstanceId)
-        .taskDefinitionKey("theTask")
-        .singleResult();
+    HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery()
+        .processInstanceId(processInstanceId).taskDefinitionKey("theTask").singleResult();
 
     // then
     assertNotNull(task.getProcessDefinitionKey());
@@ -927,11 +970,8 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     String caseInstanceId = caseService.createCaseInstanceByKey(key).getId();
 
     // when
-    HistoricTaskInstance task = historyService
-        .createHistoricTaskInstanceQuery()
-        .caseInstanceId(caseInstanceId)
-        .taskDefinitionKey("PI_HumanTask_1")
-        .singleResult();
+    HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery()
+        .caseInstanceId(caseInstanceId).taskDefinitionKey("PI_HumanTask_1").singleResult();
 
     // then
     assertNotNull(task.getCaseDefinitionKey());
@@ -946,12 +986,10 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    HistoricTaskInstanceQuery query1 = historyService
-        .createHistoricTaskInstanceQuery()
+    HistoricTaskInstanceQuery query1 = historyService.createHistoricTaskInstanceQuery()
         .taskDefinitionKey("theTask");
 
-    HistoricTaskInstanceQuery query2 = historyService
-        .createHistoricTaskInstanceQuery()
+    HistoricTaskInstanceQuery query2 = historyService.createHistoricTaskInstanceQuery()
         .taskDefinitionKeyIn("theTask");
 
     // then
@@ -959,18 +997,15 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query2.count());
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testQueryByTaskDefinitionKeys() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
     caseService.createCaseInstanceByKey("oneTaskCase");
 
     // when
-    HistoricTaskInstanceQuery query = historyService
-        .createHistoricTaskInstanceQuery()
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
         .taskDefinitionKeyIn("theTask", "PI_HumanTask_1");
 
     // then
@@ -986,25 +1021,29 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     try {
       query.taskDefinitionKeyIn(null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
 
     try {
-      query.taskDefinitionKeyIn((String)null);
+      query.taskDefinitionKeyIn((String) null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
 
     try {
       String[] values = { "a", null, "b" };
       query.taskDefinitionKeyIn(values);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+    }
 
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByProcessInstanceBusinessKey() {
     // given
-    ProcessInstance piBusinessKey1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-1");
+    ProcessInstance piBusinessKey1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        "BUSINESS-KEY-1");
 
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
@@ -1028,8 +1067,10 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
     // then
-    assertEquals(3, query.processInstanceBusinessKeyIn(businessKey1, businessKey2, businessKey3).list().size());
-    assertEquals(1, query.processInstanceBusinessKeyIn(businessKey2, unexistingBusinessKey).count());
+    assertEquals(3,
+        query.processInstanceBusinessKeyIn(businessKey1, businessKey2, businessKey3).list().size());
+    assertEquals(1,
+        query.processInstanceBusinessKeyIn(businessKey2, unexistingBusinessKey).count());
   }
 
   public void testQueryByInvalidProcessInstanceBusinessKeyIn() {
@@ -1041,18 +1082,21 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     try {
       query.processInstanceBusinessKeyIn(null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
     try {
-      query.processInstanceBusinessKeyIn((String)null);
+      query.processInstanceBusinessKeyIn((String) null);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
 
     try {
       String[] values = { "a", null, "b" };
       query.processInstanceBusinessKeyIn(values);
       fail("A ProcessEngineExcpetion was expected.");
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
@@ -1085,7 +1129,9 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
     // then
-    assertEquals(0, query.processInstanceBusinessKeyIn(businessKey1, businessKey2).processInstanceBusinessKey(unexistingBusinessKey).count());
-    assertEquals(1, query.processInstanceBusinessKeyIn(businessKey2, businessKey3).processInstanceBusinessKey(businessKey2).count());
+    assertEquals(0, query.processInstanceBusinessKeyIn(businessKey1, businessKey2)
+        .processInstanceBusinessKey(unexistingBusinessKey).count());
+    assertEquals(1, query.processInstanceBusinessKeyIn(businessKey2, businessKey3)
+        .processInstanceBusinessKey(businessKey2).count());
   }
 }

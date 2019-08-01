@@ -26,10 +26,11 @@ import java.util.List;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalTimeBatchConfiguration> {
+public class SetRemovalTimeJsonConverter
+    extends JsonObjectConverter<SetRemovalTimeBatchConfiguration> {
 
   public static final SetRemovalTimeJsonConverter INSTANCE = new SetRemovalTimeJsonConverter();
-  
+
   protected static final String IDS = "ids";
   protected static final String REMOVAL_TIME = "removalTime";
   protected static final String HAS_REMOVAL_TIME = "hasRemovalTime";
@@ -51,16 +52,14 @@ public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalT
     long removalTimeMills = JsonUtil.getLong(jsonObject, REMOVAL_TIME);
     Date removalTime = removalTimeMills > 0 ? new Date(removalTimeMills) : null;
 
-    List<String> instanceIds =  JsonUtil.asStringList(JsonUtil.getArray(jsonObject, IDS));
+    List<String> instanceIds = JsonUtil.asStringList(JsonUtil.getArray(jsonObject, IDS));
 
     boolean hasRemovalTime = JsonUtil.getBoolean(jsonObject, HAS_REMOVAL_TIME);
 
     boolean isHierarchical = JsonUtil.getBoolean(jsonObject, IS_HIERARCHICAL);
 
-    return new SetRemovalTimeBatchConfiguration(instanceIds)
-      .setRemovalTime(removalTime)
-      .setHasRemovalTime(hasRemovalTime)
-      .setHierarchical(isHierarchical);
+    return new SetRemovalTimeBatchConfiguration(instanceIds).setRemovalTime(removalTime)
+        .setHasRemovalTime(hasRemovalTime).setHierarchical(isHierarchical);
   }
 
 }

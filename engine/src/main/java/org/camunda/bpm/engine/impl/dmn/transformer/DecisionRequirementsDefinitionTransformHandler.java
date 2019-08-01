@@ -22,11 +22,14 @@ import org.camunda.bpm.dmn.engine.impl.transform.DmnDecisionRequirementsGraphTra
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.model.dmn.instance.Definitions;
 
-public class DecisionRequirementsDefinitionTransformHandler extends DmnDecisionRequirementsGraphTransformHandler {
+public class DecisionRequirementsDefinitionTransformHandler
+    extends DmnDecisionRequirementsGraphTransformHandler {
 
   @Override
-  protected DmnDecisionRequirementsGraphImpl createFromDefinitions(DmnElementTransformContext context, Definitions definitions) {
-    DecisionRequirementsDefinitionEntity entity = (DecisionRequirementsDefinitionEntity) super.createFromDefinitions(context, definitions);
+  protected DmnDecisionRequirementsGraphImpl createFromDefinitions(
+      DmnElementTransformContext context, Definitions definitions) {
+    DecisionRequirementsDefinitionEntity entity = (DecisionRequirementsDefinitionEntity) super.createFromDefinitions(
+        context, definitions);
 
     entity.setCategory(definitions.getNamespace());
 

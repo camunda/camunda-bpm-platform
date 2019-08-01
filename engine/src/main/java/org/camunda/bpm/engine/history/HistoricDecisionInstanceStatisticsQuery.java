@@ -18,16 +18,17 @@ package org.camunda.bpm.engine.history;
 
 import org.camunda.bpm.engine.query.Query;
 
-
 /**
  * @author Askar Akhmerov
  */
-public interface HistoricDecisionInstanceStatisticsQuery extends Query<HistoricDecisionInstanceStatisticsQuery, HistoricDecisionInstanceStatistics> {
+public interface HistoricDecisionInstanceStatisticsQuery
+    extends Query<HistoricDecisionInstanceStatisticsQuery, HistoricDecisionInstanceStatistics> {
 
   /**
    * Restrict query results to be based only on specified decision instance id
    *
-   * @param decisionInstanceId - decision instance based on which constraint will be applied
+   * @param decisionInstanceId
+   *          - decision instance based on which constraint will be applied
    * @return - query object to execute
    */
   HistoricDecisionInstanceStatisticsQuery decisionInstanceId(String decisionInstanceId);

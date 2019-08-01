@@ -39,10 +39,7 @@ public class TestPojo implements Serializable {
   }
 
   public String toString() {
-    return "TestPojo{" +
-      "foo='" + foo + '\'' +
-      ", bar=" + bar +
-      '}';
+    return "TestPojo{" + "foo='" + foo + '\'' + ", bar=" + bar + '}';
   }
 
 }

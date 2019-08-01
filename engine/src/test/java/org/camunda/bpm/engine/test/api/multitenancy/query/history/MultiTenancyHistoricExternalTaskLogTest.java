@@ -67,7 +67,6 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   protected final String ERROR_DETAILS = "These are the error details!";
   protected final long LOCK_DURATION = 5 * 60L * 1000L;
 
-
   @Before
   public void setUp() {
     repositoryService = engineRule.getRepositoryService();
@@ -86,11 +85,10 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   @Test
   public void testQueryWithoutTenantId() {
 
-    //given two process with different tenants
+    // given two process with different tenants
 
     // when
-    HistoricExternalTaskLogQuery query = historyService.
-      createHistoricExternalTaskLogQuery();
+    HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
 
     // then
     assertThat(query.count(), is(5L));
@@ -102,12 +100,10 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     // given two process with different tenants
 
     // when
-    HistoricExternalTaskLogQuery queryTenant1 = historyService
-      .createHistoricExternalTaskLogQuery()
-      .tenantIdIn(TENANT_ONE);
-    HistoricExternalTaskLogQuery queryTenant2 = historyService
-      .createHistoricExternalTaskLogQuery()
-      .tenantIdIn(TENANT_TWO);
+    HistoricExternalTaskLogQuery queryTenant1 = historyService.createHistoricExternalTaskLogQuery()
+        .tenantIdIn(TENANT_ONE);
+    HistoricExternalTaskLogQuery queryTenant2 = historyService.createHistoricExternalTaskLogQuery()
+        .tenantIdIn(TENANT_TWO);
 
     // then
     assertThat(queryTenant1.count(), is(2L));
@@ -117,12 +113,11 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   @Test
   public void testQueryByTenantIds() {
 
-    //given two process with different tenants
+    // given two process with different tenants
 
     // when
-    HistoricExternalTaskLogQuery query = historyService
-      .createHistoricExternalTaskLogQuery()
-      .tenantIdIn(TENANT_ONE, TENANT_TWO);
+    HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     // then
     assertThat(query.count(), is(5L));
@@ -131,12 +126,11 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   @Test
   public void testQueryByNonExistingTenantId() {
 
-    //given two process with different tenants
+    // given two process with different tenants
 
     // when
-    HistoricExternalTaskLogQuery query = historyService
-      .createHistoricExternalTaskLogQuery()
-      .tenantIdIn("nonExisting");
+    HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery()
+        .tenantIdIn("nonExisting");
 
     // then
     assertThat(query.count(), is(0L));
@@ -145,8 +139,7 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   @Test
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricExternalTaskLogQuery()
-        .tenantIdIn((String) null);
+      historyService.createHistoricExternalTaskLogQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -157,13 +150,11 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   @Test
   public void testQuerySortingAsc() {
 
-    //given two process with different tenants
+    // given two process with different tenants
 
     // when
-    List<HistoricExternalTaskLog> HistoricExternalTaskLogs = historyService.createHistoricExternalTaskLogQuery()
-      .orderByTenantId()
-      .asc()
-      .list();
+    List<HistoricExternalTaskLog> HistoricExternalTaskLogs = historyService
+        .createHistoricExternalTaskLogQuery().orderByTenantId().asc().list();
 
     // then
     assertThat(HistoricExternalTaskLogs.size(), is(5));
@@ -177,13 +168,11 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   @Test
   public void testQuerySortingDesc() {
 
-    //given two process with different tenants
+    // given two process with different tenants
 
     // when
-    List<HistoricExternalTaskLog> HistoricExternalTaskLogs = historyService.createHistoricExternalTaskLogQuery()
-      .orderByTenantId()
-      .desc()
-      .list();
+    List<HistoricExternalTaskLog> HistoricExternalTaskLogs = historyService
+        .createHistoricExternalTaskLogQuery().orderByTenantId().desc().list();
 
     // then
     assertThat(HistoricExternalTaskLogs.size(), is(5));
@@ -254,15 +243,10 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     // given
     identityService.setAuthentication("user", null, Collections.singletonList(TENANT_ONE));
 
-    String failedHistoricExternalTaskLogId = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .tenantIdIn(TENANT_ONE)
-      .singleResult()
-      .getId();
+    String failedHistoricExternalTaskLogId = historyService.createHistoricExternalTaskLogQuery()
+        .failureLog().tenantIdIn(TENANT_ONE).singleResult().getId();
     identityService.clearAuthentication();
     identityService.setAuthentication("user", null, null);
-
 
     try {
       // when
@@ -282,15 +266,12 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     // given
     identityService.setAuthentication("user", null, Collections.singletonList(TENANT_ONE));
 
-    String failedHistoricExternalTaskLogId = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .tenantIdIn(TENANT_ONE)
-      .singleResult()
-      .getId();
+    String failedHistoricExternalTaskLogId = historyService.createHistoricExternalTaskLogQuery()
+        .failureLog().tenantIdIn(TENANT_ONE).singleResult().getId();
 
     // when
-    String stacktrace = historyService.getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
+    String stacktrace = historyService
+        .getHistoricExternalTaskLogErrorDetails(failedHistoricExternalTaskLogId);
 
     // then
     assertThat(stacktrace, is(notNullValue()));
@@ -302,19 +283,11 @@ public class MultiTenancyHistoricExternalTaskLogTest {
     // given
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
-    String logIdTenant1 = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .tenantIdIn(TENANT_ONE)
-      .singleResult()
-      .getId();
+    String logIdTenant1 = historyService.createHistoricExternalTaskLogQuery().failureLog()
+        .tenantIdIn(TENANT_ONE).singleResult().getId();
 
-    String logIdTenant2 = historyService
-      .createHistoricExternalTaskLogQuery()
-      .failureLog()
-      .tenantIdIn(TENANT_ONE)
-      .singleResult()
-      .getId();
+    String logIdTenant2 = historyService.createHistoricExternalTaskLogQuery().failureLog()
+        .tenantIdIn(TENANT_ONE).singleResult().getId();
 
     // when
     String stacktrace1 = historyService.getHistoricExternalTaskLogErrorDetails(logIdTenant1);
@@ -331,8 +304,7 @@ public class MultiTenancyHistoricExternalTaskLogTest {
 
   protected void completeExternalTask(String externalTaskId) {
     List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, WORKER_ID, true)
-      .topic(DEFAULT_TOPIC, LOCK_DURATION)
-      .execute();
+        .topic(DEFAULT_TOPIC, LOCK_DURATION).execute();
     externalTaskService.complete(externalTaskId, WORKER_ID);
     // unlock the remaining tasks
     for (LockedExternalTask lockedExternalTask : list) {
@@ -344,11 +316,10 @@ public class MultiTenancyHistoricExternalTaskLogTest {
 
   @SuppressWarnings("deprecation")
   protected ExternalTask startProcessInstanceAndFailExternalTask(String tenant) {
-    ProcessInstance pi = runtimeService.createProcessInstanceByKey(DEFAULT_PROCESS_KEY).processDefinitionTenantId(tenant).execute();
-    ExternalTask externalTask = externalTaskService
-      .createExternalTaskQuery()
-      .processInstanceId(pi.getId())
-      .singleResult();
+    ProcessInstance pi = runtimeService.createProcessInstanceByKey(DEFAULT_PROCESS_KEY)
+        .processDefinitionTenantId(tenant).execute();
+    ExternalTask externalTask = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(pi.getId()).singleResult();
     reportExternalTaskFailure(externalTask.getId());
     return externalTask;
   }
@@ -359,14 +330,16 @@ public class MultiTenancyHistoricExternalTaskLogTest {
   }
 
   protected void reportExternalTaskFailure(String externalTaskId) {
-    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false, "This is an error!");
+    reportExternalTaskFailure(externalTaskId, DEFAULT_TOPIC, WORKER_ID, 1, false,
+        "This is an error!");
   }
 
-  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId, Integer retries, boolean usePriority, String errorMessage) {
+  protected void reportExternalTaskFailure(String externalTaskId, String topic, String workerId,
+      Integer retries, boolean usePriority, String errorMessage) {
     List<LockedExternalTask> list = externalTaskService.fetchAndLock(100, workerId, usePriority)
-      .topic(topic, LOCK_DURATION)
-      .execute();
-    externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, ERROR_DETAILS, retries, 0L);
+        .topic(topic, LOCK_DURATION).execute();
+    externalTaskService.handleFailure(externalTaskId, workerId, errorMessage, ERROR_DETAILS,
+        retries, 0L);
 
     for (LockedExternalTask lockedExternalTask : list) {
       externalTaskService.unlock(lockedExternalTask.getId());

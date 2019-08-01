@@ -32,7 +32,8 @@ import org.joda.time.Period;
  */
 public class HumanTaskFollowUpDateTest extends CmmnProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/humantask/HumanTaskFollowUpDateTest.testHumanTaskFollowUpDate.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/humantask/HumanTaskFollowUpDateTest.testHumanTaskFollowUpDate.cmmn" })
   public void testHumanTaskFollowUpDateExtension() throws Exception {
 
     Date date = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").parse("01-01-2015 12:10:00");
@@ -47,7 +48,8 @@ public class HumanTaskFollowUpDateTest extends CmmnProcessEngineTestCase {
     assertEquals(date, task.getFollowUpDate());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/humantask/HumanTaskFollowUpDateTest.testHumanTaskFollowUpDate.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/humantask/HumanTaskFollowUpDateTest.testHumanTaskFollowUpDate.cmmn" })
   public void testHumanTaskFollowUpDateStringExtension() throws Exception {
 
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -62,7 +64,8 @@ public class HumanTaskFollowUpDateTest extends CmmnProcessEngineTestCase {
     assertEquals(date, task.getFollowUpDate());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/humantask/HumanTaskFollowUpDateTest.testHumanTaskFollowUpDate.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/humantask/HumanTaskFollowUpDateTest.testHumanTaskFollowUpDate.cmmn" })
   public void testHumanTaskRelativeFollowUpDate() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("dateVariable", "P2DT2H30M");

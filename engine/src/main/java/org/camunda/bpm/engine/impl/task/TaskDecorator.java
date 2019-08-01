@@ -81,9 +81,9 @@ public class TaskDecorator {
 
   protected void initializeTaskDueDate(TaskEntity task, VariableScope variableScope) {
     Expression dueDateExpression = taskDefinition.getDueDateExpression();
-    if(dueDateExpression != null) {
+    if (dueDateExpression != null) {
       Object dueDate = dueDateExpression.getValue(variableScope);
-      if(dueDate != null) {
+      if (dueDate != null) {
         if (dueDate instanceof Date) {
           task.setDueDate((Date) dueDate);
 
@@ -92,8 +92,9 @@ public class TaskDecorator {
           task.setDueDate(businessCalendar.resolveDuedate((String) dueDate));
 
         } else {
-          throw new ProcessEngineException("Due date expression does not resolve to a Date or Date string: " +
-              dueDateExpression.getExpressionText());
+          throw new ProcessEngineException(
+              "Due date expression does not resolve to a Date or Date string: "
+                  + dueDateExpression.getExpressionText());
         }
       }
     }
@@ -101,9 +102,9 @@ public class TaskDecorator {
 
   protected void initializeTaskFollowUpDate(TaskEntity task, VariableScope variableScope) {
     Expression followUpDateExpression = taskDefinition.getFollowUpDateExpression();
-    if(followUpDateExpression != null) {
+    if (followUpDateExpression != null) {
       Object followUpDate = followUpDateExpression.getValue(variableScope);
-      if(followUpDate != null) {
+      if (followUpDate != null) {
         if (followUpDate instanceof Date) {
           task.setFollowUpDate((Date) followUpDate);
 
@@ -112,8 +113,9 @@ public class TaskDecorator {
           task.setFollowUpDate(businessCalendar.resolveDuedate((String) followUpDate));
 
         } else {
-          throw new ProcessEngineException("Follow up date expression does not resolve to a Date or Date string: " +
-              followUpDateExpression.getExpressionText());
+          throw new ProcessEngineException(
+              "Follow up date expression does not resolve to a Date or Date string: "
+                  + followUpDateExpression.getExpressionText());
         }
       }
     }
@@ -130,14 +132,15 @@ public class TaskDecorator {
             task.setPriority(Integer.valueOf((String) priority));
 
           } catch (NumberFormatException e) {
-            throw new ProcessEngineException("Priority does not resolve to a number: " + priority, e);
+            throw new ProcessEngineException("Priority does not resolve to a number: " + priority,
+                e);
           }
         } else if (priority instanceof Number) {
           task.setPriority(((Number) priority).intValue());
 
         } else {
-          throw new ProcessEngineException("Priority expression does not resolve to a number: " +
-                  priorityExpression.getExpressionText());
+          throw new ProcessEngineException("Priority expression does not resolve to a number: "
+              + priorityExpression.getExpressionText());
         }
       }
     }
@@ -174,7 +177,8 @@ public class TaskDecorator {
         task.addCandidateGroups((Collection) value);
 
       } else {
-        throw new ProcessEngineException("Expression did not resolve to a string or collection of strings");
+        throw new ProcessEngineException(
+            "Expression did not resolve to a string or collection of strings");
       }
     }
   }
@@ -193,11 +197,11 @@ public class TaskDecorator {
         task.addCandidateUsers((Collection) value);
 
       } else {
-        throw new ProcessEngineException("Expression did not resolve to a string or collection of strings");
+        throw new ProcessEngineException(
+            "Expression did not resolve to a string or collection of strings");
       }
     }
   }
-
 
   /**
    * Extract a candidate list from a string.
@@ -217,9 +221,7 @@ public class TaskDecorator {
   }
 
   protected BusinessCalendar getBusinessCalender() {
-    return Context
-        .getProcessEngineConfiguration()
-        .getBusinessCalendarManager()
+    return Context.getProcessEngineConfiguration().getBusinessCalendarManager()
         .getBusinessCalendar(DueDateBusinessCalendar.NAME);
   }
 

@@ -169,7 +169,8 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
   }
 
   protected void setMailServerProperties(Email email) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
 
     String host = processEngineConfiguration.getMailServerHost();
     ensureNotNull("Could not send email: no SMTP host is configured", "host", host);
@@ -186,13 +187,13 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
       email.setAuthentication(user, password);
     }
   }
-  
+
   protected void setCharset(Email email, String charSetStr) {
     if (charset != null) {
       email.setCharset(charSetStr);
     }
   }
-  
+
   protected String[] splitAndTrim(String str) {
     if (str != null) {
       String[] splittedStrings = str.split(",");
@@ -205,9 +206,9 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
   }
 
   protected String getStringFromField(Expression expression, DelegateExecution execution) {
-    if(expression != null) {
+    if (expression != null) {
       Object value = expression.getValue(execution);
-      if(value != null) {
+      if (value != null) {
         return value.toString();
       }
     }

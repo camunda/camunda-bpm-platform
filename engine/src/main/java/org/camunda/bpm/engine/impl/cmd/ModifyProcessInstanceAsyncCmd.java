@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +47,8 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
 
   protected ProcessInstanceModificationBuilderImpl builder;
 
-  public ModifyProcessInstanceAsyncCmd(ProcessInstanceModificationBuilderImpl processInstanceModificationBuilder) {
+  public ModifyProcessInstanceAsyncCmd(
+      ProcessInstanceModificationBuilderImpl processInstanceModificationBuilder) {
     this.builder = processInstanceModificationBuilder;
   }
 
@@ -63,12 +63,10 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
     checkPermissions(commandContext);
 
     commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(),
-      processInstanceId,
-      null,
-      null,
-      Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+        processInstanceId, null, null, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
 
-    List<AbstractProcessInstanceModificationCommand> instructions = builder.getModificationOperations();
+    List<AbstractProcessInstanceModificationCommand> instructions = builder
+        .getModificationOperations();
     BatchEntity batch = createBatch(commandContext, instructions, processInstance);
     batch.createSeedJobDefinition();
     batch.createMonitorJobDefinition();
@@ -81,22 +79,27 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
   }
 
   protected void checkPermissions(CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES);
     }
   }
 
-  protected BatchEntity createBatch(CommandContext commandContext, List<AbstractProcessInstanceModificationCommand> instructions,
+  protected BatchEntity createBatch(CommandContext commandContext,
+      List<AbstractProcessInstanceModificationCommand> instructions,
       ExecutionEntity processInstance) {
 
     String processInstanceId = processInstance.getProcessInstanceId();
     String processDefinitionId = processInstance.getProcessDefinitionId();
     String tenantId = processInstance.getTenantId();
 
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    BatchJobHandler<ModificationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext
+        .getProcessEngineConfiguration();
+    BatchJobHandler<ModificationBatchConfiguration> batchJobHandler = getBatchJobHandler(
+        processEngineConfiguration);
 
-    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(Arrays.asList(processInstanceId), processDefinitionId, instructions,
+    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(
+        Arrays.asList(processInstanceId), processDefinitionId, instructions,
         builder.isSkipCustomListeners(), builder.isSkipIoMappings());
 
     BatchEntity batch = new BatchEntity();
@@ -113,12 +116,15 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
   }
 
   @SuppressWarnings("unchecked")
-  protected BatchJobHandler<ModificationBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  protected BatchJobHandler<ModificationBatchConfiguration> getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     Map<String, BatchJobHandler<?>> batchHandlers = processEngineConfiguration.getBatchHandlers();
-    return (BatchJobHandler<ModificationBatchConfiguration>) batchHandlers.get(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION);
+    return (BatchJobHandler<ModificationBatchConfiguration>) batchHandlers
+        .get(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION);
   }
 
-  protected void ensureProcessInstanceExists(String processInstanceId, ExecutionEntity processInstance) {
+  protected void ensureProcessInstanceExists(String processInstanceId,
+      ExecutionEntity processInstance) {
     if (processInstance == null) {
       throw LOG.processInstanceDoesNotExist(processInstanceId);
     }

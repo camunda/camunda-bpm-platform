@@ -41,7 +41,8 @@ public class ReducedJobExceptionLoggingTest {
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule().watch("org.camunda.bpm.engine.jobexecutor", Level.DEBUG);
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
+      .watch("org.camunda.bpm.engine.jobexecutor", Level.DEBUG);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(loggingRule);
@@ -60,14 +61,16 @@ public class ReducedJobExceptionLoggingTest {
   @After
   public void tearDown() {
     processEngineConfiguration.setEnableReducedJobExceptionLogging(false);
-    List<Job> jobs = managementService.createJobQuery().processDefinitionKey("failingProcess").list();
+    List<Job> jobs = managementService.createJobQuery().processDefinitionKey("failingProcess")
+        .list();
     for (Job job : jobs) {
       managementService.deleteJob(job.getId());
     }
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
   public void shouldLogAllFailingJobExceptions() {
     // given
     processEngineConfiguration.setEnableReducedJobExceptionLogging(false);
@@ -78,14 +81,16 @@ public class ReducedJobExceptionLoggingTest {
     testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Exception while executing job");
+    List<ILoggingEvent> filteredLogList = loggingRule
+        .getFilteredLog("Exception while executing job");
 
     // then
     assertThat(filteredLogList.size()).isEqualTo(3);
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
   public void shouldLogOnlyOneFailingJobException() {
     // given
     processEngineConfiguration.setEnableReducedJobExceptionLogging(true);
@@ -96,7 +101,8 @@ public class ReducedJobExceptionLoggingTest {
     testRule.waitForJobExecutorToProcessAllJobs();
     processEngineConfiguration.getJobExecutor().shutdown();
 
-    List<ILoggingEvent> filteredLogList = loggingRule.getFilteredLog("Exception while executing job");
+    List<ILoggingEvent> filteredLogList = loggingRule
+        .getFilteredLog("Exception while executing job");
 
     // then
     assertThat(filteredLogList.size()).isEqualTo(1);

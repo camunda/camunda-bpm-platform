@@ -20,8 +20,8 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
- * A script which source code is dynamically determined during the execution.
- * Therefore it has to be executed in the context of an atomic operation.
+ * A script which source code is dynamically determined during the execution. Therefore it has to be
+ * executed in the context of an atomic operation.
  *
  * @author Sebastian Menski
  */

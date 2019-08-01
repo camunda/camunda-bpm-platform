@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
-
 /**
  * @author Joram Barrez
  * @author Tom Baeyens
@@ -112,7 +111,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return this;
   }
 
-  public JobQuery activityId(String activityId){
+  public JobQuery activityId(String activityId) {
     ensureNotNull("Provided activity id", activityId);
     this.activityId = activityId;
     return this;
@@ -130,7 +129,8 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
   public JobQuery timers() {
     if (onlyMessages) {
-      throw new ProcessEngineException("Cannot combine onlyTimers() with onlyMessages() in the same query");
+      throw new ProcessEngineException(
+          "Cannot combine onlyTimers() with onlyMessages() in the same query");
     }
     this.onlyTimers = true;
     return this;
@@ -138,7 +138,8 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
   public JobQuery messages() {
     if (onlyTimers) {
-      throw new ProcessEngineException("Cannot combine onlyTimers() with onlyMessages() in the same query");
+      throw new ProcessEngineException(
+          "Cannot combine onlyTimers() with onlyMessages() in the same query");
     }
     this.onlyMessages = true;
     return this;
@@ -190,7 +191,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return this;
   }
 
-    public JobQuery priorityHigherThanOrEquals(long priority) {
+  public JobQuery priorityHigherThanOrEquals(long priority) {
     this.priorityHigherThanOrEqual = priority;
     return this;
   }
@@ -229,9 +230,9 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions()
-      || CompareUtil.areNotInAscendingOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual)
-      || hasExcludingDueDateParameters()
-      || CompareUtil.areNotInAscendingOrder(createdBefore, createdAfter);
+        || CompareUtil.areNotInAscendingOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual)
+        || hasExcludingDueDateParameters()
+        || CompareUtil.areNotInAscendingOrder(createdBefore, createdAfter);
   }
 
   private boolean hasExcludingDueDateParameters() {
@@ -275,7 +276,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return this;
   }
 
-  //sorting //////////////////////////////////////////
+  // sorting //////////////////////////////////////////
 
   public JobQuery orderByJobDuedate() {
     return orderBy(JobQueryProperty.DUEDATE);
@@ -313,44 +314,46 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return orderBy(JobQueryProperty.TENANT_ID);
   }
 
-  //results //////////////////////////////////////////
+  // results //////////////////////////////////////////
 
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getJobManager()
-      .findJobCountByQueryCriteria(this);
+    return commandContext.getJobManager().findJobCountByQueryCriteria(this);
   }
 
   @Override
   public List<Job> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getJobManager()
-      .findJobsByQueryCriteria(this, page);
+    return commandContext.getJobManager().findJobsByQueryCriteria(this, page);
   }
 
-  //getters //////////////////////////////////////////
+  // getters //////////////////////////////////////////
 
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public String getExecutionId() {
     return executionId;
   }
+
   public boolean getRetriesLeft() {
     return retriesLeft;
   }
+
   public boolean getExecutable() {
     return executable;
   }
+
   public Date getNow() {
     return ClockUtil.getCurrentTime();
   }
+
   public boolean isWithException() {
     return withException;
   }
+
   public String getExceptionMessage() {
     return exceptionMessage;
   }

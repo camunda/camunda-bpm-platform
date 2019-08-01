@@ -79,7 +79,8 @@ public class DeleteProcessDefinitionTest {
     historyService = engineRule.getHistoryService();
     repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) engineRule.getProcessEngine()
+        .getProcessEngineConfiguration();
   }
 
   @After
@@ -91,12 +92,9 @@ public class DeleteProcessDefinitionTest {
   }
 
   protected static final String IO_MAPPING_PROCESS_KEY = "ioMappingProcess";
-  protected static final BpmnModelInstance IO_MAPPING_PROCESS = Bpmn.createExecutableProcess(IO_MAPPING_PROCESS_KEY)
-    .startEvent()
-    .userTask()
-      .camundaOutputParameter("inputParameter", "${notExistentVariable}")
-    .endEvent()
-    .done();
+  protected static final BpmnModelInstance IO_MAPPING_PROCESS = Bpmn
+      .createExecutableProcess(IO_MAPPING_PROCESS_KEY).startEvent().userTask()
+      .camundaOutputParameter("inputParameter", "${notExistentVariable}").endEvent().done();
 
   @Test
   public void testDeleteProcessDefinitionNullId() {
@@ -111,7 +109,8 @@ public class DeleteProcessDefinitionTest {
   public void testDeleteNonExistingProcessDefinition() {
     // declare expected exception
     thrown.expect(NotFoundException.class);
-    thrown.expectMessage("No process definition found with id 'notexist': processDefinition is null");
+    thrown
+        .expectMessage("No process definition found with id 'notexist': processDefinition is null");
 
     repositoryService.deleteProcessDefinition("notexist");
   }
@@ -120,35 +119,38 @@ public class DeleteProcessDefinitionTest {
   public void testDeleteProcessDefinition() {
     // given deployment with two process definitions in one xml model file
     deployment = repositoryService.createDeployment()
-            .addClasspathResource("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml")
-            .deploy();
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+        .addClasspathResource("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml")
+        .deploy();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .list();
 
-    //when a process definition is been deleted
+    // when a process definition is been deleted
     repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId());
 
-    //then only one process definition should remain
+    // then only one process definition should remain
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
   }
 
   @Test
   public void testDeleteProcessDefinitionWithProcessInstance() {
     // given process definition and a process instance
-    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done();
-    deployment = repositoryService.createDeployment()
-                                  .addModelInstance("process.bpmn", bpmnModel)
-                                  .deploy();
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
+    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask()
+        .endEvent().done();
+    deployment = repositoryService.createDeployment().addModelInstance("process.bpmn", bpmnModel)
+        .deploy();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process").singleResult();
     runtimeService.createProcessInstanceByKey("process").executeWithVariablesInReturn();
 
-    //when the corresponding process definition is deleted from the deployment
+    // when the corresponding process definition is deleted from the deployment
     try {
       repositoryService.deleteProcessDefinition(processDefinition.getId());
       fail("Should fail, since there exists a process instance");
     } catch (ProcessEngineException pee) {
       // then Exception is expected, the deletion should fail since there exist a process instance
       // and the cascade flag is per default false
-      assertTrue(pee.getMessage().contains("Deletion of process definition without cascading failed."));
+      assertTrue(
+          pee.getMessage().contains("Deletion of process definition without cascading failed."));
     }
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
   }
@@ -156,20 +158,22 @@ public class DeleteProcessDefinitionTest {
   @Test
   public void testDeleteProcessDefinitionCascade() {
     // given process definition and a process instance
-    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done();
-    deployment = repositoryService.createDeployment()
-                                  .addModelInstance("process.bpmn", bpmnModel)
-                                  .deploy();
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
+    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask()
+        .endEvent().done();
+    deployment = repositoryService.createDeployment().addModelInstance("process.bpmn", bpmnModel)
+        .deploy();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process").singleResult();
     runtimeService.createProcessInstanceByKey("process").executeWithVariablesInReturn();
 
-    //when the corresponding process definition is cascading deleted from the deployment
+    // when the corresponding process definition is cascading deleted from the deployment
     repositoryService.deleteProcessDefinition(processDefinition.getId(), true);
 
-    //then exist no process instance and no definition
+    // then exist no process instance and no definition
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     assertEquals(0, repositoryService.createProcessDefinitionQuery().count());
-    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY.getId()) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_ACTIVITY
+        .getId()) {
       assertEquals(0, engineRule.getHistoryService().createHistoricActivityInstanceQuery().count());
     }
   }
@@ -177,14 +181,12 @@ public class DeleteProcessDefinitionTest {
   @Test
   public void testDeleteProcessDefinitionClearsCache() {
     // given process definition and a process instance
-    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done();
-    deployment = repositoryService.createDeployment()
-                                  .addModelInstance("process.bpmn", bpmnModel)
-                                  .deploy();
+    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("process").startEvent().userTask()
+        .endEvent().done();
+    deployment = repositoryService.createDeployment().addModelInstance("process.bpmn", bpmnModel)
+        .deploy();
     String processDefinitionId = repositoryService.createProcessDefinitionQuery()
-                                                  .processDefinitionKey("process")
-                                                  .singleResult()
-                                                  .getId();
+        .processDefinitionKey("process").singleResult().getId();
 
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
@@ -203,29 +205,30 @@ public class DeleteProcessDefinitionTest {
   public void testDeleteProcessDefinitionAndRefillDeploymentCache() {
     // given a deployment with two process definitions in one xml model file
     deployment = repositoryService.createDeployment()
-            .addClasspathResource("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml")
-            .deploy();
-    ProcessDefinition processDefinitionOne =
-        repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").singleResult();
-    ProcessDefinition processDefinitionTwo =
-        repositoryService.createProcessDefinitionQuery().processDefinitionKey("two").singleResult();
+        .addClasspathResource("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml")
+        .deploy();
+    ProcessDefinition processDefinitionOne = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("one").singleResult();
+    ProcessDefinition processDefinitionTwo = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("two").singleResult();
 
     String idOne = processDefinitionOne.getId();
-    //one is deleted from the deployment
+    // one is deleted from the deployment
     repositoryService.deleteProcessDefinition(idOne);
 
-    //when clearing the deployment cache
+    // when clearing the deployment cache
     processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
 
-    //then creating process instance from the existing process definition
-    ProcessInstanceWithVariables procInst = runtimeService.createProcessInstanceByKey("two").executeWithVariablesInReturn();
+    // then creating process instance from the existing process definition
+    ProcessInstanceWithVariables procInst = runtimeService.createProcessInstanceByKey("two")
+        .executeWithVariablesInReturn();
     assertNotNull(procInst);
     assertTrue(procInst.getProcessDefinitionId().contains("two"));
 
-    //should refill the cache
+    // should refill the cache
     Cache cache = processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache();
     assertNotNull(cache.get(processDefinitionTwo.getId()));
-    //The deleted process definition should not be recreated after the cache is refilled
+    // The deleted process definition should not be recreated after the cache is refilled
     assertNull(cache.get(processDefinitionOne.getId()));
   }
 
@@ -233,26 +236,24 @@ public class DeleteProcessDefinitionTest {
   public void testDeleteProcessDefinitionAndRedeploy() {
     // given a deployment with two process definitions in one xml model file
     deployment = repositoryService.createDeployment()
-            .addClasspathResource("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml")
-            .deploy();
+        .addClasspathResource("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml")
+        .deploy();
 
-    ProcessDefinition processDefinitionOne =
-        repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").singleResult();
+    ProcessDefinition processDefinitionOne = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("one").singleResult();
 
-    //one is deleted from the deployment
+    // one is deleted from the deployment
     repositoryService.deleteProcessDefinition(processDefinitionOne.getId());
 
-    //when the process definition is redeployed
-    Deployment deployment2 = repositoryService.createDeployment()
-            .name(DEPLOYMENT_NAME)
-            .addDeploymentResources(deployment.getId())
-            .deploy();
+    // when the process definition is redeployed
+    Deployment deployment2 = repositoryService.createDeployment().name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment.getId()).deploy();
 
-    //then there should exist three process definitions
-    //two of the redeployment and the remaining one
+    // then there should exist three process definitions
+    // two of the redeployment and the remaining one
     assertEquals(3, repositoryService.createProcessDefinitionQuery().count());
 
-    //clean up
+    // clean up
     repositoryService.deleteDeployment(deployment2.getId(), true);
   }
 
@@ -263,10 +264,8 @@ public class DeleteProcessDefinitionTest {
     thrown.expectMessage("No process definition found");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("no existing key")
-      .withoutTenantId()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("no existing key").withoutTenantId()
+        .delete();
   }
 
   @Test
@@ -276,10 +275,7 @@ public class DeleteProcessDefinitionTest {
     thrown.expectMessage("cannot be null");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey(null)
-      .withoutTenantId()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey(null).withoutTenantId().delete();
   }
 
   @Test
@@ -290,10 +286,7 @@ public class DeleteProcessDefinitionTest {
     }
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("processOne")
-      .withoutTenantId()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("processOne").withoutTenantId().delete();
 
     // then
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(3L));
@@ -312,10 +305,7 @@ public class DeleteProcessDefinitionTest {
     thrown.expectMessage("Deletion of process definition");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("processOne")
-      .withoutTenantId()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("processOne").withoutTenantId().delete();
   }
 
   @Test
@@ -337,17 +327,11 @@ public class DeleteProcessDefinitionTest {
     }
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("processOne")
-      .withoutTenantId()
-      .cascade()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("processOne").withoutTenantId().cascade()
+        .delete();
 
-    repositoryService.deleteProcessDefinitions()
-      .byKey("processTwo")
-      .withoutTenantId()
-      .cascade()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("processTwo").withoutTenantId().cascade()
+        .delete();
 
     // then
     assertThat(historyService.createHistoricVariableInstanceQuery().count(), is(0L));
@@ -366,12 +350,8 @@ public class DeleteProcessDefinitionTest {
     runtimeService.startProcessInstanceByKey("processOne");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey("processOne")
-      .withoutTenantId()
-      .cascade()
-      .skipCustomListeners()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey("processOne").withoutTenantId().cascade()
+        .skipCustomListeners().delete();
 
     // then
     assertThat(IncrementCounterListener.counter, is(0));
@@ -387,14 +367,11 @@ public class DeleteProcessDefinitionTest {
     runtimeService.startProcessInstanceByKey(IO_MAPPING_PROCESS_KEY);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byKey(IO_MAPPING_PROCESS_KEY)
-      .withoutTenantId()
-      .cascade()
-      .skipIoMappings()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byKey(IO_MAPPING_PROCESS_KEY).withoutTenantId()
+        .cascade().skipIoMappings().delete();
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .list();
 
     // then
     assertThat(processDefinitions.size(), is(0));
@@ -407,9 +384,8 @@ public class DeleteProcessDefinitionTest {
     thrown.expectMessage("No process definition found");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds("not existing", "also not existing")
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds("not existing", "also not existing")
+        .delete();
   }
 
   @Test
@@ -419,9 +395,7 @@ public class DeleteProcessDefinitionTest {
     thrown.expectMessage("cannot be null");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(null)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(null).delete();
   }
 
   @Test
@@ -434,9 +408,7 @@ public class DeleteProcessDefinitionTest {
     String[] processDefinitionIds = findProcessDefinitionIdsByKey("processOne");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIds)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIds).delete();
 
     // then
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(3L));
@@ -456,9 +428,7 @@ public class DeleteProcessDefinitionTest {
     thrown.expectMessage("Deletion of process definition");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIds)
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIds).delete();
   }
 
   @Test
@@ -481,15 +451,9 @@ public class DeleteProcessDefinitionTest {
     }
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIdsOne)
-      .cascade()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIdsOne).cascade().delete();
 
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIdsTwo)
-      .cascade()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIdsTwo).cascade().delete();
 
     // then
     assertThat(historyService.createHistoricVariableInstanceQuery().count(), is(0L));
@@ -508,11 +472,8 @@ public class DeleteProcessDefinitionTest {
     runtimeService.startProcessInstanceByKey("processOne");
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIds)
-      .cascade()
-      .skipCustomListeners()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIds).cascade()
+        .skipCustomListeners().delete();
 
     // then
     assertThat(IncrementCounterListener.counter, is(0));
@@ -530,13 +491,11 @@ public class DeleteProcessDefinitionTest {
     String[] processDefinitionIds = findProcessDefinitionIdsByKey(IO_MAPPING_PROCESS_KEY);
 
     // when
-    repositoryService.deleteProcessDefinitions()
-      .byIds(processDefinitionIds)
-      .cascade()
-      .skipIoMappings()
-      .delete();
+    repositoryService.deleteProcessDefinitions().byIds(processDefinitionIds).cascade()
+        .skipIoMappings().delete();
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .list();
 
     // then
     assertThat(processDefinitions.size(), is(0));
@@ -544,24 +503,18 @@ public class DeleteProcessDefinitionTest {
 
   private void deployTwoProcessDefinitions() {
     testHelper.deploy(
-      Bpmn.createExecutableProcess("processOne")
-        .startEvent()
-        .userTask()
-          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, IncrementCounterListener.class.getName())
-        .endEvent()
-        .done(),
-      Bpmn.createExecutableProcess("processTwo")
-        .startEvent()
-        .userTask()
-        .endEvent()
-        .done());
+        Bpmn.createExecutableProcess("processOne").startEvent().userTask()
+            .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END,
+                IncrementCounterListener.class.getName())
+            .endEvent().done(),
+        Bpmn.createExecutableProcess("processTwo").startEvent().userTask().endEvent().done());
   }
 
   private String[] findProcessDefinitionIdsByKey(String processDefinitionKey) {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
-      .processDefinitionKey(processDefinitionKey).list();
+        .processDefinitionKey(processDefinitionKey).list();
     List<String> processDefinitionIds = new ArrayList<String>();
-    for (ProcessDefinition processDefinition: processDefinitions) {
+    for (ProcessDefinition processDefinition : processDefinitions) {
       processDefinitionIds.add(processDefinition.getId());
     }
 

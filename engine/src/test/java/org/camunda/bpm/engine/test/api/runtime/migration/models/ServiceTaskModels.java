@@ -24,13 +24,8 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  */
 public class ServiceTaskModels {
 
-
   public static BpmnModelInstance oneClassDelegateServiceTask(String className) {
-    return ProcessModels.newModel()
-      .startEvent()
-      .serviceTask("serviceTask")
-        .camundaClass(className)
-      .endEvent()
-      .done();
+    return ProcessModels.newModel().startEvent().serviceTask("serviceTask").camundaClass(className)
+        .endEvent().done();
   }
 }

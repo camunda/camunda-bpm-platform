@@ -30,7 +30,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  * @author Daniel Meyer
  *
  */
-public class GetExecutionVariableTypedCmd<T extends TypedValue> implements Command<T>, Serializable {
+public class GetExecutionVariableTypedCmd<T extends TypedValue>
+    implements Command<T>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String executionId;
@@ -38,7 +39,8 @@ public class GetExecutionVariableTypedCmd<T extends TypedValue> implements Comma
   protected boolean isLocal;
   protected boolean deserializeValue;
 
-  public GetExecutionVariableTypedCmd(String executionId, String variableName, boolean isLocal, boolean deserializeValue) {
+  public GetExecutionVariableTypedCmd(String executionId, String variableName, boolean isLocal,
+      boolean deserializeValue) {
     this.executionId = executionId;
     this.variableName = variableName;
     this.isLocal = isLocal;
@@ -49,9 +51,7 @@ public class GetExecutionVariableTypedCmd<T extends TypedValue> implements Comma
     ensureNotNull("executionId", executionId);
     ensureNotNull("variableName", variableName);
 
-    ExecutionEntity execution = commandContext
-      .getExecutionManager()
-      .findExecutionById(executionId);
+    ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(executionId);
 
     ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 
@@ -68,8 +68,10 @@ public class GetExecutionVariableTypedCmd<T extends TypedValue> implements Comma
     return value;
   }
 
-  public void checkGetExecutionVariableTyped(ExecutionEntity execution, CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+  public void checkGetExecutionVariableTyped(ExecutionEntity execution,
+      CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessInstanceVariable(execution);
     }
   }

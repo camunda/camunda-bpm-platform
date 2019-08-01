@@ -37,7 +37,8 @@ public class ExecuteFilterListPageCmd extends AbstractExecuteFilterCmd implement
     this.maxResults = maxResults;
   }
 
-  public ExecuteFilterListPageCmd(String filterId, Query<?, ?> extendingQuery, int firstResult, int maxResults) {
+  public ExecuteFilterListPageCmd(String filterId, Query<?, ?> extendingQuery, int firstResult,
+      int maxResults) {
     super(filterId, extendingQuery);
     this.firstResult = firstResult;
     this.maxResults = maxResults;

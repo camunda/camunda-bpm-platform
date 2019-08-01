@@ -35,11 +35,13 @@ public class ClassDelegateUtil {
 
   private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
-  public static Object instantiateDelegate(Class<?> clazz, List<FieldDeclaration> fieldDeclarations) {
+  public static Object instantiateDelegate(Class<?> clazz,
+      List<FieldDeclaration> fieldDeclarations) {
     return instantiateDelegate(clazz.getName(), fieldDeclarations);
   }
 
-  public static Object instantiateDelegate(String className, List<FieldDeclaration> fieldDeclarations) {
+  public static Object instantiateDelegate(String className,
+      List<FieldDeclaration> fieldDeclarations) {
     ArtifactFactory artifactFactory = Context.getProcessEngineConfiguration().getArtifactFactory();
 
     try {
@@ -49,36 +51,36 @@ public class ClassDelegateUtil {
 
       applyFieldDeclaration(fieldDeclarations, object);
       return object;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileInstantiatingClass(className, e);
     }
 
   }
 
-  public static void applyFieldDeclaration(List<FieldDeclaration> fieldDeclarations, Object target) {
-    if(fieldDeclarations != null) {
-      for(FieldDeclaration declaration : fieldDeclarations) {
+  public static void applyFieldDeclaration(List<FieldDeclaration> fieldDeclarations,
+      Object target) {
+    if (fieldDeclarations != null) {
+      for (FieldDeclaration declaration : fieldDeclarations) {
         applyFieldDeclaration(declaration, target);
       }
     }
   }
 
   public static void applyFieldDeclaration(FieldDeclaration declaration, Object target) {
-    Method setterMethod = ReflectUtil.getSetter(declaration.getName(),
-      target.getClass(), declaration.getValue().getClass());
+    Method setterMethod = ReflectUtil.getSetter(declaration.getName(), target.getClass(),
+        declaration.getValue().getClass());
 
-    if(setterMethod != null) {
+    if (setterMethod != null) {
       try {
         setterMethod.invoke(target, declaration.getValue());
+      } catch (Exception e) {
+        throw LOG.exceptionWhileApplyingFieldDeclatation(declaration.getName(),
+            target.getClass().getName(), e);
       }
-      catch (Exception e) {
-        throw LOG.exceptionWhileApplyingFieldDeclatation(declaration.getName(), target.getClass().getName(), e);
-      }
-    }
-    else {
+    } else {
       Field field = ReflectUtil.getField(declaration.getName(), target);
-      ensureNotNull("Field definition uses unexisting field '" + declaration.getName() + "' on class " + target.getClass().getName(), "field", field);
+      ensureNotNull("Field definition uses unexisting field '" + declaration.getName()
+          + "' on class " + target.getClass().getName(), "field", field);
       // Check if the delegate field's type is correct
       if (!fieldTypeCompatible(declaration, field)) {
         throw LOG.incompatibleTypeForFieldDeclaration(declaration, target, field);
@@ -88,7 +90,7 @@ public class ClassDelegateUtil {
   }
 
   public static boolean fieldTypeCompatible(FieldDeclaration declaration, Field field) {
-    if(declaration.getValue() != null) {
+    if (declaration.getValue() != null) {
       return field.getType().isAssignableFrom(declaration.getValue().getClass());
     } else {
       // Null can be set any field type

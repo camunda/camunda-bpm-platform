@@ -32,9 +32,7 @@ public class CreateFilterCmd implements Command<Filter> {
   }
 
   public Filter execute(CommandContext commandContext) {
-    return commandContext
-      .getFilterManager()
-      .createNewFilter(resourceType);
+    return commandContext.getFilterManager().createNewFilter(resourceType);
   }
 
 }

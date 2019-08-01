@@ -111,16 +111,12 @@ public class JobQueryTest {
 
   @Parameterized.Parameters(name = "Job DueDate is set: {0}")
   public static Collection<Object[]> scenarios() throws ParseException {
-    return Arrays.asList(new Object[][] {
-      { false },
-      { true }
-    });
+    return Arrays.asList(new Object[][] { { false }, { true } });
   }
 
   /**
-   * Setup will create
-   *   - 3 process instances, each with one timer, each firing at t1/t2/t3 + 1 hour (see process)
-   *   - 1 message
+   * Setup will create - 3 process instances, each with one timer, each firing at t1/t2/t3 + 1 hour
+   * (see process) - 1 message
    */
   @Before
   public void setUp() throws Exception {
@@ -135,8 +131,7 @@ public class JobQueryTest {
 
     deploymentId = repositoryService.createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/timerOnTask.bpmn20.xml")
-        .deploy()
-        .getId();
+        .deploy().getId();
 
     // Create proc inst that has timer that will fire on t1 + 1 hour
     Calendar startTime = Calendar.getInstance();
@@ -150,7 +145,7 @@ public class JobQueryTest {
 
     // Create proc inst that has timer that will fire on t2 + 1 hour
     startTime.add(Calendar.HOUR_OF_DAY, 1);
-    Date t2 = startTime.getTime();  // t2 = t1 + 1 hour
+    Date t2 = startTime.getTime(); // t2 = t1 + 1 hour
     ClockUtil.setCurrentTime(t2);
     processInstanceIdTwo = runtimeService.startProcessInstanceByKey("timerOnTask").getId();
     timerTwoFireTime = new Date(t2.getTime() + ONE_HOUR);
@@ -195,7 +190,7 @@ public class JobQueryTest {
   }
 
   @Test
-  public void testQueryByActivityId(){
+  public void testQueryByActivityId() {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     JobQuery query = managementService.createJobQuery().activityId(jobDefinition.getActivityId());
@@ -203,14 +198,15 @@ public class JobQueryTest {
   }
 
   @Test
-  public void testQueryByInvalidActivityId(){
+  public void testQueryByInvalidActivityId() {
     JobQuery query = managementService.createJobQuery().activityId("invalid");
     verifyQueryResults(query, 0);
 
     try {
       managementService.createJobQuery().activityId(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   @Test
@@ -229,7 +225,8 @@ public class JobQueryTest {
     try {
       managementService.createJobQuery().jobDefinitionId(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   @Test
@@ -246,12 +243,14 @@ public class JobQueryTest {
     try {
       managementService.createJobQuery().processInstanceId(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   @Test
   public void testQueryByExecutionId() {
-    Job job = managementService.createJobQuery().processInstanceId(processInstanceIdOne).singleResult();
+    Job job = managementService.createJobQuery().processInstanceId(processInstanceIdOne)
+        .singleResult();
     JobQuery query = managementService.createJobQuery().executionId(job.getExecutionId());
     assertEquals(query.singleResult().getId(), job.getId());
     verifyQueryResults(query, 1);
@@ -265,14 +264,17 @@ public class JobQueryTest {
     try {
       managementService.createJobQuery().executionId(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   @Test
   public void testQueryByProcessDefinitionId() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().list().get(0);
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().list()
+        .get(0);
 
-    JobQuery query = managementService.createJobQuery().processDefinitionId(processDefinition.getId());
+    JobQuery query = managementService.createJobQuery()
+        .processDefinitionId(processDefinition.getId());
     verifyQueryResults(query, 3);
   }
 
@@ -284,17 +286,16 @@ public class JobQueryTest {
     try {
       managementService.createJobQuery().processDefinitionId(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobQueryTest.testTimeCycleQueryByProcessDefinitionId.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobQueryTest.testTimeCycleQueryByProcessDefinitionId.bpmn20.xml" })
   public void testTimeCycleQueryByProcessDefinitionId() {
-    String processDefinitionId = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("process")
-        .singleResult()
-        .getId();
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("process").singleResult().getId();
 
     JobQuery query = managementService.createJobQuery().processDefinitionId(processDefinitionId);
 
@@ -323,11 +324,13 @@ public class JobQueryTest {
     try {
       managementService.createJobQuery().processDefinitionKey(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobQueryTest.testTimeCycleQueryByProcessDefinitionId.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/JobQueryTest.testTimeCycleQueryByProcessDefinitionId.bpmn20.xml" })
   public void testTimeCycleQueryByProcessDefinitionKey() {
     JobQuery query = managementService.createJobQuery().processDefinitionKey("process");
 
@@ -354,10 +357,11 @@ public class JobQueryTest {
 
   @Test
   public void testQueryByExecutable() {
-    long testTime = ensureJobDueDateSet? messageDueDate.getTime() : timerThreeFireTime.getTime();
-    int expectedCount = ensureJobDueDateSet? 0 : 1;
+    long testTime = ensureJobDueDateSet ? messageDueDate.getTime() : timerThreeFireTime.getTime();
+    int expectedCount = ensureJobDueDateSet ? 0 : 1;
 
-    ClockUtil.setCurrentTime(new Date(testTime + ONE_SECOND)); // all jobs should be executable at t3 + 1hour.1second
+    ClockUtil.setCurrentTime(new Date(testTime + ONE_SECOND)); // all jobs should be executable at
+                                                               // t3 + 1hour.1second
     JobQuery query = managementService.createJobQuery().executable();
     verifyQueryResults(query, 4);
 
@@ -367,7 +371,8 @@ public class JobQueryTest {
 
     // Setting the clock before the start of the process instance, makes none of the jobs executable
     ClockUtil.setCurrentTime(testStartTime);
-    verifyQueryResults(query, expectedCount); // 1, since a message is always executable when retries > 0
+    verifyQueryResults(query, expectedCount); // 1, since a message is always executable when
+                                              // retries > 0
   }
 
   @Test
@@ -388,7 +393,8 @@ public class JobQueryTest {
       managementService.createJobQuery().timers().messages().list();
       fail();
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot combine onlyTimers() with onlyMessages() in the same query"));
+      assertThat(e.getMessage(),
+          containsString("Cannot combine onlyTimers() with onlyMessages() in the same query"));
     }
   }
 
@@ -397,17 +403,21 @@ public class JobQueryTest {
     JobQuery query = managementService.createJobQuery().duedateLowerThen(testStartTime);
     verifyQueryResults(query, 0);
 
-    query = managementService.createJobQuery().duedateLowerThen(new Date(timerOneFireTime.getTime() + ONE_SECOND));
+    query = managementService.createJobQuery()
+        .duedateLowerThen(new Date(timerOneFireTime.getTime() + ONE_SECOND));
     verifyQueryResults(query, 1);
 
-    query = managementService.createJobQuery().duedateLowerThen(new Date(timerTwoFireTime.getTime() + ONE_SECOND));
+    query = managementService.createJobQuery()
+        .duedateLowerThen(new Date(timerTwoFireTime.getTime() + ONE_SECOND));
     verifyQueryResults(query, 2);
 
-    query = managementService.createJobQuery().duedateLowerThen(new Date(timerThreeFireTime.getTime() + ONE_SECOND));
+    query = managementService.createJobQuery()
+        .duedateLowerThen(new Date(timerThreeFireTime.getTime() + ONE_SECOND));
     verifyQueryResults(query, 3);
 
     if (ensureJobDueDateSet) {
-      query = managementService.createJobQuery().duedateLowerThen(new Date(messageDueDate.getTime() + ONE_SECOND));
+      query = managementService.createJobQuery()
+          .duedateLowerThen(new Date(messageDueDate.getTime() + ONE_SECOND));
       verifyQueryResults(query, 4);
     }
   }
@@ -434,10 +444,10 @@ public class JobQueryTest {
 
   @Test
   public void testQueryByDuedateHigherThen() {
-    int startTimeExpectedCount = ensureJobDueDateSet? 4 : 3;
-    int timerOneExpectedCount = ensureJobDueDateSet? 3 : 2;
-    int timerTwoExpectedCount = ensureJobDueDateSet? 2 : 1;
-    int timerThreeExpectedCount = ensureJobDueDateSet? 1 : 0;
+    int startTimeExpectedCount = ensureJobDueDateSet ? 4 : 3;
+    int timerOneExpectedCount = ensureJobDueDateSet ? 3 : 2;
+    int timerTwoExpectedCount = ensureJobDueDateSet ? 2 : 1;
+    int timerThreeExpectedCount = ensureJobDueDateSet ? 1 : 0;
 
     JobQuery query = managementService.createJobQuery().duedateHigherThen(testStartTime);
     verifyQueryResults(query, startTimeExpectedCount);
@@ -459,10 +469,10 @@ public class JobQueryTest {
 
   @Test
   public void testQueryByDuedateHigherThenOrEqual() {
-    int startTimeExpectedCount = ensureJobDueDateSet? 4 : 3;
-    int timerOneExpectedCount = ensureJobDueDateSet? 3 : 2;
-    int timerTwoExpectedCount = ensureJobDueDateSet? 2 : 1;
-    int timerThreeExpectedCount = ensureJobDueDateSet? 1 : 0;
+    int startTimeExpectedCount = ensureJobDueDateSet ? 4 : 3;
+    int timerOneExpectedCount = ensureJobDueDateSet ? 3 : 2;
+    int timerTwoExpectedCount = ensureJobDueDateSet ? 2 : 1;
+    int timerThreeExpectedCount = ensureJobDueDateSet ? 1 : 0;
 
     JobQuery query = managementService.createJobQuery().duedateHigherThenOrEquals(testStartTime);
     verifyQueryResults(query, startTimeExpectedCount);
@@ -470,25 +480,27 @@ public class JobQueryTest {
     query = managementService.createJobQuery().duedateHigherThenOrEquals(timerOneFireTime);
     verifyQueryResults(query, startTimeExpectedCount);
 
-    query = managementService.createJobQuery().duedateHigherThenOrEquals(new Date(timerOneFireTime.getTime() + ONE_SECOND));
+    query = managementService.createJobQuery()
+        .duedateHigherThenOrEquals(new Date(timerOneFireTime.getTime() + ONE_SECOND));
     verifyQueryResults(query, timerOneExpectedCount);
 
     query = managementService.createJobQuery().duedateHigherThenOrEquals(timerThreeFireTime);
     verifyQueryResults(query, timerTwoExpectedCount);
 
-    query = managementService.createJobQuery().duedateHigherThenOrEquals(new Date(timerThreeFireTime.getTime() + ONE_SECOND));
+    query = managementService.createJobQuery()
+        .duedateHigherThenOrEquals(new Date(timerThreeFireTime.getTime() + ONE_SECOND));
     verifyQueryResults(query, timerThreeExpectedCount);
 
     if (ensureJobDueDateSet) {
-      query = managementService.createJobQuery().duedateHigherThenOrEquals(new Date(messageDueDate.getTime() + ONE_SECOND));
+      query = managementService.createJobQuery()
+          .duedateHigherThenOrEquals(new Date(messageDueDate.getTime() + ONE_SECOND));
       verifyQueryResults(query, 0);
     }
   }
 
   @Test
   public void testQueryByDuedateCombinations() {
-    JobQuery query = managementService.createJobQuery()
-        .duedateHigherThan(testStartTime)
+    JobQuery query = managementService.createJobQuery().duedateHigherThan(testStartTime)
         .duedateLowerThan(new Date(timerThreeFireTime.getTime() + ONE_SECOND));
     verifyQueryResults(query, 3);
 
@@ -500,35 +512,31 @@ public class JobQueryTest {
 
   @Test
   public void testQueryByCreateTimeCombinations() {
-    JobQuery query = managementService.createJobQuery()
-            .processInstanceId(processInstanceIdOne);
+    JobQuery query = managementService.createJobQuery().processInstanceId(processInstanceIdOne);
     List<Job> jobs = query.list();
     assertEquals(1, jobs.size());
     Date jobCreateTime = jobs.get(0).getCreateTime();
 
-    query = managementService.createJobQuery()
-            .processInstanceId(processInstanceIdOne)
-            .createdAfter(new Date(jobCreateTime.getTime() - 1));
+    query = managementService.createJobQuery().processInstanceId(processInstanceIdOne)
+        .createdAfter(new Date(jobCreateTime.getTime() - 1));
     verifyQueryResults(query, 1);
 
-    query = managementService.createJobQuery()
-            .processInstanceId(processInstanceIdOne)
-            .createdAfter(jobCreateTime);
+    query = managementService.createJobQuery().processInstanceId(processInstanceIdOne)
+        .createdAfter(jobCreateTime);
     verifyQueryResults(query, 0);
 
-    query = managementService.createJobQuery()
-            .processInstanceId(processInstanceIdOne)
-            .createdBefore(jobCreateTime);
+    query = managementService.createJobQuery().processInstanceId(processInstanceIdOne)
+        .createdBefore(jobCreateTime);
     verifyQueryResults(query, 1);
 
-    query = managementService.createJobQuery()
-            .processInstanceId(processInstanceIdOne)
-            .createdBefore(new Date(jobCreateTime.getTime() - 1));
+    query = managementService.createJobQuery().processInstanceId(processInstanceIdOne)
+        .createdBefore(new Date(jobCreateTime.getTime() - 1));
     verifyQueryResults(query, 0);
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
   public void testQueryByException() {
     JobQuery query = managementService.createJobQuery().withException();
     verifyQueryResults(query, 0);
@@ -540,21 +548,24 @@ public class JobQueryTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
   public void testQueryByExceptionMessage() {
     JobQuery query = managementService.createJobQuery().exceptionMessage(EXCEPTION_MESSAGE);
     verifyQueryResults(query, 0);
 
     ProcessInstance processInstance = startProcessInstanceWithFailingJob();
 
-    Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+    Job job = managementService.createJobQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     query = managementService.createJobQuery().exceptionMessage(job.getExceptionMessage());
     verifyFailedJob(query, processInstance);
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml" })
   public void testQueryByExceptionMessageEmpty() {
     JobQuery query = managementService.createJobQuery().exceptionMessage("");
     verifyQueryResults(query, 0);
@@ -627,7 +638,7 @@ public class JobQueryTest {
     verifyQueryResults(query, 3);
   }
 
-  //sorting //////////////////////////////////////////
+  // sorting //////////////////////////////////////////
 
   @Test
   public void testQuerySorting() {
@@ -647,19 +658,17 @@ public class JobQueryTest {
     assertEquals(4, managementService.createJobQuery().orderByProcessInstanceId().desc().count());
     assertEquals(4, managementService.createJobQuery().orderByJobRetries().desc().count());
     assertEquals(4, managementService.createJobQuery().orderByProcessDefinitionId().desc().count());
-    assertEquals(4, managementService.createJobQuery().orderByProcessDefinitionKey().desc().count());
+    assertEquals(4,
+        managementService.createJobQuery().orderByProcessDefinitionKey().desc().count());
 
     // sorting on multiple fields
     setRetries(processInstanceIdTwo, 2);
-    ClockUtil.setCurrentTime(new Date(timerThreeFireTime.getTime() + ONE_SECOND)); // make sure all timers can fire
+    ClockUtil.setCurrentTime(new Date(timerThreeFireTime.getTime() + ONE_SECOND)); // make sure all
+                                                                                   // timers can
+                                                                                   // fire
 
-    JobQuery query = managementService.createJobQuery()
-      .timers()
-      .executable()
-      .orderByJobRetries()
-      .asc()
-      .orderByJobDuedate()
-      .desc();
+    JobQuery query = managementService.createJobQuery().timers().executable().orderByJobRetries()
+        .asc().orderByJobDuedate().desc();
 
     List<Job> jobs = query.list();
     assertEquals(3, jobs.size());
@@ -686,18 +695,21 @@ public class JobQueryTest {
       managementService.createJobQuery().asc();
       fail();
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("You should call any of the orderBy methods first before specifying a direction"));
+      assertThat(e.getMessage(), containsString(
+          "You should call any of the orderBy methods first before specifying a direction"));
     }
   }
 
-  //helper ////////////////////////////////////////////////////////////
+  // helper ////////////////////////////////////////////////////////////
 
   private void setRetries(final String processInstanceId, final int retries) {
-    final Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
+    final Job job = managementService.createJobQuery().processInstanceId(processInstanceId)
+        .singleResult();
     commandExecutor.execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {
-        JobEntity timer = commandContext.getDbEntityManager().selectById(JobEntity.class, job.getId());
+        JobEntity timer = commandContext.getDbEntityManager().selectById(JobEntity.class,
+            job.getId());
         timer.setRetries(retries);
         return null;
       }
@@ -707,20 +719,20 @@ public class JobQueryTest {
 
   private ProcessInstance startProcessInstanceWithFailingJob() {
     // start a process with a failing job
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("exceptionInJobExecution");
 
     // The execution is waiting in the first usertask. This contains a boundary
     // timer event which we will execute manual for testing purposes.
-    Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+    Job timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
 
     try {
       managementService.executeJob(timerJob.getId());
       fail("RuntimeException from within the script task expected");
-    } catch(RuntimeException re) {
+    } catch (RuntimeException re) {
       assertThat(re.getMessage(), containsString(EXCEPTION_MESSAGE));
     }
     return processInstance;
@@ -742,7 +754,7 @@ public class JobQueryTest {
 
     if (countExpected == 1) {
       assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
+    } else if (countExpected > 1) {
       verifySingleResultFails(query);
     } else if (countExpected == 0) {
       assertNull(query.singleResult());
@@ -753,7 +765,8 @@ public class JobQueryTest {
     try {
       query.singleResult();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
   private void createJobWithoutExceptionMsg() {
@@ -807,29 +820,24 @@ public class JobQueryTest {
   }
 
   private void deleteJobInDatabase() {
-      CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-      commandExecutor.execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutor.execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
 
-          timerEntity.delete();
+        timerEntity.delete();
 
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(timerEntity.getId());
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(timerEntity.getId());
 
-          List<HistoricIncident> historicIncidents = Context
-              .getProcessEngineConfiguration()
-              .getHistoryService()
-              .createHistoricIncidentQuery()
-              .list();
+        List<HistoricIncident> historicIncidents = Context.getProcessEngineConfiguration()
+            .getHistoryService().createHistoricIncidentQuery().list();
 
-          for (HistoricIncident historicIncident : historicIncidents) {
-            commandContext
-              .getDbEntityManager()
-              .delete((DbEntity) historicIncident);
-          }
-
-          return null;
+        for (HistoricIncident historicIncident : historicIncidents) {
+          commandContext.getDbEntityManager().delete((DbEntity) historicIncident);
         }
-      });
+
+        return null;
+      }
+    });
   }
 
 }

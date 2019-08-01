@@ -53,7 +53,7 @@ public class SingleQueryVariableValueCondition extends AbstractQueryVariableValu
   public void initializeValue(VariableSerializers serializers, TypedValue typedValue) {
     TypedValueSerializer serializer = determineSerializer(serializers, typedValue);
 
-    if(typedValue instanceof UntypedValueImpl) {
+    if (typedValue instanceof UntypedValueImpl) {
       // type has been detected
       typedValue = serializer.convertToTypedValue((UntypedValueImpl) typedValue);
     }
@@ -61,23 +61,22 @@ public class SingleQueryVariableValueCondition extends AbstractQueryVariableValu
     this.type = serializer.getName();
   }
 
-  protected TypedValueSerializer determineSerializer(VariableSerializers serializers, TypedValue value) {
+  protected TypedValueSerializer determineSerializer(VariableSerializers serializers,
+      TypedValue value) {
     TypedValueSerializer serializer = serializers.findSerializerForValue(value);
 
-    if(serializer.getType() == ValueType.BYTES){
+    if (serializer.getType() == ValueType.BYTES) {
       throw new ProcessEngineException("Variables of type ByteArray cannot be used to query");
-    }
-    else if(serializer.getType() == ValueType.FILE){
+    } else if (serializer.getType() == ValueType.FILE) {
       throw new ProcessEngineException("Variables of type File cannot be used to query");
-    }
-    else if(serializer instanceof JPAVariableSerializer) {
-      if(wrappedQueryValue.getOperator() != QueryOperator.EQUALS) {
-        throw new ProcessEngineException("JPA entity variables can only be used in 'variableValueEquals'");
+    } else if (serializer instanceof JPAVariableSerializer) {
+      if (wrappedQueryValue.getOperator() != QueryOperator.EQUALS) {
+        throw new ProcessEngineException(
+            "JPA entity variables can only be used in 'variableValueEquals'");
       }
 
-    }
-    else {
-      if(!serializer.getType().isPrimitiveValueType()) {
+    } else {
+      if (!serializer.getType().isPrimitiveValueType()) {
         throw new ProcessEngineException("Object values cannot be used to query");
       }
 
@@ -97,24 +96,31 @@ public class SingleQueryVariableValueCondition extends AbstractQueryVariableValu
   public String getTextValue() {
     return textValue;
   }
+
   public void setTextValue(String textValue) {
     this.textValue = textValue;
   }
+
   public String getTextValue2() {
     return textValue2;
   }
+
   public void setTextValue2(String textValue2) {
     this.textValue2 = textValue2;
   }
+
   public Long getLongValue() {
     return longValue;
   }
+
   public void setLongValue(Long longValue) {
     this.longValue = longValue;
   }
+
   public Double getDoubleValue() {
     return doubleValue;
   }
+
   public void setDoubleValue(Double doubleValue) {
     this.doubleValue = doubleValue;
   }
@@ -129,6 +135,5 @@ public class SingleQueryVariableValueCondition extends AbstractQueryVariableValu
   public String getType() {
     return type;
   }
-
 
 }

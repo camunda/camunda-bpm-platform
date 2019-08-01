@@ -25,22 +25,21 @@ import java.util.List;
 public interface ExternalTaskQueryBuilder {
 
   /**
-   * Specifies that tasks of a topic should be fetched and locked for
-   * a certain amount of time
+   * Specifies that tasks of a topic should be fetched and locked for a certain amount of time
    *
-   * @param topicName the name of the topic
-   * @param lockDuration the duration in milliseconds for which tasks should be locked;
-   *   begins at the time of fetching
+   * @param topicName
+   *          the name of the topic
+   * @param lockDuration
+   *          the duration in milliseconds for which tasks should be locked; begins at the time of
+   *          fetching
    * @return
    */
   public ExternalTaskQueryTopicBuilder topic(String topicName, long lockDuration);
 
   /**
-   * Performs the fetching. Locks candidate tasks of the given topics
-   * for the specified duration.
+   * Performs the fetching. Locks candidate tasks of the given topics for the specified duration.
    *
-   * @return fetched external tasks that match the topic and that can be
-   *   successfully locked
+   * @return fetched external tasks that match the topic and that can be successfully locked
    */
   List<LockedExternalTask> execute();
 }

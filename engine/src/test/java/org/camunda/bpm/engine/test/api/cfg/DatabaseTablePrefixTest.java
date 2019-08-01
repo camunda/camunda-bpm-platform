@@ -35,14 +35,11 @@ import org.junit.Test;
 public class DatabaseTablePrefixTest {
 
   @Test
-  public void shouldPerformDatabaseSchemaOperationCreate() throws Exception{
+  public void shouldPerformDatabaseSchemaOperationCreate() throws Exception {
 
     // both process engines will be using this datasource.
     PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(),
-            "org.h2.Driver",
-            "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000",
-            "sa",
-            "" );
+        "org.h2.Driver", "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000", "sa", "");
 
     // create two schemas is the database
     Connection connection = pooledDataSource.getConnection();
@@ -54,19 +51,19 @@ public class DatabaseTablePrefixTest {
 
     // configure & build two different process engines, each having a separate table prefix
     ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration()
-            .setProcessEngineName("DatabaseTablePrefixTest-engine1")
-            .setDataSource(pooledDataSource)
-            .setDbMetricsReporterActivate(false)
-            .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
+        .setProcessEngineName("DatabaseTablePrefixTest-engine1").setDataSource(pooledDataSource)
+        .setDbMetricsReporterActivate(false).setDatabaseSchemaUpdate("NO_CHECK"); // disable auto
+                                                                                  // create/drop
+                                                                                  // schema
     config1.setDatabaseTablePrefix("SCHEMA1.");
     config1.setUseSharedSqlSessionFactory(true);
     ProcessEngine engine1 = config1.buildProcessEngine();
 
     ProcessEngineConfigurationImpl config2 = createCustomProcessEngineConfiguration()
-            .setProcessEngineName("DatabaseTablePrefixTest-engine2")
-            .setDataSource(pooledDataSource)
-            .setDbMetricsReporterActivate(false)
-            .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
+        .setProcessEngineName("DatabaseTablePrefixTest-engine2").setDataSource(pooledDataSource)
+        .setDbMetricsReporterActivate(false).setDatabaseSchemaUpdate("NO_CHECK"); // disable auto
+                                                                                  // create/drop
+                                                                                  // schema
     config2.setDatabaseTablePrefix("SCHEMA2.");
     config2.setUseSharedSqlSessionFactory(true);
     ProcessEngine engine2 = config2.buildProcessEngine();
@@ -86,10 +83,9 @@ public class DatabaseTablePrefixTest {
     // if I deploy a process to one engine, it is not visible to the other
     // engine:
     try {
-      engine1.getRepositoryService()
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/cfg/oneJobProcess.bpmn20.xml")
-        .deploy();
+      engine1.getRepositoryService().createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/api/cfg/oneJobProcess.bpmn20.xml")
+          .deploy();
 
       assertEquals(1, engine1.getRepositoryService().createDeploymentQuery().count());
       assertEquals(0, engine2.getRepositoryService().createDeploymentQuery().count());
@@ -101,11 +97,11 @@ public class DatabaseTablePrefixTest {
     }
   }
 
-
-  //----------------------- TEST HELPERS -----------------------
+  // ----------------------- TEST HELPERS -----------------------
 
   // allows to return a process engine configuration which doesn't create a schema when it's build.
-  private static class CustomStandaloneInMemProcessEngineConfiguration extends StandaloneInMemProcessEngineConfiguration {
+  private static class CustomStandaloneInMemProcessEngineConfiguration
+      extends StandaloneInMemProcessEngineConfiguration {
 
     @Override
     public ProcessEngine buildProcessEngine() {
@@ -127,7 +123,8 @@ public class DatabaseTablePrefixTest {
   }
 
   private static ProcessEngineConfigurationImpl createCustomProcessEngineConfiguration() {
-    return new CustomStandaloneInMemProcessEngineConfiguration().setHistory(ProcessEngineConfiguration.HISTORY_FULL);
+    return new CustomStandaloneInMemProcessEngineConfiguration()
+        .setHistory(ProcessEngineConfiguration.HISTORY_FULL);
   }
 
 }

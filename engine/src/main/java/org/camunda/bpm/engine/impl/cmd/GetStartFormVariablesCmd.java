@@ -36,16 +36,18 @@ public class GetStartFormVariablesCmd extends AbstractGetFormVariablesCmd {
 
   private static final long serialVersionUID = 1L;
 
-  public GetStartFormVariablesCmd(String resourceId, Collection<String> formVariableNames, boolean deserializeObjectValues) {
+  public GetStartFormVariablesCmd(String resourceId, Collection<String> formVariableNames,
+      boolean deserializeObjectValues) {
     super(resourceId, formVariableNames, deserializeObjectValues);
   }
 
   public VariableMap execute(final CommandContext commandContext) {
-    StartFormData startFormData = commandContext.runWithoutAuthorization(new Callable<StartFormData>() {
-      public StartFormData call() throws Exception {
-        return new GetStartFormCmd(resourceId).execute(commandContext);
-      }
-    });
+    StartFormData startFormData = commandContext
+        .runWithoutAuthorization(new Callable<StartFormData>() {
+          public StartFormData call() throws Exception {
+            return new GetStartFormCmd(resourceId).execute(commandContext);
+          }
+        });
 
     ProcessDefinition definition = startFormData.getProcessDefinition();
     checkGetStartFormVariables((ProcessDefinitionEntity) definition, commandContext);
@@ -53,7 +55,7 @@ public class GetStartFormVariablesCmd extends AbstractGetFormVariablesCmd {
     VariableMap result = new VariableMapImpl();
 
     for (FormField formField : startFormData.getFormFields()) {
-      if(formVariableNames == null || formVariableNames.contains(formField.getId())) {
+      if (formVariableNames == null || formVariableNames.contains(formField.getId())) {
         result.put(formField.getId(), createVariable(formField, null));
       }
     }
@@ -61,8 +63,10 @@ public class GetStartFormVariablesCmd extends AbstractGetFormVariablesCmd {
     return result;
   }
 
-  protected void checkGetStartFormVariables(ProcessDefinitionEntity definition, CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+  protected void checkGetStartFormVariables(ProcessDefinitionEntity definition,
+      CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadProcessDefinition(definition);
     }
   }

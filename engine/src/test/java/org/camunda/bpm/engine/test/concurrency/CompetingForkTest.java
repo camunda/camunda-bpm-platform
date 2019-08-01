@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 @Ignore
 public class CompetingForkTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   Thread testThread = Thread.currentThread();
   static ControllableThread activeThread;
@@ -46,6 +46,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     public CompleteTaskThread(String taskId) {
       this.taskId = taskId;
     }
+
     public synchronized void startAndWaitUntilControlIsReturned() {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
@@ -53,14 +54,13 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
     public void run() {
       try {
-        processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new CompleteTaskCmd(taskId, null)));
+        processEngineConfiguration.getCommandExecutorTxRequired()
+            .execute(new ControlledCommand(activeThread, new CompleteTaskCmd(taskId, null)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 
@@ -70,20 +70,11 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
     TaskQuery query = taskService.createTaskQuery();
 
-    String task1 = query
-        .taskDefinitionKey("task1")
-        .singleResult()
-        .getId();
+    String task1 = query.taskDefinitionKey("task1").singleResult().getId();
 
-    String task2 = query
-        .taskDefinitionKey("task2")
-        .singleResult()
-        .getId();
+    String task2 = query.taskDefinitionKey("task2").singleResult().getId();
 
-    String task3 = query
-        .taskDefinitionKey("task3")
-        .singleResult()
-        .getId();
+    String task3 = query.taskDefinitionKey("task3").singleResult().getId();
 
     LOG.debug("test thread starts thread one");
     CompleteTaskThread threadOne = new CompleteTaskThread(task1);
@@ -104,11 +95,13 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
+    assertTextPresent("was updated by another transaction concurrently",
+        threadTwo.exception.getMessage());
 
     LOG.debug("test thread notifies thread 3");
     threadThree.proceedAndWaitTillDone();
     assertNotNull(threadThree.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadThree.exception.getMessage());
+    assertTextPresent("was updated by another transaction concurrently",
+        threadThree.exception.getMessage());
   }
 }

@@ -175,7 +175,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // then
     assertThat(query.count(), is(0L));
-    assertThat(authorizationService.createAuthorizationQuery().resourceType(TENANT).userIdIn(jonny1Id).count(), is(0L));
+    assertThat(authorizationService.createAuthorizationQuery().resourceType(TENANT)
+        .userIdIn(jonny1Id).count(), is(0L));
   }
 
   public void testUserUpdateAuthorizations() {
@@ -229,11 +230,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // assume
     int maxNumOfAttempts = 10;
-    UserEntity lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId()).singleResult();
+    UserEntity lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId())
+        .singleResult();
     assertNotNull(lockedUser);
     assertNotNull(lockedUser.getLockExpirationTime());
     assertEquals(maxNumOfAttempts, lockedUser.getAttempts());
-
 
     // create global auth
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -244,13 +245,15 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // set auth
     processEngineConfiguration.setAuthorizationEnabled(true);
-    identityService.setAuthentication("admin", Collections.singletonList(Groups.CAMUNDA_ADMIN), null);
+    identityService.setAuthentication("admin", Collections.singletonList(Groups.CAMUNDA_ADMIN),
+        null);
 
     // when
     identityService.unlockUser(lockedUser.getId());
 
     // then
-    lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId()).singleResult();
+    lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId())
+        .singleResult();
     assertNotNull(lockedUser);
     assertNull(lockedUser.getLockExpirationTime());
     assertEquals(0, lockedUser.getAttempts());
@@ -268,7 +271,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // assume
     int maxNumOfAttempts = 10;
-    UserEntity lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId()).singleResult();
+    UserEntity lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId())
+        .singleResult();
     assertNotNull(lockedUser);
     assertNotNull(lockedUser.getLockExpirationTime());
     assertEquals(maxNumOfAttempts, lockedUser.getAttempts());
@@ -281,7 +285,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       identityService.unlockUser(lockedUser.getId());
       fail("expected exception");
     } catch (AuthorizationException e) {
-      assertTrue(e.getMessage().contains("ENGINE-03029 Required admin authenticated group or user."));
+      assertTrue(
+          e.getMessage().contains("ENGINE-03029 Required admin authenticated group or user."));
     }
 
     // return to god-mode
@@ -289,7 +294,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // then
     int maxNumOfLoginAttempts = 10;
-    lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId()).singleResult();
+    lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId())
+        .singleResult();
     assertNotNull(lockedUser);
     assertNotNull(lockedUser.getLockExpirationTime());
     assertEquals(maxNumOfLoginAttempts, lockedUser.getAttempts());
@@ -398,9 +404,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // then
     assertThat(query.count(), is(0L));
-    assertThat(authorizationService.createAuthorizationQuery().resourceType(TENANT).groupIdIn("group1").count(), is(0L));
+    assertThat(authorizationService.createAuthorizationQuery().resourceType(TENANT)
+        .groupIdIn("group1").count(), is(0L));
   }
-
 
   public void testGroupUpdateAuthorizations() {
 
@@ -775,7 +781,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // change the base permission:
     processEngineConfiguration.setAuthorizationEnabled(false);
-    basePerms = authorizationService.createAuthorizationQuery().resourceType(USER).userIdIn("*").singleResult();
+    basePerms = authorizationService.createAuthorizationQuery().resourceType(USER).userIdIn("*")
+        .singleResult();
     basePerms.addPermission(READ);
     authorizationService.saveAuthorization(basePerms);
     processEngineConfiguration.setAuthorizationEnabled(true);
@@ -784,10 +791,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     assertNotNull(identityService.createUserQuery().singleResult());
     assertEquals(1, identityService.createUserQuery().count());
 
-
     // revoke permission for jonny2:
     processEngineConfiguration.setAuthorizationEnabled(false);
-    ourPerms = authorizationService.createAuthorizationQuery().resourceType(USER).userIdIn(authUserId).singleResult();
+    ourPerms = authorizationService.createAuthorizationQuery().resourceType(USER)
+        .userIdIn(authUserId).singleResult();
     ourPerms.removePermission(READ);
     authorizationService.saveAuthorization(ourPerms);
 
@@ -802,7 +809,6 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     // now we cannot fetch the user
     assertNull(identityService.createUserQuery().singleResult());
     assertEquals(0, identityService.createUserQuery().count());
-
 
     // delete our perms
     processEngineConfiguration.setAuthorizationEnabled(false);
@@ -960,7 +966,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       }
     }
 
-    List<User> accountingUser = identityService.createUserQuery().memberOfGroup("accounting").list();
+    List<User> accountingUser = identityService.createUserQuery().memberOfGroup("accounting")
+        .list();
     assertEquals(2, accountingUser.size());
 
     for (User user : accountingUser) {
@@ -969,7 +976,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       }
     }
 
-    List<User> managementUser = identityService.createUserQuery().memberOfGroup("management").list();
+    List<User> managementUser = identityService.createUserQuery().memberOfGroup("management")
+        .list();
     assertEquals(2, managementUser.size());
 
     for (User user : managementUser) {
@@ -1021,7 +1029,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // change the base permission:
     processEngineConfiguration.setAuthorizationEnabled(false);
-    basePerms = authorizationService.createAuthorizationQuery().resourceType(GROUP).userIdIn("*").singleResult();
+    basePerms = authorizationService.createAuthorizationQuery().resourceType(GROUP).userIdIn("*")
+        .singleResult();
     basePerms.addPermission(READ);
     authorizationService.saveAuthorization(basePerms);
     processEngineConfiguration.setAuthorizationEnabled(true);
@@ -1032,7 +1041,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // revoke permission for jonny2:
     processEngineConfiguration.setAuthorizationEnabled(false);
-    ourPerms = authorizationService.createAuthorizationQuery().resourceType(GROUP).userIdIn(authUserId).singleResult();
+    ourPerms = authorizationService.createAuthorizationQuery().resourceType(GROUP)
+        .userIdIn(authUserId).singleResult();
     ourPerms.removePermission(READ);
     authorizationService.saveAuthorization(ourPerms);
 
@@ -1099,7 +1109,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // change the base permission:
     processEngineConfiguration.setAuthorizationEnabled(false);
-    basePerms = authorizationService.createAuthorizationQuery().resourceType(TENANT).userIdIn("*").singleResult();
+    basePerms = authorizationService.createAuthorizationQuery().resourceType(TENANT).userIdIn("*")
+        .singleResult();
     basePerms.addPermission(READ);
     authorizationService.saveAuthorization(basePerms);
     processEngineConfiguration.setAuthorizationEnabled(true);
@@ -1109,7 +1120,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // revoke permission for jonny2:
     processEngineConfiguration.setAuthorizationEnabled(false);
-    ourPerms = authorizationService.createAuthorizationQuery().resourceType(TENANT).userIdIn(authUserId).singleResult();
+    ourPerms = authorizationService.createAuthorizationQuery().resourceType(TENANT)
+        .userIdIn(authUserId).singleResult();
     ourPerms.removePermission(READ);
     authorizationService.saveAuthorization(ourPerms);
 

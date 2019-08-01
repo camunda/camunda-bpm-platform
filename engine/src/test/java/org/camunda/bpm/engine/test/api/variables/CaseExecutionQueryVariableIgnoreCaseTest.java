@@ -29,7 +29,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CaseExecutionQueryVariableIgnoreCaseTest extends AbstractVariableIgnoreCaseTest<CaseExecutionQueryImpl, CaseExecution> {
+public class CaseExecutionQueryVariableIgnoreCaseTest
+    extends AbstractVariableIgnoreCaseTest<CaseExecutionQueryImpl, CaseExecution> {
 
   CaseService caseService;
   RepositoryService repositoryService;
@@ -39,8 +40,10 @@ public class CaseExecutionQueryVariableIgnoreCaseTest extends AbstractVariableIg
     caseService = engineRule.getCaseService();
     repositoryService = engineRule.getRepositoryService();
 
-    repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn").deploy();
-    instance = caseService.withCaseDefinitionByKey("oneTaskCase").setVariables(VARIABLES).businessKey("oneTaskCase").create();
+    repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn").deploy();
+    instance = caseService.withCaseDefinitionByKey("oneTaskCase").setVariables(VARIABLES)
+        .businessKey("oneTaskCase").create();
   }
 
   @After
@@ -60,7 +63,8 @@ public class CaseExecutionQueryVariableIgnoreCaseTest extends AbstractVariableIg
     assertThat(one.getId()).isEqualTo(two.getId());
   }
 
-  public void assertThatListContainsOnlyExpectedElements(List<CaseExecution> instances, CaseExecution instance) {
+  public void assertThatListContainsOnlyExpectedElements(List<CaseExecution> instances,
+      CaseExecution instance) {
     // normally we would only get one result. here we also get the corresponding CaseInstance
     assertThat(instances.size()).isEqualTo(2);
     assertThat(instances.get(0).getCaseInstanceId()).isEqualTo(instance.getCaseInstanceId());
@@ -71,10 +75,14 @@ public class CaseExecutionQueryVariableIgnoreCaseTest extends AbstractVariableIg
   public void testCaseInstanceVariableNameEqualsIgnoreCase() {
     // given
     // when
-    List<CaseExecution> eq = queryNameIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
-    List<CaseExecution> eqNameLC = queryNameIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
-    List<CaseExecution> eqValueLC = queryNameIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
-    List<CaseExecution> eqNameValueLC = queryNameIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+    List<CaseExecution> eq = queryNameIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<CaseExecution> eqNameLC = queryNameIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<CaseExecution> eqValueLC = queryNameIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<CaseExecution> eqNameValueLC = queryNameIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
 
     // then
     assertThatListContainsOnlyExpectedElements(eq, instance);
@@ -87,10 +95,14 @@ public class CaseExecutionQueryVariableIgnoreCaseTest extends AbstractVariableIg
   public void testCaseInstanceVariableNameNotEqualsIgnoreCase() {
     // given
     // when
-    List<CaseExecution> neq = queryNameIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
-    List<CaseExecution> neqNameLC = queryNameIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
-    List<CaseExecution> neqValueNE = queryNameIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
-    List<CaseExecution> neqNameLCValueNE = queryNameIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+    List<CaseExecution> neq = queryNameIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<CaseExecution> neqNameLC = queryNameIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<CaseExecution> neqValueNE = queryNameIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<CaseExecution> neqNameLCValueNE = queryNameIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
 
     // then
     assertThat(neq).isEmpty();
@@ -103,10 +115,14 @@ public class CaseExecutionQueryVariableIgnoreCaseTest extends AbstractVariableIg
   public void testCaseInstanceVariableValueEqualsIgnoreCase() {
     // given
     // when
-    List<CaseExecution> eq = queryValueIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
-    List<CaseExecution> eqNameLC = queryValueIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
-    List<CaseExecution> eqValueLC = queryValueIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
-    List<CaseExecution> eqNameValueLC = queryValueIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+    List<CaseExecution> eq = queryValueIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<CaseExecution> eqNameLC = queryValueIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<CaseExecution> eqValueLC = queryValueIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<CaseExecution> eqNameValueLC = queryValueIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
 
     // then
     assertThatListContainsOnlyExpectedElements(eq, instance);
@@ -119,10 +135,14 @@ public class CaseExecutionQueryVariableIgnoreCaseTest extends AbstractVariableIg
   public void testCaseInstanceVariableValueNotEqualsIgnoreCase() {
     // given
     // when
-    List<CaseExecution> neq = queryValueIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
-    List<CaseExecution> neqNameLC = queryValueIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
-    List<CaseExecution> neqValueNE = queryValueIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
-    List<CaseExecution> neqNameLCValueNE = queryValueIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+    List<CaseExecution> neq = queryValueIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<CaseExecution> neqNameLC = queryValueIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<CaseExecution> neqValueNE = queryValueIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<CaseExecution> neqNameLCValueNE = queryValueIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
 
     // then
     assertThat(neq).isEmpty();
@@ -135,12 +155,18 @@ public class CaseExecutionQueryVariableIgnoreCaseTest extends AbstractVariableIg
   public void testCaseInstanceVariableNameAndValueEqualsIgnoreCase() {
     // given
     // when
-    List<CaseExecution> eq = queryNameValueIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
-    List<CaseExecution> eqNameLC = queryNameValueIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
-    List<CaseExecution> eqValueLC = queryNameValueIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
-    List<CaseExecution> eqValueNE = queryNameValueIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
-    List<CaseExecution> eqNameValueLC = queryNameValueIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
-    List<CaseExecution> eqNameLCValueNE = queryNameValueIgnoreCase().caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+    List<CaseExecution> eq = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<CaseExecution> eqNameLC = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<CaseExecution> eqValueLC = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<CaseExecution> eqValueNE = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<CaseExecution> eqNameValueLC = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+    List<CaseExecution> eqNameLCValueNE = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
 
     // then
     assertThatListContainsOnlyExpectedElements(eq, instance);
@@ -155,12 +181,18 @@ public class CaseExecutionQueryVariableIgnoreCaseTest extends AbstractVariableIg
   public void testCaseInstanceVariableNameAndValueNotEqualsIgnoreCase() {
     // given
     // when
-    List<CaseExecution> neq = queryNameValueIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
-    List<CaseExecution> neqNameLC = queryNameValueIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
-    List<CaseExecution> neqValueLC = queryNameValueIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
-    List<CaseExecution> neqValueNE = queryNameValueIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
-    List<CaseExecution> neqNameValueLC = queryNameValueIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
-    List<CaseExecution> neqNameLCValueNE = queryNameValueIgnoreCase().caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+    List<CaseExecution> neq = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<CaseExecution> neqNameLC = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<CaseExecution> neqValueLC = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_LC).list();
+    List<CaseExecution> neqValueNE = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<CaseExecution> neqNameValueLC = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_LC).list();
+    List<CaseExecution> neqNameLCValueNE = queryNameValueIgnoreCase()
+        .caseInstanceVariableValueNotEquals(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
 
     // then
     assertThat(neq).isEmpty();

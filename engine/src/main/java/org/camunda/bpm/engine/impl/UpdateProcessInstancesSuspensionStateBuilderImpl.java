@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 
-public class UpdateProcessInstancesSuspensionStateBuilderImpl implements UpdateProcessInstancesSuspensionStateBuilder {
+public class UpdateProcessInstancesSuspensionStateBuilderImpl
+    implements UpdateProcessInstancesSuspensionStateBuilder {
 
   protected List<String> processInstanceIds;
   protected ProcessInstanceQuery processInstanceQuery;
@@ -41,25 +42,29 @@ public class UpdateProcessInstancesSuspensionStateBuilderImpl implements UpdateP
   }
 
   @Override
-  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds) {
+  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(
+      List<String> processInstanceIds) {
     this.processInstanceIds.addAll(processInstanceIds);
     return this;
   }
 
   @Override
-  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(String... processInstanceIds) {
+  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(
+      String... processInstanceIds) {
     this.processInstanceIds.addAll(Arrays.asList(processInstanceIds));
     return this;
   }
 
   @Override
-  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
+  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(
+      ProcessInstanceQuery processInstanceQuery) {
     this.processInstanceQuery = processInstanceQuery;
     return this;
   }
 
   @Override
-  public UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
+  public UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(
+      HistoricProcessInstanceQuery historicProcessInstanceQuery) {
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     return this;
   }
@@ -71,17 +76,20 @@ public class UpdateProcessInstancesSuspensionStateBuilderImpl implements UpdateP
 
   @Override
   public void activate() {
-    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this, false));
+    commandExecutor
+        .execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this, false));
   }
 
   @Override
   public Batch suspendAsync() {
-    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, true));
+    return commandExecutor
+        .execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, true));
   }
 
   @Override
   public Batch activateAsync() {
-    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, false));
+    return commandExecutor
+        .execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, false));
   }
 
   public List<String> getProcessInstanceIds() {

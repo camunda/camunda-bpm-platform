@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.test.Deployment;
 import org.subethamail.wiser.WiserMessage;
 
-
 /**
  * @author Joram Barrez
  */
@@ -48,8 +47,8 @@ public class EmailServiceTaskTest extends EmailTestCase {
     assertEquals(1, messages.size());
 
     WiserMessage message = messages.get(0);
-    assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "camunda@localhost",
-            Arrays.asList("kermit@camunda.org"), null);
+    assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.",
+        "camunda@localhost", Arrays.asList("kermit@camunda.org"), null);
     assertProcessEnded(procId);
   }
 
@@ -94,7 +93,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     WiserMessage message = messages.get(0);
     assertEmailSend(message, false, subject, "Hello " + recipientName + ", this is an e-mail",
-            sender, Arrays.asList(recipient), null);
+        sender, Arrays.asList(recipient), null);
   }
 
   @Deployment
@@ -102,8 +101,9 @@ public class EmailServiceTaskTest extends EmailTestCase {
     runtimeService.startProcessInstanceByKey("ccAndBcc");
 
     List<WiserMessage> messages = wiser.getMessages();
-    assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "camunda@localhost",
-            Arrays.asList("kermit@camunda.org"), Arrays.asList("fozzie@camunda.org"));
+    assertEmailSend(messages.get(0), false, "Hello world", "This is the content",
+        "camunda@localhost", Arrays.asList("kermit@camunda.org"),
+        Arrays.asList("fozzie@camunda.org"));
 
     // Bcc is not stored in the header (obviously)
     // so the only way to verify the bcc, is that there are three messages send.
@@ -112,11 +112,13 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
   @Deployment
   public void testHtmlMail() throws Exception {
-    runtimeService.startProcessInstanceByKey("htmlMail", CollectionUtil.singletonMap("gender", "male"));
+    runtimeService.startProcessInstanceByKey("htmlMail",
+        CollectionUtil.singletonMap("gender", "male"));
 
     List<WiserMessage> messages = wiser.getMessages();
     assertEquals(1, messages.size());
-    assertEmailSend(messages.get(0), true, "Test", "Mr. <b>Kermit</b>", "camunda@localhost", Arrays.asList("kermit@camunda.org"), null);
+    assertEmailSend(messages.get(0), true, "Test", "Mr. <b>Kermit</b>", "camunda@localhost",
+        Arrays.asList("kermit@camunda.org"), null);
   }
 
   @Deployment
@@ -145,15 +147,16 @@ public class EmailServiceTaskTest extends EmailTestCase {
     WiserMessage message = messages.get(0);
     MimeMessage mimeMessage = message.getMimeMessage();
 
-    assertEquals("Your order " + orderId + " has been shipped", mimeMessage.getHeader("Subject", null));
+    assertEquals("Your order " + orderId + " has been shipped",
+        mimeMessage.getHeader("Subject", null));
     assertEquals(from, mimeMessage.getHeader("From", null));
     assertTrue(mimeMessage.getHeader("To", null).contains(recipient));
   }
 
   // Helper
 
-  public static void assertEmailSend(WiserMessage emailMessage, boolean htmlMail, String subject, String message,
-          String from, List<String> to, List<String> cc) throws IOException {
+  public static void assertEmailSend(WiserMessage emailMessage, boolean htmlMail, String subject,
+      String message, String from, List<String> to, List<String> cc) throws IOException {
     try {
       MimeMessage mimeMessage = emailMessage.getMimeMessage();
 

@@ -37,7 +37,8 @@ public class DbEntityManagerFactory implements SessionFactory {
   }
 
   public DbEntityManager openSession() {
-    PersistenceSession persistenceSession = Context.getCommandContext().getSession(PersistenceSession.class);
+    PersistenceSession persistenceSession = Context.getCommandContext()
+        .getSession(PersistenceSession.class);
     return new DbEntityManager(idGenerator, persistenceSession);
   }
 

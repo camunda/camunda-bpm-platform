@@ -26,8 +26,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 
-public class DeploymentStatisticsQueryImpl extends AbstractQuery<DeploymentStatisticsQuery, DeploymentStatistics>
-implements DeploymentStatisticsQuery {
+public class DeploymentStatisticsQueryImpl
+    extends AbstractQuery<DeploymentStatisticsQuery, DeploymentStatistics>
+    implements DeploymentStatisticsQuery {
 
   protected static final long serialVersionUID = 1L;
   protected boolean includeFailedJobs = false;
@@ -60,20 +61,13 @@ implements DeploymentStatisticsQuery {
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return
-        commandContext
-          .getStatisticsManager()
-          .getStatisticsCountGroupedByDeployment(this);
+    return commandContext.getStatisticsManager().getStatisticsCountGroupedByDeployment(this);
   }
 
   @Override
-  public List<DeploymentStatistics> executeList(CommandContext commandContext,
-      Page page) {
+  public List<DeploymentStatistics> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return
-      commandContext
-        .getStatisticsManager()
-        .getStatisticsGroupedByDeployment(this, page);
+    return commandContext.getStatisticsManager().getStatisticsGroupedByDeployment(this, page);
   }
 
   public boolean isFailedJobsToInclude() {
@@ -87,7 +81,8 @@ implements DeploymentStatisticsQuery {
   protected void checkQueryOk() {
     super.checkQueryOk();
     if (includeIncidents && includeIncidentsForType != null) {
-      throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
+      throw new ProcessEngineException(
+          "Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
     }
   }
 
@@ -97,7 +92,8 @@ implements DeploymentStatisticsQuery {
     return processInstancePermissionChecks;
   }
 
-  public void setProcessInstancePermissionChecks(List<PermissionCheck> processInstancePermissionChecks) {
+  public void setProcessInstancePermissionChecks(
+      List<PermissionCheck> processInstancePermissionChecks) {
     this.processInstancePermissionChecks = processInstancePermissionChecks;
   }
 

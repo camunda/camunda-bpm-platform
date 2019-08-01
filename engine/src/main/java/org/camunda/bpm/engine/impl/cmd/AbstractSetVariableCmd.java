@@ -30,7 +30,8 @@ public abstract class AbstractSetVariableCmd extends AbstractVariableCmd {
 
   protected Map<String, ? extends Object> variables;
 
-  public AbstractSetVariableCmd(String entityId, Map<String, ? extends Object> variables, boolean isLocal) {
+  public AbstractSetVariableCmd(String entityId, Map<String, ? extends Object> variables,
+      boolean isLocal) {
     super(entityId, isLocal);
     this.variables = variables;
   }

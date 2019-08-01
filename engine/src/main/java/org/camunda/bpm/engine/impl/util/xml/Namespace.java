@@ -41,8 +41,7 @@ public class Namespace {
   }
 
   /**
-   * If a namespace has changed over time it could feel responsible for handling
-   * the older one.
+   * If a namespace has changed over time it could feel responsible for handling the older one.
    *
    * @return
    */

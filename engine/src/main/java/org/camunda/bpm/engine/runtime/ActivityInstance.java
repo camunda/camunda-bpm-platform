@@ -19,9 +19,13 @@ package org.camunda.bpm.engine.runtime;
 import org.camunda.bpm.engine.RuntimeService;
 
 /**
- * <p>An activity instance represents an instance of an activity.</p>
+ * <p>
+ * An activity instance represents an instance of an activity.
+ * </p>
  *
- * <p>For documentation, see {@link RuntimeService#getActivityInstance(String)}</p>
+ * <p>
+ * For documentation, see {@link RuntimeService#getActivityInstance(String)}
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -35,29 +39,35 @@ public interface ActivityInstance extends ProcessElementInstance {
   String getActivityName();
 
   /**
-   * Type of the activity, corresponds to BPMN element name in XML (e.g. 'userTask').
-   * The type of the Root activity instance (the one corresponding to the process instance will be 'processDefinition'.
+   * Type of the activity, corresponds to BPMN element name in XML (e.g. 'userTask'). The type of
+   * the Root activity instance (the one corresponding to the process instance will be
+   * 'processDefinition'.
    */
   public String getActivityType();
 
-  /** Returns the child activity instances.
-   * Returns an empty list if there are no child instances */
+  /**
+   * Returns the child activity instances. Returns an empty list if there are no child instances
+   */
   ActivityInstance[] getChildActivityInstances();
 
-  /** Returns the child transition instances.
-   * Returns an empty list if there are no child transition instances */
+  /**
+   * Returns the child transition instances. Returns an empty list if there are no child transition
+   * instances
+   */
   TransitionInstance[] getChildTransitionInstances();
 
   /** the list of executions that are currently waiting in this activity instance */
   String[] getExecutionIds();
 
   /**
-   * all descendant (children, grandchildren, etc.) activity instances that are instances of the supplied activity
+   * all descendant (children, grandchildren, etc.) activity instances that are instances of the
+   * supplied activity
    */
   ActivityInstance[] getActivityInstances(String activityId);
 
   /**
-   * all descendant (children, grandchildren, etc.) transition instances that are leaving or entering the supplied activity
+   * all descendant (children, grandchildren, etc.) transition instances that are leaving or
+   * entering the supplied activity
    */
   TransitionInstance[] getTransitionInstances(String activityId);
 

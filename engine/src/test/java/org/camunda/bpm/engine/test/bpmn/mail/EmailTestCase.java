@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.test.TestLogger;
 import org.slf4j.Logger;
 import org.subethamail.wiser.Wiser;
 
-
 /**
  * @author Joram Barrez
  */

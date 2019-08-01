@@ -39,7 +39,6 @@ import org.camunda.bpm.engine.task.Attachment;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -56,7 +55,8 @@ public class CreateAttachmentCmd implements Command<Attachment> {
   private TaskEntity task;
   protected ExecutionEntity processInstance;
 
-  public CreateAttachmentCmd(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content, String url) {
+  public CreateAttachmentCmd(String attachmentType, String taskId, String processInstanceId,
+      String attachmentName, String attachmentDescription, InputStream content, String url) {
     this.attachmentType = attachmentType;
     this.taskId = taskId;
     this.processInstanceId = processInstanceId;
@@ -69,12 +69,11 @@ public class CreateAttachmentCmd implements Command<Attachment> {
   @Override
   public Attachment execute(CommandContext commandContext) {
     if (taskId != null) {
-      task = commandContext
-          .getTaskManager()
-          .findTaskById(taskId);
+      task = commandContext.getTaskManager().findTaskById(taskId);
     } else {
       ensureNotNull("taskId or processInstanceId has to be provided", this.processInstanceId);
-      List<ExecutionEntity> executionsByProcessInstanceId = commandContext.getExecutionManager().findExecutionsByProcessInstanceId(processInstanceId);
+      List<ExecutionEntity> executionsByProcessInstanceId = commandContext.getExecutionManager()
+          .findExecutionsByProcessInstanceId(processInstanceId);
       processInstance = executionsByProcessInstanceId.get(0);
     }
 
@@ -117,11 +116,11 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     PropertyChange propertyChange = new PropertyChange("name", null, attachmentName);
 
     if (task != null) {
-      commandContext.getOperationLogManager()
-          .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, task, propertyChange);
+      commandContext.getOperationLogManager().logAttachmentOperation(
+          UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, task, propertyChange);
     } else if (processInstance != null) {
-      commandContext.getOperationLogManager()
-          .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, processInstance, propertyChange);
+      commandContext.getOperationLogManager().logAttachmentOperation(
+          UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, processInstance, propertyChange);
     }
 
     return attachment;
@@ -132,20 +131,20 @@ public class CreateAttachmentCmd implements Command<Attachment> {
   }
 
   protected String getHistoryRemovalTimeStrategy() {
-    return Context.getProcessEngineConfiguration()
-      .getHistoryRemovalTimeStrategy();
+    return Context.getProcessEngineConfiguration().getHistoryRemovalTimeStrategy();
   }
 
-  protected HistoricProcessInstanceEventEntity getHistoricRootProcessInstance(String rootProcessInstanceId) {
+  protected HistoricProcessInstanceEventEntity getHistoricRootProcessInstance(
+      String rootProcessInstanceId) {
     return Context.getCommandContext().getDbEntityManager()
-      .selectById(HistoricProcessInstanceEventEntity.class, rootProcessInstanceId);
+        .selectById(HistoricProcessInstanceEventEntity.class, rootProcessInstanceId);
   }
 
   protected void provideRemovalTime(AttachmentEntity attachment) {
     String rootProcessInstanceId = attachment.getRootProcessInstanceId();
     if (rootProcessInstanceId != null) {
-      HistoricProcessInstanceEventEntity historicRootProcessInstance =
-        getHistoricRootProcessInstance(rootProcessInstanceId);
+      HistoricProcessInstanceEventEntity historicRootProcessInstance = getHistoricRootProcessInstance(
+          rootProcessInstanceId);
 
       if (historicRootProcessInstance != null) {
         Date removalTime = historicRootProcessInstance.getRemovalTime();

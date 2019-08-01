@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 
-
 /**
  * @author Thorben Lindhauer
  *

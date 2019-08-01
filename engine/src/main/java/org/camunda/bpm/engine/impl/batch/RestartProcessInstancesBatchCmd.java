@@ -46,11 +46,12 @@ import org.camunda.bpm.engine.impl.util.BatchUtil;
  * @author Anna Pazola
  *
  */
-public class RestartProcessInstancesBatchCmd extends AbstractRestartProcessInstanceCmd<Batch>{
+public class RestartProcessInstancesBatchCmd extends AbstractRestartProcessInstanceCmd<Batch> {
 
   private final CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
-  public RestartProcessInstancesBatchCmd(CommandExecutor commandExecutor, RestartProcessInstanceBuilderImpl builder) {
+  public RestartProcessInstancesBatchCmd(CommandExecutor commandExecutor,
+      RestartProcessInstanceBuilderImpl builder) {
     super(commandExecutor, builder);
   }
 
@@ -59,14 +60,20 @@ public class RestartProcessInstancesBatchCmd extends AbstractRestartProcessInsta
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
     Collection<String> processInstanceIds = collectProcessInstanceIds();
 
-    ensureNotEmpty(BadUserRequestException.class, "Restart instructions cannot be empty", "instructions", instructions);
-    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty", "processInstanceIds", processInstanceIds);
-    ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null", "processInstanceIds", processInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "Restart instructions cannot be empty",
+        "instructions", instructions);
+    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty",
+        "processInstanceIds", processInstanceIds);
+    ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null",
+        "processInstanceIds", processInstanceIds);
 
     checkPermissions(commandContext);
-    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());;
+    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext,
+        builder.getProcessDefinitionId());
+    ;
 
-    ensureNotNull(BadUserRequestException.class, "Process definition cannot be null", processDefinition);
+    ensureNotNull(BadUserRequestException.class, "Process definition cannot be null",
+        processDefinition);
     ensureTenantAuthorized(commandContext, processDefinition);
 
     writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), true);
@@ -86,18 +93,24 @@ public class RestartProcessInstancesBatchCmd extends AbstractRestartProcessInsta
   }
 
   protected void checkPermissions(CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_RESTART_PROCESS_INSTANCES);
     }
   }
 
-  protected BatchEntity createBatch(CommandContext commandContext, List<AbstractProcessInstanceModificationCommand> instructions,
+  protected BatchEntity createBatch(CommandContext commandContext,
+      List<AbstractProcessInstanceModificationCommand> instructions,
       List<String> processInstanceIds, ProcessDefinitionEntity processDefinition) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    BatchJobHandler<RestartProcessInstancesBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext
+        .getProcessEngineConfiguration();
+    BatchJobHandler<RestartProcessInstancesBatchConfiguration> batchJobHandler = getBatchJobHandler(
+        processEngineConfiguration);
 
     RestartProcessInstancesBatchConfiguration configuration = new RestartProcessInstancesBatchConfiguration(
-        processInstanceIds, instructions, builder.getProcessDefinitionId(), builder.isInitialVariables(), builder.isSkipCustomListeners(), builder.isSkipIoMappings(), builder.isWithoutBusinessKey());
+        processInstanceIds, instructions, builder.getProcessDefinitionId(),
+        builder.isInitialVariables(), builder.isSkipCustomListeners(), builder.isSkipIoMappings(),
+        builder.isWithoutBusinessKey());
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
@@ -112,14 +125,18 @@ public class RestartProcessInstancesBatchCmd extends AbstractRestartProcessInsta
   }
 
   @SuppressWarnings("unchecked")
-  protected BatchJobHandler<RestartProcessInstancesBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  protected BatchJobHandler<RestartProcessInstancesBatchConfiguration> getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     Map<String, BatchJobHandler<?>> batchHandlers = processEngineConfiguration.getBatchHandlers();
-    return (BatchJobHandler<RestartProcessInstancesBatchConfiguration>) batchHandlers.get(Batch.TYPE_PROCESS_INSTANCE_RESTART);
+    return (BatchJobHandler<RestartProcessInstancesBatchConfiguration>) batchHandlers
+        .get(Batch.TYPE_PROCESS_INSTANCE_RESTART);
   }
 
-  protected void ensureTenantAuthorized(CommandContext commandContext, ProcessDefinitionEntity processDefinition) {
+  protected void ensureTenantAuthorized(CommandContext commandContext,
+      ProcessDefinitionEntity processDefinition) {
     if (!commandContext.getTenantManager().isAuthenticatedTenant(processDefinition.getTenantId())) {
-      throw LOG.exceptionCommandWithUnauthorizedTenant("restart process instances of process definition '" + processDefinition.getId() + "'");
+      throw LOG.exceptionCommandWithUnauthorizedTenant(
+          "restart process instances of process definition '" + processDefinition.getId() + "'");
     }
   }
 }

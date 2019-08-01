@@ -39,7 +39,8 @@ public class MigratingUserTaskInstance implements MigratingInstance {
   protected TaskEntity userTask;
   protected MigratingActivityInstance migratingActivityInstance;
 
-  public MigratingUserTaskInstance(TaskEntity userTask, MigratingActivityInstance migratingActivityInstance) {
+  public MigratingUserTaskInstance(TaskEntity userTask,
+      MigratingActivityInstance migratingActivityInstance) {
     this.userTask = userTask;
     this.migratingActivityInstance = migratingActivityInstance;
   }
@@ -78,7 +79,8 @@ public class MigratingUserTaskInstance implements MigratingInstance {
 
   @Override
   public void migrateState() {
-    userTask.setProcessDefinitionId(migratingActivityInstance.getTargetScope().getProcessDefinition().getId());
+    userTask.setProcessDefinitionId(
+        migratingActivityInstance.getTargetScope().getProcessDefinition().getId());
     userTask.setTaskDefinitionKey(migratingActivityInstance.getTargetScope().getId());
 
     migrateHistory();

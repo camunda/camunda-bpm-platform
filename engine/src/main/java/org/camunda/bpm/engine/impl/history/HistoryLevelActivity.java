@@ -54,30 +54,21 @@ public class HistoryLevelActivity extends AbstractHistoryLevel {
   }
 
   public boolean isHistoryEventProduced(HistoryEventType eventType, Object entity) {
-    return PROCESS_INSTANCE_START == eventType
-        || PROCESS_INSTANCE_UPDATE == eventType
-        || PROCESS_INSTANCE_MIGRATE == eventType
-        || PROCESS_INSTANCE_END == eventType
+    return PROCESS_INSTANCE_START == eventType || PROCESS_INSTANCE_UPDATE == eventType
+        || PROCESS_INSTANCE_MIGRATE == eventType || PROCESS_INSTANCE_END == eventType
 
-        || TASK_INSTANCE_CREATE == eventType
-        || TASK_INSTANCE_UPDATE == eventType
-        || TASK_INSTANCE_MIGRATE == eventType
-        || TASK_INSTANCE_COMPLETE == eventType
+        || TASK_INSTANCE_CREATE == eventType || TASK_INSTANCE_UPDATE == eventType
+        || TASK_INSTANCE_MIGRATE == eventType || TASK_INSTANCE_COMPLETE == eventType
         || TASK_INSTANCE_DELETE == eventType
 
-        || ACTIVITY_INSTANCE_START == eventType
-        || ACTIVITY_INSTANCE_UPDATE == eventType
-        || ACTIVITY_INSTANCE_MIGRATE == eventType
-        || ACTIVITY_INSTANCE_END == eventType
+        || ACTIVITY_INSTANCE_START == eventType || ACTIVITY_INSTANCE_UPDATE == eventType
+        || ACTIVITY_INSTANCE_MIGRATE == eventType || ACTIVITY_INSTANCE_END == eventType
 
-        || CASE_INSTANCE_CREATE == eventType
-        || CASE_INSTANCE_UPDATE == eventType
+        || CASE_INSTANCE_CREATE == eventType || CASE_INSTANCE_UPDATE == eventType
         || CASE_INSTANCE_CLOSE == eventType
 
-        || CASE_ACTIVITY_INSTANCE_CREATE == eventType
-        || CASE_ACTIVITY_INSTANCE_UPDATE == eventType
-        || CASE_ACTIVITY_INSTANCE_END == eventType
-    ;
+        || CASE_ACTIVITY_INSTANCE_CREATE == eventType || CASE_ACTIVITY_INSTANCE_UPDATE == eventType
+        || CASE_ACTIVITY_INSTANCE_END == eventType;
   }
 
 }

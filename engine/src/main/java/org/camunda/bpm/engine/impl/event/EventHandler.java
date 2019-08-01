@@ -26,6 +26,7 @@ public interface EventHandler {
 
   public String getEventHandlerType();
 
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, Object localPayload, String businessKey, CommandContext commandContext);
+  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload,
+      Object localPayload, String businessKey, CommandContext commandContext);
 
 }

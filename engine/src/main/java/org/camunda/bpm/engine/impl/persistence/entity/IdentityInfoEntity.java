@@ -24,17 +24,16 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.identity.Account;
 
-
 /**
  * @author Tom Baeyens
  */
 public class IdentityInfoEntity implements DbEntity, HasDbRevision, Account, Serializable {
-  
+
   private static final long serialVersionUID = 1L;
-  
+
   public static final String TYPE_USERACCOUNT = "account";
   public static final String TYPE_USERINFO = "userinfo";
-  
+
   protected String id;
   protected int revision;
   protected String type;
@@ -52,11 +51,11 @@ public class IdentityInfoEntity implements DbEntity, HasDbRevision, Account, Ser
     persistentState.put("password", passwordBytes);
     return persistentState;
   }
-  
+
   public int getRevisionNext() {
-    return revision+1;
+    return revision + 1;
   }
-  
+
   public String getId() {
     return id;
   }
@@ -64,7 +63,7 @@ public class IdentityInfoEntity implements DbEntity, HasDbRevision, Account, Ser
   public void setId(String id) {
     this.id = id;
   }
-  
+
   public int getRevision() {
     return revision;
   }
@@ -76,19 +75,19 @@ public class IdentityInfoEntity implements DbEntity, HasDbRevision, Account, Ser
   public String getType() {
     return type;
   }
-  
+
   public void setType(String type) {
     this.type = type;
   }
-  
+
   public String getUserId() {
     return userId;
   }
-  
+
   public void setUserId(String userId) {
     this.userId = userId;
   }
-  
+
   public String getKey() {
     return key;
   }
@@ -112,11 +111,11 @@ public class IdentityInfoEntity implements DbEntity, HasDbRevision, Account, Ser
   public void setPasswordBytes(byte[] passwordBytes) {
     this.passwordBytes = passwordBytes;
   }
-  
+
   public String getPassword() {
     return password;
   }
-  
+
   public void setPassword(String password) {
     this.password = password;
   }
@@ -136,27 +135,19 @@ public class IdentityInfoEntity implements DbEntity, HasDbRevision, Account, Ser
   public void setParentId(String parentId) {
     this.parentId = parentId;
   }
-  
+
   public Map<String, String> getDetails() {
     return details;
   }
-  
+
   public void setDetails(Map<String, String> details) {
     this.details = details;
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", revision=" + revision
-           + ", type=" + type
-           + ", userId=" + userId
-           + ", key=" + key
-           + ", value=" + value
-           + ", password=" + password
-           + ", parentId=" + parentId
-           + ", details=" + details
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", revision=" + revision + ", type="
+        + type + ", userId=" + userId + ", key=" + key + ", value=" + value + ", password="
+        + password + ", parentId=" + parentId + ", details=" + details + "]";
   }
 }

@@ -21,7 +21,9 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * <p>This atomic operation simply fires the activity end event</p>
+ * <p>
+ * This atomic operation simply fires the activity end event
+ * </p>
  *
  * @author Daniel Meyer
  *

@@ -48,8 +48,10 @@ import org.camunda.bpm.model.cmmn.instance.Task;
 public class CmmnHistoryTransformListener implements CmmnTransformListener {
 
   // Cached listeners
-  // listeners can be reused for a given process engine instance but cannot be cached in static fields since
-  // different process engine instances on the same Classloader may have different HistoryEventProducer
+  // listeners can be reused for a given process engine instance but cannot be cached in static
+  // fields since
+  // different process engine instances on the same Classloader may have different
+  // HistoryEventProducer
   // configurations wired
   protected CaseExecutionListener CASE_INSTANCE_CREATE_LISTENER;
   protected CaseExecutionListener CASE_INSTANCE_UPDATE_LISTENER;
@@ -71,30 +73,38 @@ public class CmmnHistoryTransformListener implements CmmnTransformListener {
     CASE_INSTANCE_UPDATE_LISTENER = new CaseInstanceUpdateListener(historyEventProducer);
     CASE_INSTANCE_CLOSE_LISTENER = new CaseInstanceCloseListener(historyEventProducer);
 
-    CASE_ACTIVITY_INSTANCE_CREATE_LISTENER = new CaseActivityInstanceCreateListener(historyEventProducer);
-    CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER = new CaseActivityInstanceUpdateListener(historyEventProducer);
+    CASE_ACTIVITY_INSTANCE_CREATE_LISTENER = new CaseActivityInstanceCreateListener(
+        historyEventProducer);
+    CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER = new CaseActivityInstanceUpdateListener(
+        historyEventProducer);
     CASE_ACTIVITY_INSTANCE_END_LISTENER = new CaseActivityInstanceEndListener(historyEventProducer);
   }
 
-  public void transformRootElement(Definitions definitions, List<? extends CmmnCaseDefinition> caseDefinitions) {
+  public void transformRootElement(Definitions definitions,
+      List<? extends CmmnCaseDefinition> caseDefinitions) {
   }
 
   public void transformCase(Case element, CmmnCaseDefinition caseDefinition) {
   }
 
-  public void transformCasePlanModel(org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel, CmmnActivity caseActivity) {
-    transformCasePlanModel((org.camunda.bpm.model.cmmn.instance.CasePlanModel) casePlanModel, caseActivity);
+  public void transformCasePlanModel(
+      org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel,
+      CmmnActivity caseActivity) {
+    transformCasePlanModel((org.camunda.bpm.model.cmmn.instance.CasePlanModel) casePlanModel,
+        caseActivity);
   }
 
   public void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity caseActivity) {
     addCasePlanModelHandlers(caseActivity);
   }
 
-  public void transformHumanTask(PlanItem planItem, HumanTask humanTask, CmmnActivity caseActivity) {
+  public void transformHumanTask(PlanItem planItem, HumanTask humanTask,
+      CmmnActivity caseActivity) {
     addTaskOrStageHandlers(caseActivity);
   }
 
-  public void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity caseActivity) {
+  public void transformProcessTask(PlanItem planItem, ProcessTask processTask,
+      CmmnActivity caseActivity) {
     addTaskOrStageHandlers(caseActivity);
   }
 
@@ -102,7 +112,8 @@ public class CmmnHistoryTransformListener implements CmmnTransformListener {
     addTaskOrStageHandlers(caseActivity);
   }
 
-  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity caseActivity) {
+  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask,
+      CmmnActivity caseActivity) {
     addTaskOrStageHandlers(caseActivity);
   }
 
@@ -114,11 +125,13 @@ public class CmmnHistoryTransformListener implements CmmnTransformListener {
     addTaskOrStageHandlers(caseActivity);
   }
 
-  public void transformMilestone(PlanItem planItem, Milestone milestone, CmmnActivity caseActivity) {
+  public void transformMilestone(PlanItem planItem, Milestone milestone,
+      CmmnActivity caseActivity) {
     addEventListenerOrMilestoneHandlers(caseActivity);
   }
 
-  public void transformEventListener(PlanItem planItem, EventListener eventListener, CmmnActivity caseActivity) {
+  public void transformEventListener(PlanItem planItem, EventListener eventListener,
+      CmmnActivity caseActivity) {
     addEventListenerOrMilestoneHandlers(caseActivity);
   }
 
@@ -149,12 +162,14 @@ public class CmmnHistoryTransformListener implements CmmnTransformListener {
   protected void addTaskOrStageHandlers(CmmnActivity caseActivity) {
     ensureHistoryLevelInitialized();
     if (caseActivity != null) {
-      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_CREATE, null)) {
+      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_CREATE,
+          null)) {
         for (String event : ItemHandler.TASK_OR_STAGE_CREATE_EVENTS) {
           caseActivity.addBuiltInListener(event, CASE_ACTIVITY_INSTANCE_CREATE_LISTENER);
         }
       }
-      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE, null)) {
+      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE,
+          null)) {
         for (String event : ItemHandler.TASK_OR_STAGE_UPDATE_EVENTS) {
           caseActivity.addBuiltInListener(event, CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER);
         }
@@ -170,12 +185,14 @@ public class CmmnHistoryTransformListener implements CmmnTransformListener {
   protected void addEventListenerOrMilestoneHandlers(CmmnActivity caseActivity) {
     ensureHistoryLevelInitialized();
     if (caseActivity != null) {
-      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_CREATE, null)) {
+      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_CREATE,
+          null)) {
         for (String event : ItemHandler.EVENT_LISTENER_OR_MILESTONE_CREATE_EVENTS) {
           caseActivity.addBuiltInListener(event, CASE_ACTIVITY_INSTANCE_CREATE_LISTENER);
         }
       }
-      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE, null)) {
+      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE,
+          null)) {
         for (String event : ItemHandler.EVENT_LISTENER_OR_MILESTONE_UPDATE_EVENTS) {
           caseActivity.addBuiltInListener(event, CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER);
         }
@@ -187,7 +204,7 @@ public class CmmnHistoryTransformListener implements CmmnTransformListener {
       }
     }
   }
-  
+
   protected void ensureHistoryLevelInitialized() {
     if (historyLevel == null) {
       historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();

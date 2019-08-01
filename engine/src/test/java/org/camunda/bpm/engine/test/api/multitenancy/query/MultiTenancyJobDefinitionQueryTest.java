@@ -36,12 +36,8 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
 
   @Override
   protected void setUp() {
-    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-        .timerWithDuration("PT1M")
-      .userTask()
-      .endEvent()
-      .done();
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .timerWithDuration("PT1M").userTask().endEvent().done();
 
     deployment(process);
     deploymentForTenant(TENANT_ONE, process);
@@ -52,68 +48,53 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
   }
 
   public void testQueryNoTenantIdSet() {
-    JobDefinitionQuery query = managementService
-        .createJobDefinitionQuery();
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
-    JobDefinitionQuery query = managementService
-        .createJobDefinitionQuery()
-        .tenantIdIn(TENANT_ONE);
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery().tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = managementService
-        .createJobDefinitionQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = managementService.createJobDefinitionQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    JobDefinitionQuery query = managementService
-        .createJobDefinitionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO);
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery().tenantIdIn(TENANT_ONE,
+        TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByDefinitionsWithoutTenantIds() {
-    JobDefinitionQuery query = managementService
-        .createJobDefinitionQuery()
-        .withoutTenantId();
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery().withoutTenantId();
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIdsIncludeDefinitionsWithoutTenantId() {
-    JobDefinitionQuery query = managementService
-        .createJobDefinitionQuery()
-        .tenantIdIn(TENANT_ONE)
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery().tenantIdIn(TENANT_ONE)
         .includeJobDefinitionsWithoutTenantId();
 
     assertThat(query.count(), is(2L));
 
-    query = managementService
-        .createJobDefinitionQuery()
-        .tenantIdIn(TENANT_TWO)
+    query = managementService.createJobDefinitionQuery().tenantIdIn(TENANT_TWO)
         .includeJobDefinitionsWithoutTenantId();
 
     assertThat(query.count(), is(2L));
 
-    query = managementService
-        .createJobDefinitionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
+    query = managementService.createJobDefinitionQuery().tenantIdIn(TENANT_ONE, TENANT_TWO)
         .includeJobDefinitionsWithoutTenantId();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    JobDefinitionQuery query = managementService
-        .createJobDefinitionQuery()
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -121,8 +102,7 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
 
   public void testFailQueryByTenantIdNull() {
     try {
-      managementService.createJobDefinitionQuery()
-        .tenantIdIn((String) null);
+      managementService.createJobDefinitionQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -132,10 +112,7 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
   public void testQuerySortingAsc() {
     // exclude job definitions without tenant id because of database-specific ordering
     List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc().list();
 
     assertThat(jobDefinitions.size(), is(2));
     assertThat(jobDefinitions.get(0).getTenantId(), is(TENANT_ONE));
@@ -145,10 +122,7 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
   public void testQuerySortingDesc() {
     // exclude job definitions without tenant id because of database-specific ordering
     List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .desc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().desc().list();
 
     assertThat(jobDefinitions.size(), is(2));
     assertThat(jobDefinitions.get(0).getTenantId(), is(TENANT_TWO));
@@ -170,7 +144,9 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
     assertThat(query.count(), is(2L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeJobDefinitionsWithoutTenantId().count(), is(2L));
+    assertThat(
+        query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeJobDefinitionsWithoutTenantId().count(),
+        is(2L));
   }
 
   public void testQueryAuthenticatedTenants() {

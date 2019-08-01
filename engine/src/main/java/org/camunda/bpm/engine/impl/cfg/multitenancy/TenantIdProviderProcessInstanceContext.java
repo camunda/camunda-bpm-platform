@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
- * Provides information about a starting process instance to a {@link TenantIdProvider} implementation.
+ * Provides information about a starting process instance to a {@link TenantIdProvider}
+ * implementation.
  *
  * @author Daniel Meyer
  * @since 7.5
@@ -37,17 +38,20 @@ public class TenantIdProviderProcessInstanceContext {
 
   protected DelegateCaseExecution superCaseExecution;
 
-  public TenantIdProviderProcessInstanceContext(ProcessDefinition processDefinition, VariableMap variables) {
+  public TenantIdProviderProcessInstanceContext(ProcessDefinition processDefinition,
+      VariableMap variables) {
     this.processDefinition = processDefinition;
     this.variables = variables;
   }
 
-  public TenantIdProviderProcessInstanceContext(ProcessDefinition processDefinition, VariableMap variables, DelegateExecution superExecution) {
+  public TenantIdProviderProcessInstanceContext(ProcessDefinition processDefinition,
+      VariableMap variables, DelegateExecution superExecution) {
     this(processDefinition, variables);
     this.superExecution = superExecution;
   }
 
-  public TenantIdProviderProcessInstanceContext(ProcessDefinition processDefinition, VariableMap variables, DelegateCaseExecution superCaseExecution) {
+  public TenantIdProviderProcessInstanceContext(ProcessDefinition processDefinition,
+      VariableMap variables, DelegateCaseExecution superCaseExecution) {
     this(processDefinition, variables);
     this.superCaseExecution = superCaseExecution;
   }
@@ -67,16 +71,18 @@ public class TenantIdProviderProcessInstanceContext {
   }
 
   /**
-   * @return the super execution. Null if the starting process instance is a root process instance and not started using a call activity.
-   * If the process instance is started using a call activity, this method returns the execution in the super process
-   * instance executing the call activity.
+   * @return the super execution. Null if the starting process instance is a root process instance
+   *         and not started using a call activity. If the process instance is started using a call
+   *         activity, this method returns the execution in the super process instance executing the
+   *         call activity.
    */
   public DelegateExecution getSuperExecution() {
     return superExecution;
   }
 
   /**
-   * @return the super case execution. Null if the starting process instance is not a sub process instance started using a CMMN case task.
+   * @return the super case execution. Null if the starting process instance is not a sub process
+   *         instance started using a CMMN case task.
    */
   public DelegateCaseExecution getSuperCaseExecution() {
     return superCaseExecution;

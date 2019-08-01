@@ -27,13 +27,14 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 public class NotifyAcquisitionRejectedJobsHandler implements RejectedJobsHandler {
 
   @Override
-  public void jobsRejected(List<String> jobIds, ProcessEngineImpl processEngine, JobExecutor jobExecutor) {
+  public void jobsRejected(List<String> jobIds, ProcessEngineImpl processEngine,
+      JobExecutor jobExecutor) {
     AcquireJobsRunnable acquireJobsRunnable = jobExecutor.getAcquireJobsRunnable();
     if (acquireJobsRunnable instanceof SequentialJobAcquisitionRunnable) {
-      JobAcquisitionContext context = ((SequentialJobAcquisitionRunnable) acquireJobsRunnable).getAcquisitionContext();
+      JobAcquisitionContext context = ((SequentialJobAcquisitionRunnable) acquireJobsRunnable)
+          .getAcquisitionContext();
       context.submitRejectedBatch(processEngine.getName(), jobIds);
-    }
-    else {
+    } else {
       jobExecutor.getExecuteJobsRunnable(jobIds, processEngine).run();
     }
 

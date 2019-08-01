@@ -48,10 +48,7 @@ public class ExternalTaskConditionsTest {
   private String deploymentId;
 
   private final BpmnModelInstance testProcess = Bpmn.createExecutableProcess("theProcess")
-    .startEvent()
-    .serviceTask("theTask")
-        .camundaExternalTask("theTopic")
-    .done();
+      .startEvent().serviceTask("theTask").camundaExternalTask("theTopic").done();
 
   @Before
   public void setUp() {
@@ -60,11 +57,8 @@ public class ExternalTaskConditionsTest {
 
     ProcessEngineImpl.EXT_TASK_CONDITIONS.addConsumer(condition);
 
-    deploymentId = rule.getRepositoryService()
-        .createDeployment()
-        .addModelInstance("process.bpmn", testProcess)
-        .deploy()
-        .getId();
+    deploymentId = rule.getRepositoryService().createDeployment()
+        .addModelInstance("process.bpmn", testProcess).deploy().getId();
   }
 
   @After
@@ -81,8 +75,7 @@ public class ExternalTaskConditionsTest {
   public void shouldSignalConditionOnTaskCreate() {
 
     // when
-    rule.getRuntimeService()
-      .startProcessInstanceByKey("theProcess");
+    rule.getRuntimeService().startProcessInstanceByKey("theProcess");
 
     // then
     verify(condition, times(1)).signal();
@@ -92,10 +85,8 @@ public class ExternalTaskConditionsTest {
   public void shouldSignalConditionOnTaskCreateMultipleTimes() {
 
     // when
-    rule.getRuntimeService()
-      .startProcessInstanceByKey("theProcess");
-    rule.getRuntimeService()
-      .startProcessInstanceByKey("theProcess");
+    rule.getRuntimeService().startProcessInstanceByKey("theProcess");
+    rule.getRuntimeService().startProcessInstanceByKey("theProcess");
 
     // then
     verify(condition, times(2)).signal();
@@ -106,15 +97,12 @@ public class ExternalTaskConditionsTest {
 
     // given
 
-    rule.getRuntimeService()
-      .startProcessInstanceByKey("theProcess");
+    rule.getRuntimeService().startProcessInstanceByKey("theProcess");
 
     reset(condition); // clear signal for create
 
     LockedExternalTask lockedTask = rule.getExternalTaskService().fetchAndLock(1, "theWorker")
-      .topic("theTopic", 10000)
-      .execute()
-      .get(0);
+        .topic("theTopic", 10000).execute().get(0);
 
     // when
     rule.getExternalTaskService().unlock(lockedTask.getId());

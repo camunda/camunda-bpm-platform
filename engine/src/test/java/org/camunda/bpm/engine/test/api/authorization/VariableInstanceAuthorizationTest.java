@@ -46,7 +46,8 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
-    ensureSpecificVariablePermission = processEngineConfiguration.isEnforceSpecificVariablePermission();
+    ensureSpecificVariablePermission = processEngineConfiguration
+        .isEnforceSpecificVariablePermission();
     super.setUp();
   }
 
@@ -54,7 +55,8 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
-    processEngineConfiguration.setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
+    processEngineConfiguration
+        .setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   public void testProcessVariableQueryWithoutAuthorization() {
@@ -68,7 +70,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
-  public void testCaseVariableQueryWithoutAuthorization () {
+  public void testCaseVariableQueryWithoutAuthorization() {
     // given
     createCaseInstanceByKey(CASE_KEY, getVariables());
 
@@ -79,7 +81,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 1);
   }
 
-  public void testProcessLocalTaskVariableQueryWithoutAuthorization () {
+  public void testProcessLocalTaskVariableQueryWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -92,7 +94,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
   }
 
-  public void testCaseLocalTaskVariableQueryWithoutAuthorization () {
+  public void testCaseLocalTaskVariableQueryWithoutAuthorization() {
     // given
     createCaseInstanceByKey(CASE_KEY);
     String taskId = selectSingleTask().getId();
@@ -381,7 +383,8 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     createTask(taskId);
     setTaskVariable(taskId, VARIABLE_NAME, VARIABLE_VALUE);
 
-    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getProcessInstanceId();
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables())
+        .getProcessInstanceId();
 
     createCaseInstanceByKey(CASE_KEY, getVariables());
 

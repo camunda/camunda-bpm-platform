@@ -19,9 +19,9 @@ package org.camunda.bpm.engine.impl.context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
-
 /**
- * An {@link ExecutionEntity} execution context. Provides access to the process instance and the deployment.
+ * An {@link ExecutionEntity} execution context. Provides access to the process instance and the
+ * deployment.
  *
  * @deprecated since 7.2: use {@link BpmnExecutionContext}
  *

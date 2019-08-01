@@ -40,7 +40,8 @@ public class ActivityInstanceVerification extends Assert implements ExecutionLis
     String executionId;
     boolean isCompleteScope;
 
-    public ActivityInstance(String executionId, String actInstanceId, String parentId, boolean isCompleteScope) {
+    public ActivityInstance(String executionId, String actInstanceId, String parentId,
+        boolean isCompleteScope) {
       this.id = actInstanceId;
       this.executionId = executionId;
       this.parentId = parentId;
@@ -49,7 +50,7 @@ public class ActivityInstanceVerification extends Assert implements ExecutionLis
 
     @Override
     public String toString() {
-      return id + " by "+executionId + " parent: "+parentId;
+      return id + " by " + executionId + " parent: " + parentId;
     }
 
   }
@@ -61,20 +62,21 @@ public class ActivityInstanceVerification extends Assert implements ExecutionLis
 
     final ActivityExecution execution = (ActivityExecution) e;
 
-    if(execution.getActivityInstanceId() == null) {
+    if (execution.getActivityInstanceId() == null) {
       return;
     }
 
-    if(execution.getEventName().equals(EVENTNAME_START)) {
+    if (execution.getEventName().equals(EVENTNAME_START)) {
       addActivityInstanceId(execution, startedActivityInstances);
 
-    } else if(execution.getEventName().equals(EVENTNAME_END)) {
+    } else if (execution.getEventName().equals(EVENTNAME_END)) {
       addActivityInstanceId(execution, endedActivityInstances);
     }
 
   }
 
-  private void addActivityInstanceId(ActivityExecution execution, Map<String, List<ActivityInstance>> instanceMap) {
+  private void addActivityInstanceId(ActivityExecution execution,
+      Map<String, List<ActivityInstance>> instanceMap) {
 
     String actId = execution.getActivity().getId();
     String actInstanceId = execution.getActivityInstanceId();
@@ -83,11 +85,12 @@ public class ActivityInstanceVerification extends Assert implements ExecutionLis
 
     // add to instance map
     List<ActivityInstance> instancesForThisAct = instanceMap.get(actId);
-    if(instancesForThisAct == null) {
+    if (instancesForThisAct == null) {
       instancesForThisAct = new ArrayList<ActivityInstance>();
       instanceMap.put(actId, instancesForThisAct);
     }
-    ActivityInstance activityInstance = new ActivityInstance(executionId, actInstanceId, parentActInstanceId, execution.isCompleteScope());
+    ActivityInstance activityInstance = new ActivityInstance(executionId, actInstanceId,
+        parentActInstanceId, execution.isCompleteScope());
     instancesForThisAct.add(activityInstance);
   }
 
@@ -108,19 +111,23 @@ public class ActivityInstanceVerification extends Assert implements ExecutionLis
 
     for (ActivityInstance startedActInstance : startInstancesForThisAct) {
 
-      assertNotNull("activityInstanceId cannot be null for "+startedActInstance, startedActInstance.id);
-      assertNotNull("executionId cannot be null for "+startedActInstance, startedActInstance.executionId);
-      assertNotNull("parentId cannot be null for "+startedActInstance, startedActInstance.parentId);
+      assertNotNull("activityInstanceId cannot be null for " + startedActInstance,
+          startedActInstance.id);
+      assertNotNull("executionId cannot be null for " + startedActInstance,
+          startedActInstance.executionId);
+      assertNotNull("parentId cannot be null for " + startedActInstance,
+          startedActInstance.parentId);
 
       boolean foundMatchingEnd = false;
       for (ActivityInstance endedActInstance : endInstancesForThisAct) {
-        if(startedActInstance.id.equals(endedActInstance.id)) {
+        if (startedActInstance.id.equals(endedActInstance.id)) {
           assertEquals(startedActInstance.parentId, endedActInstance.parentId);
           foundMatchingEnd = true;
         }
       }
-      if(!foundMatchingEnd) {
-        fail("cannot find matching end activity instance for start activity instance "+startedActInstance.id);
+      if (!foundMatchingEnd) {
+        fail("cannot find matching end activity instance for start activity instance "
+            + startedActInstance.id);
       }
     }
   }
@@ -150,12 +157,13 @@ public class ActivityInstanceVerification extends Assert implements ExecutionLis
     for (ActivityInstance activityInstance : actInstanceList) {
       boolean found = false;
       for (ActivityInstance parentIntance : parentInstances) {
-        if(activityInstance.parentId.equals(parentIntance.id)) {
+        if (activityInstance.parentId.equals(parentIntance.id)) {
           found = true;
         }
       }
-      if(!found) {
-        fail("every instance of '"+actId+"' must have a parent which is an instance of '"+parentId);
+      if (!found) {
+        fail("every instance of '" + actId + "' must have a parent which is an instance of '"
+            + parentId);
       }
     }
   }
@@ -176,7 +184,8 @@ public class ActivityInstanceVerification extends Assert implements ExecutionLis
     assertCorrectCompletingState(activityId, count, false);
   }
 
-  private void assertCorrectCompletingState(String activityId, int expectedCount, boolean completing) {
+  private void assertCorrectCompletingState(String activityId, int expectedCount,
+      boolean completing) {
     List<ActivityInstance> endActivityInstances = endedActivityInstances.get(activityId);
     assertNotNull(endActivityInstances);
 

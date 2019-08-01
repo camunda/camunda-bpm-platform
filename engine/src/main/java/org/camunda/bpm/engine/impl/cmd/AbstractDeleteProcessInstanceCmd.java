@@ -43,8 +43,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 /**
  * Created by aakhmerov on 16.09.16.
  * <p>
- * Provide common logic for process instance deletion operations.
- * Permissions checking and single process instance removal included.
+ * Provide common logic for process instance deletion operations. Permissions checking and single
+ * process instance removal included.
  */
 public abstract class AbstractDeleteProcessInstanceCmd {
 
@@ -54,41 +54,41 @@ public abstract class AbstractDeleteProcessInstanceCmd {
   protected boolean skipSubprocesses;
   protected boolean failIfNotExists = true;
 
-  protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+  protected void checkDeleteProcessInstance(ExecutionEntity execution,
+      CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkDeleteProcessInstance(execution);
     }
   }
 
-  protected void deleteProcessInstance(
-      final CommandContext commandContext,
-      String processInstanceId,
-      final String deleteReason,
-      final boolean skipCustomListeners,
-      boolean externallyTerminated,
-      final boolean skipIoMappings,
-      boolean skipSubprocesses) {
-    ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId", processInstanceId);
+  protected void deleteProcessInstance(final CommandContext commandContext,
+      String processInstanceId, final String deleteReason, final boolean skipCustomListeners,
+      boolean externallyTerminated, final boolean skipIoMappings, boolean skipSubprocesses) {
+    ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId",
+        processInstanceId);
 
     // fetch process instance
     ExecutionManager executionManager = commandContext.getExecutionManager();
     final ExecutionEntity execution = executionManager.findExecutionById(processInstanceId);
 
-    if(!failIfNotExists && execution == null) {
+    if (!failIfNotExists && execution == null) {
       return;
     }
 
-    ensureNotNull(BadUserRequestException.class, "No process instance found for id '" + processInstanceId + "'", "processInstance", execution);
+    ensureNotNull(BadUserRequestException.class,
+        "No process instance found for id '" + processInstanceId + "'", "processInstance",
+        execution);
 
     checkDeleteProcessInstance(execution, commandContext);
 
     // delete process instance
-    commandContext
-        .getExecutionManager()
-        .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses);
+    commandContext.getExecutionManager().deleteProcessInstance(processInstanceId, deleteReason,
+        false, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses);
 
     if (skipSubprocesses) {
-      List<ProcessInstance> superProcesslist = commandContext.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery()
+      List<ProcessInstance> superProcesslist = commandContext.getProcessEngineConfiguration()
+          .getRuntimeService().createProcessInstanceQuery()
           .superProcessInstanceId(processInstanceId).list();
       triggerHistoryEvent(superProcesslist);
     }
@@ -97,8 +97,9 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     if (superExecution != null) {
       commandContext.runWithoutAuthorization(new Callable<Void>() {
         public Void call() {
-          ProcessInstanceModificationBuilderImpl builder = (ProcessInstanceModificationBuilderImpl) new ProcessInstanceModificationBuilderImpl(commandContext, superExecution.getProcessInstanceId(), deleteReason)
-            .cancelActivityInstance(superExecution.getActivityInstanceId());
+          ProcessInstanceModificationBuilderImpl builder = (ProcessInstanceModificationBuilderImpl) new ProcessInstanceModificationBuilderImpl(
+              commandContext, superExecution.getProcessInstanceId(), deleteReason)
+                  .cancelActivityInstance(superExecution.getActivityInstanceId());
           builder.execute(false, skipCustomListeners, skipIoMappings);
           return null;
         }
@@ -107,9 +108,9 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     }
 
     // create user operation log
-    commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
-            null, null, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId, null, null,
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
   }
 
   public void triggerHistoryEvent(List<ProcessInstance> subProcesslist) {
@@ -119,7 +120,8 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     for (final ProcessInstance processInstance : subProcesslist) {
       // TODO: This smells bad, as the rest of the history is done via the
       // ParseListener
-      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, processInstance)) {
+      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE,
+          processInstance)) {
 
         HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
           @Override

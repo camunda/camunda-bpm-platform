@@ -24,7 +24,9 @@ import java.util.Map.Entry;
 import org.camunda.bpm.engine.impl.form.engine.HtmlDocumentBuilder.HtmlWriteContext;
 
 /**
- * <p>Simple writer for html elements. Used by the {@link HtmlDocumentBuilder}.</p>
+ * <p>
+ * Simple writer for html elements. Used by the {@link HtmlDocumentBuilder}.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -33,9 +35,10 @@ public class HtmlElementWriter {
 
   protected String tagName;
 
-  /** selfClosing means that the element should not be rendered as a
-   * start + end tag pair but as a single tag using "/" to close the tag
-   * inline */
+  /**
+   * selfClosing means that the element should not be rendered as a start + end tag pair but as a
+   * single tag using "/" to close the tag inline
+   */
   protected boolean isSelfClosing;
   protected String textContent;
   protected Map<String, String> attributes = new LinkedHashMap<String, String>();
@@ -59,7 +62,7 @@ public class HtmlElementWriter {
   }
 
   public void writeContent(HtmlWriteContext context) {
-    if(textContent != null) {
+    if (textContent != null) {
       writeLeadingWhitespace(context);
       writeTextContent(context);
       writeEndLine(context);
@@ -67,7 +70,7 @@ public class HtmlElementWriter {
   }
 
   public void writeEndTag(HtmlWriteContext context) {
-    if(!isSelfClosing) {
+    if (!isSelfClosing) {
       writeLeadingWhitespace(context);
       writeEndTagElement(context);
       writeEndLine(context);
@@ -98,7 +101,7 @@ public class HtmlElementWriter {
     for (Entry<String, String> attribute : attributes.entrySet()) {
       writer.write(" ");
       writer.write(attribute.getKey());
-      if(attribute.getValue() != null) {
+      if (attribute.getValue() != null) {
         writer.write("=\"");
         String attributeValue = escapeQuotes(attribute.getValue());
         writer.write(attributeValue);
@@ -107,7 +110,7 @@ public class HtmlElementWriter {
     }
   }
 
-  protected String escapeQuotes(String attributeValue){
+  protected String escapeQuotes(String attributeValue) {
     String escapedHtmlQuote = "&quot;";
     String escapedJavaQuote = "\"";
     return attributeValue.replaceAll(escapedJavaQuote, escapedHtmlQuote);
@@ -120,7 +123,7 @@ public class HtmlElementWriter {
 
   protected void writeStartTagClose(HtmlWriteContext context) {
     StringWriter writer = context.getWriter();
-    if(isSelfClosing) {
+    if (isSelfClosing) {
       writer.write(" /");
     }
     writer.write(">");
@@ -142,7 +145,7 @@ public class HtmlElementWriter {
   }
 
   public HtmlElementWriter textContent(String text) {
-    if(isSelfClosing) {
+    if (isSelfClosing) {
       throw new IllegalStateException("Self-closing element cannot have text content.");
     }
     this.textContent = text;

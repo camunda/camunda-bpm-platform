@@ -36,7 +36,8 @@ public class ActivateBatchCmd extends AbstractSetBatchStateCmd {
     checker.checkActivateBatch(batch);
   }
 
-  protected AbstractSetJobDefinitionStateCmd createSetJobDefinitionStateCommand(UpdateJobDefinitionSuspensionStateBuilderImpl builder) {
+  protected AbstractSetJobDefinitionStateCmd createSetJobDefinitionStateCommand(
+      UpdateJobDefinitionSuspensionStateBuilderImpl builder) {
     return new ActivateJobDefinitionCmd(builder);
   }
 

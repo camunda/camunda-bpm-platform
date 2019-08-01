@@ -29,12 +29,12 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
-  
+
   /**
    * The reported worker id.
    */
   protected String workerId;
-  
+
   public HandleExternalTaskCmd(String externalTaskId, String workerId) {
     super(externalTaskId);
     this.workerId = workerId;
@@ -42,33 +42,36 @@ public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
 
   @Override
   public Void execute(CommandContext commandContext) {
-    validateInput();    
+    validateInput();
 
-    ExternalTaskEntity externalTask = commandContext.getExternalTaskManager().findExternalTaskById(externalTaskId);
+    ExternalTaskEntity externalTask = commandContext.getExternalTaskManager()
+        .findExternalTaskById(externalTaskId);
     EnsureUtil.ensureNotNull(NotFoundException.class,
         "Cannot find external task with id " + externalTaskId, "externalTask", externalTask);
 
-    if (!workerId.equals(externalTask.getWorkerId())) {      
-      throw new BadUserRequestException(getErrorMessageOnWrongWorkerAccess() + "'. It is locked by worker '" + externalTask.getWorkerId() + "'.");
+    if (!workerId.equals(externalTask.getWorkerId())) {
+      throw new BadUserRequestException(getErrorMessageOnWrongWorkerAccess()
+          + "'. It is locked by worker '" + externalTask.getWorkerId() + "'.");
     }
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
     }
-    
+
     execute(externalTask);
-    
+
     return null;
   }
-  
+
   /**
-   * Returns the error message. Which is used to create an specific message
-   *  for the BadUserRequestException if an worker has no rights to execute commands of the external task.
+   * Returns the error message. Which is used to create an specific message for the
+   * BadUserRequestException if an worker has no rights to execute commands of the external task.
    * 
    * @return the specific error message
    */
   public abstract String getErrorMessageOnWrongWorkerAccess();
-    
+
   /**
    * Validates the current input of the command.
    */

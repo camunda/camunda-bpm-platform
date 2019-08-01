@@ -35,18 +35,16 @@ import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
 import org.camunda.bpm.engine.test.mock.MockElResolver;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
-
 /**
  * <p>
  * Central manager for all expressions.
  * </p>
  * <p>
- * Process parsers will use this to build expression objects that are stored in
- * the process definitions.
+ * Process parsers will use this to build expression objects that are stored in the process
+ * definitions.
  * </p>
  * <p>
- * Then also this class is used as an entry point for runtime evaluation of the
- * expressions.
+ * Then also this class is used as an entry point for runtime evaluation of the expressions.
  * </p>
  *
  * @author Tom Baeyens
@@ -54,7 +52,6 @@ import org.camunda.bpm.engine.variable.context.VariableContext;
  * @author Frederik Heremans
  */
 public class ExpressionManager {
-
 
   protected List<FunctionMapper> functionMappers = new ArrayList<FunctionMapper>();
   protected ExpressionFactory expressionFactory;
@@ -68,7 +65,8 @@ public class ExpressionManager {
   }
 
   public ExpressionManager(Map<Object, Object> beans) {
-    // Use the ExpressionFactoryImpl built-in version of juel, with parametrised method expressions enabled
+    // Use the ExpressionFactoryImpl built-in version of juel, with parametrised method expressions
+    // enabled
     expressionFactory = new ExpressionFactoryImpl();
     this.beans = beans;
   }
@@ -93,10 +91,10 @@ public class ExpressionManager {
       elContext = variableScopeImpl.getCachedElContext();
     }
 
-    if (elContext==null) {
+    if (elContext == null) {
       elContext = createElContext(variableScope);
       if (variableScope instanceof AbstractVariableScope) {
-        ((AbstractVariableScope)variableScope).setCachedElContext(elContext);
+        ((AbstractVariableScope) variableScope).setCachedElContext(elContext);
       }
     }
 
@@ -121,7 +119,7 @@ public class ExpressionManager {
 
   protected ELResolver getCachedElResolver() {
     if (elResolver == null) {
-      synchronized(this) {
+      synchronized (this) {
         if (elResolver == null) {
           elResolver = createElResolver();
         }
@@ -137,7 +135,7 @@ public class ExpressionManager {
     elResolver.add(new VariableContextElResolver());
     elResolver.add(new MockElResolver());
 
-    if(beans != null) {
+    if (beans != null) {
       // ACT-1102: Also expose all beans in configuration when using standalone engine, not
       // in spring-context
       elResolver.add(new ReadOnlyMapELResolver(beans));

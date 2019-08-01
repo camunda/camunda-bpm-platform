@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.management.TablePageQuery;
 
-
 /**
  *
  * @author Joram Barrez
@@ -67,12 +66,12 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
   }
 
   protected void addOrder(String column, String sortOrder) {
-    if (order==null) {
+    if (order == null) {
       order = "";
     } else {
-      order = order+", ";
+      order = order + ", ";
     }
-    order = order+column+" "+sortOrder;
+    order = order + column + " " + sortOrder;
   }
 
   public TablePage listPage(int firstResult, int maxResults) {
@@ -83,9 +82,7 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
 
   public TablePage execute(CommandContext commandContext) {
     commandContext.getAuthorizationManager().checkCamundaAdmin();
-    return commandContext
-      .getTableDataManager()
-      .getTablePage(this, firstResult, maxResults);
+    return commandContext.getTableDataManager().getTablePage(this, firstResult, maxResults);
   }
 
   public String getOrder() {

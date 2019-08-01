@@ -213,7 +213,8 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     conditionExpression.setText("${test}");
 
     // set exitCriteria
@@ -247,7 +248,8 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
-    ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression1 = createElement(ifPart1, "def",
+        ConditionExpression.class);
     conditionExpression1.setText("${test}");
 
     // set first exitCriteria
@@ -257,7 +259,8 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
-    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
+    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl",
+        ConditionExpression.class);
     conditionExpression2.setText("${test}");
 
     // set second exitCriteria
@@ -269,8 +272,10 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     context.setParent(parent);
 
     // transform Sentry
-    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1, context);
-    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2, context);
+    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1,
+        context);
+    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2,
+        context);
 
     // when
     CmmnActivity newActivity = handler.handleElement(planItem, context);
@@ -293,7 +298,8 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     conditionExpression.setText("${test}");
 
     // set entryCriteria
@@ -327,7 +333,8 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
-    ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression1 = createElement(ifPart1, "def",
+        ConditionExpression.class);
     conditionExpression1.setText("${test}");
 
     // set first entryCriteria
@@ -337,7 +344,8 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
-    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
+    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl",
+        ConditionExpression.class);
     conditionExpression2.setText("${test}");
 
     // set second entryCriteria
@@ -349,8 +357,10 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     context.setParent(parent);
 
     // transform Sentry
-    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1, context);
-    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2, context);
+    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1,
+        context);
+    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2,
+        context);
 
     // when
     CmmnActivity newActivity = handler.handleElement(planItem, context);
@@ -373,7 +383,8 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     conditionExpression.setText("${test}");
 
     // set entry-/exitCriteria
@@ -407,8 +418,10 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testManualActivationRule() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
-    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1",
+        ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -426,8 +439,10 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testManualActivationRuleByDefaultPlanItemControl() {
     // given
     PlanItemControl defaultControl = createElement(task, "ItemControl_1", DefaultControl.class);
-    ManualActivationRule manualActivationRule = createElement(defaultControl, "ManualActivationRule_1", ManualActivationRule.class);
-    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    ManualActivationRule manualActivationRule = createElement(defaultControl,
+        "ManualActivationRule_1", ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -446,7 +461,8 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
     RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -465,7 +481,8 @@ public class TaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // given
     PlanItemControl defaultControl = createElement(task, "ItemControl_1", DefaultControl.class);
     RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);

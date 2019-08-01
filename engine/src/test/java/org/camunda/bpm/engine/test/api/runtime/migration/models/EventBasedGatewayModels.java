@@ -28,32 +28,16 @@ public class EventBasedGatewayModels {
   public static final String SIGNAL_NAME = "Signal";
 
   public static final BpmnModelInstance TIMER_EVENT_BASED_GW_PROCESS = ProcessModels.newModel()
-      .startEvent()
-      .eventBasedGateway()
-        .id("eventBasedGateway")
-      .intermediateCatchEvent("timerCatch")
-        .timerWithDuration("PT10M")
-      .userTask("afterTimerCatch")
-      .endEvent()
-      .done();
+      .startEvent().eventBasedGateway().id("eventBasedGateway").intermediateCatchEvent("timerCatch")
+      .timerWithDuration("PT10M").userTask("afterTimerCatch").endEvent().done();
 
   public static final BpmnModelInstance MESSAGE_EVENT_BASED_GW_PROCESS = ProcessModels.newModel()
-      .startEvent()
-      .eventBasedGateway()
-        .id("eventBasedGateway")
-      .intermediateCatchEvent("messageCatch")
-        .message(MESSAGE_NAME)
-        .userTask("afterMessageCatch")
-      .endEvent()
-      .done();
+      .startEvent().eventBasedGateway().id("eventBasedGateway")
+      .intermediateCatchEvent("messageCatch").message(MESSAGE_NAME).userTask("afterMessageCatch")
+      .endEvent().done();
 
   public static final BpmnModelInstance SIGNAL_EVENT_BASED_GW_PROCESS = ProcessModels.newModel()
-      .startEvent()
-      .eventBasedGateway()
-        .id("eventBasedGateway")
-      .intermediateCatchEvent("signalCatch")
-        .signal(SIGNAL_NAME)
-      .userTask("afterSignalCatch")
-      .endEvent()
-      .done();
+      .startEvent().eventBasedGateway().id("eventBasedGateway")
+      .intermediateCatchEvent("signalCatch").signal(SIGNAL_NAME).userTask("afterSignalCatch")
+      .endEvent().done();
 }

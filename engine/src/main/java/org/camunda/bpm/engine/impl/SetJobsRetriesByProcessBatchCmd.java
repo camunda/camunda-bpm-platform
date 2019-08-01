@@ -32,7 +32,8 @@ public class SetJobsRetriesByProcessBatchCmd extends AbstractSetJobsRetriesBatch
   protected final List<String> processInstanceIds;
   protected final ProcessInstanceQuery query;
 
-  public SetJobsRetriesByProcessBatchCmd(List<String> processInstanceIds, ProcessInstanceQuery query, int retries) {
+  public SetJobsRetriesByProcessBatchCmd(List<String> processInstanceIds,
+      ProcessInstanceQuery query, int retries) {
     this.processInstanceIds = processInstanceIds;
     this.query = query;
     this.retries = retries;
@@ -43,7 +44,7 @@ public class SetJobsRetriesByProcessBatchCmd extends AbstractSetJobsRetriesBatch
     List<String> collectedProcessInstanceIds = new ArrayList<String>();
 
     if (query != null) {
-      collectedProcessInstanceIds.addAll(((ProcessInstanceQueryImpl)query).listIds());
+      collectedProcessInstanceIds.addAll(((ProcessInstanceQueryImpl) query).listIds());
     }
 
     if (this.processInstanceIds != null) {

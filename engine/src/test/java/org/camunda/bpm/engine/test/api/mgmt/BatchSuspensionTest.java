@@ -92,8 +92,7 @@ public class BatchSuspensionTest {
 
   @After
   public void resetBatchJobsPerSeed() {
-    engineRule.getProcessEngineConfiguration()
-      .setBatchJobsPerSeed(defaultBatchJobsPerSeed);
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(defaultBatchJobsPerSeed);
   }
 
   @Test
@@ -114,9 +113,9 @@ public class BatchSuspensionTest {
     try {
       managementService.suspendBatchById("unknown");
       fail("Exception expected");
-    }
-    catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("Batch for id 'unknown' cannot be found"));
+    } catch (BadUserRequestException e) {
+      assertThat(e.getMessage(),
+          CoreMatchers.containsString("Batch for id 'unknown' cannot be found"));
     }
   }
 
@@ -125,8 +124,7 @@ public class BatchSuspensionTest {
     try {
       managementService.suspendBatchById(null);
       fail("Exception expected");
-    }
-    catch (BadUserRequestException e) {
+    } catch (BadUserRequestException e) {
       assertThat(e.getMessage(), CoreMatchers.containsString("batch id is null"));
     }
   }
@@ -235,8 +233,7 @@ public class BatchSuspensionTest {
     identityService.clearAuthentication();
 
     // then
-    UserOperationLogEntry entry = historyService.createUserOperationLogQuery()
-      .singleResult();
+    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().singleResult();
 
     assertNotNull(entry);
     assertEquals(batch.getId(), entry.getBatchId());
@@ -264,9 +261,9 @@ public class BatchSuspensionTest {
     try {
       managementService.activateBatchById("unknown");
       fail("Exception expected");
-    }
-    catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("Batch for id 'unknown' cannot be found"));
+    } catch (BadUserRequestException e) {
+      assertThat(e.getMessage(),
+          CoreMatchers.containsString("Batch for id 'unknown' cannot be found"));
     }
   }
 
@@ -275,8 +272,7 @@ public class BatchSuspensionTest {
     try {
       managementService.activateBatchById(null);
       fail("Exception expected");
-    }
-    catch (BadUserRequestException e) {
+    } catch (BadUserRequestException e) {
       assertThat(e.getMessage(), CoreMatchers.containsString("batch id is null"));
     }
   }
@@ -386,8 +382,7 @@ public class BatchSuspensionTest {
     identityService.clearAuthentication();
 
     // then
-    UserOperationLogEntry entry = historyService.createUserOperationLogQuery()
-      .singleResult();
+    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().singleResult();
 
     assertNotNull(entry);
     assertEquals(batch.getId(), entry.getBatchId());
@@ -431,7 +426,8 @@ public class BatchSuspensionTest {
     identityService.clearAuthentication();
 
     // then
-    UserOperationLogQuery query = historyService.createUserOperationLogQuery().batchId(batch1.getId());
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery()
+        .batchId(batch1.getId());
     assertEquals(2, query.count());
     assertEquals(2, query.list().size());
 

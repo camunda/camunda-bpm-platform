@@ -78,11 +78,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Service exposing information about ongoing and past process instances.  This is different
- * from the runtime information in the sense that this runtime information only contains
- * the actual runtime state at any given moment and it is optimized for runtime
- * process execution performance.  The history information is optimized for easy
- * querying and remains permanent in the persistent storage.
+ * Service exposing information about ongoing and past process instances. This is different from the
+ * runtime information in the sense that this runtime information only contains the actual runtime
+ * state at any given moment and it is optimized for runtime process execution performance. The
+ * history information is optimized for easy querying and remains permanent in the persistent
+ * storage.
  *
  * @author Christian Stettler
  * @author Tom Baeyens
@@ -97,14 +97,17 @@ public interface HistoryService {
   HistoricActivityInstanceQuery createHistoricActivityInstanceQuery();
 
   /**
-   * Query for the number of historic activity instances aggregated by activities of a single process definition.
+   * Query for the number of historic activity instances aggregated by activities of a single
+   * process definition.
    */
   HistoricActivityStatisticsQuery createHistoricActivityStatisticsQuery(String processDefinitionId);
 
   /**
-   * Query for the number of historic case activity instances aggregated by case activities of a single case definition.
+   * Query for the number of historic case activity instances aggregated by case activities of a
+   * single case definition.
    */
-  HistoricCaseActivityStatisticsQuery createHistoricCaseActivityStatisticsQuery(String caseDefinitionId);
+  HistoricCaseActivityStatisticsQuery createHistoricCaseActivityStatisticsQuery(
+      String caseDefinitionId);
 
   /** Creates a new programmatic query to search for {@link HistoricTaskInstance}s. */
   HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();
@@ -116,9 +119,11 @@ public interface HistoryService {
    * Creates a new programmatic query to search for {@link HistoricVariableInstance}s.
    * <p>
    * The result of the query is empty:
-   * <li>if the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION} or</li>
-   * <li>the user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on {@link Resources#PROCESS_DEFINITION}
-   * in case {@link ProcessEngineConfiguration#enforceSpecificVariablePermission} is enabled.</li>
+   * <li>if the user has no {@link Permissions#READ_HISTORY} permission on
+   * {@link Resources#PROCESS_DEFINITION} or</li>
+   * <li>the user has no {@link ProcessDefinitionPermissions#READ_HISTORY_VARIABLE} permission on
+   * {@link Resources#PROCESS_DEFINITION} in case
+   * {@link ProcessEngineConfiguration#enforceSpecificVariablePermission} is enabled.</li>
    * </p>
    */
   HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
@@ -129,7 +134,10 @@ public interface HistoryService {
   /** Creates a new programmatic query to search for {@link HistoricIncident historic incidents}. */
   HistoricIncidentQuery createHistoricIncidentQuery();
 
-  /** Creates a new programmatic query to search for {@link HistoricIdentityLinkLog historic identity links}. */
+  /**
+   * Creates a new programmatic query to search for {@link HistoricIdentityLinkLog historic identity
+   * links}.
+   */
   HistoricIdentityLinkLogQuery createHistoricIdentityLinkLogQuery();
 
   /** Creates a new programmatic query to search for {@link HistoricCaseInstance}s. */
@@ -141,96 +149,117 @@ public interface HistoryService {
   /**
    * Creates a new programmatic query to search for {@link HistoricDecisionInstance}s.
    *
-   * If the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
-   * then the result of the query is empty.
+   * If the user has no {@link Permissions#READ_HISTORY} permission on
+   * {@link Resources#DECISION_DEFINITION} then the result of the query is empty.
    */
   HistoricDecisionInstanceQuery createHistoricDecisionInstanceQuery();
 
   /**
-   * Deletes historic task instance.  This might be useful for tasks that are
-   * {@link TaskService#newTask() dynamically created} and then {@link TaskService#complete(String) completed}.
-   * If the historic task instance doesn't exist, no exception is thrown and the
-   * method returns normal.
+   * Deletes historic task instance. This might be useful for tasks that are
+   * {@link TaskService#newTask() dynamically created} and then {@link TaskService#complete(String)
+   * completed}. If the historic task instance doesn't exist, no exception is thrown and the method
+   * returns normal.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricTaskInstance(String taskId);
 
   /**
-   * Deletes historic process instance. All historic activities, historic task and
-   * historic details (variable updates, form properties) are deleted as well.
+   * Deletes historic process instance. All historic activities, historic task and historic details
+   * (variable updates, form properties) are deleted as well.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstance(String processInstanceId);
 
   /**
-   * Deletes historic process instance. All historic activities, historic task and
-   * historic details (variable updates, form properties) are deleted as well.
-   * Does not fail if a process instance was not found.
+   * Deletes historic process instance. All historic activities, historic task and historic details
+   * (variable updates, form properties) are deleted as well. Does not fail if a process instance
+   * was not found.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstanceIfExists(String processInstanceId);
 
   /**
-   * Deletes historic process instances. All historic activities, historic task and
-   * historic details (variable updates, form properties) are deleted as well.
+   * Deletes historic process instances. All historic activities, historic task and historic details
+   * (variable updates, form properties) are deleted as well.
    *
    * @throws BadUserRequestException
-   *          when no process instances are found with the given ids or ids are null.
+   *           when no process instances are found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstances(List<String> processInstanceIds);
 
   /**
-   * Deletes historic process instances. All historic activities, historic task and
-   * historic details (variable updates, form properties) are deleted as well. Does not
-   * fail if a process instance was not found.
+   * Deletes historic process instances. All historic activities, historic task and historic details
+   * (variable updates, form properties) are deleted as well. Does not fail if a process instance
+   * was not found.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstancesIfExists(List<String> processInstanceIds);
 
   /**
-   * Deletes historic process instances and all related historic data in bulk manner. DELETE SQL statement will be created for each entity type. They will have list
-   * of given process instance ids in IN clause. Therefore, DB limitation for number of values in IN clause must be taken into account.
+   * Deletes historic process instances and all related historic data in bulk manner. DELETE SQL
+   * statement will be created for each entity type. They will have list of given process instance
+   * ids in IN clause. Therefore, DB limitation for number of values in IN clause must be taken into
+   * account.
    *
-   * @param processInstanceIds list of process instance ids for removal
+   * @param processInstanceIds
+   *          list of process instance ids for removal
    *
    * @throws BadUserRequestException
-   *          when no process instances are found with the given ids or ids are null or when some of the process instances are not finished yet
+   *           when no process instances are found with the given ids or ids are null or when some
+   *           of the process instances are not finished yet
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstancesBulk(List<String> processInstanceIds);
 
   /**
    * Schedules history cleanup job at batch window start time. The job will delete historic data for
-   * finished process, decision and case instances, and batch operations taking into account {@link ProcessDefinition#getHistoryTimeToLive()},
-   * {@link DecisionDefinition#getHistoryTimeToLive()}, {@link CaseDefinition#getHistoryTimeToLive()}, {@link ProcessEngineConfigurationImpl#getBatchOperationHistoryTimeToLive()}
-   * and {@link ProcessEngineConfigurationImpl#getBatchOperationsForHistoryCleanup()} values.
+   * finished process, decision and case instances, and batch operations taking into account
+   * {@link ProcessDefinition#getHistoryTimeToLive()},
+   * {@link DecisionDefinition#getHistoryTimeToLive()},
+   * {@link CaseDefinition#getHistoryTimeToLive()},
+   * {@link ProcessEngineConfigurationImpl#getBatchOperationHistoryTimeToLive()} and
+   * {@link ProcessEngineConfigurationImpl#getBatchOperationsForHistoryCleanup()} values.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
-   * @return history cleanup job. NB! As of v. 7.9.0, method does not guarantee to return a job. Use {@link #findHistoryCleanupJobs()} instead.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}
+   * @return history cleanup job. NB! As of v. 7.9.0, method does not guarantee to return a job. Use
+   *         {@link #findHistoryCleanupJobs()} instead.
    */
   Job cleanUpHistoryAsync();
 
   /**
    * Schedules history cleanup job at batch window start time. The job will delete historic data for
-   * finished process, decision and case instances, and batch operations taking into account {@link ProcessDefinition#getHistoryTimeToLive()},
-   * {@link DecisionDefinition#getHistoryTimeToLive()}, {@link CaseDefinition#getHistoryTimeToLive()}, {@link ProcessEngineConfigurationImpl#getBatchOperationHistoryTimeToLive()}
-   * and {@link ProcessEngineConfigurationImpl#getBatchOperationsForHistoryCleanup()} values.
+   * finished process, decision and case instances, and batch operations taking into account
+   * {@link ProcessDefinition#getHistoryTimeToLive()},
+   * {@link DecisionDefinition#getHistoryTimeToLive()},
+   * {@link CaseDefinition#getHistoryTimeToLive()},
+   * {@link ProcessEngineConfigurationImpl#getBatchOperationHistoryTimeToLive()} and
+   * {@link ProcessEngineConfigurationImpl#getBatchOperationsForHistoryCleanup()} values.
    *
-   * @param immediatelyDue must be true if cleanup must be scheduled at once, otherwise is will be scheduled according to configured batch window
+   * @param immediatelyDue
+   *          must be true if cleanup must be scheduled at once, otherwise is will be scheduled
+   *          according to configured batch window
    * @throws AuthorizationException
-   *      If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}
    * @return history cleanup job. Job id can be used to check job logs, incident etc.
    *
    */
@@ -238,7 +267,9 @@ public interface HistoryService {
 
   /**
    * Finds history cleanup job, if present.
-   * @deprecated As of v. 7.9.0, because there can be more than one history cleanup job at once, use {@link #findHistoryCleanupJobs} instead.
+   * 
+   * @deprecated As of v. 7.9.0, because there can be more than one history cleanup job at once, use
+   *             {@link #findHistoryCleanupJobs} instead.
    * @return job entity
    */
   @Deprecated
@@ -246,6 +277,7 @@ public interface HistoryService {
 
   /**
    * Finds history cleanup job if present.
+   * 
    * @return job entity
    */
   List<Job> findHistoryCleanupJobs();
@@ -255,116 +287,129 @@ public interface HistoryService {
    * historic details (variable updates, form properties) are deleted as well.
    *
    * @throws BadUserRequestException
-   *          when no process instances is found with the given ids or ids are null.
+   *           when no process instances is found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} or
-   *          {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
+   *           If the user has no {@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on
+   *           {@link Resources#BATCH}.
    */
   Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, String deleteReason);
 
   /**
-   * Deletes historic process instances asynchronously based on query. All historic activities, historic task and
-   * historic details (variable updates, form properties) are deleted as well.
+   * Deletes historic process instances asynchronously based on query. All historic activities,
+   * historic task and historic details (variable updates, form properties) are deleted as well.
    *
    * @throws BadUserRequestException
-   *          when no process instances is found with the given ids or ids are null.
+   *           when no process instances is found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} or
-   *          {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
+   *           If the user has no {@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on
+   *           {@link Resources#BATCH}.
    */
-  Batch deleteHistoricProcessInstancesAsync(HistoricProcessInstanceQuery query, String deleteReason);
+  Batch deleteHistoricProcessInstancesAsync(HistoricProcessInstanceQuery query,
+      String deleteReason);
 
   /**
-   * Deletes historic process instances asynchronously based on query and a list of process instances. Query result and
-   * list of ids will be merged.
-   * All historic activities, historic task and historic details (variable updates, form properties) are deleted as well.
+   * Deletes historic process instances asynchronously based on query and a list of process
+   * instances. Query result and list of ids will be merged. All historic activities, historic task
+   * and historic details (variable updates, form properties) are deleted as well.
    *
    * @throws BadUserRequestException
-   *          when no process instances is found with the given ids or ids are null.
+   *           when no process instances is found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} or
-   *          {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on {@link Resources#BATCH}.
+   *           If the user has no {@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_DELETE_FINISHED_PROCESS_INSTANCES} permission on
+   *           {@link Resources#BATCH}.
    */
-  Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, HistoricProcessInstanceQuery query, String deleteReason);
+  Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds,
+      HistoricProcessInstanceQuery query, String deleteReason);
 
   /**
    * Deletes a user operation log entry. Does not cascade to any related entities.
    *
    * @throws AuthorizationException
-   *           For entries related to process definition keys: If the user has
-   *           neither {@link Permissions#DELETE_HISTORY} permission on
-   *           {@link Resources#PROCESS_DEFINITION} nor
-   *           {@link UserOperationLogCategoryPermissions#DELETE} permission on
-   *           {@link Resources#OPERATION_LOG_CATEGORY}. For entries not related
-   *           to process definition keys: If the user has no
+   *           For entries related to process definition keys: If the user has neither
+   *           {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
+   *           nor {@link UserOperationLogCategoryPermissions#DELETE} permission on
+   *           {@link Resources#OPERATION_LOG_CATEGORY}. For entries not related to process
+   *           definition keys: If the user has no
    *           {@link UserOperationLogCategoryPermissions#DELETE} permission on
    *           {@link Resources#OPERATION_LOG_CATEGORY}.
    */
   void deleteUserOperationLogEntry(String entryId);
 
   /**
-   * Deletes historic case instance. All historic case activities, historic task and
-   * historic details are deleted as well.
+   * Deletes historic case instance. All historic case activities, historic task and historic
+   * details are deleted as well.
    */
   void deleteHistoricCaseInstance(String caseInstanceId);
 
   /**
-   * Deletes historic case instances and all related historic data in bulk manner. DELETE SQL statement will be created for each entity type. They will have list
-   * of given case instance ids in IN clause. Therefore, DB limitation for number of values in IN clause must be taken into account.
+   * Deletes historic case instances and all related historic data in bulk manner. DELETE SQL
+   * statement will be created for each entity type. They will have list of given case instance ids
+   * in IN clause. Therefore, DB limitation for number of values in IN clause must be taken into
+   * account.
    *
-   * @param caseInstanceIds list of case instance ids for removal
+   * @param caseInstanceIds
+   *          list of case instance ids for removal
    */
   void deleteHistoricCaseInstancesBulk(List<String> caseInstanceIds);
 
   /**
-   * Deletes historic decision instances of a decision definition. All historic
-   * decision inputs and outputs are deleted as well.
+   * Deletes historic decision instances of a decision definition. All historic decision inputs and
+   * outputs are deleted as well.
    *
-   * @deprecated Note that this method name is not expressive enough, because it is also possible to delete the historic
-   * decision instance by the instance id. Therefore use {@link #deleteHistoricDecisionInstanceByDefinitionId} instead
-   * to delete the historic decision instance by the definition id.
+   * @deprecated Note that this method name is not expressive enough, because it is also possible to
+   *             delete the historic decision instance by the instance id. Therefore use
+   *             {@link #deleteHistoricDecisionInstanceByDefinitionId} instead to delete the
+   *             historic decision instance by the definition id.
    *
    * @param decisionDefinitionId
    *          the id of the decision definition
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#DECISION_DEFINITION}.
    */
   @Deprecated
   void deleteHistoricDecisionInstance(String decisionDefinitionId);
 
   /**
-   * Deletes decision instances and all related historic data in bulk manner. DELETE SQL statement will be created for each entity type. They will have list
-   * of given decision instance ids in IN clause. Therefore, DB limitation for number of values in IN clause must be taken into account.
+   * Deletes decision instances and all related historic data in bulk manner. DELETE SQL statement
+   * will be created for each entity type. They will have list of given decision instance ids in IN
+   * clause. Therefore, DB limitation for number of values in IN clause must be taken into account.
    *
-   * @param decisionInstanceIds list of decision instance ids for removal.
+   * @param decisionInstanceIds
+   *          list of decision instance ids for removal.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#DECISION_DEFINITION}.
    */
   void deleteHistoricDecisionInstancesBulk(List<String> decisionInstanceIds);
 
   /**
-   * Deletes historic decision instances of a decision definition. All historic
-   * decision inputs and outputs are deleted as well.
+   * Deletes historic decision instances of a decision definition. All historic decision inputs and
+   * outputs are deleted as well.
    *
    * @param decisionDefinitionId
    *          the id of the decision definition
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#DECISION_DEFINITION}.
    */
   void deleteHistoricDecisionInstanceByDefinitionId(String decisionDefinitionId);
 
-
   /**
-   * Deletes historic decision instances by its id. All historic
-   * decision inputs and outputs are deleted as well.
+   * Deletes historic decision instances by its id. All historic decision inputs and outputs are
+   * deleted as well.
    *
    * @param historicDecisionInstanceId
    *          the id of the historic decision instance
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#DECISION_DEFINITION}.
    */
   void deleteHistoricDecisionInstanceByInstanceId(String historicDecisionInstanceId);
 
@@ -372,10 +417,11 @@ public interface HistoryService {
    * Deletes historic decision instances asynchronously based on a list of decision instances.
    *
    * @throws BadUserRequestException
-   *          when no decision instances are found with the given ids or ids are null.
+   *           when no decision instances are found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} or
-   *          {@link BatchPermissions#CREATE_BATCH_DELETE_DECISION_INSTANCES} permission on {@link Resources#BATCH}.
+   *           If the user has no {@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_DELETE_DECISION_INSTANCES} permission on
+   *           {@link Resources#BATCH}.
    */
   Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, String deleteReason);
 
@@ -383,48 +429,53 @@ public interface HistoryService {
    * Deletes historic decision instances asynchronously based on query of decision instances.
    *
    * @throws BadUserRequestException
-   *          when no decision instances are found with the given ids or ids are null.
+   *           when no decision instances are found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} or
-   *          {@link BatchPermissions#CREATE_BATCH_DELETE_DECISION_INSTANCES} permission on {@link Resources#BATCH}.
+   *           If the user has no {@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_DELETE_DECISION_INSTANCES} permission on
+   *           {@link Resources#BATCH}.
    */
-  Batch deleteHistoricDecisionInstancesAsync(HistoricDecisionInstanceQuery query, String deleteReason);
+  Batch deleteHistoricDecisionInstancesAsync(HistoricDecisionInstanceQuery query,
+      String deleteReason);
 
   /**
-   * Deletes historic decision instances asynchronously based on query and a list of decision instances, whereby query result and
-   * list of ids will be merged.
+   * Deletes historic decision instances asynchronously based on query and a list of decision
+   * instances, whereby query result and list of ids will be merged.
    *
    * @throws BadUserRequestException
-   *          when no decision instances are found with the given ids or ids are null.
+   *           when no decision instances are found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} or
-   *          {@link BatchPermissions#CREATE_BATCH_DELETE_DECISION_INSTANCES} permission on {@link Resources#BATCH}.
+   *           If the user has no {@link Permissions#CREATE} or
+   *           {@link BatchPermissions#CREATE_BATCH_DELETE_DECISION_INSTANCES} permission on
+   *           {@link Resources#BATCH}.
    */
-  Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query, String deleteReason);
+  Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds,
+      HistoricDecisionInstanceQuery query, String deleteReason);
 
   /**
-   * Deletes a historic variable instance by its id. All related historic
-   * details (variable updates, form properties) are deleted as well.
+   * Deletes a historic variable instance by its id. All related historic details (variable updates,
+   * form properties) are deleted as well.
    *
    * @param variableInstanceId
    *          the id of the variable instance
    * @throws BadUserRequestException
-   *           when the historic variable instance is not found by the given id
-   *           or if id is null
+   *           when the historic variable instance is not found by the given id or if id is null
    * @throws AuthorizationException
-   *           If the variable instance has a process definition key and
-   *           the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           If the variable instance has a process definition key and the user has no
+   *           {@link Permissions#DELETE_HISTORY} permission on
    *           {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricVariableInstance(String variableInstanceId);
 
   /**
-   * Deletes all historic variables and historic details (variable updates, form properties) of a process instance.
+   * Deletes all historic variables and historic details (variable updates, form properties) of a
+   * process instance.
    *
    * @param processInstanceId
    *          the id of the process instance
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           If the user has no {@link Permissions#DELETE_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId);
 
@@ -471,15 +522,17 @@ public interface HistoryService {
   HistoricJobLogQuery createHistoricJobLogQuery();
 
   /**
-   * Returns the full stacktrace of the exception that occurs when the
-   * historic job log with the given id was last executed. Returns null
-   * when the historic job log has no exception stacktrace.
+   * Returns the full stacktrace of the exception that occurs when the historic job log with the
+   * given id was last executed. Returns null when the historic job log has no exception stacktrace.
    *
-   * @param historicJobLogId id of the historic job log, cannot be null.
-   * @throws ProcessEngineException when no historic job log exists with the given id.
+   * @param historicJobLogId
+   *          id of the historic job log, cannot be null.
+   * @throws ProcessEngineException
+   *           when no historic job log exists with the given id.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           If the user has no {@link Permissions#READ_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.3
    */
@@ -528,7 +581,8 @@ public interface HistoryService {
   CleanableHistoricBatchReport createCleanableHistoricBatchReport();
 
   /**
-   * Creates a query to search for {@link org.camunda.bpm.engine.batch.history.HistoricBatch} instances.
+   * Creates a query to search for {@link org.camunda.bpm.engine.batch.history.HistoricBatch}
+   * instances.
    *
    * @since 7.5
    */
@@ -540,61 +594,72 @@ public interface HistoryService {
    * @since 7.5
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#BATCH}
+   *           If the user has no {@link Permissions#DELETE} permission on {@link Resources#BATCH}
    */
   void deleteHistoricBatch(String id);
-
 
   /**
    * Query for the statistics of DRD evaluation.
    *
-   * @param decisionRequirementsDefinitionId - id of decision requirement definition
+   * @param decisionRequirementsDefinitionId
+   *          - id of decision requirement definition
    * @since 7.6
    */
-  HistoricDecisionInstanceStatisticsQuery createHistoricDecisionInstanceStatisticsQuery(String decisionRequirementsDefinitionId);
+  HistoricDecisionInstanceStatisticsQuery createHistoricDecisionInstanceStatisticsQuery(
+      String decisionRequirementsDefinitionId);
 
   /**
-   * Creates a new programmatic query to search for {@link HistoricExternalTaskLog historic external task logs}.
+   * Creates a new programmatic query to search for {@link HistoricExternalTaskLog historic external
+   * task logs}.
    *
    * @since 7.7
    */
   HistoricExternalTaskLogQuery createHistoricExternalTaskLogQuery();
 
   /**
-   * Returns the full error details that occurs when the
-   * historic external task log with the given id was last executed. Returns null
-   * when the historic external task log contains no error details.
+   * Returns the full error details that occurs when the historic external task log with the given
+   * id was last executed. Returns null when the historic external task log contains no error
+   * details.
    *
-   * @param historicExternalTaskLogId id of the historic external task log, cannot be null.
-   * @throws ProcessEngineException when no historic external task log exists with the given id.
+   * @param historicExternalTaskLogId
+   *          id of the historic external task log, cannot be null.
+   * @throws ProcessEngineException
+   *           when no historic external task log exists with the given id.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *           If the user has no {@link Permissions#READ_HISTORY} permission on
+   *           {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.7
    */
   String getHistoricExternalTaskLogErrorDetails(String historicExternalTaskLogId);
 
   /**
-   * <p>Set a removal time to historic process instances and
-   * all associated historic entities using a fluent builder.
+   * <p>
+   * Set a removal time to historic process instances and all associated historic entities using a
+   * fluent builder.
    *
-   * <p>Historic process instances can be specified by passing a query to
+   * <p>
+   * Historic process instances can be specified by passing a query to
    * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#byQuery(HistoricProcessInstanceQuery)}.
    *
-   * <p>An absolute time can be specified via
+   * <p>
+   * An absolute time can be specified via
    * {@link SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder#absoluteRemovalTime(Date)}.
    * Pass {@code null} to clear the removal time.
    *
-   * <p>As an alternative, the removal time can also be calculated via
+   * <p>
+   * As an alternative, the removal time can also be calculated via
    * {@link SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder#calculatedRemovalTime()}
    * based on the configured time to live values.
    *
-   * <p>To additionally take those historic process instances into account that are part of
-   * a hierarchy, enable the flag
+   * <p>
+   * To additionally take those historic process instances into account that are part of a
+   * hierarchy, enable the flag
    * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#hierarchical()}
    *
-   * <p>To create the batch and complete the configuration chain, call
+   * <p>
+   * To create the batch and complete the configuration chain, call
    * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#executeAsync()}.
    *
    * @since 7.11
@@ -602,25 +667,31 @@ public interface HistoryService {
   SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder setRemovalTimeToHistoricProcessInstances();
 
   /**
-   * <p>Set a removal time to historic decision instances and
-   * all associated historic entities using a fluent builder.
+   * <p>
+   * Set a removal time to historic decision instances and all associated historic entities using a
+   * fluent builder.
    *
-   * <p>Historic decision instances can be specified by passing a query to
+   * <p>
+   * Historic decision instances can be specified by passing a query to
    * {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#byQuery(HistoricDecisionInstanceQuery)}.
    *
-   * <p>An absolute time can be specified via
+   * <p>
+   * An absolute time can be specified via
    * {@link SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder#absoluteRemovalTime(Date)}.
    * Pass {@code null} to clear the removal time.
    *
-   * <p>As an alternative, the removal time can also be calculated via
+   * <p>
+   * As an alternative, the removal time can also be calculated via
    * {@link SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder#calculatedRemovalTime()}
    * based on the configured time to live values.
    *
-   * <p>To additionally take those historic decision instances into account that are part of
-   * a hierarchy, enable the flag
+   * <p>
+   * To additionally take those historic decision instances into account that are part of a
+   * hierarchy, enable the flag
    * {@link SetRemovalTimeToHistoricProcessInstancesBuilder#hierarchical()}
    *
-   * <p>To create the batch and complete the configuration chain, call
+   * <p>
+   * To create the batch and complete the configuration chain, call
    * {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#executeAsync()}.
    *
    * @since 7.11
@@ -628,21 +699,26 @@ public interface HistoryService {
   SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder setRemovalTimeToHistoricDecisionInstances();
 
   /**
-   * <p>Set a removal time to historic batches and all
-   * associated historic entities using a fluent builder.
+   * <p>
+   * Set a removal time to historic batches and all associated historic entities using a fluent
+   * builder.
    *
-   * <p>Historic batches can be specified by passing a query to
+   * <p>
+   * Historic batches can be specified by passing a query to
    * {@link SetRemovalTimeToHistoricBatchesBuilder#byQuery(HistoricBatchQuery)}.
    *
-   * <p>An absolute time can be specified via
-   * {@link SetRemovalTimeSelectModeForHistoricBatchesBuilder#absoluteRemovalTime(Date)}.
-   * Pass {@code null} to clear the removal time.
+   * <p>
+   * An absolute time can be specified via
+   * {@link SetRemovalTimeSelectModeForHistoricBatchesBuilder#absoluteRemovalTime(Date)}. Pass
+   * {@code null} to clear the removal time.
    *
-   * <p>As an alternative, the removal time can also be calculated via
-   * {@link SetRemovalTimeSelectModeForHistoricBatchesBuilder#calculatedRemovalTime()}
-   * based on the configured time to live values.
+   * <p>
+   * As an alternative, the removal time can also be calculated via
+   * {@link SetRemovalTimeSelectModeForHistoricBatchesBuilder#calculatedRemovalTime()} based on the
+   * configured time to live values.
    *
-   * <p>To create the batch and complete the configuration chain, call
+   * <p>
+   * To create the batch and complete the configuration chain, call
    * {@link SetRemovalTimeToHistoricBatchesBuilder#executeAsync()}.
    *
    * @since 7.11

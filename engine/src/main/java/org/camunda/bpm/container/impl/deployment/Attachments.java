@@ -17,8 +17,8 @@
 package org.camunda.bpm.container.impl.deployment;
 
 /**
- * Contains the attachment names of all attachments used by the
- * ProcessApplication deployment OperationSteps.
+ * Contains the attachment names of all attachments used by the ProcessApplication deployment
+ * OperationSteps.
  *
  * @author Daniel Meyer
  *

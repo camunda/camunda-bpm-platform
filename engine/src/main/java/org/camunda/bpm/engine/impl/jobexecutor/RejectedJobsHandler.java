@@ -21,13 +21,16 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 
 /**
- * <p>Strategy for handling jobs that were acquired but cannot be
- * executed at this point (queue-size exceeded).</p>
+ * <p>
+ * Strategy for handling jobs that were acquired but cannot be executed at this point (queue-size
+ * exceeded).
+ * </p>
  *
  * @author Daniel Meyer
  */
 public interface RejectedJobsHandler {
 
-  public void jobsRejected(List<String> jobIds, ProcessEngineImpl processEngine, JobExecutor jobExecutor);
+  public void jobsRejected(List<String> jobIds, ProcessEngineImpl processEngine,
+      JobExecutor jobExecutor);
 
 }

@@ -29,8 +29,9 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * <p>Test utility allowing to run the testsuite with a database
- * table prefix</p>
+ * <p>
+ * Test utility allowing to run the testsuite with a database table prefix
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -41,11 +42,8 @@ public class DbSchemaPrefixTestHelper implements InitializingBean, DisposableBea
 
   public void afterPropertiesSet() throws Exception {
 
-    dataSource = new PooledDataSource(ReflectUtil.getClassLoader(),
-            "org.h2.Driver",
-            "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000;MVCC=TRUE;",
-            "sa",
-            "" );
+    dataSource = new PooledDataSource(ReflectUtil.getClassLoader(), "org.h2.Driver",
+        "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000;MVCC=TRUE;", "sa", "");
 
     // create schema in the
     Connection connection = dataSource.getConnection();
@@ -54,10 +52,10 @@ public class DbSchemaPrefixTestHelper implements InitializingBean, DisposableBea
     connection.close();
 
     ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration()
-            .setProcessEngineName("DatabaseTablePrefixTest-engine1")
-            .setDataSource(dataSource)
-            .setDbMetricsReporterActivate(false)
-            .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
+        .setProcessEngineName("DatabaseTablePrefixTest-engine1").setDataSource(dataSource)
+        .setDbMetricsReporterActivate(false).setDatabaseSchemaUpdate("NO_CHECK"); // disable auto
+                                                                                  // create/drop
+                                                                                  // schema
     config1.setDatabaseTablePrefix("SCHEMA1.");
     ProcessEngine engine1 = config1.buildProcessEngine();
 
@@ -77,10 +75,11 @@ public class DbSchemaPrefixTestHelper implements InitializingBean, DisposableBea
     connection.close();
   }
 
-  //----------------------- TEST HELPERS -----------------------
+  // ----------------------- TEST HELPERS -----------------------
 
   // allows to return a process engine configuration which doesn't create a schema when it's build.
-  private static class CustomStandaloneInMemProcessEngineConfiguration extends StandaloneInMemProcessEngineConfiguration {
+  private static class CustomStandaloneInMemProcessEngineConfiguration
+      extends StandaloneInMemProcessEngineConfiguration {
 
     public ProcessEngine buildProcessEngine() {
       init();
@@ -100,7 +99,8 @@ public class DbSchemaPrefixTestHelper implements InitializingBean, DisposableBea
   }
 
   private static ProcessEngineConfigurationImpl createCustomProcessEngineConfiguration() {
-    return new CustomStandaloneInMemProcessEngineConfiguration().setHistory(ProcessEngineConfiguration.HISTORY_FULL);
+    return new CustomStandaloneInMemProcessEngineConfiguration()
+        .setHistory(ProcessEngineConfiguration.HISTORY_FULL);
   }
 
 }

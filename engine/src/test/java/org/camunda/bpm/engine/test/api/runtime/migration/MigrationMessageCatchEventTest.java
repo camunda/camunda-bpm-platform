@@ -46,18 +46,20 @@ public class MigrationMessageCatchEventTest {
   @Test
   public void testMigrateEventSubscription() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("messageCatch", "messageCatch")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("messageCatch", "messageCatch").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
-    testHelper.assertEventSubscriptionMigrated("messageCatch", "messageCatch", MessageReceiveModels.MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("messageCatch", "messageCatch",
+        MessageReceiveModels.MESSAGE_NAME);
 
     // and it is possible to trigger the receive task
     rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
@@ -69,19 +71,21 @@ public class MigrationMessageCatchEventTest {
   @Test
   public void testMigrateEventSubscriptionChangeActivityId() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
-        .changeElementId("messageCatch", "newMessageCatch"));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
+            .changeElementId("messageCatch", "newMessageCatch"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("messageCatch", "newMessageCatch")
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("messageCatch", "newMessageCatch").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
-    testHelper.assertEventSubscriptionMigrated("messageCatch", "newMessageCatch", MessageReceiveModels.MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("messageCatch", "newMessageCatch",
+        MessageReceiveModels.MESSAGE_NAME);
 
     // and it is possible to trigger the receive task
     rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
@@ -93,25 +97,22 @@ public class MigrationMessageCatchEventTest {
   @Test
   public void testMigrateEventSubscriptionPreserveMessageName() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
-        .startEvent()
-        .intermediateCatchEvent("messageCatch")
-          .message("new" + MessageReceiveModels.MESSAGE_NAME)
-        .userTask("userTask")
-        .endEvent()
-        .done());
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels
+        .newModel().startEvent().intermediateCatchEvent("messageCatch")
+        .message("new" + MessageReceiveModels.MESSAGE_NAME).userTask("userTask").endEvent().done());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("messageCatch", "messageCatch")
-        .build();
+        .mapActivities("messageCatch", "messageCatch").build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then the message event subscription's event name has not changed
-    testHelper.assertEventSubscriptionMigrated("messageCatch", "messageCatch", MessageReceiveModels.MESSAGE_NAME);
+    testHelper.assertEventSubscriptionMigrated("messageCatch", "messageCatch",
+        MessageReceiveModels.MESSAGE_NAME);
 
     // and it is possible to trigger the receive task
     rule.getRuntimeService().correlateMessage(MessageReceiveModels.MESSAGE_NAME);
@@ -123,22 +124,21 @@ public class MigrationMessageCatchEventTest {
   @Test
   public void testMigrateEventSubscriptionUpdateMessageName() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
-      .renameMessage(MessageReceiveModels.MESSAGE_NAME, "new" + MessageReceiveModels.MESSAGE_NAME));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(
+        modify(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS).renameMessage(
+            MessageReceiveModels.MESSAGE_NAME, "new" + MessageReceiveModels.MESSAGE_NAME));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("messageCatch", "messageCatch")
-          .updateEventTrigger()
-        .build();
+        .mapActivities("messageCatch", "messageCatch").updateEventTrigger().build();
 
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then the message event subscription's event name has changed
-    testHelper.assertEventSubscriptionMigrated(
-        "messageCatch", MessageReceiveModels.MESSAGE_NAME,
+    testHelper.assertEventSubscriptionMigrated("messageCatch", MessageReceiveModels.MESSAGE_NAME,
         "messageCatch", "new" + MessageReceiveModels.MESSAGE_NAME);
 
     // and it is possible to trigger the event
@@ -152,26 +152,26 @@ public class MigrationMessageCatchEventTest {
   public void testMigrateEventSubscriptionUpdateMessageNameWithExpression() {
     // given
     String newMessageName = "new" + MessageReceiveModels.MESSAGE_NAME + "-${var}";
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
-        .renameMessage(MessageReceiveModels.MESSAGE_NAME, newMessageName));
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(modify(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
+            .renameMessage(MessageReceiveModels.MESSAGE_NAME, newMessageName));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapActivities("messageCatch", "messageCatch")
-        .updateEventTrigger()
-        .build();
+        .mapActivities("messageCatch", "messageCatch").updateEventTrigger().build();
 
     HashMap<String, Object> variables = new HashMap<String, Object>();
     variables.put("var", "foo");
 
     // when
-    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan, variables);
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan,
+        variables);
 
     // then the message event subscription's event name has changed
     String resolvedMessageName = "new" + MessageReceiveModels.MESSAGE_NAME + "-foo";
-    testHelper.assertEventSubscriptionMigrated(
-        "messageCatch", MessageReceiveModels.MESSAGE_NAME,
+    testHelper.assertEventSubscriptionMigrated("messageCatch", MessageReceiveModels.MESSAGE_NAME,
         "messageCatch", resolvedMessageName);
 
     // and it is possible to trigger the event

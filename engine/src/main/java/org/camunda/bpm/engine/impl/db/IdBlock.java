@@ -32,6 +32,7 @@ public class IdBlock {
   public long getNextId() {
     return nextId;
   }
+
   public long getLastId() {
     return lastId;
   }

@@ -47,21 +47,21 @@ public class IoMapping {
   }
 
   public void addInputParameter(InputParameter param) {
-    if(inputParameters == null) {
+    if (inputParameters == null) {
       inputParameters = new ArrayList<InputParameter>();
     }
     inputParameters.add(param);
   }
 
   public void addOutputParameter(OutputParameter param) {
-    if(outputParameters == null) {
+    if (outputParameters == null) {
       outputParameters = new ArrayList<OutputParameter>();
     }
     outputParameters.add(param);
   }
 
   public List<InputParameter> getInputParameters() {
-    if(inputParameters == null) {
+    if (inputParameters == null) {
       return Collections.emptyList();
 
     } else {
@@ -74,7 +74,7 @@ public class IoMapping {
   }
 
   public List<OutputParameter> getOutputParameters() {
-    if(outputParameters == null) {
+    if (outputParameters == null) {
       return Collections.emptyList();
 
     } else {

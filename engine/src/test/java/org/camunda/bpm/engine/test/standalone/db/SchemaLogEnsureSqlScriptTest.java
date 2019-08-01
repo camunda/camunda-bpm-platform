@@ -41,7 +41,8 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
   public void init() {
     super.init();
 
-    SchemaLogEntry latestEntry = processEngine.getManagementService().createSchemaLogQuery().orderByTimestamp().desc().listPage(0, 1).get(0);
+    SchemaLogEntry latestEntry = processEngine.getManagementService().createSchemaLogQuery()
+        .orderByTimestamp().desc().listPage(0, 1).get(0);
     currentSchemaVersion = latestEntry.getVersion();
 
     dataBaseType = processEngine.getProcessEngineConfiguration().getDatabaseType();
@@ -67,7 +68,7 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
 
   private String getTargetVersionForScript(String file) {
     String targetVersion = file.substring(file.indexOf("to_") + 3).replace(".sql", "");
-    if(isMinorLevel(targetVersion)) {
+    if (isMinorLevel(targetVersion)) {
       targetVersion += ".0";
     }
     return targetVersion;
@@ -76,11 +77,11 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
   private String getLatestTargetVersion(List<String> scriptFiles) {
     String latestVersion = null;
     for (String file : scriptFiles) {
-      if(latestVersion == null) {
+      if (latestVersion == null) {
         latestVersion = getTargetVersionForScript(file);
       } else {
         String targetVersion = getTargetVersionForScript(file);
-        if(isLaterVersionThan(targetVersion, latestVersion)){
+        if (isLaterVersionThan(targetVersion, latestVersion)) {
           latestVersion = targetVersion;
         }
       }
@@ -96,7 +97,7 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
     for (int i = 0; i < length; i++) {
       int v1Part = i < v1_.length ? Integer.parseInt(v1_[i]) : 0;
       int v2Part = i < v2_.length ? Integer.parseInt(v2_[i]) : 0;
-      if(v1Part != v2Part) {
+      if (v1Part != v2Part) {
         return v1Part > v2Part;
       }
     }

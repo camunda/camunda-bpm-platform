@@ -21,23 +21,24 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 
 /**
- * <p>Java API representation of a {@link ProcessEnginePlugin} configuration inside a deployment descriptor.</p>
+ * <p>
+ * Java API representation of a {@link ProcessEnginePlugin} configuration inside a deployment
+ * descriptor.
+ * </p>
  * 
  * @author Daniel Meyer
  *
  */
 public interface ProcessEnginePluginXml {
-  
+
   /** returns the fully qualified classname of the plugin */
   public String getPluginClass();
-  
+
   /**
-   * @return a set of additional properties. The properties are directly set on
-   *         the {@link ProcessEnginePlugin} class (see
-   *         {@link #getPluginClass()}). This means that each property
-   *         name used here must be a bean property name on the plugin class 
-   *         and the bean property must be of type
-   *         {@link String}, {@link Integer} or {@link Boolean}.
+   * @return a set of additional properties. The properties are directly set on the
+   *         {@link ProcessEnginePlugin} class (see {@link #getPluginClass()}). This means that each
+   *         property name used here must be a bean property name on the plugin class and the bean
+   *         property must be of type {@link String}, {@link Integer} or {@link Boolean}.
    */
   public Map<String, String> getProperties();
 

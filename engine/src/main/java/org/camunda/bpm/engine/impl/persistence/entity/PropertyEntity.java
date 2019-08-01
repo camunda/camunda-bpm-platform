@@ -23,8 +23,6 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 
-
-
 /**
  * @author Tom Baeyens
  */
@@ -84,15 +82,12 @@ public class PropertyEntity implements DbEntity, HasDbRevision, Serializable {
   }
 
   public int getRevisionNext() {
-    return revision+1;
+    return revision + 1;
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[name=" + name
-           + ", revision=" + revision
-           + ", value=" + value
-           + "]";
+    return this.getClass().getSimpleName() + "[name=" + name + ", revision=" + revision + ", value="
+        + value + "]";
   }
 }

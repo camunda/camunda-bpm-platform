@@ -31,12 +31,11 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 public class CallableElementUtil {
 
   public static DeploymentCache getDeploymentCache() {
-    return Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache();
+    return Context.getProcessEngineConfiguration().getDeploymentCache();
   }
 
-  public static ProcessDefinitionImpl getProcessDefinitionToCall(VariableScope execution, BaseCallableElement callableElement) {
+  public static ProcessDefinitionImpl getProcessDefinitionToCall(VariableScope execution,
+      BaseCallableElement callableElement) {
     String processDefinitionKey = callableElement.getDefinitionKey(execution);
     String tenantId = callableElement.getDefinitionTenantId(execution);
 
@@ -45,26 +44,31 @@ public class CallableElementUtil {
     ProcessDefinitionImpl processDefinition = null;
 
     if (callableElement.isLatestBinding()) {
-      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+      processDefinition = deploymentCache
+          .findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
 
     } else if (callableElement.isDeploymentBinding()) {
       String deploymentId = callableElement.getDeploymentId();
-      processDefinition = deploymentCache.findDeployedProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+      processDefinition = deploymentCache
+          .findDeployedProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
 
     } else if (callableElement.isVersionBinding()) {
       Integer version = callableElement.getVersion(execution);
-      processDefinition = deploymentCache.findDeployedProcessDefinitionByKeyVersionAndTenantId(processDefinitionKey, version, tenantId);
+      processDefinition = deploymentCache.findDeployedProcessDefinitionByKeyVersionAndTenantId(
+          processDefinitionKey, version, tenantId);
 
     } else if (callableElement.isVersionTagBinding()) {
       String versionTag = callableElement.getVersionTag(execution);
-      processDefinition = deploymentCache.findDeployedProcessDefinitionByKeyVersionTagAndTenantId(processDefinitionKey, versionTag, tenantId);
+      processDefinition = deploymentCache.findDeployedProcessDefinitionByKeyVersionTagAndTenantId(
+          processDefinitionKey, versionTag, tenantId);
 
     }
 
     return processDefinition;
   }
 
-  public static CmmnCaseDefinition getCaseDefinitionToCall(VariableScope execution, BaseCallableElement callableElement) {
+  public static CmmnCaseDefinition getCaseDefinitionToCall(VariableScope execution,
+      BaseCallableElement callableElement) {
     String caseDefinitionKey = callableElement.getDefinitionKey(execution);
     String tenantId = callableElement.getDefinitionTenantId(execution);
 
@@ -72,21 +76,25 @@ public class CallableElementUtil {
 
     CmmnCaseDefinition caseDefinition = null;
     if (callableElement.isLatestBinding()) {
-      caseDefinition = deploymentCache.findDeployedLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
+      caseDefinition = deploymentCache
+          .findDeployedLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
 
     } else if (callableElement.isDeploymentBinding()) {
       String deploymentId = callableElement.getDeploymentId();
-      caseDefinition = deploymentCache.findDeployedCaseDefinitionByDeploymentAndKey(deploymentId, caseDefinitionKey);
+      caseDefinition = deploymentCache.findDeployedCaseDefinitionByDeploymentAndKey(deploymentId,
+          caseDefinitionKey);
 
     } else if (callableElement.isVersionBinding()) {
       Integer version = callableElement.getVersion(execution);
-      caseDefinition = deploymentCache.findDeployedCaseDefinitionByKeyVersionAndTenantId(caseDefinitionKey, version, tenantId);
+      caseDefinition = deploymentCache
+          .findDeployedCaseDefinitionByKeyVersionAndTenantId(caseDefinitionKey, version, tenantId);
     }
 
     return caseDefinition;
   }
 
-  public static DecisionDefinition getDecisionDefinitionToCall(VariableScope execution, BaseCallableElement callableElement) {
+  public static DecisionDefinition getDecisionDefinitionToCall(VariableScope execution,
+      BaseCallableElement callableElement) {
     String decisionDefinitionKey = callableElement.getDefinitionKey(execution);
     String tenantId = callableElement.getDefinitionTenantId(execution);
 
@@ -94,19 +102,23 @@ public class CallableElementUtil {
 
     DecisionDefinition decisionDefinition = null;
     if (callableElement.isLatestBinding()) {
-      decisionDefinition = deploymentCache.findDeployedLatestDecisionDefinitionByKeyAndTenantId(decisionDefinitionKey, tenantId);
+      decisionDefinition = deploymentCache
+          .findDeployedLatestDecisionDefinitionByKeyAndTenantId(decisionDefinitionKey, tenantId);
 
     } else if (callableElement.isDeploymentBinding()) {
       String deploymentId = callableElement.getDeploymentId();
-      decisionDefinition = deploymentCache.findDeployedDecisionDefinitionByDeploymentAndKey(deploymentId, decisionDefinitionKey);
+      decisionDefinition = deploymentCache
+          .findDeployedDecisionDefinitionByDeploymentAndKey(deploymentId, decisionDefinitionKey);
 
     } else if (callableElement.isVersionBinding()) {
       Integer version = callableElement.getVersion(execution);
-      decisionDefinition = deploymentCache.findDeployedDecisionDefinitionByKeyVersionAndTenantId(decisionDefinitionKey, version, tenantId);
+      decisionDefinition = deploymentCache.findDeployedDecisionDefinitionByKeyVersionAndTenantId(
+          decisionDefinitionKey, version, tenantId);
 
     } else if (callableElement.isVersionTagBinding()) {
       String versionTag = callableElement.getVersionTag(execution);
-      decisionDefinition = deploymentCache.findDeployedDecisionDefinitionByKeyVersionTagAndTenantId(decisionDefinitionKey, versionTag, tenantId);
+      decisionDefinition = deploymentCache.findDeployedDecisionDefinitionByKeyVersionTagAndTenantId(
+          decisionDefinitionKey, versionTag, tenantId);
     }
 
     return decisionDefinition;

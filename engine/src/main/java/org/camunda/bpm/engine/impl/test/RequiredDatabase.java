@@ -24,15 +24,18 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 
 /**
- * <p>This only works if {@link ProcessEngineRule} or {@link AbstractProcessEngineTestCase} is used.
+ * <p>
+ * This only works if {@link ProcessEngineRule} or {@link AbstractProcessEngineTestCase} is used.
  * Furthermore, it only checks against the engines managed by these classes, e.g. it cannot prevent
  * that a test builds a custom engine against any database.
  *
- * <p>Check the constants in {@link DbSqlSessionFactory} for valid database names.
+ * <p>
+ * Check the constants in {@link DbSqlSessionFactory} for valid database names.
  *
- * <p>Note that this uses the process engine to check the database type. If the test
- * builds its own process engine, it may be a better idea to exclude the test via maven,
- * to avoid the overhead of unnecessarily build the engine.
+ * <p>
+ * Note that this uses the process engine to check the database type. If the test builds its own
+ * process engine, it may be a better idea to exclude the test via maven, to avoid the overhead of
+ * unnecessarily build the engine.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
@@ -41,9 +44,8 @@ public @interface RequiredDatabase {
   public String[] excludes();
 
   /*
-   * Ideas for improvement:
-   * - an includes array that allows you to only specify the
-   *   databases on which you want the test to run
+   * Ideas for improvement: - an includes array that allows you to only specify the databases on
+   * which you want the test to run
    */
 
 }

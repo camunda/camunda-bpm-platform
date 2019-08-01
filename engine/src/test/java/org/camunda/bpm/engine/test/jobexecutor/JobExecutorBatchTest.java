@@ -48,7 +48,8 @@ public class JobExecutorBatchTest {
 
   @Before
   public void replaceJobExecutor() throws Exception {
-    ProcessEngineConfigurationImpl processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = engineRule
+        .getProcessEngineConfiguration();
     defaultJobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor = new CountingJobExecutor();
     processEngineConfiguration.setJobExecutor(jobExecutor);
@@ -61,14 +62,12 @@ public class JobExecutorBatchTest {
 
   @After
   public void resetJobExecutor() {
-    engineRule.getProcessEngineConfiguration()
-      .setJobExecutor(defaultJobExecutor);
+    engineRule.getProcessEngineConfiguration().setJobExecutor(defaultJobExecutor);
   }
 
   @After
   public void resetBatchJobsPerSeed() {
-    engineRule.getProcessEngineConfiguration()
-      .setBatchJobsPerSeed(defaultBatchJobsPerSeed);
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(defaultBatchJobsPerSeed);
   }
 
   @After

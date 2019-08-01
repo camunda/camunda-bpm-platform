@@ -40,7 +40,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * @author Christian Lipphardt (camunda)
  */
-public class HistoricVariableInstanceEntity implements ValueFields, HistoricVariableInstance, DbEntity, HasDbRevision, HistoricEntity, Serializable, DbEntityLifecycleAware {
+public class HistoricVariableInstanceEntity implements ValueFields, HistoricVariableInstance,
+    DbEntity, HasDbRevision, HistoricEntity, Serializable, DbEntityLifecycleAware {
 
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
@@ -112,7 +113,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
     byteArrayField.deleteByteArrayValue();
 
-    if(historyEvent.getByteValue() != null) {
+    if (historyEvent.getByteValue() != null) {
       byteArrayField.setRootProcessInstanceId(rootProcessInstanceId);
       byteArrayField.setRemovalTime(removalTime);
       setByteArrayValue(historyEvent.getByteValue());
@@ -123,10 +124,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   public void delete() {
     byteArrayField.deleteByteArrayValue();
 
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .delete(this);
+    Context.getCommandContext().getDbEntityManager().delete(this);
   }
 
   public Object getPersistentState() {
@@ -144,7 +142,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   }
 
   public int getRevisionNext() {
-    return revision+1;
+    return revision + 1;
   }
 
   public Object getValue() {
@@ -403,32 +401,17 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-      + "[id=" + id
-      + ", processDefinitionKey=" + processDefinitionKey
-      + ", processDefinitionId=" + processDefinitionId
-      + ", rootProcessInstanceId=" + rootProcessInstanceId
-      + ", removalTime=" + removalTime
-      + ", processInstanceId=" + processInstanceId
-      + ", taskId=" + taskId
-      + ", executionId=" + executionId
-      + ", tenantId=" + tenantId
-      + ", activityInstanceId=" + activityInstanceId
-      + ", caseDefinitionKey=" + caseDefinitionKey
-      + ", caseDefinitionId=" + caseDefinitionId
-      + ", caseInstanceId=" + caseInstanceId
-      + ", caseExecutionId=" + caseExecutionId
-      + ", name=" + name
-      + ", createTime=" + createTime
-      + ", revision=" + revision
-      + ", serializerName=" + getSerializerName()
-      + ", longValue=" + longValue
-      + ", doubleValue=" + doubleValue
-      + ", textValue=" + textValue
-      + ", textValue2=" + textValue2
-      + ", state=" + state
-      + ", byteArrayId=" + getByteArrayId()
-      + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", processDefinitionKey="
+        + processDefinitionKey + ", processDefinitionId=" + processDefinitionId
+        + ", rootProcessInstanceId=" + rootProcessInstanceId + ", removalTime=" + removalTime
+        + ", processInstanceId=" + processInstanceId + ", taskId=" + taskId + ", executionId="
+        + executionId + ", tenantId=" + tenantId + ", activityInstanceId=" + activityInstanceId
+        + ", caseDefinitionKey=" + caseDefinitionKey + ", caseDefinitionId=" + caseDefinitionId
+        + ", caseInstanceId=" + caseInstanceId + ", caseExecutionId=" + caseExecutionId + ", name="
+        + name + ", createTime=" + createTime + ", revision=" + revision + ", serializerName="
+        + getSerializerName() + ", longValue=" + longValue + ", doubleValue=" + doubleValue
+        + ", textValue=" + textValue + ", textValue2=" + textValue2 + ", state=" + state
+        + ", byteArrayId=" + getByteArrayId() + "]";
   }
 
 }

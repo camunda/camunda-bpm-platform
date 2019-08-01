@@ -24,31 +24,29 @@ import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Tom Baeyens
  */
-public class DeleteUserCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
+public class DeleteUserCmd extends AbstractWritableIdentityServiceCmd<Void>
+    implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   String userId;
-  
+
   public DeleteUserCmd(String userId) {
     this.userId = userId;
   }
-  
+
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("userId", userId);
 
     // delete user picture
     new DeleteUserPictureCmd(userId).execute(commandContext);
 
-    commandContext.getIdentityInfoManager()
-      .deleteUserInfoByUserId(userId);
+    commandContext.getIdentityInfoManager().deleteUserInfoByUserId(userId);
 
-    IdentityOperationResult operationResult = commandContext
-      .getWritableIdentityProvider()
-      .deleteUser(userId);
+    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider()
+        .deleteUser(userId);
 
     commandContext.getOperationLogManager().logUserOperation(operationResult, userId);
 

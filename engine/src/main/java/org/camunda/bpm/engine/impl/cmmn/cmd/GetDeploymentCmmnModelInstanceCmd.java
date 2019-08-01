@@ -47,18 +47,20 @@ public class GetDeploymentCmmnModelInstanceCmd implements Command<CmmnModelInsta
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     final DeploymentCache deploymentCache = configuration.getDeploymentCache();
 
-    CaseDefinitionEntity caseDefinition = deploymentCache.findDeployedCaseDefinitionById(caseDefinitionId);
+    CaseDefinitionEntity caseDefinition = deploymentCache
+        .findDeployedCaseDefinitionById(caseDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadCaseDefinition(caseDefinition);
     }
 
-    CmmnModelInstance modelInstance = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
+    CmmnModelInstance modelInstance = Context.getProcessEngineConfiguration().getDeploymentCache()
         .findCmmnModelInstanceForCaseDefinition(caseDefinitionId);
 
-    ensureNotNull(CmmnModelInstanceNotFoundException.class, "No CMMN model instance found for case definition id " + caseDefinitionId, "modelInstance", modelInstance);
+    ensureNotNull(CmmnModelInstanceNotFoundException.class,
+        "No CMMN model instance found for case definition id " + caseDefinitionId, "modelInstance",
+        modelInstance);
     return modelInstance;
   }
 

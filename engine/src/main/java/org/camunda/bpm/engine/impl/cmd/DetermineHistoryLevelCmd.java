@@ -37,7 +37,8 @@ public class DetermineHistoryLevelCmd implements Command<HistoryLevel> {
 
   @Override
   public HistoryLevel execute(final CommandContext commandContext) {
-    final Integer databaseHistoryLevel = HistoryLevelSetupCommand.databaseHistoryLevel(commandContext);
+    final Integer databaseHistoryLevel = HistoryLevelSetupCommand
+        .databaseHistoryLevel(commandContext);
 
     HistoryLevel result = null;
 
@@ -51,16 +52,15 @@ public class DetermineHistoryLevelCmd implements Command<HistoryLevel> {
 
       if (result != null) {
         return result;
-      }
-      else {
+      } else {
         // if a custom non-null value is not registered, throw an exception.
-        throw new ProcessEngineException(String.format("The configured history level with id='%s' is not registered in this config.", databaseHistoryLevel));
+        throw new ProcessEngineException(String.format(
+            "The configured history level with id='%s' is not registered in this config.",
+            databaseHistoryLevel));
       }
-    }
-    else {
+    } else {
       return null;
     }
   }
-
 
 }

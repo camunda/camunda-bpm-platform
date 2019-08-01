@@ -56,8 +56,7 @@ public class UpdateExternalTaskRetriesBuilderImpl implements UpdateExternalTaskR
   public UpdateExternalTaskRetriesBuilder externalTaskIds(String... externalTaskIds) {
     if (externalTaskIds == null) {
       this.externalTaskIds = Collections.emptyList();
-    }
-    else {
+    } else {
       this.externalTaskIds = Arrays.asList(externalTaskIds);
     }
     return this;
@@ -71,8 +70,7 @@ public class UpdateExternalTaskRetriesBuilderImpl implements UpdateExternalTaskR
   public UpdateExternalTaskRetriesBuilder processInstanceIds(String... processInstanceIds) {
     if (processInstanceIds == null) {
       this.processInstanceIds = Collections.emptyList();
-    }
-    else {
+    } else {
       this.processInstanceIds = Arrays.asList(processInstanceIds);
     }
     return this;
@@ -83,12 +81,14 @@ public class UpdateExternalTaskRetriesBuilderImpl implements UpdateExternalTaskR
     return this;
   }
 
-  public UpdateExternalTaskRetriesBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
+  public UpdateExternalTaskRetriesBuilder processInstanceQuery(
+      ProcessInstanceQuery processInstanceQuery) {
     this.processInstanceQuery = processInstanceQuery;
     return this;
   }
 
-  public UpdateExternalTaskRetriesBuilder historicProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
+  public UpdateExternalTaskRetriesBuilder historicProcessInstanceQuery(
+      HistoricProcessInstanceQuery historicProcessInstanceQuery) {
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     return this;
   }

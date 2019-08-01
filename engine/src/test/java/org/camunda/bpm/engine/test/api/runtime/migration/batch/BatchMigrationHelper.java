@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.api.runtime.BatchHelper;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 
-public class BatchMigrationHelper extends BatchHelper{
+public class BatchMigrationHelper extends BatchHelper {
 
   protected MigrationTestRule migrationRule;
 
@@ -55,56 +55,65 @@ public class BatchMigrationHelper extends BatchHelper{
   }
 
   public Batch createMigrationBatchWithSize(int batchSize) {
-    int invocationsPerBatchJob = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration()).getInvocationsPerBatchJob();
+    int invocationsPerBatchJob = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine()
+        .getProcessEngineConfiguration()).getInvocationsPerBatchJob();
     return migrateProcessInstancesAsync(invocationsPerBatchJob * batchSize);
   }
 
   public Batch migrateProcessInstancesAsync(int numberOfProcessInstances) {
     sourceProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     targetProcessDefinition = migrationRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    return migrateProcessInstancesAsync(numberOfProcessInstances, sourceProcessDefinition, targetProcessDefinition);
+    return migrateProcessInstancesAsync(numberOfProcessInstances, sourceProcessDefinition,
+        targetProcessDefinition);
   }
 
-  public Batch migrateProcessInstancesAsyncForTenant(int numberOfProcessInstances, String tenantId) {
-    sourceProcessDefinition = migrationRule.deployForTenantAndGetDefinition(tenantId, ProcessModels.ONE_TASK_PROCESS);
-    targetProcessDefinition = migrationRule.deployForTenantAndGetDefinition(tenantId, ProcessModels.ONE_TASK_PROCESS);
-    return migrateProcessInstancesAsync(numberOfProcessInstances, sourceProcessDefinition, targetProcessDefinition);
+  public Batch migrateProcessInstancesAsyncForTenant(int numberOfProcessInstances,
+      String tenantId) {
+    sourceProcessDefinition = migrationRule.deployForTenantAndGetDefinition(tenantId,
+        ProcessModels.ONE_TASK_PROCESS);
+    targetProcessDefinition = migrationRule.deployForTenantAndGetDefinition(tenantId,
+        ProcessModels.ONE_TASK_PROCESS);
+    return migrateProcessInstancesAsync(numberOfProcessInstances, sourceProcessDefinition,
+        targetProcessDefinition);
   }
 
-  public Batch migrateProcessInstanceAsync(ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
+  public Batch migrateProcessInstanceAsync(ProcessDefinition sourceProcessDefinition,
+      ProcessDefinition targetProcessDefinition) {
     return migrateProcessInstancesAsync(1, sourceProcessDefinition, targetProcessDefinition);
   }
 
-  public Batch migrateProcessInstancesAsync(int numberOfProcessInstances, ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
+  public Batch migrateProcessInstancesAsync(int numberOfProcessInstances,
+      ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = new ArrayList<String>(numberOfProcessInstances);
     for (int i = 0; i < numberOfProcessInstances; i++) {
-      processInstanceIds.add(
-        runtimeService.startProcessInstanceById(sourceProcessDefinition.getId()).getId());
+      processInstanceIds
+          .add(runtimeService.startProcessInstanceById(sourceProcessDefinition.getId()).getId());
     }
 
     MigrationPlan migrationPlan = engineRule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    return runtimeService.newMigration(migrationPlan).processInstanceIds(processInstanceIds).executeAsync();
+    return runtimeService.newMigration(migrationPlan).processInstanceIds(processInstanceIds)
+        .executeAsync();
   }
 
   @Override
   public JobDefinition getExecutionJobDefinition(Batch batch) {
-    return engineRule.getManagementService()
-      .createJobDefinitionQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).jobType(Batch.TYPE_PROCESS_INSTANCE_MIGRATION).singleResult();
+    return engineRule.getManagementService().createJobDefinitionQuery()
+        .jobDefinitionId(batch.getBatchJobDefinitionId())
+        .jobType(Batch.TYPE_PROCESS_INSTANCE_MIGRATION).singleResult();
   }
 
   public long countSourceProcessInstances() {
-    return engineRule.getRuntimeService()
-      .createProcessInstanceQuery().processDefinitionId(sourceProcessDefinition.getId()).count();
+    return engineRule.getRuntimeService().createProcessInstanceQuery()
+        .processDefinitionId(sourceProcessDefinition.getId()).count();
   }
 
   public long countTargetProcessInstances() {
-    return engineRule.getRuntimeService()
-      .createProcessInstanceQuery().processDefinitionId(targetProcessDefinition.getId()).count();
+    return engineRule.getRuntimeService().createProcessInstanceQuery()
+        .processDefinitionId(targetProcessDefinition.getId()).count();
   }
 }

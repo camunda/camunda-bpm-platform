@@ -32,15 +32,15 @@ import java.util.Map;
 public class ExternalTaskParseTest extends PluggableProcessEngineTestCase {
 
   public void testParseExternalTaskWithoutTopic() {
-    DeploymentBuilder deploymentBuilder = repositoryService
-      .createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/bpmn/external/ExternalTaskParseTest.testParseExternalTaskWithoutTopic.bpmn20.xml");
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().addClasspathResource(
+        "org/camunda/bpm/engine/test/bpmn/external/ExternalTaskParseTest.testParseExternalTaskWithoutTopic.bpmn20.xml");
 
     try {
       deploymentBuilder.deploy();
       fail("exception expected");
     } catch (ProcessEngineException e) {
-      assertTextPresent("External tasks must specify a 'topic' attribute in the camunda namespace", e.getMessage());
+      assertTextPresent("External tasks must specify a 'topic' attribute in the camunda namespace",
+          e.getMessage());
     }
   }
 
@@ -49,7 +49,8 @@ public class ExternalTaskParseTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("topicName", "testTopicExpression");
 
-    runtimeService.startProcessInstanceByKey("oneExternalTaskWithExpressionTopicProcess", variables);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithExpressionTopicProcess",
+        variables);
     ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
     assertEquals("testTopicExpression", task.getTopicName());
   }

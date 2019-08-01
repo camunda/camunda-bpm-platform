@@ -28,7 +28,8 @@ public interface UpdateProcessInstancesRequest {
    *          list of ids of the process instances
    * @return the builder
    */
-  UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds);
+  UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(
+      List<String> processInstanceIds);
 
   /**
    * Selects a list of process instances with the given list of ids.
@@ -46,7 +47,8 @@ public interface UpdateProcessInstancesRequest {
    *          process instance query that discribes a list of the process instances
    * @return the builder
    */
-  UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery);
+  UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(
+      ProcessInstanceQuery processInstanceQuery);
 
   /**
    * Selects a list of process instances with the given a historical process instance query.
@@ -55,6 +57,7 @@ public interface UpdateProcessInstancesRequest {
    *          historical process instance query that discribes a list of the process instances
    * @return the builder
    */
-  UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery);
+  UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(
+      HistoricProcessInstanceQuery historicProcessInstanceQuery);
 
 }

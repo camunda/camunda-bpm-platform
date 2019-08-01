@@ -20,7 +20,6 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.impl.core.model.Properties;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -28,12 +27,14 @@ public interface PvmProcessElement extends Serializable {
 
   /**
    * The id of the element
+   * 
    * @return the id
    */
   String getId();
 
   /**
    * The process definition scope, root of the scope hierarchy.
+   * 
    * @return
    */
   PvmProcessDefinition getProcessDefinition();

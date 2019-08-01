@@ -39,7 +39,8 @@ public class ClassDelegateExecutionListener extends ClassDelegate implements Exe
 
   protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
-  public ClassDelegateExecutionListener(String className, List<FieldDeclaration> fieldDeclarations) {
+  public ClassDelegateExecutionListener(String className,
+      List<FieldDeclaration> fieldDeclarations) {
     super(className, fieldDeclarations);
   }
 
@@ -51,9 +52,8 @@ public class ClassDelegateExecutionListener extends ClassDelegate implements Exe
   public void notify(DelegateExecution execution) throws Exception {
     ExecutionListener executionListenerInstance = getExecutionListenerInstance();
 
-    Context.getProcessEngineConfiguration()
-      .getDelegateInterceptor()
-      .handleInvocation(new ExecutionListenerInvocation(executionListenerInstance, execution));
+    Context.getProcessEngineConfiguration().getDelegateInterceptor()
+        .handleInvocation(new ExecutionListenerInvocation(executionListenerInstance, execution));
   }
 
   protected ExecutionListener getExecutionListenerInstance() {
@@ -66,7 +66,7 @@ public class ClassDelegateExecutionListener extends ClassDelegate implements Exe
 
     } else {
       throw LOG.missingDelegateParentClassException(delegateInstance.getClass().getName(),
-        ExecutionListener.class.getName(), JavaDelegate.class.getName());
+          ExecutionListener.class.getName(), JavaDelegate.class.getName());
     }
   }
 

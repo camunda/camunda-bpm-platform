@@ -29,9 +29,11 @@ public abstract class MigratingScopeInstance extends MigratingProcessElementInst
 
   public abstract void addChild(MigratingScopeInstance migratingActivityInstance);
 
-  public abstract void removeChild(MigratingCompensationEventSubscriptionInstance migratingEventSubscription);
+  public abstract void removeChild(
+      MigratingCompensationEventSubscriptionInstance migratingEventSubscription);
 
-  public abstract void addChild(MigratingCompensationEventSubscriptionInstance migratingEventSubscription);
+  public abstract void addChild(
+      MigratingCompensationEventSubscriptionInstance migratingEventSubscription);
 
   public abstract boolean migrates();
 

@@ -30,7 +30,7 @@ import org.slf4j.Logger;
  */
 public class CompetingActivityInstanceCancellationTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   Thread testThread = Thread.currentThread();
   static ControllableThread activeThread;
@@ -46,6 +46,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       this.processInstanceId = processInstanceId;
       this.activityInstanceId = activityInstanceId;
     }
+
     public synchronized void startAndWaitUntilControlIsReturned() {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
@@ -53,18 +54,19 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
     public void run() {
       try {
-        processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new ActivityInstanceCancellationCmd(processInstanceId, activityInstanceId)));
+        processEngineConfiguration.getCommandExecutorTxRequired()
+            .execute(new ControlledCommand(activeThread,
+                new ActivityInstanceCancellationCmd(processInstanceId, activityInstanceId)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingForkTest.testCompetingFork.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/concurrency/CompetingForkTest.testCompetingFork.bpmn20.xml" })
   public void testCompetingCancellation() throws Exception {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
@@ -82,28 +84,28 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
       if ("task1".equals(activityId)) {
         task1ActivityInstanceId = id;
-      }
-      else if ("task2".equals(activityId)) {
+      } else if ("task2".equals(activityId)) {
         task2ActivityInstanceId = id;
-      }
-      else if ("task3".equals(activityId)) {
+      } else if ("task3".equals(activityId)) {
         task3ActivityInstanceId = id;
-      }
-      else {
+      } else {
         fail();
       }
     }
 
     LOG.debug("test thread starts thread one");
-    CancelActivityInstance threadOne = new CancelActivityInstance(processInstanceId, task1ActivityInstanceId);
+    CancelActivityInstance threadOne = new CancelActivityInstance(processInstanceId,
+        task1ActivityInstanceId);
     threadOne.startAndWaitUntilControlIsReturned();
 
     LOG.debug("test thread thread two");
-    CancelActivityInstance threadTwo = new CancelActivityInstance(processInstanceId, task2ActivityInstanceId);
+    CancelActivityInstance threadTwo = new CancelActivityInstance(processInstanceId,
+        task2ActivityInstanceId);
     threadTwo.startAndWaitUntilControlIsReturned();
 
     LOG.debug("test thread continues to start thread three");
-    CancelActivityInstance threadThree = new CancelActivityInstance(processInstanceId, task3ActivityInstanceId);
+    CancelActivityInstance threadThree = new CancelActivityInstance(processInstanceId,
+        task3ActivityInstanceId);
     threadThree.startAndWaitUntilControlIsReturned();
 
     LOG.debug("test thread notifies thread 1");
@@ -113,12 +115,14 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
+    assertTextPresent("was updated by another transaction concurrently",
+        threadTwo.exception.getMessage());
 
     LOG.debug("test thread notifies thread 3");
     threadThree.proceedAndWaitTillDone();
     assertNotNull(threadThree.exception);
-    assertTextPresent("was updated by another transaction concurrently", threadThree.exception.getMessage());
+    assertTextPresent("was updated by another transaction concurrently",
+        threadThree.exception.getMessage());
   }
 
 }

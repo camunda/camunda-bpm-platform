@@ -63,36 +63,42 @@ public class BatchModificationAuthorizationTest {
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
         scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ, Permissions.UPDATE)
-            ).succeeds(),
+            .withAuthorizations(grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ,
+                    Permissions.UPDATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ,
+                    Permissions.UPDATE))
+            .succeeds(),
+        scenario().withAuthorizations(
+            grant(Resources.BATCH, "batchId", "userId",
+                BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
+            grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ,
+                Permissions.UPDATE),
+            grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ,
+                Permissions.UPDATE))
+            .succeeds(),
         scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
-                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ, Permissions.UPDATE)
-            ).succeeds(),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
-            ).failsDueToRequired(
+            .withAuthorizations(grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ,
+                    Permissions.UPDATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ))
+            .failsDueToRequired(
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.UPDATE),
-                grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.UPDATE_INSTANCE))
+                grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId",
+                    Permissions.UPDATE_INSTANCE))
             .succeeds(),
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
-                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
-            ).failsDueToRequired(
+                grant(Resources.BATCH, "batchId", "userId",
+                    BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ,
+                    Permissions.UPDATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ))
+            .failsDueToRequired(
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.UPDATE),
-                grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.UPDATE_INSTANCE))
-            .succeeds()
-    );
+                grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId",
+                    Permissions.UPDATE_INSTANCE))
+            .succeeds());
   }
 
   @Before
@@ -109,14 +115,13 @@ public class BatchModificationAuthorizationTest {
   public void cleanBatch() {
     Batch batch = engineRule.getManagementService().createBatchQuery().singleResult();
     if (batch != null) {
-      engineRule.getManagementService().deleteBatch(
-          batch.getId(), true);
+      engineRule.getManagementService().deleteBatch(batch.getId(), true);
     }
 
-    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().singleResult();
+    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
+        .singleResult();
     if (historicBatch != null) {
-      engineRule.getHistoryService().deleteHistoricBatch(
-          historicBatch.getId());
+      engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
     }
   }
 
@@ -127,33 +132,30 @@ public class BatchModificationAuthorizationTest {
 
   @Test
   public void executeAsyncModification() {
-    //given
-    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
-    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+    // given
+    ProcessInstance processInstance1 = engineRule.getRuntimeService()
+        .startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+    ProcessInstance processInstance2 = engineRule.getRuntimeService()
+        .startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
 
-    authRule
-        .init(scenario)
-        .withUser("userId")
+    authRule.init(scenario).withUser("userId")
         .bindResource("processInstance1", processInstance1.getId())
         .bindResource("processInstance2", processInstance2.getId())
-        .bindResource("processDefinition", ProcessModels.PROCESS_KEY)
-        .bindResource("batchId", "*")
+        .bindResource("processDefinition", ProcessModels.PROCESS_KEY).bindResource("batchId", "*")
         .start();
 
-    Batch batch = engineRule.getRuntimeService()
-        .createModification(processDefinition.getId())
+    Batch batch = engineRule.getRuntimeService().createModification(processDefinition.getId())
         .processInstanceIds(processInstance1.getId(), processInstance2.getId())
-        .startAfterActivity("userTask2")
-        .executeAsync();
+        .startAfterActivity("userTask2").executeAsync();
 
     Job job = engineRule.getManagementService().createJobQuery()
-        .jobDefinitionId(batch.getSeedJobDefinitionId())
-        .singleResult();
+        .jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
 
-    //seed job
+    // seed job
     engineRule.getManagementService().executeJob(job.getId());
 
-    for (Job pending : engineRule.getManagementService().createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
+    for (Job pending : engineRule.getManagementService().createJobQuery()
+        .jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
       engineRule.getManagementService().executeJob(pending.getId());
     }
 
@@ -163,25 +165,22 @@ public class BatchModificationAuthorizationTest {
 
   @Test
   public void executeModification() {
-    //given
-    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
-    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+    // given
+    ProcessInstance processInstance1 = engineRule.getRuntimeService()
+        .startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+    ProcessInstance processInstance2 = engineRule.getRuntimeService()
+        .startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
 
-    authRule
-        .init(scenario)
-        .withUser("userId")
+    authRule.init(scenario).withUser("userId")
         .bindResource("processInstance1", processInstance1.getId())
         .bindResource("processInstance2", processInstance2.getId())
-        .bindResource("processDefinition", ProcessModels.PROCESS_KEY)
-        .bindResource("batchId", "*")
+        .bindResource("processDefinition", ProcessModels.PROCESS_KEY).bindResource("batchId", "*")
         .start();
 
     // when
-    engineRule.getRuntimeService()
-        .createModification(processDefinition.getId())
+    engineRule.getRuntimeService().createModification(processDefinition.getId())
         .processInstanceIds(processInstance1.getId(), processInstance2.getId())
-        .startAfterActivity("userTask2")
-        .execute();
+        .startAfterActivity("userTask2").execute();
 
     // then
     authRule.assertScenario(scenario);

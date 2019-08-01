@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.runtime;
 
-
-
 /**
  * Represent a 'path of execution' in a process instance.
  *
@@ -42,13 +40,15 @@ public interface Execution {
    */
   boolean isEnded();
 
-  /** Id of the root of the execution tree representing the process instance.
-   * It is the same as {@link #getId()} if this execution is the process instance. */
+  /**
+   * Id of the root of the execution tree representing the process instance. It is the same as
+   * {@link #getId()} if this execution is the process instance.
+   */
   String getProcessInstanceId();
 
   /**
-   * The id of the tenant this execution belongs to. Can be <code>null</code>
-   * if the execution belongs to no single tenant.
+   * The id of the tenant this execution belongs to. Can be <code>null</code> if the execution
+   * belongs to no single tenant.
    */
   String getTenantId();
 

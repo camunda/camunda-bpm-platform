@@ -24,8 +24,9 @@ import org.camunda.bpm.engine.history.NativeHistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-
-public class NativeHistoricCaseInstanceQueryImpl extends AbstractNativeQuery<NativeHistoricCaseInstanceQuery, HistoricCaseInstance> implements NativeHistoricCaseInstanceQuery {
+public class NativeHistoricCaseInstanceQueryImpl
+    extends AbstractNativeQuery<NativeHistoricCaseInstanceQuery, HistoricCaseInstance>
+    implements NativeHistoricCaseInstanceQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,18 +38,17 @@ public class NativeHistoricCaseInstanceQueryImpl extends AbstractNativeQuery<Nat
     super(commandExecutor);
   }
 
- //results ////////////////////////////////////////////////////////////////
-  
-  public List<HistoricCaseInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return commandContext
-      .getHistoricCaseInstanceManager()
-      .findHistoricCaseInstancesByNativeQuery(parameterMap, firstResult, maxResults);
+  // results ////////////////////////////////////////////////////////////////
+
+  public List<HistoricCaseInstance> executeList(CommandContext commandContext,
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return commandContext.getHistoricCaseInstanceManager()
+        .findHistoricCaseInstancesByNativeQuery(parameterMap, firstResult, maxResults);
   }
-  
+
   public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext
-      .getHistoricCaseInstanceManager()
-      .findHistoricCaseInstanceCountByNativeQuery(parameterMap);
+    return commandContext.getHistoricCaseInstanceManager()
+        .findHistoricCaseInstanceCountByNativeQuery(parameterMap);
   }
 
 }

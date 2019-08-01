@@ -33,7 +33,6 @@ import org.junit.rules.RuleChain;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-
 public class MigrationMessageStartEventTest {
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
@@ -51,26 +50,26 @@ public class MigrationMessageStartEventTest {
   @Test
   public void testMigrateEventSubscription() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.MESSAGE_START_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(MessageReceiveModels.MESSAGE_START_PROCESS);
     String sourceProcessDefinitionId = sourceProcessDefinition.getId();
 
     MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(sourceProcessDefinitionId, sourceProcessDefinitionId)
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceProcessDefinitionId, sourceProcessDefinitionId)
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinitionId);
-    EventSubscription eventSubscription = runtimeService
-        .createEventSubscriptionQuery()
-        .activityId("startEvent")
-        .eventName(MessageReceiveModels.MESSAGE_NAME)
-        .singleResult();
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinitionId);
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery()
+        .activityId("startEvent").eventName(MessageReceiveModels.MESSAGE_NAME).singleResult();
 
     // when
-    runtimeService.newMigration(migrationPlan).processInstanceIds(processInstance.getId()).execute();
+    runtimeService.newMigration(migrationPlan).processInstanceIds(processInstance.getId())
+        .execute();
 
     // then
-    assertEventSubscriptionMigrated(eventSubscription, "startEvent", MessageReceiveModels.MESSAGE_NAME);
+    assertEventSubscriptionMigrated(eventSubscription, "startEvent",
+        MessageReceiveModels.MESSAGE_NAME);
 
     testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(processInstance.getId());
@@ -79,21 +78,25 @@ public class MigrationMessageStartEventTest {
   @Test
   public void testMigrateEventSubscriptionWithEventSubProcess() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper
+        .deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = runtimeService
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
-    runtimeService.newMigration(migrationPlan).processInstanceIds(processInstance.getId()).execute();
+    runtimeService.newMigration(migrationPlan).processInstanceIds(processInstance.getId())
+        .execute();
 
     // then
-    EventSubscription eventSubscriptionAfter = runtimeService.createEventSubscriptionQuery().singleResult();
+    EventSubscription eventSubscriptionAfter = runtimeService.createEventSubscriptionQuery()
+        .singleResult();
 
     assertNotNull(eventSubscriptionAfter);
     assertEquals(EventSubProcessModels.MESSAGE_NAME, eventSubscriptionAfter.getEventName());
@@ -103,10 +106,12 @@ public class MigrationMessageStartEventTest {
     testHelper.assertProcessEnded(processInstance.getId());
   }
 
-  protected void assertEventSubscriptionMigrated(EventSubscription eventSubscriptionBefore, String activityIdAfter, String eventName) {
-    EventSubscription eventSubscriptionAfter = runtimeService.createEventSubscriptionQuery().singleResult();
-    assertNotNull("Expected that an event subscription with id '" + eventSubscriptionBefore.getId() + "' "
-        + "exists after migration", eventSubscriptionAfter);
+  protected void assertEventSubscriptionMigrated(EventSubscription eventSubscriptionBefore,
+      String activityIdAfter, String eventName) {
+    EventSubscription eventSubscriptionAfter = runtimeService.createEventSubscriptionQuery()
+        .singleResult();
+    assertNotNull("Expected that an event subscription with id '" + eventSubscriptionBefore.getId()
+        + "' " + "exists after migration", eventSubscriptionAfter);
 
     assertEquals(eventSubscriptionBefore.getEventType(), eventSubscriptionAfter.getEventType());
     assertEquals(activityIdAfter, eventSubscriptionAfter.getActivityId());

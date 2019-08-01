@@ -49,8 +49,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Represents the test class for the process instantiation on which
- * the process instance is returned with variables.
+ * Represents the test class for the process instantiation on which the process instance is returned
+ * with variables.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
@@ -63,7 +63,8 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   protected static final String SIMPLE_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationWithVariablesInReturn.simpleProcess.bpmn20.xml";
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
       return configuration;
     }
@@ -76,10 +77,7 @@ public class ProcessInstantiationWithVariablesInReturnTest {
 
   private void checkVariables(VariableMap map, int expectedSize) {
     List<HistoricVariableInstance> variables = engineRule.getHistoryService()
-            .createHistoricVariableInstanceQuery()
-            .orderByVariableName()
-            .asc()
-            .list();
+        .createHistoricVariableInstanceQuery().orderByVariableName().asc().list();
 
     assertEquals(expectedSize, variables.size());
 
@@ -99,23 +97,24 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   }
 
   private void testVariablesWithoutDeserialization(String processDefinitionKey) throws Exception {
-    //given serializable variable
+    // given serializable variable
     JavaSerializable javaSerializable = new JavaSerializable("foo");
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()),
+        engineRule.getProcessEngine());
 
-    //when execute process with serialized variable and wait state
+    // when execute process with serialized variable and wait state
     ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService()
-            .createProcessInstanceByKey(processDefinitionKey)
-            .setVariable("serializedVar", serializedObjectValue(serializedObject)
-              .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
-              .objectTypeName(JavaSerializable.class.getName())
-              .create())
-            .executeWithVariablesInReturn(false, false);
+        .createProcessInstanceByKey(processDefinitionKey)
+        .setVariable("serializedVar",
+            serializedObjectValue(serializedObject)
+                .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
+                .objectTypeName(JavaSerializable.class.getName()).create())
+        .executeWithVariablesInReturn(false, false);
 
-    //then returned instance contains serialized variable
+    // then returned instance contains serialized variable
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
@@ -123,7 +122,7 @@ public class ProcessInstantiationWithVariablesInReturnTest {
     assertFalse(serializedVar.isDeserialized());
     assertObjectValueSerializedJava(serializedVar, javaSerializable);
 
-    //access on value should fail because variable is not deserialized
+    // access on value should fail because variable is not deserialized
     try {
       serializedVar.getValue();
       Assert.fail("Deserialization should fail!");
@@ -147,16 +146,16 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   @Test
   @Deployment(resources = SIMPLE_PROCESS)
   public void testReturnVariablesFromStart() {
-    //given execute process with variables
+    // given execute process with variables
     ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService()
-            .createProcessInstanceByKey("simpleProcess")
-            .setVariable("aVariable1", "aValue1")
-            .setVariableLocal("aVariable2", "aValue2")
-            .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
-            .setVariablesLocal(Variables.createVariables().putValue("aVariable4", new byte[]{127, 34, 64}))
-            .executeWithVariablesInReturn(false, false);
+        .createProcessInstanceByKey("simpleProcess").setVariable("aVariable1", "aValue1")
+        .setVariableLocal("aVariable2", "aValue2")
+        .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
+        .setVariablesLocal(
+            Variables.createVariables().putValue("aVariable4", new byte[] { 127, 34, 64 }))
+        .executeWithVariablesInReturn(false, false);
 
-    //when returned instance contains variables
+    // when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
@@ -167,16 +166,16 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   @Test
   @Deployment(resources = SUBPROCESS_PROCESS)
   public void testReturnVariablesFromStartWithWaitstate() {
-    //given execute process with variables and wait state
+    // given execute process with variables and wait state
     ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService()
-            .createProcessInstanceByKey("subprocess")
-            .setVariable("aVariable1", "aValue1")
-            .setVariableLocal("aVariable2", "aValue2")
-            .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
-            .setVariablesLocal(Variables.createVariables().putValue("aVariable4", new byte[]{127, 34, 64}))
-            .executeWithVariablesInReturn(false, false);
+        .createProcessInstanceByKey("subprocess").setVariable("aVariable1", "aValue1")
+        .setVariableLocal("aVariable2", "aValue2")
+        .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
+        .setVariablesLocal(
+            Variables.createVariables().putValue("aVariable4", new byte[] { 127, 34, 64 }))
+        .executeWithVariablesInReturn(false, false);
 
-    //when returned instance contains variables
+    // when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
@@ -187,17 +186,16 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   @Test
   @Deployment(resources = SUBPROCESS_PROCESS)
   public void testReturnVariablesFromStartWithWaitstateStartInSubProcess() {
-    //given execute process with variables and wait state in sub process
+    // given execute process with variables and wait state in sub process
     ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService()
-            .createProcessInstanceByKey("subprocess")
-            .setVariable("aVariable1", "aValue1")
-            .setVariableLocal("aVariable2", "aValue2")
-            .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
-            .setVariablesLocal(Variables.createVariables().putValue("aVariable4", new byte[]{127, 34, 64}))
-            .startBeforeActivity("innerTask")
-            .executeWithVariablesInReturn(true, true);
+        .createProcessInstanceByKey("subprocess").setVariable("aVariable1", "aValue1")
+        .setVariableLocal("aVariable2", "aValue2")
+        .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
+        .setVariablesLocal(
+            Variables.createVariables().putValue("aVariable4", new byte[] { 127, 34, 64 }))
+        .startBeforeActivity("innerTask").executeWithVariablesInReturn(true, true);
 
-    //when returned instance contains variables
+    // when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
@@ -209,10 +207,10 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   @Deployment(resources = SET_VARIABLE_IN_DELEGATE_PROCESS)
   public void testReturnVariablesFromExecution() {
 
-    //given executed process which sets variables in java delegate
-    ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService().createProcessInstanceByKey("variableProcess")
-            .executeWithVariablesInReturn();
-    //when returned instance contains variables
+    // given executed process which sets variables in java delegate
+    ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService()
+        .createProcessInstanceByKey("variableProcess").executeWithVariablesInReturn();
+    // when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
@@ -224,10 +222,10 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   @Deployment(resources = SET_VARIABLE_IN_DELEGATE_WITH_WAIT_STATE_PROCESS)
   public void testReturnVariablesFromExecutionWithWaitstate() {
 
-    //given executed process which sets variables in java delegate
-    ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService().createProcessInstanceByKey("variableProcess")
-            .executeWithVariablesInReturn();
-    //when returned instance contains variables
+    // given executed process which sets variables in java delegate
+    ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService()
+        .createProcessInstanceByKey("variableProcess").executeWithVariablesInReturn();
+    // when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
@@ -239,14 +237,15 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   @Deployment(resources = SET_VARIABLE_IN_DELEGATE_PROCESS)
   public void testReturnVariablesFromStartAndExecution() {
 
-    //given executed process which sets variables in java delegate
-    ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService().createProcessInstanceByKey("variableProcess")
-            .setVariable("aVariable1", "aValue1")
-            .setVariableLocal("aVariable2", "aValue2")
-            .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
-            .setVariablesLocal(Variables.createVariables().putValue("aVariable4", new byte[]{127, 34, 64}))
-            .executeWithVariablesInReturn();
-    //when returned instance contains variables
+    // given executed process which sets variables in java delegate
+    ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService()
+        .createProcessInstanceByKey("variableProcess").setVariable("aVariable1", "aValue1")
+        .setVariableLocal("aVariable2", "aValue2")
+        .setVariables(Variables.createVariables().putValue("aVariable3", "aValue3"))
+        .setVariablesLocal(
+            Variables.createVariables().putValue("aVariable4", new byte[] { 127, 34, 64 }))
+        .executeWithVariablesInReturn();
+    // when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 
@@ -258,15 +257,16 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   @Deployment(resources = SET_VARIABLE_IN_DELEGATE_WITH_WAIT_STATE_PROCESS)
   public void testReturnVariablesFromStartAndExecutionWithWaitstate() {
 
-    //given executed process which overwrites these four variables in java delegate
+    // given executed process which overwrites these four variables in java delegate
     // and adds four additional variables
-    ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService().createProcessInstanceByKey("variableProcess")
-            .setVariable("stringVar", "aValue1")
-            .setVariableLocal("integerVar", 56789)
-            .setVariables(Variables.createVariables().putValue("longVar", 123L))
-            .setVariablesLocal(Variables.createVariables().putValue("byteVar", new byte[]{127, 34, 64}))
-            .executeWithVariablesInReturn(false, false);
-    //when returned instance contains variables
+    ProcessInstanceWithVariables procInstance = engineRule.getRuntimeService()
+        .createProcessInstanceByKey("variableProcess").setVariable("stringVar", "aValue1")
+        .setVariableLocal("integerVar", 56789)
+        .setVariables(Variables.createVariables().putValue("longVar", 123L))
+        .setVariablesLocal(
+            Variables.createVariables().putValue("byteVar", new byte[] { 127, 34, 64 }))
+        .executeWithVariablesInReturn(false, false);
+    // when returned instance contains variables
     VariableMap map = procInstance.getVariables();
     assertNotNull(map);
 

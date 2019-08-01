@@ -103,7 +103,8 @@ public class IdentityServiceTest {
       for (Tenant tenant : processEngine.getIdentityService().createTenantQuery().list()) {
         processEngine.getIdentityService().deleteTenant(tenant.getId());
       }
-      for (Authorization authorization : processEngine.getAuthorizationService().createAuthorizationQuery().list()) {
+      for (Authorization authorization : processEngine.getAuthorizationService()
+          .createAuthorizationQuery().list()) {
         processEngine.getAuthorizationService().deleteAuthorization(authorization.getId());
       }
 
@@ -140,19 +141,22 @@ public class IdentityServiceTest {
     User user = identityService.newUser("testuser");
     identityService.saveUser(user);
 
-    identityService.setUserAccount("testuser", "123", "google", "mygoogleusername", "mygooglepwd", null);
+    identityService.setUserAccount("testuser", "123", "google", "mygoogleusername", "mygooglepwd",
+        null);
     Account googleAccount = identityService.getUserAccount("testuser", "123", "google");
     assertEquals("google", googleAccount.getName());
     assertEquals("mygoogleusername", googleAccount.getUsername());
     assertEquals("mygooglepwd", googleAccount.getPassword());
 
-    identityService.setUserAccount("testuser", "123", "google", "mygoogleusername2", "mygooglepwd2", null);
+    identityService.setUserAccount("testuser", "123", "google", "mygoogleusername2", "mygooglepwd2",
+        null);
     googleAccount = identityService.getUserAccount("testuser", "123", "google");
     assertEquals("google", googleAccount.getName());
     assertEquals("mygoogleusername2", googleAccount.getUsername());
     assertEquals("mygooglepwd2", googleAccount.getPassword());
 
-    identityService.setUserAccount("testuser", "123", "alfresco", "myalfrescousername", "myalfrescopwd", null);
+    identityService.setUserAccount("testuser", "123", "alfresco", "myalfrescousername",
+        "myalfrescopwd", null);
     identityService.setUserInfo("testuser", "myinfo", "myvalue");
     identityService.setUserInfo("testuser", "myinfo2", "myvalue2");
 
@@ -193,7 +197,8 @@ public class IdentityServiceTest {
     Map<String, String> accountDetails = new HashMap<String, String>();
     accountDetails.put("server", "localhost");
     accountDetails.put("port", "35");
-    identityService.setUserAccount("testuser", "123", "google", "mygoogleusername", "mygooglepwd", accountDetails);
+    identityService.setUserAccount("testuser", "123", "google", "mygoogleusername", "mygooglepwd",
+        accountDetails);
     Account googleAccount = identityService.getUserAccount("testuser", "123", "google");
     assertEquals(accountDetails, googleAccount.getDetails());
 
@@ -585,9 +590,9 @@ public class IdentityServiceTest {
 
   @Test
   public void testSaveUserWithGenericResourceId() {
-    processEngine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
-      .buildProcessEngine();
+    processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(
+        "org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
+        .buildProcessEngine();
 
     User user = processEngine.getIdentityService().newUser("*");
 
@@ -599,9 +604,9 @@ public class IdentityServiceTest {
 
   @Test
   public void testSaveGroupWithGenericResourceId() {
-    processEngine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
-      .buildProcessEngine();
+    processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(
+        "org/camunda/bpm/engine/test/api/identity/generic.resource.id.whitelist.camunda.cfg.xml")
+        .buildProcessEngine();
 
     Group group = processEngine.getIdentityService().newGroup("*");
 
@@ -695,7 +700,8 @@ public class IdentityServiceTest {
     identityService.saveUser(user);
 
     thrown.expect(AuthenticationException.class);
-    thrown.expectMessage("The user with id 'johndoe' is permanently locked. Please contact your admin to unlock the account.");
+    thrown.expectMessage(
+        "The user with id 'johndoe' is permanently locked. Please contact your admin to unlock the account.");
 
     Date now = sdf.parse("2000-01-24T13:00:00");
     ClockUtil.setCurrentTime(now);
@@ -729,9 +735,9 @@ public class IdentityServiceTest {
 
     Date now = ClockUtil.getCurrentTime();
     assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
-    try{
-    assertFalse(identityService.checkPassword("johndoe", "xxx"));
-    fail("expected exception");
+    try {
+      assertFalse(identityService.checkPassword("johndoe", "xxx"));
+      fail("expected exception");
     } catch (AuthenticationException e) {
       assertTrue(e.getMessage().contains("The user with id 'johndoe' is locked."));
     }
@@ -750,7 +756,6 @@ public class IdentityServiceTest {
     Date now = null;
     now = ClockUtil.getCurrentTime();
     assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
-
 
     // try again before exprTime
     ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 1));
@@ -798,20 +803,23 @@ public class IdentityServiceTest {
 
     identityService.createMembership("joesmoe", "user");
 
-    List<Group> groups = identityService.createGroupQuery().groupMember("johndoe").groupType("security-role").list();
+    List<Group> groups = identityService.createGroupQuery().groupMember("johndoe")
+        .groupType("security-role").list();
     Set<String> groupIds = getGroupIds(groups);
     Set<String> expectedGroupIds = new HashSet<String>();
     expectedGroupIds.add("user");
     expectedGroupIds.add("admin");
     assertEquals(expectedGroupIds, groupIds);
 
-    groups = identityService.createGroupQuery().groupMember("joesmoe").groupType("security-role").list();
+    groups = identityService.createGroupQuery().groupMember("joesmoe").groupType("security-role")
+        .list();
     groupIds = getGroupIds(groups);
     expectedGroupIds = new HashSet<String>();
     expectedGroupIds.add("user");
     assertEquals(expectedGroupIds, groupIds);
 
-    groups = identityService.createGroupQuery().groupMember("jackblack").groupType("security-role").list();
+    groups = identityService.createGroupQuery().groupMember("jackblack").groupType("security-role")
+        .list();
     assertTrue(groups.isEmpty());
 
     identityService.deleteGroup("sales");
@@ -964,8 +972,9 @@ public class IdentityServiceTest {
   @Test
   public void testCustomResourceWhitelist() {
     processEngine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/custom.whitelist.camunda.cfg.xml")
-      .buildProcessEngine();
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/api/identity/custom.whitelist.camunda.cfg.xml")
+        .buildProcessEngine();
     String invalidUserId = "johnDoe";
     String invalidGroupId = "johnsGroup";
     String invalidTenantId = "johnsTenant";
@@ -995,8 +1004,9 @@ public class IdentityServiceTest {
   @Test
   public void testSeparateResourceWhitelistPatterns() {
     processEngine = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/custom.resource.whitelist.camunda.cfg.xml")
-      .buildProcessEngine();
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/api/identity/custom.resource.whitelist.camunda.cfg.xml")
+        .buildProcessEngine();
 
     String invalidUserId = "12345";
     String invalidGroupId = "johnsGroup";

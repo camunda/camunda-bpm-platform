@@ -33,7 +33,7 @@ public class DurationBusinessCalendarTest extends PvmTestCase {
   public void tearDown() {
     ClockUtil.reset();
   }
-  
+
   public void testSimpleDuration() throws Exception {
     DurationBusinessCalendar businessCalendar = new DurationBusinessCalendar();
 
@@ -47,7 +47,7 @@ public class DurationBusinessCalendarTest extends PvmTestCase {
 
     assertEquals(expectedDuedate, duedate);
   }
-  
+
   public void testSimpleDurationWithStartDate() throws Exception {
     DurationBusinessCalendar businessCalendar = new DurationBusinessCalendar();
 

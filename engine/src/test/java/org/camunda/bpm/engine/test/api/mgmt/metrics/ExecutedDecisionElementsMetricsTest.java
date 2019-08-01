@@ -26,30 +26,26 @@ import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 public class ExecutedDecisionElementsMetricsTest extends AbstractMetricsTest {
 
   public static final String DMN_FILE = "org/camunda/bpm/engine/test/api/mgmt/metrics/ExecutedDecisionElementsTest.dmn11.xml";
-  public static VariableMap VARIABLES = Variables.createVariables().putValue("status", "").putValue("sum", 100);
+  public static VariableMap VARIABLES = Variables.createVariables().putValue("status", "")
+      .putValue("sum", 100);
 
   @Override
   protected void clearMetrics() {
     super.clearMetrics();
-    processEngineConfiguration.getDmnEngineConfiguration()
-      .getEngineMetricCollector()
-      .clearExecutedDecisionElements();
+    processEngineConfiguration.getDmnEngineConfiguration().getEngineMetricCollector()
+        .clearExecutedDecisionElements();
   }
 
   public void testBusinessRuleTask() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .businessRuleTask("task")
-        .endEvent()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .businessRuleTask("task").endEvent().done();
 
     BusinessRuleTask task = modelInstance.getModelElementById("task");
     task.setCamundaDecisionRef("decision");
 
     deploymentId = repositoryService.createDeployment()
-        .addModelInstance("process.bpmn", modelInstance)
-        .addClasspathResource(DMN_FILE)
-        .deploy().getId();
+        .addModelInstance("process.bpmn", modelInstance).addClasspathResource(DMN_FILE).deploy()
+        .getId();
 
     assertEquals(0l, getExecutedDecisionElements());
     assertEquals(0l, getExecutedDecisionElementsFromDmnEngine());
@@ -66,14 +62,11 @@ public class ExecutedDecisionElementsMetricsTest extends AbstractMetricsTest {
   }
 
   protected long getExecutedDecisionElements() {
-    return managementService.createMetricsQuery()
-        .name(Metrics.EXECUTED_DECISION_ELEMENTS)
-        .sum();
+    return managementService.createMetricsQuery().name(Metrics.EXECUTED_DECISION_ELEMENTS).sum();
   }
 
   protected long getExecutedDecisionElementsFromDmnEngine() {
-    return processEngineConfiguration.getDmnEngineConfiguration()
-        .getEngineMetricCollector()
+    return processEngineConfiguration.getDmnEngineConfiguration().getEngineMetricCollector()
         .getExecutedDecisionElements();
   }
 

@@ -23,20 +23,23 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-public class OptimizeCompletedHistoricActivityInstanceQueryCmd implements Command<List<HistoricActivityInstance>> {
+public class OptimizeCompletedHistoricActivityInstanceQueryCmd
+    implements Command<List<HistoricActivityInstance>> {
 
   protected Date finishedAfter;
   protected Date finishedAt;
   protected int maxResults;
 
-  public OptimizeCompletedHistoricActivityInstanceQueryCmd(Date finishedAfter, Date finishedAt, int maxResults) {
+  public OptimizeCompletedHistoricActivityInstanceQueryCmd(Date finishedAfter, Date finishedAt,
+      int maxResults) {
     this.finishedAfter = finishedAfter;
     this.finishedAt = finishedAt;
     this.maxResults = maxResults;
   }
 
   public List<HistoricActivityInstance> execute(CommandContext commandContext) {
-    return commandContext.getOptimizeManager().getCompletedHistoricActivityInstances(finishedAfter, finishedAt, maxResults);
+    return commandContext.getOptimizeManager().getCompletedHistoricActivityInstances(finishedAfter,
+        finishedAt, maxResults);
   }
 
 }

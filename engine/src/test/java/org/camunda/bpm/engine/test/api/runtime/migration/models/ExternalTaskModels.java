@@ -29,27 +29,12 @@ public class ExternalTaskModels {
   public static final Integer PRIORITY = 100;
 
   public static final BpmnModelInstance ONE_EXTERNAL_TASK_PROCESS = ProcessModels.newModel()
-      .startEvent()
-      .serviceTask("externalTask")
-        .camundaType(EXTERNAL_TASK_TYPE)
-        .camundaTopic(TOPIC)
-        .camundaTaskPriority(PRIORITY.toString())
-      .endEvent()
-      .done();
+      .startEvent().serviceTask("externalTask").camundaType(EXTERNAL_TASK_TYPE).camundaTopic(TOPIC)
+      .camundaTaskPriority(PRIORITY.toString()).endEvent().done();
 
-  public static final BpmnModelInstance SUBPROCESS_PROCESS = ProcessModels.newModel()
-      .startEvent()
-      .subProcess()
-      .embeddedSubProcess()
-        .startEvent()
-        .serviceTask("externalTask")
-          .camundaType(EXTERNAL_TASK_TYPE)
-          .camundaTopic(TOPIC)
-          .camundaTaskPriority(PRIORITY.toString())
-        .endEvent()
-        .subProcessDone()
-      .endEvent()
-      .done();
-
+  public static final BpmnModelInstance SUBPROCESS_PROCESS = ProcessModels.newModel().startEvent()
+      .subProcess().embeddedSubProcess().startEvent().serviceTask("externalTask")
+      .camundaType(EXTERNAL_TASK_TYPE).camundaTopic(TOPIC).camundaTaskPriority(PRIORITY.toString())
+      .endEvent().subProcessDone().endEvent().done();
 
 }

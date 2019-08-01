@@ -31,7 +31,8 @@ import org.camunda.bpm.engine.runtime.TransitionInstance;
  * @author Thorben Lindhauer
  *
  */
-public class MigratingTransitionInstance extends MigratingProcessElementInstance implements MigratingInstance {
+public class MigratingTransitionInstance extends MigratingProcessElementInstance
+    implements MigratingInstance {
 
   public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
@@ -42,12 +43,8 @@ public class MigratingTransitionInstance extends MigratingProcessElementInstance
   protected List<MigratingInstance> migratingDependentInstances = new ArrayList<MigratingInstance>();
   protected boolean activeState;
 
-
-  public MigratingTransitionInstance(
-      TransitionInstance transitionInstance,
-      MigrationInstruction migrationInstruction,
-      ScopeImpl sourceScope,
-      ScopeImpl targetScope,
+  public MigratingTransitionInstance(TransitionInstance transitionInstance,
+      MigrationInstruction migrationInstruction, ScopeImpl sourceScope, ScopeImpl targetScope,
       ExecutionEntity asyncExecution) {
     this.transitionInstance = transitionInstance;
     this.migrationInstruction = migrationInstruction;
@@ -107,8 +104,7 @@ public class MigratingTransitionInstance extends MigratingProcessElementInstance
   public ExecutionEntity resolveRepresentativeExecution() {
     if (representativeExecution.getReplacedBy() != null) {
       return representativeExecution.resolveReplacedBy();
-    }
-    else {
+    } else {
       return representativeExecution;
     }
   }

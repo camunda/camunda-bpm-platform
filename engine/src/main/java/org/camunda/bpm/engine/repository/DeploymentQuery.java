@@ -24,19 +24,18 @@ import org.camunda.bpm.engine.query.Query;
 /**
  * Allows programmatic querying of {@link Deployment}s.
  *
- * Note that it is impossible to retrieve the deployment resources through the
- * results of this operation, since that would cause a huge transfer of
- * (possibly) unneeded bytes over the wire.
+ * Note that it is impossible to retrieve the deployment resources through the results of this
+ * operation, since that would cause a huge transfer of (possibly) unneeded bytes over the wire.
  *
  * To retrieve the actual bytes of a deployment resource use the operations on the
- * {@link RepositoryService#getDeploymentResourceNames(String)}
- * and {@link RepositoryService#getResourceAsStream(String, String)}
+ * {@link RepositoryService#getDeploymentResourceNames(String)} and
+ * {@link RepositoryService#getResourceAsStream(String, String)}
  *
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Ingo Richtsmeier
  */
-public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
+public interface DeploymentQuery extends Query<DeploymentQuery, Deployment> {
 
   /** Only select deployments with the given deployment id. */
   DeploymentQuery deploymentId(String deploymentId);
@@ -48,10 +47,8 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   DeploymentQuery deploymentNameLike(String nameLike);
 
   /**
-   * If the given <code>source</code> is <code>null</code>,
-   * then deployments are returned where source is equal to null.
-   * Otherwise only deployments with the given source are
-   * selected.
+   * If the given <code>source</code> is <code>null</code>, then deployments are returned where
+   * source is equal to null. Otherwise only deployments with the given source are selected.
    */
   DeploymentQuery deploymentSource(String source);
 
@@ -68,12 +65,12 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   DeploymentQuery withoutTenantId();
 
   /**
-   * Select deployments which have no tenant id. Can be used in
-   * combination with {@link #tenantIdIn(String...)}.
+   * Select deployments which have no tenant id. Can be used in combination with
+   * {@link #tenantIdIn(String...)}.
    */
   DeploymentQuery includeDeploymentsWithoutTenantId();
 
-  //sorting ////////////////////////////////////////////////////////
+  // sorting ////////////////////////////////////////////////////////
 
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   DeploymentQuery orderByDeploymentId();
@@ -81,16 +78,22 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   /** Order by deployment name (needs to be followed by {@link #asc()} or {@link #desc()}). */
   DeploymentQuery orderByDeploymentName();
 
-  /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * @deprecated Use {@link #orderByDeploymentTime()} instead</p>*/
+  /**
+   * Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * 
+   * @deprecated Use {@link #orderByDeploymentTime()} instead
+   *             </p>
+   */
   @Deprecated
   DeploymentQuery orderByDeploymenTime();
 
   /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}). */
   DeploymentQuery orderByDeploymentTime();
 
-  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of process instances without tenant id is database-specific. */
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of process instances without tenant id is database-specific.
+   */
   DeploymentQuery orderByTenantId();
 
 }

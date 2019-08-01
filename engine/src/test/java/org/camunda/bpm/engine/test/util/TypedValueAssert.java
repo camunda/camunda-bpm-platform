@@ -67,19 +67,21 @@ public class TypedValueAssert {
   }
 
   public static void assertObjectValueSerializedJava(ObjectValue typedValue, Object value) {
-    assertEquals(Variables.SerializationDataFormats.JAVA.getName(), typedValue.getSerializationDataFormat());
+    assertEquals(Variables.SerializationDataFormats.JAVA.getName(),
+        typedValue.getSerializationDataFormat());
 
     try {
-      // validate this is the base 64 encoded string representation of the serialized value of the java object
+      // validate this is the base 64 encoded string representation of the serialized value of the
+      // java object
       String valueSerialized = typedValue.getValueSerialized();
-      byte[] decodedObject = Base64.decodeBase64(valueSerialized.getBytes(Charset.forName("UTF-8")));
-      ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(decodedObject));
+      byte[] decodedObject = Base64
+          .decodeBase64(valueSerialized.getBytes(Charset.forName("UTF-8")));
+      ObjectInputStream objectInputStream = new ObjectInputStream(
+          new ByteArrayInputStream(decodedObject));
       assertEquals(value, objectInputStream.readObject());
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
-    }
-    catch(ClassNotFoundException e) {
+    } catch (ClassNotFoundException e) {
       throw new RuntimeException(e);
     }
   }
@@ -89,6 +91,5 @@ public class TypedValueAssert {
     assertNull(nullValue.getValue());
     assertEquals(ValueType.NULL, nullValue.getType());
   }
-
 
 }

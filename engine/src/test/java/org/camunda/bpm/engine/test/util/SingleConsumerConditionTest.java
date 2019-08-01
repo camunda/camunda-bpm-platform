@@ -24,7 +24,7 @@ import org.junit.Test;
 
 public class SingleConsumerConditionTest {
 
-  @Test(timeout=10000)
+  @Test(timeout = 10000)
   public void shouldNotBlockIfSignalAvailable() {
     SingleConsumerCondition condition = new SingleConsumerCondition(Thread.currentThread());
 
@@ -35,7 +35,7 @@ public class SingleConsumerConditionTest {
     condition.await(100000);
   }
 
-  @Test(timeout=10000)
+  @Test(timeout = 10000)
   public void shouldNotBlockIfSignalAvailableDifferentThread() throws InterruptedException {
 
     final SingleConsumerCondition condition = new SingleConsumerCondition(Thread.currentThread());
@@ -63,8 +63,7 @@ public class SingleConsumerConditionTest {
     try {
       condition.await(0);
       Assert.fail("expected exception");
-    }
-    catch (RuntimeException e) {
+    } catch (RuntimeException e) {
       // expected
     }
   }
@@ -74,8 +73,7 @@ public class SingleConsumerConditionTest {
     try {
       new SingleConsumerCondition(null);
       Assert.fail("expected exception");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // expected
     }
   }

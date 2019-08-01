@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,10 +47,12 @@ public class EvaluateStartConditionCmd implements Command<List<ProcessInstance>>
 
   @Override
   public List<ProcessInstance> execute(final CommandContext commandContext) {
-    final ConditionHandler conditionHandler = commandContext.getProcessEngineConfiguration().getConditionHandler();
+    final ConditionHandler conditionHandler = commandContext.getProcessEngineConfiguration()
+        .getConditionHandler();
     final ConditionSet conditionSet = new ConditionSet(builder);
 
-    List<ConditionHandlerResult> results = conditionHandler.evaluateStartCondition(commandContext, conditionSet);
+    List<ConditionHandlerResult> results = conditionHandler.evaluateStartCondition(commandContext,
+        conditionSet);
 
     for (ConditionHandlerResult ConditionHandlerResult : results) {
       checkAuthorization(commandContext, ConditionHandlerResult);
@@ -66,17 +67,21 @@ public class EvaluateStartConditionCmd implements Command<List<ProcessInstance>>
   }
 
   protected void checkAuthorization(CommandContext commandContext, ConditionHandlerResult result) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       ProcessDefinitionEntity definition = result.getProcessDefinition();
       checker.checkCreateProcessInstance(definition);
     }
   }
 
-  protected ProcessInstance instantiateProcess(CommandContext commandContext, ConditionHandlerResult result) {
+  protected ProcessInstance instantiateProcess(CommandContext commandContext,
+      ConditionHandlerResult result) {
     ProcessDefinitionEntity processDefinitionEntity = result.getProcessDefinition();
 
-    ActivityImpl startEvent = processDefinitionEntity.findActivity(result.getActivity().getActivityId());
-    ExecutionEntity processInstance = processDefinitionEntity.createProcessInstance(builder.getBusinessKey(), startEvent);
+    ActivityImpl startEvent = processDefinitionEntity
+        .findActivity(result.getActivity().getActivityId());
+    ExecutionEntity processInstance = processDefinitionEntity
+        .createProcessInstance(builder.getBusinessKey(), startEvent);
     processInstance.start(builder.getVariables());
 
     return processInstance;

@@ -162,10 +162,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     try {
       // when
-      repositoryService
-          .createDeployment()
-          .addClasspathResource(FIRST_RESOURCE)
-          .deploy();
+      repositoryService.createDeployment().addClasspathResource(FIRST_RESOURCE).deploy();
       fail("Exception expected: It should not be possible to create a new deployment");
     } catch (AuthorizationException e) {
       // then
@@ -181,10 +178,8 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(DEPLOYMENT, ANY, userId, CREATE);
 
     // when
-    Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(FIRST_RESOURCE)
-      .deploy();
+    Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(FIRST_RESOURCE).deploy();
 
     // then
     disableAuthorization();
@@ -474,17 +469,12 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   public void testCreateAuthorizationOnDeploy() {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, CREATE);
-    Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(FIRST_RESOURCE)
-      .deploy();
+    Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(FIRST_RESOURCE).deploy();
 
     // when
-    Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn(userId)
-      .resourceId(deployment.getId())
-      .singleResult();
+    Authorization authorization = authorizationService.createAuthorizationQuery().userIdIn(userId)
+        .resourceId(deployment.getId()).singleResult();
 
     // then
     assertNotNull(authorization);
@@ -500,17 +490,13 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   public void testClearAuthorizationOnDeleteDeployment() {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, CREATE);
-    Deployment deployment = repositoryService
-      .createDeployment()
-      .addClasspathResource(FIRST_RESOURCE)
-      .deploy();
+    Deployment deployment = repositoryService.createDeployment()
+        .addClasspathResource(FIRST_RESOURCE).deploy();
 
     String deploymentId = deployment.getId();
 
-    AuthorizationQuery query = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn(userId)
-      .resourceId(deploymentId);
+    AuthorizationQuery query = authorizationService.createAuthorizationQuery().userIdIn(userId)
+        .resourceId(deploymentId);
 
     Authorization authorization = query.singleResult();
     assertNotNull(authorization);
@@ -537,7 +523,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       managementService.registerProcessApplication(deploymentId, reference);
       fail("Exception expected: It should not be possible to register a process application");
     } catch (AuthorizationException e) {
-      //then
+      // then
       String message = e.getMessage();
       assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
@@ -555,7 +541,8 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
 
     // when
-    ProcessApplicationRegistration registration = managementService.registerProcessApplication(deploymentId, reference);
+    ProcessApplicationRegistration registration = managementService
+        .registerProcessApplication(deploymentId, reference);
 
     // then
     assertNotNull(registration);
@@ -578,7 +565,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       managementService.unregisterProcessApplication(deploymentId, true);
       fail("Exception expected: It should not be possible to unregister a process application");
     } catch (AuthorizationException e) {
-      //then
+      // then
       String message = e.getMessage();
       assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
@@ -619,7 +606,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       managementService.getProcessApplicationForDeployment(deploymentId);
       fail("Exception expected: It should not be possible to get the process application");
     } catch (AuthorizationException e) {
-      //then
+      // then
       String message = e.getMessage();
       assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
@@ -657,7 +644,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       managementService.getRegisteredDeployments();
       fail("Exception expected: It should not be possible to get the registered deployments");
     } catch (AuthorizationException e) {
-      //then
+      // then
       String message = e.getMessage();
       assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
@@ -692,7 +679,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       managementService.registerDeploymentForJobExecutor(deploymentId);
       fail("Exception expected: It should not be possible to register the deployment");
     } catch (AuthorizationException e) {
-      //then
+      // then
       String message = e.getMessage();
       assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
@@ -727,7 +714,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       managementService.unregisterDeploymentForJobExecutor(deploymentId);
       fail("Exception expected: It should not be possible to unregister the deployment");
     } catch (AuthorizationException e) {
-      //then
+      // then
       String message = e.getMessage();
       assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
 
@@ -761,7 +748,8 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     return createDeployment(name, FIRST_RESOURCE, SECOND_RESOURCE).getId();
   }
 
-  protected void registerProcessApplication(String deploymentId, ProcessApplicationReference reference) {
+  protected void registerProcessApplication(String deploymentId,
+      ProcessApplicationReference reference) {
     disableAuthorization();
     managementService.registerProcessApplication(deploymentId, reference);
     enableAuthorization();

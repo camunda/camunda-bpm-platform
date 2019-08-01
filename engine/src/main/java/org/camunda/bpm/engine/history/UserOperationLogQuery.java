@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.query.Query;
 
-
 /**
  * Programmatic querying for {@link UserOperationLogEntry} instances.
  *
@@ -31,9 +30,9 @@ import org.camunda.bpm.engine.query.Query;
 public interface UserOperationLogQuery extends Query<UserOperationLogQuery, UserOperationLogEntry> {
 
   /**
-   * Query for operations on entities of a given type only. This allows you to restrict the
-   * result set to all operations which were performed on the same Entity (ie. all Task Operations,
-   * All IdentityLink Operations ...)
+   * Query for operations on entities of a given type only. This allows you to restrict the result
+   * set to all operations which were performed on the same Entity (ie. all Task Operations, All
+   * IdentityLink Operations ...)
    *
    * @see EntityTypes#TASK
    * @see EntityTypes#IDENTITY_LINK
@@ -42,9 +41,9 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
   UserOperationLogQuery entityType(String entityType);
 
   /**
-   * Query for operations on entities of a given type only. This allows you to restrict the
-   * result set to all operations which were performed on the same Entity (ie. all Task Operations,
-   * All IdentityLink Operations ...)
+   * Query for operations on entities of a given type only. This allows you to restrict the result
+   * set to all operations which were performed on the same Entity (ie. all Task Operations, All
+   * IdentityLink Operations ...)
    *
    * @see EntityTypes#TASK
    * @see EntityTypes#IDENTITY_LINK
@@ -53,9 +52,9 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
   UserOperationLogQuery entityTypeIn(String... entityTypes);
 
   /**
-   * Query for operations of a given type only. Types of operations depend on the entity on which the operation
-   * was performed. For Instance: Tasks may be delegated, claimed, completed ...
-   * Check the {@link UserOperationLogEntry} class for a list of constants of supported operations.
+   * Query for operations of a given type only. Types of operations depend on the entity on which
+   * the operation was performed. For Instance: Tasks may be delegated, claimed, completed ... Check
+   * the {@link UserOperationLogEntry} class for a list of constants of supported operations.
    */
   UserOperationLogQuery operationType(String operationType);
 
@@ -98,34 +97,35 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
   /** Query entries which are existing for the user. */
   UserOperationLogQuery userId(String userId);
 
-  /** Query entries of a composite operation.
-   * This allows grouping multiple updates which are part of the same operation:
-   * for instance, a User may update multiple fields of a UserTask when calling {@link TaskService#saveTask(org.camunda.bpm.engine.task.Task)}
-   * which will be logged as separate {@link UserOperationLogEntry OperationLogEntries} with the same 'operationId'
-   * */
+  /**
+   * Query entries of a composite operation. This allows grouping multiple updates which are part of
+   * the same operation: for instance, a User may update multiple fields of a UserTask when calling
+   * {@link TaskService#saveTask(org.camunda.bpm.engine.task.Task)} which will be logged as separate
+   * {@link UserOperationLogEntry OperationLogEntries} with the same 'operationId'
+   */
   UserOperationLogQuery operationId(String operationId);
-  
+
   /** Query entries which are existing for the external task. */
   UserOperationLogQuery externalTaskId(String externalTaskId);
 
   /** Query entries that changed a property. */
   UserOperationLogQuery property(String property);
-  
+
   /**
-   * Query for operations of the given category only. This allows you to restrict the
-   * result set to all operations which were performed in the same domain (ie. all Task Worker Operations,
-   * All Admin Operations ...)
+   * Query for operations of the given category only. This allows you to restrict the result set to
+   * all operations which were performed in the same domain (ie. all Task Worker Operations, All
+   * Admin Operations ...)
    *
    * @see UserOperationLogEntry#CATEGORY_ADMIN
    * @see UserOperationLogEntry#CATEGORY_OPERATOR
    * @see UserOperationLogEntry#CATEGORY_TASK_WORKER
    */
   UserOperationLogQuery category(String category);
-  
+
   /**
-   * Query for operations of given categories only. This allows you to restrict the
-   * result set to all operations which were performed in the same domain (ie. all Task Worker Operations,
-   * All Admin Operations ...)
+   * Query for operations of given categories only. This allows you to restrict the result set to
+   * all operations which were performed in the same domain (ie. all Task Worker Operations, All
+   * Admin Operations ...)
    *
    * @see UserOperationLogEntry#CATEGORY_ADMIN
    * @see UserOperationLogEntry#CATEGORY_OPERATOR

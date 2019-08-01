@@ -45,9 +45,8 @@ public class ExclusiveJobAddedNotification implements TransactionListener {
 
   protected void logExclusiveJobAdded(CommandContext commandContext) {
     if (commandContext.getProcessEngineConfiguration().isMetricsEnabled()) {
-      commandContext.getProcessEngineConfiguration()
-        .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_LOCKED_EXCLUSIVE);
+      commandContext.getProcessEngineConfiguration().getMetricsRegistry()
+          .markOccurrence(Metrics.JOB_LOCKED_EXCLUSIVE);
     }
   }
 

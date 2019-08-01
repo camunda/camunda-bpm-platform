@@ -46,10 +46,8 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
-    List<ProcessInstance> instances = runtimeService
-        .createConditionEvaluation()
-        .setVariable("foo", 42)
-        .evaluateStartConditions();
+    List<ProcessInstance> instances = runtimeService.createConditionEvaluation()
+        .setVariable("foo", 42).evaluateStartConditions();
 
     // then
     assertEquals(1, instances.size());
@@ -64,13 +62,11 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
 
     // when
     try {
-      runtimeService
-          .createConditionEvaluation()
-          .setVariable("foo", 42)
-          .evaluateStartConditions();
+      runtimeService.createConditionEvaluation().setVariable("foo", 42).evaluateStartConditions();
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("No subscriptions were found during evaluation of the conditional start events."));
+      assertTrue(e.getMessage().contains(
+          "No subscriptions were found during evaluation of the conditional start events."));
     }
 
   }
@@ -85,13 +81,11 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
 
     // when
     try {
-      runtimeService
-          .createConditionEvaluation()
-          .setVariable("foo", 42)
-          .evaluateStartConditions();
+      runtimeService.createConditionEvaluation().setVariable("foo", 42).evaluateStartConditions();
       fail("expected exception");
     } catch (AuthorizationException e) {
-      assertTrue(e.getMessage().contains("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'conditionalEventProcess' of type 'ProcessDefinition'."));
+      assertTrue(e.getMessage().contains(
+          "The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'conditionalEventProcess' of type 'ProcessDefinition'."));
     }
 
   }
@@ -105,13 +99,11 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
 
     // when
     try {
-      runtimeService
-          .createConditionEvaluation()
-          .setVariable("foo", 42)
-          .evaluateStartConditions();
+      runtimeService.createConditionEvaluation().setVariable("foo", 42).evaluateStartConditions();
       fail("expected exception");
     } catch (AuthorizationException e) {
-      assertTrue(e.getMessage().contains("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'."));
+      assertTrue(e.getMessage().contains(
+          "The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'."));
     }
 
   }
@@ -126,13 +118,11 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
 
     // when
     try {
-      runtimeService
-          .createConditionEvaluation()
-          .setVariable("foo", 42)
-          .evaluateStartConditions();
+      runtimeService.createConditionEvaluation().setVariable("foo", 42).evaluateStartConditions();
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("No subscriptions were found during evaluation of the conditional start events."));
+      assertTrue(e.getMessage().contains(
+          "No subscriptions were found during evaluation of the conditional start events."));
     }
   }
 }

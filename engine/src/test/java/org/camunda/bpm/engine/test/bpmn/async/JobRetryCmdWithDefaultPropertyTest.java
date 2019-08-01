@@ -33,30 +33,34 @@ public class JobRetryCmdWithDefaultPropertyTest extends ResourceProcessEngineTes
   /**
    * Check if property "DefaultNumberOfRetries" will be used
    */
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedTask.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedTask.bpmn20.xml" })
   public void testDefaultNumberOfRetryProperty() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedTask");
     assertNotNull(pi);
 
-    Job job = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
+    Job job = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId())
+        .singleResult();
     assertNotNull(job);
     assertEquals(pi.getProcessInstanceId(), job.getProcessInstanceId());
     assertEquals(2, job.getRetries());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
   public void testOverwritingPropertyWithBpmnExtension() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedServiceTask");
     assertNotNull(pi);
 
-    Job job = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
+    Job job = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId())
+        .singleResult();
     assertNotNull(job);
     assertEquals(pi.getProcessInstanceId(), job.getProcessInstanceId());
 
     try {
       managementService.executeJob(job.getId());
       fail("Exception expected!");
-    } catch(Exception e) {
+    } catch (Exception e) {
       // expected
     }
 

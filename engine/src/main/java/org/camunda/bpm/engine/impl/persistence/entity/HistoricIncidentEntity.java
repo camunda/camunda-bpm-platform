@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
  * @author Roman Smirnov
  *
  */
-public class HistoricIncidentEntity extends HistoricIncidentEventEntity implements HistoricIncident {
+public class HistoricIncidentEntity extends HistoricIncidentEventEntity
+    implements HistoricIncident {
 
   private static final long serialVersionUID = 1L;
 

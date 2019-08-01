@@ -74,10 +74,7 @@ public class ProcessInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set endOr() before or()");
 
-    runtimeService.createProcessInstanceQuery()
-        .or()
-        .endOr()
-        .endOr();
+    runtimeService.createProcessInstanceQuery().or().endOr().endOr();
   }
 
   @Test
@@ -85,28 +82,20 @@ public class ProcessInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set or() within 'or' query");
 
-    runtimeService.createProcessInstanceQuery()
-        .or()
-        .or()
-        .endOr()
-        .endOr()
-        .or()
-        .endOr();
+    runtimeService.createProcessInstanceQuery().or().or().endOr().endOr().or().endOr();
   }
-  
+
   @Test
   public void shouldThrowExceptionOnOrderByProcessInstanceId() {
     // given
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
 
     // when
-    runtimeService.createProcessInstanceQuery()
-        .or()
-          .orderByProcessInstanceId()
-        .endOr();
+    runtimeService.createProcessInstanceQuery().or().orderByProcessInstanceId().endOr();
   }
 
   @Test
@@ -115,13 +104,11 @@ public class ProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
 
     // when
-    runtimeService.createProcessInstanceQuery()
-        .or()
-          .orderByProcessDefinitionId()
-        .endOr();
+    runtimeService.createProcessInstanceQuery().or().orderByProcessDefinitionId().endOr();
   }
 
   @Test
@@ -130,13 +117,11 @@ public class ProcessInstanceQueryOrTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
 
     // when
-    runtimeService.createProcessInstanceQuery()
-        .or()
-          .orderByProcessDefinitionKey()
-        .endOr();
+    runtimeService.createProcessInstanceQuery().or().orderByProcessDefinitionKey().endOr();
   }
 
   @Test
@@ -148,10 +133,7 @@ public class ProcessInstanceQueryOrTest {
     thrown.expectMessage("Invalid query usage: cannot set orderByTenantId() within 'or' query");
 
     // when
-    runtimeService.createProcessInstanceQuery()
-        .or()
-          .orderByTenantId()
-        .endOr();
+    runtimeService.createProcessInstanceQuery().or().orderByTenantId().endOr();
   }
 
   @Test
@@ -163,31 +145,26 @@ public class ProcessInstanceQueryOrTest {
     thrown.expectMessage("Invalid query usage: cannot set orderByBusinessKey() within 'or' query");
 
     // then
-    runtimeService.createProcessInstanceQuery()
-        .or()
-          .orderByBusinessKey()
-        .endOr();
+    runtimeService.createProcessInstanceQuery().or().orderByBusinessKey().endOr();
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnProcInstWithEmptyOrQuery() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-        .endOr()
-        .list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .endOr().list();
 
     // then
     assertEquals(2, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnProcInstWithVarValue1OrVarValue2() {
     // given
     Map<String, Object> vars = new HashMap<>();
@@ -199,59 +176,56 @@ public class ProcessInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
     // when
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-          .variableValueEquals("stringVar", "abcdef")
-          .variableValueEquals("stringVar", "ghijkl")
-        .endOr()
-        .list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .variableValueEquals("stringVar", "abcdef").variableValueEquals("stringVar", "ghijkl")
+        .endOr().list();
 
     // then
     assertEquals(2, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnProcInstWithMultipleOrCriteria() {
     // given
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     Map<String, Object> vars = new HashMap<>();
     vars.put("stringVar", "abcdef");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        vars);
     runtimeService.setVariable(processInstance2.getProcessInstanceId(), "aVarName", "varValue");
 
     vars = new HashMap<>();
     vars.put("stringVar2", "aaabbbaaa");
-    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        vars);
     runtimeService.setVariable(processInstance3.getProcessInstanceId(), "bVarName", "bTestb");
 
     vars = new HashMap<>();
     vars.put("stringVar2", "cccbbbccc");
-    ProcessInstance processInstance4 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance4 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        vars);
     runtimeService.setVariable(processInstance4.getProcessInstanceId(), "bVarName", "aTesta");
 
     // when
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-          .variableValueEquals("stringVar", "abcdef")
-          .variableValueLike("stringVar2", "%bbb%")
-          .processInstanceId(processInstance1.getId())
-        .endOr()
-        .list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .variableValueEquals("stringVar", "abcdef").variableValueLike("stringVar2", "%bbb%")
+        .processInstanceId(processInstance1.getId()).endOr().list();
 
     // then
     assertEquals(4, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnProcInstFilteredByMultipleOrAndCriteria() {
     // given
     Map<String, Object> vars = new HashMap<>();
     vars.put("stringVar", "abcdef");
     vars.put("longVar", 12345L);
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        vars);
 
     vars = new HashMap<>();
     vars.put("stringVar", "ghijkl");
@@ -269,20 +243,16 @@ public class ProcessInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
     // when
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-          .variableValueEquals("longVar", 56789L)
-          .processInstanceId(processInstance1.getId())
-        .endOr()
-        .variableValueEquals("stringVar", "abcdef")
-        .list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .variableValueEquals("longVar", 56789L).processInstanceId(processInstance1.getId()).endOr()
+        .variableValueEquals("stringVar", "abcdef").list();
 
     // then
     assertEquals(2, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnProcInstFilteredByMultipleOrQueries() {
     // given
     Map<String, Object> vars = new HashMap<>();
@@ -322,24 +292,12 @@ public class ProcessInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
     // when
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-          .variableValueEquals("stringVar", "abcdef")
-          .variableValueEquals("longVar", 12345L)
-        .endOr()
-        .or()
-          .variableValueEquals("boolVar", true)
-          .variableValueEquals("longVar", 12345L)
-        .endOr()
-        .or()
-          .variableValueEquals("stringVar", "ghijkl")
-          .variableValueEquals("longVar", 56789L)
-        .endOr()
-        .or()
-          .variableValueEquals("stringVar", "ghijkl")
-          .variableValueEquals("boolVar", false)
-          .variableValueEquals("longVar", 56789L)
-        .endOr()
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .variableValueEquals("stringVar", "abcdef").variableValueEquals("longVar", 12345L).endOr()
+        .or().variableValueEquals("boolVar", true).variableValueEquals("longVar", 12345L).endOr()
+        .or().variableValueEquals("stringVar", "ghijkl").variableValueEquals("longVar", 56789L)
+        .endOr().or().variableValueEquals("stringVar", "ghijkl")
+        .variableValueEquals("boolVar", false).variableValueEquals("longVar", 56789L).endOr()
         .list();
 
     // then
@@ -347,7 +305,7 @@ public class ProcessInstanceQueryOrTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnProcInstWhereSameCriterionWasAppliedThreeTimesInOneQuery() {
     // given
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -355,20 +313,16 @@ public class ProcessInstanceQueryOrTest {
     ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-          .processInstanceId(processInstance1.getId())
-          .processInstanceId(processInstance2.getId())
-          .processInstanceId(processInstance3.getId())
-        .endOr()
-        .list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .processInstanceId(processInstance1.getId()).processInstanceId(processInstance2.getId())
+        .processInstanceId(processInstance3.getId()).endOr().list();
 
     // then
     assertEquals(1, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnProcInstWithVariableValueEqualsOrVariableValueGreaterThan() {
     // given
     Map<String, Object> vars = new HashMap<>();
@@ -384,10 +338,8 @@ public class ProcessInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
     // when
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
-        .or()
-          .variableValueEquals("longVar", 12345L)
-          .variableValueGreaterThan("longerVar", 20000L)
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().or()
+        .variableValueEquals("longVar", 12345L).variableValueGreaterThan("longerVar", 20000L)
         .endOr();
 
     // then
@@ -398,45 +350,31 @@ public class ProcessInstanceQueryOrTest {
   public void shouldReturnProcInstWithProcessDefinitionNameOrProcessDefinitionKey() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-        .name("process1")
-        .startEvent()
-          .userTask()
-        .endEvent()
-        .done();
+        .name("process1").startEvent().userTask().endEvent().done();
 
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", aProcessDefinition)
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("aProcessDefinition");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("aProcessDefinition");
 
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-        .startEvent()
-          .userTask()
-        .endEvent()
+    BpmnModelInstance anotherProcessDefinition = Bpmn
+        .createExecutableProcess("anotherProcessDefinition").startEvent().userTask().endEvent()
         .done();
 
-    deploymentId = repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", anotherProcessDefinition)
-        .deploy()
-        .getId();
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", anotherProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
     runtimeService.startProcessInstanceByKey("anotherProcessDefinition");
 
     // when
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-          .processDefinitionId(processInstance1.getProcessDefinitionId())
-          .processDefinitionKey("anotherProcessDefinition")
-        .endOr()
-        .list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .processDefinitionId(processInstance1.getProcessDefinitionId())
+        .processDefinitionKey("anotherProcessDefinition").endOr().list();
 
     // then
     assertEquals(2, processInstances.size());
@@ -446,44 +384,30 @@ public class ProcessInstanceQueryOrTest {
   public void shouldReturnProcInstWithBusinessKeyOrBusinessKeyLike() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-        .startEvent()
-          .userTask()
-        .endEvent()
-        .done();
+        .startEvent().userTask().endEvent().done();
 
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", aProcessDefinition)
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
     runtimeService.startProcessInstanceByKey("aProcessDefinition", "aBusinessKey");
 
-    BpmnModelInstance anotherProcessDefinition = Bpmn.createExecutableProcess("anotherProcessDefinition")
-        .startEvent()
-          .userTask()
-        .endEvent()
+    BpmnModelInstance anotherProcessDefinition = Bpmn
+        .createExecutableProcess("anotherProcessDefinition").startEvent().userTask().endEvent()
         .done();
 
-    deploymentId = repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", anotherProcessDefinition)
-        .deploy()
-        .getId();
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", anotherProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
     runtimeService.startProcessInstanceByKey("anotherProcessDefinition", "anotherBusinessKey");
 
     // when
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-          .processInstanceBusinessKey("aBusinessKey")
-          .processInstanceBusinessKeyLike("anotherBusinessKey")
-        .endOr()
-        .list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .processInstanceBusinessKey("aBusinessKey")
+        .processInstanceBusinessKeyLike("anotherBusinessKey").endOr().list();
 
     // then
     assertEquals(2, processInstances.size());
@@ -493,16 +417,10 @@ public class ProcessInstanceQueryOrTest {
   public void shouldReturnProcInstByVariableAndActiveProcesses() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("oneTaskProcess")
-        .startEvent()
-          .userTask("testQuerySuspensionStateTask")
-        .endEvent()
-        .done();
+        .startEvent().userTask("testQuerySuspensionStateTask").endEvent().done();
 
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", aProcessDefinition)
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
@@ -513,86 +431,63 @@ public class ProcessInstanceQueryOrTest {
     // start one process instance and suspend it
     Map<String, Object> variables = new HashMap<>();
     variables.put("foo", 0);
-    ProcessInstance suspendedProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    ProcessInstance suspendedProcessInstance = runtimeService
+        .startProcessInstanceByKey("oneTaskProcess", variables);
     runtimeService.suspendProcessInstanceById(suspendedProcessInstance.getProcessInstanceId());
 
     List<ProcessInstance> activeProcessInstances = runtimeService.createProcessInstanceQuery()
-        .processDefinitionKey("oneTaskProcess")
-        .active()
-        .list();
+        .processDefinitionKey("oneTaskProcess").active().list();
 
     List<ProcessInstance> suspendedProcessInstances = runtimeService.createProcessInstanceQuery()
-        .processDefinitionKey("oneTaskProcess")
-        .suspended()
-        .list();
+        .processDefinitionKey("oneTaskProcess").suspended().list();
 
     // assume
     assertEquals(2, activeProcessInstances.size());
     assertEquals(1, suspendedProcessInstances.size());
 
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-          .active()
-          .variableValueEquals("foo", 0)
-        .endOr()
-        .list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .active().variableValueEquals("foo", 0).endOr().list();
 
     // then
     assertEquals(3, processInstances.size());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnByProcessDefinitionKeyOrActivityId() {
     // given
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("process")
-        .startEvent()
-          .userTask("aUserTask")
-        .endEvent()
-        .done();
+    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask("aUserTask").endEvent().done();
 
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", aProcessDefinition)
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-          .activityIdIn("theTask")
-          .processDefinitionKey("process")
-        .endOr()
-        .list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .activityIdIn("theTask").processDefinitionKey("process").endOr().list();
 
     // then
     assertThat(processInstances.size()).isEqualTo(2);
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void shouldReturnByProcessDefinitionIdOrIncidentType() {
     // given
     String processDefinitionId = runtimeService.startProcessInstanceByKey("oneTaskProcess")
         .getProcessDefinitionId();
 
-    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("process")
-        .startEvent().camundaAsyncBefore()
-          .userTask("aUserTask")
-        .endEvent()
-        .done();
+    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .camundaAsyncBefore().userTask("aUserTask").endEvent().done();
 
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addModelInstance("foo.bpmn", aProcessDefinition)
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", aProcessDefinition).deploy().getId();
 
     deploymentIds.add(deploymentId);
 
@@ -603,12 +498,8 @@ public class ProcessInstanceQueryOrTest {
     managementService.setJobRetries(jobId, 0);
 
     // when
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .or()
-          .incidentType("failedJob")
-          .processDefinitionId(processDefinitionId)
-        .endOr()
-        .list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().or()
+        .incidentType("failedJob").processDefinitionId(processDefinitionId).endOr().list();
 
     // then
     assertThat(processInstances.size()).isEqualTo(2);

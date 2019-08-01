@@ -54,17 +54,11 @@ public class DmnBusinessRuleTaskTest {
 
   public static final String DECISION_OKAY_DMN12 = "org/camunda/bpm/engine/test/dmn/businessruletask/dmn12/DmnBusinessRuleTaskTest.testDecisionOkay.dmn";
 
-  public static final BpmnModelInstance BPMN_VERSION_TAG_BINDING = Bpmn.createExecutableProcess("process")
-              .startEvent()
-              .businessRuleTask()
-                    .camundaDecisionRef("decision")
-                    .camundaDecisionRefBinding("versionTag")
-                    .camundaDecisionRefVersionTag("0.0.2")
-                    .camundaMapDecisionResult("singleEntry")
-                    .camundaResultVariable("result")
-              .endEvent()
-                    .camundaAsyncBefore()
-              .done();
+  public static final BpmnModelInstance BPMN_VERSION_TAG_BINDING = Bpmn
+      .createExecutableProcess("process").startEvent().businessRuleTask()
+      .camundaDecisionRef("decision").camundaDecisionRefBinding("versionTag")
+      .camundaDecisionRefVersionTag("0.0.2").camundaMapDecisionResult("singleEntry")
+      .camundaResultVariable("result").endEvent().camundaAsyncBefore().done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -111,9 +105,10 @@ public class DmnBusinessRuleTaskTest {
   @Test
   public void noDecisionFoundRefByExpression() {
     thrown.expect(DecisionDefinitionNotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key = 'testDecision', version = '1' and tenant-id 'null");
+    thrown.expectMessage(
+        "no decision definition deployed with key = 'testDecision', version = '1' and tenant-id 'null");
 
-   startExpressionProcess("testDecision", 1);
+    startExpressionProcess("testDecision", 1);
   }
 
   @Deployment(resources = { DECISION_PROCESS_LATEST, DECISION_OKAY_DMN })
@@ -134,7 +129,8 @@ public class DmnBusinessRuleTaskTest {
     assertEquals("okay", getDecisionResult(processInstance));
   }
 
-  @Deployment(resources = { DECISION_PROCESS_VERSION, DECISION_PROCESS_EXPRESSION, DECISION_OKAY_DMN })
+  @Deployment(resources = { DECISION_PROCESS_VERSION, DECISION_PROCESS_EXPRESSION,
+      DECISION_OKAY_DMN })
   @Test
   public void decisionRefVersionBinding() {
     testRule.deploy(DECISION_NOT_OKAY_DMN);
@@ -155,8 +151,7 @@ public class DmnBusinessRuleTaskTest {
 
     // when
     ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("process")
-        .setVariable("status", "gold")
-        .execute();
+        .setVariable("status", "gold").execute();
 
     // then
     assertEquals("A", getDecisionResult(processInstance));
@@ -166,23 +161,16 @@ public class DmnBusinessRuleTaskTest {
   public void decisionRefVersionTagBindingExpression() {
     // given
     testRule.deploy(DECISION_VERSION_TAG_OKAY_DMN);
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .businessRuleTask()
-          .camundaDecisionRef("decision")
-          .camundaDecisionRefBinding("versionTag")
-          .camundaDecisionRefVersionTag("${versionTagExpr}")
-          .camundaMapDecisionResult("singleEntry")
-          .camundaResultVariable("result")
-        .endEvent()
-          .camundaAsyncBefore()
-        .done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().businessRuleTask()
+        .camundaDecisionRef("decision").camundaDecisionRefBinding("versionTag")
+        .camundaDecisionRefVersionTag("${versionTagExpr}").camundaMapDecisionResult("singleEntry")
+        .camundaResultVariable("result").endEvent().camundaAsyncBefore().done());
 
     // when
-    VariableMap variables = Variables.createVariables()
-        .putValue("versionTagExpr", "0.0.2")
+    VariableMap variables = Variables.createVariables().putValue("versionTagExpr", "0.0.2")
         .putValue("status", "gold");
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        variables);
 
     // then
     assertEquals("A", getDecisionResult(processInstance));
@@ -195,23 +183,18 @@ public class DmnBusinessRuleTaskTest {
     thrown.expectMessage("Could not parse BPMN process.");
 
     // when
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .businessRuleTask()
-          .camundaDecisionRef("testDecision")
-          .camundaDecisionRefBinding("versionTag")
-          .camundaMapDecisionResult("singleEntry")
-          .camundaResultVariable("result")
-        .endEvent()
-          .camundaAsyncBefore()
-        .done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().businessRuleTask()
+        .camundaDecisionRef("testDecision").camundaDecisionRefBinding("versionTag")
+        .camundaMapDecisionResult("singleEntry").camundaResultVariable("result").endEvent()
+        .camundaAsyncBefore().done());
   }
 
   @Test
   public void decisionRefVersionTagBindingNoneDecisionDefinition() {
     // expected
     thrown.expect(DecisionDefinitionNotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key = 'decision', versionTag = '0.0.2' and tenant-id 'null'");
+    thrown.expectMessage(
+        "no decision definition deployed with key = 'decision', versionTag = '0.0.2' and tenant-id 'null'");
 
     // given
     testRule.deploy(BPMN_VERSION_TAG_BINDING);
@@ -224,7 +207,8 @@ public class DmnBusinessRuleTaskTest {
   public void decisionRefVersionTagBindingTwoDecisionDefinitions() {
     // expected
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Found more than one decision definition for key 'decision' and versionTag '0.0.2'");
+    thrown.expectMessage(
+        "Found more than one decision definition for key 'decision' and versionTag '0.0.2'");
 
     // given
     testRule.deploy(DECISION_VERSION_TAG_OKAY_DMN);
@@ -235,69 +219,55 @@ public class DmnBusinessRuleTaskTest {
     runtimeService.startProcessInstanceByKey("process");
   }
 
-  @Deployment(resources = {DECISION_PROCESS, DECISION_POJO_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_POJO_DMN })
   @Test
   public void testPojo() {
-    VariableMap variables = Variables.createVariables()
-      .putValue("pojo", new TestPojo("okay", 13.37));
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
+    VariableMap variables = Variables.createVariables().putValue("pojo",
+        new TestPojo("okay", 13.37));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess",
+        variables);
 
     assertEquals("okay", getDecisionResult(processInstance));
   }
 
-  @Deployment( resources = DECISION_LITERAL_EXPRESSION_DMN )
+  @Deployment(resources = DECISION_LITERAL_EXPRESSION_DMN)
   @Test
   public void evaluateDecisionWithLiteralExpression() {
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .businessRuleTask()
-          .camundaDecisionRef("decisionLiteralExpression")
-          .camundaResultVariable("result")
-          .camundaMapDecisionResult("singleEntry")
-        .endEvent()
-          .camundaAsyncBefore()
-        .done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().businessRuleTask()
+        .camundaDecisionRef("decisionLiteralExpression").camundaResultVariable("result")
+        .camundaMapDecisionResult("singleEntry").endEvent().camundaAsyncBefore().done());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", Variables.createVariables()
-        .putValue("a", 2)
-        .putValue("b", 3));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("a", 2).putValue("b", 3));
 
     assertEquals(5, getDecisionResult(processInstance));
   }
 
-  @Deployment( resources = DRD_DISH_RESOURCE )
+  @Deployment(resources = DRD_DISH_RESOURCE)
   @Test
   public void evaluateDecisionWithRequiredDecisions() {
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .businessRuleTask()
-          .camundaDecisionRef("dish-decision")
-          .camundaResultVariable("result")
-          .camundaMapDecisionResult("singleEntry")
-        .endEvent()
-          .camundaAsyncBefore()
-        .done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().businessRuleTask()
+        .camundaDecisionRef("dish-decision").camundaResultVariable("result")
+        .camundaMapDecisionResult("singleEntry").endEvent().camundaAsyncBefore().done());
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     assertEquals("Light salad", getDecisionResult(processInstance));
   }
 
-  @Deployment(resources = { DECISION_PROCESS_COMPOSITEEXPRESSION, DECISION_OKAY_DMN})
+  @Deployment(resources = { DECISION_PROCESS_COMPOSITEEXPRESSION, DECISION_OKAY_DMN })
   @Test
   public void decisionRefWithCompositeExpression() {
-    VariableMap variables = Variables.createVariables()
-      .putValue("version", 1);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcessCompositeExpression", variables);
+    VariableMap variables = Variables.createVariables().putValue("version", 1);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("testProcessCompositeExpression", variables);
 
     assertEquals("okay", getDecisionResult(processInstance));
   }
 
   protected ProcessInstance startExpressionProcess(Object decisionKey, Object version) {
-    VariableMap variables = Variables.createVariables()
-        .putValue("decision", decisionKey)
+    VariableMap variables = Variables.createVariables().putValue("decision", decisionKey)
         .putValue("version", version);
     return runtimeService.startProcessInstanceByKey("testProcessExpression", variables);
   }

@@ -33,7 +33,8 @@ public class DefaultUserPermissionNameForTaskCfgTest {
 
   @Test
   public void updateIsDefaultTaskPermission() {
-    assertEquals("UPDATE", new StandaloneInMemProcessEngineConfiguration().getDefaultUserPermissionNameForTask());
+    assertEquals("UPDATE",
+        new StandaloneInMemProcessEngineConfiguration().getDefaultUserPermissionNameForTask());
   }
 
   @Test
@@ -76,8 +77,10 @@ public class DefaultUserPermissionNameForTaskCfgTest {
       testProcessEngineCfg.initDefaultUserPermissionForTask();
       fail("Exception expected");
 
-    } catch(ProcessEngineException e) {
-      String expectedExceptionMessage = String.format("Invalid value '%s' for configuration property 'defaultUserPermissionNameForTask'.", "UNSUPPORTED");
+    } catch (ProcessEngineException e) {
+      String expectedExceptionMessage = String.format(
+          "Invalid value '%s' for configuration property 'defaultUserPermissionNameForTask'.",
+          "UNSUPPORTED");
       assertThat(e.getMessage(), containsString(expectedExceptionMessage));
     }
   }
@@ -94,7 +97,7 @@ public class DefaultUserPermissionNameForTaskCfgTest {
       testProcessEngineCfg.initDefaultUserPermissionForTask();
       fail("Exception expected");
 
-    } catch(ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       String expectedExceptionMessage = "Invalid value 'null' for configuration property 'defaultUserPermissionNameForTask'.";
       assertThat(e.getMessage(), containsString(expectedExceptionMessage));
     }
@@ -122,15 +125,13 @@ public class DefaultUserPermissionNameForTaskCfgTest {
       final TestProcessEngineCfg testProcessEngineCfg = new TestProcessEngineCfg();
 
       engine = testProcessEngineCfg.setProcessEngineName("DefaultTaskPermissionsCfgTest-engine")
-        .setJdbcUrl(String.format("jdbc:h2:mem:%s", "DefaultTaskPermissionsCfgTest-engine-db"))
-        .setMetricsEnabled(false)
-        .setJobExecutorActivate(false)
-        .buildProcessEngine();
+          .setJdbcUrl(String.format("jdbc:h2:mem:%s", "DefaultTaskPermissionsCfgTest-engine-db"))
+          .setMetricsEnabled(false).setJobExecutorActivate(false).buildProcessEngine();
 
       // then
       assertTrue(testProcessEngineCfg.initMethodCalled);
     } finally {
-      if(engine != null) {
+      if (engine != null) {
         engine.close();
       }
     }
@@ -146,6 +147,5 @@ public class DefaultUserPermissionNameForTaskCfgTest {
       initMethodCalled = true;
     }
   }
-
 
 }

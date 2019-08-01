@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.task.Attachment;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -31,15 +30,13 @@ public class GetAttachmentCmd implements Command<Attachment>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String attachmentId;
-  
+
   public GetAttachmentCmd(String attachmentId) {
     this.attachmentId = attachmentId;
   }
 
   public Attachment execute(CommandContext commandContext) {
-    return commandContext
-      .getDbEntityManager()
-      .selectById(AttachmentEntity.class, attachmentId);
+    return commandContext.getDbEntityManager().selectById(AttachmentEntity.class, attachmentId);
   }
 
 }

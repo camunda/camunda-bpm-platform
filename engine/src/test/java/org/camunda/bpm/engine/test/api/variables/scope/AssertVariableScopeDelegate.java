@@ -36,6 +36,6 @@ public class AssertVariableScopeDelegate implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    assertThat(execution.getVariableLocal("targetOrderId"),is(notNullValue()));
+    assertThat(execution.getVariableLocal("targetOrderId"), is(notNullValue()));
   }
 }

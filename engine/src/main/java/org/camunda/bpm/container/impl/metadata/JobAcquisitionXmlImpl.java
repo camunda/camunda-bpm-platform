@@ -21,7 +21,9 @@ import java.util.Map;
 import org.camunda.bpm.container.impl.metadata.spi.JobAcquisitionXml;
 
 /**
- * <p>Implementation of the {@link JobAcquisitionXml} SPI interface</p>
+ * <p>
+ * Implementation of the {@link JobAcquisitionXml} SPI interface
+ * </p>
  * 
  * @author Daniel Meyer
  * 
@@ -40,7 +42,6 @@ public class JobAcquisitionXmlImpl implements JobAcquisitionXml {
     this.name = name;
   }
 
-
   public Map<String, String> getProperties() {
     return properties;
   }
@@ -52,7 +53,7 @@ public class JobAcquisitionXmlImpl implements JobAcquisitionXml {
   public String getJobExecutorClassName() {
     return jobExecutorClassName;
   }
-  
+
   public void setJobExecutorClassName(String jobExecutorClassName) {
     this.jobExecutorClassName = jobExecutorClassName;
   }

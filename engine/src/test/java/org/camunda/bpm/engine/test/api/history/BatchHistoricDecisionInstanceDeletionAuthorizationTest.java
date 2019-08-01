@@ -77,41 +77,30 @@ public class BatchHistoricDecisionInstanceDeletionAuthorizationTest {
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
-    return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE)
-        )
-        .failsDueToRequired(
-          grant(Resources.DECISION_DEFINITION, "*", "userId", Permissions.DELETE_HISTORY)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.DECISION_DEFINITION, "*", "userId", Permissions.DELETE_HISTORY)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES),
-          grant(Resources.DECISION_DEFINITION, "*", "userId", Permissions.DELETE_HISTORY)
-        ),
-      scenario()
-        .withAuthorizations(
-          revoke(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES),
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE)
-          )
-        .failsDueToRequired(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES)
-        )
-        .succeeds()
-    );
+    return AuthorizationTestRule
+        .asParameters(
+            scenario().withoutAuthorizations()
+                .failsDueToRequired(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                    grant(Resources.BATCH, "*", "userId",
+                        BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES)),
+            scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE))
+                .failsDueToRequired(grant(Resources.DECISION_DEFINITION, "*", "userId",
+                    Permissions.DELETE_HISTORY)),
+            scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.DECISION_DEFINITION, "*", "userId", Permissions.DELETE_HISTORY)),
+            scenario().withAuthorizations(
+                grant(Resources.BATCH, "*", "userId",
+                    BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES),
+                grant(Resources.DECISION_DEFINITION, "*", "userId", Permissions.DELETE_HISTORY)),
+            scenario()
+                .withAuthorizations(
+                    revoke(Resources.BATCH, "*", "userId",
+                        BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES),
+                    grant(Resources.BATCH, "*", "userId", Permissions.CREATE))
+                .failsDueToRequired(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                    grant(Resources.BATCH, "*", "userId",
+                        BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES))
+                .succeeds());
   }
 
   @Before
@@ -126,16 +115,16 @@ public class BatchHistoricDecisionInstanceDeletionAuthorizationTest {
   public void executeDecisionInstances() {
     testRule.deploy("org/camunda/bpm/engine/test/api/dmn/Example.dmn");
 
-    VariableMap variables = Variables.createVariables()
-        .putValue("status", "silver")
-        .putValue("sum", 723);
+    VariableMap variables = Variables.createVariables().putValue("status", "silver").putValue("sum",
+        723);
 
     for (int i = 0; i < 10; i++) {
       decisionService.evaluateDecisionByKey(DECISION).variables(variables).evaluate();
     }
 
-    List<HistoricDecisionInstance> decisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
-    for(HistoricDecisionInstance decisionInstance : decisionInstances) {
+    List<HistoricDecisionInstance> decisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().list();
+    for (HistoricDecisionInstance decisionInstance : decisionInstances) {
       decisionInstanceIds.add(decisionInstance.getId());
     }
   }
@@ -160,21 +149,23 @@ public class BatchHistoricDecisionInstanceDeletionAuthorizationTest {
   @Test
   public void executeBatch() {
     // given
-    authRule.init(scenario)
-      .withUser("userId")
-      .start();
+    authRule.init(scenario).withUser("userId").start();
 
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
+        .decisionDefinitionKey(DECISION);
 
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query,
+        null);
 
     if (batch != null) {
-      Job job = managementService.createJobQuery().jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
+      Job job = managementService.createJobQuery().jobDefinitionId(batch.getSeedJobDefinitionId())
+          .singleResult();
 
       // seed job
       managementService.executeJob(job.getId());
 
-      for (Job pending : managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
+      for (Job pending : managementService.createJobQuery()
+          .jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
         managementService.executeJob(pending.getId());
       }
     }

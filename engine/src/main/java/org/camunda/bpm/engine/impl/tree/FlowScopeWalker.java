@@ -36,8 +36,7 @@ public class FlowScopeWalker extends SingleReferenceWalker<ScopeImpl> {
     if (currentElement != null && ActivityImpl.class.isAssignableFrom(currentElement.getClass())) {
       return ((PvmActivity) currentElement).getFlowScope();
 
-    }
-    else {
+    } else {
       return null;
     }
   }

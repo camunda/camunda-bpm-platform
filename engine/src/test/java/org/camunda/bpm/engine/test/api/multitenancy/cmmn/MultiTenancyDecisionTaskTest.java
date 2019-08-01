@@ -54,8 +54,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
 
-    assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
-    assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+    assertThat((String) caseService.getVariable(caseInstanceOne.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_ONE));
+    assertThat((String) caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_TWO));
   }
 
   public void testEvaluateDecisionWithLatestBindingSameVersion() {
@@ -65,8 +67,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
 
-    assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
-    assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+    assertThat((String) caseService.getVariable(caseInstanceOne.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_ONE));
+    assertThat((String) caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_TWO));
   }
 
   public void testEvaluateDecisionWithLatestBindingDifferentVersions() {
@@ -78,8 +82,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
 
-    assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
-    assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+    assertThat((String) caseService.getVariable(caseInstanceOne.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_ONE));
+    assertThat((String) caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_TWO));
   }
 
   public void testEvaluateDecisionWithVersionBinding() {
@@ -92,8 +98,10 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
     CaseInstance caseInstanceOne = createCaseInstance(CASE_DEFINITION_KEY, TENANT_ONE);
     CaseInstance caseInstanceTwo = createCaseInstance(CASE_DEFINITION_KEY, TENANT_TWO);
 
-    assertThat((String)caseService.getVariable(caseInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
-    assertThat((String)caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+    assertThat((String) caseService.getVariable(caseInstanceOne.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_ONE));
+    assertThat((String) caseService.getVariable(caseInstanceTwo.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_TWO));
   }
 
   public void testFailEvaluateDecisionFromOtherTenantWithDeploymentBinding() {
@@ -105,7 +113,8 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key = 'decision'"));
+      assertThat(e.getMessage(),
+          containsString("no decision definition deployed with key = 'decision'"));
     }
   }
 
@@ -118,7 +127,8 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision'"));
+      assertThat(e.getMessage(),
+          containsString("no decision definition deployed with key 'decision'"));
     }
   }
 
@@ -133,7 +143,8 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key = 'decision', version = '2' and tenant-id 'tenant1'"));
+      assertThat(e.getMessage(), containsString(
+          "no decision definition deployed with key = 'decision', version = '2' and tenant-id 'tenant1'"));
     }
   }
 
@@ -144,7 +155,8 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
     CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
 
-    assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String) caseService.getVariable(caseInstance.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_ONE));
   }
 
   public void testEvaluateDecisionRefWithoutTenantIdConstant() {
@@ -154,7 +166,8 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
     CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
 
-    assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String) caseService.getVariable(caseInstance.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_ONE));
   }
 
   public void testEvaluateDecisionRefTenantIdExpression() {
@@ -164,22 +177,28 @@ public class MultiTenancyDecisionTaskTest extends PluggableProcessEngineTestCase
 
     CaseInstance caseInstance = createCaseInstance(CASE_DEFINITION_KEY);
 
-    assertThat((String)caseService.getVariable(caseInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String) caseService.getVariable(caseInstance.getId(), "decisionVar"),
+        is(RESULT_OF_VERSION_ONE));
   }
 
   protected CaseInstance createCaseInstance(String caseDefinitionKey, String tenantId) {
-    CaseInstance caseInstance = caseService.withCaseDefinitionByKey(caseDefinitionKey).caseDefinitionTenantId(tenantId).create();
+    CaseInstance caseInstance = caseService.withCaseDefinitionByKey(caseDefinitionKey)
+        .caseDefinitionTenantId(tenantId).create();
 
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(DECISION_TASK_ID).tenantIdIn(tenantId).singleResult();
-    caseService.withCaseExecution(caseExecution.getId()).setVariable("status", "gold").manualStart();
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery()
+        .activityId(DECISION_TASK_ID).tenantIdIn(tenantId).singleResult();
+    caseService.withCaseExecution(caseExecution.getId()).setVariable("status", "gold")
+        .manualStart();
     return caseInstance;
   }
 
   protected CaseInstance createCaseInstance(String caseDefinitionKey) {
     CaseInstance caseInstance = caseService.withCaseDefinitionByKey(caseDefinitionKey).create();
 
-    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId(DECISION_TASK_ID).singleResult();
-    caseService.withCaseExecution(caseExecution.getId()).setVariable("status", "gold").manualStart();
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery()
+        .activityId(DECISION_TASK_ID).singleResult();
+    caseService.withCaseExecution(caseExecution.getId()).setVariable("status", "gold")
+        .manualStart();
     return caseInstance;
   }
 

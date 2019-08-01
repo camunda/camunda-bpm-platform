@@ -29,8 +29,9 @@ public interface MigratingCompensationInstanceValidator {
   /**
    * @param migratingInstance
    * @param migratingProcessInstance
-   * @param ancestorInstanceReport the report of the closest ancestor activity instance;
-   *   errors should be added to this report
+   * @param ancestorInstanceReport
+   *          the report of the closest ancestor activity instance; errors should be added to this
+   *          report
    */
   void validate(MigratingEventScopeInstance migratingInstance,
       MigratingProcessInstance migratingProcessInstance,
@@ -39,12 +40,12 @@ public interface MigratingCompensationInstanceValidator {
   /**
    * @param migratingInstance
    * @param migratingProcessInstance
-   * @param ancestorInstanceReport the report of the closest ancestor activity instance;
-   *   errors should be added to this report
+   * @param ancestorInstanceReport
+   *          the report of the closest ancestor activity instance; errors should be added to this
+   *          report
    */
   void validate(MigratingCompensationEventSubscriptionInstance migratingInstance,
       MigratingProcessInstance migratingProcessInstance,
       MigratingActivityInstanceValidationReportImpl ancestorInstanceReport);
-
 
 }

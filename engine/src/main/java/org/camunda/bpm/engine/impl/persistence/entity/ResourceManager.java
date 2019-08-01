@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -34,33 +33,40 @@ public class ResourceManager extends AbstractManager {
   }
 
   public void deleteResourcesByDeploymentId(String deploymentId) {
-    getDbEntityManager().delete(ResourceEntity.class, "deleteResourcesByDeploymentId", deploymentId);
+    getDbEntityManager().delete(ResourceEntity.class, "deleteResourcesByDeploymentId",
+        deploymentId);
   }
 
-  public ResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {
+  public ResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId,
+      String resourceName) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("deploymentId", deploymentId);
     params.put("resourceName", resourceName);
-    return (ResourceEntity) getDbEntityManager().selectOne("selectResourceByDeploymentIdAndResourceName", params);
+    return (ResourceEntity) getDbEntityManager()
+        .selectOne("selectResourceByDeploymentIdAndResourceName", params);
   }
 
   @SuppressWarnings("unchecked")
-  public List<ResourceEntity> findResourceByDeploymentIdAndResourceNames(String deploymentId, String... resourceNames) {
+  public List<ResourceEntity> findResourceByDeploymentIdAndResourceNames(String deploymentId,
+      String... resourceNames) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("deploymentId", deploymentId);
     params.put("resourceNames", resourceNames);
     return getDbEntityManager().selectList("selectResourceByDeploymentIdAndResourceNames", params);
   }
 
-  public ResourceEntity findResourceByDeploymentIdAndResourceId(String deploymentId, String resourceId) {
+  public ResourceEntity findResourceByDeploymentIdAndResourceId(String deploymentId,
+      String resourceId) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("deploymentId", deploymentId);
     params.put("resourceId", resourceId);
-    return (ResourceEntity) getDbEntityManager().selectOne("selectResourceByDeploymentIdAndResourceId", params);
+    return (ResourceEntity) getDbEntityManager()
+        .selectOne("selectResourceByDeploymentIdAndResourceId", params);
   }
 
   @SuppressWarnings("unchecked")
-  public List<ResourceEntity> findResourceByDeploymentIdAndResourceIds(String deploymentId, String... resourceIds) {
+  public List<ResourceEntity> findResourceByDeploymentIdAndResourceIds(String deploymentId,
+      String... resourceIds) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("deploymentId", deploymentId);
     params.put("resourceIds", resourceIds);
@@ -73,14 +79,16 @@ public class ResourceManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public Map<String, ResourceEntity> findLatestResourcesByDeploymentName(String deploymentName, Set<String> resourcesToFind, String source, String tenantId) {
+  public Map<String, ResourceEntity> findLatestResourcesByDeploymentName(String deploymentName,
+      Set<String> resourcesToFind, String source, String tenantId) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("deploymentName", deploymentName);
     params.put("resourcesToFind", resourcesToFind);
     params.put("source", source);
     params.put("tenantId", tenantId);
 
-    List<ResourceEntity> resources = getDbEntityManager().selectList("selectLatestResourcesByDeploymentName", params);
+    List<ResourceEntity> resources = getDbEntityManager()
+        .selectList("selectLatestResourcesByDeploymentName", params);
 
     Map<String, ResourceEntity> existingResourcesByName = new HashMap<String, ResourceEntity>();
     for (ResourceEntity existingResource : resources) {

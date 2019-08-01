@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionImpl;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
-
 /**
  * @author Roman Smirnov
  *

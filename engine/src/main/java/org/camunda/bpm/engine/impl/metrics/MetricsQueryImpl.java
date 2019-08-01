@@ -31,7 +31,8 @@ import org.camunda.bpm.engine.management.MetricIntervalValue;
  * @author Daniel Meyer
  *
  */
-public class MetricsQueryImpl extends ListQueryParameterObject implements Serializable, Command<Object>, MetricsQuery {
+public class MetricsQueryImpl extends ListQueryParameterObject
+    implements Serializable, Command<Object>, MetricsQuery {
 
   public static final int DEFAULT_LIMIT_SELECT_INTERVAL = 200;
   public static final long DEFAULT_SELECT_INTERVAL = 15 * 60;
@@ -78,8 +79,8 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
   }
 
   /**
-   * Contains the command implementation which should be executed either
-   * metric sum or select metric grouped by time interval.
+   * Contains the command implementation which should be executed either metric sum or select metric
+   * grouped by time interval.
    *
    * Note: this enables to quit with the enum distinction
    */
@@ -90,8 +91,7 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
     callback = new Command() {
       @Override
       public Object execute(CommandContext commandContext) {
-        return commandContext.getMeterLogManager()
-          .executeSelectInterval(MetricsQueryImpl.this);
+        return commandContext.getMeterLogManager().executeSelectInterval(MetricsQueryImpl.this);
       }
     };
 
@@ -108,8 +108,7 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
     callback = new Command() {
       @Override
       public Object execute(CommandContext commandContext) {
-        return commandContext.getMeterLogManager()
-          .executeSelectSum(MetricsQueryImpl.this);
+        return commandContext.getMeterLogManager().executeSelectSum(MetricsQueryImpl.this);
       }
     };
 
@@ -121,7 +120,8 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
     if (callback != null) {
       return callback.execute(commandContext);
     }
-    throw new ProcessEngineException("Query can't be executed. Use either sum or interval to query the metrics.");
+    throw new ProcessEngineException(
+        "Query can't be executed. Use either sum or interval to query the metrics.");
   }
 
   @Override
@@ -145,7 +145,8 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
   @Override
   public void setMaxResults(int maxResults) {
     if (maxResults > DEFAULT_LIMIT_SELECT_INTERVAL) {
-      throw new ProcessEngineException("Metrics interval query row limit can't be set larger than " + DEFAULT_LIMIT_SELECT_INTERVAL + '.');
+      throw new ProcessEngineException("Metrics interval query row limit can't be set larger than "
+          + DEFAULT_LIMIT_SELECT_INTERVAL + '.');
     }
     this.maxResults = maxResults;
   }

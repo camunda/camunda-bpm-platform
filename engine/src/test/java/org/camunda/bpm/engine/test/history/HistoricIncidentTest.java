@@ -39,7 +39,8 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
 
   private static String PROCESS_DEFINITION_KEY = "oneFailingServiceTaskProcess";
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml" })
   public void testPropertiesOfHistoricIncident() {
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
@@ -69,7 +70,8 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertFalse(historicIncident.isResolved());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml" })
   public void testCreateSecondHistoricIncident() {
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
@@ -89,8 +91,8 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.open().count());
   }
 
-
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml" })
   public void testSetHistoricIncidentToResolved() {
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
@@ -107,8 +109,9 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertTrue(historicIncident.isResolved());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricIncidentQueryTest.testQueryByCauseIncidentId.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricIncidentQueryTest.testQueryByCauseIncidentId.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml" })
   public void testSetHistoricIncidentToResolvedRecursive() {
     startProcessInstance("process");
 
@@ -126,7 +129,8 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml" })
   public void testSetHistoricIncidentToDeleted() {
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
@@ -143,15 +147,14 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertFalse(historicIncident.isResolved());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricIncidentQueryTest.testQueryByCauseIncidentId.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricIncidentQueryTest.testQueryByCauseIncidentId.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml" })
   public void testSetHistoricIncidentToDeletedRecursive() {
     startProcessInstance("process");
 
     String processInstanceId = runtimeService.createProcessInstanceQuery()
-        .processDefinitionKey(PROCESS_DEFINITION_KEY)
-        .singleResult()
-        .getId();
+        .processDefinitionKey(PROCESS_DEFINITION_KEY).singleResult().getId();
     runtimeService.deleteProcessInstance(processInstanceId, null);
 
     List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
@@ -166,11 +169,10 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testCreateHistoricIncidentForNestedExecution () {
+  public void testCreateHistoricIncidentForNestedExecution() {
     startProcessInstance("process");
 
-    Execution execution = runtimeService.createExecutionQuery()
-        .activityId("serviceTask")
+    Execution execution = runtimeService.createExecutionQuery().activityId("serviceTask")
         .singleResult();
     assertNotNull(execution);
 
@@ -181,29 +183,30 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertEquals("serviceTask", historicIncident.getActivityId());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricIncidentQueryTest.testQueryByCauseIncidentId.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricIncidentQueryTest.testQueryByCauseIncidentId.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml" })
   public void testCreateRecursiveHistoricIncidents() {
     startProcessInstance("process");
 
     ProcessInstance pi1 = runtimeService.createProcessInstanceQuery()
-        .processDefinitionKey("process")
-        .singleResult();
+        .processDefinitionKey("process").singleResult();
     assertNotNull(pi1);
 
     ProcessInstance pi2 = runtimeService.createProcessInstanceQuery()
-        .processDefinitionKey(PROCESS_DEFINITION_KEY)
-        .singleResult();
+        .processDefinitionKey(PROCESS_DEFINITION_KEY).singleResult();
     assertNotNull(pi2);
 
     HistoricIncidentQuery query = historyService.createHistoricIncidentQuery();
 
-    HistoricIncident rootCauseHistoricIncident = query.processInstanceId(pi2.getId()).singleResult();
+    HistoricIncident rootCauseHistoricIncident = query.processInstanceId(pi2.getId())
+        .singleResult();
     assertNotNull(rootCauseHistoricIncident);
 
     // cause and root cause id is equal to the id of the root incident
     assertEquals(rootCauseHistoricIncident.getId(), rootCauseHistoricIncident.getCauseIncidentId());
-    assertEquals(rootCauseHistoricIncident.getId(), rootCauseHistoricIncident.getRootCauseIncidentId());
+    assertEquals(rootCauseHistoricIncident.getId(),
+        rootCauseHistoricIncident.getRootCauseIncidentId());
 
     HistoricIncident historicIncident = query.processInstanceId(pi1.getId()).singleResult();
     assertNotNull(historicIncident);
@@ -213,35 +216,35 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(rootCauseHistoricIncident.getId(), historicIncident.getRootCauseIncidentId());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricIncidentTest.testCreateRecursiveHistoricIncidentsForNestedCallActivities.bpmn20.xml",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricIncidentTest.testCreateRecursiveHistoricIncidentsForNestedCallActivities.bpmn20.xml",
       "org/camunda/bpm/engine/test/history/HistoricIncidentQueryTest.testQueryByCauseIncidentId.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml" })
   public void testCreateRecursiveHistoricIncidentsForNestedCallActivities() {
     startProcessInstance("process1");
 
     ProcessInstance pi1 = runtimeService.createProcessInstanceQuery()
-        .processDefinitionKey("process1")
-        .singleResult();
+        .processDefinitionKey("process1").singleResult();
     assertNotNull(pi1);
 
     ProcessInstance pi2 = runtimeService.createProcessInstanceQuery()
-        .processDefinitionKey("process")
-        .singleResult();
+        .processDefinitionKey("process").singleResult();
     assertNotNull(pi2);
 
     ProcessInstance pi3 = runtimeService.createProcessInstanceQuery()
-        .processDefinitionKey(PROCESS_DEFINITION_KEY)
-        .singleResult();
+        .processDefinitionKey(PROCESS_DEFINITION_KEY).singleResult();
     assertNotNull(pi3);
 
     HistoricIncidentQuery query = historyService.createHistoricIncidentQuery();
 
-    HistoricIncident rootCauseHistoricIncident = query.processInstanceId(pi3.getId()).singleResult();
+    HistoricIncident rootCauseHistoricIncident = query.processInstanceId(pi3.getId())
+        .singleResult();
     assertNotNull(rootCauseHistoricIncident);
 
     // cause and root cause id is equal to the id of the root incident
     assertEquals(rootCauseHistoricIncident.getId(), rootCauseHistoricIncident.getCauseIncidentId());
-    assertEquals(rootCauseHistoricIncident.getId(), rootCauseHistoricIncident.getRootCauseIncidentId());
+    assertEquals(rootCauseHistoricIncident.getId(),
+        rootCauseHistoricIncident.getRootCauseIncidentId());
 
     HistoricIncident causeHistoricIncident = query.processInstanceId(pi2.getId()).singleResult();
     assertNotNull(causeHistoricIncident);
@@ -258,13 +261,15 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(rootCauseHistoricIncident.getId(), historicIncident.getRootCauseIncidentId());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml" })
   public void testDoNotCreateNewIncident() {
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
     ProcessInstance pi = runtimeService.createProcessInstanceQuery().singleResult();
 
-    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery().processInstanceId(pi.getId());
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery()
+        .processInstanceId(pi.getId());
     HistoricIncident incident = query.singleResult();
     assertNotNull(incident);
 
@@ -291,13 +296,15 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertTrue(tmp.isOpen());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml" })
   public void testSetRetriesByJobDefinitionIdResolveIncident() {
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
     ProcessInstance pi = runtimeService.createProcessInstanceQuery().singleResult();
 
-    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery().processInstanceId(pi.getId());
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery()
+        .processInstanceId(pi.getId());
     HistoricIncident incident = query.singleResult();
     assertNotNull(incident);
 

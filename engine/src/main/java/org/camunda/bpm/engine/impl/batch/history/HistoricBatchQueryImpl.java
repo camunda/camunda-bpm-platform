@@ -28,7 +28,8 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-public class HistoricBatchQueryImpl extends AbstractQuery<HistoricBatchQuery, HistoricBatch> implements HistoricBatchQuery {
+public class HistoricBatchQueryImpl extends AbstractQuery<HistoricBatchQuery, HistoricBatch>
+    implements HistoricBatchQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -108,17 +109,12 @@ public class HistoricBatchQueryImpl extends AbstractQuery<HistoricBatchQuery, Hi
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getHistoricBatchManager()
-    .findBatchCountByQueryCriteria(this);
+    return commandContext.getHistoricBatchManager().findBatchCountByQueryCriteria(this);
   }
-
 
   @Override
   public List<HistoricBatch> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getHistoricBatchManager()
-      .findBatchesByQueryCriteria(this, page);
+    return commandContext.getHistoricBatchManager().findBatchesByQueryCriteria(this, page);
   }
 }

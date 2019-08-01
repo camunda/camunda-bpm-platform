@@ -171,7 +171,8 @@ public class DelegateEvent implements DelegateExecution {
   }
 
   @Override
-  public <T extends TypedValue> T getVariableLocalTyped(String variableName, boolean deserializeValue) {
+  public <T extends TypedValue> T getVariableLocalTyped(String variableName,
+      boolean deserializeValue) {
     throw notYetImplemented();
   }
 
@@ -306,7 +307,6 @@ public class DelegateEvent implements DelegateExecution {
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
-
 
   public String getProcessInstanceId() {
     return processInstanceId;

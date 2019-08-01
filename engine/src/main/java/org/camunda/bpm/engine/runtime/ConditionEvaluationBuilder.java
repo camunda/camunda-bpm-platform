@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>A fluent builder for defining conditional start event correlation</p>
+ * <p>
+ * A fluent builder for defining conditional start event correlation
+ * </p>
  *
  * @author Yana Vasileva
  */
@@ -28,10 +30,10 @@ public interface ConditionEvaluationBuilder {
 
   /**
    * <p>
-   * Correlate the condition such that the process instance has a business key with
-   * the given name. If the condition is correlated to a conditional start
-   * event then the given business key is set on the created process instance.
-   * Is only supported for {@link #evaluateStartConditions()}.</p>
+   * Correlate the condition such that the process instance has a business key with the given name.
+   * If the condition is correlated to a conditional start event then the given business key is set
+   * on the created process instance. Is only supported for {@link #evaluateStartConditions()}.
+   * </p>
    *
    * @param businessKey
    *          the businessKey to correlate on.
@@ -40,27 +42,38 @@ public interface ConditionEvaluationBuilder {
   ConditionEvaluationBuilder processInstanceBusinessKey(String businessKey);
 
   /**
-   * <p>Correlate the condition such that a process definition with the given id is selected.
-   * Is only supported for {@link #evaluateStartConditions()}.</p>
+   * <p>
+   * Correlate the condition such that a process definition with the given id is selected. Is only
+   * supported for {@link #evaluateStartConditions()}.
+   * </p>
    *
-   * @param processDefinitionId the id of the process definition to correlate on.
+   * @param processDefinitionId
+   *          the id of the process definition to correlate on.
    * @return the builder
    */
   ConditionEvaluationBuilder processDefinitionId(String processDefinitionId);
 
   /**
-   * <p>Pass a variable to the condition.</p>
+   * <p>
+   * Pass a variable to the condition.
+   * </p>
    *
-   * <p>Invoking this method multiple times allows passing multiple variables.</p>
+   * <p>
+   * Invoking this method multiple times allows passing multiple variables.
+   * </p>
    *
-   * @param variableName the name of the variable to set
-   * @param variableValue the value of the variable to set
+   * @param variableName
+   *          the name of the variable to set
+   * @param variableValue
+   *          the value of the variable to set
    * @return the builder
    */
   ConditionEvaluationBuilder setVariable(String variableName, Object variableValue);
 
   /**
-   * <p>Pass a variables to the condition.</p>
+   * <p>
+   * Pass a variables to the condition.
+   * </p>
    *
    * @param variables
    *          the map of variables
@@ -69,8 +82,8 @@ public interface ConditionEvaluationBuilder {
   ConditionEvaluationBuilder setVariables(Map<String, Object> variables);
 
   /**
-   * Specify a tenant to correlate a condition to. The condition can only be
-   * correlated on process definitions which belongs to the given tenant.
+   * Specify a tenant to correlate a condition to. The condition can only be correlated on process
+   * definitions which belongs to the given tenant.
    *
    * @param tenantId
    *          the id of the tenant
@@ -79,8 +92,8 @@ public interface ConditionEvaluationBuilder {
   ConditionEvaluationBuilder tenantId(String tenantId);
 
   /**
-   * Specify that the condition can only be correlated on process
-   * definitions which belongs to no tenant.
+   * Specify that the condition can only be correlated on process definitions which belongs to no
+   * tenant.
    *
    * @return the builder
    */

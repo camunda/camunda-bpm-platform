@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
 /**
- * Contains a predefined set of states activity instances may be in
- * during the execution of a process instance.
+ * Contains a predefined set of states activity instances may be in during the execution of a
+ * process instance.
  *
  * @author nico.rehwaldt
  */

@@ -21,7 +21,6 @@ import java.io.Serializable;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -30,16 +29,14 @@ public class DeleteUserInfoCmd implements Command<Object>, Serializable {
   private static final long serialVersionUID = 1L;
   protected String userId;
   protected String key;
-  
+
   public DeleteUserInfoCmd(String userId, String key) {
     this.userId = userId;
     this.key = key;
   }
 
   public String execute(CommandContext commandContext) {
-    commandContext
-      .getIdentityInfoManager()
-      .deleteUserInfoByUserIdAndKey(userId, key);
+    commandContext.getIdentityInfoManager().deleteUserInfoByUserIdAndKey(userId, key);
     return null;
   }
 }

@@ -43,12 +43,13 @@ public class InjectionUtil {
 
   private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
-  public static Method detectAnnotatedMethod(Class<?> clazz, Class<? extends Annotation> annotationType) {
+  public static Method detectAnnotatedMethod(Class<?> clazz,
+      Class<? extends Annotation> annotationType) {
 
     Method[] methods = clazz.getMethods();
     for (Method method : methods) {
       for (Annotation annotaiton : method.getAnnotations()) {
-        if(annotationType.equals(annotaiton.annotationType())) {
+        if (annotationType.equals(annotaiton.annotationType())) {
           return method;
         }
       }
@@ -58,7 +59,8 @@ public class InjectionUtil {
 
   }
 
-  public static Object[] resolveInjections(DeploymentOperation operationContext, Method lifecycleMethod) {
+  public static Object[] resolveInjections(DeploymentOperation operationContext,
+      Method lifecycleMethod) {
 
     final Type[] parameterTypes = lifecycleMethod.getGenericParameterTypes();
     final List<Object> parameters = new ArrayList<Object>();
@@ -67,35 +69,36 @@ public class InjectionUtil {
 
       boolean injectionResolved = false;
 
-      if(parameterType instanceof Class) {
+      if (parameterType instanceof Class) {
 
-        Class<?> parameterClass = (Class<?>)parameterType;
+        Class<?> parameterClass = (Class<?>) parameterType;
 
         // support injection of the default process engine
-        if(ProcessEngine.class.isAssignableFrom(parameterClass)) {
+        if (ProcessEngine.class.isAssignableFrom(parameterClass)) {
           parameters.add(getDefaultProcessEngine(operationContext));
           injectionResolved = true;
         }
 
         // support injection of the ProcessApplicationInfo
-        else if(ProcessApplicationInfo.class.isAssignableFrom(parameterClass)) {
+        else if (ProcessApplicationInfo.class.isAssignableFrom(parameterClass)) {
           parameters.add(getProcessApplicationInfo(operationContext));
           injectionResolved = true;
         }
 
-      } else if(parameterType instanceof ParameterizedType) {
+      } else if (parameterType instanceof ParameterizedType) {
 
         ParameterizedType parameterizedType = (ParameterizedType) parameterType;
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
 
         // support injection of List<ProcessEngine>
-        if(actualTypeArguments.length==1 && ProcessEngine.class.isAssignableFrom((Class<?>) actualTypeArguments[0])) {
+        if (actualTypeArguments.length == 1
+            && ProcessEngine.class.isAssignableFrom((Class<?>) actualTypeArguments[0])) {
           parameters.add(getProcessEngines(operationContext));
           injectionResolved = true;
         }
       }
 
-      if(!injectionResolved) {
+      if (!injectionResolved) {
         throw LOG.unsuppoertedParameterType(parameterType);
       }
 
@@ -104,24 +107,30 @@ public class InjectionUtil {
     return parameters.toArray();
   }
 
-  public static ProcessApplicationInfo getProcessApplicationInfo(DeploymentOperation operationContext) {
+  public static ProcessApplicationInfo getProcessApplicationInfo(
+      DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
+    final AbstractProcessApplication processApplication = operationContext
+        .getAttachment(Attachments.PROCESS_APPLICATION);
 
-    JmxManagedProcessApplication managedPa = serviceContainer.getServiceValue(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
+    JmxManagedProcessApplication managedPa = serviceContainer
+        .getServiceValue(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
     return managedPa.getProcessApplicationInfo();
   }
 
   public static List<ProcessEngine> getProcessEngines(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final ProcessApplicationInfo processApplicationInfo = getProcessApplicationInfo(operationContext);
+    final ProcessApplicationInfo processApplicationInfo = getProcessApplicationInfo(
+        operationContext);
 
     List<ProcessEngine> processEngines = new ArrayList<ProcessEngine>();
-    for (ProcessApplicationDeploymentInfo deploymentInfo : processApplicationInfo.getDeploymentInfo()) {
+    for (ProcessApplicationDeploymentInfo deploymentInfo : processApplicationInfo
+        .getDeploymentInfo()) {
       String processEngineName = deploymentInfo.getProcessEngineName();
-      processEngines.add((ProcessEngine) serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName));
+      processEngines.add((ProcessEngine) serviceContainer
+          .getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName));
     }
 
     return processEngines;

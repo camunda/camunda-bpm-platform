@@ -17,33 +17,33 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * The set of built-in {@link Permission Permissions} for {@link Resources#OPERATION_LOG_CATEGORY User operation log based on categories} in Camunda BPM.
+ * The set of built-in {@link Permission Permissions} for {@link Resources#OPERATION_LOG_CATEGORY
+ * User operation log based on categories} in Camunda BPM.
  *
  * @author Tobias Metzke
  *
  */
 public enum UserOperationLogCategoryPermissions implements Permission {
-  
-  /** The none permission means 'no action', 'doing nothing'.
-   * It does not mean that no permissions are granted. */
+
+  /**
+   * The none permission means 'no action', 'doing nothing'. It does not mean that no permissions
+   * are granted.
+   */
   NONE("NONE", 0),
 
   /**
-   * Indicates that  all interactions are permitted.
-   * If ALL is revoked it means that the user is not permitted
-   * to do everything, which means that at least one permission
-   * is revoked. This does not implicate that all individual
-   * permissions are revoked.
+   * Indicates that all interactions are permitted. If ALL is revoked it means that the user is not
+   * permitted to do everything, which means that at least one permission is revoked. This does not
+   * implicate that all individual permissions are revoked.
    *
-   * Example: If the UPDATE permission is revoke also the ALL
-   * permission is revoked, because the user is not authorized
-   * to execute all actions anymore.
+   * Example: If the UPDATE permission is revoke also the ALL permission is revoked, because the
+   * user is not authorized to execute all actions anymore.
    */
   ALL("ALL", Integer.MAX_VALUE),
 
   /** Indicates that READ interactions on defined categories are permitted. */
   READ("READ", 2),
-  
+
   /** Indicates that DELETE interactions on defined categories are permitted. */
   DELETE("DELETE", 16);
 

@@ -42,11 +42,8 @@ public class MultiTenancyHistoricTaskInstanceQueryTest extends PluggableProcessE
 
   @Override
   protected void setUp() {
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .userTask()
-      .endEvent()
-    .done();
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .userTask().endEvent().done();
 
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
@@ -59,37 +56,31 @@ public class MultiTenancyHistoricTaskInstanceQueryTest extends PluggableProcessE
   }
 
   public void testQueryWithoutTenantId() {
-    HistoricTaskInstanceQuery query = historyService.
-        createHistoricTaskInstanceQuery();
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
-    HistoricTaskInstanceQuery query = historyService
-        .createHistoricTaskInstanceQuery()
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = historyService
-        .createHistoricTaskInstanceQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = historyService.createHistoricTaskInstanceQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    HistoricTaskInstanceQuery query = historyService
-        .createHistoricTaskInstanceQuery()
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    HistoricTaskInstanceQuery query = historyService
-        .createHistoricTaskInstanceQuery()
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -97,8 +88,7 @@ public class MultiTenancyHistoricTaskInstanceQueryTest extends PluggableProcessE
 
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricTaskInstanceQuery()
-        .tenantIdIn((String) null);
+      historyService.createHistoricTaskInstanceQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -106,10 +96,8 @@ public class MultiTenancyHistoricTaskInstanceQueryTest extends PluggableProcessE
   }
 
   public void testQuerySortingAsc() {
-    List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
+    List<HistoricTaskInstance> historicTaskInstances = historyService
+        .createHistoricTaskInstanceQuery().orderByTenantId().asc().list();
 
     assertThat(historicTaskInstances.size(), is(2));
     assertThat(historicTaskInstances.get(0).getTenantId(), is(TENANT_ONE));
@@ -117,10 +105,8 @@ public class MultiTenancyHistoricTaskInstanceQueryTest extends PluggableProcessE
   }
 
   public void testQuerySortingDesc() {
-    List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
-        .orderByTenantId()
-        .desc()
-        .list();
+    List<HistoricTaskInstance> historicTaskInstances = historyService
+        .createHistoricTaskInstanceQuery().orderByTenantId().desc().list();
 
     assertThat(historicTaskInstances.size(), is(2));
     assertThat(historicTaskInstances.get(0).getTenantId(), is(TENANT_TWO));
@@ -165,14 +151,14 @@ public class MultiTenancyHistoricTaskInstanceQueryTest extends PluggableProcessE
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {
     return runtimeService.createProcessInstanceByKey("testProcess")
-        .processDefinitionTenantId(tenant)
-        .execute();
+        .processDefinitionTenantId(tenant).execute();
   }
 
   protected void completeUserTask(ProcessInstance processInstance) {
-   Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-   assertThat(task, is(notNullValue()));
-   taskService.complete(task.getId());
- }
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
+    assertThat(task, is(notNullValue()));
+    taskService.complete(task.getId());
+  }
 
 }

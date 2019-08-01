@@ -29,31 +29,30 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  * @author smirnov
  *
  */
-public class HistoricCaseActivityStatisticsQueryImpl extends AbstractQuery<HistoricCaseActivityStatisticsQuery, HistoricCaseActivityStatistics> implements
-    HistoricCaseActivityStatisticsQuery {
+public class HistoricCaseActivityStatisticsQueryImpl
+    extends AbstractQuery<HistoricCaseActivityStatisticsQuery, HistoricCaseActivityStatistics>
+    implements HistoricCaseActivityStatisticsQuery {
 
   private static final long serialVersionUID = 1L;
 
   protected String caseDefinitionId;
 
-  public HistoricCaseActivityStatisticsQueryImpl(String caseDefinitionId, CommandExecutor commandExecutor) {
+  public HistoricCaseActivityStatisticsQueryImpl(String caseDefinitionId,
+      CommandExecutor commandExecutor) {
     super(commandExecutor);
     this.caseDefinitionId = caseDefinitionId;
   }
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return
-      commandContext
-        .getHistoricStatisticsManager()
+    return commandContext.getHistoricStatisticsManager()
         .getHistoricStatisticsCountGroupedByCaseActivity(this);
   }
 
-  public List<HistoricCaseActivityStatistics> executeList(CommandContext commandContext, Page page) {
+  public List<HistoricCaseActivityStatistics> executeList(CommandContext commandContext,
+      Page page) {
     checkQueryOk();
-    return
-      commandContext
-        .getHistoricStatisticsManager()
+    return commandContext.getHistoricStatisticsManager()
         .getHistoricStatisticsGroupedByCaseActivity(this, page);
   }
 

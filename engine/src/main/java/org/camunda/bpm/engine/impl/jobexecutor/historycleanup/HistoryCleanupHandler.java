@@ -46,7 +46,8 @@ public abstract class HistoryCleanupHandler implements TransactionListener {
         Map<String, Long> report = reportMetrics();
         boolean isRescheduleNow = shouldRescheduleNow();
 
-        new HistoryCleanupSchedulerCmd(isRescheduleNow, report, configuration, jobId).execute(commandContext);
+        new HistoryCleanupSchedulerCmd(isRescheduleNow, report, configuration, jobId)
+            .execute(commandContext);
 
         return null;
       }
@@ -63,7 +64,8 @@ public abstract class HistoryCleanupHandler implements TransactionListener {
     return configuration;
   }
 
-  public HistoryCleanupHandler setConfiguration(HistoryCleanupJobHandlerConfiguration configuration) {
+  public HistoryCleanupHandler setConfiguration(
+      HistoryCleanupJobHandlerConfiguration configuration) {
     this.configuration = configuration;
     return this;
   }

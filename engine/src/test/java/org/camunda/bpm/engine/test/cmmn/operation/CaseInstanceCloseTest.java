@@ -37,15 +37,8 @@ public class CaseInstanceCloseTest extends PvmTestCase {
 
   /**
    *
-   *   +-----------------+
-   *   | Case1            \
-   *   +-------------------+---+
-   *   |                       |
-   *   |     +-------+         |
-   *   |     |   A   |         |
-   *   |     +-------+         |
-   *   |                       |
-   *   +-----------------------+
+   * +-----------------+ | Case1 \ +-------------------+---+ | | | +-------+ | | | A | | | +-------+
+   * | | | +-----------------------+
    *
    */
   @Test
@@ -56,12 +49,10 @@ public class CaseInstanceCloseTest extends PvmTestCase {
     // given
     // a case definition
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .listener("close", stateTransitionCollector)
-      .createActivity("A")
+        .listener("close", stateTransitionCollector).createActivity("A")
         .behavior(new TaskWaitState())
         .property(ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE, defaultManualActivation())
-      .endActivity()
-      .buildCaseDefinition();
+        .endActivity().buildCaseDefinition();
 
     // an active case instance
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();
@@ -94,15 +85,8 @@ public class CaseInstanceCloseTest extends PvmTestCase {
 
   /**
    *
-   *   +-----------------+
-   *   | Case1            \
-   *   +-------------------+---+
-   *   |                       |
-   *   |     +-------+         |
-   *   |     |   A   |         |
-   *   |     +-------+         |
-   *   |                       |
-   *   +-----------------------+
+   * +-----------------+ | Case1 \ +-------------------+---+ | | | +-------+ | | | A | | | +-------+
+   * | | | +-----------------------+
    *
    */
   @Test
@@ -113,11 +97,8 @@ public class CaseInstanceCloseTest extends PvmTestCase {
     // given
     // a case definition
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .listener("close", stateTransitionCollector)
-      .createActivity("A")
-        .behavior(new TaskWaitState())
-      .endActivity()
-      .buildCaseDefinition();
+        .listener("close", stateTransitionCollector).createActivity("A")
+        .behavior(new TaskWaitState()).endActivity().buildCaseDefinition();
 
     // an active case instance
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();
@@ -145,15 +126,8 @@ public class CaseInstanceCloseTest extends PvmTestCase {
 
   /**
    *
-   *   +-----------------+
-   *   | Case1            \
-   *   +-------------------+---+
-   *   |                       |
-   *   |     +-------+         |
-   *   |     |   A   |         |
-   *   |     +-------+         |
-   *   |                       |
-   *   +-----------------------+
+   * +-----------------+ | Case1 \ +-------------------+---+ | | | +-------+ | | | A | | | +-------+
+   * | | | +-----------------------+
    *
    */
   @Test
@@ -164,11 +138,8 @@ public class CaseInstanceCloseTest extends PvmTestCase {
     // given
     // a case definition
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .listener("close", stateTransitionCollector)
-      .createActivity("A")
-        .behavior(new TaskWaitState())
-      .endActivity()
-      .buildCaseDefinition();
+        .listener("close", stateTransitionCollector).createActivity("A")
+        .behavior(new TaskWaitState()).endActivity().buildCaseDefinition();
 
     // an active case instance
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();
@@ -196,18 +167,10 @@ public class CaseInstanceCloseTest extends PvmTestCase {
     assertNull(caseInstance.findCaseExecution("A"));
   }
 
-
   /**
    *
-   *   +-----------------+
-   *   | Case1            \
-   *   +-------------------+---+
-   *   |                       |
-   *   |     +-------+         |
-   *   |     |   A   |         |
-   *   |     +-------+         |
-   *   |                       |
-   *   +-----------------------+
+   * +-----------------+ | Case1 \ +-------------------+---+ | | | +-------+ | | | A | | | +-------+
+   * | | | +-----------------------+
    *
    */
   @Test
@@ -218,11 +181,8 @@ public class CaseInstanceCloseTest extends PvmTestCase {
     // given
     // a case definition
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .listener("close", stateTransitionCollector)
-      .createActivity("A")
-        .behavior(new TaskWaitState())
-      .endActivity()
-      .buildCaseDefinition();
+        .listener("close", stateTransitionCollector).createActivity("A")
+        .behavior(new TaskWaitState()).endActivity().buildCaseDefinition();
 
     // an active case instance
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();
@@ -247,15 +207,8 @@ public class CaseInstanceCloseTest extends PvmTestCase {
 
   /**
    *
-   *   +-----------------+
-   *   | Case1            \
-   *   +-------------------+---+
-   *   |                       |
-   *   |     +-------+         |
-   *   |     |   A   |         |
-   *   |     +-------+         |
-   *   |                       |
-   *   +-----------------------+
+   * +-----------------+ | Case1 \ +-------------------+---+ | | | +-------+ | | | A | | | +-------+
+   * | | | +-----------------------+
    *
    */
   @Test
@@ -266,11 +219,8 @@ public class CaseInstanceCloseTest extends PvmTestCase {
     // given
     // a case definition
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .listener("close", stateTransitionCollector)
-      .createActivity("A")
-        .behavior(new TaskWaitState())
-      .endActivity()
-      .buildCaseDefinition();
+        .listener("close", stateTransitionCollector).createActivity("A")
+        .behavior(new TaskWaitState()).endActivity().buildCaseDefinition();
 
     // an active case instance
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();
@@ -295,19 +245,10 @@ public class CaseInstanceCloseTest extends PvmTestCase {
 
   /**
    *
-   *   +-----------------+
-   *   | Case1            \
-   *   +-------------------+-----------------+
-   *   |                                     |
-   *   |     +------------------------+      |
-   *   |    / X                        \     |
-   *   |   +    +-------+  +-------+    +    |
-   *   |   |    |   A   |  |   B   |    |    |
-   *   |   +    +-------+  +-------+    +    |
-   *   |    \                          /     |
-   *   |     +------------------------+      |
-   *   |                                     |
-   *   +-------------------------------------+
+   * +-----------------+ | Case1 \ +-------------------+-----------------+ | | |
+   * +------------------------+ | | / X \ | | + +-------+ +-------+ + | | | | A | | B | | | | +
+   * +-------+ +-------+ + | | \ / | | +------------------------+ | | |
+   * +-------------------------------------+
    *
    */
   @Test
@@ -318,17 +259,10 @@ public class CaseInstanceCloseTest extends PvmTestCase {
     // given
     // a case definition
     CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .listener("close", stateTransitionCollector)
-      .createActivity("X")
-        .behavior(new StageActivityBehavior())
-        .createActivity("A")
-          .behavior(new TaskWaitState())
-        .endActivity()
-        .createActivity("B")
-          .behavior(new TaskWaitState())
-        .endActivity()
-      .endActivity()
-      .buildCaseDefinition();
+        .listener("close", stateTransitionCollector).createActivity("X")
+        .behavior(new StageActivityBehavior()).createActivity("A").behavior(new TaskWaitState())
+        .endActivity().createActivity("B").behavior(new TaskWaitState()).endActivity().endActivity()
+        .buildCaseDefinition();
 
     // an active case instance
     CmmnCaseInstance caseInstance = caseDefinition.createCaseInstance();

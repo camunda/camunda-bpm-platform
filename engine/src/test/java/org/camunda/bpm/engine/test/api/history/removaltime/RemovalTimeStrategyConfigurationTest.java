@@ -57,98 +57,99 @@ public class RemovalTimeStrategyConfigurationTest {
   public void init() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
 
-    processEngineConfiguration
-      .setHistoryRemovalTimeStrategy(null)
-      .setHistoryRemovalTimeProvider(null)
-      .initHistoryRemovalTime();
+    processEngineConfiguration.setHistoryRemovalTimeStrategy(null)
+        .setHistoryRemovalTimeProvider(null).initHistoryRemovalTime();
   }
 
   @AfterClass
   public static void tearDown() {
-    processEngineConfiguration
-      .setHistoryRemovalTimeStrategy(null)
-      .setHistoryRemovalTimeProvider(null)
-      .initHistoryRemovalTime();
+    processEngineConfiguration.setHistoryRemovalTimeStrategy(null)
+        .setHistoryRemovalTimeProvider(null).initHistoryRemovalTime();
   }
 
   @Test
   public void shouldAutomaticallyConfigure() {
     // given
 
-    processEngineConfiguration
-      .setHistoryRemovalTimeProvider(null)
-      .setHistoryRemovalTimeStrategy(null);
+    processEngineConfiguration.setHistoryRemovalTimeProvider(null)
+        .setHistoryRemovalTimeStrategy(null);
 
     // when
     processEngineConfiguration.initHistoryRemovalTime();
 
     // then
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeStrategy(), is(HISTORY_REMOVAL_TIME_STRATEGY_END));
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(), isA(HistoryRemovalTimeProvider.class));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeStrategy(),
+        is(HISTORY_REMOVAL_TIME_STRATEGY_END));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(),
+        isA(HistoryRemovalTimeProvider.class));
   }
 
   @Test
   public void shouldConfigureToStart() {
     // given
 
-    processEngineConfiguration
-      .setHistoryRemovalTimeProvider(mock(HistoryRemovalTimeProvider.class))
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START);
+    processEngineConfiguration.setHistoryRemovalTimeProvider(mock(HistoryRemovalTimeProvider.class))
+        .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_START);
 
     // when
     processEngineConfiguration.initHistoryRemovalTime();
 
     // then
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeStrategy(), is(HISTORY_REMOVAL_TIME_STRATEGY_START));
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(), isA(HistoryRemovalTimeProvider.class));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeStrategy(),
+        is(HISTORY_REMOVAL_TIME_STRATEGY_START));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(),
+        isA(HistoryRemovalTimeProvider.class));
   }
 
   @Test
   public void shouldConfigureToEnd() {
     // given
 
-    processEngineConfiguration
-      .setHistoryRemovalTimeProvider(mock(HistoryRemovalTimeProvider.class))
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END);
+    processEngineConfiguration.setHistoryRemovalTimeProvider(mock(HistoryRemovalTimeProvider.class))
+        .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END);
 
     // when
     processEngineConfiguration.initHistoryRemovalTime();
 
     // then
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeStrategy(), is(HISTORY_REMOVAL_TIME_STRATEGY_END));
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(), isA(HistoryRemovalTimeProvider.class));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeStrategy(),
+        is(HISTORY_REMOVAL_TIME_STRATEGY_END));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(),
+        isA(HistoryRemovalTimeProvider.class));
   }
 
   @Test
   public void shouldConfigureToNone() {
     // given
 
-    processEngineConfiguration
-      .setHistoryRemovalTimeProvider(mock(HistoryRemovalTimeProvider.class))
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE);
+    processEngineConfiguration.setHistoryRemovalTimeProvider(mock(HistoryRemovalTimeProvider.class))
+        .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE);
 
     // when
     processEngineConfiguration.initHistoryRemovalTime();
 
     // then
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeStrategy(), is(HISTORY_REMOVAL_TIME_STRATEGY_NONE));
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(), isA(HistoryRemovalTimeProvider.class));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeStrategy(),
+        is(HISTORY_REMOVAL_TIME_STRATEGY_NONE));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(),
+        isA(HistoryRemovalTimeProvider.class));
   }
 
   @Test
   public void shouldConfigureWithoutProvider() {
     // given
 
-    processEngineConfiguration
-      .setHistoryRemovalTimeProvider(null)
-      .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END);
+    processEngineConfiguration.setHistoryRemovalTimeProvider(null)
+        .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END);
 
     // when
     processEngineConfiguration.initHistoryRemovalTime();
 
     // then
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeStrategy(), is(HISTORY_REMOVAL_TIME_STRATEGY_END));
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(), isA(HistoryRemovalTimeProvider.class));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeStrategy(),
+        is(HISTORY_REMOVAL_TIME_STRATEGY_END));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(),
+        isA(HistoryRemovalTimeProvider.class));
   }
 
   @Test
@@ -165,7 +166,8 @@ public class RemovalTimeStrategyConfigurationTest {
     processEngineConfiguration.initHistoryRemovalTime();
 
     // assume
-    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(), isA(HistoryRemovalTimeProvider.class));
+    assertThat(processEngineConfiguration.getHistoryRemovalTimeProvider(),
+        isA(HistoryRemovalTimeProvider.class));
   }
 
 }

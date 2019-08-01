@@ -34,20 +34,13 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   public void testTreeCompactionWithLocalVariableOnConcurrentExecution() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    Execution innerTaskExecution = runtimeService
-        .createExecutionQuery()
-        .activityId("innerTask")
+    Execution innerTaskExecution = runtimeService.createExecutionQuery().activityId("innerTask")
         .singleResult();
 
-    Execution subProcessConcurrentExecution = runtimeService
-        .createExecutionQuery()
-        .executionId(((ExecutionEntity) innerTaskExecution).getParentId())
-        .singleResult();
+    Execution subProcessConcurrentExecution = runtimeService.createExecutionQuery()
+        .executionId(((ExecutionEntity) innerTaskExecution).getParentId()).singleResult();
 
-    Task task = taskService
-        .createTaskQuery()
-        .taskDefinitionKey("task")
-        .singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
 
     // when
     runtimeService.setVariableLocal(subProcessConcurrentExecution.getId(), "foo", "bar");
@@ -65,30 +58,25 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   public void testStableVariableInstanceIdsOnCompaction() {
     runtimeService.startProcessInstanceByKey("process");
 
-    Execution innerTaskExecution = runtimeService
-        .createExecutionQuery()
-        .activityId("innerTask")
+    Execution innerTaskExecution = runtimeService.createExecutionQuery().activityId("innerTask")
         .singleResult();
 
-    Execution subProcessConcurrentExecution = runtimeService
-        .createExecutionQuery()
-        .executionId(((ExecutionEntity) innerTaskExecution).getParentId())
-        .singleResult();
+    Execution subProcessConcurrentExecution = runtimeService.createExecutionQuery()
+        .executionId(((ExecutionEntity) innerTaskExecution).getParentId()).singleResult();
 
-    Task task = taskService
-        .createTaskQuery()
-        .taskDefinitionKey("task")
-        .singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
 
     // when
     runtimeService.setVariableLocal(subProcessConcurrentExecution.getId(), "foo", "bar");
-    VariableInstance variableBeforeCompaction = runtimeService.createVariableInstanceQuery().singleResult();
+    VariableInstance variableBeforeCompaction = runtimeService.createVariableInstanceQuery()
+        .singleResult();
 
     // and completing the concurrent task, thereby pruning the sub process concurrent execution
     taskService.complete(task.getId());
 
     // then the variable still exists
-    VariableInstance variableAfterCompaction = runtimeService.createVariableInstanceQuery().singleResult();
+    VariableInstance variableAfterCompaction = runtimeService.createVariableInstanceQuery()
+        .singleResult();
     assertEquals(variableBeforeCompaction.getId(), variableAfterCompaction.getId());
   }
 
@@ -96,30 +84,26 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   public void testStableVariableInstanceIdsOnCompactionAndExpansion() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    Execution task1Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task1")
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1")
         .singleResult();
 
-    Task task2 = taskService
-        .createTaskQuery()
-        .taskDefinitionKey("task2")
-        .singleResult();
+    Task task2 = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
 
     // when
     runtimeService.setVariableLocal(task1Execution.getId(), "foo", "bar");
-    VariableInstance variableBeforeCompaction = runtimeService.createVariableInstanceQuery().singleResult();
+    VariableInstance variableBeforeCompaction = runtimeService.createVariableInstanceQuery()
+        .singleResult();
 
     // compacting the tree
     taskService.complete(task2.getId());
 
     // expanding the tree
     runtimeService.createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("task2")
-      .execute();
+        .startBeforeActivity("task2").execute();
 
     // then the variable still exists
-    VariableInstance variableAfterCompaction = runtimeService.createVariableInstanceQuery().singleResult();
+    VariableInstance variableAfterCompaction = runtimeService.createVariableInstanceQuery()
+        .singleResult();
     assertEquals(variableBeforeCompaction.getId(), variableAfterCompaction.getId());
   }
 
@@ -128,14 +112,9 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    Task task1 = taskService
-        .createTaskQuery()
-        .taskDefinitionKey("task1")
-        .singleResult();
+    Task task1 = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
 
-    Execution task2Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task2")
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2")
         .singleResult();
 
     // when
@@ -155,14 +134,9 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
     // given
     runtimeService.startProcessInstanceByKey("process");
 
-    Task task1 = taskService
-        .createTaskQuery()
-        .taskDefinitionKey("task1")
-        .singleResult();
+    Task task1 = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
 
-    Execution task2Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task2")
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2")
         .singleResult();
     String subProcessScopeExecutionId = ((ExecutionEntity) task2Execution).getParentId();
 
@@ -183,14 +157,9 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    Task task1 = taskService
-        .createTaskQuery()
-        .taskDefinitionKey("task1")
-        .singleResult();
+    Task task1 = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
 
-    Execution task2Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task2")
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2")
         .singleResult();
 
     // when
@@ -211,15 +180,15 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
     // given
     runtimeService.startProcessInstanceByKey("process");
 
-    Execution task2Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task2")
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2")
         .singleResult();
 
     // when
     runtimeService.setVariableLocal(task2Execution.getId(), "foo", "bar");
-    taskService.complete(taskService.createTaskQuery().taskDefinitionKey("task1").singleResult().getId());
-    taskService.complete(taskService.createTaskQuery().taskDefinitionKey("task2").singleResult().getId());
+    taskService
+        .complete(taskService.createTaskQuery().taskDefinitionKey("task1").singleResult().getId());
+    taskService
+        .complete(taskService.createTaskQuery().taskDefinitionKey("task2").singleResult().getId());
 
     // then
     assertEquals(0, runtimeService.createVariableInstanceQuery().count());
@@ -230,15 +199,15 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
     // given
     runtimeService.startProcessInstanceByKey("process");
 
-    Execution task2Execution = runtimeService
-        .createExecutionQuery()
-        .activityId("task2")
+    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2")
         .singleResult();
 
     // when
     runtimeService.setVariableLocal(task2Execution.getId(), "foo", "bar");
-    taskService.complete(taskService.createTaskQuery().taskDefinitionKey("task1").singleResult().getId());
-    taskService.complete(taskService.createTaskQuery().taskDefinitionKey("task2").singleResult().getId());
+    taskService
+        .complete(taskService.createTaskQuery().taskDefinitionKey("task1").singleResult().getId());
+    taskService
+        .complete(taskService.createTaskQuery().taskDefinitionKey("task2").singleResult().getId());
 
     // then
     assertEquals(0, runtimeService.createVariableInstanceQuery().count());
@@ -250,7 +219,8 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1")
+        .singleResult();
     Task task2 = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
 
     runtimeService.setVariableLocal(task1Execution.getId(), "var", "value");
@@ -260,8 +230,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
 
     // and expanding again
     runtimeService.createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("task2")
-      .execute();
+        .startBeforeActivity("task2").execute();
 
     // then the variable is again assigned to task1's concurrent execution
     Task task1 = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
@@ -285,8 +254,7 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
 
     // and expanding again
     runtimeService.createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("task2")
-      .execute();
+        .startBeforeActivity("task2").execute();
 
     // then the variable is still assigned to the scope execution execution
     VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();

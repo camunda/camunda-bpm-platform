@@ -49,7 +49,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class GetCompletedHistoricProcessInstancesForOptimizeTest {
 
@@ -71,11 +70,9 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
   private AuthorizationService authorizationService;
   private TaskService taskService;
 
-
   @Before
   public void init() {
-    ProcessEngineConfigurationImpl config =
-      engineRule.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl config = engineRule.getProcessEngineConfiguration();
     optimizeService = config.getOptimizeService();
     identityService = engineRule.getIdentityService();
     runtimeService = engineRule.getRuntimeService();
@@ -101,17 +98,15 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
 
   @Test
   public void getCompletedHistoricProcessInstances() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .endEvent().done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    List<HistoricProcessInstance> completedHistoricProcessInstances =
-      optimizeService.getCompletedHistoricProcessInstances(pastDate(), null, 10);
+    List<HistoricProcessInstance> completedHistoricProcessInstances = optimizeService
+        .getCompletedHistoricProcessInstances(pastDate(), null, 10);
 
     // then
     assertThat(completedHistoricProcessInstances.size(), is(1));
@@ -120,11 +115,9 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
 
   @Test
   public void fishedAfterParameterWorks() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .endEvent().done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
@@ -134,8 +127,8 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    List<HistoricProcessInstance> completedHistoricProcessInstances =
-      optimizeService.getCompletedHistoricProcessInstances(now, null, 10);
+    List<HistoricProcessInstance> completedHistoricProcessInstances = optimizeService
+        .getCompletedHistoricProcessInstances(now, null, 10);
 
     // then
     assertThat(completedHistoricProcessInstances.size(), is(1));
@@ -143,23 +136,20 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
 
   @Test
   public void fishedAtParameterWorks() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .endEvent().done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
-    ProcessInstance processInstance =
-      runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    List<HistoricProcessInstance> completedHistoricProcessInstances =
-      optimizeService.getCompletedHistoricProcessInstances(null, now, 10);
+    List<HistoricProcessInstance> completedHistoricProcessInstances = optimizeService
+        .getCompletedHistoricProcessInstances(null, now, 10);
 
     // then
     assertThat(completedHistoricProcessInstances.size(), is(1));
@@ -168,23 +158,20 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
 
   @Test
   public void fishedAfterAndFinishedAtParameterWorks() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .endEvent().done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
-    ProcessInstance processInstance =
-      runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    List<HistoricProcessInstance> completedHistoricProcessInstances =
-      optimizeService.getCompletedHistoricProcessInstances(now, now, 10);
+    List<HistoricProcessInstance> completedHistoricProcessInstances = optimizeService
+        .getCompletedHistoricProcessInstances(now, now, 10);
 
     // then
     assertThat(completedHistoricProcessInstances.size(), is(0));
@@ -192,11 +179,9 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
 
   @Test
   public void maxResultsParameterWorks() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .endEvent().done();
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
     runtimeService.startProcessInstanceByKey("process");
@@ -205,8 +190,8 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("process");
 
     // when
-    List<HistoricProcessInstance> completedHistoricProcessInstances =
-      optimizeService.getCompletedHistoricProcessInstances(pastDate(), null, 3);
+    List<HistoricProcessInstance> completedHistoricProcessInstances = optimizeService
+        .getCompletedHistoricProcessInstances(pastDate(), null, 3);
 
     // then
     assertThat(completedHistoricProcessInstances.size(), is(3));
@@ -214,29 +199,24 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
 
   @Test
   public void resultIsSortedByEndTime() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .endEvent().done();
     testHelper.deploy(simpleDefinition);
     Date now = new Date();
     Date nowPlus1Second = new Date(now.getTime() + 1000L);
     ClockUtil.setCurrentTime(nowPlus1Second);
-    ProcessInstance processInstance1 =
-      runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("process");
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
-    ProcessInstance processInstance2 =
-      runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("process");
     Date nowPlus4Seconds = new Date(nowPlus2Seconds.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus4Seconds);
-    ProcessInstance processInstance3 =
-      runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("process");
 
     // when
-    List<HistoricProcessInstance> completedHistoricProcessInstances =
-      optimizeService.getCompletedHistoricProcessInstances(now, null, 10);
+    List<HistoricProcessInstance> completedHistoricProcessInstances = optimizeService
+        .getCompletedHistoricProcessInstances(now, null, 10);
 
     // then
     assertThat(completedHistoricProcessInstances.size(), is(3));
@@ -247,26 +227,22 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
 
   @Test
   public void fetchOnlyCompletedProcessInstances() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask()
-      .endEvent()
-      .done();
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask().endEvent().done();
     testHelper.deploy(simpleDefinition);
-    ProcessInstance processInstanceToComplete =
-      runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstanceToComplete = runtimeService.startProcessInstanceByKey("process");
     completeAllUserTasks();
     runtimeService.startProcessInstanceByKey("process");
 
-
     // when
-    List<HistoricProcessInstance> completedHistoricProcessInstances =
-      optimizeService.getCompletedHistoricProcessInstances(pastDate(), null, 10);
+    List<HistoricProcessInstance> completedHistoricProcessInstances = optimizeService
+        .getCompletedHistoricProcessInstances(pastDate(), null, 10);
 
     // then
     assertThat(completedHistoricProcessInstances.size(), is(1));
-        assertThat(completedHistoricProcessInstances.get(0).getId(), is(processInstanceToComplete.getId()));
+    assertThat(completedHistoricProcessInstances.get(0).getId(),
+        is(processInstanceToComplete.getId()));
 
   }
 
@@ -287,7 +263,8 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
     identityService.saveUser(user);
   }
 
-  private void assertThatInstanceHasAllImportantInformation(HistoricProcessInstance historicProcessInstance) {
+  private void assertThatInstanceHasAllImportantInformation(
+      HistoricProcessInstance historicProcessInstance) {
     assertThat(historicProcessInstance, notNullValue());
     assertThat(historicProcessInstance.getId(), notNullValue());
     assertThat(historicProcessInstance.getProcessDefinitionKey(), is("process"));
@@ -297,6 +274,5 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
     assertThat(historicProcessInstance.getStartTime(), notNullValue());
     assertThat(historicProcessInstance.getEndTime(), notNullValue());
   }
-
 
 }

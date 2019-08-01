@@ -34,17 +34,16 @@ public class ScriptInvocation extends DelegateInvocation {
     this(script, scope, null);
   }
 
-  public ScriptInvocation(ExecutableScript script, VariableScope scope, BaseDelegateExecution contextExecution) {
+  public ScriptInvocation(ExecutableScript script, VariableScope scope,
+      BaseDelegateExecution contextExecution) {
     super(contextExecution, null);
     this.script = script;
     this.scope = scope;
   }
 
   protected void invoke() throws Exception {
-    invocationResult = Context
-      .getProcessEngineConfiguration()
-      .getScriptingEnvironment()
-      .execute(script, scope);
+    invocationResult = Context.getProcessEngineConfiguration().getScriptingEnvironment()
+        .execute(script, scope);
   }
 
 }

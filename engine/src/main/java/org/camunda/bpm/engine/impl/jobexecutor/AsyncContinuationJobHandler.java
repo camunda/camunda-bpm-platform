@@ -46,14 +46,19 @@ public class AsyncContinuationJobHandler implements JobHandler<AsyncContinuation
   public AsyncContinuationJobHandler() {
     supportedOperations = new HashMap<String, PvmAtomicOperation>();
     // async before activity
-    supportedOperations.put(PvmAtomicOperation.TRANSITION_CREATE_SCOPE.getCanonicalName(), PvmAtomicOperation.TRANSITION_CREATE_SCOPE);
-    supportedOperations.put(PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE.getCanonicalName(), PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE);
+    supportedOperations.put(PvmAtomicOperation.TRANSITION_CREATE_SCOPE.getCanonicalName(),
+        PvmAtomicOperation.TRANSITION_CREATE_SCOPE);
+    supportedOperations.put(PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE.getCanonicalName(),
+        PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE);
     // async before start event
-    supportedOperations.put(PvmAtomicOperation.PROCESS_START.getCanonicalName(), PvmAtomicOperation.PROCESS_START);
+    supportedOperations.put(PvmAtomicOperation.PROCESS_START.getCanonicalName(),
+        PvmAtomicOperation.PROCESS_START);
 
     // async after activity depending if an outgoing sequence flow exists
-    supportedOperations.put(PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE.getCanonicalName(), PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE);
-    supportedOperations.put(PvmAtomicOperation.ACTIVITY_END.getCanonicalName(), PvmAtomicOperation.ACTIVITY_END);
+    supportedOperations.put(PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE.getCanonicalName(),
+        PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE);
+    supportedOperations.put(PvmAtomicOperation.ACTIVITY_END.getCanonicalName(),
+        PvmAtomicOperation.ACTIVITY_END);
   }
 
   @Override
@@ -62,12 +67,15 @@ public class AsyncContinuationJobHandler implements JobHandler<AsyncContinuation
   }
 
   @Override
-  public void execute(AsyncContinuationConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(AsyncContinuationConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
 
     LegacyBehavior.repairMultiInstanceAsyncJob(execution);
 
-    PvmAtomicOperation atomicOperation = findMatchingAtomicOperation(configuration.getAtomicOperation());
-    ensureNotNull("Cannot process job with configuration " + configuration, "atomicOperation", atomicOperation);
+    PvmAtomicOperation atomicOperation = findMatchingAtomicOperation(
+        configuration.getAtomicOperation());
+    ensureNotNull("Cannot process job with configuration " + configuration, "atomicOperation",
+        atomicOperation);
 
     // reset transition id.
     String transitionId = configuration.getTransitionId();
@@ -77,8 +85,7 @@ public class AsyncContinuationJobHandler implements JobHandler<AsyncContinuation
       execution.setTransition(transition);
     }
 
-    Context.getCommandInvocationContext()
-      .performOperation(atomicOperation, execution);
+    Context.getCommandInvocationContext().performOperation(atomicOperation, execution);
   }
 
   public PvmAtomicOperation findMatchingAtomicOperation(String operationName) {
@@ -108,17 +115,19 @@ public class AsyncContinuationJobHandler implements JobHandler<AsyncContinuation
 
   /**
    * @return an array of length two with the following contents:
-   * <ul><li>First element: pvm atomic operation name
-   * <li>Second element: transition id (may be null)
+   *         <ul>
+   *         <li>First element: pvm atomic operation name
+   *         <li>Second element: transition id (may be null)
    */
   protected String[] tokenizeJobConfiguration(String jobConfiguration) {
 
     String[] configuration = new String[2];
 
-    if (jobConfiguration != null ) {
+    if (jobConfiguration != null) {
       String[] configParts = jobConfiguration.split("\\$");
       if (configuration.length > 2) {
-        throw new ProcessEngineException("Illegal async continuation job handler configuration: '" + jobConfiguration + "': exprecting one part or two parts seperated by '$'.");
+        throw new ProcessEngineException("Illegal async continuation job handler configuration: '"
+            + jobConfiguration + "': exprecting one part or two parts seperated by '$'.");
       }
       configuration[0] = configParts[0];
       if (configParts.length == 2) {
@@ -154,7 +163,7 @@ public class AsyncContinuationJobHandler implements JobHandler<AsyncContinuation
     public String toCanonicalString() {
       String configuration = atomicOperation;
 
-      if(transitionId != null) {
+      if (transitionId != null) {
         // store id of selected transition in case this is async after.
         // id is not serialized with the execution -> we need to remember it as
         // job handler configuration.

@@ -44,29 +44,28 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
   public Object execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
 
-    HistoricTaskInstanceEntity task = commandContext.getHistoricTaskInstanceManager().findHistoricTaskInstanceById(taskId);
+    HistoricTaskInstanceEntity task = commandContext.getHistoricTaskInstanceManager()
+        .findHistoricTaskInstanceById(taskId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkDeleteHistoricTaskInstance(task);
     }
 
     writeUserOperationLog(commandContext, task);
 
-    commandContext
-      .getHistoricTaskInstanceManager()
-      .deleteHistoricTaskInstanceById(taskId);
+    commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstanceById(taskId);
 
     return null;
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext, HistoricTaskInstanceEntity historicTask) {
+  protected void writeUserOperationLog(CommandContext commandContext,
+      HistoricTaskInstanceEntity historicTask) {
     List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("nrOfInstances", null, 1));
     propertyChanges.add(new PropertyChange("async", null, false));
 
-    commandContext.getOperationLogManager()
-      .logTaskOperations(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
-        historicTask,
-        propertyChanges);
+    commandContext.getOperationLogManager().logTaskOperations(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, historicTask, propertyChanges);
   }
 }

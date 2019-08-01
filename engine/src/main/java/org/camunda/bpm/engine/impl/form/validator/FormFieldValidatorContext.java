@@ -23,7 +23,9 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.form.handler.FormFieldHandler;
 
 /**
- * <p>Object passed in to a {@link FormFieldValidator} providing access to validation properties</p>
+ * <p>
+ * Object passed in to a {@link FormFieldValidator} providing access to validation properties
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -32,8 +34,9 @@ public interface FormFieldValidatorContext {
 
   public FormFieldHandler getFormFieldHandler();
 
-  /** @return the execution
-   * Deprecated, use {@link #getVariableScope()} */
+  /**
+   * @return the execution Deprecated, use {@link #getVariableScope()}
+   */
   @Deprecated
   public DelegateExecution getExecution();
 

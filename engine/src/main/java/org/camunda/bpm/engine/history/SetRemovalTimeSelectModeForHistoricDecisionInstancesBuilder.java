@@ -23,29 +23,35 @@ import java.util.Date;
  *
  * @author Tassilo Weidner
  */
-public interface SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder extends SetRemovalTimeToHistoricDecisionInstancesBuilder {
+public interface SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder
+    extends SetRemovalTimeToHistoricDecisionInstancesBuilder {
 
   /**
    * Sets the removal time to an absolute date.
    *
-   * @param removalTime supposed to be set to historic entities.
+   * @param removalTime
+   *          supposed to be set to historic entities.
    * @return the builder.
    */
   SetRemovalTimeToHistoricDecisionInstancesBuilder absoluteRemovalTime(Date removalTime);
 
   /**
-   * <p> Calculates the removal time dynamically based on the respective decision definition time to
+   * <p>
+   * Calculates the removal time dynamically based on the respective decision definition time to
    * live and the engine's removal time strategy.
    *
-   * <p> In case {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#hierarchical()} is enabled, the removal time is being calculated
-   * based on the base time and time to live of the historic root decision instance.
+   * <p>
+   * In case {@link SetRemovalTimeToHistoricDecisionInstancesBuilder#hierarchical()} is enabled, the
+   * removal time is being calculated based on the base time and time to live of the historic root
+   * decision instance.
    *
    * @return the builder.
    */
   SetRemovalTimeToHistoricDecisionInstancesBuilder calculatedRemovalTime();
 
   /**
-   * <p> Sets the removal time to {@code null}.
+   * <p>
+   * Sets the removal time to {@code null}.
    *
    * @return the builder.
    */

@@ -17,8 +17,10 @@
 package org.camunda.bpm.container.impl.jmx.services;
 
 /**
- * <p>MBean interface exposing management properties of the jobExecutor through JMX.
- * This MBean also allows to {@link #start()} and {@link #shutdown()} the Job Executor.</p>
+ * <p>
+ * MBean interface exposing management properties of the jobExecutor through JMX. This MBean also
+ * allows to {@link #start()} and {@link #shutdown()} the Job Executor.
+ * </p>
  *
  * @author Daniel Meyer
  *

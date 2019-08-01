@@ -26,44 +26,50 @@ import java.util.EnumSet;
  */
 public enum Permissions implements Permission {
 
-  /** The none permission means 'no action', 'doing nothing'.
-   * It does not mean that no permissions are granted. */
+  /**
+   * The none permission means 'no action', 'doing nothing'. It does not mean that no permissions
+   * are granted.
+   */
   NONE("NONE", 0, EnumSet.allOf(Resources.class)),
 
   /**
-   * Indicates that  all interactions are permitted.
-   * If ALL is revoked it means that the user is not permitted
-   * to do everything, which means that at least one permission
-   * is revoked. This does not implicate that all individual
-   * permissions are revoked.
+   * Indicates that all interactions are permitted. If ALL is revoked it means that the user is not
+   * permitted to do everything, which means that at least one permission is revoked. This does not
+   * implicate that all individual permissions are revoked.
    *
-   * Example: If the UPDATE permission is revoke also the ALL
-   * permission is revoked, because the user is not authorized
-   * to execute all actions anymore.
+   * Example: If the UPDATE permission is revoke also the ALL permission is revoked, because the
+   * user is not authorized to execute all actions anymore.
    */
   ALL("ALL", Integer.MAX_VALUE, EnumSet.allOf(Resources.class)),
 
   /** Indicates that READ interactions are permitted. */
   READ("READ", 2,
-      EnumSet.of(Resources.AUTHORIZATION, Resources.BATCH, Resources.DASHBOARD, Resources.DECISION_DEFINITION, Resources.DECISION_REQUIREMENTS_DEFINITION,
-          Resources.DEPLOYMENT, Resources.FILTER, Resources.GROUP, Resources.PROCESS_DEFINITION, Resources.PROCESS_INSTANCE, Resources.REPORT, Resources.TASK,
-          Resources.TENANT, Resources.USER)),
+      EnumSet.of(Resources.AUTHORIZATION, Resources.BATCH, Resources.DASHBOARD,
+          Resources.DECISION_DEFINITION, Resources.DECISION_REQUIREMENTS_DEFINITION,
+          Resources.DEPLOYMENT, Resources.FILTER, Resources.GROUP, Resources.PROCESS_DEFINITION,
+          Resources.PROCESS_INSTANCE, Resources.REPORT, Resources.TASK, Resources.TENANT,
+          Resources.USER)),
 
   /** Indicates that UPDATE interactions are permitted. */
-  UPDATE("UPDATE", 4, EnumSet.of(Resources.AUTHORIZATION, Resources.BATCH, Resources.DASHBOARD, Resources.DECISION_DEFINITION, Resources.FILTER,
-      Resources.GROUP, Resources.PROCESS_DEFINITION, Resources.PROCESS_INSTANCE, Resources.REPORT, Resources.TASK, Resources.TENANT, Resources.USER)),
+  UPDATE("UPDATE", 4,
+      EnumSet.of(Resources.AUTHORIZATION, Resources.BATCH, Resources.DASHBOARD,
+          Resources.DECISION_DEFINITION, Resources.FILTER, Resources.GROUP,
+          Resources.PROCESS_DEFINITION, Resources.PROCESS_INSTANCE, Resources.REPORT,
+          Resources.TASK, Resources.TENANT, Resources.USER)),
 
   /** Indicates that CREATE interactions are permitted. */
   CREATE("CREATE", 8,
-      EnumSet.of(Resources.AUTHORIZATION, Resources.BATCH, Resources.DASHBOARD, Resources.DEPLOYMENT, Resources.FILTER, Resources.GROUP,
-          Resources.GROUP_MEMBERSHIP, Resources.PROCESS_INSTANCE, Resources.REPORT, Resources.TASK, Resources.TENANT, Resources.TENANT_MEMBERSHIP,
-          Resources.USER)),
+      EnumSet.of(Resources.AUTHORIZATION, Resources.BATCH, Resources.DASHBOARD,
+          Resources.DEPLOYMENT, Resources.FILTER, Resources.GROUP, Resources.GROUP_MEMBERSHIP,
+          Resources.PROCESS_INSTANCE, Resources.REPORT, Resources.TASK, Resources.TENANT,
+          Resources.TENANT_MEMBERSHIP, Resources.USER)),
 
   /** Indicates that DELETE interactions are permitted. */
   DELETE("DELETE", 16,
-      EnumSet.of(Resources.AUTHORIZATION, Resources.BATCH, Resources.DASHBOARD, Resources.DEPLOYMENT, Resources.FILTER, Resources.GROUP,
-          Resources.GROUP_MEMBERSHIP, Resources.PROCESS_DEFINITION, Resources.PROCESS_INSTANCE, Resources.REPORT, Resources.TASK, Resources.TENANT,
-          Resources.TENANT_MEMBERSHIP, Resources.USER)),
+      EnumSet.of(Resources.AUTHORIZATION, Resources.BATCH, Resources.DASHBOARD,
+          Resources.DEPLOYMENT, Resources.FILTER, Resources.GROUP, Resources.GROUP_MEMBERSHIP,
+          Resources.PROCESS_DEFINITION, Resources.PROCESS_INSTANCE, Resources.REPORT,
+          Resources.TASK, Resources.TENANT, Resources.TENANT_MEMBERSHIP, Resources.USER)),
 
   /** Indicates that ACCESS interactions are permitted. */
   ACCESS("ACCESS", 32, EnumSet.of(Resources.APPLICATION)),
@@ -75,7 +81,8 @@ public enum Permissions implements Permission {
   UPDATE_TASK("UPDATE_TASK", 128, EnumSet.of(Resources.PROCESS_DEFINITION)),
 
   /** Indicates that CREATE_INSTANCE interactions are permitted. */
-  CREATE_INSTANCE("CREATE_INSTANCE", 256, EnumSet.of(Resources.DECISION_DEFINITION, Resources.PROCESS_DEFINITION)),
+  CREATE_INSTANCE("CREATE_INSTANCE", 256,
+      EnumSet.of(Resources.DECISION_DEFINITION, Resources.PROCESS_DEFINITION)),
 
   /** Indicates that READ_INSTANCE interactions are permitted. */
   READ_INSTANCE("READ_INSTANCE", 512, EnumSet.of(Resources.PROCESS_DEFINITION)),
@@ -87,10 +94,12 @@ public enum Permissions implements Permission {
   DELETE_INSTANCE("DELETE_INSTANCE", 2048, EnumSet.of(Resources.PROCESS_DEFINITION)),
 
   /** Indicates that READ_HISTORY interactions are permitted. */
-  READ_HISTORY("READ_HISTORY", 4096, EnumSet.of(Resources.BATCH, Resources.DECISION_DEFINITION, Resources.PROCESS_DEFINITION, Resources.TASK)),
+  READ_HISTORY("READ_HISTORY", 4096, EnumSet.of(Resources.BATCH, Resources.DECISION_DEFINITION,
+      Resources.PROCESS_DEFINITION, Resources.TASK)),
 
   /** Indicates that DELETE_HISTORY interactions are permitted. */
-  DELETE_HISTORY("DELETE_HISTORY", 8192, EnumSet.of(Resources.BATCH, Resources.DECISION_DEFINITION, Resources.PROCESS_DEFINITION)),
+  DELETE_HISTORY("DELETE_HISTORY", 8192,
+      EnumSet.of(Resources.BATCH, Resources.DECISION_DEFINITION, Resources.PROCESS_DEFINITION)),
 
   /** Indicates that TASK_WORK interactions are permitted */
   TASK_WORK("TASK_WORK", 16384, EnumSet.of(Resources.PROCESS_DEFINITION, Resources.TASK)),
@@ -105,7 +114,6 @@ public enum Permissions implements Permission {
   // Keep in mind to use unique permissions' ids for the same Resource
   // TODO in case a new XxxPermissions enum is created:
   // please adjust ResourceTypeUtil#PERMISSION_ENUMS accordingly
-
 
   // implementation //////////////////////////
 

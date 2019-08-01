@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  * @author Saeid Mirzaei
  * @author Tijs Rademakers
@@ -90,45 +89,42 @@ public class StartAuthorizationTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(userInGroup1.getId());
     identityService.deleteUser(userInGroup2.getId());
     identityService.deleteUser(userInGroup3.getId());
-    
+
     identityService.deleteUser("user1");
     identityService.deleteUser("user2");
     identityService.deleteUser("user3");
   }
-  
+
   @Deployment
   public void testIdentityLinks() throws Exception {
-    
+
     setUpUsersAndGroups();
-    
+
     try {
-      ProcessDefinition latestProcessDef = repositoryService
-          .createProcessDefinitionQuery().processDefinitionKey("process1")
-          .singleResult();
+      ProcessDefinition latestProcessDef = repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("process1").singleResult();
       assertNotNull(latestProcessDef);
-      List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
+      List<IdentityLink> links = repositoryService
+          .getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(0, links.size());
-      
-      latestProcessDef = repositoryService
-          .createProcessDefinitionQuery().processDefinitionKey("process2")
-          .singleResult();
+
+      latestProcessDef = repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("process2").singleResult();
       assertNotNull(latestProcessDef);
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(2, links.size());
       assertEquals(true, containsUserOrGroup("user1", null, links));
       assertEquals(true, containsUserOrGroup("user2", null, links));
-      
-      latestProcessDef = repositoryService
-          .createProcessDefinitionQuery().processDefinitionKey("process3")
-          .singleResult();
+
+      latestProcessDef = repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("process3").singleResult();
       assertNotNull(latestProcessDef);
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(1, links.size());
       assertEquals("user1", links.get(0).getUserId());
-      
-      latestProcessDef = repositoryService
-          .createProcessDefinitionQuery().processDefinitionKey("process4")
-          .singleResult();
+
+      latestProcessDef = repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("process4").singleResult();
       assertNotNull(latestProcessDef);
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(4, links.size());
@@ -136,61 +132,61 @@ public class StartAuthorizationTest extends PluggableProcessEngineTestCase {
       assertEquals(true, containsUserOrGroup(null, "group1", links));
       assertEquals(true, containsUserOrGroup(null, "group2", links));
       assertEquals(true, containsUserOrGroup(null, "group3", links));
-      
+
     } finally {
       tearDownUsersAndGroups();
     }
   }
-  
+
   @Deployment
   public void testAddAndRemoveIdentityLinks() throws Exception {
-    
+
     setUpUsersAndGroups();
-    
+
     try {
-      ProcessDefinition latestProcessDef = repositoryService
-          .createProcessDefinitionQuery().processDefinitionKey("potentialStarterNoDefinition")
-          .singleResult();
+      ProcessDefinition latestProcessDef = repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("potentialStarterNoDefinition").singleResult();
       assertNotNull(latestProcessDef);
-      List<IdentityLink> links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
+      List<IdentityLink> links = repositoryService
+          .getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(0, links.size());
-      
+
       repositoryService.addCandidateStarterGroup(latestProcessDef.getId(), "group1");
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(1, links.size());
       assertEquals("group1", links.get(0).getGroupId());
-      
+
       repositoryService.addCandidateStarterUser(latestProcessDef.getId(), "user1");
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(2, links.size());
       assertEquals(true, containsUserOrGroup(null, "group1", links));
       assertEquals(true, containsUserOrGroup("user1", null, links));
-      
+
       repositoryService.deleteCandidateStarterGroup(latestProcessDef.getId(), "nonexisting");
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(2, links.size());
-      
+
       repositoryService.deleteCandidateStarterGroup(latestProcessDef.getId(), "group1");
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(1, links.size());
       assertEquals("user1", links.get(0).getUserId());
-      
+
       repositoryService.deleteCandidateStarterUser(latestProcessDef.getId(), "user1");
       links = repositoryService.getIdentityLinksForProcessDefinition(latestProcessDef.getId());
       assertEquals(0, links.size());
-      
+
     } finally {
       tearDownUsersAndGroups();
     }
   }
-  
+
   private boolean containsUserOrGroup(String userId, String groupId, List<IdentityLink> links) {
     boolean found = false;
     for (IdentityLink identityLink : links) {
-      if(userId != null && userId.equals(identityLink.getUserId())) {
+      if (userId != null && userId.equals(identityLink.getUserId())) {
         found = true;
         break;
-      } else if(groupId != null && groupId.equals(identityLink.getGroupId())) {
+      } else if (groupId != null && groupId.equals(identityLink.getGroupId())) {
         found = true;
         break;
       }
@@ -205,21 +201,23 @@ public class StartAuthorizationTest extends PluggableProcessEngineTestCase {
     setUpUsersAndGroups();
 
     try {
-    
-	    // Authentication should not be done. So an unidentified user should also be able to start the process
-	    identityService.setAuthenticatedUserId("unauthorizedUser");
-	    try {
-	      runtimeService.startProcessInstanceByKey("potentialStarter");
-	
-	    }  catch (Exception e) {
-	      fail("No StartAuthorizationException expected, " + e.getClass().getName() + " caught.");
-	    }
-	
-	    // check with an authorized user obviously it should be no problem starting the process
-	    identityService.setAuthenticatedUserId("user1");
-	    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("potentialStarter");
-	    assertProcessEnded(processInstance.getId());
-	    assertTrue(processInstance.isEnded());
+
+      // Authentication should not be done. So an unidentified user should also be able to start the
+      // process
+      identityService.setAuthenticatedUserId("unauthorizedUser");
+      try {
+        runtimeService.startProcessInstanceByKey("potentialStarter");
+
+      } catch (Exception e) {
+        fail("No StartAuthorizationException expected, " + e.getClass().getName() + " caught.");
+      }
+
+      // check with an authorized user obviously it should be no problem starting the process
+      identityService.setAuthenticatedUserId("user1");
+      ProcessInstance processInstance = runtimeService
+          .startProcessInstanceByKey("potentialStarter");
+      assertProcessEnded(processInstance.getId());
+      assertTrue(processInstance.isEnded());
     } finally {
 
       tearDownUsersAndGroups();
@@ -227,55 +225,56 @@ public class StartAuthorizationTest extends PluggableProcessEngineTestCase {
   }
 
   /*
-   * if there is no security definition, then user authorization check is not
-   * done. This ensures backward compatibility
+   * if there is no security definition, then user authorization check is not done. This ensures
+   * backward compatibility
    */
   @Deployment
   public void testPotentialStarterNoDefinition() throws Exception {
     identityService = processEngine.getIdentityService();
 
     identityService.setAuthenticatedUserId("someOneFromMars");
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("potentialStarterNoDefinition");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("potentialStarterNoDefinition");
     assertNotNull(processInstance.getId());
     assertProcessEnded(processInstance.getId());
     assertTrue(processInstance.isEnded());
   }
-  
+
   // this test checks the list without user constraint
   @Deployment
-	public void testProcessDefinitionList() throws Exception {
-	  
+  public void testProcessDefinitionList() throws Exception {
+
     setUpUsersAndGroups();
     try {
-      
+
       // Process 1 has no potential starters
-      ProcessDefinition latestProcessDef = repositoryService
-              .createProcessDefinitionQuery().processDefinitionKey("process1")
-              .singleResult();      
-      List<User> authorizedUsers = identityService.createUserQuery().potentialStarter(latestProcessDef.getId()).list();
+      ProcessDefinition latestProcessDef = repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("process1").singleResult();
+      List<User> authorizedUsers = identityService.createUserQuery()
+          .potentialStarter(latestProcessDef.getId()).list();
       assertEquals(0, authorizedUsers.size());
 
       // user1 and user2 are potential Startes of Process2
-      latestProcessDef = repositoryService
-              .createProcessDefinitionQuery().processDefinitionKey("process2")
-              .singleResult();      
-      authorizedUsers =  identityService.createUserQuery().potentialStarter(latestProcessDef.getId()).orderByUserId().asc().list();
+      latestProcessDef = repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("process2").singleResult();
+      authorizedUsers = identityService.createUserQuery().potentialStarter(latestProcessDef.getId())
+          .orderByUserId().asc().list();
       assertEquals(2, authorizedUsers.size());
       assertEquals("user1", authorizedUsers.get(0).getId());
       assertEquals("user2", authorizedUsers.get(1).getId());
 
       // Process 2 has no potential starter groups
-      latestProcessDef = repositoryService
-              .createProcessDefinitionQuery().processDefinitionKey("process2")
-              .singleResult();      
-      List<Group> authorizedGroups = identityService.createGroupQuery().potentialStarter(latestProcessDef.getId()).list();
+      latestProcessDef = repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("process2").singleResult();
+      List<Group> authorizedGroups = identityService.createGroupQuery()
+          .potentialStarter(latestProcessDef.getId()).list();
       assertEquals(0, authorizedGroups.size());
-      
+
       // Process 3 has 3 groups as authorized starter groups
-      latestProcessDef = repositoryService
-              .createProcessDefinitionQuery().processDefinitionKey("process4")
-              .singleResult();      
-      authorizedGroups = identityService.createGroupQuery().potentialStarter(latestProcessDef.getId()).orderByGroupId().asc().list();
+      latestProcessDef = repositoryService.createProcessDefinitionQuery()
+          .processDefinitionKey("process4").singleResult();
+      authorizedGroups = identityService.createGroupQuery()
+          .potentialStarter(latestProcessDef.getId()).orderByGroupId().asc().list();
       assertEquals(3, authorizedGroups.size());
       assertEquals("group1", authorizedGroups.get(0).getId());
       assertEquals("group2", authorizedGroups.get(1).getId());
@@ -301,28 +300,31 @@ public class StartAuthorizationTest extends PluggableProcessEngineTestCase {
       assertEquals("process2", processDefinitions.get(0).getKey());
       assertEquals("process3", processDefinitions.get(1).getKey());
 
-
       // "user2" can only start process2
-      processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("user2").list();
+      processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("user2")
+          .list();
 
       assertEquals(1, processDefinitions.size());
       assertEquals("process2", processDefinitions.get(0).getKey());
 
       // no process could be started with "user4"
-      processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("user4").list();
+      processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("user4")
+          .list();
       assertEquals(0, processDefinitions.size());
 
       // "userInGroup3" is in "group3" and can start only process4 via group authorization
-      processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("userInGroup3").list();
+      processDefinitions = repositoryService.createProcessDefinitionQuery()
+          .startableByUser("userInGroup3").list();
       assertEquals(1, processDefinitions.size());
       assertEquals("process4", processDefinitions.get(0).getKey());
 
       // "userInGroup2" can start process4, via both user and group authorizations
       // but we have to be sure that process4 appears only once
-      processDefinitions = repositoryService.createProcessDefinitionQuery().startableByUser("userInGroup2").list();
+      processDefinitions = repositoryService.createProcessDefinitionQuery()
+          .startableByUser("userInGroup2").list();
       assertEquals(1, processDefinitions.size());
       assertEquals("process4", processDefinitions.get(0).getKey());
-    
+
     } finally {
       tearDownUsersAndGroups();
     }

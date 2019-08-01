@@ -37,119 +37,61 @@ public class EventSubProcessModels {
   public static final String SUB_PROCESS_ID = "subProcess";
   public static final String USER_TASK_ID = "userTask";
 
-  public static final BpmnModelInstance CONDITIONAL_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.ONE_TASK_PROCESS)
-    .addSubProcessTo(ProcessModels.PROCESS_KEY)
-    .id(EVENT_SUB_PROCESS_ID)
-    .triggerByEvent()
-    .embeddedSubProcess()
-      .startEvent(EVENT_SUB_PROCESS_START_ID)
-      .condition(VAR_CONDITION)
-      .userTask(EVENT_SUB_PROCESS_TASK_ID)
-      .endEvent()
-    .subProcessDone()
-    .done();
+  public static final BpmnModelInstance CONDITIONAL_EVENT_SUBPROCESS_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).addSubProcessTo(ProcessModels.PROCESS_KEY)
+          .id(EVENT_SUB_PROCESS_ID).triggerByEvent().embeddedSubProcess()
+          .startEvent(EVENT_SUB_PROCESS_START_ID).condition(VAR_CONDITION)
+          .userTask(EVENT_SUB_PROCESS_TASK_ID).endEvent().subProcessDone().done();
 
+  public static final BpmnModelInstance FALSE_CONDITIONAL_EVENT_SUBPROCESS_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).addSubProcessTo(ProcessModels.PROCESS_KEY)
+          .id(EVENT_SUB_PROCESS_ID).triggerByEvent().embeddedSubProcess()
+          .startEvent(EVENT_SUB_PROCESS_START_ID).condition(FALSE_CONDITION)
+          .userTask(EVENT_SUB_PROCESS_TASK_ID).endEvent().subProcessDone().done();
 
-  public static final BpmnModelInstance FALSE_CONDITIONAL_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.ONE_TASK_PROCESS)
-    .addSubProcessTo(ProcessModels.PROCESS_KEY)
-    .id(EVENT_SUB_PROCESS_ID)
-    .triggerByEvent()
-    .embeddedSubProcess()
-      .startEvent(EVENT_SUB_PROCESS_START_ID)
-      .condition(FALSE_CONDITION)
-      .userTask(EVENT_SUB_PROCESS_TASK_ID)
-      .endEvent()
-    .subProcessDone()
-    .done();
-
-
-  public static final BpmnModelInstance MESSAGE_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSubProcessTo(ProcessModels.PROCESS_KEY)
-        .id(EVENT_SUB_PROCESS_ID)
-        .triggerByEvent()
-        .embeddedSubProcess()
+  public static final BpmnModelInstance MESSAGE_EVENT_SUBPROCESS_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).addSubProcessTo(ProcessModels.PROCESS_KEY)
+          .id(EVENT_SUB_PROCESS_ID).triggerByEvent().embeddedSubProcess()
           .startEvent(EVENT_SUB_PROCESS_START_ID).message(MESSAGE_NAME)
-          .userTask(EVENT_SUB_PROCESS_TASK_ID)
-          .endEvent()
-      .subProcessDone()
-      .done();
+          .userTask(EVENT_SUB_PROCESS_TASK_ID).endEvent().subProcessDone().done();
 
-  public static final BpmnModelInstance MESSAGE_INTERMEDIATE_EVENT_SUBPROCESS_PROCESS = ProcessModels.newModel()
-      .startEvent()
-        .subProcess(EVENT_SUB_PROCESS_ID)
-        .embeddedSubProcess()
-          .startEvent()
-          .intermediateCatchEvent("catchMessage")
-            .message(MESSAGE_NAME)
-          .userTask("userTask")
-          .endEvent()
-        .subProcessDone()
-      .endEvent()
-      .done();
+  public static final BpmnModelInstance MESSAGE_INTERMEDIATE_EVENT_SUBPROCESS_PROCESS = ProcessModels
+      .newModel().startEvent().subProcess(EVENT_SUB_PROCESS_ID).embeddedSubProcess().startEvent()
+      .intermediateCatchEvent("catchMessage").message(MESSAGE_NAME).userTask("userTask").endEvent()
+      .subProcessDone().endEvent().done();
 
-  public static final BpmnModelInstance TIMER_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSubProcessTo(ProcessModels.PROCESS_KEY)
-      .id(EVENT_SUB_PROCESS_ID)
-      .triggerByEvent()
-      .embeddedSubProcess()
-        .startEvent(EVENT_SUB_PROCESS_START_ID).timerWithDuration("PT10M")
-        .userTask(EVENT_SUB_PROCESS_TASK_ID)
-        .endEvent()
-      .subProcessDone()
-      .done();
+  public static final BpmnModelInstance TIMER_EVENT_SUBPROCESS_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).addSubProcessTo(ProcessModels.PROCESS_KEY)
+          .id(EVENT_SUB_PROCESS_ID).triggerByEvent().embeddedSubProcess()
+          .startEvent(EVENT_SUB_PROCESS_START_ID).timerWithDuration("PT10M")
+          .userTask(EVENT_SUB_PROCESS_TASK_ID).endEvent().subProcessDone().done();
 
-  public static final BpmnModelInstance SIGNAL_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSubProcessTo(ProcessModels.PROCESS_KEY)
-      .id(EVENT_SUB_PROCESS_ID)
-      .triggerByEvent()
-      .embeddedSubProcess()
-        .startEvent(EVENT_SUB_PROCESS_START_ID).signal(SIGNAL_NAME)
-        .userTask(EVENT_SUB_PROCESS_TASK_ID)
-        .endEvent()
-      .subProcessDone()
-      .done();
+  public static final BpmnModelInstance SIGNAL_EVENT_SUBPROCESS_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).addSubProcessTo(ProcessModels.PROCESS_KEY)
+          .id(EVENT_SUB_PROCESS_ID).triggerByEvent().embeddedSubProcess()
+          .startEvent(EVENT_SUB_PROCESS_START_ID).signal(SIGNAL_NAME)
+          .userTask(EVENT_SUB_PROCESS_TASK_ID).endEvent().subProcessDone().done();
 
-  public static final BpmnModelInstance ESCALATION_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSubProcessTo(ProcessModels.PROCESS_KEY)
-      .id(EVENT_SUB_PROCESS_ID)
-      .triggerByEvent()
-      .embeddedSubProcess()
-        .startEvent(EVENT_SUB_PROCESS_START_ID).escalation()
-        .userTask(EVENT_SUB_PROCESS_TASK_ID)
-        .endEvent()
-      .subProcessDone()
-      .done();
+  public static final BpmnModelInstance ESCALATION_EVENT_SUBPROCESS_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).addSubProcessTo(ProcessModels.PROCESS_KEY)
+          .id(EVENT_SUB_PROCESS_ID).triggerByEvent().embeddedSubProcess()
+          .startEvent(EVENT_SUB_PROCESS_START_ID).escalation().userTask(EVENT_SUB_PROCESS_TASK_ID)
+          .endEvent().subProcessDone().done();
 
-  public static final BpmnModelInstance ERROR_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.ONE_TASK_PROCESS)
-      .addSubProcessTo(ProcessModels.PROCESS_KEY)
-      .id(EVENT_SUB_PROCESS_ID)
-      .triggerByEvent()
-      .embeddedSubProcess()
-      .startEvent(EVENT_SUB_PROCESS_START_ID).error()
-      .userTask(EVENT_SUB_PROCESS_TASK_ID)
-      .endEvent()
-      .subProcessDone()
-      .done();
+  public static final BpmnModelInstance ERROR_EVENT_SUBPROCESS_PROCESS = modify(
+      ProcessModels.ONE_TASK_PROCESS).addSubProcessTo(ProcessModels.PROCESS_KEY)
+          .id(EVENT_SUB_PROCESS_ID).triggerByEvent().embeddedSubProcess()
+          .startEvent(EVENT_SUB_PROCESS_START_ID).error().userTask(EVENT_SUB_PROCESS_TASK_ID)
+          .endEvent().subProcessDone().done();
 
-  public static final BpmnModelInstance COMPENSATE_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessTo(SUB_PROCESS_ID)
-      .id(EVENT_SUB_PROCESS_ID)
-      .triggerByEvent()
-      .embeddedSubProcess()
-        .startEvent(EVENT_SUB_PROCESS_START_ID).compensation()
-        .userTask(EVENT_SUB_PROCESS_TASK_ID)
-        .endEvent()
-      .subProcessDone()
-      .done();
+  public static final BpmnModelInstance COMPENSATE_EVENT_SUBPROCESS_PROCESS = modify(
+      ProcessModels.SUBPROCESS_PROCESS).addSubProcessTo(SUB_PROCESS_ID).id(EVENT_SUB_PROCESS_ID)
+          .triggerByEvent().embeddedSubProcess().startEvent(EVENT_SUB_PROCESS_START_ID)
+          .compensation().userTask(EVENT_SUB_PROCESS_TASK_ID).endEvent().subProcessDone().done();
 
-  public static final BpmnModelInstance NESTED_EVENT_SUB_PROCESS_PROCESS = modify(ProcessModels.SUBPROCESS_PROCESS)
-      .addSubProcessTo(SUB_PROCESS_ID)
-      .id(EVENT_SUB_PROCESS_ID)
-      .triggerByEvent()
-      .embeddedSubProcess()
-        .startEvent(EVENT_SUB_PROCESS_START_ID).message(MESSAGE_NAME)
-        .userTask(EVENT_SUB_PROCESS_TASK_ID)
-        .endEvent()
-      .subProcessDone()
-      .done();
+  public static final BpmnModelInstance NESTED_EVENT_SUB_PROCESS_PROCESS = modify(
+      ProcessModels.SUBPROCESS_PROCESS).addSubProcessTo(SUB_PROCESS_ID).id(EVENT_SUB_PROCESS_ID)
+          .triggerByEvent().embeddedSubProcess().startEvent(EVENT_SUB_PROCESS_START_ID)
+          .message(MESSAGE_NAME).userTask(EVENT_SUB_PROCESS_TASK_ID).endEvent().subProcessDone()
+          .done();
 }

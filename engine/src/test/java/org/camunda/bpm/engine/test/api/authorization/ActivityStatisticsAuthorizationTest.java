@@ -42,7 +42,8 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
   @Override
   public void setUp() throws Exception {
-    deploymentId = createDeployment(null, "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml").getId();
+    deploymentId = createDeployment(null,
+        "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml").getId();
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
     startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
@@ -64,7 +65,8 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     try {
       // when
       managementService.createActivityStatisticsQuery(processDefinitionId).list();
-      fail("Exception expected: It should not be possible to execute the activity statistics query");
+      fail(
+          "Exception expected: It should not be possible to execute the activity statistics query");
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
@@ -84,7 +86,8 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ);
 
     // when
-    ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processDefinitionId);
+    ActivityStatisticsQuery query = managementService
+        .createActivityStatisticsQuery(processDefinitionId);
 
     // then
     verifyQueryResults(query, 0);
@@ -102,7 +105,8 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
-    ActivityStatistics statistics = managementService.createActivityStatisticsQuery(processDefinitionId).singleResult();
+    ActivityStatistics statistics = managementService
+        .createActivityStatisticsQuery(processDefinitionId).singleResult();
 
     // then
     assertNotNull(statistics);
@@ -125,7 +129,8 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     // when
-    ActivityStatistics statistics = managementService.createActivityStatisticsQuery(processDefinitionId).singleResult();
+    ActivityStatistics statistics = managementService
+        .createActivityStatisticsQuery(processDefinitionId).singleResult();
 
     // then
     assertNotNull(statistics);
@@ -143,7 +148,8 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
 
     // when
-    ActivityStatistics statistics = managementService.createActivityStatisticsQuery(processDefinitionId).singleResult();
+    ActivityStatistics statistics = managementService
+        .createActivityStatisticsQuery(processDefinitionId).singleResult();
 
     // then
     assertNotNull(statistics);
@@ -157,10 +163,12 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ,
+        READ_INSTANCE);
 
     // when
-    ActivityStatistics statistics = managementService.createActivityStatisticsQuery(processDefinitionId).singleResult();
+    ActivityStatistics statistics = managementService
+        .createActivityStatisticsQuery(processDefinitionId).singleResult();
 
     // then
     assertNotNull(statistics);
@@ -180,9 +188,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeFailedJobs()
-        .singleResult();
+        .createActivityStatisticsQuery(processDefinitionId).includeFailedJobs().singleResult();
 
     // then
     assertNull(statistics);
@@ -201,9 +207,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeFailedJobs()
-        .singleResult();
+        .createActivityStatisticsQuery(processDefinitionId).includeFailedJobs().singleResult();
 
     // then
     assertNotNull(statistics);
@@ -222,9 +226,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeFailedJobs()
-        .singleResult();
+        .createActivityStatisticsQuery(processDefinitionId).includeFailedJobs().singleResult();
 
     // then
     assertNotNull(statistics);
@@ -238,13 +240,12 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ,
+        READ_INSTANCE);
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeFailedJobs()
-        .singleResult();
+        .createActivityStatisticsQuery(processDefinitionId).includeFailedJobs().singleResult();
 
     // then
     assertNotNull(statistics);
@@ -264,9 +265,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeIncidents()
-        .singleResult();
+        .createActivityStatisticsQuery(processDefinitionId).includeIncidents().singleResult();
 
     // then
     assertNull(statistics);
@@ -285,9 +284,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeIncidents()
-        .singleResult();
+        .createActivityStatisticsQuery(processDefinitionId).includeIncidents().singleResult();
 
     // then
     assertNotNull(statistics);
@@ -308,9 +305,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeIncidents()
-        .singleResult();
+        .createActivityStatisticsQuery(processDefinitionId).includeIncidents().singleResult();
 
     // then
     assertNotNull(statistics);
@@ -326,13 +321,12 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ,
+        READ_INSTANCE);
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeIncidents()
-        .singleResult();
+        .createActivityStatisticsQuery(processDefinitionId).includeIncidents().singleResult();
 
     // then
     assertNotNull(statistics);
@@ -354,9 +348,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeIncidents()
-        .includeFailedJobs()
+        .createActivityStatisticsQuery(processDefinitionId).includeIncidents().includeFailedJobs()
         .singleResult();
 
     // then
@@ -376,9 +368,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeIncidents()
-        .includeFailedJobs()
+        .createActivityStatisticsQuery(processDefinitionId).includeIncidents().includeFailedJobs()
         .singleResult();
 
     // then
@@ -400,9 +390,7 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeIncidents()
-        .includeFailedJobs()
+        .createActivityStatisticsQuery(processDefinitionId).includeIncidents().includeFailedJobs()
         .singleResult();
 
     // then
@@ -419,13 +407,12 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ,
+        READ_INSTANCE);
 
     // when
     ActivityStatistics statistics = managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeIncidents()
-        .includeFailedJobs()
+        .createActivityStatisticsQuery(processDefinitionId).includeIncidents().includeFailedJobs()
         .singleResult();
 
     // then
@@ -441,14 +428,13 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
   public void testManyAuthorizationsActivityStatisticsQueryIncludingFailedJobsAndIncidents() {
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ, READ_INSTANCE);
-    createGrantAuthorizationGroup(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, groupId, READ, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ,
+        READ_INSTANCE);
+    createGrantAuthorizationGroup(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, groupId, READ,
+        READ_INSTANCE);
 
-    List<ActivityStatistics> statistics =
-      managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .includeFailedJobs()
-        .includeIncidents()
+    List<ActivityStatistics> statistics = managementService
+        .createActivityStatisticsQuery(processDefinitionId).includeFailedJobs().includeIncidents()
         .list();
 
     assertEquals(1, statistics.size());
@@ -465,13 +451,13 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
   public void testManyAuthorizationsActivityStatisticsQuery() {
     String processDefinitionId = selectProcessDefinitionByKey(ONE_INCIDENT_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ, READ_INSTANCE);
-    createGrantAuthorizationGroup(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, groupId, READ, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ,
+        READ_INSTANCE);
+    createGrantAuthorizationGroup(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, groupId, READ,
+        READ_INSTANCE);
 
-    List<ActivityStatistics> statistics =
-      managementService
-        .createActivityStatisticsQuery(processDefinitionId)
-        .list();
+    List<ActivityStatistics> statistics = managementService
+        .createActivityStatisticsQuery(processDefinitionId).list();
 
     assertEquals(1, statistics.size());
 

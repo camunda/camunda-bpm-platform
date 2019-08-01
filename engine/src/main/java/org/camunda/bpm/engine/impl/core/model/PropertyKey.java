@@ -19,7 +19,8 @@ package org.camunda.bpm.engine.impl.core.model;
 /**
  * Key of a typed property.
  *
- * @param T the type of the property value
+ * @param T
+ *          the type of the property value
  *
  * @author Philipp Ossler
  *

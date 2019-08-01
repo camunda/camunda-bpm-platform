@@ -52,23 +52,22 @@ public class MultiTenancyMigrationExecuteTenantCheckTest {
   @Test
   public void canMigrateWithAuthenticatedTenant() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = engineRule
-        .getRuntimeService()
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
     // when
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+    engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     assertMigratedTo(processInstance, targetDefinition);
@@ -78,43 +77,43 @@ public class MultiTenancyMigrationExecuteTenantCheckTest {
   @Test
   public void cannotMigrateOfNonAuthenticatedTenant() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = engineRule
-        .getRuntimeService()
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_TWO));
 
     // then
     exception.expect(ProcessEngineException.class);
     exception.expectMessage("Cannot migrate process instance '" + processInstance.getId()
-              + "' because it belongs to no authenticated tenant");
+        + "' because it belongs to no authenticated tenant");
 
     // when
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+    engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
   }
 
   @Test
   public void cannotMigrateWithNoAuthenticatedTenant() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = engineRule
-        .getRuntimeService()
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
     // then
@@ -123,32 +122,29 @@ public class MultiTenancyMigrationExecuteTenantCheckTest {
         + "' because it belongs to no authenticated tenant");
 
     // when
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+    engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
   }
 
   @Test
   public void canMigrateSharedInstanceWithNoTenant() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = engineRule
-        .getRuntimeService()
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
     // when
     engineRule.getIdentityService().setAuthentication("user", null, null);
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+    engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     assertMigratedTo(processInstance, targetDefinition);
@@ -158,35 +154,34 @@ public class MultiTenancyMigrationExecuteTenantCheckTest {
   @Test
   public void canMigrateInstanceWithTenantCheckDisabled() {
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE, ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition sourceDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployForTenantAndGetDefinition(TENANT_ONE,
+        ProcessModels.ONE_TASK_PROCESS);
 
-    MigrationPlan migrationPlan = engineRule
-        .getRuntimeService()
+    MigrationPlan migrationPlan = engineRule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
     // when
     engineRule.getIdentityService().setAuthentication("user", null, null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    engineRule.getRuntimeService()
-      .newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .execute();
+    engineRule.getRuntimeService().newMigration(migrationPlan)
+        .processInstanceIds(Arrays.asList(processInstance.getId())).execute();
 
     // then
     assertMigratedTo(processInstance, targetDefinition);
 
   }
 
-  protected void assertMigratedTo(ProcessInstance processInstance, ProcessDefinition targetDefinition) {
-    Assert.assertEquals(1, engineRule.getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstance.getId())
-      .processDefinitionId(targetDefinition.getId())
-      .count());
+  protected void assertMigratedTo(ProcessInstance processInstance,
+      ProcessDefinition targetDefinition) {
+    Assert.assertEquals(1,
+        engineRule.getRuntimeService().createProcessInstanceQuery()
+            .processInstanceId(processInstance.getId())
+            .processDefinitionId(targetDefinition.getId()).count());
   }
 }

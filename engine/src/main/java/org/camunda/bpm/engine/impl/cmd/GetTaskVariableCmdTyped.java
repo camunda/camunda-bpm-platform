@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
 /**
  * @author Daniel Meyer
  */
@@ -39,7 +38,8 @@ public class GetTaskVariableCmdTyped implements Command<TypedValue>, Serializabl
   protected boolean isLocal;
   protected boolean deserializeValue;
 
-  public GetTaskVariableCmdTyped(String taskId, String variableName, boolean isLocal, boolean deserializeValue) {
+  public GetTaskVariableCmdTyped(String taskId, String variableName, boolean isLocal,
+      boolean deserializeValue) {
     this.taskId = taskId;
     this.variableName = variableName;
     this.isLocal = isLocal;
@@ -50,10 +50,7 @@ public class GetTaskVariableCmdTyped implements Command<TypedValue>, Serializabl
     ensureNotNull("taskId", taskId);
     ensureNotNull("variableName", variableName);
 
-    TaskEntity task = Context
-      .getCommandContext()
-      .getTaskManager()
-      .findTaskById(taskId);
+    TaskEntity task = Context.getCommandContext().getTaskManager().findTaskById(taskId);
 
     ensureNotNull("task " + taskId + " doesn't exist", "task", task);
 
@@ -71,7 +68,8 @@ public class GetTaskVariableCmdTyped implements Command<TypedValue>, Serializabl
   }
 
   protected void checkGetTaskVariableTyped(TaskEntity task, CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadTaskVariable(task);
     }
   }

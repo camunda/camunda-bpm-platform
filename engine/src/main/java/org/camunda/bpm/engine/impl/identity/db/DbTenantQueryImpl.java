@@ -36,7 +36,7 @@ public class DbTenantQueryImpl extends TenantQueryImpl {
     super(commandExecutor);
   }
 
-  //results ////////////////////////////////////////////////////////
+  // results ////////////////////////////////////////////////////////
 
   @Override
   public long executeCount(CommandContext commandContext) {

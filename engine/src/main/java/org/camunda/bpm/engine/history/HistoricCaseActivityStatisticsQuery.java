@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.query.Query;
  * @author Roman Smirnov
  *
  */
-public interface HistoricCaseActivityStatisticsQuery extends Query<HistoricCaseActivityStatisticsQuery, HistoricCaseActivityStatistics> {
+public interface HistoricCaseActivityStatisticsQuery
+    extends Query<HistoricCaseActivityStatisticsQuery, HistoricCaseActivityStatistics> {
 
 }

@@ -37,7 +37,8 @@ public interface ProcessApplicationScanner {
    *          the URL to the META-INF/processes.xml file
    * @return a Map of process definitions
    */
-  public abstract Map<String, byte[]> findResources(ClassLoader classLoader, String paResourceRootPath, URL metaFileUrl);
+  public abstract Map<String, byte[]> findResources(ClassLoader classLoader,
+      String paResourceRootPath, URL metaFileUrl);
 
   /**
    *
@@ -51,6 +52,7 @@ public interface ProcessApplicationScanner {
    *          a list of additional suffixes for resources
    * @return a Map of process definitions
    */
-  public abstract Map<String, byte[]> findResources(ClassLoader classLoader, String paResourceRootPath, URL metaFileUrl, String[] additionalResourceSuffixes);
+  public abstract Map<String, byte[]> findResources(ClassLoader classLoader,
+      String paResourceRootPath, URL metaFileUrl, String[] additionalResourceSuffixes);
 
 }

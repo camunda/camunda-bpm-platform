@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.form;
 
 import org.camunda.bpm.engine.FormService;
 
-
 /**
  * Represents a single property on a form.
  *
@@ -27,8 +26,11 @@ import org.camunda.bpm.engine.FormService;
 @Deprecated
 public interface FormProperty {
 
-  /** The key used to submit the property in {@link FormService#submitStartFormData(String, java.util.Map)}
-   * or {@link FormService#submitTaskFormData(String, java.util.Map)} */
+  /**
+   * The key used to submit the property in
+   * {@link FormService#submitStartFormData(String, java.util.Map)} or
+   * {@link FormService#submitTaskFormData(String, java.util.Map)}
+   */
   String getId();
 
   /** The display label */
@@ -40,8 +42,10 @@ public interface FormProperty {
   /** Optional value that should be used to display in this property */
   String getValue();
 
-  /** Is this property read to be displayed in the form and made accessible with the methods
-   * {@link FormService#getStartFormData(String)} and {@link FormService#getTaskFormData(String)}. */
+  /**
+   * Is this property read to be displayed in the form and made accessible with the methods
+   * {@link FormService#getStartFormData(String)} and {@link FormService#getTaskFormData(String)}.
+   */
   boolean isReadable();
 
   /** Is this property expected when a user submits the form? */

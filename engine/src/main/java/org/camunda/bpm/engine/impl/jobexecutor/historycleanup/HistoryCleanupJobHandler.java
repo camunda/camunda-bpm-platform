@@ -30,26 +30,29 @@ import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_
 
 /**
  * Job handler for history cleanup job.
+ * 
  * @author Svetlana Dorokhova
  */
 public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHandlerConfiguration> {
 
   public static final String TYPE = "history-cleanup";
 
-  public void execute(HistoryCleanupJobHandlerConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(HistoryCleanupJobHandlerConfiguration configuration,
+      ExecutionEntity execution, CommandContext commandContext, String tenantId) {
 
     HistoryCleanupHandler cleanupHandler = initCleanupHandler(configuration, commandContext);
 
-    if (configuration.isImmediatelyDue() || isWithinBatchWindow(commandContext) ) {
+    if (configuration.isImmediatelyDue() || isWithinBatchWindow(commandContext)) {
       cleanupHandler.performCleanup();
     }
 
-    commandContext.getTransactionContext()
-      .addTransactionListener(TransactionState.COMMITTED, cleanupHandler);
+    commandContext.getTransactionContext().addTransactionListener(TransactionState.COMMITTED,
+        cleanupHandler);
 
   }
 
-  protected HistoryCleanupHandler initCleanupHandler(HistoryCleanupJobHandlerConfiguration configuration, CommandContext commandContext) {
+  protected HistoryCleanupHandler initCleanupHandler(
+      HistoryCleanupJobHandlerConfiguration configuration, CommandContext commandContext) {
     HistoryCleanupHandler cleanupHandler = null;
 
     if (isHistoryCleanupStrategyRemovalTimeBased(commandContext)) {
@@ -59,25 +62,24 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
     }
 
     CommandExecutor commandExecutor = commandContext.getProcessEngineConfiguration()
-      .getCommandExecutorTxRequiresNew();
+        .getCommandExecutorTxRequiresNew();
 
     String jobId = commandContext.getCurrentJob().getId();
 
-    return cleanupHandler
-      .setConfiguration(configuration)
-      .setCommandExecutor(commandExecutor)
-      .setJobId(jobId);
+    return cleanupHandler.setConfiguration(configuration).setCommandExecutor(commandExecutor)
+        .setJobId(jobId);
   }
 
   protected boolean isHistoryCleanupStrategyRemovalTimeBased(CommandContext commandContext) {
     String historyRemovalTimeStrategy = commandContext.getProcessEngineConfiguration()
-      .getHistoryCleanupStrategy();
+        .getHistoryCleanupStrategy();
 
     return HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED.equals(historyRemovalTimeStrategy);
   }
 
   protected boolean isWithinBatchWindow(CommandContext commandContext) {
-    return HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext.getProcessEngineConfiguration());
+    return HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(),
+        commandContext.getProcessEngineConfiguration());
   }
 
   public HistoryCleanupJobHandlerConfiguration newConfiguration(String canonicalString) {

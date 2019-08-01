@@ -78,12 +78,12 @@ public class HistoricTaskInstanceQueryOrTest {
 
   @After
   public void tearDown() {
-    for (org.camunda.bpm.engine.repository.Deployment deployment:
-      repositoryService.createDeploymentQuery().list()) {
+    for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService
+        .createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
-    for (HistoricTaskInstance task: historyService.createHistoricTaskInstanceQuery().list()) {
+    for (HistoricTaskInstance task : historyService.createHistoricTaskInstanceQuery().list()) {
       taskService.deleteTask(task.getId(), true);
     }
   }
@@ -93,10 +93,7 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set endOr() before or()");
 
-    historyService.createHistoricTaskInstanceQuery()
-      .or()
-      .endOr()
-      .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().endOr().endOr();
   }
 
   @Test
@@ -104,13 +101,7 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set or() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .or()
-        .endOr()
-      .endOr()
-      .or()
-      .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().or().endOr().endOr().or().endOr();
   }
 
   @Test
@@ -118,21 +109,16 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set withCandidateGroups() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .withCandidateGroups()
-      .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().withCandidateGroups().endOr();
   }
 
   @Test
   public void shouldThrowExceptionByWithoutCandidateGroupsApplied() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set withoutCandidateGroups() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set withoutCandidateGroups() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .withoutCandidateGroups()
-      .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().withoutCandidateGroups().endOr();
   }
 
   @Test
@@ -140,10 +126,7 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set orderByTenantId() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .orderByTenantId()
-      .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByTenantId().endOr();
   }
 
   @Test
@@ -151,43 +134,35 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set orderByTaskId() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByTaskId()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByTaskId().endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByHistoricActivityInstanceId() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByHistoricActivityInstanceId() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByHistoricActivityInstanceId() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByHistoricActivityInstanceId()
+    historyService.createHistoricTaskInstanceQuery().or().orderByHistoricActivityInstanceId()
         .endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessDefinitionId() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByProcessDefinitionId()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByProcessDefinitionId().endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessInstanceId() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByProcessInstanceId()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByProcessInstanceId().endOr();
   }
 
   @Test
@@ -195,42 +170,36 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set orderByExecutionId() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByExecutionId()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByExecutionId().endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByHistoricTaskInstanceDuration() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByHistoricTaskInstanceDuration() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByHistoricTaskInstanceDuration() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByHistoricTaskInstanceDuration()
+    historyService.createHistoricTaskInstanceQuery().or().orderByHistoricTaskInstanceDuration()
         .endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByHistoricTaskInstanceEndTime() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByHistoricTaskInstanceEndTime() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByHistoricTaskInstanceEndTime() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByHistoricTaskInstanceEndTime()
+    historyService.createHistoricTaskInstanceQuery().or().orderByHistoricTaskInstanceEndTime()
         .endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByHistoricActivityInstanceStartTime() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByHistoricTaskInstanceEndTime() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByHistoricTaskInstanceEndTime() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByHistoricTaskInstanceEndTime()
+    historyService.createHistoricTaskInstanceQuery().or().orderByHistoricTaskInstanceEndTime()
         .endOr();
   }
 
@@ -239,21 +208,16 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set orderByTaskName() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByTaskName()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByTaskName().endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByTaskDescription() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByTaskDescription() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByTaskDescription() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByTaskDescription()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByTaskDescription().endOr();
   }
 
   @Test
@@ -261,10 +225,7 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set orderByTaskAssignee() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByTaskAssignee()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByTaskAssignee().endOr();
   }
 
   @Test
@@ -272,10 +233,7 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set orderByTaskOwner() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByTaskOwner()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByTaskOwner().endOr();
   }
 
   @Test
@@ -283,21 +241,16 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set orderByTaskDueDate() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByTaskDueDate()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByTaskDueDate().endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByTaskFollowUpDate() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByTaskFollowUpDate() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByTaskFollowUpDate() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByTaskFollowUpDate()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByTaskFollowUpDate().endOr();
   }
 
   @Test
@@ -305,21 +258,16 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set orderByDeleteReason() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByDeleteReason()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByDeleteReason().endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByTaskDefinitionKey() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByTaskDefinitionKey() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByTaskDefinitionKey() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByTaskDefinitionKey()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByTaskDefinitionKey().endOr();
   }
 
   @Test
@@ -327,43 +275,34 @@ public class HistoricTaskInstanceQueryOrTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Invalid query usage: cannot set orderByTaskPriority() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByTaskPriority()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByTaskPriority().endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByCaseDefinitionId() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByCaseDefinitionId() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByCaseDefinitionId() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByCaseDefinitionId()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByCaseDefinitionId().endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByCaseInstanceId() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByCaseInstanceId() within 'or' query");
+    thrown
+        .expectMessage("Invalid query usage: cannot set orderByCaseInstanceId() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByCaseInstanceId()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByCaseInstanceId().endOr();
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByCaseExecutionId() {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByCaseExecutionId() within 'or' query");
+    thrown.expectMessage(
+        "Invalid query usage: cannot set orderByCaseExecutionId() within 'or' query");
 
-    historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .orderByCaseExecutionId()
-        .endOr();
+    historyService.createHistoricTaskInstanceQuery().or().orderByCaseExecutionId().endOr();
   }
 
   @Test
@@ -373,10 +312,8 @@ public class HistoricTaskInstanceQueryOrTest {
     taskService.saveTask(taskService.newTask());
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-      .or()
-      .endOr()
-      .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or().endOr()
+        .list();
 
     // then
     assertEquals(2, tasks.size());
@@ -394,12 +331,8 @@ public class HistoricTaskInstanceQueryOrTest {
     taskService.saveTask(task2);
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-      .endOr()
-      .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .taskName("aTaskName").taskDescription("aTaskDescription").endOr().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -428,15 +361,9 @@ public class HistoricTaskInstanceQueryOrTest {
     taskService.saveTask(task5);
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-        .taskId(task3.getId())
-        .taskPriority(5)
-        .taskOwner("aTaskOwner")
-      .endOr()
-      .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .taskName("aTaskName").taskDescription("aTaskDescription").taskId(task3.getId())
+        .taskPriority(5).taskOwner("aTaskOwner").endOr().list();
 
     // then
     assertEquals(5, tasks.size());
@@ -477,16 +404,9 @@ public class HistoricTaskInstanceQueryOrTest {
     taskService.saveTask(task5);
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-        .taskId(task3.getId())
-      .endOr()
-      .taskOwner("aTaskOwner")
-      .taskPriority(4)
-      .taskAssignee("aTaskAssignee")
-      .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .taskName("aTaskName").taskDescription("aTaskDescription").taskId(task3.getId()).endOr()
+        .taskOwner("aTaskOwner").taskPriority(4).taskAssignee("aTaskAssignee").list();
 
     // then
     assertEquals(3, tasks.size());
@@ -534,27 +454,12 @@ public class HistoricTaskInstanceQueryOrTest {
     taskService.saveTask(task6);
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-      .endOr()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-        .taskAssignee("aTaskAssignee")
-      .endOr()
-      .or()
-        .taskName("aTaskName")
-        .taskDescription("aTaskDescription")
-        .taskOwner("aTaskOwner")
-        .taskAssignee("aTaskAssignee")
-      .endOr()
-      .or()
-        .taskAssignee("aTaskAssignee")
-        .taskPriority(4)
-      .endOr()
-      .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .taskName("aTaskName").taskDescription("aTaskDescription").endOr().or()
+        .taskName("aTaskName").taskDescription("aTaskDescription").taskAssignee("aTaskAssignee")
+        .endOr().or().taskName("aTaskName").taskDescription("aTaskDescription")
+        .taskOwner("aTaskOwner").taskAssignee("aTaskAssignee").endOr().or()
+        .taskAssignee("aTaskAssignee").taskPriority(4).endOr().list();
 
     // then
     assertEquals(3, tasks.size());
@@ -576,13 +481,8 @@ public class HistoricTaskInstanceQueryOrTest {
     taskService.saveTask(task3);
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskName("task1")
-        .taskName("task2")
-        .taskName("task3")
-      .endOr()
-      .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .taskName("task1").taskName("task2").taskName("task3").endOr().list();
 
     // then
     assertEquals(1, tasks.size());
@@ -592,32 +492,22 @@ public class HistoricTaskInstanceQueryOrTest {
   public void shouldReturnHistoricTasksWithActivityInstanceIdInOrTaskId() {
     // given
     BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("aProcessDefinition")
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+        .startEvent().userTask().endEvent().done();
 
-    repositoryService
-      .createDeployment()
-      .addModelInstance("foo.bpmn", aProcessDefinition)
-      .deploy();
+    repositoryService.createDeployment().addModelInstance("foo.bpmn", aProcessDefinition).deploy();
 
     ProcessInstance processInstance1 = runtimeService
-      .startProcessInstanceByKey("aProcessDefinition");
+        .startProcessInstanceByKey("aProcessDefinition");
 
     String activityInstanceId = runtimeService.getActivityInstance(processInstance1.getId())
-      .getChildActivityInstances()[0].getId();
+        .getChildActivityInstances()[0].getId();
 
     Task task2 = taskService.newTask();
     taskService.saveTask(task2);
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .activityInstanceIdIn(activityInstanceId)
-        .taskId(task2.getId())
-      .endOr()
-      .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .activityInstanceIdIn(activityInstanceId).taskId(task2.getId()).endOr().list();
 
     // then
     assertEquals(2, tasks.size());
@@ -627,82 +517,53 @@ public class HistoricTaskInstanceQueryOrTest {
   public void shouldTestDueDateCombinations() throws ParseException {
     HashMap<String, Date> dates = createFollowUpAndDueDateTasks();
 
-    assertEquals(2, historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskDueDate(dates.get("date"))
-        .taskDueBefore(dates.get("oneHourAgo"))
-      .endOr()
-      .count());
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().or()
+        .taskDueDate(dates.get("date")).taskDueBefore(dates.get("oneHourAgo")).endOr().count());
 
-    assertEquals(2, historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskDueDate(dates.get("date"))
-        .taskDueAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(2, historyService.createHistoricTaskInstanceQuery().or()
+        .taskDueDate(dates.get("date")).taskDueAfter(dates.get("oneHourLater")).endOr().count());
 
-    assertEquals(2, historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskDueBefore(dates.get("oneHourAgo"))
-        .taskDueAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(2,
+        historyService.createHistoricTaskInstanceQuery().or().taskDueBefore(dates.get("oneHourAgo"))
+            .taskDueAfter(dates.get("oneHourLater")).endOr().count());
 
-    assertEquals(3, historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskDueBefore(dates.get("oneHourLater"))
-        .taskDueAfter(dates.get("oneHourAgo"))
-      .endOr()
-      .count());
+    assertEquals(3,
+        historyService.createHistoricTaskInstanceQuery().or()
+            .taskDueBefore(dates.get("oneHourLater")).taskDueAfter(dates.get("oneHourAgo")).endOr()
+            .count());
 
-    assertEquals(3, historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskDueDate(dates.get("date"))
-        .taskDueBefore(dates.get("oneHourAgo"))
-        .taskDueAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(3,
+        historyService.createHistoricTaskInstanceQuery().or().taskDueDate(dates.get("date"))
+            .taskDueBefore(dates.get("oneHourAgo")).taskDueAfter(dates.get("oneHourLater")).endOr()
+            .count());
   }
 
   @Test
   public void shouldTestFollowUpDateCombinations() throws ParseException {
     HashMap<String, Date> dates = createFollowUpAndDueDateTasks();
 
-    assertEquals(2, historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskFollowUpDate(dates.get("date"))
-        .taskFollowUpBefore(dates.get("oneHourAgo"))
-      .endOr()
-      .count());
+    assertEquals(2,
+        historyService.createHistoricTaskInstanceQuery().or().taskFollowUpDate(dates.get("date"))
+            .taskFollowUpBefore(dates.get("oneHourAgo")).endOr().count());
 
-    assertEquals(2, historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskFollowUpDate(dates.get("date"))
-        .taskFollowUpAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(2,
+        historyService.createHistoricTaskInstanceQuery().or().taskFollowUpDate(dates.get("date"))
+            .taskFollowUpAfter(dates.get("oneHourLater")).endOr().count());
 
-    assertEquals(2, historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskFollowUpBefore(dates.get("oneHourAgo"))
-        .taskFollowUpAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(2,
+        historyService.createHistoricTaskInstanceQuery().or()
+            .taskFollowUpBefore(dates.get("oneHourAgo"))
+            .taskFollowUpAfter(dates.get("oneHourLater")).endOr().count());
 
-    assertEquals(3, historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskFollowUpBefore(dates.get("oneHourLater"))
-        .taskFollowUpAfter(dates.get("oneHourAgo"))
-      .endOr()
-      .count());
+    assertEquals(3,
+        historyService.createHistoricTaskInstanceQuery().or()
+            .taskFollowUpBefore(dates.get("oneHourLater"))
+            .taskFollowUpAfter(dates.get("oneHourAgo")).endOr().count());
 
-    assertEquals(3, historyService.createHistoricTaskInstanceQuery()
-      .or()
-        .taskFollowUpDate(dates.get("date"))
-        .taskFollowUpBefore(dates.get("oneHourAgo"))
-        .taskFollowUpAfter(dates.get("oneHourLater"))
-      .endOr()
-      .count());
+    assertEquals(3,
+        historyService.createHistoricTaskInstanceQuery().or().taskFollowUpDate(dates.get("date"))
+            .taskFollowUpBefore(dates.get("oneHourAgo"))
+            .taskFollowUpAfter(dates.get("oneHourLater")).endOr().count());
 
     // followUp before or null
     taskService.saveTask(taskService.newTask());
@@ -726,12 +587,9 @@ public class HistoricTaskInstanceQueryOrTest {
     taskService.saveTask(taskTwo);
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .startedBefore(new Date(dateOne.getTime() + 1000))
-          .startedAfter(new Date(dateTwo.getTime() - 1000))
-        .endOr()
-        .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .startedBefore(new Date(dateOne.getTime() + 1000))
+        .startedAfter(new Date(dateTwo.getTime() - 1000)).endOr().list();
 
     // then
     assertThat(tasks.size()).isEqualTo(2);
@@ -747,12 +605,8 @@ public class HistoricTaskInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .taskId(taskOne.getId())
-          .processDefinitionKey("oneTaskProcess")
-        .endOr()
-        .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .taskId(taskOne.getId()).processDefinitionKey("oneTaskProcess").endOr().list();
 
     // then
     assertThat(tasks.size()).isEqualTo(2);
@@ -768,12 +622,8 @@ public class HistoricTaskInstanceQueryOrTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", "aBusinessKey");
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .taskId(taskOne.getId())
-          .processInstanceBusinessKey("aBusinessKey")
-        .endOr()
-        .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .taskId(taskOne.getId()).processInstanceBusinessKey("aBusinessKey").endOr().list();
 
     // then
     assertThat(tasks.size()).isEqualTo(2);
@@ -789,12 +639,8 @@ public class HistoricTaskInstanceQueryOrTest {
     caseService.createCaseInstanceByKey("oneTaskCase");
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .taskId(taskOne.getId())
-          .caseDefinitionKey("oneTaskCase")
-        .endOr()
-        .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .taskId(taskOne.getId()).caseDefinitionKey("oneTaskCase").endOr().list();
 
     // then
     assertThat(tasks.size()).isEqualTo(2);
@@ -818,12 +664,9 @@ public class HistoricTaskInstanceQueryOrTest {
     taskService.complete(taskTwo.getId());
 
     // when
-    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
-        .or()
-          .finishedBefore(new Date(dateOne.getTime() + 1000))
-          .finishedAfter(new Date(dateTwo.getTime() - 1000))
-        .endOr()
-        .list();
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().or()
+        .finishedBefore(new Date(dateOne.getTime() + 1000))
+        .finishedAfter(new Date(dateTwo.getTime() - 1000)).endOr().list();
 
     // then
     assertThat(tasks.size()).isEqualTo(2);
@@ -831,8 +674,8 @@ public class HistoricTaskInstanceQueryOrTest {
 
   public HashMap<String, Date> createFollowUpAndDueDateTasks() throws ParseException {
     final Date date = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("27/07/2017 01:12:13"),
-      oneHourAgo = new Date(date.getTime() - 60 * 60 * 1000),
-      oneHourLater = new Date(date.getTime() + 60 * 60 * 1000);
+        oneHourAgo = new Date(date.getTime() - 60 * 60 * 1000),
+        oneHourLater = new Date(date.getTime() + 60 * 60 * 1000);
 
     Task taskDueBefore = taskService.newTask();
     taskDueBefore.setFollowUpDate(new Date(oneHourAgo.getTime() - 1000));
@@ -851,10 +694,12 @@ public class HistoricTaskInstanceQueryOrTest {
 
     assertEquals(3, historyService.createHistoricTaskInstanceQuery().count());
 
-    return new HashMap<String, Date>() {{
-      put("date", date);
-      put("oneHourAgo", oneHourAgo);
-      put("oneHourLater", oneHourLater);
-    }};
+    return new HashMap<String, Date>() {
+      {
+        put("date", date);
+        put("oneHourAgo", oneHourAgo);
+        put("oneHourLater", oneHourLater);
+      }
+    };
   }
 }

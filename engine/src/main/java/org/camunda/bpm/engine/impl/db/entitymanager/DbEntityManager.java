@@ -120,14 +120,14 @@ public class DbEntityManager implements Session, EntityLoadListener {
   protected void initializeEntityCache() {
 
     final JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
-    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
 
-    if(processEngineConfiguration != null
-        && processEngineConfiguration.isDbEntityCacheReuseEnabled()
-        && jobExecutorContext != null) {
+    if (processEngineConfiguration != null
+        && processEngineConfiguration.isDbEntityCacheReuseEnabled() && jobExecutorContext != null) {
 
       dbEntityCache = jobExecutorContext.getEntityCache();
-      if(dbEntityCache == null) {
+      if (dbEntityCache == null) {
         dbEntityCache = new DbEntityCache(processEngineConfiguration.getDbEntityCacheKeyMapping());
         jobExecutorContext.setEntityCache(dbEntityCache);
       }
@@ -154,7 +154,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   public List selectList(String statement, Object parameter, Page page) {
-    if(page!=null) {
+    if (page != null) {
       return selectList(statement, parameter, page.getFirstResult(), page.getMaxResults());
     } else {
       return selectList(statement, parameter, 0, Integer.MAX_VALUE);
@@ -170,12 +170,14 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   public List selectList(String statement, ListQueryParameterObject parameter) {
-    return selectListWithRawParameter(statement, parameter, parameter.getFirstResult(), parameter.getMaxResults());
+    return selectListWithRawParameter(statement, parameter, parameter.getFirstResult(),
+        parameter.getMaxResults());
   }
 
   @SuppressWarnings("unchecked")
-  public List selectListWithRawParameter(String statement, Object parameter, int firstResult, int maxResults) {
-    if(firstResult == -1 ||  maxResults==-1) {
+  public List selectListWithRawParameter(String statement, Object parameter, int firstResult,
+      int maxResults) {
+    if (firstResult == -1 || maxResults == -1) {
       return Collections.EMPTY_LIST;
     }
     List loadedObjects = persistenceSession.selectList(statement, parameter);
@@ -194,7 +196,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
   @SuppressWarnings("unchecked")
   public boolean selectBoolean(String statement, Object parameter) {
     List<String> result = (List<String>) persistenceSession.selectList(statement, parameter);
-    if(result != null) {
+    if (result != null) {
       return result.contains(1);
     }
     return false;
@@ -203,13 +205,13 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
   public <T extends DbEntity> T selectById(Class<T> entityClass, String id) {
     T persistentObject = dbEntityCache.get(entityClass, id);
-    if (persistentObject!=null) {
+    if (persistentObject != null) {
       return persistentObject;
     }
 
     persistentObject = persistenceSession.selectById(entityClass, id);
 
-    if (persistentObject==null) {
+    if (persistentObject == null) {
       return null;
     }
     // don't have to put object into the cache now. See onEntityLoaded() callback
@@ -228,25 +230,27 @@ public class DbEntityManager implements Session, EntityLoadListener {
     if (loadedObjects.isEmpty() || loadedObjects.get(0) == null) {
       return loadedObjects;
     }
-    if (! (DbEntity.class.isAssignableFrom(loadedObjects.get(0).getClass()))) {
+    if (!(DbEntity.class.isAssignableFrom(loadedObjects.get(0).getClass()))) {
       return loadedObjects;
     }
     List<DbEntity> filteredObjects = new ArrayList<>(loadedObjects.size());
-    for (Object loadedObject: loadedObjects) {
+    for (Object loadedObject : loadedObjects) {
       DbEntity cachedPersistentObject = cacheFilter((DbEntity) loadedObject);
       filteredObjects.add(cachedPersistentObject);
     }
     return filteredObjects;
   }
 
-  /** returns the object in the cache.  if this object was loaded before,
-   * then the original object is returned. */
+  /**
+   * returns the object in the cache. if this object was loaded before, then the original object is
+   * returned.
+   */
   protected DbEntity cacheFilter(DbEntity persistentObject) {
-    DbEntity cachedPersistentObject = dbEntityCache.get(persistentObject.getClass(), persistentObject.getId());
-    if (cachedPersistentObject!=null) {
+    DbEntity cachedPersistentObject = dbEntityCache.get(persistentObject.getClass(),
+        persistentObject.getId());
+    if (cachedPersistentObject != null) {
       return cachedPersistentObject;
-    }
-    else {
+    } else {
       return persistentObject;
     }
 
@@ -255,7 +259,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
   public void onEntityLoaded(DbEntity entity) {
     // we get a callback when the persistence session loads an object from the database
     DbEntity cachedPersistentObject = dbEntityCache.get(entity.getClass(), entity.getId());
-    if(cachedPersistentObject == null) {
+    if (cachedPersistentObject == null) {
       // only put into the cache if not already present
       dbEntityCache.putPersistent(entity);
 
@@ -278,7 +282,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
   public boolean isDirty(DbEntity dbEntity) {
     CachedDbEntity cachedEntity = dbEntityCache.getCachedEntity(dbEntity);
-    if(cachedEntity == null) {
+    if (cachedEntity == null) {
       return false;
     } else {
       return cachedEntity.isDirty() || cachedEntity.getEntityState() == DbEntityState.MERGED;
@@ -317,7 +321,8 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
 
     try {
-      final List<List<DbOperation>> batches = CollectionUtil.partition(operationsToFlush, BATCH_SIZE);
+      final List<List<DbOperation>> batches = CollectionUtil.partition(operationsToFlush,
+          BATCH_SIZE);
       for (List<DbOperation> batch : batches) {
         flushDbOperations(batch, operationsToFlush);
       }
@@ -330,7 +335,8 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
   }
 
-  protected void flushDbOperations(List<DbOperation> operationsToFlush, List<DbOperation> allOperations) {
+  protected void flushDbOperations(List<DbOperation> operationsToFlush,
+      List<DbOperation> allOperations) {
 
     // execute the flush
     while (!operationsToFlush.isEmpty()) {
@@ -350,9 +356,9 @@ public class DbEntityManager implements Session, EntityLoadListener {
           // this method throws an exception in case the flush cannot be continued;
           // accordingly, this method will be left as well in this case
           handleConcurrentModification(failedOperation);
-        }
-        else if (failureState == State.FAILED_ERROR) {
-          throw LOG.flushDbOperationException(allOperations, failedOperation, failedOperation.getFailure());
+        } else if (failureState == State.FAILED_ERROR) {
+          throw LOG.flushDbOperationException(allOperations, failedOperation,
+              failedOperation.getFailure());
         } else {
           // This branch should never be reached and the exception thus indicates a bug
           throw new ProcessEngineException("Entity session returned a failed operation not "
@@ -363,13 +369,13 @@ public class DbEntityManager implements Session, EntityLoadListener {
       List<DbOperation> remainingOperations = flushResult.getRemainingOperations();
 
       // avoid infinite loops
-      EnsureUtil.ensureLessThan("Database flush did not process any operations. This indicates a bug.",
+      EnsureUtil.ensureLessThan(
+          "Database flush did not process any operations. This indicates a bug.",
           "remainingOperations", remainingOperations.size(), operationsToFlush.size());
 
       operationsToFlush = remainingOperations;
     }
   }
-
 
   public void flushEntity(DbEntity entity) {
     CachedDbEntity cachedEntity = dbEntityCache.getCachedEntity(entity);
@@ -381,33 +387,35 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   /**
-   * Decides if an operation that failed for concurrent modifications can be tolerated,
-   * or if {@link OptimisticLockingException} should be raised
+   * Decides if an operation that failed for concurrent modifications can be tolerated, or if
+   * {@link OptimisticLockingException} should be raised
    *
    * @param dbOperation
-   * @throws OptimisticLockingException if there is no handler for the failure
+   * @throws OptimisticLockingException
+   *           if there is no handler for the failure
    */
   protected void handleConcurrentModification(DbOperation dbOperation) {
     boolean isHandled = false;
 
-    if(optimisticLockingListeners != null) {
+    if (optimisticLockingListeners != null) {
       for (OptimisticLockingListener optimisticLockingListener : optimisticLockingListeners) {
-        if(optimisticLockingListener.getEntityType() == null
-            || optimisticLockingListener.getEntityType().isAssignableFrom(dbOperation.getEntityType())) {
+        if (optimisticLockingListener.getEntityType() == null || optimisticLockingListener
+            .getEntityType().isAssignableFrom(dbOperation.getEntityType())) {
           optimisticLockingListener.failedOperation(dbOperation);
           isHandled = true;
         }
       }
     }
 
-    if (!isHandled && Context.getProcessEngineConfiguration().isSkipHistoryOptimisticLockingExceptions()) {
+    if (!isHandled
+        && Context.getProcessEngineConfiguration().isSkipHistoryOptimisticLockingExceptions()) {
       DbEntity dbEntity = ((DbEntityOperation) dbOperation).getEntity();
       if (dbEntity instanceof HistoricEntity || isHistoricByteArray(dbEntity)) {
         isHandled = true;
       }
     }
 
-    if(!isHandled) {
+    if (!isHandled) {
       throw LOG.concurrentUpdateDbEntityException(dbOperation);
     }
   }
@@ -422,8 +430,8 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   /**
-   * Flushes the entity cache:
-   * Depending on the entity state, the required {@link DbOperation} is performed and the cache is updated.
+   * Flushes the entity cache: Depending on the entity state, the required {@link DbOperation} is
+   * performed and the cache is updated.
    */
   protected void flushEntityCache() {
     List<CachedDbEntity> cachedEntities = dbEntityCache.getCachedEntities();
@@ -437,7 +445,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
   protected void flushCachedEntity(CachedDbEntity cachedDbEntity) {
 
-    if(cachedDbEntity.getEntityState() == TRANSIENT) {
+    if (cachedDbEntity.getEntityState() == TRANSIENT) {
       // latest state of references in cache is relevant when determining insertion order
       cachedDbEntity.determineEntityReferences();
       // perform INSERT
@@ -445,22 +453,22 @@ public class DbEntityManager implements Session, EntityLoadListener {
       // mark PERSISTENT
       cachedDbEntity.setEntityState(PERSISTENT);
 
-    } else if(cachedDbEntity.getEntityState() == PERSISTENT && cachedDbEntity.isDirty()) {
+    } else if (cachedDbEntity.getEntityState() == PERSISTENT && cachedDbEntity.isDirty()) {
       // object is dirty -> perform UPDATE
       performEntityOperation(cachedDbEntity, UPDATE);
 
-    } else if(cachedDbEntity.getEntityState() == MERGED) {
+    } else if (cachedDbEntity.getEntityState() == MERGED) {
       // perform UPDATE
       performEntityOperation(cachedDbEntity, UPDATE);
       // mark PERSISTENT
       cachedDbEntity.setEntityState(PERSISTENT);
 
-    } else if(cachedDbEntity.getEntityState() == DELETED_TRANSIENT) {
+    } else if (cachedDbEntity.getEntityState() == DELETED_TRANSIENT) {
       // remove from cache
       dbEntityCache.remove(cachedDbEntity);
 
-    } else if(cachedDbEntity.getEntityState() == DELETED_PERSISTENT
-           || cachedDbEntity.getEntityState() == DELETED_MERGED) {
+    } else if (cachedDbEntity.getEntityState() == DELETED_PERSISTENT
+        || cachedDbEntity.getEntityState() == DELETED_MERGED) {
       // perform DELETE
       performEntityOperation(cachedDbEntity, DELETE);
       // remove from cache
@@ -469,7 +477,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
 
     // if object is PERSISTENT after flush
-    if(cachedDbEntity.getEntityState() == PERSISTENT) {
+    if (cachedDbEntity.getEntityState() == PERSISTENT) {
       // make a new copy
       cachedDbEntity.makeCopy();
       // update cached references
@@ -490,7 +498,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
   public void merge(DbEntity dbEntity) {
 
-    if(dbEntity.getId() == null) {
+    if (dbEntity.getId() == null) {
       throw LOG.mergeDbEntityException(dbEntity);
     }
 
@@ -504,7 +512,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
   public void forceUpdate(DbEntity entity) {
     CachedDbEntity cachedEntity = dbEntityCache.getCachedEntity(entity);
-    if(cachedEntity != null && cachedEntity.getEntityState() == PERSISTENT) {
+    if (cachedEntity != null && cachedEntity.getEntityState() == PERSISTENT) {
       cachedEntity.forceSetDirty();
     }
   }
@@ -513,7 +521,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     dbEntityCache.setDeleted(dbEntity);
   }
 
-  public void undoDelete(DbEntity entity){
+  public void undoDelete(DbEntity entity) {
     dbEntityCache.undoDelete(entity);
   }
 
@@ -522,14 +530,18 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   /**
-   * Several update operations added by this method will be executed preserving the order of method calls, no matter what entity type they refer to.
-   * They will though be executed after all "not-bulk" operations (e.g. {@link DbEntityManager#insert(DbEntity)} or {@link DbEntityManager#merge(DbEntity)})
-   * and after those updates added by {@link DbEntityManager#update(Class, String, Object)}.
+   * Several update operations added by this method will be executed preserving the order of method
+   * calls, no matter what entity type they refer to. They will though be executed after all
+   * "not-bulk" operations (e.g. {@link DbEntityManager#insert(DbEntity)} or
+   * {@link DbEntityManager#merge(DbEntity)}) and after those updates added by
+   * {@link DbEntityManager#update(Class, String, Object)}.
+   * 
    * @param entityType
    * @param statement
    * @param parameter
    */
-  public void updatePreserveOrder(Class<? extends DbEntity> entityType, String statement, Object parameter) {
+  public void updatePreserveOrder(Class<? extends DbEntity> entityType, String statement,
+      Object parameter) {
     performBulkOperationPreserveOrder(entityType, statement, parameter, UPDATE_BULK);
   }
 
@@ -538,36 +550,45 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   /**
-   * Several delete operations added by this method will be executed preserving the order of method calls, no matter what entity type they refer to.
-   * They will though be executed after all "not-bulk" operations (e.g. {@link DbEntityManager#insert(DbEntity)} or {@link DbEntityManager#merge(DbEntity)})
-   * and after those deletes added by {@link DbEntityManager#delete(Class, String, Object)}.
+   * Several delete operations added by this method will be executed preserving the order of method
+   * calls, no matter what entity type they refer to. They will though be executed after all
+   * "not-bulk" operations (e.g. {@link DbEntityManager#insert(DbEntity)} or
+   * {@link DbEntityManager#merge(DbEntity)}) and after those deletes added by
+   * {@link DbEntityManager#delete(Class, String, Object)}.
+   * 
    * @param entityType
    * @param statement
    * @param parameter
    * @return delete operation
    */
-  public DbBulkOperation deletePreserveOrder(Class<? extends DbEntity> entityType, String statement, Object parameter) {
+  public DbBulkOperation deletePreserveOrder(Class<? extends DbEntity> entityType, String statement,
+      Object parameter) {
     return performBulkOperationPreserveOrder(entityType, statement, parameter, DELETE_BULK);
   }
 
-  protected DbBulkOperation performBulkOperation(Class<? extends DbEntity> entityType, String statement, Object parameter, DbOperationType operationType) {
+  protected DbBulkOperation performBulkOperation(Class<? extends DbEntity> entityType,
+      String statement, Object parameter, DbOperationType operationType) {
     // create operation
-    DbBulkOperation bulkOperation = createDbBulkOperation(entityType, statement, parameter, operationType);
+    DbBulkOperation bulkOperation = createDbBulkOperation(entityType, statement, parameter,
+        operationType);
 
     // schedule operation
     dbOperationManager.addOperation(bulkOperation);
     return bulkOperation;
   }
 
-  protected DbBulkOperation performBulkOperationPreserveOrder(Class<? extends DbEntity> entityType, String statement, Object parameter, DbOperationType operationType) {
-    DbBulkOperation bulkOperation = createDbBulkOperation(entityType, statement, parameter, operationType);
+  protected DbBulkOperation performBulkOperationPreserveOrder(Class<? extends DbEntity> entityType,
+      String statement, Object parameter, DbOperationType operationType) {
+    DbBulkOperation bulkOperation = createDbBulkOperation(entityType, statement, parameter,
+        operationType);
 
     // schedule operation
     dbOperationManager.addOperationPreserveOrder(bulkOperation);
     return bulkOperation;
   }
 
-  private DbBulkOperation createDbBulkOperation(Class<? extends DbEntity> entityType, String statement, Object parameter, DbOperationType operationType) {
+  private DbBulkOperation createDbBulkOperation(Class<? extends DbEntity> entityType,
+      String statement, Object parameter, DbOperationType operationType) {
     // create operation
     DbBulkOperation bulkOperation = new DbBulkOperation();
 
@@ -596,20 +617,21 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   protected void ensureHasId(DbEntity dbEntity) {
-    if(dbEntity.getId() == null) {
+    if (dbEntity.getId() == null) {
       String nextId = idGenerator.getNextId();
       dbEntity.setId(nextId);
     }
   }
 
   protected void validateId(DbEntity dbEntity) {
-    EnsureUtil.ensureValidIndividualResourceId("Entity " + dbEntity + " has an invalid id", dbEntity.getId());
+    EnsureUtil.ensureValidIndividualResourceId("Entity " + dbEntity + " has an invalid id",
+        dbEntity.getId());
   }
 
   public <T extends DbEntity> List<T> pruneDeletedEntities(List<T> listToPrune) {
     ArrayList<T> prunedList = new ArrayList<>();
     for (T potentiallyDeleted : listToPrune) {
-      if(!isDeleted(potentiallyDeleted)) {
+      if (!isDeleted(potentiallyDeleted)) {
         prunedList.add(potentiallyDeleted);
       }
     }
@@ -700,8 +722,9 @@ public class DbEntityManager implements Session, EntityLoadListener {
     return new DbGroupQueryImpl();
   }
 
-  public void registerOptimisticLockingListener(OptimisticLockingListener optimisticLockingListener) {
-    if(optimisticLockingListeners == null) {
+  public void registerOptimisticLockingListener(
+      OptimisticLockingListener optimisticLockingListener) {
+    if (optimisticLockingListeners == null) {
       optimisticLockingListeners = new ArrayList<>();
     }
     optimisticLockingListeners.add(optimisticLockingListener);
@@ -710,7 +733,5 @@ public class DbEntityManager implements Session, EntityLoadListener {
   public List<String> getTableNamesPresentInDatabase() {
     return persistenceSession.getTableNamesPresent();
   }
-
-
 
 }

@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class CompositeDbHistoryEventHandlerTest extends AbstractCompositeHistoryEventHandlerTest {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testCompositeDbHistoryEventHandlerNonArgumentConstructor() {
     processEngineConfiguration.setHistoryEventHandler(new CompositeDbHistoryEventHandler());
 
@@ -50,7 +50,7 @@ public class CompositeDbHistoryEventHandlerTest extends AbstractCompositeHistory
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testCompositeDbHistoryEventHandlerNonArgumentConstructorAddNotNullEvent() {
     CompositeDbHistoryEventHandler compositeDbHistoryEventHandler = new CompositeDbHistoryEventHandler();
     compositeDbHistoryEventHandler.add(new CustomDbHistoryEventHandler());
@@ -96,7 +96,8 @@ public class CompositeDbHistoryEventHandlerTest extends AbstractCompositeHistory
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testCompositeDbHistoryEventHandlerArgumentConstructorWithNotNullVarargsOneEvent() {
-    CompositeDbHistoryEventHandler compositeDbHistoryEventHandler = new CompositeDbHistoryEventHandler(new CustomDbHistoryEventHandler());
+    CompositeDbHistoryEventHandler compositeDbHistoryEventHandler = new CompositeDbHistoryEventHandler(
+        new CustomDbHistoryEventHandler());
     processEngineConfiguration.setHistoryEventHandler(compositeDbHistoryEventHandler);
 
     startProcessAndCompleteUserTask();
@@ -107,7 +108,8 @@ public class CompositeDbHistoryEventHandlerTest extends AbstractCompositeHistory
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testCompositeDbHistoryEventHandlerArgumentConstructorWithNotNullVarargsTwoEvents() {
-    CompositeDbHistoryEventHandler compositeDbHistoryEventHandler = new CompositeDbHistoryEventHandler(new CustomDbHistoryEventHandler(), new CustomDbHistoryEventHandler());
+    CompositeDbHistoryEventHandler compositeDbHistoryEventHandler = new CompositeDbHistoryEventHandler(
+        new CustomDbHistoryEventHandler(), new CustomDbHistoryEventHandler());
     processEngineConfiguration.setHistoryEventHandler(compositeDbHistoryEventHandler);
 
     startProcessAndCompleteUserTask();
@@ -116,9 +118,10 @@ public class CompositeDbHistoryEventHandlerTest extends AbstractCompositeHistory
     assertEquals(2, historyService.createHistoricDetailQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testCompositeDbHistoryEventHandlerArgumentConstructorWithEmptyList() {
-    CompositeDbHistoryEventHandler compositeDbHistoryEventHandler = new CompositeDbHistoryEventHandler(new ArrayList<HistoryEventHandler>());
+    CompositeDbHistoryEventHandler compositeDbHistoryEventHandler = new CompositeDbHistoryEventHandler(
+        new ArrayList<HistoryEventHandler>());
     processEngineConfiguration.setHistoryEventHandler(compositeDbHistoryEventHandler);
 
     startProcessAndCompleteUserTask();
@@ -141,14 +144,15 @@ public class CompositeDbHistoryEventHandlerTest extends AbstractCompositeHistory
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testCompositeDbHistoryEventHandlerArgumentConstructorWithNotEmptyListNotNullTwoEvents() {
     // prepare the list with two events
     List<HistoryEventHandler> historyEventHandlers = new ArrayList<HistoryEventHandler>();
     historyEventHandlers.add(new CustomDbHistoryEventHandler());
     historyEventHandlers.add(new CustomDbHistoryEventHandler());
 
-    CompositeDbHistoryEventHandler compositeDbHistoryEventHandler = new CompositeDbHistoryEventHandler(historyEventHandlers);
+    CompositeDbHistoryEventHandler compositeDbHistoryEventHandler = new CompositeDbHistoryEventHandler(
+        historyEventHandlers);
     processEngineConfiguration.setHistoryEventHandler(compositeDbHistoryEventHandler);
 
     startProcessAndCompleteUserTask();

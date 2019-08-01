@@ -19,14 +19,13 @@ package org.camunda.bpm.engine.impl.util.io;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-
 /**
  * @author Tom Baeyens
  */
 public class StringStreamSource implements StreamSource {
-  
+
   String string;
-  
+
   public StringStreamSource(String string) {
     this.string = string;
   }

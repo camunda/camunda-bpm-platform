@@ -51,25 +51,23 @@ import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
-
 /**
  * @author Joram Barrez
  * @author Bernd Ruecker
  */
 public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml" })
   public void testSequentialUserTasks() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks",
-            CollectionUtil.singletonMap("nrOfLoops", 3));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+        "miSequentialUserTasks", CollectionUtil.singletonMap("nrOfLoops", 3));
     String procId = processInstance.getId();
 
     // now there is now 1 activity instance below the pi:
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    ActivityInstance expectedTree = describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-      .beginMiBody("miTasks")
-        .activity("miTasks")
-    .done();
+    ActivityInstance expectedTree = describeActivityInstanceTree(
+        processInstance.getProcessDefinitionId()).beginMiBody("miTasks").activity("miTasks").done();
     assertThat(tree).hasStructure(expectedTree);
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -97,16 +95,19 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml" })
   public void testSequentialUserTasksHistory() {
     runtimeService.startProcessInstanceByKey("miSequentialUserTasks",
-            CollectionUtil.singletonMap("nrOfLoops", 4)).getId();
-    for (int i=0; i<4; i++) {
+        CollectionUtil.singletonMap("nrOfLoops", 4)).getId();
+    for (int i = 0; i < 4; i++) {
       taskService.complete(taskService.createTaskQuery().singleResult().getId());
     }
 
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("userTask").list();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      List<HistoricActivityInstance> historicActivityInstances = historyService
+          .createHistoricActivityInstanceQuery().activityType("userTask").list();
       assertEquals(4, historicActivityInstances.size());
       for (HistoricActivityInstance hai : historicActivityInstances) {
         assertNotNull(hai.getActivityId());
@@ -118,9 +119,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
     }
 
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
 
-      List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
+      List<HistoricTaskInstance> historicTaskInstances = historyService
+          .createHistoricTaskInstanceQuery().list();
       assertEquals(4, historicTaskInstances.size());
       for (HistoricTaskInstance ht : historicTaskInstances) {
         assertNotNull(ht.getAssignee());
@@ -131,10 +134,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml" })
   public void testSequentialUserTasksWithTimer() {
     String procId = runtimeService.startProcessInstanceByKey("miSequentialUserTasks",
-            CollectionUtil.singletonMap("nrOfLoops", 3)).getId();
+        CollectionUtil.singletonMap("nrOfLoops", 3)).getId();
 
     // Complete 1 tasks
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
@@ -149,13 +153,14 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml" })
   public void testSequentialUserTasksCompletionCondition() {
     String procId = runtimeService.startProcessInstanceByKey("miSequentialUserTasks",
-            CollectionUtil.singletonMap("nrOfLoops", 10)).getId();
+        CollectionUtil.singletonMap("nrOfLoops", 10)).getId();
 
     // 10 tasks are to be created, but completionCondition stops them at 5
-    for (int i=0; i<5; i++) {
+    for (int i = 0; i < 5; i++) {
       Task task = taskService.createTaskQuery().singleResult();
       taskService.complete(task.getId());
     }
@@ -171,20 +176,25 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     vars.put("nrOfLoops", 2);
     runtimeService.startProcessInstanceByKey("miSequentialListener", vars);
 
-    assertEquals(1, (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
+    assertEquals(1,
+        (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
     assertNull(RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_END));
 
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
 
-    assertEquals(2, (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
-    assertEquals(1, (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_END));
+    assertEquals(2,
+        (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
+    assertEquals(1,
+        (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_END));
 
     task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
 
-    assertEquals(2, (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
-    assertEquals(2, (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_END));
+    assertEquals(2,
+        (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
+    assertEquals(2,
+        (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_END));
   }
 
   @Deployment
@@ -195,33 +205,39 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     vars.put("nrOfLoops", 5);
     runtimeService.startProcessInstanceByKey("miSequentialListener", vars);
 
-    assertEquals(5, (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
+    assertEquals(5,
+        (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
     assertNull(RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_END));
 
     List<Task> tasks = taskService.createTaskQuery().list();
     taskService.complete(tasks.get(0).getId());
 
-    assertEquals(5, (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
-    assertEquals(1, (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_END));
+    assertEquals(5,
+        (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
+    assertEquals(1,
+        (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_END));
 
     taskService.complete(tasks.get(1).getId());
     taskService.complete(tasks.get(2).getId());
     taskService.complete(tasks.get(3).getId());
     taskService.complete(tasks.get(4).getId());
 
-    assertEquals(5, (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
-    assertEquals(5, (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_END));
+    assertEquals(5,
+        (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_START));
+    assertEquals(5,
+        (int) RecordInvocationListener.INVOCATIONS.get(ExecutionListener.EVENTNAME_END));
   }
 
   @Deployment
   public void testNestedSequentialUserTasks() {
     String procId = runtimeService.startProcessInstanceByKey("miNestedSequentialUserTasks").getId();
 
-    for (int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++) {
       Task task = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
       assertEquals("My Task", task.getName());
       ActivityInstance processInstance = runtimeService.getActivityInstance(procId);
-      List<ActivityInstance> instancesForActivitiyId = getInstancesForActivityId(processInstance, "miTasks");
+      List<ActivityInstance> instancesForActivitiyId = getInstancesForActivityId(processInstance,
+          "miTasks");
       assertEquals(1, instancesForActivitiyId.size());
       taskService.complete(task.getId());
     }
@@ -265,8 +281,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(3, runtimeService.createEventSubscriptionQuery().count());
 
-    List<Execution> receiveTaskExecutions = runtimeService
-        .createExecutionQuery().activityId("miTasks").list();
+    List<Execution> receiveTaskExecutions = runtimeService.createExecutionQuery()
+        .activityId("miTasks").list();
 
     for (Execution execution : receiveTaskExecutions) {
       runtimeService.messageEventReceived("message", execution.getId());
@@ -280,8 +296,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(3, runtimeService.createEventSubscriptionQuery().count());
 
-    List<Execution> receiveTaskExecutions = runtimeService
-        .createExecutionQuery().activityId("miTasks").list();
+    List<Execution> receiveTaskExecutions = runtimeService.createExecutionQuery()
+        .activityId("miTasks").list();
 
     // signal one of the instances
     runtimeService.messageEventReceived("message", receiveTaskExecutions.get(0).getId());
@@ -290,7 +306,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(2, runtimeService.createEventSubscriptionQuery().count());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasks.bpmn20.xml" })
   public void testParallelUserTasksHistory() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
     for (Task task : taskService.createTaskQuery().list()) {
@@ -298,21 +315,25 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     }
 
     // Validate history
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().asc().list();
-      for (int i=0; i<historicTaskInstances.size(); i++) {
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      List<HistoricTaskInstance> historicTaskInstances = historyService
+          .createHistoricTaskInstanceQuery().orderByTaskAssignee().asc().list();
+      for (int i = 0; i < historicTaskInstances.size(); i++) {
         HistoricTaskInstance hi = historicTaskInstances.get(i);
         assertNotNull(hi.getStartTime());
         assertNotNull(hi.getEndTime());
-        assertEquals("kermit_"+i, hi.getAssignee());
+        assertEquals("kermit_" + i, hi.getAssignee());
       }
 
-      HistoricActivityInstance multiInstanceBodyInstance = historyService.createHistoricActivityInstanceQuery()
-          .activityId("miTasks#multiInstanceBody").singleResult();
+      HistoricActivityInstance multiInstanceBodyInstance = historyService
+          .createHistoricActivityInstanceQuery().activityId("miTasks#multiInstanceBody")
+          .singleResult();
       assertNotNull(multiInstanceBodyInstance);
       assertEquals(pi.getId(), multiInstanceBodyInstance.getParentActivityInstanceId());
 
-      List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("userTask").list();
+      List<HistoricActivityInstance> historicActivityInstances = historyService
+          .createHistoricActivityInstanceQuery().activityType("userTask").list();
       assertEquals(3, historicActivityInstances.size());
       for (HistoricActivityInstance hai : historicActivityInstances) {
         assertNotNull(hai.getStartTime());
@@ -327,7 +348,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testParallelUserTasksWithTimer() {
-    String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksWithTimer").getId();
+    String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksWithTimer")
+        .getId();
 
     List<Task> tasks = taskService.createTaskQuery().list();
     taskService.complete(tasks.get(0).getId());
@@ -344,13 +366,14 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testParallelUserTasksCompletionCondition() {
-    String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksCompletionCondition").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("miParallelUserTasksCompletionCondition").getId();
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(5, tasks.size());
 
     // Completing 3 tasks gives 50% of tasks completed, which triggers completionCondition
-    for (int i=0; i<3; i++) {
-      assertEquals(5-i, taskService.createTaskQuery().count());
+    for (int i = 0; i < 3; i++) {
+      assertEquals(5 - i, taskService.createTaskQuery().count());
       taskService.complete(tasks.get(i).getId());
     }
     assertProcessEnded(procId);
@@ -360,7 +383,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   public void testParallelUserTasksBasedOnCollection() {
     List<String> assigneeList = Arrays.asList("kermit", "gonzo", "mispiggy", "fozzie", "bubba");
     String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksBasedOnCollection",
-          CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
+        CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
 
     List<Task> tasks = taskService.createTaskQuery().orderByTaskAssignee().asc().list();
     assertEquals(5, tasks.size());
@@ -378,20 +401,19 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasksBasedOnCollection.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasksBasedOnCollection.bpmn20.xml")
   public void testEmptyCollectionInMI() {
     List<String> assigneeList = new ArrayList<String>();
     String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksBasedOnCollection",
-      CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
+        CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
 
     assertEquals(0, taskService.createTaskQuery().count());
     assertProcessEnded(procId);
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       List<HistoricActivityInstance> activities = historyService
-          .createHistoricActivityInstanceQuery()
-          .processInstanceId(procId)
-          .orderByActivityId()
-          .asc().list();
+          .createHistoricActivityInstanceQuery().processInstanceId(procId).orderByActivityId().asc()
+          .list();
       assertEquals(3, activities.size());
       assertEquals("miTasks#multiInstanceBody", activities.get(0).getActivityId());
       assertEquals("theEnd", activities.get(1).getActivityId());
@@ -410,7 +432,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(2, recordedEvents.size());
 
     assertEquals("miTasks#multiInstanceBody", recordedEvents.get(0).getCurrentActivityId());
-    assertEquals("miTasks#multiInstanceBody", recordedEvents.get(1).getCurrentActivityId()); // or miTasks
+    assertEquals("miTasks#multiInstanceBody", recordedEvents.get(1).getCurrentActivityId()); // or
+                                                                                             // miTasks
 
     DelegateEvent.clearEvents();
   }
@@ -466,7 +489,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(10, sum);
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialScriptTasks.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialScriptTasks.bpmn20.xml")
   public void testSequentialScriptTasksNoStackOverflow() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("sum", 0);
@@ -477,7 +500,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(19900, sum);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialScriptTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialScriptTasks.bpmn20.xml" })
   public void testSequentialScriptTasksHistory() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("sum", 0);
@@ -485,10 +509,13 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("miSequentialScriptTask", vars);
 
     // Validate history
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      List<HistoricActivityInstance> historicInstances = historyService.createHistoricActivityInstanceQuery().activityType("scriptTask").orderByActivityId().asc().list();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      List<HistoricActivityInstance> historicInstances = historyService
+          .createHistoricActivityInstanceQuery().activityType("scriptTask").orderByActivityId()
+          .asc().list();
       assertEquals(7, historicInstances.size());
-      for (int i=0; i<7; i++) {
+      for (int i = 0; i < 7; i++) {
         HistoricActivityInstance hai = historicInstances.get(i);
         assertEquals("scriptTask", hai.getActivityType());
         assertNotNull(hai.getStartTime());
@@ -516,14 +543,17 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(45, sum);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelScriptTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelScriptTasks.bpmn20.xml" })
   public void testParallelScriptTasksHistory() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("sum", 0);
     vars.put("nrOfLoops", 4);
     runtimeService.startProcessInstanceByKey("miParallelScriptTask", vars);
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("scriptTask").list();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      List<HistoricActivityInstance> historicActivityInstances = historyService
+          .createHistoricActivityInstanceQuery().activityType("scriptTask").list();
       assertEquals(4, historicActivityInstances.size());
       for (HistoricActivityInstance hai : historicActivityInstances) {
         assertNotNull(hai.getStartTime());
@@ -540,11 +570,14 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(2, sum);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelScriptTasksCompletionCondition.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelScriptTasksCompletionCondition.bpmn20.xml" })
   public void testParallelScriptTasksCompletionConditionHistory() {
     runtimeService.startProcessInstanceByKey("miParallelScriptTaskCompletionCondition");
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("scriptTask").list();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      List<HistoricActivityInstance> historicActivityInstances = historyService
+          .createHistoricActivityInstanceQuery().activityType("scriptTask").list();
       assertEquals(2, historicActivityInstances.size());
     }
   }
@@ -554,7 +587,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     String procId = runtimeService.startProcessInstanceByKey("miSequentialSubprocess").getId();
 
     TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
-    for (int i=0; i<4; i++) {
+    for (int i = 0; i < 4; i++) {
       List<Task> tasks = query.list();
       assertEquals(2, tasks.size());
 
@@ -564,7 +597,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       taskService.complete(tasks.get(0).getId());
       taskService.complete(tasks.get(1).getId());
 
-      if(i != 3) {
+      if (i != 3) {
         List<String> activities = runtimeService.getActiveActivityIds(procId);
         assertNotNull(activities);
         assertEquals(2, activities.size());
@@ -580,7 +613,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     String procId = runtimeService.startProcessInstanceByKey("miSequentialSubprocess").getId();
 
     TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
-    for (int i=0; i<4; i++) {
+    for (int i = 0; i < 4; i++) {
       List<Task> tasks = query.list();
       assertEquals(1, tasks.size());
 
@@ -589,7 +622,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       taskService.complete(tasks.get(0).getId());
 
       // Last run, the execution no longer exists
-      if(i != 3) {
+      if (i != 3) {
         List<String> activities = runtimeService.getActiveActivityIds(procId);
         assertNotNull(activities);
         assertEquals(1, activities.size());
@@ -599,28 +632,33 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialSubProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialSubProcess.bpmn20.xml" })
   public void testSequentialSubProcessHistory() {
     runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
-    for (int i=0; i<4; i++) {
+    for (int i = 0; i < 4; i++) {
       List<Task> tasks = taskService.createTaskQuery().list();
       taskService.complete(tasks.get(0).getId());
       taskService.complete(tasks.get(1).getId());
     }
 
     // Validate history
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      List<HistoricActivityInstance> onlySubProcessInstances = historyService.createHistoricActivityInstanceQuery().activityType("subProcess").list();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      List<HistoricActivityInstance> onlySubProcessInstances = historyService
+          .createHistoricActivityInstanceQuery().activityType("subProcess").list();
       assertEquals(4, onlySubProcessInstances.size());
 
-      List<HistoricActivityInstance> historicInstances = historyService.createHistoricActivityInstanceQuery().activityType("subProcess").list();
+      List<HistoricActivityInstance> historicInstances = historyService
+          .createHistoricActivityInstanceQuery().activityType("subProcess").list();
       assertEquals(4, historicInstances.size());
       for (HistoricActivityInstance hai : historicInstances) {
         assertNotNull(hai.getStartTime());
         assertNotNull(hai.getEndTime());
       }
 
-      historicInstances = historyService.createHistoricActivityInstanceQuery().activityType("userTask").list();
+      historicInstances = historyService.createHistoricActivityInstanceQuery()
+          .activityType("userTask").list();
       assertEquals(8, historicInstances.size());
       for (HistoricActivityInstance hai : historicInstances) {
         assertNotNull(hai.getStartTime());
@@ -631,7 +669,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testSequentialSubProcessWithTimer() {
-    String procId = runtimeService.startProcessInstanceByKey("miSequentialSubprocessWithTimer").getId();
+    String procId = runtimeService.startProcessInstanceByKey("miSequentialSubprocessWithTimer")
+        .getId();
 
     // Complete one subprocess
     List<Task> tasks = taskService.createTaskQuery().list();
@@ -654,10 +693,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testSequentialSubProcessCompletionCondition() {
-    String procId = runtimeService.startProcessInstanceByKey("miSequentialSubprocessCompletionCondition").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("miSequentialSubprocessCompletionCondition").getId();
 
     TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
-    for (int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++) {
       List<Task> tasks = query.list();
       assertEquals(2, tasks.size());
 
@@ -673,9 +713,10 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testNestedSequentialSubProcess() {
-    String procId = runtimeService.startProcessInstanceByKey("miNestedSequentialSubProcess").getId();
+    String procId = runtimeService.startProcessInstanceByKey("miNestedSequentialSubProcess")
+        .getId();
 
-    for (int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++) {
       List<Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
       taskService.complete(tasks.get(0).getId());
       taskService.complete(tasks.get(1).getId());
@@ -686,9 +727,10 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testNestedSequentialSubProcessWithTimer() {
-    String procId = runtimeService.startProcessInstanceByKey("miNestedSequentialSubProcessWithTimer").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("miNestedSequentialSubProcessWithTimer").getId();
 
-    for (int i=0; i<2; i++) {
+    for (int i = 0; i < 2; i++) {
       List<Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
       taskService.complete(tasks.get(0).getId());
       taskService.complete(tasks.get(1).getId());
@@ -721,13 +763,16 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelSubProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelSubProcess.bpmn20.xml" })
   public void testParallelSubProcessHistory() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
 
     // Validate history
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("miSubProcess").list();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      List<HistoricActivityInstance> historicActivityInstances = historyService
+          .createHistoricActivityInstanceQuery().activityId("miSubProcess").list();
       assertEquals(2, historicActivityInstances.size());
       for (HistoricActivityInstance hai : historicActivityInstances) {
         assertNotNull(hai.getStartTime());
@@ -742,8 +787,10 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     }
 
     // Validate history
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("miSubProcess").list();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      List<HistoricActivityInstance> historicActivityInstances = historyService
+          .createHistoricActivityInstanceQuery().activityId("miSubProcess").list();
       assertEquals(2, historicActivityInstances.size());
       for (HistoricActivityInstance hai : historicActivityInstances) {
         assertNotNull(hai.getStartTime());
@@ -755,7 +802,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testParallelSubProcessWithTimer() {
-    String procId = runtimeService.startProcessInstanceByKey("miParallelSubprocessWithTimer").getId();
+    String procId = runtimeService.startProcessInstanceByKey("miParallelSubprocessWithTimer")
+        .getId();
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(6, tasks.size());
 
@@ -776,18 +824,19 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testParallelSubProcessCompletionCondition() {
-    String procId = runtimeService.startProcessInstanceByKey("miParallelSubprocessCompletionCondition").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("miParallelSubprocessCompletionCondition").getId();
 
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(4, tasks.size());
 
     // get activities of a single subprocess
     ActivityInstance[] taskActivities = runtimeService.getActivityInstance(procId)
-      .getActivityInstances("miSubProcess")[0]
-      .getChildActivityInstances();
+        .getActivityInstances("miSubProcess")[0].getChildActivityInstances();
 
     for (ActivityInstance taskActivity : taskActivities) {
-      Task task = taskService.createTaskQuery().activityInstanceIdIn(taskActivity.getId()).singleResult();
+      Task task = taskService.createTaskQuery().activityInstanceIdIn(taskActivity.getId())
+          .singleResult();
       taskService.complete(task.getId());
     }
 
@@ -797,7 +846,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testParallelSubProcessAllAutomatic() {
     String procId = runtimeService.startProcessInstanceByKey("miParallelSubprocessAllAutomatics",
-            CollectionUtil.singletonMap("nrOfLoops", 5)).getId();
+        CollectionUtil.singletonMap("nrOfLoops", 5)).getId();
     Execution waitState = runtimeService.createExecutionQuery().singleResult();
     assertEquals(10, runtimeService.getVariable(waitState.getId(), "sum"));
 
@@ -805,10 +854,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelSubProcessAllAutomatic.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelSubProcessAllAutomatic.bpmn20.xml" })
   public void testParallelSubProcessAllAutomaticCompletionCondition() {
     String procId = runtimeService.startProcessInstanceByKey("miParallelSubprocessAllAutomatics",
-            CollectionUtil.singletonMap("nrOfLoops", 10)).getId();
+        CollectionUtil.singletonMap("nrOfLoops", 10)).getId();
     Execution waitState = runtimeService.createExecutionQuery().singleResult();
     assertEquals(12, runtimeService.getVariable(waitState.getId(), "sum"));
 
@@ -834,7 +884,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(12, tasks.size());
 
-    for (int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++) {
       taskService.complete(tasks.get(i).getId());
     }
 
@@ -849,12 +899,13 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivity.bpmn20.xml",
-          "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivity.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
   public void testSequentialCallActivity() {
     String procId = runtimeService.startProcessInstanceByKey("miSequentialCallActivity").getId();
 
-    for (int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++) {
       List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
       assertEquals(2, tasks.size());
       assertEquals("task one", tasks.get(0).getName());
@@ -877,8 +928,10 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
     String procId = runtimeService.startProcessInstanceByKey("parentProcess", variables).getId();
 
-    Task task1 = taskService.createTaskQuery().processVariableValueEquals("element", "one").singleResult();
-    Task task2 = taskService.createTaskQuery().processVariableValueEquals("element", "two").singleResult();
+    Task task1 = taskService.createTaskQuery().processVariableValueEquals("element", "one")
+        .singleResult();
+    Task task2 = taskService.createTaskQuery().processVariableValueEquals("element", "two")
+        .singleResult();
 
     assertNotNull(task1);
     assertNotNull(task2);
@@ -900,10 +953,12 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivityWithTimer.bpmn20.xml",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivityWithTimer.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
   public void testSequentialCallActivityWithTimer() {
-    String procId = runtimeService.startProcessInstanceByKey("miSequentialCallActivityWithTimer").getId();
+    String procId = runtimeService.startProcessInstanceByKey("miSequentialCallActivityWithTimer")
+        .getId();
 
     // Complete first subprocess
     List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
@@ -924,7 +979,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelCallActivity.bpmn20.xml",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelCallActivity.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
   public void testParallelCallActivity() {
     String procId = runtimeService.startProcessInstanceByKey("miParallelCallActivity").getId();
@@ -937,8 +993,9 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelCallActivity.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelCallActivity.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
   public void testParallelCallActivityHistory() {
     runtimeService.startProcessInstanceByKey("miParallelCallActivity");
     List<Task> tasks = taskService.createTaskQuery().list();
@@ -947,9 +1004,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       taskService.complete(tasks.get(i).getId());
     }
 
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       // Validate historic processes
-      List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+      List<HistoricProcessInstance> historicProcessInstances = historyService
+          .createHistoricProcessInstanceQuery().list();
       assertEquals(7, historicProcessInstances.size()); // 6 subprocesses + main process
       for (HistoricProcessInstance hpi : historicProcessInstances) {
         assertNotNull(hpi.getStartTime());
@@ -957,7 +1016,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       }
 
       // Validate historic activities
-      List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("callActivity").list();
+      List<HistoricActivityInstance> historicActivityInstances = historyService
+          .createHistoricActivityInstanceQuery().activityType("callActivity").list();
       assertEquals(6, historicActivityInstances.size());
       for (HistoricActivityInstance hai : historicActivityInstances) {
         assertNotNull(hai.getStartTime());
@@ -965,9 +1025,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       }
     }
 
-    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       // Validate historic tasks
-      List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
+      List<HistoricTaskInstance> historicTaskInstances = historyService
+          .createHistoricTaskInstanceQuery().list();
       assertEquals(12, historicTaskInstances.size());
       for (HistoricTaskInstance hti : historicTaskInstances) {
         assertNotNull(hti.getStartTime());
@@ -978,8 +1040,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelCallActivityWithTimer.bpmn20.xml",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelCallActivityWithTimer.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
   public void testParallelCallActivityWithTimer() {
     String procId = runtimeService.startProcessInstanceByKey("miParallelCallActivity").getId();
@@ -1000,12 +1062,14 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedSequentialCallActivity.bpmn20.xml",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedSequentialCallActivity.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
   public void testNestedSequentialCallActivity() {
-    String procId = runtimeService.startProcessInstanceByKey("miNestedSequentialCallActivity").getId();
+    String procId = runtimeService.startProcessInstanceByKey("miNestedSequentialCallActivity")
+        .getId();
 
-    for (int i=0; i<4; i++) {
+    for (int i = 0; i < 4; i++) {
       List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
       assertEquals(2, tasks.size());
       assertEquals("task one", tasks.get(0).getName());
@@ -1017,10 +1081,12 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedSequentialCallActivityWithTimer.bpmn20.xml",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedSequentialCallActivityWithTimer.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
   public void testNestedSequentialCallActivityWithTimer() {
-    String procId = runtimeService.startProcessInstanceByKey("miNestedSequentialCallActivityWithTimer").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("miNestedSequentialCallActivityWithTimer").getId();
 
     // first instance
     List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
@@ -1046,10 +1112,12 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedParallelCallActivity.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedParallelCallActivity.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
   public void testNestedParallelCallActivity() {
-    String procId = runtimeService.startProcessInstanceByKey("miNestedParallelCallActivity").getId();
+    String procId = runtimeService.startProcessInstanceByKey("miNestedParallelCallActivity")
+        .getId();
 
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(14, tasks.size());
@@ -1060,10 +1128,12 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedParallelCallActivityWithTimer.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedParallelCallActivityWithTimer.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
   public void testNestedParallelCallActivityWithTimer() {
-    String procId = runtimeService.startProcessInstanceByKey("miNestedParallelCallActivityWithTimer").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("miNestedParallelCallActivityWithTimer").getId();
 
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(4, tasks.size());
@@ -1082,16 +1152,20 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedParallelCallActivityCompletionCondition.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedParallelCallActivityCompletionCondition.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
   public void testNestedParallelCallActivityCompletionCondition() {
-    String procId = runtimeService.startProcessInstanceByKey("miNestedParallelCallActivityCompletionCondition").getId();
+    String procId = runtimeService
+        .startProcessInstanceByKey("miNestedParallelCallActivityCompletionCondition").getId();
 
     assertEquals(8, taskService.createTaskQuery().count());
 
     for (int i = 0; i < 2; i++) {
-      ProcessInstance nextSubProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("externalSubProcess").listPage(0, 1).get(0);
-      List<Task> tasks = taskService.createTaskQuery().processInstanceId(nextSubProcessInstance.getId()).list();
+      ProcessInstance nextSubProcessInstance = runtimeService.createProcessInstanceQuery()
+          .processDefinitionKey("externalSubProcess").listPage(0, 1).get(0);
+      List<Task> tasks = taskService.createTaskQuery()
+          .processInstanceId(nextSubProcessInstance.getId()).list();
       assertEquals(2, tasks.size());
       for (Task task : tasks) {
         taskService.complete(task.getId());
@@ -1104,7 +1178,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   // ACT-764
   @Deployment
   public void testSequentialServiceTaskWithClass() {
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey("multiInstanceServiceTask", CollectionUtil.singletonMap("result", 5));
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey("multiInstanceServiceTask",
+        CollectionUtil.singletonMap("result", 5));
     Integer result = (Integer) runtimeService.getVariable(procInst.getId(), "result");
     assertEquals(160, result.intValue());
 
@@ -1114,12 +1189,13 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testSequentialServiceTaskWithClassAndCollection() {
-    Collection<Integer> items = Arrays.asList(1,2,3,4,5,6);
+    Collection<Integer> items = Arrays.asList(1, 2, 3, 4, 5, 6);
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("result", 1);
     vars.put("items", items);
 
-    ProcessInstance procInst = runtimeService.startProcessInstanceByKey("multiInstanceServiceTask", vars);
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey("multiInstanceServiceTask",
+        vars);
     Integer result = (Integer) runtimeService.getVariable(procInst.getId(), "result");
     assertEquals(720, result.intValue());
 
@@ -1134,29 +1210,34 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     Date startTime = ClockUtil.getCurrentTime();
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("multiInstanceSubProcess");
-    List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc().list();
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName()
+        .asc().list();
 
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + 61000L)); // timer is set to one minute
     List<Job> timers = managementService.createJobQuery().list();
     assertEquals(5, timers.size());
 
-    // Execute all timers one by one (single thread vs thread pool of job executor, which leads to optimisticlockingexceptions!)
+    // Execute all timers one by one (single thread vs thread pool of job executor, which leads to
+    // optimisticlockingexceptions!)
     for (Job timer : timers) {
       managementService.executeJob(timer.getId());
     }
 
     // All tasks should be canceled
-    tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc().list();
+    tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc()
+        .list();
     assertEquals(0, tasks.size());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.callActivityWithBoundaryErrorEvent.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.throwingErrorEventSubProcess.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.callActivityWithBoundaryErrorEvent.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.throwingErrorEventSubProcess.bpmn20.xml" })
   public void testMultiInstanceCallActivityWithErrorBoundaryEvent() {
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("assignees", Arrays.asList("kermit", "gonzo"));
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        variableMap);
 
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(2, tasks.size());
@@ -1171,18 +1252,21 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(tasks.get(0).getId());
 
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("process").list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("process").list();
     assertEquals(0, processInstances.size());
     assertProcessEnded(processInstance.getId());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.callActivityWithBoundaryErrorEventSequential.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.throwingErrorEventSubProcess.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.callActivityWithBoundaryErrorEventSequential.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.throwingErrorEventSubProcess.bpmn20.xml" })
   public void testSequentialMultiInstanceCallActivityWithErrorBoundaryEvent() {
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("assignees", Arrays.asList("kermit", "gonzo"));
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
+        variableMap);
 
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(1, tasks.size());
@@ -1200,7 +1284,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedMultiInstanceTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedMultiInstanceTasks.bpmn20.xml" })
   public void testNestedMultiInstanceTasks() {
     List<String> processes = Arrays.asList("process A", "process B");
     List<String> assignees = Arrays.asList("kermit", "gonzo");
@@ -1208,7 +1293,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     variableMap.put("subProcesses", processes);
     variableMap.put("assignees", assignees);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miNestedMultiInstanceTasks", variableMap);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miNestedMultiInstanceTasks", variableMap);
 
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(processes.size() * assignees.size(), tasks.size());
@@ -1217,12 +1303,14 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       taskService.complete(t.getId());
     }
 
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("miNestedMultiInstanceTasks").list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("miNestedMultiInstanceTasks").list();
     assertEquals(0, processInstances.size());
     assertProcessEnded(processInstance.getId());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedMultiInstanceTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedMultiInstanceTasks.bpmn20.xml" })
   public void testNestedMultiInstanceTasksActivityInstance() {
     List<String> processes = Arrays.asList("process A", "process B");
     List<String> assignees = Arrays.asList("kermit", "gonzo");
@@ -1230,32 +1318,22 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     variableMap.put("subProcesses", processes);
     variableMap.put("assignees", assignees);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miNestedMultiInstanceTasks", variableMap);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("miNestedMultiInstanceTasks", variableMap);
 
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
     ActivityInstanceAssert.assertThat(activityInstance)
-    .hasStructure(
-        ActivityInstanceAssert
-        .describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginMiBody("subprocess1")
-          .beginScope("subprocess1")
-            .beginMiBody("miTasks")
-              .activity("miTasks")
-              .activity("miTasks")
-            .endScope()
-          .endScope()
-          .beginScope("subprocess1")
-            .beginMiBody("miTasks")
-              .activity("miTasks")
-              .activity("miTasks")
-            .endScope()
-          .endScope()
-        .done());
+        .hasStructure(ActivityInstanceAssert
+            .describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .beginMiBody("subprocess1").beginScope("subprocess1").beginMiBody("miTasks")
+            .activity("miTasks").activity("miTasks").endScope().endScope().beginScope("subprocess1")
+            .beginMiBody("miTasks").activity("miTasks").activity("miTasks").endScope().endScope()
+            .done());
 
   }
 
-
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasks.bpmn20.xml" })
   public void testActiveExecutionsInParallelTasks() {
     runtimeService.startProcessInstanceByKey("miParallelUserTasks").getId();
 
@@ -1267,7 +1345,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     for (Execution execution : executions) {
       ExecutionEntity entity = (ExecutionEntity) execution;
 
-      if (!entity.getId().equals(instance.getId()) && !entity.getParentId().equals(instance.getId())) {
+      if (!entity.getId().equals(instance.getId())
+          && !entity.getParentId().equals(instance.getId())) {
         // child executions
         assertTrue(entity.isActive());
       } else {
@@ -1277,9 +1356,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchExceptionThrownByExecuteOfSequentialAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess", throwException()).getId();
 
@@ -1293,9 +1371,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchErrorThrownByExecuteOfSequentialAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess", throwError()).getId();
 
@@ -1309,9 +1386,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchExceptionThrownBySignalOfSequentialAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess").getId();
 
@@ -1320,11 +1396,14 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
     // signal 2 times to execute first sequential behaviors
     runtimeService.setVariables(pi, leaveExecution());
-    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult().getId());
     runtimeService.setVariables(pi, leaveExecution());
-    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult().getId());
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult();
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwException());
@@ -1340,9 +1419,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchErrorThrownBySignalOfSequentialAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess").getId();
 
@@ -1351,11 +1429,14 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
     // signal 2 times to execute first sequential behaviors
     runtimeService.setVariables(pi, leaveExecution());
-    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult().getId());
     runtimeService.setVariables(pi, leaveExecution());
-    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult().getId());
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult();
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwError());
@@ -1371,9 +1452,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchExceptionThrownByExecuteOfParallelAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess", throwException()).getId();
 
@@ -1387,9 +1467,8 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchErrorThrownByExecuteOfParallelAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess", throwError()).getId();
 
@@ -1403,16 +1482,16 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchExceptionThrownBySignalOfParallelAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess").getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
     assertNull(runtimeService.getVariable(pi, "signaled"));
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").list().get(3);
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").list().get(3);
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwException());
@@ -1428,16 +1507,16 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelAbstractBpmnActivityBehavior.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelAbstractBpmnActivityBehavior.bpmn20.xml" })
   public void testCatchErrorThrownBySignalOfParallelAbstractBpmnActivityBehavior() {
     String pi = runtimeService.startProcessInstanceByKey("testProcess").getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
     assertNull(runtimeService.getVariable(pi, "signaled"));
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").list().get(3);
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").list().get(3);
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwError());
@@ -1453,11 +1532,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml" })
   public void testCatchExceptionThrownByExecuteOfSequentialDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     variables.putAll(throwException());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
@@ -1471,11 +1550,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml" })
   public void testCatchErrorThrownByExecuteOfSequentialDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     variables.putAll(throwError());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
@@ -1489,11 +1568,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml" })
   public void testCatchExceptionThrownBySignalOfSequentialDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
@@ -1501,11 +1580,14 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
     // signal 2 times to execute first sequential behaviors
     runtimeService.setVariables(pi, leaveExecution());
-    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult().getId());
     runtimeService.setVariables(pi, leaveExecution());
-    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult().getId());
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult();
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwException());
@@ -1521,11 +1603,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownBySequentialDelegateExpression.bpmn20.xml" })
   public void testCatchErrorThrownBySignalOfSequentialDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
@@ -1533,11 +1615,14 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
     // signal 2 times to execute first sequential behaviors
     runtimeService.setVariables(pi, leaveExecution());
-    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult().getId());
     runtimeService.setVariables(pi, leaveExecution());
-    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult().getId());
+    runtimeService.signal(runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult().getId());
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").singleResult();
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").singleResult();
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwError());
@@ -1553,11 +1638,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml" })
   public void testCatchExceptionThrownByExecuteOfParallelDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     variables.putAll(throwException());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
@@ -1571,11 +1656,11 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml" })
   public void testCatchErrorThrownByExecuteOfParallelDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     variables.putAll(throwError());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
@@ -1589,17 +1674,18 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml" })
   public void testCatchExceptionThrownBySignalOfParallelDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
     assertNull(runtimeService.getVariable(pi, "signaled"));
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").list().get(3);
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").list().get(3);
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwException());
@@ -1615,17 +1701,18 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  @Deployment( resources = {
-    "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml"
-  })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testCatchErrorThrownByParallelDelegateExpression.bpmn20.xml" })
   public void testCatchErrorThrownBySignalOfParallelDelegateExpression() {
-    VariableMap variables = Variables.createVariables().putValue("myDelegate", new ThrowErrorDelegate());
+    VariableMap variables = Variables.createVariables().putValue("myDelegate",
+        new ThrowErrorDelegate());
     String pi = runtimeService.startProcessInstanceByKey("testProcess", variables).getId();
 
     assertTrue((Boolean) runtimeService.getVariable(pi, "executed"));
     assertNull(runtimeService.getVariable(pi, "signaled"));
 
-    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi).activityId("serviceTask").list().get(3);
+    Execution serviceTask = runtimeService.createExecutionQuery().processInstanceId(pi)
+        .activityId("serviceTask").list().get(3);
     assertNotNull(serviceTask);
 
     runtimeService.setVariables(pi, throwError());

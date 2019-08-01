@@ -44,7 +44,8 @@ public class ExecutionStartContext {
     PvmExecutionImpl parent = execution;
     while (parent != null && parent.getExecutionStartContext() != null) {
       if (parent instanceof ExecutionEntity && delayFireHistoricVariableEvents) {
-        // with the fix of CAM-9249 we presume that the parent and the child have the same startContext
+        // with the fix of CAM-9249 we presume that the parent and the child have the same
+        // startContext
         ExecutionEntity executionEntity = (ExecutionEntity) parent;
         executionEntity.fireHistoricVariableInstanceCreateEvents();
       }

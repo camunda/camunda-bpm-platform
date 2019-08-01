@@ -28,7 +28,9 @@ import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResu
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<CleanableHistoricProcessInstanceReport, CleanableHistoricProcessInstanceReportResult> implements CleanableHistoricProcessInstanceReport {
+public class CleanableHistoricProcessInstanceReportImpl extends
+    AbstractQuery<CleanableHistoricProcessInstanceReport, CleanableHistoricProcessInstanceReportResult>
+    implements CleanableHistoricProcessInstanceReport {
 
   private static final long serialVersionUID = 1L;
 
@@ -46,14 +48,18 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
     super(commandExecutor);
   }
 
-  public CleanableHistoricProcessInstanceReport processDefinitionIdIn(String... processDefinitionIds) {
-    ensureNotNull(NotValidException.class, "", "processDefinitionIdIn", (Object[]) processDefinitionIds);
+  public CleanableHistoricProcessInstanceReport processDefinitionIdIn(
+      String... processDefinitionIds) {
+    ensureNotNull(NotValidException.class, "", "processDefinitionIdIn",
+        (Object[]) processDefinitionIds);
     this.processDefinitionIdIn = processDefinitionIds;
     return this;
   }
 
-  public CleanableHistoricProcessInstanceReport processDefinitionKeyIn(String... processDefinitionKeys) {
-    ensureNotNull(NotValidException.class, "", "processDefinitionKeyIn", (Object[]) processDefinitionKeys);
+  public CleanableHistoricProcessInstanceReport processDefinitionKeyIn(
+      String... processDefinitionKeys) {
+    ensureNotNull(NotValidException.class, "", "processDefinitionKeyIn",
+        (Object[]) processDefinitionKeys);
     this.processDefinitionKeyIn = processDefinitionKeys;
     return this;
   }
@@ -90,18 +96,17 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
     provideHistoryCleanupStrategy(commandContext);
 
     checkQueryOk();
-    return commandContext
-        .getHistoricProcessInstanceManager()
+    return commandContext.getHistoricProcessInstanceManager()
         .findCleanableHistoricProcessInstancesReportCountByCriteria(this);
   }
 
   @Override
-  public List<CleanableHistoricProcessInstanceReportResult> executeList(CommandContext commandContext, final Page page) {
+  public List<CleanableHistoricProcessInstanceReportResult> executeList(
+      CommandContext commandContext, final Page page) {
     provideHistoryCleanupStrategy(commandContext);
 
     checkQueryOk();
-    return commandContext
-        .getHistoricProcessInstanceManager()
+    return commandContext.getHistoricProcessInstanceManager()
         .findCleanableHistoricProcessInstancesReportByCriteria(this, page);
   }
 
@@ -139,9 +144,10 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
 
   protected void provideHistoryCleanupStrategy(CommandContext commandContext) {
     String historyCleanupStrategy = commandContext.getProcessEngineConfiguration()
-      .getHistoryCleanupStrategy();
+        .getHistoryCleanupStrategy();
 
-    isHistoryCleanupStrategyRemovalTimeBased = HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED.equals(historyCleanupStrategy);
+    isHistoryCleanupStrategyRemovalTimeBased = HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED
+        .equals(historyCleanupStrategy);
   }
 
   public boolean isHistoryCleanupStrategyRemovalTimeBased() {

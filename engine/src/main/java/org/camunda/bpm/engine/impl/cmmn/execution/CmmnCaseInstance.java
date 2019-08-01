@@ -27,27 +27,32 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 public interface CmmnCaseInstance extends CmmnActivityExecution {
 
   /**
-   * <p><code>This</code> case instance transitions to <code>ACTIVE</code>
-   * state.</p>
+   * <p>
+   * <code>This</code> case instance transitions to <code>ACTIVE</code> state.
+   * </p>
    */
   void create();
 
   /**
-   * <p><code>This</code> case instance transitions to <code>ACTIVE</code>
-   * state.</p>
+   * <p>
+   * <code>This</code> case instance transitions to <code>ACTIVE</code> state.
+   * </p>
    *
-   * <p>The given <code>variables</code> will be set a case instance variables.</p>
+   * <p>
+   * The given <code>variables</code> will be set a case instance variables.
+   * </p>
    */
   void create(Map<String, Object> variables);
 
   /**
-   * <p>Find a case execution by the given <code>activityId</code>.</p>
+   * <p>
+   * Find a case execution by the given <code>activityId</code>.
+   * </p>
    *
-   * @param activityId the id of the {@link CmmnActivity activity} to
-   *                   which a case execution is associated.
-
-   * @return returns a case execution or null if a case execution could
-   *         not be found.
+   * @param activityId
+   *          the id of the {@link CmmnActivity activity} to which a case execution is associated.
+   * 
+   * @return returns a case execution or null if a case execution could not be found.
    */
   CmmnActivityExecution findCaseExecution(String activityId);
 

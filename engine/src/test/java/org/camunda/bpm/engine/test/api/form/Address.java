@@ -18,19 +18,19 @@ package org.camunda.bpm.engine.test.api.form;
 
 import java.io.Serializable;
 
-
 /**
  * @author Tom Baeyens
  */
 public class Address implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   private String street;
 
   public String getStreet() {
     return street;
   }
+
   public void setStreet(String street) {
     this.street = street;
   }

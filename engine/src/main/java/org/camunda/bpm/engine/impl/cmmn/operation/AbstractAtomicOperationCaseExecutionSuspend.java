@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Roman Smirnov
  *
  */
-public abstract class AbstractAtomicOperationCaseExecutionSuspend extends AbstractCmmnEventAtomicOperation {
+public abstract class AbstractAtomicOperationCaseExecutionSuspend
+    extends AbstractCmmnEventAtomicOperation {
 
   protected CmmnExecution eventNotificationsStarted(CmmnExecution execution) {
     execution.setCurrentState(SUSPENDED);

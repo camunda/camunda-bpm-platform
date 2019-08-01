@@ -44,8 +44,10 @@ public class ConditionHandlerResult {
     this.activity = activity;
   }
 
-  public static ConditionHandlerResult matchedProcessDefinition(ProcessDefinitionEntity processDefinition, ActivityImpl startActivityId) {
-    ConditionHandlerResult conditionHandlerResult = new ConditionHandlerResult(processDefinition, startActivityId);
+  public static ConditionHandlerResult matchedProcessDefinition(
+      ProcessDefinitionEntity processDefinition, ActivityImpl startActivityId) {
+    ConditionHandlerResult conditionHandlerResult = new ConditionHandlerResult(processDefinition,
+        startActivityId);
     return conditionHandlerResult;
   }
 }

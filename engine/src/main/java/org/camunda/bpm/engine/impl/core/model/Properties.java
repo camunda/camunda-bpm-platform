@@ -24,8 +24,8 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
- * Properties that maps property keys to values. The properties cannot contain
- * duplicate property names; each property name can map to at most one value.
+ * Properties that maps property keys to values. The properties cannot contain duplicate property
+ * names; each property name can map to at most one value.
  *
  * @author Philipp Ossler
  *
@@ -43,13 +43,13 @@ public class Properties {
   }
 
   /**
-   * Returns the value to which the specified property key is mapped, or
-   * <code>null</code> if this properties contains no mapping for the property key.
+   * Returns the value to which the specified property key is mapped, or <code>null</code> if this
+   * properties contains no mapping for the property key.
    *
    * @param property
    *          the property key whose associated value is to be returned
-   * @return the value to which the specified property key is mapped, or
-   *         <code>null</code> if this properties contains no mapping for the property key
+   * @return the value to which the specified property key is mapped, or <code>null</code> if this
+   *         properties contains no mapping for the property key
    */
   @SuppressWarnings("unchecked")
   public <T> T get(PropertyKey<T> property) {
@@ -57,14 +57,14 @@ public class Properties {
   }
 
   /**
-   * Returns the list to which the specified property key is mapped, or
-   * an empty list if this properties contains no mapping for the property key.
-   * Note that the empty list is not mapped to the property key.
+   * Returns the list to which the specified property key is mapped, or an empty list if this
+   * properties contains no mapping for the property key. Note that the empty list is not mapped to
+   * the property key.
    *
    * @param property
    *          the property key whose associated list is to be returned
-   * @return the list to which the specified property key is mapped, or
-   *         an empty list if this properties contains no mapping for the property key
+   * @return the list to which the specified property key is mapped, or an empty list if this
+   *         properties contains no mapping for the property key
    *
    * @see #addListItem(PropertyListKey, Object)
    */
@@ -78,14 +78,14 @@ public class Properties {
   }
 
   /**
-   * Returns the map to which the specified property key is mapped, or
-   * an empty map if this properties contains no mapping for the property key.
-   * Note that the empty map is not mapped to the property key.
+   * Returns the map to which the specified property key is mapped, or an empty map if this
+   * properties contains no mapping for the property key. Note that the empty map is not mapped to
+   * the property key.
    *
    * @param property
    *          the property key whose associated map is to be returned
-   * @return the map to which the specified property key is mapped, or
-   *         an empty map if this properties contains no mapping for the property key
+   * @return the map to which the specified property key is mapped, or an empty map if this
+   *         properties contains no mapping for the property key
    *
    * @see #putMapEntry(PropertyMapKey, Object, Object)
    */
@@ -99,8 +99,8 @@ public class Properties {
   }
 
   /**
-   * Associates the specified value with the specified property key. If the properties previously contained a mapping for the property key, the old
-   * value is replaced by the specified value.
+   * Associates the specified value with the specified property key. If the properties previously
+   * contained a mapping for the property key, the old value is replaced by the specified value.
    *
    * @param <T>
    *          the type of the value
@@ -114,8 +114,8 @@ public class Properties {
   }
 
   /**
-   * Associates the specified list with the specified property key. If the properties previously contained a mapping for the property key, the old
-   * value is replaced by the specified list.
+   * Associates the specified list with the specified property key. If the properties previously
+   * contained a mapping for the property key, the old value is replaced by the specified list.
    *
    * @param <T>
    *          the type of elements in the list
@@ -129,8 +129,8 @@ public class Properties {
   }
 
   /**
-   * Associates the specified map with the specified property key. If the properties previously contained a mapping for the property key, the old
-   * value is replaced by the specified map.
+   * Associates the specified map with the specified property key. If the properties previously
+   * contained a mapping for the property key, the old value is replaced by the specified map.
    *
    * @param <K>
    *          the type of keys maintained by the map
@@ -146,9 +146,9 @@ public class Properties {
   }
 
   /**
-   * Append the value to the list to which the specified property key is mapped. If
-   * this properties contains no mapping for the property key, the value append to
-   * a new list witch is associate the the specified property key.
+   * Append the value to the list to which the specified property key is mapped. If this properties
+   * contains no mapping for the property key, the value append to a new list witch is associate the
+   * the specified property key.
    *
    * @param <T>
    *          the type of elements in the list
@@ -167,9 +167,9 @@ public class Properties {
   }
 
   /**
-   * Insert the value to the map to which the specified property key is mapped. If
-   * this properties contains no mapping for the property key, the value insert to
-   * a new map witch is associate the the specified property key.
+   * Insert the value to the map to which the specified property key is mapped. If this properties
+   * contains no mapping for the property key, the value insert to a new map witch is associate the
+   * the specified property key.
    *
    * @param <K>
    *          the type of keys maintained by the map
@@ -184,7 +184,8 @@ public class Properties {
     Map<K, V> map = get(property);
 
     if (!property.allowsOverwrite() && map.containsKey(key)) {
-      throw new ProcessEngineException("Cannot overwrite property key " + key + ". Key already exists");
+      throw new ProcessEngineException(
+          "Cannot overwrite property key " + key + ". Key already exists");
     }
 
     map.put(key, value);
@@ -198,7 +199,7 @@ public class Properties {
    * Returns <code>true</code> if this properties contains a mapping for the specified property key.
    *
    * @param property
-   *            the property key whose presence is to be tested
+   *          the property key whose presence is to be tested
    * @return <code>true</code> if this properties contains a mapping for the specified property key
    */
   public boolean contains(PropertyKey<?> property) {
@@ -209,7 +210,7 @@ public class Properties {
    * Returns <code>true</code> if this properties contains a mapping for the specified property key.
    *
    * @param property
-   *            the property key whose presence is to be tested
+   *          the property key whose presence is to be tested
    * @return <code>true</code> if this properties contains a mapping for the specified property key
    */
   public boolean contains(PropertyListKey<?> property) {
@@ -220,7 +221,7 @@ public class Properties {
    * Returns <code>true</code> if this properties contains a mapping for the specified property key.
    *
    * @param property
-   *            the property key whose presence is to be tested
+   *          the property key whose presence is to be tested
    * @return <code>true</code> if this properties contains a mapping for the specified property key
    */
   public boolean contains(PropertyMapKey<?, ?> property) {
@@ -228,8 +229,7 @@ public class Properties {
   }
 
   /**
-   * Returns a map view of this properties. Changes to the map are not reflected
-   * to the properties.
+   * Returns a map view of this properties. Changes to the map are not reflected to the properties.
    *
    * @return a map view of this properties
    */

@@ -49,55 +49,57 @@ public class VariableScopeTest extends PluggableProcessEngineTestCase {
     varMap.put("test", "test");
     varMap.put("helloWorld", "helloWorld");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", varMap);
-    Task subProcessTask = taskService.createTaskQuery()
-        .processInstanceId(pi.getId())
+    Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId())
         .singleResult();
-    runtimeService.setVariableLocal(pi.getProcessInstanceId(), "mainProcessLocalVariable", "Hello World");
+    runtimeService.setVariableLocal(pi.getProcessInstanceId(), "mainProcessLocalVariable",
+        "Hello World");
 
     assertEquals("Task in subprocess", subProcessTask.getName());
 
-    runtimeService.setVariableLocal(subProcessTask.getExecutionId(), "subProcessLocalVariable", "Hello SubProcess");
+    runtimeService.setVariableLocal(subProcessTask.getExecutionId(), "subProcessLocalVariable",
+        "Hello SubProcess");
 
     // Returns a set of local variablenames of pi
-    List<String> result = processEngineConfiguration.
-            getCommandExecutorTxRequired().
-            execute(new GetVariableNamesCommand(pi.getProcessInstanceId(), true));
+    List<String> result = processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new GetVariableNamesCommand(pi.getProcessInstanceId(), true));
 
-    // pi contains local the variablenames "test", "helloWorld" and "mainProcessLocalVariable" but not "subProcessLocalVariable"
+    // pi contains local the variablenames "test", "helloWorld" and "mainProcessLocalVariable" but
+    // not "subProcessLocalVariable"
     assertTrue(result.contains("test"));
     assertTrue(result.contains("helloWorld"));
     assertTrue(result.contains("mainProcessLocalVariable"));
     assertFalse(result.contains("subProcessLocalVariable"));
 
     // Returns a set of global variablenames of pi
-    result = processEngineConfiguration.
-            getCommandExecutorTxRequired().
-            execute(new GetVariableNamesCommand(pi.getProcessInstanceId(), false));
+    result = processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new GetVariableNamesCommand(pi.getProcessInstanceId(), false));
 
-    // pi contains global the variablenames "test", "helloWorld" and "mainProcessLocalVariable" but not "subProcessLocalVariable"
+    // pi contains global the variablenames "test", "helloWorld" and "mainProcessLocalVariable" but
+    // not "subProcessLocalVariable"
     assertTrue(result.contains("test"));
     assertTrue(result.contains("mainProcessLocalVariable"));
     assertTrue(result.contains("helloWorld"));
     assertFalse(result.contains("subProcessLocalVariable"));
 
     // Returns a set of local variablenames of subProcessTask execution
-    result = processEngineConfiguration.
-            getCommandExecutorTxRequired().
-            execute(new GetVariableNamesCommand(subProcessTask.getExecutionId(), true));
+    result = processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new GetVariableNamesCommand(subProcessTask.getExecutionId(), true));
 
-    // subProcessTask execution contains local the variablenames "test", "subProcessLocalVariable" but not "helloWorld" and "mainProcessLocalVariable"
-    assertTrue(result.contains("test")); // the variable "test" was set locally by SetLocalVariableTask
+    // subProcessTask execution contains local the variablenames "test", "subProcessLocalVariable"
+    // but not "helloWorld" and "mainProcessLocalVariable"
+    assertTrue(result.contains("test")); // the variable "test" was set locally by
+                                         // SetLocalVariableTask
     assertTrue(result.contains("subProcessLocalVariable"));
     assertFalse(result.contains("helloWorld"));
     assertFalse(result.contains("mainProcessLocalVariable"));
 
     // Returns a set of global variablenames of subProcessTask execution
-    result = processEngineConfiguration.
-            getCommandExecutorTxRequired().
-            execute(new GetVariableNamesCommand(subProcessTask.getExecutionId(), false));
+    result = processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new GetVariableNamesCommand(subProcessTask.getExecutionId(), false));
 
     // subProcessTask execution contains global all defined variablenames
-    assertTrue(result.contains("test")); // the variable "test" was set locally by SetLocalVariableTask
+    assertTrue(result.contains("test")); // the variable "test" was set locally by
+                                         // SetLocalVariableTask
     assertTrue(result.contains("subProcessLocalVariable"));
     assertTrue(result.contains("helloWorld"));
     assertTrue(result.contains("mainProcessLocalVariable"));
@@ -107,6 +109,7 @@ public class VariableScopeTest extends PluggableProcessEngineTestCase {
 
   /**
    * A command to get the names of the variables
+   * 
    * @author Roman Smirnov
    * @author Christian Lipphardt
    */
@@ -115,18 +118,16 @@ public class VariableScopeTest extends PluggableProcessEngineTestCase {
     private String executionId;
     private boolean isLocal;
 
-
     public GetVariableNamesCommand(String executionId, boolean isLocal) {
-     this.executionId = executionId;
-     this.isLocal = isLocal;
+      this.executionId = executionId;
+      this.isLocal = isLocal;
     }
 
     public List<String> execute(CommandContext commandContext) {
       ensureNotNull("executionId", executionId);
 
-      ExecutionEntity execution = commandContext
-        .getExecutionManager()
-        .findExecutionById(executionId);
+      ExecutionEntity execution = commandContext.getExecutionManager()
+          .findExecutionById(executionId);
 
       ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 

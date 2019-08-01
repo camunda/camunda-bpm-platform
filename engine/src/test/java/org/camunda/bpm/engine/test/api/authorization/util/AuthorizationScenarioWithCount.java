@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.util;
 
-
 /**
  * @author Askar Akhmerov
  *

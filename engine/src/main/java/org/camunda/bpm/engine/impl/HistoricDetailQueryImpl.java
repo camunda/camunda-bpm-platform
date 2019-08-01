@@ -29,11 +29,11 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 
-
 /**
  * @author Tom Baeyens
  */
-public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, HistoricDetail> implements HistoricDetailQuery {
+public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, HistoricDetail>
+    implements HistoricDetailQuery {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -186,9 +186,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getHistoricDetailManager()
-      .findHistoricDetailCountByQueryCriteria(this);
+    return commandContext.getHistoricDetailManager().findHistoricDetailCountByQueryCriteria(this);
   }
 
   public HistoricDetailQuery disableBinaryFetching() {
@@ -203,18 +201,17 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public List<HistoricDetail> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    List<HistoricDetail> historicDetails = commandContext
-      .getHistoricDetailManager()
-      .findHistoricDetailsByQueryCriteria(this, page);
-    if (historicDetails!=null) {
-      for (HistoricDetail historicDetail: historicDetails) {
+    List<HistoricDetail> historicDetails = commandContext.getHistoricDetailManager()
+        .findHistoricDetailsByQueryCriteria(this, page);
+    if (historicDetails != null) {
+      for (HistoricDetail historicDetail : historicDetails) {
         if (historicDetail instanceof HistoricDetailVariableInstanceUpdateEntity) {
           HistoricDetailVariableInstanceUpdateEntity entity = (HistoricDetailVariableInstanceUpdateEntity) historicDetail;
           if (shouldFetchValue(entity)) {
             try {
               entity.getTypedValue(isCustomObjectDeserializationEnabled);
 
-            } catch(Exception t) {
+            } catch (Exception t) {
               // do not fail if one of the variables fails to load
               LOG.exceptionWhileGettingValueForVariable(t);
             }
@@ -228,8 +225,8 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   protected boolean shouldFetchValue(HistoricDetailVariableInstanceUpdateEntity entity) {
     // do not fetch values for byte arrays eagerly (unless requested by the user)
-    return isByteArrayFetchingEnabled
-        || !AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(entity.getSerializer().getType().getName());
+    return isByteArrayFetchingEnabled || !AbstractTypedValueSerializer.BINARY_VALUE_TYPES
+        .contains(entity.getSerializer().getType().getName());
   }
 
   // order by /////////////////////////////////////////////////////////////////

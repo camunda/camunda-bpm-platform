@@ -40,12 +40,10 @@ public class HistoryDecisionEvaluationListener implements DmnDecisionEvaluationL
   }
 
   public void notify(DmnDecisionEvaluationEvent evaluationEvent) {
-   HistoryEvent historyEvent = createHistoryEvent(evaluationEvent);
+    HistoryEvent historyEvent = createHistoryEvent(evaluationEvent);
 
-    if(historyEvent != null) {
-      Context.getProcessEngineConfiguration()
-        .getHistoryEventHandler()
-        .handleEvent(historyEvent);
+    if (historyEvent != null) {
+      Context.getProcessEngineConfiguration().getHistoryEventHandler().handleEvent(historyEvent);
     }
   }
 
@@ -54,17 +52,18 @@ public class HistoryDecisionEvaluationListener implements DmnDecisionEvaluationL
       historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     }
     DmnDecision decisionTable = evaluationEvent.getDecisionResult().getDecision();
-    if(isDeployedDecisionTable(decisionTable) && historyLevel.isHistoryEventProduced(HistoryEventTypes.DMN_DECISION_EVALUATE, decisionTable)) {
+    if (isDeployedDecisionTable(decisionTable) && historyLevel
+        .isHistoryEventProduced(HistoryEventTypes.DMN_DECISION_EVALUATE, decisionTable)) {
 
-      CoreExecutionContext<? extends CoreExecution> executionContext = Context.getCoreExecutionContext();
+      CoreExecutionContext<? extends CoreExecution> executionContext = Context
+          .getCoreExecutionContext();
       if (executionContext != null) {
         CoreExecution coreExecution = executionContext.getExecution();
 
         if (coreExecution instanceof ExecutionEntity) {
           ExecutionEntity execution = (ExecutionEntity) coreExecution;
           return eventProducer.createDecisionEvaluatedEvt(execution, evaluationEvent);
-        }
-        else if (coreExecution instanceof CaseExecutionEntity) {
+        } else if (coreExecution instanceof CaseExecutionEntity) {
           CaseExecutionEntity caseExecution = (CaseExecutionEntity) coreExecution;
           return eventProducer.createDecisionEvaluatedEvt(caseExecution, evaluationEvent);
         }
@@ -79,7 +78,7 @@ public class HistoryDecisionEvaluationListener implements DmnDecisionEvaluationL
   }
 
   protected boolean isDeployedDecisionTable(DmnDecision decision) {
-    if(decision instanceof DecisionDefinition) {
+    if (decision instanceof DecisionDefinition) {
       return ((DecisionDefinition) decision).getId() != null;
     } else {
       return false;

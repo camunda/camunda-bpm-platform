@@ -23,7 +23,9 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 
 /**
- * <p>A fluent builder to create a new case instance.</p>
+ * <p>
+ * A fluent builder to create a new case instance.
+ * </p>
  *
  * @author Roman Smirnov
  *
@@ -31,20 +33,23 @@ import org.camunda.bpm.engine.exception.NotValidException;
 public interface CaseInstanceBuilder {
 
   /**
-   * <p>A business key can be provided to associate the case instance with a
-   * certain identifier that has a clear business meaning. This business key can
-   * then be used to easily look up that case instance, see
-   * {@link CaseInstanceQuery#caseInstanceBusinessKey(String)}. Providing such a
-   * business key is definitely a best practice.</p>
+   * <p>
+   * A business key can be provided to associate the case instance with a certain identifier that
+   * has a clear business meaning. This business key can then be used to easily look up that case
+   * instance, see {@link CaseInstanceQuery#caseInstanceBusinessKey(String)}. Providing such a
+   * business key is definitely a best practice.
+   * </p>
    *
-   * <p>Note that a business key MUST be unique for the given case definition WHEN
-   * you have added a database constraint for it. In this case, only case instance
-   * from different case definition are allowed to have the same business key and
-   * the combination of caseDefinitionKey-businessKey must be unique.</p>
+   * <p>
+   * Note that a business key MUST be unique for the given case definition WHEN you have added a
+   * database constraint for it. In this case, only case instance from different case definition are
+   * allowed to have the same business key and the combination of caseDefinitionKey-businessKey must
+   * be unique.
+   * </p>
    *
    * @param businessKey
-   *          a key that uniquely identifies the case instance in the context
-   *          of the given case definition.
+   *          a key that uniquely identifies the case instance in the context of the given case
+   *          definition.
    *
    * @return the builder
    *
@@ -52,47 +57,64 @@ public interface CaseInstanceBuilder {
   CaseInstanceBuilder businessKey(String businessKey);
 
   /**
-   * Specify the id of the tenant the case definition belongs to. Can only be
-   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   * Specify the id of the tenant the case definition belongs to. Can only be used when the
+   * definition is referenced by <code>key</code> and not by <code>id</code>.
    */
   CaseInstanceBuilder caseDefinitionTenantId(String tenantId);
 
   /**
-   * Specify that the case definition belongs to no tenant. Can only be
-   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   * Specify that the case definition belongs to no tenant. Can only be used when the definition is
+   * referenced by <code>key</code> and not by <code>id</code>.
    */
   CaseInstanceBuilder caseDefinitionWithoutTenantId();
 
   /**
-   * <p>Pass a variable to the case instance.</p>
+   * <p>
+   * Pass a variable to the case instance.
+   * </p>
    *
-   * <p>Invoking this method multiple times allows passing multiple variables.</p>
+   * <p>
+   * Invoking this method multiple times allows passing multiple variables.
+   * </p>
    *
-   * @param variableName the name of the variable to set
-   * @param variableValue the value of the variable to set
+   * @param variableName
+   *          the name of the variable to set
+   * @param variableValue
+   *          the value of the variable to set
    *
    * @return the builder
    *
-   * @throws NotValidException when the given variable name is null
+   * @throws NotValidException
+   *           when the given variable name is null
    */
   CaseInstanceBuilder setVariable(String variableName, Object variableValue);
 
   /**
-   * <p>Pass a map of variables to the case instance.</p>
+   * <p>
+   * Pass a map of variables to the case instance.
+   * </p>
    *
-   * <p>Invoking this method multiple times allows passing multiple variables.</p>
+   * <p>
+   * Invoking this method multiple times allows passing multiple variables.
+   * </p>
    *
-   * @param variables the map of variables
+   * @param variables
+   *          the map of variables
    * @return the builder
    */
   CaseInstanceBuilder setVariables(Map<String, Object> variables);
 
   /**
-   * <p>Creates a new {@link CaseInstance}, which will be in the <code>ACTIVE</code> state.</p>
+   * <p>
+   * Creates a new {@link CaseInstance}, which will be in the <code>ACTIVE</code> state.
+   * </p>
    *
-   * @throws NotValidException when the given case definition key or id is null or
-   * @throws NotFoundException when no case definition is deployed with the given key or id.
-   * @throws ProcessEngineException when an internal exception happens during the execution of the command
+   * @throws NotValidException
+   *           when the given case definition key or id is null or
+   * @throws NotFoundException
+   *           when no case definition is deployed with the given key or id.
+   * @throws ProcessEngineException
+   *           when an internal exception happens during the execution of the command
    */
   CaseInstance create();
 

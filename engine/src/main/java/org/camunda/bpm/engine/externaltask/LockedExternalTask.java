@@ -79,15 +79,15 @@ public interface LockedExternalTask {
   String getProcessDefinitionKey();
 
   /**
-   * @return the number of retries left. The number of retries is provided by
-   *   a task client, therefore the initial value is <code>null</code>.
+   * @return the number of retries left. The number of retries is provided by a task client,
+   *         therefore the initial value is <code>null</code>.
    */
   Integer getRetries();
 
   /**
    * @return the full error message submitted with the latest reported failure executing this task;
-   *   <code>null</code> if no failure was reported previously or if no error message
-   *   was submitted
+   *         <code>null</code> if no failure was reported previously or if no error message was
+   *         submitted
    *
    * @see ExternalTaskService#handleFailure(String, String, String, int, long)
    */
@@ -95,29 +95,28 @@ public interface LockedExternalTask {
 
   /**
    * @return error details submitted with the latest reported failure executing this task;
-   *   <code>null</code> if no failure was reported previously or if no error details
-   *   was submitted
+   *         <code>null</code> if no failure was reported previously or if no error details was
+   *         submitted
    *
    * @see ExternalTaskService#handleFailure(String, String, String, String, int, long)
    */
   String getErrorDetails();
 
   /**
-   * @return a map of variables that contains an entry for every variable
-   *   that was specified at fetching time, if such a variable exists in the task's
-   *   ancestor execution hierarchy.
+   * @return a map of variables that contains an entry for every variable that was specified at
+   *         fetching time, if such a variable exists in the task's ancestor execution hierarchy.
    */
   VariableMap getVariables();
 
   /**
-   * @return the id of the tenant the task belongs to. Can be <code>null</code>
-   * if the task belongs to no single tenant.
+   * @return the id of the tenant the task belongs to. Can be <code>null</code> if the task belongs
+   *         to no single tenant.
    */
   String getTenantId();
 
   /**
-   * Returns the priority of the locked external task.
-   * The default priority is 0.
+   * Returns the priority of the locked external task. The default priority is 0.
+   * 
    * @return the priority of the external task
    */
   long getPriority();

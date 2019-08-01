@@ -40,52 +40,60 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
 
   public long findHistoricIncidentCountByQueryCriteria(HistoricIncidentQueryImpl query) {
     configureQuery(query);
-    return (Long) getDbEntityManager().selectOne("selectHistoricIncidentCountByQueryCriteria", query);
+    return (Long) getDbEntityManager().selectOne("selectHistoricIncidentCountByQueryCriteria",
+        query);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricIncident> findHistoricIncidentByQueryCriteria(HistoricIncidentQueryImpl query, Page page) {
+  public List<HistoricIncident> findHistoricIncidentByQueryCriteria(HistoricIncidentQueryImpl query,
+      Page page) {
     configureQuery(query);
     return getDbEntityManager().selectList("selectHistoricIncidentByQueryCriteria", query, page);
   }
 
-  public void addRemovalTimeToIncidentsByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToIncidentsByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricIncidentEventEntity.class, "updateHistoricIncidentsByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricIncidentEventEntity.class,
+        "updateHistoricIncidentsByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToIncidentsByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public void addRemovalTimeToIncidentsByProcessInstanceId(String processInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricIncidentEventEntity.class, "updateHistoricIncidentsByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricIncidentEventEntity.class,
+        "updateHistoricIncidentsByProcessInstanceId", parameters);
   }
 
   public void deleteHistoricIncidentsByProcessInstanceIds(List<String> processInstanceIds) {
-    getDbEntityManager().deletePreserveOrder(HistoricIncidentEntity.class, "deleteHistoricIncidentsByProcessInstanceIds", processInstanceIds);
+    getDbEntityManager().deletePreserveOrder(HistoricIncidentEntity.class,
+        "deleteHistoricIncidentsByProcessInstanceIds", processInstanceIds);
   }
 
   public void deleteHistoricIncidentsByProcessDefinitionId(String processDefinitionId) {
     if (isHistoryEventProduced()) {
-      getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByProcessDefinitionId", processDefinitionId);
+      getDbEntityManager().delete(HistoricIncidentEntity.class,
+          "deleteHistoricIncidentsByProcessDefinitionId", processDefinitionId);
     }
   }
 
   public void deleteHistoricIncidentsByJobDefinitionId(String jobDefinitionId) {
     if (isHistoryEventProduced()) {
-      getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByJobDefinitionId", jobDefinitionId);
+      getDbEntityManager().delete(HistoricIncidentEntity.class,
+          "deleteHistoricIncidentsByJobDefinitionId", jobDefinitionId);
     }
   }
 
   public void deleteHistoricIncidentsByBatchId(List<String> historicBatchIds) {
     if (isHistoryEventProduced()) {
-      getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByBatchIds", historicBatchIds);
+      getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByBatchIds",
+          historicBatchIds);
     }
   }
 
@@ -96,13 +104,14 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
 
   protected boolean isHistoryEventProduced() {
     HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    return historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_CREATE, null) ||
-           historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_DELETE, null) ||
-           historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_MIGRATE, null) ||
-           historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_RESOLVE, null);
+    return historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_CREATE, null)
+        || historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_DELETE, null)
+        || historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_MIGRATE, null)
+        || historyLevel.isHistoryEventProduced(HistoryEventTypes.INCIDENT_RESOLVE, null);
   }
 
-  public DbOperation deleteHistoricIncidentsByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteHistoricIncidentsByRemovalTime(Date removalTime, int minuteFrom,
+      int minuteTo, int batchSize) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -111,8 +120,8 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(HistoricIncidentEntity.class, "deleteHistoricIncidentsByRemovalTime",
+    return getDbEntityManager().deletePreserveOrder(HistoricIncidentEntity.class,
+        "deleteHistoricIncidentsByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
@@ -121,8 +130,8 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
     parameters.put("batchId", batchId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricIncidentEntity.class, "updateHistoricIncidentsByBatchId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricIncidentEntity.class,
+        "updateHistoricIncidentsByBatchId", parameters);
   }
 
 }

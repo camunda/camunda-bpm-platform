@@ -57,47 +57,58 @@ public class CreateCaseInstanceCmd implements Command<CaseInstance>, Serializabl
   }
 
   public CaseInstance execute(CommandContext commandContext) {
-    ensureAtLeastOneNotNull("caseDefinitionId and caseDefinitionKey are null", caseDefinitionId, caseDefinitionKey);
+    ensureAtLeastOneNotNull("caseDefinitionId and caseDefinitionKey are null", caseDefinitionId,
+        caseDefinitionKey);
 
     CaseDefinitionEntity caseDefinition = find(commandContext);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateCaseInstance(caseDefinition);
     }
 
     // Start the case instance
-    CaseExecutionEntity caseInstance = (CaseExecutionEntity) caseDefinition.createCaseInstance(businessKey);
+    CaseExecutionEntity caseInstance = (CaseExecutionEntity) caseDefinition
+        .createCaseInstance(businessKey);
     caseInstance.create(variables);
     return caseInstance;
   }
 
   protected CaseDefinitionEntity find(CommandContext commandContext) {
-    DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
+    DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration()
+        .getDeploymentCache();
 
     // Find the case definition
     CaseDefinitionEntity caseDefinition = null;
 
-    if (caseDefinitionId!=null) {
-      caseDefinition =  findById(deploymentCache, caseDefinitionId);
+    if (caseDefinitionId != null) {
+      caseDefinition = findById(deploymentCache, caseDefinitionId);
 
-      ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for id = '" + caseDefinitionId + "'", "caseDefinition", caseDefinition);
+      ensureNotNull(CaseDefinitionNotFoundException.class,
+          "No case definition found for id = '" + caseDefinitionId + "'", "caseDefinition",
+          caseDefinition);
 
     } else {
       caseDefinition = findByKey(deploymentCache, caseDefinitionKey);
 
-      ensureNotNull(CaseDefinitionNotFoundException.class, "No case definition found for key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
+      ensureNotNull(CaseDefinitionNotFoundException.class,
+          "No case definition found for key '" + caseDefinitionKey + "'", "caseDefinition",
+          caseDefinition);
     }
 
     return caseDefinition;
   }
 
-  protected CaseDefinitionEntity findById(DeploymentCache deploymentCache, String caseDefinitionId) {
+  protected CaseDefinitionEntity findById(DeploymentCache deploymentCache,
+      String caseDefinitionId) {
     return deploymentCache.findDeployedCaseDefinitionById(caseDefinitionId);
   }
 
-  protected CaseDefinitionEntity findByKey(DeploymentCache deploymentCache, String caseDefinitionKey) {
+  protected CaseDefinitionEntity findByKey(DeploymentCache deploymentCache,
+      String caseDefinitionKey) {
     if (isTenantIdSet) {
-      return deploymentCache.findDeployedLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, caseDefinitionTenantId);
+      return deploymentCache.findDeployedLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey,
+          caseDefinitionTenantId);
 
     } else {
       return deploymentCache.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);

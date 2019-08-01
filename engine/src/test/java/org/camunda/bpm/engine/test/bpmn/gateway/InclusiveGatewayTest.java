@@ -55,7 +55,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testDivergingInclusiveGateway() {
     for (int i = 1; i <= 3; i++) {
-      ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwDiverging", CollectionUtil.singletonMap("input", i));
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwDiverging",
+          CollectionUtil.singletonMap("input", i));
       List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
       List<String> expectedNames = new ArrayList<String>();
       if (i == 1) {
@@ -79,7 +80,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testMergingInclusiveGateway() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwMerging", CollectionUtil.singletonMap("input", 2));
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwMerging",
+        CollectionUtil.singletonMap("input", 2));
     assertEquals(1, taskService.createTaskQuery().count());
 
     runtimeService.deleteProcessInstance(pi.getId(), "testing deletion");
@@ -87,7 +89,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testMergingInclusiveGatewayAsync() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwMerging", CollectionUtil.singletonMap("input", 2));
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwMerging",
+        CollectionUtil.singletonMap("input", 2));
     List<Job> list = managementService.createJobQuery().list();
     for (Job job : list) {
       managementService.executeJob(job.getId());
@@ -99,7 +102,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testPartialMergingInclusiveGateway() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("partialInclusiveGwMerging", CollectionUtil.singletonMap("input", 2));
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("partialInclusiveGwMerging",
+        CollectionUtil.singletonMap("input", 2));
     Task partialTask = taskService.createTaskQuery().singleResult();
     assertEquals("partialTask", partialTask.getTaskDefinitionKey());
 
@@ -114,10 +118,13 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testNoSequenceFlowSelected() {
     try {
-      runtimeService.startProcessInstanceByKey("inclusiveGwNoSeqFlowSelected", CollectionUtil.singletonMap("input", 4));
+      runtimeService.startProcessInstanceByKey("inclusiveGwNoSeqFlowSelected",
+          CollectionUtil.singletonMap("input", 4));
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("ENGINE-02004 No outgoing sequence flow for the element with id 'inclusiveGw' could be selected for continuing the process.", e.getMessage());
+      assertTextPresent(
+          "ENGINE-02004 No outgoing sequence flow for the element with id 'inclusiveGw' could be selected for continuing the process.",
+          e.getMessage());
     }
   }
 
@@ -126,22 +133,25 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
    */
   @Deployment
   public void testParentActivationOnNonJoiningEnd() throws Exception {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parentActivationOnNonJoiningEnd");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("parentActivationOnNonJoiningEnd");
 
     List<Execution> executionsBefore = runtimeService.createExecutionQuery().list();
     assertEquals(3, executionsBefore.size());
 
     // start first round of tasks
-    List<Task> firstTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    List<Task> firstTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .list();
 
     assertEquals(2, firstTasks.size());
 
-    for (Task t: firstTasks) {
+    for (Task t : firstTasks) {
       taskService.complete(t.getId());
     }
 
     // start first round of tasks
-    List<Task> secondTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    List<Task> secondTasks = taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId()).list();
 
     assertEquals(2, secondTasks.size());
 
@@ -161,7 +171,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
     // Completing last task should finish the process instance
 
-    Task lastTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Task lastTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     taskService.complete(lastTask.getId());
 
     assertEquals(0l, runtimeService.createProcessInstanceQuery().active().count());
@@ -174,15 +185,18 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
   public void testWhitespaceInExpression() {
     // Starting a process instance will lead to an exception if whitespace are
     // incorrectly handled
-    runtimeService.startProcessInstanceByKey("inclusiveWhiteSpaceInExpression", CollectionUtil.singletonMap("input", 1));
+    runtimeService.startProcessInstanceByKey("inclusiveWhiteSpaceInExpression",
+        CollectionUtil.singletonMap("input", 1));
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testDivergingInclusiveGateway.bpmn20.xml" })
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testDivergingInclusiveGateway.bpmn20.xml" })
   public void testUnknownVariableInExpression() {
     // Instead of 'input' we're starting a process instance with the name
     // 'iinput' (ie. a typo)
     try {
-      runtimeService.startProcessInstanceByKey("inclusiveGwDiverging", CollectionUtil.singletonMap("iinput", 1));
+      runtimeService.startProcessInstanceByKey("inclusiveGwDiverging",
+          CollectionUtil.singletonMap("iinput", 1));
       fail();
     } catch (ProcessEngineException e) {
       assertTextPresent("Unknown property used in expression", e.getMessage());
@@ -191,7 +205,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testDecideBasedOnBeanProperty() {
-    runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanProperty", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(150)));
+    runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanProperty",
+        CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(150)));
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(2, tasks.size());
     Map<String, String> expectedNames = new HashMap<String, String>();
@@ -212,20 +227,23 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
     ProcessInstance pi = null;
     try {
-      pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
+      pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans",
+          CollectionUtil.singletonMap("orders", orders));
       fail();
     } catch (ProcessEngineException e) {
       // expect an exception to be thrown here
     }
 
     orders.set(1, new InclusiveGatewayTestOrder(175));
-    pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
+    pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans",
+        CollectionUtil.singletonMap("orders", orders));
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     assertNotNull(task);
     assertEquals(BEAN_TASK3_NAME, task.getName());
 
     orders.set(1, new InclusiveGatewayTestOrder(125));
-    pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
+    pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans",
+        CollectionUtil.singletonMap("orders", orders));
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertNotNull(tasks);
     assertEquals(2, tasks.size());
@@ -238,9 +256,11 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals(0, expectedNames.size());
 
     // Arrays are usable in exactly the same way
-    InclusiveGatewayTestOrder[] orderArray = orders.toArray(new InclusiveGatewayTestOrder[orders.size()]);
+    InclusiveGatewayTestOrder[] orderArray = orders
+        .toArray(new InclusiveGatewayTestOrder[orders.size()]);
     orderArray[1].setPrice(10);
-    pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orderArray));
+    pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans",
+        CollectionUtil.singletonMap("orders", orderArray));
     tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertNotNull(tasks);
     assertEquals(3, tasks.size());
@@ -256,14 +276,15 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testDecideBasedOnBeanMethod() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod",
-            CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(200)));
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey(
+        "inclusiveDecisionBasedOnBeanMethod",
+        CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(200)));
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     assertNotNull(task);
     assertEquals(BEAN_TASK3_NAME, task.getName());
 
     pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod",
-            CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(125)));
+        CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(125)));
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertEquals(2, tasks.size());
     List<String> expectedNames = new ArrayList<String>();
@@ -275,7 +296,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals(0, expectedNames.size());
 
     try {
-      runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(300)));
+      runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod",
+          CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(300)));
       fail();
     } catch (ProcessEngineException e) {
       // Should get an exception indicating that no path could be taken
@@ -286,7 +308,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testInvalidMethodExpression() {
     try {
-      runtimeService.startProcessInstanceByKey("inclusiveInvalidMethodExpression", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(50)));
+      runtimeService.startProcessInstanceByKey("inclusiveInvalidMethodExpression",
+          CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(50)));
       fail();
     } catch (ProcessEngineException e) {
       assertTextPresent("Unknown method used in expression", e.getMessage());
@@ -296,7 +319,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testDefaultSequenceFlow() {
     // Input == 1 -> default is not selected, other 2 tasks are selected
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow", CollectionUtil.singletonMap("input", 1));
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow",
+        CollectionUtil.singletonMap("input", 1));
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertEquals(2, tasks.size());
     Map<String, String> expectedNames = new HashMap<String, String>();
@@ -309,12 +333,14 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(pi.getId(), null);
 
     // Input == 3 -> default is not selected, "one or three" is selected
-    pi = runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow", CollectionUtil.singletonMap("input", 3));
+    pi = runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow",
+        CollectionUtil.singletonMap("input", 3));
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     assertEquals("Input is three or one", task.getName());
 
     // Default input
-    pi = runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow", CollectionUtil.singletonMap("input", 5));
+    pi = runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow",
+        CollectionUtil.singletonMap("input", 5));
     task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     assertEquals("Default input", task.getName());
   }
@@ -322,48 +348,52 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testDefaultSequenceFlow.bpmn20.xml")
   public void testDefaultSequenceFlowExecutionIsActive() {
     // given a triggered inclusive gateway default flow
-    runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow", CollectionUtil.singletonMap("input", 5));
+    runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow",
+        CollectionUtil.singletonMap("input", 5));
 
     // then the process instance execution is not deactivated
-    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().singleResult();
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .singleResult();
     assertEquals("theTask2", execution.getActivityId());
     assertTrue(execution.isActive());
   }
 
   /**
-   * 1. or split
-   * 2. or join
-   * 3. that same or join splits again (in this case has a single default sequence flow)
+   * 1. or split 2. or join 3. that same or join splits again (in this case has a single default
+   * sequence flow)
    */
   @Deployment
   public void testSplitMergeSplit() {
     // given a process instance with two concurrent tasks
-    ProcessInstance processInstance =
-        runtimeService.startProcessInstanceByKey("inclusiveGwSplitAndMerge", CollectionUtil.singletonMap("input", 1));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+        "inclusiveGwSplitAndMerge", CollectionUtil.singletonMap("input", 1));
 
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(2, tasks.size());
 
-    // when the executions are joined at an inclusive gateway and the gateway itself has an outgoing default flow
+    // when the executions are joined at an inclusive gateway and the gateway itself has an outgoing
+    // default flow
     taskService.complete(tasks.get(0).getId());
     taskService.complete(tasks.get(1).getId());
 
-    // then the task after the inclusive gateway is reached by the process instance execution (i.e. concurrent root)
+    // then the task after the inclusive gateway is reached by the process instance execution (i.e.
+    // concurrent root)
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
 
     assertEquals(processInstance.getId(), task.getExecutionId());
   }
 
-
   @Deployment
   public void testNoIdOnSequenceFlow() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveNoIdOnSequenceFlow", CollectionUtil.singletonMap("input", 3));
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveNoIdOnSequenceFlow",
+        CollectionUtil.singletonMap("input", 3));
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     assertEquals("Input is more than one", task.getName());
 
     // Both should be enabled on 1
-    pi = runtimeService.startProcessInstanceByKey("inclusiveNoIdOnSequenceFlow", CollectionUtil.singletonMap("input", 1));
+    pi = runtimeService.startProcessInstanceByKey("inclusiveNoIdOnSequenceFlow",
+        CollectionUtil.singletonMap("input", 1));
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertEquals(2, tasks.size());
     Map<String, String> expectedNames = new HashMap<String, String>();
@@ -375,16 +405,17 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals(0, expectedNames.size());
   }
 
-  /** This test the isReachable() check thaty is done to check if
-   * upstream tokens can reach the inclusive gateway.
+  /**
+   * This test the isReachable() check thaty is done to check if upstream tokens can reach the
+   * inclusive gateway.
    *
-   * In case of loops, special care needs to be taken in the algorithm,
-   * or else stackoverflows will happen very quickly.
+   * In case of loops, special care needs to be taken in the algorithm, or else stackoverflows will
+   * happen very quickly.
    */
   @Deployment
   public void testLoop() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveTestLoop",
-            CollectionUtil.singletonMap("counter", 1));
+        CollectionUtil.singletonMap("counter", 1));
 
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("task C", task.getName());
@@ -392,12 +423,12 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
     assertEquals(0, taskService.createTaskQuery().count());
 
-
     for (Execution execution : runtimeService.createExecutionQuery().list()) {
       System.out.println(((ExecutionEntity) execution).getActivityId());
     }
 
-    assertEquals("Found executions: " + runtimeService.createExecutionQuery().list(), 0, runtimeService.createExecutionQuery().count());
+    assertEquals("Found executions: " + runtimeService.createExecutionQuery().list(), 0,
+        runtimeService.createExecutionQuery().count());
     assertProcessEnded(pi.getId());
   }
 
@@ -407,10 +438,12 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("a", 1);
     variableMap.put("b", 1);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("InclusiveGateway", variableMap);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("InclusiveGateway",
+        variableMap);
     assertNotNull(processInstance.getId());
 
-    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .list();
     assertEquals(2, taskService.createTaskQuery().count());
 
     taskService.complete(tasks.get(0).getId());
@@ -422,7 +455,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertNotNull(task);
     taskService.complete(task.getId());
 
-    processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+    processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId()).singleResult();
     assertNull(processInstance);
 
     variableMap = new HashMap<String, Object>();
@@ -442,7 +476,8 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertNotNull(task);
     taskService.complete(task.getId());
 
-    processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+    processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId()).singleResult();
     assertNull(processInstance);
 
     variableMap = new HashMap<String, Object>();
@@ -451,16 +486,18 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     try {
       processInstance = runtimeService.startProcessInstanceByKey("InclusiveGateway", variableMap);
       fail();
-    } catch(ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertTrue(e.getMessage().contains("No outgoing sequence flow"));
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCall.bpmn20.xml",
-                    "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCallSubProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCall.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCallSubProcess.bpmn20.xml" })
   public void testJoinAfterCall() {
     // Test case to test act-1026
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("InclusiveGatewayAfterCall");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("InclusiveGatewayAfterCall");
     assertNotNull(processInstance.getId());
     assertEquals(3, taskService.createTaskQuery().count());
 
@@ -490,13 +527,14 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     assertEquals("Task D", taskD.getName());
     taskService.complete(taskD.getId());
 
-    processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+    processInstance = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId()).singleResult();
     assertNull(processInstance);
   }
 
   /**
-   * The test process has an OR gateway where, the 'input' variable is used to
-   * select the expected outgoing sequence flow.
+   * The test process has an OR gateway where, the 'input' variable is used to select the expected
+   * outgoing sequence flow.
    */
   @Deployment
   public void testDecisionFunctionality() {
@@ -561,9 +599,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     TaskQuery query = taskService.createTaskQuery();
 
     // when
-    Task task = query
-        .taskDefinitionKey("task")
-        .singleResult();
+    Task task = query.taskDefinitionKey("task").singleResult();
     taskService.complete(task.getId());
 
     // then
@@ -578,9 +614,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     TaskQuery query = taskService.createTaskQuery();
 
     // when
-    Task task = query
-        .taskDefinitionKey("task")
-        .singleResult();
+    Task task = query.taskDefinitionKey("task").singleResult();
     taskService.complete(task.getId());
 
     // then
@@ -595,9 +629,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     TaskQuery query = taskService.createTaskQuery();
 
     // when
-    Task task = query
-        .taskDefinitionKey("task")
-        .singleResult();
+    Task task = query.taskDefinitionKey("task").singleResult();
     taskService.complete(task.getId());
 
     // then
@@ -605,19 +637,12 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
   }
 
   public void testTriggerGatewayWithEnoughArrivedTokens() {
-    deployment(Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("beforeTask")
-      .inclusiveGateway("gw")
-      .userTask("afterTask")
-      .endEvent()
-      .done());
+    deployment(Bpmn.createExecutableProcess("process").startEvent().userTask("beforeTask")
+        .inclusiveGateway("gw").userTask("afterTask").endEvent().done());
 
     // given
     ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("process")
-      .startBeforeActivity("beforeTask")
-      .startBeforeActivity("beforeTask")
-      .execute();
+        .startBeforeActivity("beforeTask").startBeforeActivity("beforeTask").execute();
 
     Task task = taskService.createTaskQuery().list().get(0);
 
@@ -627,11 +652,9 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     // then
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
 
-    assertThat(activityInstance).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("beforeTask")
-        .activity("afterTask")
-      .done());
+    assertThat(activityInstance)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("beforeTask").activity("afterTask").done());
   }
 
   @Deployment
@@ -643,26 +666,15 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
 
     // then
-    assertThat(activityInstance).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task2")
-        .activity("inclusiveGw3")
-      .done());
+    assertThat(activityInstance)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+            .activity("task1").activity("task2").activity("inclusiveGw3").done());
   }
 
   public void testRemoveConcurrentExecutionLocalVariablesOnJoin() {
-    deployment(Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .inclusiveGateway("fork")
-      .userTask("task1")
-      .inclusiveGateway("join")
-      .userTask("afterTask")
-      .endEvent()
-      .moveToNode("fork")
-      .userTask("task2")
-      .connectTo("join")
-      .done());
+    deployment(Bpmn.createExecutableProcess("process").startEvent().inclusiveGateway("fork")
+        .userTask("task1").inclusiveGateway("join").userTask("afterTask").endEvent()
+        .moveToNode("fork").userTask("task2").connectTo("join").done());
 
     // given
     runtimeService.startProcessInstanceByKey("process");

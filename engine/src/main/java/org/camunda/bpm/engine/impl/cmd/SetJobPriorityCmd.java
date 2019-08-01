@@ -45,9 +45,11 @@ public class SetJobPriorityCmd implements Command<Void> {
     EnsureUtil.ensureNotNull("job id must not be null", "jobId", jobId);
 
     JobEntity job = commandContext.getJobManager().findJobById(jobId);
-    EnsureUtil.ensureNotNull(NotFoundException.class, "No job found with id '" + jobId + "'", "job", job);
+    EnsureUtil.ensureNotNull(NotFoundException.class, "No job found with id '" + jobId + "'", "job",
+        job);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateJob(job);
     }
 
@@ -59,17 +61,13 @@ public class SetJobPriorityCmd implements Command<Void> {
     return null;
   }
 
-  protected void createOpLogEntry(CommandContext commandContext, long previousPriority, JobEntity job) {
-    PropertyChange propertyChange = new PropertyChange(JOB_PRIORITY_PROPERTY, previousPriority, job.getPriority());
-    commandContext
-      .getOperationLogManager()
-      .logJobOperation(
-          UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY,
-          job.getId(),
-          job.getJobDefinitionId(),
-          job.getProcessInstanceId(),
-          job.getProcessDefinitionId(),
-          job.getProcessDefinitionKey(),
-          propertyChange);
+  protected void createOpLogEntry(CommandContext commandContext, long previousPriority,
+      JobEntity job) {
+    PropertyChange propertyChange = new PropertyChange(JOB_PRIORITY_PROPERTY, previousPriority,
+        job.getPriority());
+    commandContext.getOperationLogManager().logJobOperation(
+        UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY, job.getId(), job.getJobDefinitionId(),
+        job.getProcessInstanceId(), job.getProcessDefinitionId(), job.getProcessDefinitionKey(),
+        propertyChange);
   }
 }

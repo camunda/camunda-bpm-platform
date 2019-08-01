@@ -34,7 +34,8 @@ public class CmmnTransformer implements Transformer<CmmnTransform> {
   protected List<CmmnTransformListener> transformListeners = new ArrayList<CmmnTransformListener>();
   protected DefaultCmmnElementHandlerRegistry cmmnElementHandlerRegistry;
 
-  public CmmnTransformer(ExpressionManager expressionManager, DefaultCmmnElementHandlerRegistry handlerRegistry, CmmnTransformFactory factory) {
+  public CmmnTransformer(ExpressionManager expressionManager,
+      DefaultCmmnElementHandlerRegistry handlerRegistry, CmmnTransformFactory factory) {
     this.expressionManager = expressionManager;
     this.factory = factory;
     this.cmmnElementHandlerRegistry = handlerRegistry;

@@ -28,9 +28,9 @@ public class NoDbConnectionTest extends PvmTestCase {
 
   public void testNoDbConnection() {
     try {
-      ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/nodbconnection.camunda.cfg.xml")
-        .buildProcessEngine();
+      ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(
+          "org/camunda/bpm/engine/test/standalone/initialization/nodbconnection.camunda.cfg.xml")
+          .buildProcessEngine();
       fail("expected exception");
     } catch (RuntimeException e) {
       assertTrue(containsSqlException(e));

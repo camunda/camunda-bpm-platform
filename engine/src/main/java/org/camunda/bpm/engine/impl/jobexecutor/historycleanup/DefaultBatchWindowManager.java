@@ -26,17 +26,23 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public class DefaultBatchWindowManager implements BatchWindowManager {
 
-  public BatchWindow getPreviousDayBatchWindow(Date date, ProcessEngineConfigurationImpl configuration) {
+  public BatchWindow getPreviousDayBatchWindow(Date date,
+      ProcessEngineConfigurationImpl configuration) {
     Date previousDay = addDays(date, -1);
     return getBatchWindowForDate(previousDay, configuration);
   }
 
-  private BatchWindow getBatchWindowForDate(Date date, ProcessEngineConfigurationImpl configuration) {
+  private BatchWindow getBatchWindowForDate(Date date,
+      ProcessEngineConfigurationImpl configuration) {
 
-    //get configuration for given day of week
-    BatchWindowConfiguration batchWindowConfiguration = configuration.getHistoryCleanupBatchWindows().get(dayOfWeek(date));
-    if (batchWindowConfiguration == null && configuration.getHistoryCleanupBatchWindowStartTime() != null) {
-      batchWindowConfiguration = new BatchWindowConfiguration(configuration.getHistoryCleanupBatchWindowStartTime(), configuration.getHistoryCleanupBatchWindowEndTime());
+    // get configuration for given day of week
+    BatchWindowConfiguration batchWindowConfiguration = configuration
+        .getHistoryCleanupBatchWindows().get(dayOfWeek(date));
+    if (batchWindowConfiguration == null
+        && configuration.getHistoryCleanupBatchWindowStartTime() != null) {
+      batchWindowConfiguration = new BatchWindowConfiguration(
+          configuration.getHistoryCleanupBatchWindowStartTime(),
+          configuration.getHistoryCleanupBatchWindowEndTime());
     }
 
     if (batchWindowConfiguration == null) {
@@ -59,19 +65,21 @@ public class DefaultBatchWindowManager implements BatchWindowManager {
   }
 
   @Override
-  public BatchWindow getCurrentOrNextBatchWindow(Date date, ProcessEngineConfigurationImpl configuration) {
+  public BatchWindow getCurrentOrNextBatchWindow(Date date,
+      ProcessEngineConfigurationImpl configuration) {
     final BatchWindow previousDayBatchWindow = getPreviousDayBatchWindow(date, configuration);
     if (previousDayBatchWindow != null && previousDayBatchWindow.isWithin(date)) {
       return previousDayBatchWindow;
     }
 
     final BatchWindow currentDayBatchWindow = getBatchWindowForDate(date, configuration);
-    if (currentDayBatchWindow!= null && (currentDayBatchWindow.isWithin(date) || date.before(currentDayBatchWindow.getStart()))) {
+    if (currentDayBatchWindow != null && (currentDayBatchWindow.isWithin(date)
+        || date.before(currentDayBatchWindow.getStart()))) {
       return currentDayBatchWindow;
     }
 
-    //check next week
-    for (int i=1; i<=7; i++ ) {
+    // check next week
+    for (int i = 1; i <= 7; i++) {
       Date dateToCheck = addDays(date, i);
       final BatchWindow batchWindowForDate = getBatchWindowForDate(dateToCheck, configuration);
       if (batchWindowForDate != null) {
@@ -88,8 +96,8 @@ public class DefaultBatchWindowManager implements BatchWindowManager {
     if (currentDayBatchWindow != null && date.before(currentDayBatchWindow.getStart())) {
       return currentDayBatchWindow;
     } else {
-      //check next week
-      for (int i=1; i<=7; i++ ) {
+      // check next week
+      for (int i = 1; i <= 7; i++) {
         Date dateToCheck = addDays(date, i);
         final BatchWindow batchWindowForDate = getBatchWindowForDate(dateToCheck, configuration);
         if (batchWindowForDate != null) {
@@ -102,8 +110,8 @@ public class DefaultBatchWindowManager implements BatchWindowManager {
 
   @Override
   public boolean isBatchWindowConfigured(ProcessEngineConfigurationImpl configuration) {
-    return configuration.getHistoryCleanupBatchWindowStartTimeAsDate() != null ||
-      !configuration.getHistoryCleanupBatchWindows().isEmpty();
+    return configuration.getHistoryCleanupBatchWindowStartTimeAsDate() != null
+        || !configuration.getHistoryCleanupBatchWindows().isEmpty();
   }
 
   private static Date updateTime(Date now, Date newTime) {

@@ -79,46 +79,39 @@ public class ProcessEngineTestRule extends TestWatcher {
   }
 
   public void assertProcessEnded(String processInstanceId) {
-    ProcessInstance processInstance = processEngine
-      .getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstanceId)
-      .singleResult();
+    ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).singleResult();
 
     assertThat("Process instance with id " + processInstanceId + " is not finished",
         processInstance, is(nullValue()));
   }
 
   public void assertProcessNotEnded(final String processInstanceId) {
-    ProcessInstance processInstance = processEngine
-      .getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstanceId)
-      .singleResult();
+    ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).singleResult();
 
-    if (processInstance==null) {
-      throw new AssertionFailedError("Expected process instance '"+processInstanceId+"' to be still active but it was not in the db");
+    if (processInstance == null) {
+      throw new AssertionFailedError("Expected process instance '" + processInstanceId
+          + "' to be still active but it was not in the db");
     }
   }
 
-
   public void assertCaseEnded(String caseInstanceId) {
-    CaseInstance caseInstance = processEngine
-      .getCaseService()
-      .createCaseInstanceQuery()
-      .caseInstanceId(caseInstanceId)
-      .singleResult();
+    CaseInstance caseInstance = processEngine.getCaseService().createCaseInstanceQuery()
+        .caseInstanceId(caseInstanceId).singleResult();
 
-    assertThat("Case instance with id " + caseInstanceId + " is not finished",
-        caseInstance, is(nullValue()));
+    assertThat("Case instance with id " + caseInstanceId + " is not finished", caseInstance,
+        is(nullValue()));
   }
 
   public DeploymentWithDefinitions deploy(BpmnModelInstance... bpmnModelInstances) {
-    return deploy(createDeploymentBuilder(), Arrays.asList(bpmnModelInstances), Collections.<String> emptyList());
+    return deploy(createDeploymentBuilder(), Arrays.asList(bpmnModelInstances),
+        Collections.<String> emptyList());
   }
 
   public DeploymentWithDefinitions deploy(String... resources) {
-    return deploy(createDeploymentBuilder(), Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
+    return deploy(createDeploymentBuilder(), Collections.<BpmnModelInstance> emptyList(),
+        Arrays.asList(resources));
   }
 
   public DeploymentWithDefinitions deploy(DeploymentBuilder deploymentBuilder) {
@@ -130,35 +123,41 @@ public class ProcessEngineTestRule extends TestWatcher {
   }
 
   public Deployment deploy(BpmnModelInstance bpmnModelInstance, String resource) {
-    return deploy(createDeploymentBuilder(), Collections.singletonList(bpmnModelInstance), Collections.singletonList(resource));
+    return deploy(createDeploymentBuilder(), Collections.singletonList(bpmnModelInstance),
+        Collections.singletonList(resource));
   }
 
   public Deployment deployForTenant(String tenantId, BpmnModelInstance... bpmnModelInstances) {
-    return deploy(createDeploymentBuilder().tenantId(tenantId), Arrays.asList(bpmnModelInstances), Collections.<String> emptyList());
+    return deploy(createDeploymentBuilder().tenantId(tenantId), Arrays.asList(bpmnModelInstances),
+        Collections.<String> emptyList());
   }
 
   public Deployment deployForTenant(String tenantId, String... resources) {
-    return deploy(createDeploymentBuilder().tenantId(tenantId), Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
+    return deploy(createDeploymentBuilder().tenantId(tenantId),
+        Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
   }
 
-  public Deployment deployForTenant(String tenant, BpmnModelInstance bpmnModelInstance, String resource) {
-    return deploy(createDeploymentBuilder().tenantId(tenant), Collections.singletonList(bpmnModelInstance), Collections.singletonList(resource));
+  public Deployment deployForTenant(String tenant, BpmnModelInstance bpmnModelInstance,
+      String resource) {
+    return deploy(createDeploymentBuilder().tenantId(tenant),
+        Collections.singletonList(bpmnModelInstance), Collections.singletonList(resource));
   }
 
   public ProcessDefinition deployAndGetDefinition(BpmnModelInstance bpmnModel) {
     return deployForTenantAndGetDefinition(null, bpmnModel);
   }
 
-  public ProcessDefinition deployForTenantAndGetDefinition(String tenant, BpmnModelInstance bpmnModel) {
-    Deployment deployment = deploy(createDeploymentBuilder().tenantId(tenant), Collections.singletonList(bpmnModel), Collections.<String>emptyList());
+  public ProcessDefinition deployForTenantAndGetDefinition(String tenant,
+      BpmnModelInstance bpmnModel) {
+    Deployment deployment = deploy(createDeploymentBuilder().tenantId(tenant),
+        Collections.singletonList(bpmnModel), Collections.<String> emptyList());
 
-    return processEngineRule.getRepositoryService()
-      .createProcessDefinitionQuery()
-      .deploymentId(deployment.getId())
-      .singleResult();
+    return processEngineRule.getRepositoryService().createProcessDefinitionQuery()
+        .deploymentId(deployment.getId()).singleResult();
   }
 
-  protected DeploymentWithDefinitions deploy(DeploymentBuilder deploymentBuilder, List<BpmnModelInstance> bpmnModelInstances, List<String> resources) {
+  protected DeploymentWithDefinitions deploy(DeploymentBuilder deploymentBuilder,
+      List<BpmnModelInstance> bpmnModelInstances, List<String> resources) {
     int i = 0;
     for (BpmnModelInstance bpmnModelInstance : bpmnModelInstances) {
       deploymentBuilder.addModelInstance(i + "_" + DEFAULT_BPMN_RESOURCE_NAME, bpmnModelInstance);
@@ -181,13 +180,14 @@ public class ProcessEngineTestRule extends TestWatcher {
   }
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+        .getProcessEngineConfiguration();
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
     long intervalMillis = 1000;
 
     int jobExecutorWaitTime = jobExecutor.getWaitTimeInMillis() * 2;
-    if(maxMillisToWait < jobExecutorWaitTime) {
+    if (maxMillisToWait < jobExecutorWaitTime) {
       maxMillisToWait = jobExecutorWaitTime;
     }
 
@@ -201,7 +201,7 @@ public class ProcessEngineTestRule extends TestWatcher {
           Thread.sleep(intervalMillis);
           try {
             areJobsAvailable = areJobsAvailable();
-          } catch(Throwable t) {
+          } catch (Throwable t) {
             // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
             // isolation level doesn't allow READ of the table
           }
@@ -222,7 +222,8 @@ public class ProcessEngineTestRule extends TestWatcher {
   protected boolean areJobsAvailable() {
     List<Job> list = processEngine.getManagementService().createJobQuery().list();
     for (Job job : list) {
-      if (!job.isSuspended() && job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
+      if (!job.isSuspended() && job.getRetries() > 0
+          && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
         return true;
       }
     }
@@ -237,15 +238,18 @@ public class ProcessEngineTestRule extends TestWatcher {
   }
 
   /**
-   * Execute all available jobs recursively till no more jobs found or the number of executions is higher than expected.
+   * Execute all available jobs recursively till no more jobs found or the number of executions is
+   * higher than expected.
    *
-   * @param expectedExecutions number of expected job executions
+   * @param expectedExecutions
+   *          number of expected job executions
    *
-   * @throws AssertionFailedError when execute less or more jobs than expected
+   * @throws AssertionFailedError
+   *           when execute less or more jobs than expected
    *
    * @see #executeAvailableJobs()
    */
-  public void executeAvailableJobs(int expectedExecutions){
+  public void executeAvailableJobs(int expectedExecutions) {
     executeAvailableJobs(0, expectedExecutions);
   }
 
@@ -263,11 +267,12 @@ public class ProcessEngineTestRule extends TestWatcher {
       try {
         processEngine.getManagementService().executeJob(job.getId());
         jobsExecuted += 1;
-      } catch (Exception e) {}
+      } catch (Exception e) {
+      }
     }
 
-    assertThat("executed more jobs than expected.",
-        jobsExecuted, lessThanOrEqualTo(expectedExecutions));
+    assertThat("executed more jobs than expected.", jobsExecuted,
+        lessThanOrEqualTo(expectedExecutions));
 
     executeAvailableJobs(jobsExecuted, expectedExecutions);
   }
@@ -326,10 +331,9 @@ public class ProcessEngineTestRule extends TestWatcher {
    * Asserts if the provided text is part of some text.
    */
   public void assertTextPresent(String expected, String actual) {
-    if ( (actual==null)
-      || (actual.indexOf(expected)==-1)
-      ) {
-      throw new AssertionFailedError("expected presence of ["+expected+"], but was ["+actual+"]");
+    if ((actual == null) || (actual.indexOf(expected) == -1)) {
+      throw new AssertionFailedError(
+          "expected presence of [" + expected + "], but was [" + actual + "]");
     }
   }
 
@@ -349,12 +353,15 @@ public class ProcessEngineTestRule extends TestWatcher {
   protected static class InterruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
+
     public InterruptTask(Thread thread) {
       this.thread = thread;
     }
+
     public boolean isTimeLimitExceeded() {
       return timeLimitExceeded;
     }
+
     @Override
     public void run() {
       timeLimitExceeded = true;

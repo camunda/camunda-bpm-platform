@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.optimize;
 
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -52,15 +51,13 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
   @Override
   public void setUp() throws Exception {
 
-    ProcessEngineConfigurationImpl config =
-      (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) getProcessEngine()
+        .getProcessEngineConfiguration();
     optimizeService = config.getOptimizeService();
 
     DeploymentBuilder deploymentbuilder = repositoryService.createDeployment();
-    BpmnModelInstance defaultModel = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .endEvent()
-      .done();
+    BpmnModelInstance defaultModel = Bpmn.createExecutableProcess("process").startEvent().endEvent()
+        .done();
     deploymentId = deployment(deploymentbuilder, defaultModel);
 
     super.setUp();
@@ -96,8 +93,8 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<HistoricActivityInstance> completedHistoricActivityInstances =
-      optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
+    List<HistoricActivityInstance> completedHistoricActivityInstances = optimizeService
+        .getCompletedHistoricActivityInstances(new Date(0L), null, 10);
 
     // then
     assertThat(completedHistoricActivityInstances.size(), is(2));
@@ -127,8 +124,8 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<HistoricActivityInstance> runningHistoricActivityInstances =
-      optimizeService.getRunningHistoricActivityInstances(new Date(0L), null, 10);
+    List<HistoricActivityInstance> runningHistoricActivityInstances = optimizeService
+        .getRunningHistoricActivityInstances(new Date(0L), null, 10);
 
     // then
     assertThat(runningHistoricActivityInstances.size(), is(0));
@@ -157,8 +154,8 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<HistoricTaskInstance> completedHistoricTaskInstances =
-      optimizeService.getCompletedHistoricTaskInstances(new Date(0L), null, 10);
+    List<HistoricTaskInstance> completedHistoricTaskInstances = optimizeService
+        .getCompletedHistoricTaskInstances(new Date(0L), null, 10);
 
     // then
     assertThat(completedHistoricTaskInstances.size(), is(0));
@@ -187,8 +184,8 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<HistoricTaskInstance> runningHistoricTaskInstances =
-      optimizeService.getRunningHistoricTaskInstances(new Date(0L), null, 10);
+    List<HistoricTaskInstance> runningHistoricTaskInstances = optimizeService
+        .getRunningHistoricTaskInstances(new Date(0L), null, 10);
 
     // then
     assertThat(runningHistoricTaskInstances.size(), is(0));
@@ -217,8 +214,8 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<UserOperationLogEntry> operationLogEntries =
-      optimizeService.getHistoricUserOperationLogs(new Date(0L), null, 10);
+    List<UserOperationLogEntry> operationLogEntries = optimizeService
+        .getHistoricUserOperationLogs(new Date(0L), null, 10);
 
     // then
     assertThat(operationLogEntries.size(), is(0));
@@ -247,8 +244,8 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<OptimizeHistoricIdentityLinkLogEntity> historicIdentityLinkLogs =
-      optimizeService.getHistoricIdentityLinkLogs(new Date(0L), null, 10);
+    List<OptimizeHistoricIdentityLinkLogEntity> historicIdentityLinkLogs = optimizeService
+        .getHistoricIdentityLinkLogs(new Date(0L), null, 10);
 
     // then
     assertThat(historicIdentityLinkLogs.size(), is(0));
@@ -277,8 +274,8 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<HistoricProcessInstance> completedHistoricProcessInstances =
-      optimizeService.getCompletedHistoricProcessInstances(new Date(0L), null, 10);
+    List<HistoricProcessInstance> completedHistoricProcessInstances = optimizeService
+        .getCompletedHistoricProcessInstances(new Date(0L), null, 10);
 
     // then
     assertThat(completedHistoricProcessInstances.size(), is(1));
@@ -307,8 +304,8 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<HistoricProcessInstance> runningHistoricProcessInstances =
-      optimizeService.getRunningHistoricProcessInstances(new Date(0L), null, 10);
+    List<HistoricProcessInstance> runningHistoricProcessInstances = optimizeService
+        .getRunningHistoricProcessInstances(new Date(0L), null, 10);
 
     // then
     assertThat(runningHistoricProcessInstances.size(), is(0));
@@ -337,8 +334,8 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<HistoricVariableUpdate> historicVariableUpdates =
-      optimizeService.getHistoricVariableUpdates(new Date(0L), null, 10);
+    List<HistoricVariableUpdate> historicVariableUpdates = optimizeService
+        .getHistoricVariableUpdates(new Date(0L), null, 10);
 
     // then
     assertThat(historicVariableUpdates.size(), is(0));
@@ -369,8 +366,8 @@ public class OptimizeProcessDefinitionServiceAuthorizationTest extends Authoriza
     createGrantAuthorization(PROCESS_INSTANCE, "*", userId, ALL);
 
     // when
-    List<HistoricActivityInstance> completedHistoricActivityInstances =
-      optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
+    List<HistoricActivityInstance> completedHistoricActivityInstances = optimizeService
+        .getCompletedHistoricActivityInstances(new Date(0L), null, 10);
 
     // then
     assertThat(completedHistoricActivityInstances.size(), is(2));

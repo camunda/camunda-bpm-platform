@@ -49,37 +49,31 @@ public class MultiTenancyHistoricDecisionInstanceQueryTest extends PluggableProc
   }
 
   public void testQueryWithoutTenantId() {
-    HistoricDecisionInstanceQuery query = historyService.
-        createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
-    HistoricDecisionInstanceQuery query = historyService
-        .createHistoricDecisionInstanceQuery()
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = historyService
-        .createHistoricDecisionInstanceQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = historyService.createHistoricDecisionInstanceQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    HistoricDecisionInstanceQuery query = historyService
-        .createHistoricDecisionInstanceQuery()
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    HistoricDecisionInstanceQuery query = historyService
-        .createHistoricDecisionInstanceQuery()
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -87,8 +81,7 @@ public class MultiTenancyHistoricDecisionInstanceQueryTest extends PluggableProc
 
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricDecisionInstanceQuery()
-        .tenantIdIn((String) null);
+      historyService.createHistoricDecisionInstanceQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -96,10 +89,8 @@ public class MultiTenancyHistoricDecisionInstanceQueryTest extends PluggableProc
   }
 
   public void testQuerySortingAsc() {
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().orderByTenantId().asc().list();
 
     assertThat(historicDecisionInstances.size(), is(2));
     assertThat(historicDecisionInstances.get(0).getTenantId(), is(TENANT_ONE));
@@ -107,10 +98,8 @@ public class MultiTenancyHistoricDecisionInstanceQueryTest extends PluggableProc
   }
 
   public void testQuerySortingDesc() {
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
-        .orderByTenantId()
-        .desc()
-        .list();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService
+        .createHistoricDecisionInstanceQuery().orderByTenantId().desc().list();
 
     assertThat(historicDecisionInstances.size(), is(2));
     assertThat(historicDecisionInstances.get(0).getTenantId(), is(TENANT_TWO));
@@ -155,9 +144,7 @@ public class MultiTenancyHistoricDecisionInstanceQueryTest extends PluggableProc
 
   protected void evaluateDecisionInstanceForTenant(String tenant) {
     String decisionDefinitionId = repositoryService.createDecisionDefinitionQuery()
-        .tenantIdIn(tenant)
-        .singleResult()
-        .getId();
+        .tenantIdIn(tenant).singleResult().getId();
 
     VariableMap variables = Variables.createVariables().putValue("status", "bronze");
     decisionService.evaluateDecisionTableById(decisionDefinitionId, variables);

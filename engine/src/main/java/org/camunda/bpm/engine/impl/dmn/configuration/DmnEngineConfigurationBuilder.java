@@ -35,9 +35,9 @@ import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.Definitions;
 
 /**
- * Modify the given DMN engine configuration so that the DMN engine can be used
- * from the process engine. Note that properties will not be overridden if they
- * are set on the configuration, except the transform handler for the decision table.
+ * Modify the given DMN engine configuration so that the DMN engine can be used from the process
+ * engine. Note that properties will not be overridden if they are set on the configuration, except
+ * the transform handler for the decision table.
  *
  * @author Philipp Ossler
  */
@@ -58,13 +58,15 @@ public class DmnEngineConfigurationBuilder {
     this.dmnEngineConfiguration = dmnEngineConfiguration;
   }
 
-  public DmnEngineConfigurationBuilder dmnHistoryEventProducer(DmnHistoryEventProducer dmnHistoryEventProducer) {
+  public DmnEngineConfigurationBuilder dmnHistoryEventProducer(
+      DmnHistoryEventProducer dmnHistoryEventProducer) {
     this.dmnHistoryEventProducer = dmnHistoryEventProducer;
 
     return this;
   }
 
-  public DmnEngineConfigurationBuilder scriptEngineResolver(DmnScriptEngineResolver scriptEngineResolver) {
+  public DmnEngineConfigurationBuilder scriptEngineResolver(
+      DmnScriptEngineResolver scriptEngineResolver) {
     this.scriptEngineResolver = scriptEngineResolver;
 
     return this;
@@ -86,8 +88,10 @@ public class DmnEngineConfigurationBuilder {
 
     // override the decision table handler
     DmnTransformer dmnTransformer = dmnEngineConfiguration.getTransformer();
-    dmnTransformer.getElementTransformHandlerRegistry().addHandler(Definitions.class, new DecisionRequirementsDefinitionTransformHandler());
-    dmnTransformer.getElementTransformHandlerRegistry().addHandler(Decision.class, new DecisionDefinitionHandler());
+    dmnTransformer.getElementTransformHandlerRegistry().addHandler(Definitions.class,
+        new DecisionRequirementsDefinitionTransformHandler());
+    dmnTransformer.getElementTransformHandlerRegistry().addHandler(Decision.class,
+        new DecisionDefinitionHandler());
 
     // do not override the script engine resolver if set
     if (dmnEngineConfiguration.getScriptEngineResolver() == null) {
@@ -111,7 +115,8 @@ public class DmnEngineConfigurationBuilder {
     ensureNotNull("dmnHistoryEventProducer", dmnHistoryEventProducer);
     // note that the history level may be null - see CAM-5165
 
-    HistoryDecisionEvaluationListener historyDecisionEvaluationListener = new HistoryDecisionEvaluationListener(dmnHistoryEventProducer);
+    HistoryDecisionEvaluationListener historyDecisionEvaluationListener = new HistoryDecisionEvaluationListener(
+        dmnHistoryEventProducer);
 
     List<DmnDecisionEvaluationListener> customPostDecisionEvaluationListeners = dmnEngineConfiguration
         .getCustomPostDecisionEvaluationListeners();

@@ -21,8 +21,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-
-
 /**
  * @author Tom Baeyens
  */
@@ -35,19 +33,16 @@ public class LongFormType extends SimpleFormFieldType {
   }
 
   public TypedValue convertValue(TypedValue propertyValue) {
-    if(propertyValue instanceof LongValue) {
+    if (propertyValue instanceof LongValue) {
       return propertyValue;
-    }
-    else {
+    } else {
       Object value = propertyValue.getValue();
-      if(value == null) {
+      if (value == null) {
         return Variables.longValue(null, propertyValue.isTransient());
-      }
-      else if((value instanceof Number) || (value instanceof String)) {
+      } else if ((value instanceof Number) || (value instanceof String)) {
         return Variables.longValue(new Long(value.toString()), propertyValue.isTransient());
-      }
-      else {
-        throw new ProcessEngineException("Value '"+value+"' is not of type Long.");
+      } else {
+        throw new ProcessEngineException("Value '" + value + "' is not of type Long.");
       }
     }
   }
@@ -55,18 +50,17 @@ public class LongFormType extends SimpleFormFieldType {
   // deprecated ////////////////////////////////////////////
 
   public Object convertFormValueToModelValue(Object propertyValue) {
-    if (propertyValue==null || "".equals(propertyValue)) {
+    if (propertyValue == null || "".equals(propertyValue)) {
       return null;
     }
     return new Long(propertyValue.toString());
   }
 
   public String convertModelValueToFormValue(Object modelValue) {
-    if (modelValue==null) {
+    if (modelValue == null) {
       return null;
     }
     return modelValue.toString();
   }
-
 
 }

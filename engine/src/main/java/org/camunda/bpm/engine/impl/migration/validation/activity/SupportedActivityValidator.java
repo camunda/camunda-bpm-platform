@@ -26,8 +26,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 /**
  * *Supported* refers to whether an activity instance of a certain activity type can be migrated.
  * This validator is irrelevant for transition instances which can be migrated at any activity type.
- * Thus, this validator is only used during migration instruction generation and migrating activity instance validation,
- * not during migration instruction validation.
+ * Thus, this validator is only used during migration instruction generation and migrating activity
+ * instance validation, not during migration instruction validation.
  */
 public class SupportedActivityValidator implements MigrationActivityValidator {
 
@@ -50,7 +50,8 @@ public class SupportedActivityValidator implements MigrationActivityValidator {
     SUPPORTED_ACTIVITY_BEHAVIORS.add(EventSubProcessStartEventActivityBehavior.class);
     SUPPORTED_ACTIVITY_BEHAVIORS.add(ExternalTaskActivityBehavior.class);
     SUPPORTED_ACTIVITY_BEHAVIORS.add(ParallelGatewayActivityBehavior.class);
-    SUPPORTED_ACTIVITY_BEHAVIORS.add(InclusiveGatewayActivityBehavior.class);;
+    SUPPORTED_ACTIVITY_BEHAVIORS.add(InclusiveGatewayActivityBehavior.class);
+    ;
     SUPPORTED_ACTIVITY_BEHAVIORS.add(IntermediateConditionalEventBehavior.class);
     SUPPORTED_ACTIVITY_BEHAVIORS.add(BoundaryConditionalEventActivityBehavior.class);
     SUPPORTED_ACTIVITY_BEHAVIORS.add(EventSubProcessStartConditionalEventActivityBehavior.class);

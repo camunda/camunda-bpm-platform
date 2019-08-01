@@ -56,14 +56,9 @@ public class HistoricDecisionInstanceInputOutputValueTest {
 
   @Parameters(name = "{index}: input({0}) = {1}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {
-      { "string", "a" },
-      { "long", 1L },
-      { "double", 2.5 },
-      { "bytes", "object".getBytes() },
-      { "object", new JavaSerializable("foo") },
-      { "object", Collections.singletonList(new JavaSerializable("bar")) }
-    });
+    return Arrays.asList(new Object[][] { { "string", "a" }, { "long", 1L }, { "double", 2.5 },
+        { "bytes", "object".getBytes() }, { "object", new JavaSerializable("foo") },
+        { "object", Collections.singletonList(new JavaSerializable("bar")) } });
   }
 
   @Parameter(0)
@@ -89,7 +84,8 @@ public class HistoricDecisionInstanceInputOutputValueTest {
 
     startProcessInstanceAndEvaluateDecision(inputValue);
 
-    HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService().createHistoricDecisionInstanceQuery().includeInputs().singleResult();
+    HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService()
+        .createHistoricDecisionInstanceQuery().includeInputs().singleResult();
     List<HistoricDecisionInputInstance> inputInstances = historicDecisionInstance.getInputs();
     assertThat(inputInstances.size(), is(1));
 
@@ -108,7 +104,8 @@ public class HistoricDecisionInstanceInputOutputValueTest {
 
     startProcessInstanceAndEvaluateDecision(inputValue);
 
-    HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService().createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
+    HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService()
+        .createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
     List<HistoricDecisionOutputInstance> outputInstances = historicDecisionInstance.getOutputs();
     assertThat(outputInstances.size(), is(1));
 

@@ -18,10 +18,9 @@ package org.camunda.bpm.engine.history;
 
 import java.util.Date;
 
-
-
-/** Base class for all kinds of information that is related to
- * either a {@link HistoricProcessInstance} or a {@link HistoricActivityInstance}.
+/**
+ * Base class for all kinds of information that is related to either a
+ * {@link HistoricProcessInstance} or a {@link HistoricActivityInstance}.
  *
  * @author Tom Baeyens
  */
@@ -67,14 +66,14 @@ public interface HistoricDetail {
   Date getTime();
 
   /**
-   * The id of the tenant this historic detail belongs to. Can be <code>null</code>
-   * if the historic detail belongs to no single tenant.
+   * The id of the tenant this historic detail belongs to. Can be <code>null</code> if the historic
+   * detail belongs to no single tenant.
    */
   String getTenantId();
 
   /**
-   * The id of operation. Helps to link records in different historic tables.
-   * References operationId of user operation log entry.
+   * The id of operation. Helps to link records in different historic tables. References operationId
+   * of user operation log entry.
    */
   String getUserOperationId();
 

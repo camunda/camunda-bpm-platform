@@ -16,11 +16,9 @@
  */
 package org.camunda.bpm.engine.test.standalone.history;
 
-
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.Expression;
-
 
 /**
  * @author Frederik Heremans

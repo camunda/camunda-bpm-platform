@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.variable.VariableMap;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -37,14 +36,15 @@ public class DefaultStartFormHandler extends DefaultFormHandler implements Start
   protected Expression formKey;
 
   @Override
-  public void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
+  public void parseConfiguration(Element activityElement, DeploymentEntity deployment,
+      ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
     super.parseConfiguration(activityElement, deployment, processDefinition, bpmnParse);
 
-    ExpressionManager expressionManager = Context
-        .getProcessEngineConfiguration()
+    ExpressionManager expressionManager = Context.getProcessEngineConfiguration()
         .getExpressionManager();
 
-    String formKeyAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formKey");
+    String formKeyAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,
+        "formKey");
 
     if (formKeyAttribute != null) {
       this.formKey = expressionManager.createExpression(formKeyAttribute);
@@ -68,7 +68,8 @@ public class DefaultStartFormHandler extends DefaultFormHandler implements Start
     return startFormData;
   }
 
-  public ExecutionEntity submitStartFormData(ExecutionEntity processInstance, VariableMap properties) {
+  public ExecutionEntity submitStartFormData(ExecutionEntity processInstance,
+      VariableMap properties) {
     submitFormVariables(properties, processInstance);
     return processInstance;
   }

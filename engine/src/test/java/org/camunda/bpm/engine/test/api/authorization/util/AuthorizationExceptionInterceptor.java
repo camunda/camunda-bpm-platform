@@ -28,7 +28,7 @@ import org.slf4j.Logger;
  */
 public class AuthorizationExceptionInterceptor extends CommandInterceptor {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   protected boolean isActive;
   protected AuthorizationException lastException;
@@ -43,14 +43,12 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       T result = next.execute(command);
       count--;
       return result;
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       count--;
       if (count == 0 && isActive) {
         lastException = e;
         LOG.info("Caught authorization exception; storing for assertion in test", e);
-      }
-      else {
+      } else {
         throw e;
       }
     }

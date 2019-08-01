@@ -36,15 +36,16 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     String deploymentName = "my deployment";
 
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
-        .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
-        .name(deploymentName)
-        .deploy();
+        .addClasspathResource(
+            "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
+        .addClasspathResource(
+            "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
+        .name(deploymentName).deploy();
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
     runtimeService.startProcessInstanceByKey("ParGatewayExampleProcess");
 
-    List<DeploymentStatistics> statistics =
-        managementService.createDeploymentStatisticsQuery().includeFailedJobs().list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeFailedJobs().list();
 
     Assert.assertEquals(1, statistics.size());
 
@@ -72,16 +73,21 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
   @Test
   public void testDeploymentStatisticsQueryCountAndPaging() {
     org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
-        .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
+        .addClasspathResource(
+            "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
+        .addClasspathResource(
+            "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
         .deploy();
 
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
     runtimeService.startProcessInstanceByKey("ParGatewayExampleProcess");
 
-    org.camunda.bpm.engine.repository.Deployment anotherDeployment = repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
-        .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
+    org.camunda.bpm.engine.repository.Deployment anotherDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource(
+            "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
+        .addClasspathResource(
+            "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
         .deploy();
 
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
@@ -91,7 +97,8 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     Assert.assertEquals(2, count);
 
-    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery().includeFailedJobs().listPage(0, 1);
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeFailedJobs().listPage(0, 1);
     Assert.assertEquals(1, statistics.size());
 
     repositoryService.deleteDeployment(deployment.getId(), true);
@@ -99,8 +106,9 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml" })
   public void testDeploymentStatisticsQueryWithFailedJobs() {
 
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -111,16 +119,17 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     executeAvailableJobs();
 
-    List<DeploymentStatistics> statistics =
-        managementService.createDeploymentStatisticsQuery().includeFailedJobs().list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeFailedJobs().list();
 
     DeploymentStatistics result = statistics.get(0);
     Assert.assertEquals(1, result.getFailedJobs());
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml" })
   public void testDeploymentStatisticsQueryWithIncidents() {
 
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -131,8 +140,8 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     executeAvailableJobs();
 
-    List<DeploymentStatistics> statistics =
-        managementService.createDeploymentStatisticsQuery().includeIncidents().list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeIncidents().list();
 
     assertFalse(statistics.isEmpty());
     assertEquals(1, statistics.size());
@@ -149,8 +158,9 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml" })
   public void testDeploymentStatisticsQueryWithIncidentType() {
 
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -161,11 +171,8 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     executeAvailableJobs();
 
-    List<DeploymentStatistics> statistics =
-        managementService
-        .createDeploymentStatisticsQuery()
-        .includeIncidentsForType("failedJob")
-        .list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeIncidentsForType("failedJob").list();
 
     assertFalse(statistics.isEmpty());
     assertEquals(1, statistics.size());
@@ -182,8 +189,9 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml" })
   public void testDeploymentStatisticsQueryWithInvalidIncidentType() {
 
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -194,11 +202,8 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     executeAvailableJobs();
 
-    List<DeploymentStatistics> statistics =
-        managementService
-        .createDeploymentStatisticsQuery()
-        .includeIncidentsForType("invalid")
-        .list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeIncidentsForType("invalid").list();
 
     assertFalse(statistics.isEmpty());
     assertEquals(1, statistics.size());
@@ -210,8 +215,9 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
-  "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml" })
   public void testDeploymentStatisticsQueryWithIncidentsAndFailedJobs() {
 
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -222,12 +228,8 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     executeAvailableJobs();
 
-    List<DeploymentStatistics> statistics =
-        managementService
-        .createDeploymentStatisticsQuery()
-        .includeIncidents()
-        .includeFailedJobs()
-        .list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeIncidents().includeFailedJobs().list();
 
     assertFalse(statistics.isEmpty());
     assertEquals(1, statistics.size());
@@ -252,12 +254,8 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     executeAvailableJobs();
 
-    List<DeploymentStatistics> statistics =
-        managementService
-        .createDeploymentStatisticsQuery()
-        .includeIncidents()
-        .includeFailedJobs()
-        .list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeIncidents().includeFailedJobs().list();
 
     assertFalse(statistics.isEmpty());
     assertEquals(1, statistics.size());
@@ -276,13 +274,13 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     assertEquals(2, incident.getIncidentCount()); // ...but two incidents
   }
 
-
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml" })
   public void testDeploymentStatisticsQueryWithoutRunningInstances() {
-    List<DeploymentStatistics> statistics =
-        managementService.createDeploymentStatisticsQuery().includeFailedJobs().list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeFailedJobs().list();
 
     Assert.assertEquals(1, statistics.size());
 
@@ -296,11 +294,8 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     executeAvailableJobs();
 
-    List<DeploymentStatistics> statistics =
-        managementService
-        .createDeploymentStatisticsQuery()
-        .includeIncidents()
-        .list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeIncidents().list();
 
     assertEquals(1, statistics.size());
 
@@ -324,11 +319,8 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     executeAvailableJobs();
 
-    List<DeploymentStatistics> statistics =
-        managementService
-        .createDeploymentStatisticsQuery()
-        .includeIncidentsForType(Incident.FAILED_JOB_HANDLER_TYPE)
-        .list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeIncidentsForType(Incident.FAILED_JOB_HANDLER_TYPE).list();
 
     assertEquals(1, statistics.size());
 
@@ -352,11 +344,8 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     executeAvailableJobs();
 
-    List<DeploymentStatistics> statistics =
-        managementService
-        .createDeploymentStatisticsQuery()
-        .includeFailedJobs()
-        .list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeFailedJobs().list();
 
     assertEquals(1, statistics.size());
 
@@ -373,12 +362,8 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     executeAvailableJobs();
 
-    List<DeploymentStatistics> statistics =
-        managementService
-        .createDeploymentStatisticsQuery()
-        .includeFailedJobs()
-        .includeIncidents()
-        .list();
+    List<DeploymentStatistics> statistics = managementService.createDeploymentStatisticsQuery()
+        .includeFailedJobs().includeIncidents().list();
 
     assertEquals(1, statistics.size());
 

@@ -44,13 +44,10 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
   @Override
   protected void setUp() {
 
-    BpmnModelInstance process = Bpmn.createExecutableProcess("EmptyProcess")
-    .startEvent().done();
+    BpmnModelInstance process = Bpmn.createExecutableProcess("EmptyProcess").startEvent().done();
 
     BpmnModelInstance singleTaskProcess = Bpmn.createExecutableProcess("SingleTaskProcess")
-      .startEvent()
-        .userTask()
-      .done();
+        .startEvent().userTask().done();
 
     deployment(process);
     deploymentForTenant(TENANT_ONE, singleTaskProcess);
@@ -59,8 +56,7 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
 
   public void testDeploymentStatistics() {
     List<DeploymentStatistics> deploymentStatistics = managementService
-        .createDeploymentStatisticsQuery()
-        .list();
+        .createDeploymentStatisticsQuery().list();
 
     assertThat(deploymentStatistics.size(), is(3));
 
@@ -70,8 +66,7 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
 
   public void testProcessDefinitionStatistics() {
     List<ProcessDefinitionStatistics> processDefinitionStatistics = managementService
-      .createProcessDefinitionStatisticsQuery()
-      .list();
+        .createProcessDefinitionStatisticsQuery().list();
 
     assertThat(processDefinitionStatistics.size(), is(3));
 
@@ -130,7 +125,8 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
   public void testQueryNoAuthenticatedTenantsForProcessDefinitionStatistics() {
     identityService.setAuthentication("user", null, null);
 
-    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+    ProcessDefinitionStatisticsQuery query = managementService
+        .createProcessDefinitionStatisticsQuery();
     assertThat(query.count(), is(1L));
 
     Set<String> tenantIds = collectDefinitionTenantIds(query.list());
@@ -141,7 +137,8 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
   public void testQueryAuthenticatedTenantForProcessDefinitionStatistics() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+    ProcessDefinitionStatisticsQuery query = managementService
+        .createProcessDefinitionStatisticsQuery();
 
     assertThat(query.count(), is(2L));
 
@@ -153,7 +150,8 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
   public void testQueryAuthenticatedTenantsForProcessDefinitionStatistics() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE, TENANT_TWO));
 
-    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+    ProcessDefinitionStatisticsQuery query = managementService
+        .createProcessDefinitionStatisticsQuery();
 
     assertThat(query.count(), is(3L));
 
@@ -166,7 +164,8 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
     processEngineConfiguration.setTenantCheckEnabled(false);
     identityService.setAuthentication("user", null, null);
 
-    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+    ProcessDefinitionStatisticsQuery query = managementService
+        .createProcessDefinitionStatisticsQuery();
 
     assertThat(query.count(), is(3L));
 
@@ -178,7 +177,8 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
   public void testActivityStatistics() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
 
-    ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
+    ActivityStatisticsQuery query = managementService
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
 
     assertThat(query.count(), is(1L));
 
@@ -189,38 +189,42 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
 
-    ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
+    ActivityStatisticsQuery query = managementService
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
 
     assertThat(query.count(), is(1L));
 
   }
 
   public void testQueryNoAuthenticatedTenantForActivityStatistics() {
-    
+
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
 
     identityService.setAuthentication("user", null);
 
-    ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
+    ActivityStatisticsQuery query = managementService
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
 
     assertThat(query.count(), is(0L));
 
   }
 
   public void testQueryDisabledTenantCheckForActivityStatistics() {
-    
+
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SingleTaskProcess");
-    
+
     identityService.setAuthentication("user", null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
-    ActivityStatisticsQuery query = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
-    
+    ActivityStatisticsQuery query = managementService
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId());
+
     assertThat(query.count(), is(1L));
-    
+
   }
 
-  protected Set<String> collectDeploymentTenantIds(List<DeploymentStatistics> deploymentStatistics) {
+  protected Set<String> collectDeploymentTenantIds(
+      List<DeploymentStatistics> deploymentStatistics) {
     Set<String> tenantIds = new HashSet<String>();
 
     for (DeploymentStatistics statistics : deploymentStatistics) {
@@ -229,7 +233,8 @@ public class MultiTenancyStatisticsQueryTest extends PluggableProcessEngineTestC
     return tenantIds;
   }
 
-  protected Set<String> collectDefinitionTenantIds(List<ProcessDefinitionStatistics> processDefinitionStatistics) {
+  protected Set<String> collectDefinitionTenantIds(
+      List<ProcessDefinitionStatistics> processDefinitionStatistics) {
     Set<String> tenantIds = new HashSet<String>();
 
     for (ProcessDefinitionStatistics statistics : processDefinitionStatistics) {

@@ -21,44 +21,43 @@ import org.camunda.bpm.engine.identity.UserQuery;
 
 import java.util.Date;
 
-
 /**
  * An historic identity link stores the association of a task with a certain identity.
  * 
- * For example, historic identity link is logged on the following conditions:
- * - a user can be an assignee/Candidate/Owner (= identity link type) for a task
- * - a group can be a candidate-group (= identity link type) for a task
- * - a user can be an candidate in the scope of process definition
- * - a group can be a candidate-group in the scope of process definition
+ * For example, historic identity link is logged on the following conditions: - a user can be an
+ * assignee/Candidate/Owner (= identity link type) for a task - a group can be a candidate-group (=
+ * identity link type) for a task - a user can be an candidate in the scope of process definition -
+ * a group can be a candidate-group in the scope of process definition
  * 
- * For every log, an operation type (add/delete) is added to the database
- * based on the identity link operation
+ * For every log, an operation type (add/delete) is added to the database based on the identity link
+ * operation
  */
 public interface HistoricIdentityLinkLog {
-  
+
   /**
    * Returns the id of historic identity link (Candidate or Assignee or Owner).
    */
   String getId();
+
   /**
-   * Returns the type of link (Candidate or Assignee or Owner).
-   * See {@link IdentityLinkType} for the native supported types by the process engine.
+   * Returns the type of link (Candidate or Assignee or Owner). See {@link IdentityLinkType} for the
+   * native supported types by the process engine.
    *
-   * */
+   */
   String getType();
-  
+
   /**
-   * If the identity link involves a user, then this will be a non-null id of a user.
-   * That userId can be used to query for user information through the {@link UserQuery} API.
+   * If the identity link involves a user, then this will be a non-null id of a user. That userId
+   * can be used to query for user information through the {@link UserQuery} API.
    */
   String getUserId();
-  
+
   /**
-   * If the identity link involves a group, then this will be a non-null id of a group.
-   * That groupId can be used to query for user information through the {@link GroupQuery} API.
+   * If the identity link involves a group, then this will be a non-null id of a group. That groupId
+   * can be used to query for user information through the {@link GroupQuery} API.
    */
   String getGroupId();
-  
+
   /**
    * The id of the task associated with this identity link.
    */
@@ -69,35 +68,34 @@ public interface HistoricIdentityLinkLog {
    * 
    */
   String getAssignerId();
-  
+
   /**
    * Returns the type of identity link history (add or delete identity link)
    */
   String getOperationType();
-  
+
   /**
    * Returns the time of identity link event (Creation/Deletion)
    */
   Date getTime();
 
   /**
-   * Returns the id of the related process definition 
+   * Returns the id of the related process definition
    */
   String getProcessDefinitionId();
-  
+
   /**
-   * Returns the key of the related process definition 
+   * Returns the key of the related process definition
    */
   String getProcessDefinitionKey();
-  
+
   /**
-   * Returns the id of the related tenant 
+   * Returns the id of the related tenant
    */
   String getTenantId();
 
   /**
-   * Returns the root process instance id of
-   * the related process instance
+   * Returns the root process instance id of the related process instance
    */
   String getRootProcessInstanceId();
 

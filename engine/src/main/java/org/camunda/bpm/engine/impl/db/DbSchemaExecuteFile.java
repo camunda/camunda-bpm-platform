@@ -38,25 +38,27 @@ public class DbSchemaExecuteFile {
    */
   public static void main(String[] args) {
 
-    if(args.length != 2) {
+    if (args.length != 2) {
       throw LOG.invokeSchemaResourceToolException(args.length);
     }
 
     final String configurationFileResourceName = args[0];
     final String schemaFileResourceName = args[1];
 
-    ensureNotNull("Process engine configuration file name cannot be null", "configurationFileResourceName", configurationFileResourceName);
-    ensureNotNull("Schema resource file name cannot be null", "schemaFileResourceName", schemaFileResourceName);
+    ensureNotNull("Process engine configuration file name cannot be null",
+        "configurationFileResourceName", configurationFileResourceName);
+    ensureNotNull("Schema resource file name cannot be null", "schemaFileResourceName",
+        schemaFileResourceName);
 
-    ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(configurationFileResourceName);
+    ProcessEngineConfigurationImpl configuration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+        .createProcessEngineConfigurationFromResource(configurationFileResourceName);
     ProcessEngine processEngine = configuration.buildProcessEngine();
 
     configuration.getCommandExecutorTxRequired().execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {
 
-        commandContext.getDbSqlSession()
-          .executeSchemaResource(schemaFileResourceName);
+        commandContext.getDbSqlSession().executeSchemaResource(schemaFileResourceName);
 
         return null;
       }

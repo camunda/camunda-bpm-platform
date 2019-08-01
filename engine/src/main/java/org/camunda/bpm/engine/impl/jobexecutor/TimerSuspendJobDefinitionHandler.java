@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
 /**
  * @author roman.smirnov
  */
-public class TimerSuspendJobDefinitionHandler extends TimerChangeJobDefinitionSuspensionStateJobHandler {
+public class TimerSuspendJobDefinitionHandler
+    extends TimerChangeJobDefinitionSuspensionStateJobHandler {
 
   public static final String TYPE = "suspend-job-definition";
 
@@ -31,7 +32,8 @@ public class TimerSuspendJobDefinitionHandler extends TimerChangeJobDefinitionSu
   }
 
   @Override
-  protected AbstractSetJobDefinitionStateCmd getCommand(JobDefinitionSuspensionStateConfiguration configuration) {
+  protected AbstractSetJobDefinitionStateCmd getCommand(
+      JobDefinitionSuspensionStateConfiguration configuration) {
 
     return new SuspendJobDefinitionCmd(configuration.createBuilder());
   }

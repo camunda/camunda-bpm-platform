@@ -38,10 +38,8 @@ public class MigrationCompensationInstanceVisitor extends MigratingProcessElemen
   }
 
   @Override
-  protected void instantiateScopes(
-      MigratingScopeInstance ancestorScopeInstance,
-      MigratingScopeInstanceBranch executionBranch,
-      List<ScopeImpl> scopesToInstantiate) {
+  protected void instantiateScopes(MigratingScopeInstance ancestorScopeInstance,
+      MigratingScopeInstanceBranch executionBranch, List<ScopeImpl> scopesToInstantiate) {
 
     if (scopesToInstantiate.isEmpty()) {
       return;
@@ -61,10 +59,12 @@ public class MigrationCompensationInstanceVisitor extends MigratingProcessElemen
       compensationScopeExecution.activityInstanceStarting();
       compensationScopeExecution.enterActivityInstance();
 
-      EventSubscriptionEntity eventSubscription = EventSubscriptionEntity.createAndInsert(parentExecution, EventType.COMPENSATE, (ActivityImpl) scope);
+      EventSubscriptionEntity eventSubscription = EventSubscriptionEntity
+          .createAndInsert(parentExecution, EventType.COMPENSATE, (ActivityImpl) scope);
       eventSubscription.setConfiguration(compensationScopeExecution.getId());
 
-      executionBranch.visited(new MigratingEventScopeInstance(eventSubscription, compensationScopeExecution, scope));
+      executionBranch.visited(
+          new MigratingEventScopeInstance(eventSubscription, compensationScopeExecution, scope));
 
       parentExecution = compensationScopeExecution;
     }

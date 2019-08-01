@@ -65,7 +65,8 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
     startProcessInstanceByKey(PROCESS_KEY);
 
     // when
-    HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId);
 
     // then
     verifyQueryResults(query, 0);
@@ -82,7 +83,8 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
 
     // when
-    HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId);
 
     // then
     verifyQueryResults(query, 1);
@@ -100,7 +102,8 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
 
     // when
-    HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId);
 
     // then
     verifyQueryResults(query, 1);
@@ -119,7 +122,8 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
 
     // when
-    HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId);
 
     // then
     verifyQueryResults(query, 1);
@@ -143,8 +147,7 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished();
 
     // then
     verifyQueryResults(query, 0);
@@ -167,8 +170,7 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished();
 
     // then
     verifyQueryResults(query, 3);
@@ -201,8 +203,7 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished();
 
     // then
     verifyQueryResults(query, 3);
@@ -234,8 +235,7 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCanceled();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled();
 
     // then
     verifyQueryResults(query, 0);
@@ -257,8 +257,7 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCanceled();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled();
 
     // then
     verifyQueryResults(query, 1);
@@ -284,8 +283,7 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCanceled();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled();
 
     // then
     verifyQueryResults(query, 1);
@@ -295,7 +293,8 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
     verifyStatisticsResult(task, 2, 0, 1, 0);
   }
 
-  // historic activity statistics query (including complete scope) //////////////////////////////////
+  // historic activity statistics query (including complete scope)
+  // //////////////////////////////////
 
   public void testQueryIncludingCompleteScopeWithoutAuthorization() {
     // given
@@ -312,8 +311,7 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCompleteScope();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCompleteScope();
 
     // then
     verifyQueryResults(query, 0);
@@ -336,8 +334,7 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCompleteScope();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCompleteScope();
 
     // then
     verifyQueryResults(query, 2);
@@ -367,8 +364,7 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeCompleteScope();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeCompleteScope();
 
     // then
     verifyQueryResults(query, 2);
@@ -402,10 +398,8 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished()
-        .includeCanceled()
-        .includeCompleteScope();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished()
+        .includeCanceled().includeCompleteScope();
 
     // then
     verifyQueryResults(query, 0);
@@ -432,10 +426,8 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished()
-        .includeCanceled()
-        .includeCompleteScope();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished()
+        .includeCanceled().includeCompleteScope();
 
     // then
     verifyQueryResults(query, 3);
@@ -472,10 +464,8 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
     // when
     HistoricActivityStatisticsQuery query = historyService
-        .createHistoricActivityStatisticsQuery(processDefinitionId)
-        .includeFinished()
-        .includeCanceled()
-        .includeCompleteScope();
+        .createHistoricActivityStatisticsQuery(processDefinitionId).includeFinished()
+        .includeCanceled().includeCompleteScope();
 
     // then
     verifyQueryResults(query, 3);
@@ -497,14 +487,16 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
 
-  protected void verifyStatisticsResult(HistoricActivityStatistics statistics, int instances, int finished, int canceled, int completeScope) {
+  protected void verifyStatisticsResult(HistoricActivityStatistics statistics, int instances,
+      int finished, int canceled, int completeScope) {
     assertEquals("Instances", instances, statistics.getInstances());
     assertEquals("Finished", finished, statistics.getFinished());
     assertEquals("Canceled", canceled, statistics.getCanceled());
     assertEquals("Complete Scope", completeScope, statistics.getCompleteScope());
   }
 
-  protected HistoricActivityStatistics getStatisticsByKey(List<HistoricActivityStatistics> statistics, String key) {
+  protected HistoricActivityStatistics getStatisticsByKey(
+      List<HistoricActivityStatistics> statistics, String key) {
     for (HistoricActivityStatistics result : statistics) {
       if (key.equals(result.getId())) {
         return result;

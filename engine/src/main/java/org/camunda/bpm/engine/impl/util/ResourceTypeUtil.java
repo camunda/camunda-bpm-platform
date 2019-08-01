@@ -34,18 +34,22 @@ import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 public class ResourceTypeUtil {
 
   /**
-   * A map containing all {@link Resources} as a key and
-   * the respective {@link Permission} Enum class for this resource.<p>
+   * A map containing all {@link Resources} as a key and the respective {@link Permission} Enum
+   * class for this resource.
+   * <p>
    * NOTE: In case of new {@link Permission} Enum class, please adjust the map accordingly
    */
   private static final Map<Integer, Class<? extends Enum<? extends Permission>>> PERMISSION_ENUMS = new HashMap<>();
 
   static {
     PERMISSION_ENUMS.put(Resources.BATCH.resourceType(), BatchPermissions.class);
-    PERMISSION_ENUMS.put(Resources.PROCESS_DEFINITION.resourceType(), ProcessDefinitionPermissions.class);
-    PERMISSION_ENUMS.put(Resources.PROCESS_INSTANCE.resourceType(), ProcessInstancePermissions.class);
+    PERMISSION_ENUMS.put(Resources.PROCESS_DEFINITION.resourceType(),
+        ProcessDefinitionPermissions.class);
+    PERMISSION_ENUMS.put(Resources.PROCESS_INSTANCE.resourceType(),
+        ProcessInstancePermissions.class);
     PERMISSION_ENUMS.put(Resources.TASK.resourceType(), TaskPermissions.class);
-    PERMISSION_ENUMS.put(Resources.OPERATION_LOG_CATEGORY.resourceType(), UserOperationLogCategoryPermissions.class);
+    PERMISSION_ENUMS.put(Resources.OPERATION_LOG_CATEGORY.resourceType(),
+        UserOperationLogCategoryPermissions.class);
     PERMISSION_ENUMS.put(Resources.OPTIMIZE.resourceType(), OptimizePermissions.class);
 
     // the rest
@@ -58,7 +62,8 @@ public class ResourceTypeUtil {
   }
 
   /**
-   * @return <code>true</code> in case the resource with the provided resourceTypeId is contained by the specified list
+   * @return <code>true</code> in case the resource with the provided resourceTypeId is contained by
+   *         the specified list
    */
   public static boolean resourceIsContainedInArray(Integer resourceTypeId, Resource[] resources) {
     for (Resource resource : resources) {
@@ -69,7 +74,6 @@ public class ResourceTypeUtil {
     return false;
   }
 
-  
   /**
    * @return See {@link ResourceTypeUtil#PERMISSION_ENUMS}
    */
@@ -78,7 +82,8 @@ public class ResourceTypeUtil {
   }
 
   /**
-   * Retrieves the {@link Permission} array based on the predifined {@link ResourceTypeUtil#PERMISSION_ENUMS PERMISSION_ENUMS}
+   * Retrieves the {@link Permission} array based on the predifined
+   * {@link ResourceTypeUtil#PERMISSION_ENUMS PERMISSION_ENUMS}
    */
   public static Permission[] getPermissionsByResourceType(int givenResourceType) {
     Class<? extends Enum<? extends Permission>> clazz = PERMISSION_ENUMS.get(givenResourceType);
@@ -89,24 +94,27 @@ public class ResourceTypeUtil {
   }
 
   /**
-   * Currently used only in the Rest API
-   * Returns a {@link Permission} based on the specified <code>permissionName</code> and <code>resourceType</code>
-   * @throws BadUserRequestException in case the permission is not valid for the specified resource type
+   * Currently used only in the Rest API Returns a {@link Permission} based on the specified
+   * <code>permissionName</code> and <code>resourceType</code>
+   * 
+   * @throws BadUserRequestException
+   *           in case the permission is not valid for the specified resource type
    */
-  public static Permission getPermissionByNameAndResourceType(String permissionName, int resourceType) {
+  public static Permission getPermissionByNameAndResourceType(String permissionName,
+      int resourceType) {
     for (Permission permission : getPermissionsByResourceType(resourceType)) {
       if (permission.getName().equals(permissionName)) {
         return permission;
       }
     }
     throw new BadUserRequestException(
-        String.format("The permission '%s' is not valid for '%s' resource type.", permissionName, getResourceByType(resourceType))
-        );
+        String.format("The permission '%s' is not valid for '%s' resource type.", permissionName,
+            getResourceByType(resourceType)));
   }
 
   /**
-   * Iterates over the {@link Resources} and 
-   * returns either the resource with specified <code>resourceType</code> or <code>null</code>.
+   * Iterates over the {@link Resources} and returns either the resource with specified
+   * <code>resourceType</code> or <code>null</code>.
    */
   public static Resource getResourceByType(int resourceType) {
     for (Resource resource : Resources.values()) {

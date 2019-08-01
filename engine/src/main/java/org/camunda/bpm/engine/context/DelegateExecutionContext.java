@@ -22,16 +22,14 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
- * Represents a delegation execution context which should return the current
- * delegation execution.
+ * Represents a delegation execution context which should return the current delegation execution.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public class DelegateExecutionContext {
 
   /**
-   * Returns the current delegation execution or null if the
-   * execution is not available.
+   * Returns the current delegation execution or null if the execution is not available.
    *
    * @return the current delegation execution or null if not available
    */

@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Sebastian Menski
  *
  */
-public abstract class AbstractPvmEventAtomicOperation extends AbstractEventAtomicOperation<PvmExecutionImpl> implements PvmAtomicOperation {
+public abstract class AbstractPvmEventAtomicOperation
+    extends AbstractEventAtomicOperation<PvmExecutionImpl> implements PvmAtomicOperation {
 
   protected abstract CoreModelElement getScope(PvmExecutionImpl execution);
 
@@ -50,8 +51,7 @@ public abstract class AbstractPvmEventAtomicOperation extends AbstractEventAtomi
         // re-throw the original exception so that it is logged
         // and set as cause of the failure
         super.eventNotificationsFailed(execution, exception);
-      } catch (Exception e)
-      {
+      } catch (Exception e) {
         super.eventNotificationsFailed(execution, e);
       }
     } else {

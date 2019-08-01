@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.api.runtime.util;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 
-
 public class CreateLocalVariableEventListener implements TaskListener {
 
   public void notify(DelegateTask delegateTask) {

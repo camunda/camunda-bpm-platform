@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.management.TableMetaData;
 
-
 /**
  * @author Joram Barrez
  */
@@ -42,9 +41,7 @@ public class GetTableMetaDataCmd implements Command<TableMetaData>, Serializable
 
     commandContext.getAuthorizationManager().checkCamundaAdmin();
 
-    return commandContext
-      .getTableDataManager()
-      .getTableMetaData(tableName);
+    return commandContext.getTableDataManager().getTableMetaData(tableName);
   }
 
 }

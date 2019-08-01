@@ -30,8 +30,9 @@ import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateBuild
 import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateTenantBuilder;
 
-public class UpdateJobDefinitionSuspensionStateBuilderImpl
-    implements UpdateJobDefinitionSuspensionStateBuilder, UpdateJobDefinitionSuspensionStateSelectBuilder, UpdateJobDefinitionSuspensionStateTenantBuilder {
+public class UpdateJobDefinitionSuspensionStateBuilderImpl implements
+    UpdateJobDefinitionSuspensionStateBuilder, UpdateJobDefinitionSuspensionStateSelectBuilder,
+    UpdateJobDefinitionSuspensionStateTenantBuilder {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -53,9 +54,9 @@ public class UpdateJobDefinitionSuspensionStateBuilderImpl
   }
 
   /**
-   * Creates a builder without CommandExecutor which can not be used to update
-   * the suspension state via {@link #activate()} or {@link #suspend()}. Can only be
-   * used in combination with your own command.
+   * Creates a builder without CommandExecutor which can not be used to update the suspension state
+   * via {@link #activate()} or {@link #suspend()}. Can only be used in combination with your own
+   * command.
    */
   public UpdateJobDefinitionSuspensionStateBuilderImpl() {
     this(null);
@@ -69,14 +70,16 @@ public class UpdateJobDefinitionSuspensionStateBuilderImpl
   }
 
   @Override
-  public UpdateJobDefinitionSuspensionStateBuilderImpl byProcessDefinitionId(String processDefinitionId) {
+  public UpdateJobDefinitionSuspensionStateBuilderImpl byProcessDefinitionId(
+      String processDefinitionId) {
     ensureNotNull("processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   @Override
-  public UpdateJobDefinitionSuspensionStateBuilderImpl byProcessDefinitionKey(String processDefinitionKey) {
+  public UpdateJobDefinitionSuspensionStateBuilderImpl byProcessDefinitionKey(
+      String processDefinitionKey) {
     ensureNotNull("processDefinitionKey", processDefinitionKey);
     this.processDefinitionKey = processDefinitionKey;
     return this;
@@ -110,7 +113,6 @@ public class UpdateJobDefinitionSuspensionStateBuilderImpl
     return this;
   }
 
-
   @Override
   public void activate() {
     validateParameters();
@@ -128,10 +130,12 @@ public class UpdateJobDefinitionSuspensionStateBuilderImpl
   }
 
   protected void validateParameters() {
-    ensureOnlyOneNotNull("Need to specify either a job definition id, a process definition id or a process definition key.",
+    ensureOnlyOneNotNull(
+        "Need to specify either a job definition id, a process definition id or a process definition key.",
         jobDefinitionId, processDefinitionId, processDefinitionKey);
 
-    if (isProcessDefinitionTenantIdSet && (jobDefinitionId != null || processDefinitionId != null)) {
+    if (isProcessDefinitionTenantIdSet
+        && (jobDefinitionId != null || processDefinitionId != null)) {
       throw LOG.exceptionUpdateSuspensionStateForTenantOnlyByProcessDefinitionKey();
     }
 

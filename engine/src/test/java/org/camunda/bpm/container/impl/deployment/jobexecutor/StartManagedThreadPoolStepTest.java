@@ -50,29 +50,32 @@ import org.junit.Test;
  *
  */
 public class StartManagedThreadPoolStepTest {
-  
+
   private MBeanServiceContainer container = new MBeanServiceContainer();
-  
+
   private DeploymentOperation deploymentOperation;
-  
+
   private JobExecutorXmlImpl jobExecutorXml;
-  
+
   private BpmPlatformXml bpmPlatformXml;
-  
+
   private StartManagedThreadPoolStep step;
-  
+
   @Before
-  public void setUp(){
+  public void setUp() {
     step = new StartManagedThreadPoolStep();
-    deploymentOperation = new DeploymentOperation("name", container, Collections.<DeploymentOperationStep> emptyList());
+    deploymentOperation = new DeploymentOperation("name", container,
+        Collections.<DeploymentOperationStep> emptyList());
     jobExecutorXml = new JobExecutorXmlImpl();
-    bpmPlatformXml = new BpmPlatformXmlImpl(jobExecutorXml, Collections.<ProcessEngineXml>emptyList());
+    bpmPlatformXml = new BpmPlatformXmlImpl(jobExecutorXml,
+        Collections.<ProcessEngineXml> emptyList());
     deploymentOperation.addAttachment(Attachments.BPM_PLATFORM_XML, bpmPlatformXml);
   }
-  
+
   @After
-  public void tearDown(){
-    container.stopService(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR);
+  public void tearDown() {
+    container.stopService(ServiceTypes.BPM_PLATFORM,
+        RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR);
   }
 
   @Test
@@ -81,10 +84,11 @@ public class StartManagedThreadPoolStepTest {
     jobExecutorXml.setProperties(properties);
     step.performOperationStep(deploymentOperation);
 
-    PlatformService<JmxManagedThreadPool> service = container.getService(getObjectNameForExecutor());
+    PlatformService<JmxManagedThreadPool> service = container
+        .getService(getObjectNameForExecutor());
     ThreadPoolExecutor executor = service.getValue().getThreadPoolExecutor();
 
-    //since no jobs will start, remaining capacity is sufficent to check the size
+    // since no jobs will start, remaining capacity is sufficent to check the size
     assertThat(executor.getQueue().remainingCapacity(), is(3));
     assertThat(executor.getCorePoolSize(), is(3));
     assertThat(executor.getMaximumPoolSize(), is(10));
@@ -98,25 +102,27 @@ public class StartManagedThreadPoolStepTest {
     String corePoolSize = "12";
     String maxPoolSize = "20";
     String keepAliveTime = "100";
-    properties.put(JobExecutorXml.CORE_POOL_SIZE, corePoolSize );
+    properties.put(JobExecutorXml.CORE_POOL_SIZE, corePoolSize);
     properties.put(JobExecutorXml.KEEP_ALIVE_TIME, keepAliveTime);
     properties.put(JobExecutorXml.MAX_POOL_SIZE, maxPoolSize);
     properties.put(JobExecutorXml.QUEUE_SIZE, queueSize);
     jobExecutorXml.setProperties(properties);
     step.performOperationStep(deploymentOperation);
 
-    PlatformService<JmxManagedThreadPool> service = container.getService(getObjectNameForExecutor());
+    PlatformService<JmxManagedThreadPool> service = container
+        .getService(getObjectNameForExecutor());
     ThreadPoolExecutor executor = service.getValue().getThreadPoolExecutor();
 
-    //since no jobs will start, remaining capacity is sufficent to check the size
+    // since no jobs will start, remaining capacity is sufficent to check the size
     assertThat(executor.getQueue().remainingCapacity(), is(Integer.parseInt(queueSize)));
     assertThat(executor.getCorePoolSize(), is(Integer.parseInt(corePoolSize)));
     assertThat(executor.getMaximumPoolSize(), is(Integer.parseInt(maxPoolSize)));
     assertThat(executor.getKeepAliveTime(TimeUnit.MILLISECONDS), is(Long.parseLong(keepAliveTime)));
   }
-  
-  private ObjectName getObjectNameForExecutor(){
-    String localName = MBeanServiceContainer.composeLocalName(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR);
+
+  private ObjectName getObjectNameForExecutor() {
+    String localName = MBeanServiceContainer.composeLocalName(ServiceTypes.BPM_PLATFORM,
+        RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR);
     return MBeanServiceContainer.getObjectName(localName);
   }
 }

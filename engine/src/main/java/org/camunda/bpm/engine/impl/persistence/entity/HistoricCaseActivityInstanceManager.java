@@ -25,51 +25,64 @@ import org.camunda.bpm.engine.impl.HistoricCaseActivityInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
-
 /**
  * @author Sebastian Menski
  */
 public class HistoricCaseActivityInstanceManager extends AbstractHistoricManager {
 
-  public void deleteHistoricCaseActivityInstancesByCaseInstanceIds(List<String> historicCaseInstanceIds) {
+  public void deleteHistoricCaseActivityInstancesByCaseInstanceIds(
+      List<String> historicCaseInstanceIds) {
     if (isHistoryEnabled()) {
-      getDbEntityManager().delete(HistoricCaseActivityInstanceEntity.class, "deleteHistoricCaseActivityInstancesByCaseInstanceIds", historicCaseInstanceIds);
+      getDbEntityManager().delete(HistoricCaseActivityInstanceEntity.class,
+          "deleteHistoricCaseActivityInstancesByCaseInstanceIds", historicCaseInstanceIds);
     }
   }
 
-  public void insertHistoricCaseActivityInstance(HistoricCaseActivityInstanceEntity historicCaseActivityInstance) {
+  public void insertHistoricCaseActivityInstance(
+      HistoricCaseActivityInstanceEntity historicCaseActivityInstance) {
     getDbEntityManager().insert(historicCaseActivityInstance);
   }
 
-  public HistoricCaseActivityInstanceEntity findHistoricCaseActivityInstance(String caseActivityId, String caseInstanceId) {
+  public HistoricCaseActivityInstanceEntity findHistoricCaseActivityInstance(String caseActivityId,
+      String caseInstanceId) {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("caseActivityId", caseActivityId);
     parameters.put("caseInstanceId", caseInstanceId);
 
-    return (HistoricCaseActivityInstanceEntity) getDbEntityManager().selectOne("selectHistoricCaseActivityInstance", parameters);
+    return (HistoricCaseActivityInstanceEntity) getDbEntityManager()
+        .selectOne("selectHistoricCaseActivityInstance", parameters);
   }
 
-  public long findHistoricCaseActivityInstanceCountByQueryCriteria(HistoricCaseActivityInstanceQueryImpl historicCaseActivityInstanceQuery) {
+  public long findHistoricCaseActivityInstanceCountByQueryCriteria(
+      HistoricCaseActivityInstanceQueryImpl historicCaseActivityInstanceQuery) {
     configureHistoricCaseActivityInstanceQuery(historicCaseActivityInstanceQuery);
-    return (Long) getDbEntityManager().selectOne("selectHistoricCaseActivityInstanceCountByQueryCriteria", historicCaseActivityInstanceQuery);
+    return (Long) getDbEntityManager().selectOne(
+        "selectHistoricCaseActivityInstanceCountByQueryCriteria",
+        historicCaseActivityInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricCaseActivityInstance> findHistoricCaseActivityInstancesByQueryCriteria(HistoricCaseActivityInstanceQueryImpl historicCaseActivityInstanceQuery, Page page) {
+  public List<HistoricCaseActivityInstance> findHistoricCaseActivityInstancesByQueryCriteria(
+      HistoricCaseActivityInstanceQueryImpl historicCaseActivityInstanceQuery, Page page) {
     configureHistoricCaseActivityInstanceQuery(historicCaseActivityInstanceQuery);
-    return getDbEntityManager().selectList("selectHistoricCaseActivityInstancesByQueryCriteria", historicCaseActivityInstanceQuery, page);
+    return getDbEntityManager().selectList("selectHistoricCaseActivityInstancesByQueryCriteria",
+        historicCaseActivityInstanceQuery, page);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricCaseActivityInstance> findHistoricCaseActivityInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbEntityManager().selectListWithRawParameter("selectHistoricCaseActivityInstanceByNativeQuery", parameterMap, firstResult, maxResults);
+  public List<HistoricCaseActivityInstance> findHistoricCaseActivityInstancesByNativeQuery(
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return getDbEntityManager().selectListWithRawParameter(
+        "selectHistoricCaseActivityInstanceByNativeQuery", parameterMap, firstResult, maxResults);
   }
 
   public long findHistoricCaseActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbEntityManager().selectOne("selectHistoricCaseActivityInstanceCountByNativeQuery", parameterMap);
+    return (Long) getDbEntityManager()
+        .selectOne("selectHistoricCaseActivityInstanceCountByNativeQuery", parameterMap);
   }
 
-  protected void configureHistoricCaseActivityInstanceQuery(HistoricCaseActivityInstanceQueryImpl query) {
+  protected void configureHistoricCaseActivityInstanceQuery(
+      HistoricCaseActivityInstanceQueryImpl query) {
     getTenantManager().configureQuery(query);
   }
 }

@@ -28,7 +28,8 @@ public class FormFieldValidatorInvocation extends DelegateInvocation {
   protected Object submittedValue;
   protected FormFieldValidatorContext validatorContext;
 
-  public FormFieldValidatorInvocation(FormFieldValidator formFieldValidator, Object submittedValue, FormFieldValidatorContext validatorContext) {
+  public FormFieldValidatorInvocation(FormFieldValidator formFieldValidator, Object submittedValue,
+      FormFieldValidatorContext validatorContext) {
     super(null, null);
     this.formFieldValidator = formFieldValidator;
     this.submittedValue = submittedValue;

@@ -18,7 +18,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
 
-public class CleanableHistoricCaseInstanceReportResultEntity implements CleanableHistoricCaseInstanceReportResult {
+public class CleanableHistoricCaseInstanceReportResultEntity
+    implements CleanableHistoricCaseInstanceReportResult {
 
   protected String caseDefinitionId;
   protected String caseDefinitionKey;
@@ -94,15 +95,11 @@ public class CleanableHistoricCaseInstanceReportResultEntity implements Cleanabl
   }
 
   public String toString() {
-    return this.getClass().getSimpleName()
-        + "[caseDefinitionId = " + caseDefinitionId
-        + ", caseDefinitionKey = " + caseDefinitionKey
-        + ", caseDefinitionName = " + caseDefinitionName
-        + ", caseDefinitionVersion = " + caseDefinitionVersion
-        + ", historyTimeToLive = " + historyTimeToLive
-        + ", finishedCaseInstanceCount = " + finishedCaseInstanceCount
-        + ", cleanableCaseInstanceCount = " + cleanableCaseInstanceCount
-        + ", tenantId = " + tenantId
-        + "]";
+    return this.getClass().getSimpleName() + "[caseDefinitionId = " + caseDefinitionId
+        + ", caseDefinitionKey = " + caseDefinitionKey + ", caseDefinitionName = "
+        + caseDefinitionName + ", caseDefinitionVersion = " + caseDefinitionVersion
+        + ", historyTimeToLive = " + historyTimeToLive + ", finishedCaseInstanceCount = "
+        + finishedCaseInstanceCount + ", cleanableCaseInstanceCount = " + cleanableCaseInstanceCount
+        + ", tenantId = " + tenantId + "]";
   }
 }

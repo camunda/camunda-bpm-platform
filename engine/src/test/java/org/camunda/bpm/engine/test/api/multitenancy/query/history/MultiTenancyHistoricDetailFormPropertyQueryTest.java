@@ -38,22 +38,17 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class MultiTenancyHistoricDetailFormPropertyQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyHistoricDetailFormPropertyQueryTest
+    extends PluggableProcessEngineTestCase {
 
   protected final static String TENANT_ONE = "tenant1";
   protected final static String TENANT_TWO = "tenant2";
 
   @Override
   protected void setUp() throws IOException {
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .userTask("userTask")
-        .camundaFormField()
-          .camundaId("myFormField")
-          .camundaType("string")
-          .camundaFormFieldDone()
-      .endEvent()
-    .done();
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .userTask("userTask").camundaFormField().camundaId("myFormField").camundaType("string")
+        .camundaFormFieldDone().endEvent().done();
 
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
@@ -66,42 +61,31 @@ public class MultiTenancyHistoricDetailFormPropertyQueryTest extends PluggablePr
   }
 
   public void testQueryWithoutTenantId() {
-    HistoricDetailQuery query = historyService
-        .createHistoricDetailQuery()
-        .formFields();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().formFields();
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
-    HistoricDetailQuery query = historyService
-        .createHistoricDetailQuery()
-        .formFields()
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().formFields()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = historyService
-        .createHistoricDetailQuery()
-        .formFields()
-        .tenantIdIn(TENANT_TWO);
+    query = historyService.createHistoricDetailQuery().formFields().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    HistoricDetailQuery query = historyService
-        .createHistoricDetailQuery()
-        .formFields()
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().formFields()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    HistoricDetailQuery query = historyService
-        .createHistoricDetailQuery()
-        .formFields()
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().formFields()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -109,9 +93,7 @@ public class MultiTenancyHistoricDetailFormPropertyQueryTest extends PluggablePr
 
   public void testFailQueryByTenantIdNull() {
     try {
-      historyService.createHistoricDetailQuery()
-        .formFields()
-        .tenantIdIn((String) null);
+      historyService.createHistoricDetailQuery().formFields().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -119,11 +101,8 @@ public class MultiTenancyHistoricDetailFormPropertyQueryTest extends PluggablePr
   }
 
   public void testQuerySortingAsc() {
-    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery()
-        .formFields()
-        .orderByTenantId()
-        .asc()
-        .list();
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().formFields()
+        .orderByTenantId().asc().list();
 
     assertThat(historicDetails.size(), is(2));
     assertThat(historicDetails.get(0).getTenantId(), is(TENANT_ONE));
@@ -131,11 +110,8 @@ public class MultiTenancyHistoricDetailFormPropertyQueryTest extends PluggablePr
   }
 
   public void testQuerySortingDesc() {
-    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery()
-        .formFields()
-        .orderByTenantId()
-        .desc()
-        .list();
+    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().formFields()
+        .orderByTenantId().desc().list();
 
     assertThat(historicDetails.size(), is(2));
     assertThat(historicDetails.get(0).getTenantId(), is(TENANT_TWO));
@@ -180,12 +156,12 @@ public class MultiTenancyHistoricDetailFormPropertyQueryTest extends PluggablePr
 
   protected ProcessInstance startProcessInstanceForTenant(String tenant) {
     return runtimeService.createProcessInstanceByKey("testProcess")
-        .processDefinitionTenantId(tenant)
-        .execute();
+        .processDefinitionTenantId(tenant).execute();
   }
 
   protected void completeUserTask(ProcessInstance processInstance) {
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .singleResult();
     assertThat(task, is(notNullValue()));
 
     Map<String, Object> properties = new HashMap<String, Object>();

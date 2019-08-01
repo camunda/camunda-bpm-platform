@@ -28,10 +28,14 @@ public interface CaseInstance extends CaseExecution {
   String getBusinessKey();
 
   /**
-   * <p>Returns <code>true</code> if the case instance is completed.</p>
+   * <p>
+   * Returns <code>true</code> if the case instance is completed.
+   * </p>
    *
-   * <p><strong>Note:</strong> If this case execution is not the case instance,
-   * it will always return <code>false</code>.</p>
+   * <p>
+   * <strong>Note:</strong> If this case execution is not the case instance, it will always return
+   * <code>false</code>.
+   * </p>
    */
   boolean isCompleted();
 

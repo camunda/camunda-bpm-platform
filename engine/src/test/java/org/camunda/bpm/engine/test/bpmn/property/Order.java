@@ -24,25 +24,25 @@ import java.io.Serializable;
  * @author Joram Barrez
  */
 public class Order implements Serializable {
-    
-    private static final long serialVersionUID = 1L;
-    
-    private String address;
-    
-    public Order() {
-      
-    }
-    
-    public Order(String address) {
-      this.address = address;
-    }
 
-    public String getAddress() {
-      return address;
-    }
+  private static final long serialVersionUID = 1L;
 
-    public void setAddress(String address) {
-      this.address = address;
-    }
-    
+  private String address;
+
+  public Order() {
+
   }
+
+  public Order(String address) {
+    this.address = address;
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
+  }
+
+}

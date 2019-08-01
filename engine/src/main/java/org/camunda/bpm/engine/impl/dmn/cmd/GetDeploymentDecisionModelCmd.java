@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
-
 /**
  * Gives access to a deployed decision model, e.g., a DMN 1.0 XML file, through a stream of bytes.
  */
@@ -39,7 +38,8 @@ public class GetDeploymentDecisionModelCmd implements Command<InputStream>, Seri
   }
 
   public InputStream execute(final CommandContext commandContext) {
-    DecisionDefinition decisionDefinition = new GetDeploymentDecisionDefinitionCmd(decisionDefinitionId).execute(commandContext);
+    DecisionDefinition decisionDefinition = new GetDeploymentDecisionDefinitionCmd(
+        decisionDefinitionId).execute(commandContext);
 
     final String deploymentId = decisionDefinition.getDeploymentId();
     final String resourceName = decisionDefinition.getResourceName();

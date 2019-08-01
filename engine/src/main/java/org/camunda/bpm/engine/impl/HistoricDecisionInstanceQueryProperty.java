@@ -20,7 +20,8 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
- * Properties which can be used in {@link HistoricDecisionInstanceQuery} to sort historic decision instances.
+ * Properties which can be used in {@link HistoricDecisionInstanceQuery} to sort historic decision
+ * instances.
  *
  * @author Philipp Ossler
  */

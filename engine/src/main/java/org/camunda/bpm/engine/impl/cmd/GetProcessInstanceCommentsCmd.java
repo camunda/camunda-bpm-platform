@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.task.Comment;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -31,15 +30,13 @@ public class GetProcessInstanceCommentsCmd implements Command<List<Comment>>, Se
 
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
-  
+
   public GetProcessInstanceCommentsCmd(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
 
   @SuppressWarnings("unchecked")
   public List<Comment> execute(CommandContext commandContext) {
-    return commandContext
-      .getCommentManager()
-      .findCommentsByProcessInstanceId(processInstanceId);
+    return commandContext.getCommentManager().findCommentsByProcessInstanceId(processInstanceId);
   }
 }

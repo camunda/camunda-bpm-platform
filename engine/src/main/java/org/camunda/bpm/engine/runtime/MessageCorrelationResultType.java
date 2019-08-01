@@ -17,11 +17,10 @@
 package org.camunda.bpm.engine.runtime;
 
 /**
- * The message correlation result type indicates which type
- * of message correlation result is returned after a message correlation.
- * A message may be correlated to either
- * a waiting execution (BPMN receive message event) or a process definition
- * (BPMN message start event). The result type indicates which correlation was performed.
+ * The message correlation result type indicates which type of message correlation result is
+ * returned after a message correlation. A message may be correlated to either a waiting execution
+ * (BPMN receive message event) or a process definition (BPMN message start event). The result type
+ * indicates which correlation was performed.
  * 
  * @author Christopher Zell <christopher.zell@camunda.com>
  */

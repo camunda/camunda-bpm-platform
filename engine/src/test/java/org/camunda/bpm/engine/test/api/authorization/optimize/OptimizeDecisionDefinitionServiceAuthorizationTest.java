@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.optimize;
 
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
@@ -43,22 +42,20 @@ public class OptimizeDecisionDefinitionServiceAuthorizationTest extends Authoriz
   protected String deploymentId;
   private OptimizeService optimizeService;
 
-  public static final String DECISION_PROCESS =
-    "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml";
-  public static final String DECISION_SINGLE_OUTPUT_DMN =
-    "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml";
+  public static final String DECISION_PROCESS = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml";
+  public static final String DECISION_SINGLE_OUTPUT_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml";
 
   @Override
   public void setUp() throws Exception {
 
-    ProcessEngineConfigurationImpl config =
-      (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) getProcessEngine()
+        .getProcessEngineConfiguration();
     optimizeService = config.getOptimizeService();
 
     super.setUp();
   }
 
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testGetDecisionInstancesWithoutAuthorization() {
     // given
     VariableMap variables = Variables.createVariables();
@@ -79,7 +76,7 @@ public class OptimizeDecisionDefinitionServiceAuthorizationTest extends Authoriz
 
   }
 
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testGetDecisionInstancesWithAuthorization() {
     // given
     VariableMap variables = Variables.createVariables();
@@ -88,14 +85,14 @@ public class OptimizeDecisionDefinitionServiceAuthorizationTest extends Authoriz
     createGrantAuthorization(DECISION_DEFINITION, "*", userId, READ_HISTORY);
 
     // when
-    List<HistoricDecisionInstance> decisionInstances =
-      optimizeService.getHistoricDecisionInstances(new Date(0L), null, 10);
+    List<HistoricDecisionInstance> decisionInstances = optimizeService
+        .getHistoricDecisionInstances(new Date(0L), null, 10);
 
     // then
     assertThat(decisionInstances.size(), is(1));
   }
 
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testAuthorizationsOnSingleDecisionDefinitionIsNotEnough() {
     // given
     VariableMap variables = Variables.createVariables();
@@ -116,7 +113,7 @@ public class OptimizeDecisionDefinitionServiceAuthorizationTest extends Authoriz
     }
   }
 
-  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN})
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testGrantAuthorizationWithAllPermissions() {
     // given
     VariableMap variables = Variables.createVariables();
@@ -125,8 +122,8 @@ public class OptimizeDecisionDefinitionServiceAuthorizationTest extends Authoriz
     createGrantAuthorization(DECISION_DEFINITION, "*", userId, ALL);
 
     // when
-    List<HistoricDecisionInstance> decisionInstances =
-      optimizeService.getHistoricDecisionInstances(new Date(0L), null, 10);
+    List<HistoricDecisionInstance> decisionInstances = optimizeService
+        .getHistoricDecisionInstances(new Date(0L), null, 10);
 
     // then
     assertThat(decisionInstances.size(), is(1));

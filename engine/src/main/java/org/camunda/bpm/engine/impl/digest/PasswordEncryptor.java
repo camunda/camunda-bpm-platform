@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.digest;
 
-
 /**
- * The {@link PasswordEncryptor} provides the api to customize
- * the encryption of passwords.
+ * The {@link PasswordEncryptor} provides the api to customize the encryption of passwords.
  *
  * @author Daniel Meyer
  * @author nico.rehwaldt
@@ -45,9 +43,8 @@ public interface PasswordEncryptor {
   public boolean check(String password, String encrypted);
 
   /**
-   * In order to distinguish which algorithm was used to hash the
-   * password, it needs a unique id. In particular, this is needed
-   * for {@link #check}.
+   * In order to distinguish which algorithm was used to hash the password, it needs a unique id. In
+   * particular, this is needed for {@link #check}.
    *
    * @return the name of the algorithm
    */

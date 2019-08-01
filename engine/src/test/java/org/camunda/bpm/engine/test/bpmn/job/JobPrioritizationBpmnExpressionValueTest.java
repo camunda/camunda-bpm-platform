@@ -53,10 +53,8 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
   public void testConstantValueExpressionPrioritization() {
     // when
-    runtimeService
-      .createProcessInstanceByKey("jobPrioExpressionProcess")
-      .startBeforeActivity("task2")
-      .execute();
+    runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+        .startBeforeActivity("task2").execute();
 
     // then
     Job job = managementService.createJobQuery().singleResult();
@@ -67,10 +65,8 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
   public void testConstantValueHashExpressionPrioritization() {
     // when
-    runtimeService
-      .createProcessInstanceByKey("jobPrioExpressionProcess")
-      .startBeforeActivity("task4")
-      .execute();
+    runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+        .startBeforeActivity("task4").execute();
 
     // then
     Job job = managementService.createJobQuery().singleResult();
@@ -81,11 +77,8 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
   public void testVariableValueExpressionPrioritization() {
     // when
-    runtimeService
-      .createProcessInstanceByKey("jobPrioExpressionProcess")
-      .startBeforeActivity("task1")
-      .setVariable("priority", 22)
-      .execute();
+    runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+        .startBeforeActivity("task1").setVariable("priority", 22).execute();
 
     // then
     Job job = managementService.createJobQuery().singleResult();
@@ -100,27 +93,21 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   public void FAILING_testVariableValueExpressionPrioritizationFailsWhenVariableMisses() {
     // when
     try {
-      runtimeService
-        .createProcessInstanceByKey("jobPrioExpressionProcess")
-        .startBeforeActivity("task1")
-        .execute();
+      runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+          .startBeforeActivity("task1").execute();
       fail("this should not succeed since the priority variable is not defined");
     } catch (ProcessEngineException e) {
 
       assertTextPresentIgnoreCase("Unknown property used in expression: ${priority}. "
-          + "Cause: Cannot resolve identifier 'priority'",
-          e.getMessage());
+          + "Cause: Cannot resolve identifier 'priority'", e.getMessage());
     }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
   public void testExecutionExpressionPrioritization() {
     // when
-    runtimeService
-      .createProcessInstanceByKey("jobPrioExpressionProcess")
-      .startBeforeActivity("task1")
-      .setVariable("priority", 25)
-      .execute();
+    runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+        .startBeforeActivity("task1").setVariable("priority", 25).execute();
 
     // then
     Job job = managementService.createJobQuery().singleResult();
@@ -132,11 +119,8 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   public void testExpressionEvaluatesToNull() {
     // when
     try {
-      runtimeService
-        .createProcessInstanceByKey("jobPrioExpressionProcess")
-        .startBeforeActivity("task3")
-        .setVariable("priority", null)
-        .execute();
+      runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+          .startBeforeActivity("task3").setVariable("priority", null).execute();
       fail("this should not succeed since the priority variable is not defined");
     } catch (ProcessEngineException e) {
       assertTextPresentIgnoreCase("Priority value is not an Integer", e.getMessage());
@@ -147,11 +131,9 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   public void testExpressionEvaluatesToNonNumericalValue() {
     // when
     try {
-      runtimeService
-        .createProcessInstanceByKey("jobPrioExpressionProcess")
-        .startBeforeActivity("task3")
-        .setVariable("priority", "aNonNumericalVariableValue")
-        .execute();
+      runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+          .startBeforeActivity("task3").setVariable("priority", "aNonNumericalVariableValue")
+          .execute();
       fail("this should not succeed since the priority must be integer");
     } catch (ProcessEngineException e) {
       assertTextPresentIgnoreCase("Priority value is not an Integer", e.getMessage());
@@ -162,11 +144,8 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   public void testExpressionEvaluatesToNonIntegerValue() {
     // when
     try {
-      runtimeService
-        .createProcessInstanceByKey("jobPrioExpressionProcess")
-        .startBeforeActivity("task3")
-        .setVariable("priority", 4.2d)
-        .execute();
+      runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+          .startBeforeActivity("task3").setVariable("priority", 4.2d).execute();
       fail("this should not succeed since the priority must be integer");
     } catch (ProcessEngineException e) {
       assertTextPresentIgnoreCase("Priority value must be either Short, Integer, or Long",
@@ -177,13 +156,20 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
   public void testConcurrentLocalVariablesAreAccessible() {
     // when
-    runtimeService
-      .createProcessInstanceByKey("jobPrioExpressionProcess")
-      .startBeforeActivity("task2")
-      .startBeforeActivity("task1")
-      .setVariableLocal("priority", 14) // this is a local variable on the
-                                        // concurrent execution entering the activity
-      .execute();
+    runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+        .startBeforeActivity("task2").startBeforeActivity("task1").setVariableLocal("priority", 14) // this
+                                                                                                    // is
+                                                                                                    // a
+                                                                                                    // local
+                                                                                                    // variable
+                                                                                                    // on
+                                                                                                    // the
+                                                                                                    // concurrent
+                                                                                                    // execution
+                                                                                                    // entering
+                                                                                                    // the
+                                                                                                    // activity
+        .execute();
 
     // then
     Job job = managementService.createJobQuery().activityId("task1").singleResult();
@@ -192,18 +178,17 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   }
 
   /**
-   * This test case asserts that a non-resolving expression does not fail job creation;
-   * This is a unit test scenario, where simply the variable misses (in general a human-made error), but
-   * the actual case covered by the behavior are missing beans (e.g. in the case the engine can't perform a
-   * context switch)
+   * This test case asserts that a non-resolving expression does not fail job creation; This is a
+   * unit test scenario, where simply the variable misses (in general a human-made error), but the
+   * actual case covered by the behavior are missing beans (e.g. in the case the engine can't
+   * perform a context switch)
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
   public void testDefaultPriorityWhenBeanMisses() {
-    // creating a job with a priority that can't be resolved does not fail entirely but uses a default priority
-    runtimeService
-      .createProcessInstanceByKey("jobPrioExpressionProcess")
-      .startBeforeActivity("task1")
-      .execute();
+    // creating a job with a priority that can't be resolved does not fail entirely but uses a
+    // default priority
+    runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+        .startBeforeActivity("task1").execute();
 
     // then
     Job job = managementService.createJobQuery().singleResult();
@@ -216,10 +201,8 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
       processEngineConfiguration.setEnableGracefulDegradationOnContextSwitchFailure(false);
 
       try {
-        runtimeService
-          .createProcessInstanceByKey("jobPrioExpressionProcess")
-          .startBeforeActivity("task1")
-          .execute();
+        runtimeService.createProcessInstanceByKey("jobPrioExpressionProcess")
+            .startBeforeActivity("task1").execute();
         fail("should not succeed due to missing variable");
       } catch (ProcessEngineException e) {
         assertTextPresentIgnoreCase("unknown property used in expression", e.getMessage());

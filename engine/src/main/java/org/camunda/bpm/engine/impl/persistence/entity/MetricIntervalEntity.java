@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.management.MetricIntervalValue;
  */
 public class MetricIntervalEntity implements MetricIntervalValue, DbEntity, Serializable {
 
-
   protected Date timestamp;
 
   protected String name;
@@ -131,10 +130,12 @@ public class MetricIntervalEntity implements MetricIntervalValue, DbEntity, Seri
     if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
       return false;
     }
-    if ((this.reporter == null) ? (other.reporter != null) : !this.reporter.equals(other.reporter)) {
+    if ((this.reporter == null) ? (other.reporter != null)
+        : !this.reporter.equals(other.reporter)) {
       return false;
     }
-    if (this.timestamp != other.timestamp && (this.timestamp == null || !this.timestamp.equals(other.timestamp))) {
+    if (this.timestamp != other.timestamp
+        && (this.timestamp == null || !this.timestamp.equals(other.timestamp))) {
       return false;
     }
     return true;

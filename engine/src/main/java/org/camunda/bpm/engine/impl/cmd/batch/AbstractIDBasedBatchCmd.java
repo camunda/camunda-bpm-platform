@@ -26,15 +26,15 @@ import org.camunda.bpm.engine.impl.util.BatchUtil;
 import java.util.List;
 
 /**
- * Representation of common logic to all Batch commands which are based on list of
- * IDs.
+ * Representation of common logic to all Batch commands which are based on list of IDs.
  *
  * @author Askar Akhmerov
  */
 public abstract class AbstractIDBasedBatchCmd<T> extends AbstractBatchCmd<T> {
 
   protected BatchEntity createBatch(CommandContext commandContext, List<String> ids) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext
+        .getProcessEngineConfiguration();
     BatchJobHandler batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
     BatchConfiguration configuration = getAbstractIdsBatchConfiguration(ids);
@@ -52,5 +52,6 @@ public abstract class AbstractIDBasedBatchCmd<T> extends AbstractBatchCmd<T> {
 
   protected abstract BatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids);
 
-  protected abstract BatchJobHandler getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration);
+  protected abstract BatchJobHandler getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration);
 }

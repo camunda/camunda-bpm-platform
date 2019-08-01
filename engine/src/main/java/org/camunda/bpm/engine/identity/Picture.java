@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.identity;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -36,7 +35,7 @@ public class Picture {
   public byte[] getBytes() {
     return bytes;
   }
-  
+
   public InputStream getInputStream() {
     return new ByteArrayInputStream(bytes);
   }

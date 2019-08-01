@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine.impl.form.validator;
 
 /**
- * <p>Interface for implenting form field validators.</p>
+ * <p>
+ * Interface for implenting form field validators.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -30,8 +32,7 @@ public interface FormFieldValidator {
    * @param submittedValue
    *          the value submitted to the form field
    * @param validatorContext
-   *          object providing access to additional information useful wile
-   *          validating the form
+   *          object providing access to additional information useful wile validating the form
    * @return true if the value is valid, false otherwise.
    */
   public boolean validate(Object submittedValue, FormFieldValidatorContext validatorContext);

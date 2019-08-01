@@ -68,7 +68,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     executeAllJobs();
 
-    List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
+    List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("startTimerEventExample").list();
     assertEquals(1, pi.size());
 
     assertEquals(0, jobQuery.count());
@@ -82,10 +83,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
-    ClockUtil.setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:12:30"));
+    ClockUtil
+        .setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:12:30"));
     executeAllJobs();
 
-    List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
+    List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("startTimerEventExample").list();
     assertEquals(1, pi.size());
 
     assertEquals(0, jobQuery.count());
@@ -102,7 +105,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
-    final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
+    final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("startTimerEventExample");
 
     assertEquals(0, piq.count());
 
@@ -117,12 +121,13 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, jobQuery.count());
     // have to manually delete pending timer
-//    cleanDB();
+    // cleanDB();
 
   }
 
   private void moveByMinutes(int minutes) throws Exception {
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + ((minutes * 60 * 1000) + 5000)));
+    ClockUtil.setCurrentTime(
+        new Date(ClockUtil.getCurrentTime().getTime() + ((minutes * 60 * 1000) + 5000)));
   }
 
   @Deployment
@@ -137,7 +142,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     Job job = jobQuery.singleResult();
     assertNotNull(job.getDeploymentId());
 
-    final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExampleCycle");
+    final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("startTimerEventExampleCycle");
 
     assertEquals(0, piq.count());
 
@@ -171,7 +177,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(9999, job.getPriority());
 
     final ProcessInstanceQuery piq = runtimeService.createProcessInstanceQuery()
-      .processDefinitionKey("startTimerEventExampleCycle");
+        .processDefinitionKey("startTimerEventExampleCycle");
 
     assertEquals(0, piq.count());
 
@@ -194,35 +200,38 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
-    ClockUtil.setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:12:30"));
+    ClockUtil
+        .setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:12:30"));
     executeAllJobs();
 
-    List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
+    List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("startTimerEventExample").list();
     assertEquals(1, pi.size());
 
     assertEquals(0, jobQuery.count());
   }
-  
+
   @Deployment
   public void testRecalculateExpressionStartTimerEvent() throws Exception {
     // given
     JobQuery jobQuery = managementService.createJobQuery();
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("startTimerEventExample");
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     Job job = jobQuery.singleResult();
     Date oldDate = job.getDuedate();
-    
+
     // when
     moveByMinutes(2);
     Date currentTime = ClockUtil.getCurrentTime();
     managementService.recalculateJobDuedate(job.getId(), false);
-    
+
     // then
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     Date newDate = jobQuery.singleResult().getDuedate();
     assertNotEquals(oldDate, newDate);
     assertTrue(oldDate.before(newDate));
@@ -238,25 +247,28 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     assertEquals(0, jobQuery.count());
   }
-  
+
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/StartTimerEventTest.testRecalculateExpressionStartTimerEvent.bpmn20.xml")
-  public void testRecalculateUnchangedExpressionStartTimerEventCreationDateBased() throws Exception {
+  public void testRecalculateUnchangedExpressionStartTimerEventCreationDateBased()
+      throws Exception {
     // given
     JobQuery jobQuery = managementService.createJobQuery();
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("startTimerEventExample");
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     // when
     moveByMinutes(1);
     managementService.recalculateJobDuedate(jobQuery.singleResult().getId(), true);
-    
+
     // then due date should be based on the creation time
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     Job jobUpdated = jobQuery.singleResult();
-    Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusHours(2).toDate();
+    Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusHours(2)
+        .toDate();
     assertEquals(expectedDate, jobUpdated.getDuedate());
 
     // move the clock forward 2 hours and 1 minute
@@ -278,24 +290,29 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(1, jobQuery.count());
 
     // we deploy new process version, with some small change
-    InputStream in = getClass().getResourceAsStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml");
-    String process = new String(IoUtil.readInputStream(in, "")).replaceAll("beforeChange", "changed");
+    InputStream in = getClass()
+        .getResourceAsStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml");
+    String process = new String(IoUtil.readInputStream(in, "")).replaceAll("beforeChange",
+        "changed");
     IoUtil.closeSilently(in);
     in = new ByteArrayInputStream(process.getBytes());
-    String id = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml", in).deploy().getId();
+    String id = repositoryService.createDeployment()
+        .addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml", in)
+        .deploy().getId();
     IoUtil.closeSilently(in);
 
     assertEquals(1, jobQuery.count());
 
     moveByMinutes(5);
     executeAllJobs();
-    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").singleResult();
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("startTimerEventExample").singleResult();
     String pi = processInstance.getProcessInstanceId();
     assertEquals("changed", runtimeService.getActiveActivityIds(pi).get(0));
 
     assertEquals(1, jobQuery.count());
 
-//    cleanDB();
+    // cleanDB();
     repositoryService.deleteDeployment(id, true);
   }
 
@@ -324,12 +341,14 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
   // Test for ACT-1533
   public void testTimerShouldNotBeRemovedWhenUndeployingOldVersion() throws Exception {
     // Deploy test process
-    InputStream in = getClass().getResourceAsStream("StartTimerEventTest.testTimerShouldNotBeRemovedWhenUndeployingOldVersion.bpmn20.xml");
+    InputStream in = getClass().getResourceAsStream(
+        "StartTimerEventTest.testTimerShouldNotBeRemovedWhenUndeployingOldVersion.bpmn20.xml");
     String process = new String(IoUtil.readInputStream(in, ""));
     IoUtil.closeSilently(in);
 
     in = new ByteArrayInputStream(process.getBytes());
-    String firstDeploymentId = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml", in)
+    String firstDeploymentId = repositoryService.createDeployment()
+        .addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml", in)
         .deploy().getId();
     IoUtil.closeSilently(in);
 
@@ -340,7 +359,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // we deploy new process version, with some small change
     String processChanged = process.replaceAll("beforeChange", "changed");
     in = new ByteArrayInputStream(processChanged.getBytes());
-    String secondDeploymentId = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml", in)
+    String secondDeploymentId = repositoryService.createDeployment()
+        .addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml", in)
         .deploy().getId();
     IoUtil.closeSilently(in);
     assertEquals(1, jobQuery.count());
@@ -362,10 +382,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     DummyServiceTask.wasExecuted = false;
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startTimerEventInEventSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("startTimerEventInEventSubProcess");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
 
     // check if user task exists
@@ -388,7 +410,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // interrupting
     assertEquals(0, executionQuery.count());
 
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(0, processInstanceQuery.count());
   }
 
@@ -397,10 +420,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     DummyServiceTask.wasExecuted = false;
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterruptingStartTimerEventInEventSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("nonInterruptingStartTimerEventInEventSubProcess");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
 
     // check if user task exists
@@ -423,7 +448,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // interrupting
     assertEquals(1, executionQuery.count());
 
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, processInstanceQuery.count());
   }
 
@@ -432,10 +458,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     DummyServiceTask.wasExecuted = false;
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startTimerEventSubProcessInSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("startTimerEventSubProcessInSubProcess");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(2, executionQuery.count());
 
     // check if user task exists
@@ -458,7 +486,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // interrupting
     assertEquals(0, executionQuery.count());
 
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(0, processInstanceQuery.count());
 
   }
@@ -468,10 +497,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     DummyServiceTask.wasExecuted = false;
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterruptingStartTimerEventSubProcessInSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("nonInterruptingStartTimerEventSubProcessInSubProcess");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(2, executionQuery.count());
 
     // check if user task exists
@@ -494,7 +525,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // interrupting
     assertEquals(2, executionQuery.count());
 
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, processInstanceQuery.count());
 
   }
@@ -502,10 +534,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testStartTimerEventWithTwoEventSubProcesses() {
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startTimerEventWithTwoEventSubProcesses");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("startTimerEventWithTwoEventSubProcesses");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
 
     // check if user task exists
@@ -530,7 +564,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // check if process instance doesn't exist because timer start event is
     // interrupting
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(0, processInstanceQuery.count());
 
   }
@@ -540,10 +575,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     DummyServiceTask.wasExecuted = false;
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterruptingStartTimerEventWithTwoEventSubProcesses");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("nonInterruptingStartTimerEventWithTwoEventSubProcesses");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
 
     // check if user task exists
@@ -583,7 +620,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // check if execution still exists because timer event is non interrupting
     assertEquals(1, executionQuery.count());
 
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, processInstanceQuery.count());
 
   }
@@ -591,7 +629,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testStartTimerEventSubProcessWithUserTask() {
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startTimerEventSubProcessWithUserTask");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("startTimerEventSubProcessWithUserTask");
 
     // check if user task exists
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
@@ -611,21 +650,25 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // check if process instance exists because subprocess named "subProcess" is
     // already running
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, processInstanceQuery.count());
 
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/timer/simpleProcessWithCallActivity.bpmn20.xml",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/timer/simpleProcessWithCallActivity.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/timer/StartTimerEventTest.testStartTimerEventWithTwoEventSubProcesses.bpmn20.xml" })
   public void testStartTimerEventSubProcessCalledFromCallActivity() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("calledProcess", "startTimerEventWithTwoEventSubProcesses");
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleCallActivityProcess", variables);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("simpleCallActivityProcess", variables);
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(2, executionQuery.count());
 
     // check if user task exists
@@ -650,21 +693,25 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // check if process instance doesn't exist because timer start event is
     // interrupting
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(0, processInstanceQuery.count());
 
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/timer/simpleProcessWithCallActivity.bpmn20.xml",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/timer/simpleProcessWithCallActivity.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/timer/StartTimerEventTest.testNonInterruptingStartTimerEventWithTwoEventSubProcesses.bpmn20.xml" })
   public void testNonInterruptingStartTimerEventSubProcessesCalledFromCallActivity() {
     DummyServiceTask.wasExecuted = false;
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterruptingStartTimerEventWithTwoEventSubProcesses");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("nonInterruptingStartTimerEventWithTwoEventSubProcesses");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, executionQuery.count());
 
     // check if user task exists
@@ -704,7 +751,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // check if execution still exists because timer event is non interrupting
     assertEquals(1, executionQuery.count());
 
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, processInstanceQuery.count());
 
   }
@@ -714,7 +762,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     DummyServiceTask.wasExecuted = false;
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startTimerEventSubProcessInMultiInstanceSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("startTimerEventSubProcessInMultiInstanceSubProcess");
 
     // check if user task exists
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -756,7 +805,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     DummyServiceTask.wasExecuted = false;
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterruptingStartTimerEventInMultiInstanceEventSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("nonInterruptingStartTimerEventInMultiInstanceEventSubProcess");
 
     // execute multiInstance loop number 1
 
@@ -797,7 +847,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // check if process instance doesn't exist because timer start event is
     // interrupting
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, processInstanceQuery.count());
 
   }
@@ -807,10 +858,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     DummyServiceTask.wasExecuted = false;
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startTimerEventSubProcessInParallelMultiInstanceSubProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("startTimerEventSubProcessInParallelMultiInstanceSubProcess");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(6, executionQuery.count());
 
     // check if user task exists
@@ -837,7 +890,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // check if process instance doesn't exist because timer start event is
     // interrupting
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(0, processInstanceQuery.count());
 
   }
@@ -847,10 +901,12 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     DummyServiceTask.wasExecuted = false;
 
     // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonInterruptingParallelMultiInstance");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("nonInterruptingParallelMultiInstance");
 
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(6, executionQuery.count());
 
     // check if user task exists
@@ -879,15 +935,15 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // check if process instance doesn't exist because timer start event is
     // interrupting
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, processInstanceQuery.count());
 
   }
 
   /**
-   * test scenario: - start process instance with multiInstance sequential -
-   * execute interrupting timer job of event subprocess - execute non
-   * interrupting timer boundary event of subprocess
+   * test scenario: - start process instance with multiInstance sequential - execute interrupting
+   * timer job of event subprocess - execute non interrupting timer boundary event of subprocess
    */
   @Deployment
   public void testStartTimerEventSubProcessInMultiInstanceSubProcessWithNonInterruptingBoundaryTimerEvent() {
@@ -919,15 +975,15 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // after non interrupting boundary timer job execution
     assertEquals(1, jobQuery.count());
     assertEquals(1, taskQuery.count());
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, processInstanceQuery.count());
 
   }
 
   /**
-   * test scenario: - start process instance with multiInstance sequential -
-   * execute interrupting timer job of event subprocess - execute interrupting
-   * timer boundary event of subprocess
+   * test scenario: - start process instance with multiInstance sequential - execute interrupting
+   * timer job of event subprocess - execute interrupting timer boundary event of subprocess
    */
   @Deployment
   public void testStartTimerEventSubProcessInMultiInstanceSubProcessWithInterruptingBoundaryTimerEvent() {
@@ -976,7 +1032,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // execute multiInstance loop number 1
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(3, executionQuery.count());
 
     // check if user task exists
@@ -1007,15 +1064,15 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(0, jobQuery.count());
     assertEquals(0, taskQuery.count());
     assertEquals(0, executionQuery.count());
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(0, processInstanceQuery.count());
 
   }
 
   /**
-   * test scenario: - start process instance with multiInstance parallel -
-   * execute interrupting timer job of event subprocess - execute non
-   * interrupting timer boundary event of subprocess
+   * test scenario: - start process instance with multiInstance parallel - execute interrupting
+   * timer job of event subprocess - execute non interrupting timer boundary event of subprocess
    */
   @Deployment
   public void testStartTimerEventSubProcessInParallelMultiInstanceSubProcessWithNonInterruptingBoundaryTimerEvent() {
@@ -1026,7 +1083,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // execute multiInstance loop number 1
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(6, executionQuery.count());
 
     // check if user task exists
@@ -1054,15 +1112,15 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskQuery.count());
     assertEquals(5, executionQuery.count());
 
-    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
+    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(1, processInstanceQuery.count());
 
   }
 
   /**
-   * test scenario: - start process instance with multiInstance parallel -
-   * execute interrupting timer job of event subprocess - execute interrupting
-   * timer boundary event of subprocess
+   * test scenario: - start process instance with multiInstance parallel - execute interrupting
+   * timer job of event subprocess - execute interrupting timer boundary event of subprocess
    */
   @Deployment
   public void testStartTimerEventSubProcessInParallelMultiInstanceSubProcessWithInterruptingBoundaryTimerEvent() {
@@ -1071,7 +1129,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // execute multiInstance loop number 1
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(6, executionQuery.count());
 
     // check if user task exists
@@ -1102,9 +1161,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
   }
 
   /**
-   * test scenario: - start process instance with multiInstance parallel -
-   * execute non interrupting timer job of event subprocess - execute
-   * interrupting timer boundary event of subprocess
+   * test scenario: - start process instance with multiInstance parallel - execute non interrupting
+   * timer job of event subprocess - execute interrupting timer boundary event of subprocess
    */
   @Deployment
   public void testNonInterruptingStartTimerEventSubProcessInParallelMiSubProcessWithInterruptingBoundaryTimerEvent() {
@@ -1115,7 +1173,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     // execute multiInstance loop number 1
     // check if execution exists
-    ExecutionQuery executionQuery = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId());
+    ExecutionQuery executionQuery = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId());
     assertEquals(6, executionQuery.count());
 
     // check if user task exists
@@ -1182,23 +1241,19 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     String anotherJobId = jobQuery.singleResult().getId();
     assertFalse(jobId.equals(anotherJobId));
   }
-  
+
   public void testRecalculateTimeCycleExpressionCurrentDateBased() throws Exception {
     // given
     Mocks.register("cycle", "R/PT15M");
 
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
 
-    BpmnModelInstance modelInstance = processBuilder
-      .startEvent().timerWithCycle("${cycle}")
-        .userTask("aTaskName")
-      .endEvent()
-      .done();
+    BpmnModelInstance modelInstance = processBuilder.startEvent().timerWithCycle("${cycle}")
+        .userTask("aTaskName").endEvent().done();
 
     deploymentId = repositoryService.createDeployment()
-      .addModelInstance("process.bpmn", modelInstance).deploy()
-      .getId();
-    
+        .addModelInstance("process.bpmn", modelInstance).deploy().getId();
+
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
@@ -1215,7 +1270,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(jobId, jobUpdated.getId());
     assertNotEquals(oldDuedate, jobUpdated.getDuedate());
     assertTrue(oldDuedate.before(jobUpdated.getDuedate()));
-    
+
     // when
     Mocks.register("cycle", "R/PT10M");
     managementService.recalculateJobDuedate(jobId, false);
@@ -1225,26 +1280,22 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(jobId, jobUpdated.getId());
     assertNotEquals(oldDuedate, jobUpdated.getDuedate());
     assertTrue(oldDuedate.after(jobUpdated.getDuedate()));
-    
+
     Mocks.reset();
   }
-  
+
   public void testRecalculateTimeCycleExpressionCreationDateBased() throws Exception {
     // given
     Mocks.register("cycle", "R/PT15M");
 
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
 
-    BpmnModelInstance modelInstance = processBuilder
-      .startEvent().timerWithCycle("${cycle}")
-        .userTask("aTaskName")
-      .endEvent()
-      .done();
+    BpmnModelInstance modelInstance = processBuilder.startEvent().timerWithCycle("${cycle}")
+        .userTask("aTaskName").endEvent().done();
 
     deploymentId = repositoryService.createDeployment()
-      .addModelInstance("process.bpmn", modelInstance).deploy()
-      .getId();
-    
+        .addModelInstance("process.bpmn", modelInstance).deploy().getId();
+
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
@@ -1259,9 +1310,10 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // then
     Job jobUpdated = jobQuery.singleResult();
     assertEquals(jobId, jobUpdated.getId());
-    Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(15).toDate();
+    Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(15)
+        .toDate();
     assertEquals(expectedDate, jobUpdated.getDuedate());
-    
+
     // when
     Mocks.register("cycle", "R/PT10M");
     managementService.recalculateJobDuedate(jobId, true);
@@ -1271,12 +1323,13 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(jobId, jobUpdated.getId());
     assertNotEquals(oldDuedate, jobUpdated.getDuedate());
     assertTrue(oldDuedate.after(jobUpdated.getDuedate()));
-    expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(10).toDate();
+    expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(10)
+        .toDate();
     assertEquals(expectedDate, jobUpdated.getDuedate());
-    
+
     Mocks.reset();
   }
-  
+
   @Deployment
   public void testFailingTimeCycle() throws Exception {
     // given
@@ -1354,20 +1407,14 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
 
-    BpmnModelInstance modelInstance = processBuilder
-      .startEvent().timerWithDuration("${duration}")
-        .userTask("aTaskName")
-      .endEvent()
-      .done();
+    BpmnModelInstance modelInstance = processBuilder.startEvent().timerWithDuration("${duration}")
+        .userTask("aTaskName").endEvent().done();
 
     deploymentId = repositoryService.createDeployment()
-      .addModelInstance("process.bpmn", modelInstance).deploy()
-      .getId();
+        .addModelInstance("process.bpmn", modelInstance).deploy().getId();
 
     // when
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     managementService.executeJob(jobId);
 
@@ -1382,29 +1429,19 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // given
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
 
-    BpmnModelInstance modelInstance = processBuilder
-      .startEvent()
-        .userTask()
-      .endEvent()
-      .done();
+    BpmnModelInstance modelInstance = processBuilder.startEvent().userTask().endEvent().done();
 
-    processBuilder.eventSubProcess()
-      .startEvent().timerWithDuration("${duration}")
-        .userTask("taskInSubprocess")
-      .endEvent();
+    processBuilder.eventSubProcess().startEvent().timerWithDuration("${duration}")
+        .userTask("taskInSubprocess").endEvent();
 
     deploymentId = repositoryService.createDeployment()
-      .addModelInstance("process.bpmn", modelInstance).deploy()
-      .getId();
+        .addModelInstance("process.bpmn", modelInstance).deploy().getId();
 
     // when
     runtimeService.startProcessInstanceByKey("process",
-      Variables.createVariables()
-        .putValue("duration", "PT60S"));
+        Variables.createVariables().putValue("duration", "PT60S"));
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     managementService.executeJob(jobId);
 
@@ -1416,61 +1453,47 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // given
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
 
-    BpmnModelInstance modelInstance = processBuilder
-      .startEvent()
-        .userTask()
-      .endEvent().done();
+    BpmnModelInstance modelInstance = processBuilder.startEvent().userTask().endEvent().done();
 
-    processBuilder.eventSubProcess()
-      .startEvent().interrupting(false).timerWithDuration("${duration}")
-        .userTask("taskInSubprocess")
-      .endEvent();
+    processBuilder.eventSubProcess().startEvent().interrupting(false)
+        .timerWithDuration("${duration}").userTask("taskInSubprocess").endEvent();
 
     deploymentId = repositoryService.createDeployment()
-      .addModelInstance("process.bpmn", modelInstance).deploy()
-      .getId();
+        .addModelInstance("process.bpmn", modelInstance).deploy().getId();
 
     // when
     runtimeService.startProcessInstanceByKey("process",
-      Variables.createVariables()
-        .putValue("duration", "PT60S"));
+        Variables.createVariables().putValue("duration", "PT60S"));
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     managementService.executeJob(jobId);
 
     // then
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
   }
-  
-  public void testRecalculateNonInterruptingWithUnchangedDurationExpressionInEventSubprocessCurrentDateBased() throws Exception {
+
+  public void testRecalculateNonInterruptingWithUnchangedDurationExpressionInEventSubprocessCurrentDateBased()
+      throws Exception {
     // given
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
 
-    BpmnModelInstance modelInstance = processBuilder
-      .startEvent()
-        .userTask()
-      .endEvent().done();
+    BpmnModelInstance modelInstance = processBuilder.startEvent().userTask().endEvent().done();
 
-    processBuilder.eventSubProcess()
-      .startEvent().interrupting(false).timerWithDuration("${duration}")
-        .userTask("taskInSubprocess")
-      .endEvent();
+    processBuilder.eventSubProcess().startEvent().interrupting(false)
+        .timerWithDuration("${duration}").userTask("taskInSubprocess").endEvent();
 
     deploymentId = repositoryService.createDeployment()
-      .addModelInstance("process.bpmn", modelInstance).deploy()
-      .getId();
+        .addModelInstance("process.bpmn", modelInstance).deploy().getId();
 
-    runtimeService.startProcessInstanceByKey("process", 
+    runtimeService.startProcessInstanceByKey("process",
         Variables.createVariables().putValue("duration", "PT70S"));
-    
+
     JobQuery jobQuery = managementService.createJobQuery();
     Job job = jobQuery.singleResult();
     String jobId = job.getId();
     Date oldDueDate = job.getDuedate();
-    
+
     // when
     moveByMinutes(2);
     Date currentTime = ClockUtil.getCurrentTime();
@@ -1483,37 +1506,32 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertTrue(oldDueDate.before(newDuedate));
     Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusSeconds(70).toDate();
     assertThat(newDuedate).isCloseTo(expectedDate, 1000l);
-    
+
     managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
   }
-  
-  public void testRecalculateNonInterruptingWithChangedDurationExpressionInEventSubprocessCreationDateBased() throws Exception {
+
+  public void testRecalculateNonInterruptingWithChangedDurationExpressionInEventSubprocessCreationDateBased()
+      throws Exception {
     // given
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
 
-    BpmnModelInstance modelInstance = processBuilder
-      .startEvent()
-        .userTask()
-      .endEvent().done();
+    BpmnModelInstance modelInstance = processBuilder.startEvent().userTask().endEvent().done();
 
-    processBuilder.eventSubProcess()
-      .startEvent().interrupting(false).timerWithDuration("${duration}")
-        .userTask("taskInSubprocess")
-      .endEvent();
+    processBuilder.eventSubProcess().startEvent().interrupting(false)
+        .timerWithDuration("${duration}").userTask("taskInSubprocess").endEvent();
 
     deploymentId = repositoryService.createDeployment()
-      .addModelInstance("process.bpmn", modelInstance).deploy()
-      .getId();
+        .addModelInstance("process.bpmn", modelInstance).deploy().getId();
 
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", 
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process",
         Variables.createVariables().putValue("duration", "PT60S"));
-    
+
     JobQuery jobQuery = managementService.createJobQuery();
     Job job = jobQuery.singleResult();
     String jobId = job.getId();
     Date oldDueDate = job.getDuedate();
-    
+
     // when
     runtimeService.setVariable(pi.getId(), "duration", "PT2M");
     managementService.recalculateJobDuedate(jobId, true);
@@ -1521,10 +1539,11 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     // then
     assertEquals(1L, jobQuery.count());
     Date newDuedate = jobQuery.singleResult().getDuedate();
-    Date expectedDate = LocalDateTime.fromDateFields(jobQuery.singleResult().getCreateTime()).plusMinutes(2).toDate();
+    Date expectedDate = LocalDateTime.fromDateFields(jobQuery.singleResult().getCreateTime())
+        .plusMinutes(2).toDate();
     assertTrue(oldDueDate.before(newDuedate));
     assertTrue(expectedDate.equals(newDuedate));
-    
+
     managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
   }
@@ -1583,8 +1602,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
   // util methods ////////////////////////////////////////
 
   /**
-   * executes all jobs in this threads until they are either done or retries are
-   * exhausted.
+   * executes all jobs in this threads until they are either done or retries are exhausted.
    */
   protected void executeAllJobs() {
     String nextJobId = getNextExecutableJobId();

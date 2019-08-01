@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.metrics.reporter;
 
-
 import java.util.Timer;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -56,13 +55,12 @@ public class DbMetricsReporter {
     timer = new Timer("Camunda Metrics Reporter", true);
     long reportingIntervalInMillis = reportingIntervalInSeconds * 1000;
 
-    timer.scheduleAtFixedRate(metricsCollectionTask,
-        reportingIntervalInMillis,
+    timer.scheduleAtFixedRate(metricsCollectionTask, reportingIntervalInMillis,
         reportingIntervalInMillis);
   }
 
   public void stop() {
-    if(timer != null) {
+    if (timer != null) {
       // cancel the timer
       timer.cancel();
       timer = null;
@@ -72,7 +70,7 @@ public class DbMetricsReporter {
   }
 
   public void reportNow() {
-    if(metricsCollectionTask != null) {
+    if (metricsCollectionTask != null) {
       metricsCollectionTask.run();
     }
   }
@@ -81,7 +79,8 @@ public class DbMetricsReporter {
     commandExecutor.execute(new Command<Void>() {
       @Override
       public Void execute(CommandContext commandContext) {
-        commandContext.getMeterLogManager().insert(new MeterLogEntity(name, reporterId, value, ClockUtil.getCurrentTime()));
+        commandContext.getMeterLogManager()
+            .insert(new MeterLogEntity(name, reporterId, value, ClockUtil.getCurrentTime()));
         return null;
       }
     });

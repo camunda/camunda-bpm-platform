@@ -36,7 +36,8 @@ public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecution
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
 
-  public MigrationPlanExecutionBuilderImpl(CommandExecutor commandExecutor, MigrationPlan migrationPlan) {
+  public MigrationPlanExecutionBuilderImpl(CommandExecutor commandExecutor,
+      MigrationPlan migrationPlan) {
     this.commandExecutor = commandExecutor;
     this.migrationPlan = migrationPlan;
   }
@@ -54,8 +55,7 @@ public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecution
   public MigrationPlanExecutionBuilder processInstanceIds(String... processInstanceIds) {
     if (processInstanceIds == null) {
       this.processInstanceIds = Collections.emptyList();
-    }
-    else {
+    } else {
       this.processInstanceIds = Arrays.asList(processInstanceIds);
     }
     return this;
@@ -65,7 +65,8 @@ public class MigrationPlanExecutionBuilderImpl implements MigrationPlanExecution
     return processInstanceIds;
   }
 
-  public MigrationPlanExecutionBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
+  public MigrationPlanExecutionBuilder processInstanceQuery(
+      ProcessInstanceQuery processInstanceQuery) {
     this.processInstanceQuery = processInstanceQuery;
     return this;
   }

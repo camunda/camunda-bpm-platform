@@ -48,9 +48,7 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
 
     // then
-    CaseInstance caseInstance = caseService
-        .createCaseInstanceQuery()
-        .caseInstanceId(caseInstanceId)
+    CaseInstance caseInstance = caseService.createCaseInstanceQuery().caseInstanceId(caseInstanceId)
         .singleResult();
 
     assertNotNull(caseInstance);
@@ -67,9 +65,7 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     // given
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
 
-    CaseExecutionQuery query = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_Stage_1");
+    CaseExecutionQuery query = caseService.createCaseExecutionQuery().activityId("PI_Stage_1");
 
     String stageId = query.singleResult().getId();
 
@@ -80,9 +76,7 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
 
     // the instance is still active (contains
     // a further human task)
-    CaseInstance caseInstance = caseService
-        .createCaseInstanceQuery()
-        .caseInstanceId(caseInstanceId)
+    CaseInstance caseInstance = caseService.createCaseInstanceQuery().caseInstanceId(caseInstanceId)
         .singleResult();
     assertNotNull(caseInstance);
     assertTrue(caseInstance.isActive());
@@ -105,9 +99,8 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
 
     // then (1)
-    CaseInstanceQuery instanceQuery = caseService
-      .createCaseInstanceQuery()
-      .caseInstanceId(caseInstanceId);
+    CaseInstanceQuery instanceQuery = caseService.createCaseInstanceQuery()
+        .caseInstanceId(caseInstanceId);
 
     CaseInstance caseInstance = instanceQuery.singleResult();
     assertNotNull(caseInstance);
@@ -115,10 +108,7 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
 
     CaseExecutionQuery executionQuery = caseService.createCaseExecutionQuery();
 
-    String humanTask2Id = executionQuery
-      .activityId("PI_HumanTask_2")
-      .singleResult()
-      .getId();
+    String humanTask2Id = executionQuery.activityId("PI_HumanTask_2").singleResult().getId();
 
     // when (2)
     caseService.completeCaseExecution(humanTask2Id);
@@ -140,22 +130,14 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
 
     CaseExecutionQuery executionQuery = caseService.createCaseExecutionQuery();
 
-    String stageId = executionQuery
-        .activityId("PI_Stage_1")
-        .singleResult()
-        .getId();
+    String stageId = executionQuery.activityId("PI_Stage_1").singleResult().getId();
 
     // then (1)
-    CaseExecution stage = executionQuery
-        .activityId("PI_Stage_1")
-        .singleResult();
+    CaseExecution stage = executionQuery.activityId("PI_Stage_1").singleResult();
     assertNotNull(stage);
     assertTrue(stage.isActive());
 
-    String humanTask2Id = executionQuery
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String humanTask2Id = executionQuery.activityId("PI_HumanTask_2").singleResult().getId();
 
     // when (2)
     complete(humanTask2Id);
@@ -163,9 +145,7 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     // then (2)
     // the instance is still active (contains
     // a further human task)
-    CaseInstance caseInstance = caseService
-        .createCaseInstanceQuery()
-        .caseInstanceId(caseInstanceId)
+    CaseInstance caseInstance = caseService.createCaseInstanceQuery().caseInstanceId(caseInstanceId)
         .singleResult();
     assertNotNull(caseInstance);
     assertTrue(caseInstance.isActive());
@@ -190,9 +170,7 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
 
     // then
-    CaseInstance caseInstance = caseService
-        .createCaseInstanceQuery()
-        .caseInstanceId(caseInstanceId)
+    CaseInstance caseInstance = caseService.createCaseInstanceQuery().caseInstanceId(caseInstanceId)
         .singleResult();
     assertNotNull(caseInstance);
     assertTrue(caseInstance.isCompleted());
@@ -216,16 +194,11 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
 
     // then (1)
-    CaseInstance caseInstance = instanceQuery
-        .caseInstanceId(caseInstanceId)
-        .singleResult();
+    CaseInstance caseInstance = instanceQuery.caseInstanceId(caseInstanceId).singleResult();
     assertNotNull(caseInstance);
     assertTrue(caseInstance.isActive());
 
-    String humanTask1Id = executionQuery
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTask1Id = executionQuery.activityId("PI_HumanTask_1").singleResult().getId();
     manualStart(humanTask1Id);
 
     // when (2)
@@ -236,10 +209,7 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     assertNotNull(caseInstance);
     assertTrue(caseInstance.isActive());
 
-    String humanTask2Id = executionQuery
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String humanTask2Id = executionQuery.activityId("PI_HumanTask_2").singleResult().getId();
     manualStart(humanTask2Id);
 
     // when (3)
@@ -258,25 +228,17 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
 
     CaseExecutionQuery executionQuery = caseService.createCaseExecutionQuery();
 
-    String humanTask3Id = executionQuery
-        .activityId("PI_HumanTask_3")
-        .singleResult()
-        .getId();
+    String humanTask3Id = executionQuery.activityId("PI_HumanTask_3").singleResult().getId();
 
     // when (1)
     complete(humanTask3Id);
 
     // then (1)
-    CaseExecution stage = executionQuery
-        .activityId("PI_Stage_1")
-        .singleResult();
+    CaseExecution stage = executionQuery.activityId("PI_Stage_1").singleResult();
     assertNotNull(stage);
     assertTrue(stage.isActive());
 
-    String humanTask2Id = executionQuery
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String humanTask2Id = executionQuery.activityId("PI_HumanTask_2").singleResult().getId();
 
     // when (2)
     complete(humanTask2Id);
@@ -284,10 +246,8 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     // then (2)
     assertNull(executionQuery.activityId("PI_Stage_1").singleResult());
 
-    CaseInstance caseInstance = caseService
-      .createCaseInstanceQuery()
-      .caseInstanceId(caseInstanceId)
-      .singleResult();
+    CaseInstance caseInstance = caseService.createCaseInstanceQuery().caseInstanceId(caseInstanceId)
+        .singleResult();
     assertNotNull(caseInstance);
     assertTrue(caseInstance.isActive());
   }
@@ -299,27 +259,20 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
 
     CaseExecutionQuery executionQuery = caseService.createCaseExecutionQuery();
 
-    String humanTask1Id = executionQuery
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTask1Id = executionQuery.activityId("PI_HumanTask_1").singleResult().getId();
 
     // when (1)
     complete(humanTask1Id);
 
     // then (1)
-    CaseInstanceQuery instanceQuery = caseService
-        .createCaseInstanceQuery()
+    CaseInstanceQuery instanceQuery = caseService.createCaseInstanceQuery()
         .caseInstanceId(caseInstanceId);
 
     CaseInstance caseInstance = instanceQuery.singleResult();
     assertNotNull(caseInstance);
     assertTrue(caseInstance.isActive());
 
-    String humanTask2Id = executionQuery
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String humanTask2Id = executionQuery.activityId("PI_HumanTask_2").singleResult().getId();
 
     // when (2)
     complete(humanTask2Id);
@@ -337,30 +290,24 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
 
     CaseExecutionQuery executionQuery = caseService.createCaseExecutionQuery();
 
-    String humanTask1Id = executionQuery
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTask1Id = executionQuery.activityId("PI_HumanTask_1").singleResult().getId();
 
-    CaseExecution humanTask2 = executionQuery
-      .activityId("PI_HumanTask_2")
-      .singleResult();
+    CaseExecution humanTask2 = executionQuery.activityId("PI_HumanTask_2").singleResult();
 
     manualStart(humanTask2.getId());
- 
+
     // when
     complete(humanTask1Id);
 
     // then
-    CaseInstance caseInstance = caseService
-        .createCaseInstanceQuery()
-        .caseInstanceId(caseInstanceId)
+    CaseInstance caseInstance = caseService.createCaseInstanceQuery().caseInstanceId(caseInstanceId)
         .singleResult();
     assertNotNull(caseInstance);
     assertTrue(caseInstance.isCompleted());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testRequiredEnabled.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testRequiredEnabled.cmmn" })
   public void testTerminate() {
     // given
     // a deployed case definition
@@ -368,12 +315,10 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     String caseInstanceId = createCaseInstanceByKey(CASE_DEFINITION_KEY).getId();
 
     CaseExecutionQuery executionQuery = caseService.createCaseExecutionQuery();
-    CaseInstanceQuery instanceQuery = caseService.createCaseInstanceQuery().caseInstanceId(caseInstanceId);
+    CaseInstanceQuery instanceQuery = caseService.createCaseInstanceQuery()
+        .caseInstanceId(caseInstanceId);
 
-    String humanTask2Id = executionQuery
-      .activityId("PI_HumanTask_2")
-      .singleResult()
-      .getId();
+    String humanTask2Id = executionQuery.activityId("PI_HumanTask_2").singleResult().getId();
     manualStart(humanTask2Id);
 
     // when
@@ -386,9 +331,8 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.cmmn",
-    "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.bpmn"
-  })
+      "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.cmmn",
+      "org/camunda/bpm/engine/test/cmmn/stage/AutoCompleteTest.testProcessTasksOnStage.bpmn" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testProcessTasksOnStage() {
     // given
@@ -396,10 +340,8 @@ public class AutoCompleteTest extends CmmnProcessEngineTestCase {
     // when
     createCaseInstanceByKey(CASE_DEFINITION_KEY);
 
-    List<HistoricCaseActivityInstance> historicCaseActivityInstances =
-      historyService.createHistoricCaseActivityInstanceQuery()
-      .caseActivityType("processTask")
-      .list();
+    List<HistoricCaseActivityInstance> historicCaseActivityInstances = historyService
+        .createHistoricCaseActivityInstanceQuery().caseActivityType("processTask").list();
 
     // then
     assertThat(historicCaseActivityInstances.size(), is(2));

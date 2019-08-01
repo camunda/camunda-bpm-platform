@@ -61,38 +61,34 @@ public class SetJobDefinitionPriorityCascadeAuthorizationTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE))
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE, Permissions.UPDATE_INSTANCE))
-        .succeeds()
-      );
+        scenario().withoutAuthorizations()
+            .failsDueToRequired(grant(Resources.PROCESS_DEFINITION, "processDefinitionKey",
+                "userId", Permissions.UPDATE)),
+        scenario().withAuthorizations(grant(Resources.PROCESS_DEFINITION, "processDefinitionKey",
+            "userId", Permissions.UPDATE)).failsDueToRequired(
+                grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE),
+                grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId",
+                    Permissions.UPDATE_INSTANCE)),
+        scenario().withAuthorizations(
+            grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId",
+                Permissions.UPDATE),
+            grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))
+            .failsDueToRequired(
+                grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE),
+                grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId",
+                    Permissions.UPDATE_INSTANCE)),
+        scenario().withAuthorizations(
+            grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId",
+                Permissions.UPDATE),
+            grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)).succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId",
+                    Permissions.UPDATE),
+                grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
+            .succeeds(),
+        scenario().withAuthorizations(grant(Resources.PROCESS_DEFINITION, "processDefinitionKey",
+            "userId", Permissions.UPDATE, Permissions.UPDATE_INSTANCE)).succeeds());
   }
 
   @Before
@@ -110,19 +106,17 @@ public class SetJobDefinitionPriorityCascadeAuthorizationTest {
   public void testSetJobDefinitionPriority() {
 
     // given
-    JobDefinition jobDefinition = engineRule.getManagementService().createJobDefinitionQuery().singleResult();
+    JobDefinition jobDefinition = engineRule.getManagementService().createJobDefinitionQuery()
+        .singleResult();
     ProcessInstance instance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
     Job job = engineRule.getManagementService().createJobQuery().singleResult();
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("processDefinitionKey", "process")
-      .bindResource("processInstanceId", instance.getId())
-      .start();
+    authRule.init(scenario).withUser("userId").bindResource("processDefinitionKey", "process")
+        .bindResource("processInstanceId", instance.getId()).start();
 
-    engineRule.getManagementService().setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42, true);
+    engineRule.getManagementService()
+        .setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42, true);
 
     // then
     if (authRule.assertScenario(scenario)) {

@@ -47,18 +47,14 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
   public void testStartBeforeWithVariablesInHistory() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("task2")
-      .setVariable("procInstVar", "procInstValue")
-      .setVariableLocal("localVar", "localValue")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("task2").setVariable("procInstVar", "procInstValue")
+        .setVariableLocal("localVar", "localValue").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstance.getId());
 
     HistoricVariableInstance procInstVariable = historyService.createHistoricVariableInstanceQuery()
-      .variableName("procInstVar")
-      .singleResult();
+        .variableName("procInstVar").singleResult();
 
     assertNotNull(procInstVariable);
     assertEquals(updatedTree.getId(), procInstVariable.getActivityInstanceId());
@@ -73,8 +69,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     assertNull(procInstanceVarDetail.getActivityInstanceId());
 
     HistoricVariableInstance localVariable = historyService.createHistoricVariableInstanceQuery()
-      .variableName("localVar")
-      .singleResult();
+        .variableName("localVar").singleResult();
 
     assertNotNull(localVariable);
     assertNull(localVariable.getActivityInstanceId());
@@ -95,18 +90,14 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
   public void testStartBeforeAsyncWithVariablesInHistory() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("task2")
-      .setVariable("procInstVar", "procInstValue")
-      .setVariableLocal("localVar", "localValue")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("task2").setVariable("procInstVar", "procInstValue")
+        .setVariableLocal("localVar", "localValue").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstance.getId());
 
     HistoricVariableInstance procInstVariable = historyService.createHistoricVariableInstanceQuery()
-      .variableName("procInstVar")
-      .singleResult();
+        .variableName("procInstVar").singleResult();
 
     assertNotNull(procInstVariable);
     assertEquals(updatedTree.getId(), procInstVariable.getActivityInstanceId());
@@ -121,8 +112,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     assertNull(procInstanceVarDetail.getActivityInstanceId());
 
     HistoricVariableInstance localVariable = historyService.createHistoricVariableInstanceQuery()
-      .variableName("localVar")
-      .singleResult();
+        .variableName("localVar").singleResult();
 
     assertNotNull(localVariable);
     // the following is null because localVariable is local on a concurrent execution
@@ -151,18 +141,14 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
   public void testStartBeforeScopeWithVariablesInHistory() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subprocess");
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("innerTask")
-      .setVariable("procInstVar", "procInstValue")
-      .setVariableLocal("localVar", "localValue")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("innerTask").setVariable("procInstVar", "procInstValue")
+        .setVariableLocal("localVar", "localValue").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstance.getId());
 
     HistoricVariableInstance procInstVariable = historyService.createHistoricVariableInstanceQuery()
-      .variableName("procInstVar")
-      .singleResult();
+        .variableName("procInstVar").singleResult();
 
     assertNotNull(procInstVariable);
     assertEquals(updatedTree.getId(), procInstVariable.getActivityInstanceId());
@@ -177,11 +163,11 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     assertNull(procInstanceVarDetail.getActivityInstanceId());
 
     HistoricVariableInstance localVariable = historyService.createHistoricVariableInstanceQuery()
-      .variableName("localVar")
-      .singleResult();
+        .variableName("localVar").singleResult();
 
     assertNotNull(localVariable);
-    assertEquals(updatedTree.getActivityInstances("subProcess")[0].getId(), localVariable.getActivityInstanceId());
+    assertEquals(updatedTree.getActivityInstances("subProcess")[0].getId(),
+        localVariable.getActivityInstanceId());
     assertEquals("localVar", localVariable.getName());
     assertEquals("localValue", localVariable.getValue());
 
@@ -196,18 +182,14 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
   public void testStartTransitionWithVariablesInHistory() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startTransition("flow2")
-      .setVariable("procInstVar", "procInstValue")
-      .setVariableLocal("localVar", "localValue")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startTransition("flow2").setVariable("procInstVar", "procInstValue")
+        .setVariableLocal("localVar", "localValue").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstance.getId());
 
     HistoricVariableInstance procInstVariable = historyService.createHistoricVariableInstanceQuery()
-      .variableName("procInstVar")
-      .singleResult();
+        .variableName("procInstVar").singleResult();
 
     assertNotNull(procInstVariable);
     assertEquals(updatedTree.getId(), procInstVariable.getActivityInstanceId());
@@ -220,8 +202,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     assertEquals(updatedTree.getId(), procInstVariable.getActivityInstanceId());
 
     HistoricVariableInstance localVariable = historyService.createHistoricVariableInstanceQuery()
-      .variableName("localVar")
-      .singleResult();
+        .variableName("localVar").singleResult();
 
     assertNotNull(localVariable);
     assertEquals(updatedTree.getId(), procInstVariable.getActivityInstanceId());
@@ -246,13 +227,12 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
 
     // when
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .cancelAllForActivity("theTask")
-      .execute(true, false);
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .cancelAllForActivity("theTask").execute(true, false);
 
     // then
-    HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().singleResult();
+    HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
+        .singleResult();
     assertNotNull(instance);
 
     assertEquals(processInstanceId, instance.getId());
@@ -265,23 +245,21 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     String processInstanceId = runtimeService.startProcessInstanceByKey("exclusiveGateway").getId();
 
     // when creating the task skipping custom listeners
-    runtimeService.createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("task2")
-      .execute(true, false);
+    runtimeService.createProcessInstanceModification(processInstanceId).startBeforeActivity("task2")
+        .execute(true, false);
 
     // then the task assignment history (which uses a task listener) is written
     Task task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
 
-    HistoricActivityInstance instance = historyService
-        .createHistoricActivityInstanceQuery()
-        .activityId("task2")
-        .singleResult();
+    HistoricActivityInstance instance = historyService.createHistoricActivityInstanceQuery()
+        .activityId("task2").singleResult();
     assertNotNull(instance);
     assertEquals(task.getId(), instance.getTaskId());
     assertEquals("kermit", instance.getAssignee());
   }
 
-  protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance, String activityId) {
+  protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance,
+      String activityId) {
     if (activityId.equals(activityInstance.getActivityId())) {
       return activityInstance;
     }

@@ -27,7 +27,8 @@ import org.junit.runners.Parameterized;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @RunWith(Parameterized.class)
-public class HandleExternalTaskBpmnErrorAuthorizationTest extends HandleExternalTaskAuthorizationTest {
+public class HandleExternalTaskBpmnErrorAuthorizationTest
+    extends HandleExternalTaskAuthorizationTest {
 
   @Override
   public void testExternalTaskApi(LockedExternalTask task) {
@@ -39,4 +40,3 @@ public class HandleExternalTaskBpmnErrorAuthorizationTest extends HandleExternal
     Assert.assertEquals(0, engineRule.getExternalTaskService().createExternalTaskQuery().count());
   }
 }
-

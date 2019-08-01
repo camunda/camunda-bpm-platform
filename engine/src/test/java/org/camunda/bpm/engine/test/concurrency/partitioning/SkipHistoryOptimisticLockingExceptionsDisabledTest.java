@@ -39,7 +39,7 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
     processEngine.getProcessEngineConfiguration().setSkipHistoryOptimisticLockingExceptions(false);
 
     String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK,
-      Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE)).getId();
+        Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE)).getId();
 
     ThreadControl asyncThread = executeControllableCommand(new AsyncThread(processInstanceId));
 
@@ -49,8 +49,8 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
 
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
-        HistoricVariableInstanceEntity historicVariableInstanceEntity =
-          (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().singleResult();
+        HistoricVariableInstanceEntity historicVariableInstanceEntity = (HistoricVariableInstanceEntity) historyService
+            .createHistoricVariableInstanceQuery().singleResult();
 
         commandContext.getDbEntityManager().delete(historicVariableInstanceEntity);
 
@@ -64,7 +64,8 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
     asyncThread.waitUntilDone();
 
     // then
-    assertTextPresent("Entity was updated by another transaction concurrently.", asyncThread.getException().getMessage());
+    assertTextPresent("Entity was updated by another transaction concurrently.",
+        asyncThread.getException().getMessage());
   }
 
   public class AsyncThread extends ControllableCommand<Void> {
@@ -76,14 +77,11 @@ public class SkipHistoryOptimisticLockingExceptionsDisabledTest extends Abstract
     }
 
     public Void execute(CommandContext commandContext) {
-      historyService.createHistoricVariableInstanceQuery()
-        .singleResult()
-        .getId(); // cache
+      historyService.createHistoricVariableInstanceQuery().singleResult().getId(); // cache
 
       monitor.sync();
 
-        commandContext.getProcessEngineConfiguration()
-          .getRuntimeService()
+      commandContext.getProcessEngineConfiguration().getRuntimeService()
           .setVariable(processInstanceId, VARIABLE_NAME, ANOTHER_VARIABLE_VALUE);
 
       return null;

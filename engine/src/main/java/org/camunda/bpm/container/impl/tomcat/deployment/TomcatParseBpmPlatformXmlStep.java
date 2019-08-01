@@ -26,9 +26,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * <p>This deployment operation step is responsible for parsing and attaching the bpm-platform.xml file on tomcat.</p>
+ * <p>
+ * This deployment operation step is responsible for parsing and attaching the bpm-platform.xml file
+ * on tomcat.
+ * </p>
  *
- * <p>We assume that the bpm-platform.xml file is located under <code>$CATALINA_HOME/conf/bpm-platform.xml</code>.</p>
+ * <p>
+ * We assume that the bpm-platform.xml file is located under
+ * <code>$CATALINA_HOME/conf/bpm-platform.xml</code>.
+ * </p>
  *
  * @author Daniel Meyer
  * @author Christian Lipphardt
@@ -58,7 +64,8 @@ public class TomcatParseBpmPlatformXmlStep extends AbstractParseBpmPlatformXmlSt
       catalinaHome = System.getProperty(CATALINA_HOME);
     }
 
-    String bpmPlatformFileLocation = catalinaHome + File.separator + "conf" + File.separator + BPM_PLATFORM_XML_FILE;
+    String bpmPlatformFileLocation = catalinaHome + File.separator + "conf" + File.separator
+        + BPM_PLATFORM_XML_FILE;
 
     try {
       URL fileLocation = checkValidFileLocation(bpmPlatformFileLocation);
@@ -68,11 +75,9 @@ public class TomcatParseBpmPlatformXmlStep extends AbstractParseBpmPlatformXmlSt
       }
 
       return fileLocation;
-    }
-    catch (MalformedURLException e) {
+    } catch (MalformedURLException e) {
       throw LOG.invalidDeploymentDescriptorLocation(bpmPlatformFileLocation, e);
     }
   }
-
 
 }

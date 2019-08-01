@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -46,13 +45,15 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
     TaskEntity task = taskManager.findTaskById(taskId);
     ensureNotNull("No task found for taskId '" + taskId + "'", "task", task);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadTaskVariable(task);
     }
 
     if (task.getTaskDefinition() != null) {
       TaskFormHandler taskFormHandler = task.getTaskDefinition().getTaskFormHandler();
-      ensureNotNull("No taskFormHandler specified for task '" + taskId + "'", "taskFormHandler", taskFormHandler);
+      ensureNotNull("No taskFormHandler specified for task '" + taskId + "'", "taskFormHandler",
+          taskFormHandler);
 
       return taskFormHandler.createTaskForm(task);
     } else {

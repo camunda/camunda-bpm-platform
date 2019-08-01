@@ -40,23 +40,17 @@ import static org.hamcrest.Matchers.containsString;
  */
 public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByClass.cmmn" })
   public void testCreateListenerByClass() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(3, query.count());
@@ -67,18 +61,15 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByExpression.cmmn" })
   public void testCreateListenerByExpression() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MyTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MyTaskListener()).create().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -89,26 +80,20 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByDelegateExpression.cmmn" })
   public void testCreateListenerByDelegateExpression() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MySpecialTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MySpecialTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -119,17 +104,14 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCreateListenerByScript.cmmn" })
   public void testCreateListenerByScript() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(2, query.count());
@@ -139,28 +121,20 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByClass.cmmn" })
   public void testCompleteListenerByClass() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(3, query.count());
@@ -171,29 +145,21 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByExpression.cmmn" })
   public void testCompleteListenerByExpression() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MyTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MyTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -204,29 +170,21 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByDelegateExpression.cmmn" })
   public void testCompleteListenerByDelegateExpression() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MySpecialTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MySpecialTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -237,28 +195,20 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testCompleteListenerByScript.cmmn" })
   public void testCompleteListenerByScript() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(2, query.count());
@@ -268,26 +218,20 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByClass.cmmn" })
   public void testDeleteListenerByClass() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
     terminate(humanTaskId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(3, query.count());
@@ -298,27 +242,21 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByExpression.cmmn" })
   public void testDeleteListenerByExpression() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MyTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MyTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
     terminate(humanTaskId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -329,27 +267,21 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByDelegateExpression.cmmn" })
   public void testDeleteListenerByDelegateExpression() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MySpecialTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MySpecialTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
     terminate(humanTaskId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -360,26 +292,20 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByScript.cmmn" })
   public void testDeleteListenerByScript() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
     terminate(humanTaskId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(2, query.count());
@@ -389,68 +315,50 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByCaseInstanceDeletion.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDeleteListenerByCaseInstanceDeletion.cmmn" })
   public void testDeleteListenerByCaseInstanceDeletion() {
     TaskDeleteListener.clear();
 
     // given
-    final String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    final String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
 
-        @Override
-        public Void execute(CommandContext commandContext) {
-          commandContext
-            .getCaseExecutionManager()
-            .deleteCaseInstance(caseInstanceId, null);
-          return null;
-        }
+      @Override
+      public Void execute(CommandContext commandContext) {
+        commandContext.getCaseExecutionManager().deleteCaseInstance(caseInstanceId, null);
+        return null;
+      }
 
-      });
+    });
 
     // then
     assertEquals(1, TaskDeleteListener.eventCounter);
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByClass.cmmn" })
   public void testAssignmentListenerByClass() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     // when
     taskService.setAssignee(taskId, "jonny");
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(3, query.count());
@@ -461,33 +369,24 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByExpression.cmmn" })
   public void testAssignmentListenerByExpression() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MyTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MyTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     // when
     taskService.setAssignee(taskId, "jonny");
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -498,33 +397,24 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByDelegateExpression.cmmn" })
   public void testAssignmentListenerByDelegateExpression() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MySpecialTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MySpecialTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     // when
     taskService.setAssignee(taskId, "jonny");
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -535,32 +425,23 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByScript.cmmn" })
   public void testAssignmentListenerByScript() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     // when
     taskService.setAssignee(taskId, "jonny");
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(2, query.count());
@@ -570,23 +451,17 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByInitialInstantiation.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAssignmentListenerByInitialInstantiation.cmmn" })
   public void testAssignmentListenerByInitialInstantiation() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(3, query.count());
@@ -597,36 +472,25 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByClass.cmmn" })
   public void testAllListenerByClassExcludingDeletion() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     taskService.setAssignee(taskId, "jonny");
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(7, query.count());
@@ -644,26 +508,18 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByClass.cmmn" })
   public void testAllListenerByClassExcludingCompletion() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
 
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     taskService.setAssignee(taskId, "jonny");
@@ -671,8 +527,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
     terminate(humanTaskId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(7, query.count());
@@ -690,38 +545,27 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByExpression.cmmn" })
   public void testAllListenerByExpressionExcludingDeletion() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MyTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MyTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
 
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     taskService.setAssignee(taskId, "jonny");
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(8, query.count());
@@ -739,27 +583,19 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByExpression.cmmn" })
   public void testAllListenerByExpressionExcludingCompletion() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MyTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MyTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
 
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     taskService.setAssignee(taskId, "jonny");
@@ -767,8 +603,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
     terminate(humanTaskId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(8, query.count());
@@ -786,38 +621,27 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByDelegateExpression.cmmn" })
   public void testAllListenerByDelegateExpressionExcludingDeletion() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MySpecialTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MySpecialTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
 
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     taskService.setAssignee(taskId, "jonny");
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(8, query.count());
@@ -835,26 +659,18 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByDelegateExpression.cmmn" })
   public void testAllListenerByDelegateExpressionExcludingCompletion() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new MySpecialTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new MySpecialTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     taskService.setAssignee(taskId, "jonny");
@@ -862,8 +678,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
     terminate(humanTaskId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(8, query.count());
@@ -881,36 +696,25 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByScript.cmmn" })
   public void testAllListenerByScriptExcludingDeletion() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
-    //when
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    // when
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     taskService.setAssignee(taskId, "jonny");
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(7, query.count());
@@ -928,26 +732,18 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByScript.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testAllListenerByScript.cmmn" })
   public void testAllListenerByScriptExcludingCompletion() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
 
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     taskService.setAssignee(taskId, "jonny");
@@ -955,8 +751,7 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
     terminate(humanTaskId);
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(7, query.count());
@@ -974,23 +769,17 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testFieldInjectionByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testFieldInjectionByClass.cmmn" })
   public void testFieldInjectionByClass() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(4, query.count());
@@ -1002,24 +791,18 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testFieldInjectionByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testFieldInjectionByDelegateExpression.cmmn" })
   public void testFieldInjectionByDelegateExpression() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .setVariable("myTaskListener", new FieldInjectionTaskListener())
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case")
+        .setVariable("myTaskListener", new FieldInjectionTaskListener()).create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(5, query.count());
@@ -1033,37 +816,24 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testListenerByScriptResource.cmmn",
-      "org/camunda/bpm/engine/test/cmmn/tasklistener/taskListener.groovy"
-      })
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/taskListener.groovy" })
   public void testListenerByScriptResource() {
     // given
-    String caseInstanceId = caseService
-      .withCaseDefinitionByKey("case")
-      .create()
-      .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String humanTaskId = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1")
+        .singleResult().getId();
 
     // when
-    String taskId = taskService
-        .createTaskQuery()
-        .caseExecutionId(humanTaskId)
-        .singleResult()
+    String taskId = taskService.createTaskQuery().caseExecutionId(humanTaskId).singleResult()
         .getId();
 
     taskService.setAssignee(taskId, "jonny");
 
-    caseService
-      .withCaseExecution(humanTaskId)
-      .complete();
+    caseService.withCaseExecution(humanTaskId).complete();
 
     // then
-    VariableInstanceQuery query = runtimeService
-        .createVariableInstanceQuery()
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery()
         .caseInstanceIdIn(caseInstanceId);
 
     assertEquals(7, query.count());
@@ -1080,75 +850,70 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
     assertEquals(3, query.variableName("eventCounter").singleResult().getValue());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDoesNotImplementTaskListenerInterfaceByClass.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDoesNotImplementTaskListenerInterfaceByClass.cmmn" })
   public void testDoesNotImplementTaskListenerInterfaceByClass() {
     try {
-      caseService
-          .withCaseDefinitionByKey("case")
-          .create()
-          .getId();
+      caseService.withCaseDefinitionByKey("case").create().getId();
       fail("exception expected");
     } catch (Exception e) {
       // then
       Throwable cause = e.getCause();
       String message = cause.getMessage();
-      assertTextPresent("NotTaskListener doesn't implement "+TaskListener.class, message);
+      assertTextPresent("NotTaskListener doesn't implement " + TaskListener.class, message);
     }
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDoesNotImplementTaskListenerInterfaceByDelegateExpression.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testDoesNotImplementTaskListenerInterfaceByDelegateExpression.cmmn" })
   public void testDoesNotImplementTaskListenerInterfaceByDelegateExpression() {
     try {
-      caseService
-          .withCaseDefinitionByKey("case")
-          .setVariable("myTaskListener", new NotTaskListener())
-          .create()
-          .getId();
+      caseService.withCaseDefinitionByKey("case")
+          .setVariable("myTaskListener", new NotTaskListener()).create().getId();
       fail("exception expected");
     } catch (Exception e) {
       // then
       Throwable cause = e.getCause();
       String message = cause.getMessage();
-      assertTextPresent("Delegate expression ${myTaskListener} did not resolve to an implementation of interface "+TaskListener.class.getName(), message);
+      assertTextPresent(
+          "Delegate expression ${myTaskListener} did not resolve to an implementation of interface "
+              + TaskListener.class.getName(),
+          message);
     }
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testTaskListenerDoesNotExist.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/tasklistener/TaskListenerTest.testTaskListenerDoesNotExist.cmmn" })
   public void testTaskListenerDoesNotExist() {
 
     try {
-      caseService
-          .withCaseDefinitionByKey("case")
-          .create()
-          .getId();
+      caseService.withCaseDefinitionByKey("case").create().getId();
       fail("exception expected");
     } catch (Exception e) {
       // then
       Throwable cause = e.getCause();
       String message = cause.getMessage();
-      assertTextPresent("Exception while instantiating class 'org.camunda.bpm.engine.test.cmmn.tasklistener.util.NotExistingTaskListener'", message);
+      assertTextPresent(
+          "Exception while instantiating class 'org.camunda.bpm.engine.test.cmmn.tasklistener.util.NotExistingTaskListener'",
+          message);
     }
 
   }
 
   protected void terminate(final String caseExecutionId) {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
 
-        @Override
-        public Void execute(CommandContext commandContext) {
-          CmmnExecution caseTask = (CmmnExecution) caseService
-              .createCaseExecutionQuery()
-              .caseExecutionId(caseExecutionId)
-              .singleResult();
-          caseTask.terminate();
-          return null;
-        }
+      @Override
+      public Void execute(CommandContext commandContext) {
+        CmmnExecution caseTask = (CmmnExecution) caseService.createCaseExecutionQuery()
+            .caseExecutionId(caseExecutionId).singleResult();
+        caseTask.terminate();
+        return null;
+      }
 
-      });
+    });
   }
 
 }

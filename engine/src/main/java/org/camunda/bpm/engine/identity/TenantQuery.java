@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.identity;
 
 import org.camunda.bpm.engine.query.Query;
 
-
 /**
  * Allows to programmatically query for {@link Tenant}s.
  */
@@ -33,8 +32,10 @@ public interface TenantQuery extends Query<TenantQuery, Tenant> {
   /** Only select {@link Tenant}s with the given name. */
   TenantQuery tenantName(String tenantName);
 
-  /** Only select {@link Tenant}s where the name matches the given parameter.
-   *  The syntax to use is that of SQL, eg. %tenant%. */
+  /**
+   * Only select {@link Tenant}s where the name matches the given parameter. The syntax to use is
+   * that of SQL, eg. %tenant%.
+   */
   TenantQuery tenantNameLike(String tenantNameLike);
 
   /** Only select {@link Tenant}s where the given user is member of. */
@@ -43,11 +44,13 @@ public interface TenantQuery extends Query<TenantQuery, Tenant> {
   /** Only select {@link Tenant}s where the given group is member of. */
   TenantQuery groupMember(String groupId);
 
-  /** Selects the {@link Tenant}s which belongs to one of the user's groups.
-   * Can only be used in combination with {@link #userMember(String)} */
+  /**
+   * Selects the {@link Tenant}s which belongs to one of the user's groups. Can only be used in
+   * combination with {@link #userMember(String)}
+   */
   TenantQuery includingGroupsOfUser(boolean includingGroups);
 
-  //sorting ////////////////////////////////////////////////////////
+  // sorting ////////////////////////////////////////////////////////
 
   /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   TenantQuery orderByTenantId();

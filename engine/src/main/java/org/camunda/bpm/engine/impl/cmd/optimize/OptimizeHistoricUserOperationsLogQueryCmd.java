@@ -23,20 +23,23 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import java.util.Date;
 import java.util.List;
 
-public class OptimizeHistoricUserOperationsLogQueryCmd implements Command<List<UserOperationLogEntry>> {
+public class OptimizeHistoricUserOperationsLogQueryCmd
+    implements Command<List<UserOperationLogEntry>> {
 
   protected Date occurredAfter;
   protected Date occurredAt;
   protected int maxResults;
 
-  public OptimizeHistoricUserOperationsLogQueryCmd(Date occurredAfter, Date occurredAt, int maxResults) {
+  public OptimizeHistoricUserOperationsLogQueryCmd(Date occurredAfter, Date occurredAt,
+      int maxResults) {
     this.occurredAfter = occurredAfter;
     this.occurredAt = occurredAt;
     this.maxResults = maxResults;
   }
 
   public List<UserOperationLogEntry> execute(CommandContext commandContext) {
-    return commandContext.getOptimizeManager().getHistoricUserOperationLogs(occurredAfter, occurredAt, maxResults);
+    return commandContext.getOptimizeManager().getHistoricUserOperationLogs(occurredAfter,
+        occurredAt, maxResults);
   }
 
 }

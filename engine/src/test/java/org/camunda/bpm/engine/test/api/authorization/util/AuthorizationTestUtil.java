@@ -49,13 +49,17 @@ public class AuthorizationTestUtil {
   /**
    * Checks if the info has the expected parameters.
    *
-   * @param expectedPermissionName to use
-   * @param expectedResourceName to use
-   * @param expectedResourceId to use
-   * @param info to check
+   * @param expectedPermissionName
+   *          to use
+   * @param expectedResourceName
+   *          to use
+   * @param expectedResourceId
+   *          to use
+   * @param info
+   *          to check
    */
-  public static void assertExceptionInfo(String expectedPermissionName, String expectedResourceName, String expectedResourceId,
-      MissingAuthorization info) {
+  public static void assertExceptionInfo(String expectedPermissionName, String expectedResourceName,
+      String expectedResourceId, MissingAuthorization info) {
     assertEquals(expectedPermissionName, info.getViolatedPermissionName());
     assertEquals(expectedResourceName, info.getResourceType());
     assertEquals(expectedResourceId, info.getResourceId());
@@ -64,10 +68,10 @@ public class AuthorizationTestUtil {
   /**
    * @return the set of permission for the given authorization
    */
-  public static Permission[] getPermissions(Authorization authorization)
-  {
+  public static Permission[] getPermissions(Authorization authorization) {
     int resourceType = authorization.getResourceType();
-    Permission[] permissionsByResourceType = ResourceTypeUtil.getPermissionsByResourceType(resourceType);
+    Permission[] permissionsByResourceType = ResourceTypeUtil
+        .getPermissionsByResourceType(resourceType);
 
     return authorization.getPermissions(permissionsByResourceType);
   }

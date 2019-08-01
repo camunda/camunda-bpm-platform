@@ -24,11 +24,11 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.task.NativeTaskQuery;
 import org.camunda.bpm.engine.task.Task;
 
-
-public class NativeTaskQueryImpl extends AbstractNativeQuery<NativeTaskQuery, Task> implements NativeTaskQuery {
+public class NativeTaskQueryImpl extends AbstractNativeQuery<NativeTaskQuery, Task>
+    implements NativeTaskQuery {
 
   private static final long serialVersionUID = 1L;
-  
+
   public NativeTaskQueryImpl(CommandContext commandContext) {
     super(commandContext);
   }
@@ -37,19 +37,16 @@ public class NativeTaskQueryImpl extends AbstractNativeQuery<NativeTaskQuery, Ta
     super(commandExecutor);
   }
 
+  // results ////////////////////////////////////////////////////////////////
 
- //results ////////////////////////////////////////////////////////////////
-  
-  public List<Task> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return commandContext
-      .getTaskManager()
-      .findTasksByNativeQuery(parameterMap, firstResult, maxResults);
+  public List<Task> executeList(CommandContext commandContext, Map<String, Object> parameterMap,
+      int firstResult, int maxResults) {
+    return commandContext.getTaskManager().findTasksByNativeQuery(parameterMap, firstResult,
+        maxResults);
   }
-  
+
   public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext
-      .getTaskManager()
-      .findTaskCountByNativeQuery(parameterMap);
+    return commandContext.getTaskManager().findTaskCountByNativeQuery(parameterMap);
   }
 
 }

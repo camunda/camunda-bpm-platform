@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 /**
  * @author Daniel Meyer
  */
-public class PvmAtomicOperationActivityNotifyListenerEnd extends PvmAtomicOperationActivityInstanceEnd {
+public class PvmAtomicOperationActivityNotifyListenerEnd
+    extends PvmAtomicOperationActivityInstanceEnd {
 
   protected ScopeImpl getScope(PvmExecutionImpl execution) {
     return execution.getActivity();

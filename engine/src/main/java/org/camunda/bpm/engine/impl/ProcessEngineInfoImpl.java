@@ -20,14 +20,13 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineInfo;
 
-
 /**
  * @author Tom Baeyens
  */
 public class ProcessEngineInfoImpl implements Serializable, ProcessEngineInfo {
 
   private static final long serialVersionUID = 1L;
-  
+
   String name;
   String resourceUrl;
   String exception;
@@ -37,13 +36,15 @@ public class ProcessEngineInfoImpl implements Serializable, ProcessEngineInfo {
     this.resourceUrl = resourceUrl;
     this.exception = exception;
   }
-  
+
   public String getName() {
     return name;
   }
+
   public String getResourceUrl() {
     return resourceUrl;
   }
+
   public String getException() {
     return exception;
   }

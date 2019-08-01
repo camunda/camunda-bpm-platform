@@ -19,7 +19,8 @@ package org.camunda.bpm.engine.management;
 /**
  * Fluent builder to update the suspension state of job definitions.
  */
-public interface UpdateJobDefinitionSuspensionStateTenantBuilder extends UpdateJobDefinitionSuspensionStateBuilder {
+public interface UpdateJobDefinitionSuspensionStateTenantBuilder
+    extends UpdateJobDefinitionSuspensionStateBuilder {
 
   /**
    * Specify that the process definition belongs to no tenant.

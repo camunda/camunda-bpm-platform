@@ -60,11 +60,12 @@ public class ProcessInstanceStartContext extends ExecutionStartContext {
     if (instantiationStack == null) {
       FlowScopeWalker flowScopeWalker = new FlowScopeWalker(initial.getFlowScope());
       ScopeCollector scopeCollector = new ScopeCollector();
-      flowScopeWalker.addPreVisitor(scopeCollector).walkWhile(new ReferenceWalker.WalkCondition<ScopeImpl>() {
-        public boolean isFulfilled(ScopeImpl element) {
-          return element == null || element == initial.getProcessDefinition();
-        }
-      });
+      flowScopeWalker.addPreVisitor(scopeCollector)
+          .walkWhile(new ReferenceWalker.WalkCondition<ScopeImpl>() {
+            public boolean isFulfilled(ScopeImpl element) {
+              return element == null || element == initial.getProcessDefinition();
+            }
+          });
 
       List<PvmActivity> scopeActivities = (List) scopeCollector.getScopes();
       Collections.reverse(scopeActivities);

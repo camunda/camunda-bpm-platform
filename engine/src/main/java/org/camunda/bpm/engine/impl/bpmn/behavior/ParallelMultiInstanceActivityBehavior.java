@@ -34,7 +34,8 @@ import java.util.List;
  * @author Daniel Meyer
  *
  */
-public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivityBehavior implements MigrationObserverBehavior {
+public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivityBehavior
+    implements MigrationObserverBehavior {
 
   @Override
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
@@ -49,7 +50,8 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     }
 
     // start the concurrent child executions
-    // start executions in reverse order (order will be reversed again in command context with the effect that they are
+    // start executions in reverse order (order will be reversed again in command context with the
+    // effect that they are
     // actually be started in correct order :) )
     for (int i = (nrOfInstances - 1); i >= 0; i--) {
       ActivityExecution activityExecution = concurrentExecutions.get(i);
@@ -75,7 +77,8 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
   }
 
   @Override
-  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
+  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution,
+      ActivityExecution endedExecution) {
 
     int nrOfCompletedInstances = getLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
     setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
@@ -88,17 +91,20 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
 
     // join
     scopeExecution.forceUpdate();
-    // TODO: should the completion condition be evaluated on the scopeExecution or on the endedExecution?
-    if(completionConditionSatisfied(endedExecution) ||
-        allExecutionsEnded(scopeExecution, endedExecution)) {
+    // TODO: should the completion condition be evaluated on the scopeExecution or on the
+    // endedExecution?
+    if (completionConditionSatisfied(endedExecution)
+        || allExecutionsEnded(scopeExecution, endedExecution)) {
 
-      ArrayList<ActivityExecution> childExecutions = new ArrayList<ActivityExecution>(((PvmExecutionImpl) scopeExecution).getNonEventScopeExecutions());
+      ArrayList<ActivityExecution> childExecutions = new ArrayList<ActivityExecution>(
+          ((PvmExecutionImpl) scopeExecution).getNonEventScopeExecutions());
       for (ActivityExecution childExecution : childExecutions) {
-        // delete all not-ended instances; these are either active (for non-scope tasks) or inactive but have no activity id (for subprocesses, etc.)
+        // delete all not-ended instances; these are either active (for non-scope tasks) or inactive
+        // but have no activity id (for subprocesses, etc.)
         if (childExecution.isActive() || childExecution.getActivity() == null) {
-          ((PvmExecutionImpl)childExecution).deleteCascade("Multi instance completion condition satisfied.");
-        }
-        else {
+          ((PvmExecutionImpl) childExecution)
+              .deleteCascade("Multi instance completion condition satisfied.");
+        } else {
           childExecution.remove();
         }
       }
@@ -107,17 +113,20 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
       scopeExecution.setActive(true);
       leave(scopeExecution);
     } else {
-      ((ExecutionEntity) scopeExecution).dispatchDelayedEventsAndPerformOperation((Callback<PvmExecutionImpl, Void>) null);
+      ((ExecutionEntity) scopeExecution)
+          .dispatchDelayedEventsAndPerformOperation((Callback<PvmExecutionImpl, Void>) null);
     }
   }
 
-  protected boolean allExecutionsEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
-    int numberOfInactiveConcurrentExecutions = endedExecution.findInactiveConcurrentExecutions(endedExecution.getActivity()).size();
+  protected boolean allExecutionsEnded(ActivityExecution scopeExecution,
+      ActivityExecution endedExecution) {
+    int numberOfInactiveConcurrentExecutions = endedExecution
+        .findInactiveConcurrentExecutions(endedExecution.getActivity()).size();
     int concurrentExecutions = scopeExecution.getExecutions().size();
 
     // no active instances exist and all concurrent executions are inactive
-    return getLocalLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) <= 0 &&
-           numberOfInactiveConcurrentExecutions == concurrentExecutions;
+    return getLocalLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) <= 0
+        && numberOfInactiveConcurrentExecutions == concurrentExecutions;
   }
 
   @Override
@@ -126,7 +135,8 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
   }
 
   @Override
-  public List<ActivityExecution> initializeScope(ActivityExecution scopeExecution, int numberOfInstances) {
+  public List<ActivityExecution> initializeScope(ActivityExecution scopeExecution,
+      int numberOfInstances) {
 
     prepareScopeExecution(scopeExecution, numberOfInstances);
 
@@ -172,17 +182,20 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     // migrate already completed instances
     for (ActivityExecution child : scopeExecution.getExecutions()) {
       if (!child.isActive()) {
-        ((PvmExecutionImpl) child).setProcessDefinition(((PvmExecutionImpl) scopeExecution).getProcessDefinition());
+        ((PvmExecutionImpl) child)
+            .setProcessDefinition(((PvmExecutionImpl) scopeExecution).getProcessDefinition());
       }
     }
   }
 
   @Override
-  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
+  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext,
+      MigratingActivityInstance migratingInstance) {
     ExecutionEntity scopeExecution = migratingInstance.resolveRepresentativeExecution();
 
-    List<ActivityExecution> concurrentInActiveExecutions =
-        scopeExecution.findInactiveChildExecutions(getInnerActivity((ActivityImpl) migratingInstance.getSourceScope()));
+    List<ActivityExecution> concurrentInActiveExecutions = scopeExecution
+        .findInactiveChildExecutions(
+            getInnerActivity((ActivityImpl) migratingInstance.getSourceScope()));
 
     // variables on ended inner instance executions need not be migrated anywhere
     // since they are also not represented in the tree of migrating instances, we remove

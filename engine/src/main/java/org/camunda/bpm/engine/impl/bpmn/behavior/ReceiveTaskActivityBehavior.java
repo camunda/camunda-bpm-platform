@@ -19,12 +19,11 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-
 /**
  * A receive task is a wait state that waits for the receival of some message.
  *
- * Currently, the only message that is supported is the external trigger,
- * given by calling the {@link RuntimeService#signal(String)} operation.
+ * Currently, the only message that is supported is the external trigger, given by calling the
+ * {@link RuntimeService#signal(String)} operation.
  *
  * @author Joram Barrez
  */

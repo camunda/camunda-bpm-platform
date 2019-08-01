@@ -19,7 +19,9 @@ package org.camunda.bpm.engine.impl.cfg;
 import org.camunda.bpm.engine.ProcessEngine;
 
 /**
- * <p>Adapter class for implementing process engine plugins</p>
+ * <p>
+ * Adapter class for implementing process engine plugins
+ * </p>
  *
  * @author Daniel Meyer
  *

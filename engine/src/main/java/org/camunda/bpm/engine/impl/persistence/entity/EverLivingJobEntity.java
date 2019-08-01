@@ -57,48 +57,40 @@ public class EverLivingJobEntity extends JobEntity {
       jobHandler.onDelete(getJobHandlerConfiguration(), this);
     }
 
-    //cancel the retries -> will resolve job incident if present
+    // cancel the retries -> will resolve job incident if present
     setRetries(commandContext.getProcessEngineConfiguration().getDefaultNumberOfRetries());
 
-    //delete the job's exception byte array and exception message
-    String exceptionByteArrayIdToDelete =null;
+    // delete the job's exception byte array and exception message
+    String exceptionByteArrayIdToDelete = null;
     if (exceptionByteArrayId != null) {
       exceptionByteArrayIdToDelete = exceptionByteArrayId;
       this.exceptionByteArrayId = null;
       this.exceptionMessage = null;
     }
 
-    //clean the lock information
+    // clean the lock information
     if (shouldResetLock) {
       setLockOwner(null);
       setLockExpirationTime(null);
     }
 
     if (exceptionByteArrayIdToDelete != null) {
-      ByteArrayEntity byteArray = commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, exceptionByteArrayIdToDelete);
+      ByteArrayEntity byteArray = commandContext.getDbEntityManager()
+          .selectById(ByteArrayEntity.class, exceptionByteArrayIdToDelete);
       commandContext.getDbEntityManager().delete(byteArray);
     }
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", revision=" + revision
-           + ", duedate=" + duedate
-           + ", lockOwner=" + lockOwner
-           + ", lockExpirationTime=" + lockExpirationTime
-           + ", executionId=" + executionId
-           + ", processInstanceId=" + processInstanceId
-           + ", isExclusive=" + isExclusive
-           + ", retries=" + retries
-           + ", jobHandlerType=" + jobHandlerType
-           + ", jobHandlerConfiguration=" + jobHandlerConfiguration
-           + ", exceptionByteArray=" + exceptionByteArray
-           + ", exceptionByteArrayId=" + exceptionByteArrayId
-           + ", exceptionMessage=" + exceptionMessage
-           + ", deploymentId=" + deploymentId
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", revision=" + revision + ", duedate="
+        + duedate + ", lockOwner=" + lockOwner + ", lockExpirationTime=" + lockExpirationTime
+        + ", executionId=" + executionId + ", processInstanceId=" + processInstanceId
+        + ", isExclusive=" + isExclusive + ", retries=" + retries + ", jobHandlerType="
+        + jobHandlerType + ", jobHandlerConfiguration=" + jobHandlerConfiguration
+        + ", exceptionByteArray=" + exceptionByteArray + ", exceptionByteArrayId="
+        + exceptionByteArrayId + ", exceptionMessage=" + exceptionMessage + ", deploymentId="
+        + deploymentId + "]";
   }
 
 }

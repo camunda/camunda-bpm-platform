@@ -40,7 +40,8 @@ import org.junit.rules.RuleChain;
 public class UnhandledBpmnErrorTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setEnableExceptionsAfterUnhandledBpmnError(true);
       return configuration;
     }
@@ -50,7 +51,8 @@ public class UnhandledBpmnErrorTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -71,10 +73,8 @@ public class UnhandledBpmnErrorTest {
     thrown.expectMessage(containsString("no error handler"));
 
     // given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .serviceTask().camundaClass(ThrowBpmnErrorDelegate.class)
-      .endEvent().done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process").startEvent().serviceTask()
+        .camundaClass(ThrowBpmnErrorDelegate.class).endEvent().done();
     testRule.deploy(instance);
 
     // when

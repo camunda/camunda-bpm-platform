@@ -22,7 +22,9 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.query.Report;
 
 /**
- * <p>Defines a report query for {@link HistoricProcessInstance}s.</p>
+ * <p>
+ * Defines a report query for {@link HistoricProcessInstance}s.
+ * </p>
  *
  * @author Roman Smirnov
  *
@@ -32,7 +34,8 @@ public interface HistoricProcessInstanceReport extends Report {
   /**
    * Only takes historic process instances into account that were started before the given date.
    *
-   * @throws NotValidException if the given started before date is null
+   * @throws NotValidException
+   *           if the given started before date is null
    *
    */
   HistoricProcessInstanceReport startedBefore(Date startedBefore);
@@ -40,21 +43,24 @@ public interface HistoricProcessInstanceReport extends Report {
   /**
    * Only takes historic process instances into account that were started after the given date.
    *
-   * @throws NotValidException if the given started after date is null
+   * @throws NotValidException
+   *           if the given started after date is null
    */
   HistoricProcessInstanceReport startedAfter(Date startedAfter);
 
   /**
    * Only takes historic process instances into account for the given process definition ids.
    *
-   * @throws NotValidException if one of the given ids is null
+   * @throws NotValidException
+   *           if one of the given ids is null
    */
   HistoricProcessInstanceReport processDefinitionIdIn(String... processDefinitionIds);
 
   /**
    * Only takes historic process instances into account for the given process definition keys.
    *
-   * @throws NotValidException if one of the given ids is null
+   * @throws NotValidException
+   *           if one of the given ids is null
    */
   HistoricProcessInstanceReport processDefinitionKeyIn(String... processDefinitionKeys);
 

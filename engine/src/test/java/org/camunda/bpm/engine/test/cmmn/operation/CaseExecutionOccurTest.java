@@ -39,11 +39,8 @@ public class CaseExecutionOccurTest extends PvmTestCase {
 
     // given
     // a case definition
-    CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1")
-      .createActivity("A")
-        .behavior(new MilestoneActivityBehavior())
-      .endActivity()
-      .buildCaseDefinition();
+    CmmnCaseDefinition caseDefinition = new CaseDefinitionBuilder("Case1").createActivity("A")
+        .behavior(new MilestoneActivityBehavior()).endActivity().buildCaseDefinition();
 
     CmmnActivity activity = caseDefinition.findActivity("A");
 

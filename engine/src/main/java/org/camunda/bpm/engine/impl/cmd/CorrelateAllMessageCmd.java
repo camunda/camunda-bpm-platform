@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -36,29 +35,36 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureAtLeastOneNotNul
  * @author Daniel Meyer
  * @author Michael Scholz
  */
-public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implements Command<List<MessageCorrelationResultImpl>> {
+public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd
+    implements Command<List<MessageCorrelationResultImpl>> {
 
   /**
    * Initialize the command with a builder
    *
    * @param messageCorrelationBuilderImpl
    */
-  public CorrelateAllMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl, boolean collectVariables, boolean deserializeVariableValues) {
+  public CorrelateAllMessageCmd(MessageCorrelationBuilderImpl messageCorrelationBuilderImpl,
+      boolean collectVariables, boolean deserializeVariableValues) {
     super(messageCorrelationBuilderImpl, collectVariables, deserializeVariableValues);
   }
 
   public List<MessageCorrelationResultImpl> execute(final CommandContext commandContext) {
     ensureAtLeastOneNotNull(
-        "At least one of the following correlation criteria has to be present: " + "messageName, businessKey, correlationKeys, processInstanceId", messageName,
-        builder.getBusinessKey(), builder.getCorrelationProcessInstanceVariables(), builder.getProcessInstanceId());
+        "At least one of the following correlation criteria has to be present: "
+            + "messageName, businessKey, correlationKeys, processInstanceId",
+        messageName, builder.getBusinessKey(), builder.getCorrelationProcessInstanceVariables(),
+        builder.getProcessInstanceId());
 
-    final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
+    final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration()
+        .getCorrelationHandler();
     final CorrelationSet correlationSet = new CorrelationSet(builder);
-    List<CorrelationHandlerResult> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<CorrelationHandlerResult>>() {
-      public List<CorrelationHandlerResult> call() throws Exception {
-        return correlationHandler.correlateMessages(commandContext, messageName, correlationSet);
-      }
-    });
+    List<CorrelationHandlerResult> correlationResults = commandContext
+        .runWithoutAuthorization(new Callable<List<CorrelationHandlerResult>>() {
+          public List<CorrelationHandlerResult> call() throws Exception {
+            return correlationHandler.correlateMessages(commandContext, messageName,
+                correlationSet);
+          }
+        });
 
     // check authorization
     for (CorrelationHandlerResult correlationResult : correlationResults) {

@@ -27,7 +27,8 @@ public interface TreeVisitor<T> {
   /**
    * Invoked for a node in tree.
    *
-   * @param obj a reference to the node
+   * @param obj
+   *          a reference to the node
    */
   void visit(T obj);
 }

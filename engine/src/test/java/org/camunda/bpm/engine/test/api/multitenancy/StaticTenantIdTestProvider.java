@@ -42,7 +42,8 @@ public class StaticTenantIdTestProvider implements TenantIdProvider {
   }
 
   @Override
-  public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+  public String provideTenantIdForHistoricDecisionInstance(
+      TenantIdProviderHistoricDecisionInstanceContext ctx) {
     return tenantId;
   }
 

@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.test.api.cfg;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 
-
 public class IdGeneratorDataSource extends PooledDataSource {
 
   public IdGeneratorDataSource() {

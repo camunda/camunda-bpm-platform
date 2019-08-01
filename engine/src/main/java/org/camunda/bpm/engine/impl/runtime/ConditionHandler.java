@@ -30,9 +30,10 @@ public interface ConditionHandler {
    * Evaluates conditions of process definition with a conditional start event
    *
    * @param conditionSet
-   * @return all matched process definitions and respective activities containing evaluated to true conditions
+   * @return all matched process definitions and respective activities containing evaluated to true
+   *         conditions
    */
-  public List<ConditionHandlerResult> evaluateStartCondition(CommandContext commandContext, ConditionSet conditionSet);
-
+  public List<ConditionHandlerResult> evaluateStartCondition(CommandContext commandContext,
+      ConditionSet conditionSet);
 
 }

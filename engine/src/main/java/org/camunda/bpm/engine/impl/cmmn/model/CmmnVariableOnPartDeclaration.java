@@ -30,7 +30,7 @@ public class CmmnVariableOnPartDeclaration implements Serializable {
 
   protected String variableEvent;
   protected String variableName;
-  
+
   public String getVariableEvent() {
     return variableEvent;
   }
@@ -46,5 +46,5 @@ public class CmmnVariableOnPartDeclaration implements Serializable {
   public void setVariableName(String variableName) {
     this.variableName = variableName;
   }
-  
+
 }

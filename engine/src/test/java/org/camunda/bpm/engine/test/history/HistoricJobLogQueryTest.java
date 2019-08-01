@@ -56,7 +56,8 @@ import org.camunda.bpm.engine.variable.Variables;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQuery() {
     runtimeService.startProcessInstanceByKey("process");
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
@@ -64,7 +65,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByLogId() {
     runtimeService.startProcessInstanceByKey("process");
     String logId = historyService.createHistoricJobLogQuery().singleResult().getId();
@@ -86,7 +88,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByJobId() {
     runtimeService.startProcessInstanceByKey("process");
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -108,7 +111,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByJobExceptionMessage() {
     runtimeService.startProcessInstanceByKey("process");
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -119,13 +123,15 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
       // expected
     }
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobExceptionMessage(FailingDelegate.EXCEPTION_MESSAGE);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .jobExceptionMessage(FailingDelegate.EXCEPTION_MESSAGE);
 
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidJobExceptionMessage() {
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobExceptionMessage("invalid");
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .jobExceptionMessage("invalid");
 
     verifyQueryResults(query, 0);
 
@@ -136,18 +142,21 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByJobDefinitionId() {
     runtimeService.startProcessInstanceByKey("process");
     String jobDefinitionId = managementService.createJobQuery().singleResult().getJobDefinitionId();
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobDefinitionId(jobDefinitionId);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .jobDefinitionId(jobDefinitionId);
 
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidJobDefinitionId() {
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobDefinitionId("invalid");
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .jobDefinitionId("invalid");
 
     verifyQueryResults(query, 0);
 
@@ -158,17 +167,20 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByJobDefinitionType() {
     runtimeService.startProcessInstanceByKey("process");
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobDefinitionType(AsyncContinuationJobHandler.TYPE);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .jobDefinitionType(AsyncContinuationJobHandler.TYPE);
 
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidJobDefinitionType() {
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobDefinitionType("invalid");
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .jobDefinitionType("invalid");
 
     verifyQueryResults(query, 0);
 
@@ -179,17 +191,20 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByJobDefinitionConfiguration() {
     runtimeService.startProcessInstanceByKey("process");
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobDefinitionConfiguration(MessageJobDeclaration.ASYNC_BEFORE);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .jobDefinitionConfiguration(MessageJobDeclaration.ASYNC_BEFORE);
 
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidJobDefinitionConfiguration() {
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobDefinitionConfiguration("invalid");
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .jobDefinitionConfiguration("invalid");
 
     verifyQueryResults(query, 0);
 
@@ -200,11 +215,13 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByActivityId() {
     runtimeService.startProcessInstanceByKey("process");
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().activityIdIn("serviceTask");
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .activityIdIn("serviceTask");
 
     verifyQueryResults(query, 1);
   }
@@ -222,7 +239,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     } catch (Exception e) {
     }
 
-    String[] activityIdsContainsNull = {"a", null, "b"};
+    String[] activityIdsContainsNull = { "a", null, "b" };
 
     try {
       query.activityIdIn(activityIdsContainsNull);
@@ -230,7 +247,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     } catch (Exception e) {
     }
 
-    String[] activityIdsContainsEmptyString = {"a", "", "b"};
+    String[] activityIdsContainsEmptyString = { "a", "", "b" };
 
     try {
       query.activityIdIn(activityIdsContainsEmptyString);
@@ -239,12 +256,14 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByExecutionId() {
     runtimeService.startProcessInstanceByKey("process");
     String executionId = managementService.createJobQuery().singleResult().getExecutionId();
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().executionIdIn(executionId);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .executionIdIn(executionId);
 
     verifyQueryResults(query, 1);
   }
@@ -262,7 +281,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     } catch (Exception e) {
     }
 
-    String[] executionIdsContainsNull = {"a", null, "b"};
+    String[] executionIdsContainsNull = { "a", null, "b" };
 
     try {
       query.executionIdIn(executionIdsContainsNull);
@@ -270,7 +289,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     } catch (Exception e) {
     }
 
-    String[] executionIdsContainsEmptyString = {"a", "", "b"};
+    String[] executionIdsContainsEmptyString = { "a", "", "b" };
 
     try {
       query.executionIdIn(executionIdsContainsEmptyString);
@@ -279,18 +298,22 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByProcessInstanceId() {
     runtimeService.startProcessInstanceByKey("process");
-    String processInstanceId = managementService.createJobQuery().singleResult().getProcessInstanceId();
+    String processInstanceId = managementService.createJobQuery().singleResult()
+        .getProcessInstanceId();
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().processInstanceId(processInstanceId);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .processInstanceId(processInstanceId);
 
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidProcessInstanceId() {
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().processInstanceId("invalid");
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .processInstanceId("invalid");
 
     verifyQueryResults(query, 0);
 
@@ -301,18 +324,22 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByProcessDefinitionId() {
     runtimeService.startProcessInstanceByKey("process");
-    String processDefinitionId = managementService.createJobQuery().singleResult().getProcessDefinitionId();
+    String processDefinitionId = managementService.createJobQuery().singleResult()
+        .getProcessDefinitionId();
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().processDefinitionId(processDefinitionId);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .processDefinitionId(processDefinitionId);
 
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidProcessDefinitionId() {
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().processDefinitionId("invalid");
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .processDefinitionId("invalid");
 
     verifyQueryResults(query, 0);
 
@@ -323,18 +350,22 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByProcessDefinitionKey() {
     runtimeService.startProcessInstanceByKey("process");
-    String processDefinitionKey = managementService.createJobQuery().singleResult().getProcessDefinitionKey();
+    String processDefinitionKey = managementService.createJobQuery().singleResult()
+        .getProcessDefinitionKey();
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().processDefinitionKey(processDefinitionKey);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .processDefinitionKey(processDefinitionKey);
 
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidProcessDefinitionKey() {
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().processDefinitionKey("invalid");
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .processDefinitionKey("invalid");
 
     verifyQueryResults(query, 0);
 
@@ -345,12 +376,14 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByDeploymentId() {
     runtimeService.startProcessInstanceByKey("process");
     String deploymentId = managementService.createJobQuery().singleResult().getDeploymentId();
 
-    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().deploymentId(deploymentId);
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery()
+        .deploymentId(deploymentId);
 
     verifyQueryResults(query, 1);
   }
@@ -380,10 +413,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     // then the creation logs can be filtered by priority of the jobs
     // (1) lower than or equal a priority
     List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
-        .jobPriorityLowerThanOrEquals(2L)
-        .orderByJobPriority()
-        .asc()
-        .list();
+        .jobPriorityLowerThanOrEquals(2L).orderByJobPriority().asc().list();
 
     assertEquals(3, jobLogs.size());
     for (HistoricJobLog log : jobLogs) {
@@ -391,11 +421,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
 
     // (2) higher than or equal a given priorty
-    jobLogs = historyService.createHistoricJobLogQuery()
-        .jobPriorityHigherThanOrEquals(3L)
-        .orderByJobPriority()
-        .asc()
-        .list();
+    jobLogs = historyService.createHistoricJobLogQuery().jobPriorityHigherThanOrEquals(3L)
+        .orderByJobPriority().asc().list();
 
     assertEquals(2, jobLogs.size());
     for (HistoricJobLog log : jobLogs) {
@@ -403,12 +430,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
 
     // (3) lower and higher than or equal
-    jobLogs = historyService.createHistoricJobLogQuery()
-        .jobPriorityHigherThanOrEquals(1L)
-        .jobPriorityLowerThanOrEquals(3L)
-        .orderByJobPriority()
-        .asc()
-        .list();
+    jobLogs = historyService.createHistoricJobLogQuery().jobPriorityHigherThanOrEquals(1L)
+        .jobPriorityLowerThanOrEquals(3L).orderByJobPriority().asc().list();
 
     assertEquals(3, jobLogs.size());
     for (HistoricJobLog log : jobLogs) {
@@ -416,16 +439,13 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
 
     // (4) lower and higher than or equal are disjunctive
-    jobLogs = historyService.createHistoricJobLogQuery()
-        .jobPriorityHigherThanOrEquals(3)
-        .jobPriorityLowerThanOrEquals(1)
-        .orderByJobPriority()
-        .asc()
-        .list();
+    jobLogs = historyService.createHistoricJobLogQuery().jobPriorityHigherThanOrEquals(3)
+        .jobPriorityLowerThanOrEquals(1).orderByJobPriority().asc().list();
     assertEquals(0, jobLogs.size());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByCreationLog() {
     runtimeService.startProcessInstanceByKey("process");
 
@@ -434,7 +454,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByFailureLog() {
     runtimeService.startProcessInstanceByKey("process");
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -450,9 +471,11 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryBySuccessLog() {
-    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", false));
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValue("fail", false));
     String jobId = managementService.createJobQuery().singleResult().getId();
     managementService.executeJob(jobId);
 
@@ -461,7 +484,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQueryByDeletionLog() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
     runtimeService.deleteProcessInstance(processInstanceId, null);
@@ -471,7 +495,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 1);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQuerySorting() {
     for (int i = 0; i < 10; i++) {
       runtimeService.startProcessInstanceByKey("process");
@@ -480,175 +505,129 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
 
     // asc
-    query
-      .orderByTimestamp()
-      .asc();
+    query.orderByTimestamp().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByTimestamp());
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByJobId()
-      .asc();
+    query.orderByJobId().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByJobId());
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByJobDefinitionId()
-      .asc();
+    query.orderByJobDefinitionId().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByJobDefinitionId());
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByJobDueDate()
-      .asc();
+    query.orderByJobDueDate().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByJobDueDate());
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByJobRetries()
-      .asc();
+    query.orderByJobRetries().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByJobRetries());
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByActivityId()
-      .asc();
+    query.orderByActivityId().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByActivityId());
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByExecutionId()
-      .asc();
+    query.orderByExecutionId().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByExecutionId());
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByProcessInstanceId()
-      .asc();
+    query.orderByProcessInstanceId().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByProcessInstanceId());
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByProcessDefinitionId()
-      .asc();
+    query.orderByProcessDefinitionId().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByProcessDefinitionId());
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByProcessDefinitionKey()
-      .asc();
+    query.orderByProcessDefinitionKey().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByProcessDefinitionKey(processEngine));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByDeploymentId()
-      .asc();
+    query.orderByDeploymentId().asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByDeploymentId());
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByJobPriority()
-      .asc();
+    query.orderByJobPriority().asc();
 
     verifyQueryWithOrdering(query, 10, historicJobLogByJobPriority());
 
     // desc
-    query
-      .orderByTimestamp()
-      .desc();
+    query.orderByTimestamp().desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByTimestamp()));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByJobId()
-      .desc();
+    query.orderByJobId().desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByJobId()));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByJobDefinitionId()
-      .asc();
+    query.orderByJobDefinitionId().asc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByJobDefinitionId()));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByJobDueDate()
-      .desc();
+    query.orderByJobDueDate().desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByJobDueDate()));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByJobRetries()
-      .desc();
+    query.orderByJobRetries().desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByJobRetries()));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByActivityId()
-      .desc();
+    query.orderByActivityId().desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByActivityId()));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByExecutionId()
-      .desc();
+    query.orderByExecutionId().desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByExecutionId()));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByProcessInstanceId()
-      .desc();
+    query.orderByProcessInstanceId().desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByProcessInstanceId()));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByProcessDefinitionId()
-      .desc();
+    query.orderByProcessDefinitionId().desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByProcessDefinitionId()));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByProcessDefinitionKey()
-      .desc();
-    verifyQueryWithOrdering(query, 10, inverted(historicJobLogByProcessDefinitionKey(processEngine)));
+    query.orderByProcessDefinitionKey().desc();
+    verifyQueryWithOrdering(query, 10,
+        inverted(historicJobLogByProcessDefinitionKey(processEngine)));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByDeploymentId()
-      .desc();
+    query.orderByDeploymentId().desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByDeploymentId()));
 
     query = historyService.createHistoricJobLogQuery();
 
-    query
-      .orderByJobPriority()
-      .desc();
+    query.orderByJobPriority().desc();
 
-  verifyQueryWithOrdering(query, 10, inverted(historicJobLogByJobPriority()));
+    verifyQueryWithOrdering(query, 10, inverted(historicJobLogByJobPriority()));
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml" })
   public void testQuerySortingPartiallyByOccurrence() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -658,19 +637,13 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     managementService.executeJob(jobId);
 
     // asc
-    HistoricJobLogQuery query = historyService
-      .createHistoricJobLogQuery()
-      .jobId(jobId)
-      .orderPartiallyByOccurrence()
-      .asc();
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery().jobId(jobId)
+        .orderPartiallyByOccurrence().asc();
 
     verifyQueryWithOrdering(query, 5, historicJobLogPartiallyByOccurence());
 
     // desc
-    query = historyService
-        .createHistoricJobLogQuery()
-        .jobId(jobId)
-        .orderPartiallyByOccurrence()
+    query = historyService.createHistoricJobLogQuery().jobId(jobId).orderPartiallyByOccurrence()
         .desc();
 
     verifyQueryWithOrdering(query, 5, inverted(historicJobLogPartiallyByOccurence()));
@@ -686,19 +659,13 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     managementService.deleteJob(jobId);
 
     // asc
-    query = historyService
-      .createHistoricJobLogQuery()
-      .jobId(jobId)
-      .orderPartiallyByOccurrence()
-      .asc();
+    query = historyService.createHistoricJobLogQuery().jobId(jobId).orderPartiallyByOccurrence()
+        .asc();
 
     verifyQueryWithOrdering(query, 5, historicJobLogPartiallyByOccurence());
 
     // desc
-    query = historyService
-        .createHistoricJobLogQuery()
-        .jobId(jobId)
-        .orderPartiallyByOccurrence()
+    query = historyService.createHistoricJobLogQuery().jobId(jobId).orderPartiallyByOccurrence()
         .desc();
 
     verifyQueryWithOrdering(query, 5, inverted(historicJobLogPartiallyByOccurence()));
@@ -710,14 +677,15 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
 
     if (countExpected == 1) {
       assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
+    } else if (countExpected > 1) {
       verifySingleResultFails(query);
     } else if (countExpected == 0) {
       assertNull(query.singleResult());
     }
   }
 
-  protected void verifyQueryWithOrdering(HistoricJobLogQuery query, int countExpected, NullTolerantComparator<HistoricJobLog> expectedOrdering) {
+  protected void verifyQueryWithOrdering(HistoricJobLogQuery query, int countExpected,
+      NullTolerantComparator<HistoricJobLog> expectedOrdering) {
     verifyQueryResults(query, countExpected);
     TestOrderingUtil.verifySorting(query.list(), expectedOrdering);
   }
@@ -726,7 +694,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.singleResult();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+    }
   }
 
 }

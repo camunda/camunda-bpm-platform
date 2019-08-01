@@ -33,9 +33,9 @@ public class SimpleIpBasedProvider implements MetricsReporterIdProvider {
     String localIp = "";
     try {
       localIp = InetAddress.getLocalHost().getHostAddress();
-    }
-    catch (Exception e) {
-      // do not throw an exception; failure to determine an IP should not prevent from using the engine
+    } catch (Exception e) {
+      // do not throw an exception; failure to determine an IP should not prevent from using the
+      // engine
       LOG.couldNotDetermineIp(e);
     }
 

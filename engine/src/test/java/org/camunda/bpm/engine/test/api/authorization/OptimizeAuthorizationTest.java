@@ -64,8 +64,10 @@ public class OptimizeAuthorizationTest {
     authRule.enableAuthorization(USER_ID);
 
     // then
-    assertTrue(authorizationService.isUserAuthorized(USER_ID, null, OptimizePermissions.EDIT, Resources.OPTIMIZE));
-    assertTrue(authorizationService.isUserAuthorized(USER_ID, null, OptimizePermissions.SHARE, Resources.OPTIMIZE));
+    assertTrue(authorizationService.isUserAuthorized(USER_ID, null, OptimizePermissions.EDIT,
+        Resources.OPTIMIZE));
+    assertTrue(authorizationService.isUserAuthorized(USER_ID, null, OptimizePermissions.SHARE,
+        Resources.OPTIMIZE));
   }
 
   @After

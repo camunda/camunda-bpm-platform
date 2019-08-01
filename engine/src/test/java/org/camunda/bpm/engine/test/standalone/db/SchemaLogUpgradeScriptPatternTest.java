@@ -37,9 +37,7 @@ public class SchemaLogUpgradeScriptPatternTest extends SchemaLogTestCase {
   @Test
   public void testOnlyValidUpgradeFilePatterns() {
     /**
-     * valid patterns: 
-     * h2_engine_7.2_to_7.3.sql,
-     * oracle_engine_7.3_patch_7.3.0_to_7.3.1.sql,
+     * valid patterns: h2_engine_7.2_to_7.3.sql, oracle_engine_7.3_patch_7.3.0_to_7.3.1.sql,
      * postgres_engine_7.3_patch_7.3.2_to_7.3.3_1.sql,
      */
     for (String file : folderContents.get(UPGRADE_SCRIPT_FOLDER)) {
@@ -60,7 +58,8 @@ public class SchemaLogUpgradeScriptPatternTest extends SchemaLogTestCase {
       } else if (nameParts[3].equals("patch")) {
         // patch update
         String basePatchVersion = nameParts[4];
-        assertTrue("unexpected patch version pattern for file: " + file, isPatchLevel(basePatchVersion));
+        assertTrue("unexpected patch version pattern for file: " + file,
+            isPatchLevel(basePatchVersion));
         assertThat(minorVersion, is(getMinorLevelFromPatchVersion(basePatchVersion)));
         assertThat(nameParts[5], is("to"));
         assertThat(nameParts[6], isOneOf(getPossibleNextVersions(basePatchVersion)));
@@ -87,7 +86,8 @@ public class SchemaLogUpgradeScriptPatternTest extends SchemaLogTestCase {
     String[] versionParts = version.split("\\.");
     if (isPatchLevel(version)) {
       // next patch version
-      versions.add(versionParts[0] + "." + versionParts[1] + "." + (Integer.parseInt(versionParts[2]) + 1));
+      versions.add(
+          versionParts[0] + "." + versionParts[1] + "." + (Integer.parseInt(versionParts[2]) + 1));
     } else if (isMinorLevel(version)) {
       // next minor version
       versions.add(versionParts[0] + "." + (Integer.parseInt(versionParts[1]) + 1));

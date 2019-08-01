@@ -44,7 +44,6 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
     VariableLogDelegate.reset();
   }
 
-
   @Deployment
   public void testMessageThrowEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
@@ -55,7 +54,8 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
     assertEquals("mappedValue", mappedVariables.get("mappedVariable"));
 
     // output mapping
-    String variable = (String) runtimeService.getVariableLocal(processInstance.getId(), "outVariable");
+    String variable = (String) runtimeService.getVariableLocal(processInstance.getId(),
+        "outVariable");
     assertEquals("mappedValue", variable);
   }
 
@@ -63,7 +63,8 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
   public void testMessageCatchEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
-    Execution messageExecution = runtimeService.createExecutionQuery().activityId("messageCatch").singleResult();
+    Execution messageExecution = runtimeService.createExecutionQuery().activityId("messageCatch")
+        .singleResult();
 
     Map<String, Object> localVariables = runtimeService.getVariablesLocal(messageExecution.getId());
     assertEquals(1, localVariables.size());
@@ -74,7 +75,8 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
     runtimeService.messageEventReceived("IncomingMessage", messageExecution.getId(), variables);
 
     // output mapping
-    String variable = (String) runtimeService.getVariableLocal(processInstance.getId(), "outVariable");
+    String variable = (String) runtimeService.getVariableLocal(processInstance.getId(),
+        "outVariable");
     assertEquals("outValue", variable);
   }
 
@@ -104,32 +106,33 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
     assertEquals("mappedValue", mappedVariables.get("mappedVariable"));
 
     // output mapping
-    String variable = (String) runtimeService.getVariableLocal(processInstance.getId(), "outVariable");
+    String variable = (String) runtimeService.getVariableLocal(processInstance.getId(),
+        "outVariable");
     assertEquals("mappedValue", variable);
   }
 
   public void testMessageStartEvent() {
 
     try {
-      repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputEventTest.testMessageStartEvent.bpmn20.xml")
-        .deploy();
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputEventTest.testMessageStartEvent.bpmn20.xml")
+          .deploy();
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("camunda:inputOutput mapping unsupported for element type 'startEvent'", e.getMessage());
+      assertTextPresent("camunda:inputOutput mapping unsupported for element type 'startEvent'",
+          e.getMessage());
     }
   }
 
   public void testNoneEndEvent() {
     try {
-      repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputEventTest.testNoneEndEvent.bpmn20.xml")
-        .deploy();
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputEventTest.testNoneEndEvent.bpmn20.xml")
+          .deploy();
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("camunda:outputParameter not allowed for element type 'endEvent'", e.getMessage());
+      assertTextPresent("camunda:outputParameter not allowed for element type 'endEvent'",
+          e.getMessage());
     }
   }
 
@@ -151,15 +154,12 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     // when
-    runtimeService.createMessageCorrelation("foo")
-      .processInstanceId(processInstance.getId())
-      .correlate();
+    runtimeService.createMessageCorrelation("foo").processInstanceId(processInstance.getId())
+        .correlate();
 
     // then
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
-      .processInstanceIdIn(processInstance.getId())
-      .variableName("foo")
-      .singleResult();
+        .processInstanceIdIn(processInstance.getId()).variableName("foo").singleResult();
 
     assertNotNull(variableInstance);
     assertEquals("bar", variableInstance.getValue());
@@ -170,8 +170,7 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    Job job = managementService.createJobQuery()
-        .processInstanceId(processInstance.getId())
+    Job job = managementService.createJobQuery().processInstanceId(processInstance.getId())
         .singleResult();
 
     // when
@@ -179,9 +178,7 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
 
     // then
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
-      .processInstanceIdIn(processInstance.getId())
-      .variableName("foo")
-      .singleResult();
+        .processInstanceIdIn(processInstance.getId()).variableName("foo").singleResult();
 
     assertNotNull(variableInstance);
     assertEquals("bar", variableInstance.getValue());
@@ -193,9 +190,8 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     Execution execution = runtimeService.createExecutionQuery()
-      .processInstanceId(processInstance.getId())
-      .signalEventSubscriptionName("foo")
-      .singleResult();
+        .processInstanceId(processInstance.getId()).signalEventSubscriptionName("foo")
+        .singleResult();
 
     assertNotNull(execution);
 
@@ -204,9 +200,7 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
 
     // then
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
-      .processInstanceIdIn(processInstance.getId())
-      .variableName("foo")
-      .singleResult();
+        .processInstanceIdIn(processInstance.getId()).variableName("foo").singleResult();
 
     assertNotNull(variableInstance);
     assertEquals("bar", variableInstance.getValue());
@@ -222,9 +216,7 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
 
     // then
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
-      .processInstanceIdIn(processInstance.getId())
-      .variableName("foo")
-      .singleResult();
+        .processInstanceIdIn(processInstance.getId()).variableName("foo").singleResult();
 
     assertNotNull(variableInstance);
     assertEquals("bar", variableInstance.getValue());
@@ -232,13 +224,13 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
 
   public void testMessageBoundaryEvent() {
     try {
-      repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputEventTest.testMessageBoundaryEvent.bpmn20.xml")
-        .deploy();
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputEventTest.testMessageBoundaryEvent.bpmn20.xml")
+          .deploy();
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("camunda:inputOutput mapping unsupported for element type 'boundaryEvent'", e.getMessage());
+      assertTextPresent("camunda:inputOutput mapping unsupported for element type 'boundaryEvent'",
+          e.getMessage());
     }
   }
 

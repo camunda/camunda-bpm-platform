@@ -47,12 +47,11 @@ public class ExternalTaskSupportTest {
 
   @Parameters
   public static Collection<Object[]> processResources() {
-    return Arrays.asList(new Object[][] {
-      {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskSupportTest.businessRuleTask.bpmn20.xml"},
-      {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskSupportTest.messageEndEvent.bpmn20.xml"},
-      {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskSupportTest.messageIntermediateEvent.bpmn20.xml"},
-      {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskSupportTest.sendTask.bpmn20.xml"}
-    });
+    return Arrays.asList(new Object[][] { {
+        "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskSupportTest.businessRuleTask.bpmn20.xml" },
+        { "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskSupportTest.messageEndEvent.bpmn20.xml" },
+        { "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskSupportTest.messageIntermediateEvent.bpmn20.xml" },
+        { "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskSupportTest.sendTask.bpmn20.xml" } });
   }
 
   @Parameter
@@ -62,11 +61,8 @@ public class ExternalTaskSupportTest {
 
   @Before
   public void setUp() {
-    deploymentId = rule.getRepositoryService()
-        .createDeployment()
-        .addClasspathResource(processDefinitionResource)
-        .deploy()
-        .getId();
+    deploymentId = rule.getRepositoryService().createDeployment()
+        .addClasspathResource(processDefinitionResource).deploy().getId();
   }
 
   @After
@@ -79,17 +75,16 @@ public class ExternalTaskSupportTest {
   @Test
   public void testExternalTaskSupport() {
     // given
-    ProcessDefinition processDefinition = rule.getRepositoryService().createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = rule.getRepositoryService().createProcessDefinitionQuery()
+        .singleResult();
 
     // when
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(processDefinition.getId());
 
     // then
-    List<LockedExternalTask> externalTasks = rule
-        .getExternalTaskService()
-        .fetchAndLock(1, "aWorker")
-        .topic("externalTaskTopic", 5000L)
-        .execute();
+    List<LockedExternalTask> externalTasks = rule.getExternalTaskService()
+        .fetchAndLock(1, "aWorker").topic("externalTaskTopic", 5000L).execute();
 
     Assert.assertEquals(1, externalTasks.size());
     Assert.assertEquals(processInstance.getId(), externalTasks.get(0).getProcessInstanceId());

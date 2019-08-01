@@ -21,8 +21,7 @@ package org.camunda.bpm.engine.test.api.runtime.migration.models;
  */
 public class ConditionalModels {
 
-
-  public static final String CONDITIONAL_PROCESS_KEY= "processKey";
+  public static final String CONDITIONAL_PROCESS_KEY = "processKey";
   public static final String SUB_PROCESS_ID = "subProcess";
   public static final String BOUNDARY_ID = "boundaryId";
   public static final String PROC_DEF_KEY = "Process";

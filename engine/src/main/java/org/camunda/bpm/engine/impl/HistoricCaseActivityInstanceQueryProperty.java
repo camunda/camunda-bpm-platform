@@ -19,15 +19,16 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
 
-
 /**
- * Contains the possible properties which can be used in a {@link HistoricCaseActivityInstanceQuery}.
+ * Contains the possible properties which can be used in a
+ * {@link HistoricCaseActivityInstanceQuery}.
  *
  * @author Sebastian Menski
  */
 public interface HistoricCaseActivityInstanceQueryProperty {
 
-  public static final QueryProperty HISTORIC_CASE_ACTIVITY_INSTANCE_ID = new QueryPropertyImpl("ID_");
+  public static final QueryProperty HISTORIC_CASE_ACTIVITY_INSTANCE_ID = new QueryPropertyImpl(
+      "ID_");
   public static final QueryProperty CASE_INSTANCE_ID = new QueryPropertyImpl("CASE_INST_ID_");
   public static final QueryProperty CASE_ACTIVITY_ID = new QueryPropertyImpl("CASE_ACT_ID_");
   public static final QueryProperty CASE_ACTIVITY_NAME = new QueryPropertyImpl("CASE_ACT_NAME_");

@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
-
 /**
  * @author Joram Barrez
  */
@@ -55,13 +54,12 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
     if (taskId != null) {
       deleteTask(taskId, commandContext);
     } else if (taskIds != null) {
-        for (String taskId : taskIds) {
-          deleteTask(taskId, commandContext);
-        }
+      for (String taskId : taskIds) {
+        deleteTask(taskId, commandContext);
+      }
     } else {
       throw new ProcessEngineException("taskId and taskIds are null");
     }
-
 
     return null;
   }
@@ -71,26 +69,29 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
     TaskEntity task = taskManager.findTaskById(taskId);
 
     if (task != null) {
-      if(task.getExecutionId() != null) {
-        throw new ProcessEngineException("The task cannot be deleted because is part of a running process");
+      if (task.getExecutionId() != null) {
+        throw new ProcessEngineException(
+            "The task cannot be deleted because is part of a running process");
       } else if (task.getCaseExecutionId() != null) {
-        throw new ProcessEngineException("The task cannot be deleted because is part of a running case instance");
+        throw new ProcessEngineException(
+            "The task cannot be deleted because is part of a running case instance");
       }
 
       checkDeleteTask(task, commandContext);
 
-      String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
+      String reason = (deleteReason == null || deleteReason.length() == 0)
+          ? TaskEntity.DELETE_REASON_DELETED
+          : deleteReason;
       task.delete(reason, cascade);
     } else if (cascade) {
-      Context
-        .getCommandContext()
-        .getHistoricTaskInstanceManager()
-        .deleteHistoricTaskInstanceById(taskId);
+      Context.getCommandContext().getHistoricTaskInstanceManager()
+          .deleteHistoricTaskInstanceById(taskId);
     }
   }
 
-  protected void checkDeleteTask(TaskEntity task,  CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+  protected void checkDeleteTask(TaskEntity task, CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkDeleteTask(task);
     }
   }

@@ -33,7 +33,8 @@ public class ExpressionExecutionListenerSpec extends AbstractExecutionListenerSp
     super(eventName);
   }
 
-  protected void configureCaseExecutionListener(CmmnModelInstance modelInstance, CamundaCaseExecutionListener listener) {
+  protected void configureCaseExecutionListener(CmmnModelInstance modelInstance,
+      CamundaCaseExecutionListener listener) {
     listener.setCamundaExpression(EXPRESSION);
 
   }

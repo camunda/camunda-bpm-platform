@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.task.Task;
 /**
  * @author Johannes Heinemann
  */
-public class MyExtendedPermissionDefaultAuthorizationProvider extends DefaultAuthorizationProvider{
+public class MyExtendedPermissionDefaultAuthorizationProvider extends DefaultAuthorizationProvider {
 
   public AuthorizationEntity[] newTaskAssignee(Task task, String oldAssignee, String newAssignee) {
     AuthorizationEntity[] authorizations = super.newTaskAssignee(task, oldAssignee, newAssignee);

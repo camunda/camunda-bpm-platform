@@ -35,10 +35,11 @@ public class QueryValidators {
 
     @Override
     public void validate(T query) {
-      if (!Context.getProcessEngineConfiguration().isEnableExpressionsInAdhocQueries() &&
-          !query.getExpressions().isEmpty()) {
-        throw new BadUserRequestException("Expressions are forbidden in adhoc queries. This behavior can be toggled"
-            + " in the process engine configuration");
+      if (!Context.getProcessEngineConfiguration().isEnableExpressionsInAdhocQueries()
+          && !query.getExpressions().isEmpty()) {
+        throw new BadUserRequestException(
+            "Expressions are forbidden in adhoc queries. This behavior can be toggled"
+                + " in the process engine configuration");
       }
     }
 
@@ -59,10 +60,11 @@ public class QueryValidators {
 
     @Override
     public void validate(T query) {
-      if (!Context.getProcessEngineConfiguration().isEnableExpressionsInStoredQueries() &&
-          !query.getExpressions().isEmpty()) {
-        throw new BadUserRequestException("Expressions are forbidden in stored queries. This behavior can be toggled"
-            + " in the process engine configuration");
+      if (!Context.getProcessEngineConfiguration().isEnableExpressionsInStoredQueries()
+          && !query.getExpressions().isEmpty()) {
+        throw new BadUserRequestException(
+            "Expressions are forbidden in stored queries. This behavior can be toggled"
+                + " in the process engine configuration");
       }
     }
 

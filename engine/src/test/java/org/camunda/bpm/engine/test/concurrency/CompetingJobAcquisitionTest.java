@@ -25,13 +25,12 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 import org.slf4j.Logger;
 
-
 /**
  * @author Tom Baeyens
  */
 public class CompetingJobAcquisitionTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   Thread testThread = Thread.currentThread();
   static ControllableThread activeThread;
@@ -46,17 +45,17 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     public void run() {
       try {
         JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-        jobs = (AcquiredJobs) processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new AcquireJobsCmd(jobExecutor)));
+        jobs = (AcquiredJobs) processEngineConfiguration.getCommandExecutorTxRequired()
+            .execute(new ControlledCommand(activeThread, new AcquireJobsCmd(jobExecutor)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 

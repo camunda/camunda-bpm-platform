@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
-
 /**
  * @author Roman Smirnov
  *
@@ -35,15 +34,17 @@ public abstract class TimerEventJobHandler implements JobHandler<TimerJobConfigu
     String[] configParts = canonicalString.split("\\" + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER);
 
     if (configParts.length > 2) {
-      throw new ProcessEngineException("Illegal timer job handler configuration: '" + canonicalString
-          + "': exprecting a one or two part configuration seperated by '" + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + "'.");
+      throw new ProcessEngineException("Illegal timer job handler configuration: '"
+          + canonicalString + "': exprecting a one or two part configuration seperated by '"
+          + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + "'.");
     }
 
     TimerJobConfiguration configuration = new TimerJobConfiguration();
     configuration.timerElementKey = configParts[0];
 
     if (configParts.length == 2) {
-      configuration.followUpJobCreated = JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED.equals(configParts[1]);
+      configuration.followUpJobCreated = JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED
+          .equals(configParts[1]);
     }
 
     return configuration;
@@ -75,7 +76,8 @@ public abstract class TimerEventJobHandler implements JobHandler<TimerJobConfigu
       String canonicalString = timerElementKey;
 
       if (followUpJobCreated) {
-        canonicalString += JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
+        canonicalString += JOB_HANDLER_CONFIG_PROPERTY_DELIMITER
+            + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
       }
 
       return canonicalString;

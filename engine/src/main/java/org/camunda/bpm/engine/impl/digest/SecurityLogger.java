@@ -23,20 +23,17 @@ import java.util.Collection;
 
 public class SecurityLogger extends ProcessEngineLogger {
 
-  public ProcessEngineException cannotResolveAlgorithmPrefixFromGivenPasswordException(String resolvedHashAlgorithmName, Collection<String> availableHashAlgorithmNames) {
-    return new PasswordEncryptionException(exceptionMessage(
-      "001",
-      "Could not resolve hash algorithm name of a hashed password. Resolved hash algorithm name {}. Available hash algorithms {}",
-      resolvedHashAlgorithmName,
-      availableHashAlgorithmNames
-    ));
+  public ProcessEngineException cannotResolveAlgorithmPrefixFromGivenPasswordException(
+      String resolvedHashAlgorithmName, Collection<String> availableHashAlgorithmNames) {
+    return new PasswordEncryptionException(exceptionMessage("001",
+        "Could not resolve hash algorithm name of a hashed password. Resolved hash algorithm name {}. Available hash algorithms {}",
+        resolvedHashAlgorithmName, availableHashAlgorithmNames));
   }
 
-  public ProcessEngineException hashAlgorithmForPasswordEncryptionAlreadyAvailableException(String hashAlgorithmName) {
-    return new PasswordEncryptionException(exceptionMessage(
-      "002",
-      "Hash algorithm with the name '{}' was already added. The algorithm cannot be added twice!",
-      hashAlgorithmName
-    ));
+  public ProcessEngineException hashAlgorithmForPasswordEncryptionAlreadyAvailableException(
+      String hashAlgorithmName) {
+    return new PasswordEncryptionException(exceptionMessage("002",
+        "Hash algorithm with the name '{}' was already added. The algorithm cannot be added twice!",
+        hashAlgorithmName));
   }
 }

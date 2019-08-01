@@ -18,14 +18,13 @@ package org.camunda.bpm.engine.impl.util.io;
 
 import java.io.InputStream;
 
-
 /**
  * @author Tom Baeyens
  */
 public class InputStreamSource implements StreamSource {
-  
+
   InputStream inputStream;
-  
+
   public InputStreamSource(InputStream inputStream) {
     this.inputStream = inputStream;
   }
@@ -33,7 +32,7 @@ public class InputStreamSource implements StreamSource {
   public InputStream getInputStream() {
     return inputStream;
   }
-  
+
   public String toString() {
     return "InputStream";
   }

@@ -71,7 +71,6 @@ public class HistoricDetailQueryTest {
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
 
-
   protected RuntimeService runtimeService;
   protected ManagementService managementService;
   protected HistoryService historyService;
@@ -90,7 +89,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByUserOperationId() {
     startProcessInstance(PROCESS_KEY);
 
@@ -101,18 +100,19 @@ public class HistoricDetailQueryTest {
     // when
     taskService.resolveTask(taskId, getVariables());
 
-    //then
-    String userOperationId = historyService.createHistoricDetailQuery().singleResult().getUserOperationId();
+    // then
+    String userOperationId = historyService.createHistoricDetailQuery().singleResult()
+        .getUserOperationId();
 
     HistoricDetailQuery query = historyService.createHistoricDetailQuery()
-            .userOperationId(userOperationId);
+        .userOperationId(userOperationId);
 
     assertEquals(1, query.list().size());
     assertEquals(1, query.count());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByInvalidUserOperationId() {
     startProcessInstance(PROCESS_KEY);
 
@@ -121,9 +121,9 @@ public class HistoricDetailQueryTest {
     // when
     taskService.resolveTask(taskId, getVariables());
 
-    //then
+    // then
     HistoricDetailQuery query = historyService.createHistoricDetailQuery()
-            .userOperationId("invalid");
+        .userOperationId("invalid");
 
     assertEquals(0, query.list().size());
     assertEquals(0, query.count());
@@ -131,11 +131,12 @@ public class HistoricDetailQueryTest {
     try {
       query.userOperationId(null);
       fail("It was possible to set a null value as userOperationId.");
-    } catch (ProcessEngineException e) { }
+    } catch (ProcessEngineException e) {
+    }
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByExecutionId() {
     startProcessInstance(PROCESS_KEY);
 
@@ -144,18 +145,17 @@ public class HistoricDetailQueryTest {
     // when
     taskService.resolveTask(taskId, getVariables());
 
-    //then
+    // then
     String executionId = historyService.createHistoricDetailQuery().singleResult().getExecutionId();
 
-    HistoricDetailQuery query = historyService.createHistoricDetailQuery()
-            .executionId(executionId);
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().executionId(executionId);
 
     assertEquals(1, query.list().size());
     assertEquals(1, query.count());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByInvalidExecutionId() {
     startProcessInstance(PROCESS_KEY);
 
@@ -164,16 +164,15 @@ public class HistoricDetailQueryTest {
     // when
     taskService.resolveTask(taskId, getVariables());
 
-    //then
-    HistoricDetailQuery query = historyService.createHistoricDetailQuery()
-            .executionId("invalid");
+    // then
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().executionId("invalid");
 
     assertEquals(0, query.list().size());
     assertEquals(0, query.count());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByExecutionIdAndProcessInstanceId() {
     // given
     startProcessInstance(PROCESS_KEY);
@@ -188,16 +187,15 @@ public class HistoricDetailQueryTest {
 
     // when
     HistoricDetail detail = historyService.createHistoricDetailQuery()
-        .processInstanceId(processInstanceId)
-        .executionId(executionId).singleResult();
+        .processInstanceId(processInstanceId).executionId(executionId).singleResult();
 
-    //then
+    // then
     assertThat(detail.getProcessInstanceId(), is(processInstanceId));
     assertThat(detail.getExecutionId(), is(executionId));
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testQueryByVariableTypeIn() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
@@ -206,9 +204,7 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery()
-        .variableTypeIn("string");
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().variableTypeIn("string");
 
     // then
     assertEquals(1, query.list().size());
@@ -224,7 +220,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testQueryByVariableTypeInWithCapitalLetter() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
@@ -233,8 +229,7 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery()
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery()
         .variableTypeIn("Boolean");
 
     // then
@@ -251,7 +246,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testQueryByVariableTypeInWithSeveralTypes() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
@@ -263,9 +258,8 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery()
-        .variableTypeIn("boolean", "integer", "Serializable");
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().variableTypeIn("boolean",
+        "integer", "Serializable");
 
     // then
     assertEquals(3, query.list().size());
@@ -285,7 +279,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testQueryByInvalidVariableTypeIn() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
@@ -295,8 +289,7 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery()
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery()
         .variableTypeIn("invalid");
 
     // then
@@ -312,7 +305,7 @@ public class HistoricDetailQueryTest {
 
     try {
       // when
-      query.variableTypeIn((String)null);
+      query.variableTypeIn((String) null);
       fail("A ProcessEngineException was expected.");
     } catch (ProcessEngineException e) {
       // then fails
@@ -320,17 +313,16 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryBySingleProcessInstanceId() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("stringVar", "test");
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY,
+        variables);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery()
-        .variableUpdates()
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().variableUpdates()
         .processInstanceIdIn(processInstance.getProcessInstanceId());
 
     // then
@@ -339,20 +331,21 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryBySeveralProcessInstanceIds() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("stringVar", "test");
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY,
+        variables);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(PROCESS_KEY,
+        variables);
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery()
-        .variableUpdates()
-        .processInstanceIdIn(processInstance.getProcessInstanceId(), processInstance2.getProcessInstanceId());
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().variableUpdates()
+        .processInstanceIdIn(processInstance.getProcessInstanceId(),
+            processInstance2.getProcessInstanceId());
 
     // then
     Set<String> expectedProcessInstanceIds = new HashSet<String>();
@@ -364,7 +357,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByNonExistingProcessInstanceId() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -372,8 +365,7 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery()
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery()
         .processInstanceIdIn("foo");
 
     // then
@@ -381,7 +373,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testQueryByInvalidProcessInstanceIds() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
@@ -389,8 +381,7 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables1);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     try {
       // when
@@ -402,7 +393,7 @@ public class HistoricDetailQueryTest {
 
     try {
       // when
-      query.processInstanceIdIn((String)null);
+      query.processInstanceIdIn((String) null);
       fail("A ProcessEngineException was expected.");
     } catch (ProcessEngineException e) {
       // then fails
@@ -410,7 +401,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByOccurredBefore() {
     // given
     Calendar startTime = Calendar.getInstance();
@@ -426,8 +417,7 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     // then
     assertEquals(1, query.occurredBefore(hourFromNow.getTime()).count());
@@ -436,7 +426,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByOccurredAfter() {
     // given
     Calendar startTime = Calendar.getInstance();
@@ -452,8 +442,7 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     // then
     assertEquals(0, query.occurredAfter(hourFromNow.getTime()).count());
@@ -461,7 +450,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByOccurredAfterAndOccurredBefore() {
     // given
     Calendar startTime = Calendar.getInstance();
@@ -477,18 +466,21 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     // then
-    assertEquals(0, query.occurredAfter(hourFromNow.getTime()).occurredBefore(hourFromNow.getTime()).count());
-    assertEquals(1, query.occurredAfter(hourAgo.getTime()).occurredBefore(hourFromNow.getTime()).count());
-    assertEquals(0, query.occurredAfter(hourFromNow.getTime()).occurredBefore(hourAgo.getTime()).count());
-    assertEquals(0, query.occurredAfter(hourAgo.getTime()).occurredBefore(hourAgo.getTime()).count());
+    assertEquals(0,
+        query.occurredAfter(hourFromNow.getTime()).occurredBefore(hourFromNow.getTime()).count());
+    assertEquals(1,
+        query.occurredAfter(hourAgo.getTime()).occurredBefore(hourFromNow.getTime()).count());
+    assertEquals(0,
+        query.occurredAfter(hourFromNow.getTime()).occurredBefore(hourAgo.getTime()).count());
+    assertEquals(0,
+        query.occurredAfter(hourAgo.getTime()).occurredBefore(hourAgo.getTime()).count());
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testQueryByInvalidOccurredBeforeDate() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
@@ -496,8 +488,7 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables1);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     try {
       // when
@@ -509,7 +500,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
   public void testQueryByInvalidOccurredAfterDate() {
     // given
     Map<String, Object> variables1 = new HashMap<String, Object>();
@@ -517,8 +508,7 @@ public class HistoricDetailQueryTest {
     runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables1);
 
     // when
-    HistoricDetailQuery query =
-      historyService.createHistoricDetailQuery();
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
     try {
       // when
@@ -530,7 +520,7 @@ public class HistoricDetailQueryTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testQueryByCaseInstanceIdAndCaseExecutionId() {
     // given
     String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
@@ -538,8 +528,7 @@ public class HistoricDetailQueryTest {
 
     // when
     HistoricDetail detail = historyService.createHistoricDetailQuery()
-        .caseInstanceId(caseInstanceId)
-        .caseExecutionId(caseInstanceId).singleResult();
+        .caseInstanceId(caseInstanceId).caseExecutionId(caseInstanceId).singleResult();
 
     // then
     assertThat(detail.getCaseInstanceId(), is(caseInstanceId));
@@ -547,8 +536,7 @@ public class HistoricDetailQueryTest {
   }
 
   protected VariableMap getVariables() {
-    return Variables.createVariables()
-            .putValue("aVariableName", "aVariableValue");
+    return Variables.createVariables().putValue("aVariableName", "aVariableValue");
   }
 
   protected void startProcessInstance(String key) {

@@ -34,10 +34,14 @@ import org.jboss.vfs.VirtualFile;
 import org.jboss.vfs.VirtualFileFilter;
 
 /**
- * <p>A {@link ProcessArchiveScanner} which uses Jboss VFS for
- * scanning the process archive for processes.</p>
+ * <p>
+ * A {@link ProcessArchiveScanner} which uses Jboss VFS for scanning the process archive for
+ * processes.
+ * </p>
  *
- * <p>This implementation should be used on Jboss AS 7</p>
+ * <p>
+ * This implementation should be used on Jboss AS 7
+ * </p>
  *
  * @author Daniel Meyer
  * @author Falko Menge
@@ -46,31 +50,33 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
 
   private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
-  public Map<String, byte[]> findResources(ClassLoader classLoader, String resourceRootPath, URL processesXml) {
+  public Map<String, byte[]> findResources(ClassLoader classLoader, String resourceRootPath,
+      URL processesXml) {
     return findResources(classLoader, resourceRootPath, processesXml, null);
   }
 
-  public Map<String, byte[]> findResources(ClassLoader classLoader, String resourceRootPath, URL processesXml, String[] additionalResourceSuffixes) {
+  public Map<String, byte[]> findResources(ClassLoader classLoader, String resourceRootPath,
+      URL processesXml, String[] additionalResourceSuffixes) {
 
     // the map in which we collect the resources
     final Map<String, byte[]> resources = new HashMap<String, byte[]>();
 
-    if(resourceRootPath != null && !resourceRootPath.startsWith("pa:")) {
+    if (resourceRootPath != null && !resourceRootPath.startsWith("pa:")) {
 
-        //  1. CASE: paResourceRootPath specified AND it is a "classpath:" resource root
+      // 1. CASE: paResourceRootPath specified AND it is a "classpath:" resource root
 
-        String strippedPath = resourceRootPath.replace("classpath:", "");
-        Enumeration<URL> resourceRoots = loadClasspathResourceRoots(classLoader, strippedPath);
+      String strippedPath = resourceRootPath.replace("classpath:", "");
+      Enumeration<URL> resourceRoots = loadClasspathResourceRoots(classLoader, strippedPath);
 
-        if(!resourceRoots.hasMoreElements()) {
-          LOG.cannotFindResourcesForPath(resourceRootPath, classLoader);
-        }
+      if (!resourceRoots.hasMoreElements()) {
+        LOG.cannotFindResourcesForPath(resourceRootPath, classLoader);
+      }
 
-        while (resourceRoots.hasMoreElements()) {
-          URL resourceRoot = resourceRoots.nextElement();
-          VirtualFile virtualRoot = getVirtualFileForUrl(resourceRoot);
-          scanRoot(virtualRoot, additionalResourceSuffixes, resources);
-        }
+      while (resourceRoots.hasMoreElements()) {
+        URL resourceRoot = resourceRoots.nextElement();
+        VirtualFile virtualRoot = getVirtualFileForUrl(resourceRoot);
+        scanRoot(virtualRoot, additionalResourceSuffixes, resources);
+      }
 
     } else {
 
@@ -98,20 +104,22 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
 
   protected VirtualFile getVirtualFileForUrl(final URL url) {
     try {
-      return  VFS.getChild(url.toURI());
-    }
-    catch (URISyntaxException e) {
+      return VFS.getChild(url.toURI());
+    } catch (URISyntaxException e) {
       throw LOG.exceptionWhileGettingVirtualFolder(url, e);
     }
   }
 
-  protected void scanRoot(VirtualFile processArchiveRoot, final String[] additionalResourceSuffixes, Map<String, byte[]> resources) {
+  protected void scanRoot(VirtualFile processArchiveRoot, final String[] additionalResourceSuffixes,
+      Map<String, byte[]> resources) {
     try {
-      List<VirtualFile> processes = processArchiveRoot.getChildrenRecursively(new VirtualFileFilter() {
-        public boolean accepts(VirtualFile file) {
-          return file.isFile() && ProcessApplicationScanningUtil.isDeployable(file.getName(), additionalResourceSuffixes);
-        }
-      });
+      List<VirtualFile> processes = processArchiveRoot
+          .getChildrenRecursively(new VirtualFileFilter() {
+            public boolean accepts(VirtualFile file) {
+              return file.isFile() && ProcessApplicationScanningUtil.isDeployable(file.getName(),
+                  additionalResourceSuffixes);
+            }
+          });
       for (final VirtualFile process : processes) {
         addResource(process, processArchiveRoot, resources);
         // find diagram(s) for process
@@ -124,30 +132,29 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
           addResource(diagram, processArchiveRoot, resources);
         }
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       LOG.cannotScanVfsRoot(processArchiveRoot, e);
     }
   }
 
-  private void addResource(VirtualFile virtualFile, VirtualFile processArchiveRoot, Map<String, byte[]> resources) {
+  private void addResource(VirtualFile virtualFile, VirtualFile processArchiveRoot,
+      Map<String, byte[]> resources) {
     String resourceName = virtualFile.getPathNameRelativeTo(processArchiveRoot);
     try {
       InputStream inputStream = virtualFile.openStream();
       byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
       IoUtil.closeSilently(inputStream);
       resources.put(resourceName, bytes);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       LOG.cannotReadInputStreamForFile(resourceName, processArchiveRoot, e);
     }
   }
 
-  protected Enumeration<URL> loadClasspathResourceRoots(final ClassLoader classLoader, String strippedPaResourceRootPath) {
+  protected Enumeration<URL> loadClasspathResourceRoots(final ClassLoader classLoader,
+      String strippedPaResourceRootPath) {
     try {
       return classLoader.getResources(strippedPaResourceRootPath);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       throw LOG.exceptionWhileLoadingCpRoots(strippedPaResourceRootPath, classLoader, e);
     }
   }

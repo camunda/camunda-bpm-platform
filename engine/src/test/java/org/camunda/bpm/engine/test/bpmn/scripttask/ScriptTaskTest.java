@@ -70,27 +70,25 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
         // an execution variable 'foo'
         "execution.setVariable('foo', 'a');"
 
-        // THEN
-        // there should be a script variable defined
-      + "if (typeof foo !== 'undefined') { "
-      + "  throw 'Variable foo should be defined as script variable.';"
-      + "}"
+            // THEN
+            // there should be a script variable defined
+            + "if (typeof foo !== 'undefined') { "
+            + "  throw 'Variable foo should be defined as script variable.';" + "}"
 
-        // GIVEN
-        // a script variable with the same name
-      + "var foo = 'b';"
+            // GIVEN
+            // a script variable with the same name
+            + "var foo = 'b';"
 
-        // THEN
-        // it should not change the value of the execution variable
-      + "if(execution.getVariable('foo') != 'a') {"
-      + "  throw 'Execution should contain variable foo';"
-      + "}"
+            // THEN
+            // it should not change the value of the execution variable
+            + "if(execution.getVariable('foo') != 'a') {"
+            + "  throw 'Execution should contain variable foo';" + "}"
 
-        // AND
-        // it should override the visibility of the execution variable
-      + "if(foo != 'b') {"
-      + "  throw 'Script variable must override the visibiltity of the execution variable.';"
-      + "}"
+            // AND
+            // it should override the visibility of the execution variable
+            + "if(foo != 'b') {"
+            + "  throw 'Script variable must override the visibiltity of the execution variable.';"
+            + "}"
 
     );
 
@@ -114,24 +112,24 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
         // an execution variable 'foo'
         "execution.setVariable('foo', 'a')\n"
 
-        // THEN
-        // there should be a script variable defined
-      + "if not foo:\n"
-      + "    raise Exception('Variable foo should be defined as script variable.')\n"
+            // THEN
+            // there should be a script variable defined
+            + "if not foo:\n"
+            + "    raise Exception('Variable foo should be defined as script variable.')\n"
 
-        // GIVEN
-        // a script variable with the same name
-      + "foo = 'b'\n"
+            // GIVEN
+            // a script variable with the same name
+            + "foo = 'b'\n"
 
-        // THEN
-        // it should not change the value of the execution variable
-      + "if execution.getVariable('foo') != 'a':\n"
-      + "    raise Exception('Execution should contain variable foo')\n"
+            // THEN
+            // it should not change the value of the execution variable
+            + "if execution.getVariable('foo') != 'a':\n"
+            + "    raise Exception('Execution should contain variable foo')\n"
 
-        // AND
-        // it should override the visibility of the execution variable
-      + "if foo != 'b':\n"
-      + "    raise Exception('Script variable must override the visibiltity of the execution variable.')\n"
+            // AND
+            // it should override the visibility of the execution variable
+            + "if foo != 'b':\n"
+            + "    raise Exception('Script variable must override the visibiltity of the execution variable.')\n"
 
     );
 
@@ -155,25 +153,24 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
         // an execution variable 'foo'
         "$execution.setVariable('foo', 'a')\n"
 
-        // THEN
-        // there should NOT be a script variable defined (this is unsupported in Ruby binding)
-      + "raise 'Variable foo should be defined as script variable.' if !$foo.nil?\n"
+            // THEN
+            // there should NOT be a script variable defined (this is unsupported in Ruby binding)
+            + "raise 'Variable foo should be defined as script variable.' if !$foo.nil?\n"
 
-        // GIVEN
-        // a script variable with the same name
-      + "$foo = 'b'\n"
+            // GIVEN
+            // a script variable with the same name
+            + "$foo = 'b'\n"
 
-        // THEN
-        // it should not change the value of the execution variable
-      + "if $execution.getVariable('foo') != 'a'\n"
-      + "  raise 'Execution should contain variable foo'\n"
-      + "end\n"
+            // THEN
+            // it should not change the value of the execution variable
+            + "if $execution.getVariable('foo') != 'a'\n"
+            + "  raise 'Execution should contain variable foo'\n" + "end\n"
 
-        // AND
-        // it should override the visibility of the execution variable
-      + "if $foo != 'b'\n"
-      + "  raise 'Script variable must override the visibiltity of the execution variable.'\n"
-      + "end"
+            // AND
+            // it should override the visibility of the execution variable
+            + "if $foo != 'b'\n"
+            + "  raise 'Script variable must override the visibiltity of the execution variable.'\n"
+            + "end"
 
     );
 
@@ -197,27 +194,26 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
         // an execution variable 'foo'
         "execution.setVariable('foo', 'a')\n"
 
-        // THEN
-        // there should be a script variable defined
-      + "if ( !foo ) {\n"
-      + "  throw new Exception('Variable foo should be defined as script variable.')\n"
-      + "}\n"
+            // THEN
+            // there should be a script variable defined
+            + "if ( !foo ) {\n"
+            + "  throw new Exception('Variable foo should be defined as script variable.')\n"
+            + "}\n"
 
-        // GIVEN
-        // a script variable with the same name
-      + "foo = 'b'\n"
+            // GIVEN
+            // a script variable with the same name
+            + "foo = 'b'\n"
 
-        // THEN
-        // it should not change the value of the execution variable
-      + "if (execution.getVariable('foo') != 'a') {\n"
-      + "  throw new Exception('Execution should contain variable foo')\n"
-      + "}\n"
+            // THEN
+            // it should not change the value of the execution variable
+            + "if (execution.getVariable('foo') != 'a') {\n"
+            + "  throw new Exception('Execution should contain variable foo')\n" + "}\n"
 
-        // AND
-        // it should override the visibility of the execution variable
-      + "if (foo != 'b') {\n"
-      + "  throw new Exception('Script variable must override the visibiltity of the execution variable.')\n"
-      + "}"
+            // AND
+            // it should override the visibility of the execution variable
+            + "if (foo != 'b') {\n"
+            + "  throw new Exception('Script variable must override the visibiltity of the execution variable.')\n"
+            + "}"
 
     );
 
@@ -239,15 +235,13 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
         // GIVEN
         // a function named sum
-        "function sum(a,b){"
-      + "  return a+b;"
-      + "};"
+        "function sum(a,b){" + "  return a+b;" + "};"
 
         // THEN
         // i can call the function
-      + "var result = sum(1,2);"
+            + "var result = sum(1,2);"
 
-      + "execution.setVariable('foo', result);"
+            + "execution.setVariable('foo', result);"
 
     );
 
@@ -275,13 +269,11 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
         // GIVEN
         // a function named sum
-        "def sum(a, b):\n"
-      + "    return a + b\n"
+        "def sum(a, b):\n" + "    return a + b\n"
 
         // THEN
         // i can call the function
-      + "result = sum(1,2)\n"
-      + "execution.setVariable('foo', result)"
+            + "result = sum(1,2)\n" + "execution.setVariable('foo', result)"
 
     );
 
@@ -302,15 +294,13 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
         // GIVEN
         // a function named sum
-        "def sum(a, b)\n"
-      + "    return a + b\n"
-      + "end\n"
+        "def sum(a, b)\n" + "    return a + b\n" + "end\n"
 
         // THEN
         // i can call the function
-      + "result = sum(1,2)\n"
+            + "result = sum(1,2)\n"
 
-      + "$execution.setVariable('foo', result)\n"
+            + "$execution.setVariable('foo', result)\n"
 
     );
 
@@ -331,15 +321,13 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
         // GIVEN
         // a function named sum
-        "def sum(a, b) {\n"
-      + "    return a + b\n"
-      + "}\n"
+        "def sum(a, b) {\n" + "    return a + b\n" + "}\n"
 
         // THEN
         // i can call the function
-      + "result = sum(1,2)\n"
+            + "result = sum(1,2)\n"
 
-      + "execution.setVariable('foo', result)\n"
+            + "execution.setVariable('foo', result)\n"
 
     );
 
@@ -437,8 +425,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     try {
       runtimeService.startProcessInstanceByKey("testProcess");
       fail("Process variable 'scriptSource' not defined");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertTextPresentIgnoreCase("Cannot resolve identifier 'scriptSource'", e.getMessage());
     }
   }
@@ -473,7 +460,8 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
     assertEquals(0, date.getTime());
 
-    deployProcess(JAVASCRIPT, "execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
+    deployProcess(JAVASCRIPT,
+        "execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
 
     pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -482,15 +470,16 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
   }
 
   public void testPythonVariableSerialization() {
-    deployProcess(PYTHON, "import java.util.Date\nexecution.setVariable('date', java.util.Date(0))");
+    deployProcess(PYTHON,
+        "import java.util.Date\nexecution.setVariable('date', java.util.Date(0))");
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
     Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
     assertEquals(0, date.getTime());
 
-    deployProcess(PYTHON, "import org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable\n" +
-      "execution.setVariable('myVar', org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
+    deployProcess(PYTHON, "import org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable\n"
+        + "execution.setVariable('myVar', org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
 
     pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -506,7 +495,8 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
     assertEquals(0, date.getTime());
 
-    deployProcess(RUBY, "$execution.setVariable('myVar', org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable.new('test'));");
+    deployProcess(RUBY,
+        "$execution.setVariable('myVar', org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable.new('test'));");
 
     pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -522,7 +512,8 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
     assertEquals(0, date.getTime());
 
-    deployProcess(GROOVY, "execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
+    deployProcess(GROOVY,
+        "execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
 
     pi = runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -536,8 +527,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     try {
       runtimeService.startProcessInstanceByKey("testProcess");
       fail("Should fail during script compilation");
-    }
-    catch (ScriptCompilationException e) {
+    } catch (ScriptCompilationException e) {
       assertTextPresentIgnoreCase("import unknown", e.getMessage());
     }
   }
@@ -551,11 +541,9 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     try {
       runtimeService.startProcessInstanceByKey("testProcess");
       fail("Should fail during script evaluation");
-    }
-    catch (ScriptEvaluationException e) {
+    } catch (ScriptEvaluationException e) {
       assertTextPresentIgnoreCase("import unknown", e.getMessage());
-    }
-    finally {
+    } finally {
       // re-enable script compilation
       processEngineConfiguration.setEnableScriptCompilation(true);
     }
@@ -563,13 +551,8 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   public void testShouldNotDeployProcessWithMissingScriptElementAndResource() {
     try {
-      deployProcess(Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .scriptTask()
-          .scriptFormat(RUBY)
-        .userTask()
-        .endEvent()
-      .done());
+      deployProcess(Bpmn.createExecutableProcess("testProcess").startEvent().scriptTask()
+          .scriptFormat(RUBY).userTask().endEvent().done());
 
       fail("this process should not be deployable");
     } catch (ProcessEngineException e) {
@@ -578,13 +561,8 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
   }
 
   public void testShouldUseJuelAsDefaultScriptLanguage() {
-    deployProcess(Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .scriptTask()
-        .scriptText("${true}")
-      .userTask()
-      .endEvent()
-    .done());
+    deployProcess(Bpmn.createExecutableProcess("testProcess").startEvent().scriptTask()
+        .scriptText("${true}").userTask().endEvent().done());
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -594,9 +572,8 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   protected void deployProcess(BpmnModelInstance process) {
     Deployment deployment = repositoryService.createDeployment()
-        .addModelInstance("testProcess.bpmn", process)
-        .deploy();
-      deploymentIds.add(deployment.getId());
+        .addModelInstance("testProcess.bpmn", process).deploy();
+    deploymentIds.add(deployment.getId());
   }
 
   protected void deployProcess(String scriptFormat, String scriptText) {
@@ -606,14 +583,8 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   protected BpmnModelInstance createProcess(String scriptFormat, String scriptText) {
 
-    return Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .scriptTask()
-        .scriptFormat(scriptFormat)
-        .scriptText(scriptText)
-      .userTask()
-      .endEvent()
-    .done();
+    return Bpmn.createExecutableProcess("testProcess").startEvent().scriptTask()
+        .scriptFormat(scriptFormat).scriptText(scriptText).userTask().endEvent().done();
 
   }
 
@@ -622,7 +593,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @org.camunda.bpm.engine.test.Deployment
-  public void testPreviousTaskShouldNotHandleException(){
+  public void testPreviousTaskShouldNotHandleException() {
     try {
       runtimeService.startProcessInstanceByKey("process");
       fail();
@@ -642,7 +613,8 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     variables.put("echo", "hello");
     variables.put("existingProcessVariableName", "one");
 
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("setScriptResultToProcessVariable", variables);
+    ProcessInstance pi = runtimeService
+        .startProcessInstanceByKey("setScriptResultToProcessVariable", variables);
 
     assertEquals("hello", runtimeService.getVariable(pi.getId(), "existingProcessVariableName"));
     assertEquals(pi.getId(), runtimeService.getVariable(pi.getId(), "newProcessVariableName"));
@@ -653,8 +625,9 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     try {
 
       processEngineConfiguration.setAutoStoreScriptVariables(true);
-      int[] inputArray = new int[] {1, 2, 3, 4, 5};
-      ProcessInstance pi = runtimeService.startProcessInstanceByKey("scriptExecution", CollectionUtil.singletonMap("inputArray", inputArray));
+      int[] inputArray = new int[] { 1, 2, 3, 4, 5 };
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("scriptExecution",
+          CollectionUtil.singletonMap("inputArray", inputArray));
 
       Integer result = (Integer) runtimeService.getVariable(pi.getId(), "sum");
       assertEquals(15, result.intValue());
@@ -666,7 +639,8 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   @org.camunda.bpm.engine.test.Deployment
   public void testGroovySetVariableThroughExecutionInScript() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("setScriptVariableThroughExecution");
+    ProcessInstance pi = runtimeService
+        .startProcessInstanceByKey("setScriptVariableThroughExecution");
 
     // Since 'def' is used, the 'scriptVar' will be script local
     // and not automatically stored as a process variable.
@@ -676,11 +650,15 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   @org.camunda.bpm.engine.test.Deployment
   public void testScriptEvaluationException() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("Process_1").singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("Process_1").singleResult();
     try {
       runtimeService.startProcessInstanceByKey("Process_1");
     } catch (ScriptEvaluationException e) {
-      assertTextPresent("Unable to evaluate script while executing activity 'Failing' in the process definition with id '" + processDefinition.getId() + "'", e.getMessage());
+      assertTextPresent(
+          "Unable to evaluate script while executing activity 'Failing' in the process definition with id '"
+              + processDefinition.getId() + "'",
+          e.getMessage());
     }
   }
 }

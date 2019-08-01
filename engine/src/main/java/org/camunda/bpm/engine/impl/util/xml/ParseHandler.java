@@ -23,7 +23,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -38,7 +37,8 @@ public class ParseHandler extends DefaultHandler {
     this.parse = parse;
   }
 
-  public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+  public void startElement(String uri, String localName, String qName, Attributes attributes)
+      throws SAXException {
     Element element = new Element(uri, localName, qName, attributes, locator);
     if (elementStack.isEmpty()) {
       parse.rootElement = element;
@@ -59,12 +59,15 @@ public class ParseHandler extends DefaultHandler {
   public void error(SAXParseException e) {
     parse.addError(e);
   }
+
   public void fatalError(SAXParseException e) {
     parse.addError(e);
   }
+
   public void warning(SAXParseException e) {
     parse.addWarning(e);
   }
+
   public void setDocumentLocator(Locator locator) {
     this.locator = locator;
   }
@@ -72,6 +75,5 @@ public class ParseHandler extends DefaultHandler {
   public void setDefaultNamespace(String defaultNamespace) {
     this.defaultNamespace = defaultNamespace;
   }
-
 
 }

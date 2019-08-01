@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionComplete extends AbstractAtomicOperationCaseExecutionComplete {
+public class AtomicOperationCaseExecutionComplete
+    extends AbstractAtomicOperationCaseExecutionComplete {
 
   public String getCanonicalName() {
     return "case-execution-complete";

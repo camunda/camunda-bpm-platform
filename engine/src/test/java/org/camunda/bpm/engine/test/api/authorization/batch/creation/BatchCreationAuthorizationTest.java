@@ -74,8 +74,10 @@ public abstract class BatchCreationAuthorizationTest {
 
   @Before
   public void deployProcesses() {
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
   }
 
   @After
@@ -87,14 +89,13 @@ public abstract class BatchCreationAuthorizationTest {
   public void cleanBatch() {
     Batch batch = engineRule.getManagementService().createBatchQuery().singleResult();
     if (batch != null) {
-      engineRule.getManagementService().deleteBatch(
-          batch.getId(), true);
+      engineRule.getManagementService().deleteBatch(batch.getId(), true);
     }
 
-    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().singleResult();
+    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
+        .singleResult();
     if (historicBatch != null) {
-      engineRule.getHistoryService().deleteHistoricBatch(
-          historicBatch.getId());
+      engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
     }
   }
 

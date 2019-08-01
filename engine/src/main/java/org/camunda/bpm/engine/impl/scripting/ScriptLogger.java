@@ -25,18 +25,15 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 public class ScriptLogger extends ProcessEngineLogger {
 
   public void debugEvaluatingCompiledScript(String language) {
-    logDebug(
-        "001", "Evaluating compiled script {} in language", language);
+    logDebug("001", "Evaluating compiled script {} in language", language);
   }
 
   public void debugCompiledScriptUsing(String language) {
-    logDebug(
-        "002", "Compiled script using {} script language", language);
+    logDebug("002", "Compiled script using {} script language", language);
   }
 
   public void debugEvaluatingNonCompiledScript(String scriptSource) {
-    logDebug(
-        "001", "Evaluating non-compiled script {}", scriptSource);
+    logDebug("001", "Evaluating non-compiled script {}", scriptSource);
   }
 
 }

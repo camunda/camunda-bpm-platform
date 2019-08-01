@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  * @author Frederik Heremans
  */
@@ -43,7 +42,7 @@ public class ExpressionBeanAccessTest extends ResourceProcessEngineTestCase {
     try {
       runtimeService.signal(pi.getId());
       fail("Exception expected");
-    } catch(ProcessEngineException ae) {
+    } catch (ProcessEngineException ae) {
       assertNotNull(ae.getCause());
       assertTrue(ae.getCause() instanceof PropertyNotFoundException);
     }

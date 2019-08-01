@@ -44,7 +44,8 @@ public class CmmnDecisionTaskResultMappingTest extends CmmnProcessEngineTestCase
     CaseInstance caseInstance = createTestCase("single entry");
 
     assertEquals("foo", caseService.getVariable(caseInstance.getId(), "result"));
-    assertEquals(Variables.stringValue("foo"), caseService.getVariableTyped(caseInstance.getId(), "result"));
+    assertEquals(Variables.stringValue("foo"),
+        caseService.getVariableTyped(caseInstance.getId(), "result"));
   }
 
   @SuppressWarnings("unchecked")
@@ -52,7 +53,8 @@ public class CmmnDecisionTaskResultMappingTest extends CmmnProcessEngineTestCase
   public void testSingleResultMapping() {
     CaseInstance caseInstance = createTestCase("multiple entries");
 
-    Map<String, Object> output = (Map<String, Object>) caseService.getVariable(caseInstance.getId(), "result");
+    Map<String, Object> output = (Map<String, Object>) caseService.getVariable(caseInstance.getId(),
+        "result");
 
     assertEquals(2, output.size());
     assertEquals("foo", output.get("result1"));
@@ -76,7 +78,8 @@ public class CmmnDecisionTaskResultMappingTest extends CmmnProcessEngineTestCase
   public void testResultListMapping() {
     CaseInstance caseInstance = createTestCase("multiple entries list");
 
-    List<Map<String, Object>> resultList = (List<Map<String, Object>>) caseService.getVariable(caseInstance.getId(), "result");
+    List<Map<String, Object>> resultList = (List<Map<String, Object>>) caseService
+        .getVariable(caseInstance.getId(), "result");
     assertEquals(2, resultList.size());
 
     for (Map<String, Object> valueMap : resultList) {
@@ -92,7 +95,8 @@ public class CmmnDecisionTaskResultMappingTest extends CmmnProcessEngineTestCase
     CaseInstance caseInstance = createTestCase("multiple entries list");
 
     // default mapping is 'resultList'
-    List<Map<String, Object>> resultList = (List<Map<String, Object>>) caseService.getVariable(caseInstance.getId(), "result");
+    List<Map<String, Object>> resultList = (List<Map<String, Object>>) caseService
+        .getVariable(caseInstance.getId(), "result");
     assertEquals(2, resultList.size());
 
     for (Map<String, Object> valueMap : resultList) {
@@ -148,7 +152,8 @@ public class CmmnDecisionTaskResultMappingTest extends CmmnProcessEngineTestCase
 
   @Deployment(resources = { DEFAULT_MAPPING_CMMN, TEST_DECISION })
   public void testTransientDecisionResult() {
-    // when a decision is evaluated and the result is stored in a transient variable "decisionResult"
+    // when a decision is evaluated and the result is stored in a transient variable
+    // "decisionResult"
     CaseInstance caseInstance = createTestCase("single entry");
 
     // then the variable should not be available outside the decision task
@@ -158,12 +163,14 @@ public class CmmnDecisionTaskResultMappingTest extends CmmnProcessEngineTestCase
   @Deployment(resources = { OVERRIDE_DECISION_RESULT_CMMN, TEST_DECISION })
   public void testFailedToOverrideDecisionResultVariable() {
     try {
-      // the transient variable "decisionResult" should not be overridden by the task result variable
+      // the transient variable "decisionResult" should not be overridden by the task result
+      // variable
       createTestCase("single entry");
       fail("expect exception");
 
     } catch (ProcessEngineException e) {
-      assertTextPresent("transient variable with name decisionResult to non-transient", e.getMessage());
+      assertTextPresent("transient variable with name decisionResult to non-transient",
+          e.getMessage());
     }
   }
 

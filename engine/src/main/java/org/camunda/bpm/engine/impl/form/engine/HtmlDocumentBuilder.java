@@ -20,10 +20,14 @@ import java.io.StringWriter;
 import java.util.Stack;
 
 /**
- * <p>The {@link HtmlDocumentBuilder} is part of the {@link HtmlFormEngine}
- * and maintains a stack of element which are written out to a {@link StringWriter}.</p>
+ * <p>
+ * The {@link HtmlDocumentBuilder} is part of the {@link HtmlFormEngine} and maintains a stack of
+ * element which are written out to a {@link StringWriter}.
+ * </p>
  *
- * <p>Actual writing of the html elements is delegated to the {@link HtmlElementWriter}.</p>
+ * <p>
+ * Actual writing of the html elements is delegated to the {@link HtmlElementWriter}.
+ * </p>
  *
  * @author Daniel Meyer
  *

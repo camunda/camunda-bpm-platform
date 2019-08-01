@@ -33,8 +33,8 @@ public class FormFieldValidatorException extends FormException {
   protected final String config;
   protected final Object value;
 
-  public FormFieldValidatorException(String id, String name, String config, Object value, String message,
-      Throwable cause) {
+  public FormFieldValidatorException(String id, String name, String config, Object value,
+      String message, Throwable cause) {
     super(message, cause);
 
     this.id = id;
@@ -43,7 +43,8 @@ public class FormFieldValidatorException extends FormException {
     this.value = value;
   }
 
-  public FormFieldValidatorException(String id, String name, String config, Object value, String message) {
+  public FormFieldValidatorException(String id, String name, String config, Object value,
+      String message) {
     super(message);
 
     this.id = id;

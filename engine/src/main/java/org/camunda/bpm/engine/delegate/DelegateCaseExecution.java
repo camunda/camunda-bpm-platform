@@ -20,7 +20,8 @@ package org.camunda.bpm.engine.delegate;
  * @author Roman Smirnov
  *
  */
-public interface DelegateCaseExecution extends BaseDelegateExecution, ProcessEngineServicesAware, CmmnModelExecutionContext {
+public interface DelegateCaseExecution
+    extends BaseDelegateExecution, ProcessEngineServicesAware, CmmnModelExecutionContext {
 
   String getId();
 

@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.engine.history;
 
-
-/** A single field that was submitted in either a start form or a task form.
- * This is the audit information that can be used to trace who supplied which
- * input for which tasks at what time.
+/**
+ * A single field that was submitted in either a start form or a task form. This is the audit
+ * information that can be used to trace who supplied which input for which tasks at what time.
  *
  * @author Tom Baeyens
  */

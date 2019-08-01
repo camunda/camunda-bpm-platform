@@ -47,7 +47,8 @@ public class NestedExecutionAPIInvocationTest {
   public ProcessEngineRule engineRule1 = new ProvidedProcessEngineRule();
 
   @ClassRule
-  public static ProcessEngineBootstrapRule engine2BootstrapRule = new ProcessEngineBootstrapRule("camunda.cfg.prefix_extended.xml");
+  public static ProcessEngineBootstrapRule engine2BootstrapRule = new ProcessEngineBootstrapRule(
+      "camunda.cfg.prefix_extended.xml");
 
   @Rule
   public ProcessEngineRule engineRule2 = new ProvidedProcessEngineRule(engine2BootstrapRule);
@@ -59,26 +60,17 @@ public class NestedExecutionAPIInvocationTest {
   public static final String ONE_TASK_PROCESS_KEY = "oneTaskProcess";
 
   public static final BpmnModelInstance PROCESS_MODEL = Bpmn.createExecutableProcess(PROCESS_KEY_1)
-      .startEvent()
-      .userTask("waitState")
-      .serviceTask("startProcess")
-        .camundaClass(NestedProcessStartDelegate.class.getName())
-      .endEvent()
+      .startEvent().userTask("waitState").serviceTask("startProcess")
+      .camundaClass(NestedProcessStartDelegate.class.getName()).endEvent().done();
+
+  public static final BpmnModelInstance PROCESS_MODEL_2 = Bpmn
+      .createExecutableProcess(PROCESS_KEY_2).startEvent().userTask("waitState")
+      .serviceTask("startProcess").camundaClass(StartProcessOnAnotherEngineDelegate.class.getName())
+      .endEvent().done();
+
+  public static final BpmnModelInstance ONE_TASK_PROCESS_MODEL = Bpmn
+      .createExecutableProcess(ONE_TASK_PROCESS_KEY).startEvent().userTask("waitState").endEvent()
       .done();
-
-  public static final BpmnModelInstance PROCESS_MODEL_2 = Bpmn.createExecutableProcess(PROCESS_KEY_2)
-    .startEvent()
-    .userTask("waitState")
-    .serviceTask("startProcess")
-      .camundaClass(StartProcessOnAnotherEngineDelegate.class.getName())
-    .endEvent()
-    .done();
-
-  public static final BpmnModelInstance ONE_TASK_PROCESS_MODEL = Bpmn.createExecutableProcess(ONE_TASK_PROCESS_KEY)
-  .startEvent()
-    .userTask("waitState")
-  .endEvent()
-  .done();
 
   @Before
   public void init() {
@@ -87,23 +79,17 @@ public class NestedExecutionAPIInvocationTest {
     NestedProcessStartDelegate.engine = engineRule1.getProcessEngine();
 
     // given
-    Deployment deployment1 = engineRule1.getRepositoryService()
-      .createDeployment()
-      .addModelInstance("foo.bpmn", PROCESS_MODEL)
-      .deploy();
+    Deployment deployment1 = engineRule1.getRepositoryService().createDeployment()
+        .addModelInstance("foo.bpmn", PROCESS_MODEL).deploy();
 
-    Deployment deployment2 = engineRule1.getRepositoryService()
-      .createDeployment()
-      .addModelInstance("boo.bpmn", PROCESS_MODEL_2)
-      .deploy();
+    Deployment deployment2 = engineRule1.getRepositoryService().createDeployment()
+        .addModelInstance("boo.bpmn", PROCESS_MODEL_2).deploy();
 
     engineRule1.manageDeployment(deployment1);
     engineRule1.manageDeployment(deployment2);
 
     Deployment deployment3 = engineRule2.getProcessEngine().getRepositoryService()
-      .createDeployment()
-      .addModelInstance("joo.bpmn", ONE_TASK_PROCESS_MODEL)
-      .deploy();
+        .createDeployment().addModelInstance("joo.bpmn", ONE_TASK_PROCESS_MODEL).deploy();
 
     engineRule2.manageDeployment(deployment3);
   }
@@ -118,10 +104,7 @@ public class NestedExecutionAPIInvocationTest {
   public void testWaitStateIsReachedOnNestedInstantiation() {
 
     engineRule1.getRuntimeService().startProcessInstanceByKey(PROCESS_KEY_1);
-    String taskId = engineRule1.getTaskService()
-      .createTaskQuery()
-      .singleResult()
-      .getId();
+    String taskId = engineRule1.getTaskService().createTaskQuery().singleResult().getId();
 
     // when
     engineRule1.getTaskService().complete(taskId);
@@ -131,10 +114,7 @@ public class NestedExecutionAPIInvocationTest {
   public void testWaitStateIsReachedOnMultiEngine() {
 
     engineRule1.getRuntimeService().startProcessInstanceByKey(PROCESS_KEY_2);
-    String taskId = engineRule1.getTaskService()
-      .createTaskQuery()
-      .singleResult()
-      .getId();
+    String taskId = engineRule1.getTaskService().createTaskQuery().singleResult().getId();
 
     // when
     engineRule1.getTaskService().complete(taskId);
@@ -143,16 +123,18 @@ public class NestedExecutionAPIInvocationTest {
   public static class StartProcessOnAnotherEngineDelegate implements JavaDelegate {
 
     public static ProcessEngine engine;
-    
+
     @Override
     public void execute(DelegateExecution execution) throws Exception {
 
       RuntimeService runtimeService = engine.getRuntimeService();
 
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+      ProcessInstance processInstance = runtimeService
+          .startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
       // then the wait state is reached immediately after instantiation
-      ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+      ActivityInstance activityInstance = runtimeService
+          .getActivityInstance(processInstance.getId());
       ActivityInstance[] activityInstances = activityInstance.getActivityInstances("waitState");
       Assert.assertEquals(1, activityInstances.length);
 
@@ -162,6 +144,7 @@ public class NestedExecutionAPIInvocationTest {
   public static class NestedProcessStartDelegate implements JavaDelegate {
 
     public static ProcessEngine engine;
+
     @Override
     public void execute(DelegateExecution execution) throws Exception {
 
@@ -170,7 +153,8 @@ public class NestedExecutionAPIInvocationTest {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
       // then the wait state is reached immediately after instantiation
-      ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+      ActivityInstance activityInstance = runtimeService
+          .getActivityInstance(processInstance.getId());
       ActivityInstance[] activityInstances = activityInstance.getActivityInstances("waitState");
       Assert.assertEquals(1, activityInstances.length);
 

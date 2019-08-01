@@ -37,9 +37,11 @@ import org.camunda.bpm.engine.variable.VariableMap;
  * @author Roman Smirnov
  *
  */
-public class CaseCallActivityBehavior extends CallableElementActivityBehavior implements MigrationObserverBehavior {
+public class CaseCallActivityBehavior extends CallableElementActivityBehavior
+    implements MigrationObserverBehavior {
 
-  protected void startInstance(ActivityExecution execution, VariableMap variables, String businessKey) {
+  protected void startInstance(ActivityExecution execution, VariableMap variables,
+      String businessKey) {
     CmmnCaseDefinition definition = getCaseDefinitionToCall(execution, getCallableElement());
     CmmnCaseInstance caseInstance = execution.createSubCaseInstance(definition, businessKey);
     caseInstance.create(variables);
@@ -50,10 +52,12 @@ public class CaseCallActivityBehavior extends CallableElementActivityBehavior im
   }
 
   @Override
-  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext, MigratingActivityInstance migratingInstance) {
+  public void onParseMigratingInstance(MigratingInstanceParseContext parseContext,
+      MigratingActivityInstance migratingInstance) {
     ActivityImpl callActivity = (ActivityImpl) migratingInstance.getSourceScope();
 
-    // A call activity is typically scope and since we guarantee stability of scope executions during migration,
+    // A call activity is typically scope and since we guarantee stability of scope executions
+    // during migration,
     // the superExecution link does not have to be maintained during migration.
     // There are some exceptions, though: A multi-instance call activity is not scope and therefore
     // does not have a dedicated scope execution. In this case, the link to the super execution
@@ -61,7 +65,8 @@ public class CaseCallActivityBehavior extends CallableElementActivityBehavior im
     if (!callActivity.isScope()) {
       ExecutionEntity callActivityExecution = migratingInstance.resolveRepresentativeExecution();
       CaseExecutionEntity calledCaseInstance = callActivityExecution.getSubCaseInstance();
-      migratingInstance.addMigratingDependentInstance(new MigratingCalledCaseInstance(calledCaseInstance));
+      migratingInstance
+          .addMigratingDependentInstance(new MigratingCalledCaseInstance(calledCaseInstance));
     }
   }
 

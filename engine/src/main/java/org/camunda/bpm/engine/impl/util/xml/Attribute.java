@@ -16,28 +16,27 @@
  */
 package org.camunda.bpm.engine.impl.util.xml;
 
-
 /**
  * @author Joram Barrez
  */
 public class Attribute {
-  
+
   protected String name;
-  
+
   protected String value;
 
   protected String uri;
-  
+
   public Attribute(String name, String value) {
     this.name = name;
     this.value = value;
   }
-  
+
   public Attribute(String name, String value, String uri) {
     this(name, value);
     this.uri = uri;
   }
-  
+
   public String getName() {
     return name;
   }
@@ -61,5 +60,5 @@ public class Attribute {
   public void setUri(String uri) {
     this.uri = uri;
   }
-  
+
 }

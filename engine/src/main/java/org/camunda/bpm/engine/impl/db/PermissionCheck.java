@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.db;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 
-
 /**
  * @author Roman Smirnov
  *

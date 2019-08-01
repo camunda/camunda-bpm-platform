@@ -109,14 +109,12 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext.getBatchManager()
-      .findBatchCountByQueryCriteria(this);
+    return commandContext.getBatchManager().findBatchCountByQueryCriteria(this);
   }
 
   public List<Batch> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext.getBatchManager()
-      .findBatchesByQueryCriteria(this, page);
+    return commandContext.getBatchManager().findBatchesByQueryCriteria(this, page);
   }
 
 }

@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.cmmn.behavior;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
-
 /**
  * @author Roman Smirnov
  *

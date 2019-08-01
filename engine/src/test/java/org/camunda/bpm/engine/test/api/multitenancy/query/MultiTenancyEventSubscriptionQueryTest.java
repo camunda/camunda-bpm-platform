@@ -36,12 +36,8 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
 
   @Override
   protected void setUp() {
-    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-        .message("start")
-        .userTask()
-        .endEvent()
-        .done();
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .message("start").userTask().endEvent().done();
 
     deployment(process);
     deploymentForTenant(TENANT_ONE, process);
@@ -52,68 +48,54 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
   }
 
   public void testQueryNoTenantIdSet() {
-    EventSubscriptionQuery query = runtimeService
-        .createEventSubscriptionQuery();
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
-    EventSubscriptionQuery query = runtimeService
-        .createEventSubscriptionQuery()
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = runtimeService
-        .createEventSubscriptionQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = runtimeService.createEventSubscriptionQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    EventSubscriptionQuery query = runtimeService
-        .createEventSubscriptionQuery()
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryBySubscriptionsWithoutTenantId() {
-    EventSubscriptionQuery query = runtimeService
-        .createEventSubscriptionQuery()
-        .withoutTenantId();
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery().withoutTenantId();
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIdsIncludeSubscriptionsWithoutTenantId() {
-    EventSubscriptionQuery query = runtimeService
-        .createEventSubscriptionQuery()
-        .tenantIdIn(TENANT_ONE)
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery()
+        .tenantIdIn(TENANT_ONE).includeEventSubscriptionsWithoutTenantId();
+
+    assertThat(query.count(), is(2L));
+
+    query = runtimeService.createEventSubscriptionQuery().tenantIdIn(TENANT_TWO)
         .includeEventSubscriptionsWithoutTenantId();
 
     assertThat(query.count(), is(2L));
 
-    query = runtimeService
-        .createEventSubscriptionQuery()
-        .tenantIdIn(TENANT_TWO)
-        .includeEventSubscriptionsWithoutTenantId();
-
-    assertThat(query.count(), is(2L));
-
-    query = runtimeService
-        .createEventSubscriptionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
+    query = runtimeService.createEventSubscriptionQuery().tenantIdIn(TENANT_ONE, TENANT_TWO)
         .includeEventSubscriptionsWithoutTenantId();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    EventSubscriptionQuery query = runtimeService.
-        createEventSubscriptionQuery()
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -121,8 +103,7 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
 
   public void testFailQueryByTenantIdNull() {
     try {
-      runtimeService.createEventSubscriptionQuery()
-        .tenantIdIn((String) null);
+      runtimeService.createEventSubscriptionQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -132,10 +113,7 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
   public void testQuerySortingAsc() {
     // exclude subscriptions without tenant id because of database-specific ordering
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc().list();
 
     assertThat(eventSubscriptions.size(), is(2));
     assertThat(eventSubscriptions.get(0).getTenantId(), is(TENANT_ONE));
@@ -145,10 +123,7 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
   public void testQuerySortingDesc() {
     // exclude subscriptions without tenant id because of database-specific ordering
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .desc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().desc().list();
 
     assertThat(eventSubscriptions.size(), is(2));
     assertThat(eventSubscriptions.get(0).getTenantId(), is(TENANT_TWO));
@@ -170,7 +145,9 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
     assertThat(query.count(), is(2L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeEventSubscriptionsWithoutTenantId().count(), is(2L));
+    assertThat(
+        query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeEventSubscriptionsWithoutTenantId().count(),
+        is(2L));
   }
 
   public void testQueryAuthenticatedTenants() {

@@ -60,7 +60,7 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
       public void run() {
         try {
           processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(command);
-        } catch(RuntimeException e) {
+        } catch (RuntimeException e) {
           command.monitor.setException(e);
           controlThread.interrupt();
           throw e;
@@ -75,7 +75,6 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
 
     return command.monitor;
   }
-
 
   public static abstract class ControllableCommand<T> implements Command<T> {
 
@@ -115,16 +114,15 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
 
     public void waitForSync(long timeout) {
       synchronized (this) {
-        if(exception != null) {
+        if (exception != null) {
           if (reportFailure) {
             return;
-          }
-          else {
+          } else {
             fail();
           }
         }
         try {
-          if(!syncAvailable) {
+          if (!syncAvailable) {
             try {
               wait(timeout);
             } catch (InterruptedException e) {
@@ -157,10 +155,11 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
           fail("Unexpected interruption");
         }
       } finally {
-        // clear our interruption state; the controlled thread may have interrupted us 
-        // in case the controlled command failed (see ConcurrencyTestCase#executeControllableCommand).
-        // 
-        // If the controlled thread finished before we entered the #join method, #join returns 
+        // clear our interruption state; the controlled thread may have interrupted us
+        // in case the controlled command failed (see
+        // ConcurrencyTestCase#executeControllableCommand).
+        //
+        // If the controlled thread finished before we entered the #join method, #join returns
         // immediately and does not clear our interruption status. If we do not clear the
         // interruption status here, any subsequent call of interrupt-sensitive
         // methods may fail (e.g. monitors, IO operations)
@@ -188,7 +187,7 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
 
     public void makeContinue() {
       synchronized (this) {
-        if(exception != null) {
+        if (exception != null) {
           fail();
         }
         notifyAll();

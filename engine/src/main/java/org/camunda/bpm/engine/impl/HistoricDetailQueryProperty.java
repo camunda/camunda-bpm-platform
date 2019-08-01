@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
 
-
 /**
  * Contains the possible properties which can be used in a {@link HistoricDetailQuery}.
  *

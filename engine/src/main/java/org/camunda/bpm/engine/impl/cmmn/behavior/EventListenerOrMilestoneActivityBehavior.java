@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
  * @author Roman Smirnov
  *
  */
-public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemDefinitionActivityBehavior {
+public abstract class EventListenerOrMilestoneActivityBehavior
+    extends PlanItemDefinitionActivityBehavior {
 
   protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
@@ -147,7 +148,8 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
 
   // helper ////////////////////////////////////////////////////////////////
 
-  protected CaseIllegalStateTransitionException createIllegalStateTransitionException(String transition, CmmnActivityExecution execution) {
+  protected CaseIllegalStateTransitionException createIllegalStateTransitionException(
+      String transition, CmmnActivityExecution execution) {
     String id = execution.getId();
     return LOG.illegalStateTransitionException(transition, id, getTypeName());
   }

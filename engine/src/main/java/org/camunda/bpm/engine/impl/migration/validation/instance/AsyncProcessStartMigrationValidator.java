@@ -30,21 +30,26 @@ import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 public class AsyncProcessStartMigrationValidator implements MigratingTransitionInstanceValidator {
 
   @Override
-  public void validate(MigratingTransitionInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+  public void validate(MigratingTransitionInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
       MigratingTransitionInstanceValidationReportImpl instanceReport) {
 
     ActivityImpl targetActivity = (ActivityImpl) migratingInstance.getTargetScope();
 
     if (targetActivity != null) {
-      if (isProcessStartJob(migratingInstance.getJobInstance().getJobEntity()) && !isTopLevelActivity(targetActivity)) {
-        instanceReport.addFailure("A transition instance that instantiates the process can only be migrated to a process-level flow node");
+      if (isProcessStartJob(migratingInstance.getJobInstance().getJobEntity())
+          && !isTopLevelActivity(targetActivity)) {
+        instanceReport.addFailure(
+            "A transition instance that instantiates the process can only be migrated to a process-level flow node");
       }
     }
   }
 
   protected boolean isProcessStartJob(JobEntity job) {
-    AsyncContinuationConfiguration configuration = (AsyncContinuationConfiguration) job.getJobHandlerConfiguration();
-    return PvmAtomicOperation.PROCESS_START.getCanonicalName().equals(configuration.getAtomicOperation());
+    AsyncContinuationConfiguration configuration = (AsyncContinuationConfiguration) job
+        .getJobHandlerConfiguration();
+    return PvmAtomicOperation.PROCESS_START.getCanonicalName()
+        .equals(configuration.getAtomicOperation());
   }
 
   protected boolean isTopLevelActivity(ActivityImpl activity) {

@@ -33,7 +33,9 @@ import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 /**
  * @author roman.smirnov
  */
-public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<VariableInstanceQuery, VariableInstance> implements VariableInstanceQuery, Serializable {
+public class VariableInstanceQueryImpl
+    extends AbstractVariableQueryImpl<VariableInstanceQuery, VariableInstance>
+    implements VariableInstanceQuery, Serializable {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -55,7 +57,8 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
 
-  public VariableInstanceQueryImpl() { }
+  public VariableInstanceQueryImpl() {
+  }
 
   public VariableInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -157,7 +160,8 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   @Override
   protected boolean hasExcludingConditions() {
-    return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(variableName, variableNames);
+    return super.hasExcludingConditions()
+        || CompareUtil.elementIsNotContainedInArray(variableName, variableNames);
   }
 
   // results ////////////////////////////////////////////////////
@@ -166,18 +170,16 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
-      .getVariableInstanceManager()
-      .findVariableInstanceCountByQueryCriteria(this);
+    return commandContext.getVariableInstanceManager()
+        .findVariableInstanceCountByQueryCriteria(this);
   }
 
   @Override
   public List<VariableInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
-    List<VariableInstance> result = commandContext
-      .getVariableInstanceManager()
-      .findVariableInstanceByQueryCriteria(this, page);
+    List<VariableInstance> result = commandContext.getVariableInstanceManager()
+        .findVariableInstanceByQueryCriteria(this, page);
 
     if (result == null) {
       return result;
@@ -191,7 +193,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
         try {
           variableInstanceEntity.getTypedValue(isCustomObjectDeserializationEnabled);
 
-        } catch(Exception t) {
+        } catch (Exception t) {
           // do not fail if one of the variables fails to load
           LOG.exceptionWhileGettingValueForVariable(t);
         }
@@ -204,8 +206,8 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   protected boolean shouldFetchValue(VariableInstanceEntity entity) {
     // do not fetch values for byte arrays eagerly (unless requested by the user)
-    return isByteArrayFetchingEnabled
-        || !AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(entity.getSerializer().getType().getName());
+    return isByteArrayFetchingEnabled || !AbstractTypedValueSerializer.BINARY_VALUE_TYPES
+        .contains(entity.getSerializer().getType().getName());
   }
 
   // getters ////////////////////////////////////////////////////

@@ -37,21 +37,15 @@ public class DelegateExecutionHierarchyTest extends PluggableProcessEngineTestCa
 
   public void testSingleNonScopeActivity() {
 
-    deployment(Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .serviceTask()
-        .camundaClass(AssertingJavaDelegate.class.getName())
-      .endEvent()
-    .done());
+    deployment(Bpmn.createExecutableProcess("testProcess").startEvent().serviceTask()
+        .camundaClass(AssertingJavaDelegate.class.getName()).endEvent().done());
 
-    AssertingJavaDelegate.addAsserts(
-      new DelegateExecutionAsserter() {
-        public void doAssert(DelegateExecution execution) {
-          assertEquals(execution, execution.getProcessInstance());
-          assertNull(execution.getSuperExecution());
-        }
+    AssertingJavaDelegate.addAsserts(new DelegateExecutionAsserter() {
+      public void doAssert(DelegateExecution execution) {
+        assertEquals(execution, execution.getProcessInstance());
+        assertNull(execution.getSuperExecution());
       }
-    );
+    });
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -59,53 +53,34 @@ public class DelegateExecutionHierarchyTest extends PluggableProcessEngineTestCa
 
   public void testConcurrentServiceTasks() {
 
-    deployment(Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .parallelGateway("fork")
-        .serviceTask()
-          .camundaClass(AssertingJavaDelegate.class.getName())
-        .parallelGateway("join")
-        .endEvent()
-        .moveToNode("fork")
-          .serviceTask()
-          .camundaClass(AssertingJavaDelegate.class.getName())
-          .connectTo("join")
-          .done());
+    deployment(Bpmn.createExecutableProcess("testProcess").startEvent().parallelGateway("fork")
+        .serviceTask().camundaClass(AssertingJavaDelegate.class.getName()).parallelGateway("join")
+        .endEvent().moveToNode("fork").serviceTask()
+        .camundaClass(AssertingJavaDelegate.class.getName()).connectTo("join").done());
 
-    AssertingJavaDelegate.addAsserts(
-      new DelegateExecutionAsserter() {
-        public void doAssert(DelegateExecution execution) {
-          assertFalse(execution.equals(execution.getProcessInstance()));
-          assertNull(execution.getSuperExecution());
-        }
+    AssertingJavaDelegate.addAsserts(new DelegateExecutionAsserter() {
+      public void doAssert(DelegateExecution execution) {
+        assertFalse(execution.equals(execution.getProcessInstance()));
+        assertNull(execution.getSuperExecution());
       }
-    );
+    });
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
   }
 
   public void testTaskInsideEmbeddedSubprocess() {
-    deployment(Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .subProcess()
-          .embeddedSubProcess()
-            .startEvent()
-            .serviceTask()
-              .camundaClass(AssertingJavaDelegate.class.getName())
-            .endEvent()
-        .subProcessDone()
-        .endEvent()
-      .done());
+    deployment(
+        Bpmn.createExecutableProcess("testProcess").startEvent().subProcess().embeddedSubProcess()
+            .startEvent().serviceTask().camundaClass(AssertingJavaDelegate.class.getName())
+            .endEvent().subProcessDone().endEvent().done());
 
-    AssertingJavaDelegate.addAsserts(
-      new DelegateExecutionAsserter() {
-        public void doAssert(DelegateExecution execution) {
-          assertFalse(execution.equals(execution.getProcessInstance()));
-          assertNull(execution.getSuperExecution());
-        }
+    AssertingJavaDelegate.addAsserts(new DelegateExecutionAsserter() {
+      public void doAssert(DelegateExecution execution) {
+        assertFalse(execution.equals(execution.getProcessInstance()));
+        assertNull(execution.getSuperExecution());
       }
-    );
+    });
 
     runtimeService.startProcessInstanceByKey("testProcess");
   }
@@ -113,27 +88,17 @@ public class DelegateExecutionHierarchyTest extends PluggableProcessEngineTestCa
   public void testSubProcessInstance() {
 
     deployment(
-      Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .callActivity()
-          .calledElement("testProcess2")
-        .endEvent()
-      .done(),
-      Bpmn.createExecutableProcess("testProcess2")
-        .startEvent()
-        .serviceTask()
-          .camundaClass(AssertingJavaDelegate.class.getName())
-        .endEvent()
-      .done());
+        Bpmn.createExecutableProcess("testProcess").startEvent().callActivity()
+            .calledElement("testProcess2").endEvent().done(),
+        Bpmn.createExecutableProcess("testProcess2").startEvent().serviceTask()
+            .camundaClass(AssertingJavaDelegate.class.getName()).endEvent().done());
 
-    AssertingJavaDelegate.addAsserts(
-      new DelegateExecutionAsserter() {
-        public void doAssert(DelegateExecution execution) {
-          assertTrue(execution.equals(execution.getProcessInstance()));
-          assertNotNull(execution.getSuperExecution());
-        }
+    AssertingJavaDelegate.addAsserts(new DelegateExecutionAsserter() {
+      public void doAssert(DelegateExecution execution) {
+        assertTrue(execution.equals(execution.getProcessInstance()));
+        assertNotNull(execution.getSuperExecution());
       }
-    );
+    });
 
     runtimeService.startProcessInstanceByKey("testProcess");
   }

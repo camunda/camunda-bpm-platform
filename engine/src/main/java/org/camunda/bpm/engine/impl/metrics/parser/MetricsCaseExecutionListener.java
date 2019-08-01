@@ -28,9 +28,8 @@ import org.camunda.bpm.engine.management.Metrics;
 public class MetricsCaseExecutionListener implements CaseExecutionListener {
 
   public void notify(DelegateCaseExecution caseExecution) throws Exception {
-    Context.getProcessEngineConfiguration()
-      .getMetricsRegistry()
-      .markOccurrence(Metrics.ACTIVTY_INSTANCE_START);
+    Context.getProcessEngineConfiguration().getMetricsRegistry()
+        .markOccurrence(Metrics.ACTIVTY_INSTANCE_START);
   }
 
 }

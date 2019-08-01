@@ -169,7 +169,8 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
     assertIsCompletingActivityInstances(allInstances, "subprocessEnd", 3);
     assertNonCanceledActivityInstance(allInstances, "subprocessEnd");
 
-    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess#multiInstanceBody", 1);
+    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess#multiInstanceBody",
+        1);
     assertNonCanceledActivityInstance(allInstances, "intermediateSubprocess#multiInstanceBody");
 
     assertIsCompletingActivityInstances(allInstances, "end", 1);
@@ -192,7 +193,8 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
     assertIsCompletingActivityInstances(allInstances, "subprocessEnd", 3);
     assertNonCanceledActivityInstance(allInstances, "subprocessEnd");
 
-    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess#multiInstanceBody", 1);
+    assertNonCompletingActivityInstance(allInstances, "intermediateSubprocess#multiInstanceBody",
+        1);
     assertNonCanceledActivityInstance(allInstances, "intermediateSubprocess#multiInstanceBody");
 
     assertIsCompletingActivityInstances(allInstances, "end", 1);
@@ -217,7 +219,6 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
     ProcessInstance processInstance = startProcess();
     runtimeService.correlateMessage("continue");
     assertProcessEnded(processInstance.getId());
-
 
     List<HistoricActivityInstance> allInstances = getAllActivityInstances();
 
@@ -391,7 +392,8 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
 
   }
 
-  @Deployment (resources={ "org/camunda/bpm/engine/test/history/HistoricActivityInstanceStateTest.testCancelProcessInstanceInUserTask.bpmn",
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/history/HistoricActivityInstanceStateTest.testCancelProcessInstanceInUserTask.bpmn",
       "org/camunda/bpm/engine/test/history/HistoricActivityInstanceStateTest.testEndTerminateEventWithCallActivity.bpmn" })
   public void testEndTerminateEventCancelWithCallActivity() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process1");
@@ -459,74 +461,91 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
 
   }
 
-  private void assertIsCanceledActivityInstances(List<HistoricActivityInstance> allInstances, String activityId, int count) {
+  private void assertIsCanceledActivityInstances(List<HistoricActivityInstance> allInstances,
+      String activityId, int count) {
     assertCorrectCanceledState(allInstances, activityId, count, true);
   }
 
-  private void assertNonCanceledActivityInstance(List<HistoricActivityInstance> instances, String activityId) {
+  private void assertNonCanceledActivityInstance(List<HistoricActivityInstance> instances,
+      String activityId) {
     assertNonCanceledActivityInstance(instances, activityId, -1);
   }
 
-  private void assertNonCanceledActivityInstance(List<HistoricActivityInstance> instances, String activityId, int count) {
+  private void assertNonCanceledActivityInstance(List<HistoricActivityInstance> instances,
+      String activityId, int count) {
     assertCorrectCanceledState(instances, activityId, count, false);
   }
 
-  private void assertCorrectCanceledState(List<HistoricActivityInstance> allInstances, String activityId, int expectedCount, boolean canceled) {
+  private void assertCorrectCanceledState(List<HistoricActivityInstance> allInstances,
+      String activityId, int expectedCount, boolean canceled) {
     int found = 0;
 
     for (HistoricActivityInstance instance : allInstances) {
       if (instance.getActivityId().equals(activityId)) {
         found++;
-        assertEquals(String.format("expect <%s> to be %scanceled", activityId, (canceled ? "" : "non-")), canceled, instance.isCanceled());
+        assertEquals(
+            String.format("expect <%s> to be %scanceled", activityId, (canceled ? "" : "non-")),
+            canceled, instance.isCanceled());
       }
     }
 
     assertTrue("contains entry for activity <" + activityId + ">", found > 0);
 
     if (expectedCount != -1) {
-      assertTrue("contains <" + expectedCount + "> entries for activity <" + activityId + ">", found == expectedCount);
+      assertTrue("contains <" + expectedCount + "> entries for activity <" + activityId + ">",
+          found == expectedCount);
     }
   }
 
-  private void assertIsCompletingActivityInstances(List<HistoricActivityInstance> allInstances, String activityId) {
+  private void assertIsCompletingActivityInstances(List<HistoricActivityInstance> allInstances,
+      String activityId) {
     assertIsCompletingActivityInstances(allInstances, activityId, -1);
   }
 
-  private void assertIsCompletingActivityInstances(List<HistoricActivityInstance> allInstances, String activityId, int count) {
+  private void assertIsCompletingActivityInstances(List<HistoricActivityInstance> allInstances,
+      String activityId, int count) {
     assertCorrectCompletingState(allInstances, activityId, count, true);
   }
 
-  private void assertNonCompletingActivityInstance(List<HistoricActivityInstance> instances, String activityId) {
+  private void assertNonCompletingActivityInstance(List<HistoricActivityInstance> instances,
+      String activityId) {
     assertNonCompletingActivityInstance(instances, activityId, -1);
   }
 
-  private void assertNonCompletingActivityInstance(List<HistoricActivityInstance> instances, String activityId, int count) {
+  private void assertNonCompletingActivityInstance(List<HistoricActivityInstance> instances,
+      String activityId, int count) {
     assertCorrectCompletingState(instances, activityId, count, false);
   }
 
-  private void assertCorrectCompletingState(List<HistoricActivityInstance> allInstances, String activityId, int expectedCount, boolean completing) {
+  private void assertCorrectCompletingState(List<HistoricActivityInstance> allInstances,
+      String activityId, int expectedCount, boolean completing) {
     int found = 0;
 
     for (HistoricActivityInstance instance : allInstances) {
       if (instance.getActivityId().equals(activityId)) {
         found++;
-        assertEquals(String.format("expect <%s> to be %scompleting", activityId, (completing ? "" : "non-")), completing, instance.isCompleteScope());
+        assertEquals(
+            String.format("expect <%s> to be %scompleting", activityId, (completing ? "" : "non-")),
+            completing, instance.isCompleteScope());
       }
     }
 
     assertTrue("contains entry for activity <" + activityId + ">", found > 0);
 
     if (expectedCount != -1) {
-      assertTrue("contains <" + expectedCount + "> entries for activity <" + activityId + ">", found == expectedCount);
+      assertTrue("contains <" + expectedCount + "> entries for activity <" + activityId + ">",
+          found == expectedCount);
     }
   }
 
   private List<HistoricActivityInstance> getEndActivityInstances() {
-    return historyService.createHistoricActivityInstanceQuery().orderByHistoricActivityInstanceEndTime().asc().completeScope().list();
+    return historyService.createHistoricActivityInstanceQuery()
+        .orderByHistoricActivityInstanceEndTime().asc().completeScope().list();
   }
 
   private List<HistoricActivityInstance> getAllActivityInstances() {
-    return historyService.createHistoricActivityInstanceQuery().orderByHistoricActivityInstanceStartTime().asc().list();
+    return historyService.createHistoricActivityInstanceQuery()
+        .orderByHistoricActivityInstanceStartTime().asc().list();
   }
 
   private ProcessInstance startProcess() {

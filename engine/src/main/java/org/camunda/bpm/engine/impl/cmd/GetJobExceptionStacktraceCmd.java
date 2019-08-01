@@ -25,11 +25,10 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
-
 /**
  * @author Frederik Heremans
  */
-public class GetJobExceptionStacktraceCmd implements Command<String>, Serializable{
+public class GetJobExceptionStacktraceCmd implements Command<String>, Serializable {
 
   private static final long serialVersionUID = 1L;
   private String jobId;
@@ -38,22 +37,19 @@ public class GetJobExceptionStacktraceCmd implements Command<String>, Serializab
     this.jobId = jobId;
   }
 
-
   public String execute(CommandContext commandContext) {
     ensureNotNull("jobId", jobId);
 
-    JobEntity job = commandContext
-      .getJobManager()
-      .findJobById(jobId);
+    JobEntity job = commandContext.getJobManager().findJobById(jobId);
 
     ensureNotNull("No job found with id " + jobId, "job", job);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadJob(job);
     }
-    
+
     return job.getExceptionStacktrace();
   }
-
 
 }

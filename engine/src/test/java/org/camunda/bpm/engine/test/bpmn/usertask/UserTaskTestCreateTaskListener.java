@@ -20,8 +20,6 @@ import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 
-
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -52,5 +50,3 @@ public class UserTaskTestCreateTaskListener implements TaskListener {
   }
 
 }
-
-

@@ -27,8 +27,9 @@ import org.camunda.bpm.engine.task.TaskQuery;
 
 /**
  * Tests for cub-tasks querying
+ * 
  * @author Ionut Paduraru
- * @see TaskQueryTest 
+ * @see TaskQueryTest
  */
 public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
 
@@ -57,7 +58,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   /**
-   * test for task inclusion/exclusion (no other filters, no sort) 
+   * test for task inclusion/exclusion (no other filters, no sort)
    */
   public void testQueryExcludeSubtasks() throws Exception {
     // query all tasks, including subtasks
@@ -71,7 +72,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   /**
-   * test for task inclusion/exclusion (no other filters, no sort) 
+   * test for task inclusion/exclusion (no other filters, no sort)
    */
   public void testQueryWithPagination() throws Exception {
     // query all tasks, including subtasks
@@ -85,7 +86,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   /**
-   * test for task inclusion/exclusion (no other filters, order by task assignee ) 
+   * test for task inclusion/exclusion (no other filters, order by task assignee )
    */
   public void testQueryExcludeSubtasksSorted() throws Exception {
     // query all tasks, including subtasks
@@ -99,8 +100,9 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   /**
-   * test for task inclusion/exclusion when additional filter is specified (like assignee), no order. 
-   */ 
+   * test for task inclusion/exclusion when additional filter is specified (like assignee), no
+   * order.
+   */
   public void testQueryByAssigneeExcludeSubtasks() throws Exception {
     // gonzo has 2 root tasks and 3+2 subtasks assigned
     // include subtasks
@@ -126,8 +128,9 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   /**
-   * test for task inclusion/exclusion when additional filter is specified (like assignee), no order. 
-   */ 
+   * test for task inclusion/exclusion when additional filter is specified (like assignee), no
+   * order.
+   */
   public void testQueryByAssigneeExcludeSubtasksPaginated() throws Exception {
     // gonzo has 2 root tasks and 3+2 subtasks assigned
     // include subtasks
@@ -153,20 +156,22 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   /**
-   * test for task inclusion/exclusion when additional filter is specified (like assignee), ordered. 
-   */ 
+   * test for task inclusion/exclusion when additional filter is specified (like assignee), ordered.
+   */
   public void testQueryByAssigneeExcludeSubtasksOrdered() throws Exception {
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
 
     // gonzo has 2 root tasks and 3+2 subtasks assigned
     // include subtasks
-    TaskQuery query = taskService.createTaskQuery().taskAssignee("gonzo").orderByTaskCreateTime().desc();
+    TaskQuery query = taskService.createTaskQuery().taskAssignee("gonzo").orderByTaskCreateTime()
+        .desc();
     assertEquals(7, query.count());
     assertEquals(7, query.list().size());
     assertEquals(sdf.parse("02/01/2009 01:01:01.000"), query.list().get(0).getCreateTime());
 
     // exclude subtasks
-    query = taskService.createTaskQuery().taskAssignee("gonzo").excludeSubtasks().orderByTaskCreateTime().asc();
+    query = taskService.createTaskQuery().taskAssignee("gonzo").excludeSubtasks()
+        .orderByTaskCreateTime().asc();
     assertEquals(2, query.count());
     assertEquals(2, query.list().size());
     assertEquals(sdf.parse("01/02/2008 02:02:02.000"), query.list().get(0).getCreateTime());
@@ -179,21 +184,23 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, query.list().size());
     assertNull(query.singleResult());
     // exclude subtasks
-    query = taskService.createTaskQuery().taskAssignee("kermit").excludeSubtasks().orderByTaskCreateTime().desc();
+    query = taskService.createTaskQuery().taskAssignee("kermit").excludeSubtasks()
+        .orderByTaskCreateTime().desc();
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
     assertNull(query.singleResult());
   }
 
   /**
-   * test for task inclusion/exclusion when additional filter is specified (like assignee), ordered. 
-   */ 
+   * test for task inclusion/exclusion when additional filter is specified (like assignee), ordered.
+   */
   public void testQueryByAssigneeExcludeSubtasksOrderedAndPaginated() throws Exception {
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
 
     // gonzo has 2 root tasks and 3+2 subtasks assigned
     // include subtasks
-    TaskQuery query = taskService.createTaskQuery().taskAssignee("gonzo").orderByTaskCreateTime().asc();
+    TaskQuery query = taskService.createTaskQuery().taskAssignee("gonzo").orderByTaskCreateTime()
+        .asc();
     assertEquals(7, query.count());
     assertEquals(1, query.listPage(0, 1).size());
     assertEquals(sdf.parse("01/02/2008 02:02:02.000"), query.listPage(0, 1).get(0).getCreateTime());
@@ -204,7 +211,8 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(sdf.parse("05/02/2008 02:02:02.000"), query.listPage(0, 2).get(1).getCreateTime());
 
     // exclude subtasks
-    query = taskService.createTaskQuery().taskAssignee("gonzo").excludeSubtasks().orderByTaskCreateTime().desc();
+    query = taskService.createTaskQuery().taskAssignee("gonzo").excludeSubtasks()
+        .orderByTaskCreateTime().desc();
     assertEquals(2, query.count());
     assertEquals(1, query.listPage(1, 1).size());
     assertEquals(sdf.parse("01/02/2008 02:02:02.000"), query.listPage(1, 1).get(0).getCreateTime());
@@ -218,16 +226,17 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, query.listPage(0, 2).size());
     assertNull(query.singleResult());
     // exclude subtasks
-    query = taskService.createTaskQuery().taskAssignee("kermit").excludeSubtasks().orderByTaskCreateTime().desc();
+    query = taskService.createTaskQuery().taskAssignee("kermit").excludeSubtasks()
+        .orderByTaskCreateTime().desc();
     assertEquals(0, query.count());
     assertEquals(0, query.listPage(0, 2).size());
     assertNull(query.singleResult());
   }
 
   /**
-   * Generates some test sub-tasks to the tasks generated by {@link #generateTestTasks()}.<br/> 
-   * - 1 root task where kermit is a candidate with 2 subtasks (both with kermit as candidate) <br/> 
-   * - 2 root task where gonzo is assignee with 3 + 2 subtasks assigned to gonzo  
+   * Generates some test sub-tasks to the tasks generated by {@link #generateTestTasks()}.<br/>
+   * - 1 root task where kermit is a candidate with 2 subtasks (both with kermit as candidate) <br/>
+   * - 2 root task where gonzo is assignee with 3 + 2 subtasks assigned to gonzo
    */
   private List<String> generateTestSubTasks() throws Exception {
     List<String> ids = new ArrayList<String>();
@@ -254,7 +263,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
     }
 
     // 2 parent tasks for gonzo
-      // first parent task for gonzo
+    // first parent task for gonzo
     ClockUtil.setCurrentTime(sdf.parse("01/02/2008 02:02:02.000"));
     Task rootTask2 = taskService.newTask();
     rootTask2.setName("gonzoRootTask1");
@@ -262,7 +271,7 @@ public class SubTaskQueryTest extends PluggableProcessEngineTestCase {
     taskService.saveTask(rootTask2);
     taskService.setAssignee(rootTask2.getId(), "gonzo");
     ids.add(rootTask2.getId());
-      // second parent task for gonzo
+    // second parent task for gonzo
     ClockUtil.setCurrentTime(sdf.parse("05/02/2008 02:02:02.000"));
     Task rootTask3 = taskService.newTask();
     rootTask3.setName("gonzoRootTask2");

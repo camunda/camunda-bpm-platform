@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 
-
 /**
  * NOTE: instances of Messge Entity should be created via {@link MessageJobDeclaration}.
  *
@@ -35,6 +34,7 @@ public class MessageEntity extends JobEntity {
   public String getRepeat() {
     return repeat;
   }
+
   public void setRepeat(String repeat) {
     this.repeat = repeat;
   }
@@ -45,24 +45,14 @@ public class MessageEntity extends JobEntity {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[repeat=" + repeat
-           + ", id=" + id
-           + ", revision=" + revision
-           + ", duedate=" + duedate
-           + ", lockOwner=" + lockOwner
-           + ", lockExpirationTime=" + lockExpirationTime
-           + ", executionId=" + executionId
-           + ", processInstanceId=" + processInstanceId
-           + ", isExclusive=" + isExclusive
-           + ", retries=" + retries
-           + ", jobHandlerType=" + jobHandlerType
-           + ", jobHandlerConfiguration=" + jobHandlerConfiguration
-           + ", exceptionByteArray=" + exceptionByteArray
-           + ", exceptionByteArrayId=" + exceptionByteArrayId
-           + ", exceptionMessage=" + exceptionMessage
-           + ", deploymentId=" + deploymentId
-           + "]";
+    return this.getClass().getSimpleName() + "[repeat=" + repeat + ", id=" + id + ", revision="
+        + revision + ", duedate=" + duedate + ", lockOwner=" + lockOwner + ", lockExpirationTime="
+        + lockExpirationTime + ", executionId=" + executionId + ", processInstanceId="
+        + processInstanceId + ", isExclusive=" + isExclusive + ", retries=" + retries
+        + ", jobHandlerType=" + jobHandlerType + ", jobHandlerConfiguration="
+        + jobHandlerConfiguration + ", exceptionByteArray=" + exceptionByteArray
+        + ", exceptionByteArrayId=" + exceptionByteArrayId + ", exceptionMessage="
+        + exceptionMessage + ", deploymentId=" + deploymentId + "]";
   }
 
 }

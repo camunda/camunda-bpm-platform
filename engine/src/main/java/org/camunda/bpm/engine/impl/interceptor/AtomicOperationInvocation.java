@@ -44,7 +44,8 @@ public class AtomicOperationInvocation {
   protected String activityId = null;
   protected String activityName = null;
 
-  public AtomicOperationInvocation(AtomicOperation operation, ExecutionEntity execution, boolean performAsync) {
+  public AtomicOperationInvocation(AtomicOperation operation, ExecutionEntity execution,
+      boolean performAsync) {
     init(operation, execution, performAsync);
   }
 
@@ -56,33 +57,31 @@ public class AtomicOperationInvocation {
 
   public void execute(BpmnStackTrace stackTrace) {
 
-    if(operation != PvmAtomicOperation.ACTIVITY_START_CANCEL_SCOPE
-       && operation != PvmAtomicOperation.ACTIVITY_START_INTERRUPT_SCOPE
-       && operation != PvmAtomicOperation.ACTIVITY_START_CONCURRENT
-       && operation != PvmAtomicOperation.DELETE_CASCADE) {
+    if (operation != PvmAtomicOperation.ACTIVITY_START_CANCEL_SCOPE
+        && operation != PvmAtomicOperation.ACTIVITY_START_INTERRUPT_SCOPE
+        && operation != PvmAtomicOperation.ACTIVITY_START_CONCURRENT
+        && operation != PvmAtomicOperation.DELETE_CASCADE) {
       // execution might be replaced in the meantime:
       ExecutionEntity replacedBy = execution.getReplacedBy();
-      if(replacedBy != null) {
+      if (replacedBy != null) {
         execution = replacedBy;
       }
     }
 
-    //execution was canceled for example via terminate end event
-    if (execution.isCanceled() &&
-         (operation == PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_END
-         || operation == PvmAtomicOperation.ACTIVITY_NOTIFY_LISTENER_END)) {
+    // execution was canceled for example via terminate end event
+    if (execution.isCanceled() && (operation == PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_END
+        || operation == PvmAtomicOperation.ACTIVITY_NOTIFY_LISTENER_END)) {
       return;
     }
 
     // execution might have ended in the meanwhile
-    if(execution.isEnded() &&
-        (operation == PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE
+    if (execution.isEnded() && (operation == PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE
         || operation == PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE)) {
       return;
     }
 
     ProcessApplicationReference currentPa = Context.getCurrentProcessApplication();
-    if(currentPa != null) {
+    if (currentPa != null) {
       applicationContextName = currentPa.getName();
     }
     activityId = execution.getActivityId();
@@ -91,11 +90,10 @@ public class AtomicOperationInvocation {
 
     try {
       Context.setExecutionContext(execution);
-      if(!performAsync) {
+      if (!performAsync) {
         LOG.debugExecutingAtomicOperation(operation, execution);
         operation.execute(execution);
-      }
-      else {
+      } else {
         execution.scheduleAtomicOperationAsync(this);
       }
     } finally {

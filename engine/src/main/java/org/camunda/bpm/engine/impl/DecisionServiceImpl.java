@@ -30,39 +30,40 @@ import org.camunda.bpm.engine.impl.dmn.DecisionTableEvaluationBuilderImpl;
  */
 public class DecisionServiceImpl extends ServiceImpl implements DecisionService {
 
-  public DmnDecisionTableResult evaluateDecisionTableById(String decisionDefinitionId, Map<String, Object> variables) {
-    return evaluateDecisionTableById(decisionDefinitionId)
-        .variables(variables)
-        .evaluate();
+  public DmnDecisionTableResult evaluateDecisionTableById(String decisionDefinitionId,
+      Map<String, Object> variables) {
+    return evaluateDecisionTableById(decisionDefinitionId).variables(variables).evaluate();
   }
 
-  public DmnDecisionTableResult evaluateDecisionTableByKey(String decisionDefinitionKey, Map<String, Object> variables) {
-    return evaluateDecisionTableByKey(decisionDefinitionKey)
-        .variables(variables)
-        .evaluate();
+  public DmnDecisionTableResult evaluateDecisionTableByKey(String decisionDefinitionKey,
+      Map<String, Object> variables) {
+    return evaluateDecisionTableByKey(decisionDefinitionKey).variables(variables).evaluate();
   }
 
-  public DmnDecisionTableResult evaluateDecisionTableByKeyAndVersion(String decisionDefinitionKey, Integer version, Map<String, Object> variables) {
-    return evaluateDecisionTableByKey(decisionDefinitionKey)
-        .version(version)
-        .variables(variables)
+  public DmnDecisionTableResult evaluateDecisionTableByKeyAndVersion(String decisionDefinitionKey,
+      Integer version, Map<String, Object> variables) {
+    return evaluateDecisionTableByKey(decisionDefinitionKey).version(version).variables(variables)
         .evaluate();
   }
 
   public DecisionEvaluationBuilder evaluateDecisionTableByKey(String decisionDefinitionKey) {
-    return DecisionTableEvaluationBuilderImpl.evaluateDecisionTableByKey(commandExecutor, decisionDefinitionKey);
+    return DecisionTableEvaluationBuilderImpl.evaluateDecisionTableByKey(commandExecutor,
+        decisionDefinitionKey);
   }
 
   public DecisionEvaluationBuilder evaluateDecisionTableById(String decisionDefinitionId) {
-    return DecisionTableEvaluationBuilderImpl.evaluateDecisionTableById(commandExecutor, decisionDefinitionId);
+    return DecisionTableEvaluationBuilderImpl.evaluateDecisionTableById(commandExecutor,
+        decisionDefinitionId);
   }
 
   public DecisionsEvaluationBuilder evaluateDecisionByKey(String decisionDefinitionKey) {
-    return DecisionEvaluationBuilderImpl.evaluateDecisionByKey(commandExecutor, decisionDefinitionKey);
+    return DecisionEvaluationBuilderImpl.evaluateDecisionByKey(commandExecutor,
+        decisionDefinitionKey);
   }
 
   public DecisionsEvaluationBuilder evaluateDecisionById(String decisionDefinitionId) {
-    return DecisionEvaluationBuilderImpl.evaluateDecisionById(commandExecutor, decisionDefinitionId);
+    return DecisionEvaluationBuilderImpl.evaluateDecisionById(commandExecutor,
+        decisionDefinitionId);
   }
 
 }

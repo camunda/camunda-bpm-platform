@@ -62,7 +62,8 @@ public class PvmAtomicOperationActivityExecute implements PvmAtomicOperation {
         } catch (RuntimeException e) {
           throw e;
         } catch (Exception e) {
-          throw new PvmException("couldn't execute activity <" + activity.getProperty("type") + " id=\"" + activity.getId() + "\" ...>: " + e.getMessage(), e);
+          throw new PvmException("couldn't execute activity <" + activity.getProperty("type")
+              + " id=\"" + activity.getId() + "\" ...>: " + e.getMessage(), e);
         }
         return null;
       }

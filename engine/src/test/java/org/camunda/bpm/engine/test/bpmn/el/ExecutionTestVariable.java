@@ -20,16 +20,15 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 
-
 /**
  * Class used to test passing of execution in expressions/
  * 
  * @author Frederik Heremans
  */
-public class ExecutionTestVariable implements Serializable{
+public class ExecutionTestVariable implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   public void testMethod(DelegateExecution delegateExecution) {
     delegateExecution.setVariable("testVar", "myValue");
   }

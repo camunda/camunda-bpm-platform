@@ -28,17 +28,15 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  * @author Thorben Lindhauer
  *
  */
-public class MigratingCompensationEventSubscriptionInstance extends MigratingProcessElementInstance implements RemovingInstance {
+public class MigratingCompensationEventSubscriptionInstance extends MigratingProcessElementInstance
+    implements RemovingInstance {
 
   public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
   protected EventSubscriptionEntity eventSubscription;
 
-  public MigratingCompensationEventSubscriptionInstance(
-      MigrationInstruction migrationInstruction,
-      ScopeImpl sourceScope,
-      ScopeImpl targetScope,
-      EventSubscriptionEntity eventSubscription) {
+  public MigratingCompensationEventSubscriptionInstance(MigrationInstruction migrationInstruction,
+      ScopeImpl sourceScope, ScopeImpl targetScope, EventSubscriptionEntity eventSubscription) {
     this.migrationInstruction = migrationInstruction;
     this.eventSubscription = eventSubscription;
     this.sourceScope = sourceScope;
@@ -86,7 +84,8 @@ public class MigratingCompensationEventSubscriptionInstance extends MigratingPro
   public void attachState(MigratingScopeInstance targetActivityInstance) {
     setParent(targetActivityInstance);
 
-    ExecutionEntity representativeExecution = targetActivityInstance.resolveRepresentativeExecution();
+    ExecutionEntity representativeExecution = targetActivityInstance
+        .resolveRepresentativeExecution();
     eventSubscription.setExecution(representativeExecution);
   }
 

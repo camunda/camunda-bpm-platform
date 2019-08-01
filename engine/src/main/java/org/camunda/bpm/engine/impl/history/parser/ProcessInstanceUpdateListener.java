@@ -32,7 +32,7 @@ public class ProcessInstanceUpdateListener extends HistoryExecutionListener {
 
   protected HistoryEvent createHistoryEvent(DelegateExecution execution) {
     ensureHistoryLevelInitialized();
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, execution)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, execution)) {
       return eventProducer.createProcessInstanceUpdateEvt(execution);
     } else {
       return null;

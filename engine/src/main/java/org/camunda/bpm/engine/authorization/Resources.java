@@ -19,32 +19,28 @@ package org.camunda.bpm.engine.authorization;
 import org.camunda.bpm.engine.EntityTypes;
 
 /**
- * <p>The set of built-in {@link Resource} names.</p>
+ * <p>
+ * The set of built-in {@link Resource} names.
+ * </p>
  *
  * @author Daniel Meyer
  *
  */
 public enum Resources implements Resource {
 
-  APPLICATION(EntityTypes.APPLICATION, 0),
-  USER(EntityTypes.USER, 1),
-  GROUP(EntityTypes.GROUP, 2),
-  GROUP_MEMBERSHIP(EntityTypes.GROUP_MEMBERSHIP, 3),
-  AUTHORIZATION(EntityTypes.AUTHORIZATION, 4),
-  FILTER(EntityTypes.FILTER, 5),
-  PROCESS_DEFINITION(EntityTypes.PROCESS_DEFINITION, 6),
-  TASK(EntityTypes.TASK, 7),
-  PROCESS_INSTANCE(EntityTypes.PROCESS_INSTANCE, 8),
-  DEPLOYMENT(EntityTypes.DEPLOYMENT, 9),
-  DECISION_DEFINITION(EntityTypes.DECISION_DEFINITION, 10),
-  TENANT(EntityTypes.TENANT, 11),
-  TENANT_MEMBERSHIP(EntityTypes.TENANT_MEMBERSHIP, 12),
-  BATCH(EntityTypes.BATCH, 13),
-  DECISION_REQUIREMENTS_DEFINITION(EntityTypes.DECISION_REQUIREMENTS_DEFINITION, 14),
-  REPORT(EntityTypes.REPORT, 15),
-  DASHBOARD(EntityTypes.DASHBOARD, 16),
-  OPERATION_LOG_CATEGORY(EntityTypes.OPERATION_LOG_CATEGORY, 17),
-  OPTIMIZE(EntityTypes.OPTIMIZE, 18);
+  APPLICATION(EntityTypes.APPLICATION, 0), USER(EntityTypes.USER, 1), GROUP(EntityTypes.GROUP,
+      2), GROUP_MEMBERSHIP(EntityTypes.GROUP_MEMBERSHIP, 3), AUTHORIZATION(
+          EntityTypes.AUTHORIZATION, 4), FILTER(EntityTypes.FILTER, 5), PROCESS_DEFINITION(
+              EntityTypes.PROCESS_DEFINITION, 6), TASK(EntityTypes.TASK, 7), PROCESS_INSTANCE(
+                  EntityTypes.PROCESS_INSTANCE, 8), DEPLOYMENT(EntityTypes.DEPLOYMENT,
+                      9), DECISION_DEFINITION(EntityTypes.DECISION_DEFINITION, 10), TENANT(
+                          EntityTypes.TENANT, 11), TENANT_MEMBERSHIP(EntityTypes.TENANT_MEMBERSHIP,
+                              12), BATCH(EntityTypes.BATCH, 13), DECISION_REQUIREMENTS_DEFINITION(
+                                  EntityTypes.DECISION_REQUIREMENTS_DEFINITION,
+                                  14), REPORT(EntityTypes.REPORT, 15), DASHBOARD(
+                                      EntityTypes.DASHBOARD, 16), OPERATION_LOG_CATEGORY(
+                                          EntityTypes.OPERATION_LOG_CATEGORY,
+                                          17), OPTIMIZE(EntityTypes.OPTIMIZE, 18);
 
   String name;
   int id;

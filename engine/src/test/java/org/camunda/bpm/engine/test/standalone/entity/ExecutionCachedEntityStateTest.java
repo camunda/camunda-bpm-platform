@@ -38,19 +38,24 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
   public void testProcessInstanceTasks() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.TASKS_STATE_BIT), processInstance.getCachedEntityStateRaw());
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.TASKS_STATE_BIT),
+        processInstance.getCachedEntityStateRaw());
   }
 
   @Deployment
   public void testExecutionTasksScope() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
     assertEquals(0, processInstance.getCachedEntityStateRaw());
 
-    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().activityId("userTask").singleResult();
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.TASKS_STATE_BIT), execution.getCachedEntityStateRaw());
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .activityId("userTask").singleResult();
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.TASKS_STATE_BIT),
+        execution.getCachedEntityStateRaw());
 
   }
 
@@ -58,11 +63,14 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
   public void testExecutionTasksParallel() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
     assertEquals(0, processInstance.getCachedEntityStateRaw());
 
-    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().activityId("userTask").singleResult();
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.TASKS_STATE_BIT), execution.getCachedEntityStateRaw());
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .activityId("userTask").singleResult();
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.TASKS_STATE_BIT),
+        execution.getCachedEntityStateRaw());
 
   }
 
@@ -70,19 +78,22 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
   public void testExecutionTasksMi() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
     assertEquals(0, processInstance.getCachedEntityStateRaw());
 
-    List<Execution> executions =  runtimeService.createExecutionQuery().activityId("userTask").list();
+    List<Execution> executions = runtimeService.createExecutionQuery().activityId("userTask")
+        .list();
     for (Execution execution : executions) {
       int cachedEntityStateRaw = ((ExecutionEntity) execution).getCachedEntityStateRaw();
-      if(!((ExecutionEntity)execution).isScope()) {
+      if (!((ExecutionEntity) execution).isScope()) {
         assertEquals(
             BitMaskUtil.getMaskForBit(ExecutionEntity.TASKS_STATE_BIT)
-            | BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT)
-            , cachedEntityStateRaw);
+                | BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT),
+            cachedEntityStateRaw);
       } else {
-        assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT), cachedEntityStateRaw);
+        assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT),
+            cachedEntityStateRaw);
       }
     }
 
@@ -92,8 +103,10 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
   public void testProcessInstanceEventSubscriptions() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.EVENT_SUBSCRIPTIONS_STATE_BIT), processInstance.getCachedEntityStateRaw());
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.EVENT_SUBSCRIPTIONS_STATE_BIT),
+        processInstance.getCachedEntityStateRaw());
   }
 
   @Deployment
@@ -101,11 +114,14 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
     assertEquals(0, processInstance.getCachedEntityStateRaw());
 
-    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().activityId("IntermediateCatchEvent_1").singleResult();
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.EVENT_SUBSCRIPTIONS_STATE_BIT), execution.getCachedEntityStateRaw());
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .activityId("IntermediateCatchEvent_1").singleResult();
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.EVENT_SUBSCRIPTIONS_STATE_BIT),
+        execution.getCachedEntityStateRaw());
 
   }
 
@@ -114,18 +130,21 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
     assertEquals(0, processInstance.getCachedEntityStateRaw());
 
-    List<Execution> executions =  runtimeService.createExecutionQuery().activityId("ReceiveTask_1").list();
+    List<Execution> executions = runtimeService.createExecutionQuery().activityId("ReceiveTask_1")
+        .list();
     for (Execution execution : executions) {
       int cachedEntityStateRaw = ((ExecutionEntity) execution).getCachedEntityStateRaw();
 
-      if(!((ExecutionEntity)execution).isScope()) {
-        assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT), cachedEntityStateRaw);
+      if (!((ExecutionEntity) execution).isScope()) {
+        assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.VARIABLES_STATE_BIT),
+            cachedEntityStateRaw);
       } else {
-        assertEquals(
-            BitMaskUtil.getMaskForBit(ExecutionEntity.EVENT_SUBSCRIPTIONS_STATE_BIT), cachedEntityStateRaw);
+        assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.EVENT_SUBSCRIPTIONS_STATE_BIT),
+            cachedEntityStateRaw);
       }
     }
 
@@ -136,8 +155,10 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.JOBS_STATE_BIT), processInstance.getCachedEntityStateRaw());
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.JOBS_STATE_BIT),
+        processInstance.getCachedEntityStateRaw());
 
   }
 
@@ -145,11 +166,14 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
   public void testExecutionJobsScope() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
     assertEquals(0, processInstance.getCachedEntityStateRaw());
 
-    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().activityId("userTask").singleResult();
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.JOBS_STATE_BIT), execution.getCachedEntityStateRaw());
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .activityId("userTask").singleResult();
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.JOBS_STATE_BIT),
+        execution.getCachedEntityStateRaw());
   }
 
   @Deployment
@@ -157,11 +181,14 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
     assertEquals(0, processInstance.getCachedEntityStateRaw());
 
-    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().activityId("userTask").singleResult();
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.JOBS_STATE_BIT), execution.getCachedEntityStateRaw());
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .activityId("userTask").singleResult();
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.JOBS_STATE_BIT),
+        execution.getCachedEntityStateRaw());
 
   }
 
@@ -170,27 +197,30 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
     assertEquals(0, processInstance.getCachedEntityStateRaw());
 
-    final ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().activityId("task").singleResult();
+    final ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .activityId("task").singleResult();
     assertEquals(0, execution.getCachedEntityStateRaw());
 
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
 
-          IncidentContext incidentContext = new IncidentContext();
-          incidentContext.setExecutionId(execution.getId());
+        IncidentContext incidentContext = new IncidentContext();
+        incidentContext.setExecutionId(execution.getId());
 
-          IncidentEntity.createAndInsertIncident("foo", incidentContext, null);
+        IncidentEntity.createAndInsertIncident("foo", incidentContext, null);
 
-          return null;
-        }
-      });
+        return null;
+      }
+    });
 
-    ExecutionEntity execution2 = (ExecutionEntity) runtimeService.createExecutionQuery().activityId("task").singleResult();
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.INCIDENT_STATE_BIT), execution2.getCachedEntityStateRaw());
+    ExecutionEntity execution2 = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .activityId("task").singleResult();
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.INCIDENT_STATE_BIT),
+        execution2.getCachedEntityStateRaw());
 
   }
 
@@ -199,27 +229,30 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
-    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery().singleResult();
+    ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+        .singleResult();
     assertEquals(0, processInstance.getCachedEntityStateRaw());
 
-    final ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().activityId("task").singleResult();
+    final ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .activityId("task").singleResult();
     assertEquals(0, execution.getCachedEntityStateRaw());
 
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
 
-          IncidentContext incidentContext = new IncidentContext();
-          incidentContext.setExecutionId(execution.getId());
+        IncidentContext incidentContext = new IncidentContext();
+        incidentContext.setExecutionId(execution.getId());
 
-          IncidentEntity.createAndInsertIncident("foo", incidentContext, null);
+        IncidentEntity.createAndInsertIncident("foo", incidentContext, null);
 
-          return null;
-        }
-      });
+        return null;
+      }
+    });
 
-    ExecutionEntity execution2 = (ExecutionEntity) runtimeService.createExecutionQuery().activityId("task").singleResult();
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.INCIDENT_STATE_BIT), execution2.getCachedEntityStateRaw());
+    ExecutionEntity execution2 = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .activityId("task").singleResult();
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.INCIDENT_STATE_BIT),
+        execution2.getCachedEntityStateRaw());
 
   }
 
@@ -227,12 +260,11 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
   public void testExecutionExternalTask() {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
-    ExecutionEntity execution = (ExecutionEntity) runtimeService
-        .createExecutionQuery()
-        .activityId("externalTask")
-        .singleResult();
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .activityId("externalTask").singleResult();
 
-    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.EXTERNAL_TASKS_BIT), execution.getCachedEntityStateRaw());
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.EXTERNAL_TASKS_BIT),
+        execution.getCachedEntityStateRaw());
 
   }
 

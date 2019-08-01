@@ -94,10 +94,12 @@ public class UserTaskBpmnModelExecutionContextTest extends PluggableProcessEngin
     BpmnModelInstance modelInstance = ModelExecutionContextTaskListener.modelInstance;
     assertNotNull(modelInstance);
 
-    Collection<ModelElementInstance> events = modelInstance.getModelElementsByType(modelInstance.getModel().getType(Event.class));
+    Collection<ModelElementInstance> events = modelInstance
+        .getModelElementsByType(modelInstance.getModel().getType(Event.class));
     assertEquals(2, events.size());
 
-    Collection<ModelElementInstance> tasks = modelInstance.getModelElementsByType(modelInstance.getModel().getType(Task.class));
+    Collection<ModelElementInstance> tasks = modelInstance
+        .getModelElementsByType(modelInstance.getModel().getType(Task.class));
     assertEquals(1, tasks.size());
 
     Process process = (Process) modelInstance.getDefinitions().getRootElements().iterator().next();
@@ -109,31 +111,34 @@ public class UserTaskBpmnModelExecutionContextTest extends PluggableProcessEngin
     UserTask userTask = ModelExecutionContextTaskListener.userTask;
     assertNotNull(userTask);
 
-    ModelElementInstance taskListener = userTask.getExtensionElements().getUniqueChildElementByNameNs(CAMUNDA_NS, "taskListener");
+    ModelElementInstance taskListener = userTask.getExtensionElements()
+        .getUniqueChildElementByNameNs(CAMUNDA_NS, "taskListener");
     assertEquals(eventName, taskListener.getAttributeValueNs(CAMUNDA_NS, "event"));
-    assertEquals(ModelExecutionContextTaskListener.class.getName(), taskListener.getAttributeValueNs(CAMUNDA_NS, "class"));
+    assertEquals(ModelExecutionContextTaskListener.class.getName(),
+        taskListener.getAttributeValueNs(CAMUNDA_NS, "class"));
 
     BpmnModelInstance modelInstance = ModelExecutionContextTaskListener.modelInstance;
-    Collection<ModelElementInstance> tasks = modelInstance.getModelElementsByType(modelInstance.getModel().getType(Task.class));
+    Collection<ModelElementInstance> tasks = modelInstance
+        .getModelElementsByType(modelInstance.getModel().getType(Task.class));
     assertTrue(tasks.contains(userTask));
   }
 
   private void deployProcess(String eventName) {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-      .startEvent()
-      .userTask(USER_TASK_ID)
-      .endEvent()
-      .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .userTask(USER_TASK_ID).endEvent().done();
 
     ExtensionElements extensionElements = modelInstance.newInstance(ExtensionElements.class);
-    ModelElementInstance taskListener = extensionElements.addExtensionElement(CAMUNDA_NS, "taskListener");
-    taskListener.setAttributeValueNs(CAMUNDA_NS, "class", ModelExecutionContextTaskListener.class.getName());
+    ModelElementInstance taskListener = extensionElements.addExtensionElement(CAMUNDA_NS,
+        "taskListener");
+    taskListener.setAttributeValueNs(CAMUNDA_NS, "class",
+        ModelExecutionContextTaskListener.class.getName());
     taskListener.setAttributeValueNs(CAMUNDA_NS, "event", eventName);
 
     UserTask userTask = modelInstance.getModelElementById(USER_TASK_ID);
     userTask.setExtensionElements(extensionElements);
 
-    deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("process.bpmn", modelInstance).deploy().getId();
   }
 
   public void tearDown() {

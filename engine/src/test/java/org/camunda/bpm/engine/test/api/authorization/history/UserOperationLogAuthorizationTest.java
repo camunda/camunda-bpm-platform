@@ -63,7 +63,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn",
-        "org/camunda/bpm/engine/test/api/authorization/timerBoundaryEventProcess.bpmn20.xml").getId();
+        "org/camunda/bpm/engine/test/api/authorization/timerBoundaryEventProcess.bpmn20.xml")
+            .getId();
     super.setUp();
   }
 
@@ -88,86 +89,90 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     deleteTask(taskId, true);
   }
-  
+
   public void testQueryCreateStandaloneTaskUserOperationLogWithReadHistoryPermissionOnProcessDefinition() {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
-    
+
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        READ_HISTORY);
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    
+
     // then
     verifyQueryResults(query, 0);
-    
+
     deleteTask(taskId, true);
   }
-  
+
   // CAM-9888
   public void failing_testQueryCreateStandaloneTaskUserOperationLogWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    
+
     createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
-    
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    
+
     // then
     verifyQueryResults(query, 0);
-    
+
     deleteTask(taskId, true);
   }
-  
+
   public void testQueryCreateStandaloneTaskUserOperationLogWithReadPermissionOnCategory() {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, READ);
-    
+
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER,
+        userId, READ);
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    
+
     // then
     verifyQueryResults(query, 1);
-    
+
     deleteTask(taskId, true);
   }
-  
+
   public void testQueryCreateStandaloneTaskUserOperationLogWithReadPermissionOnAnyCategory() {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    
+
     createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
-    
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    
+
     // then
     verifyQueryResults(query, 1);
-    
+
     deleteTask(taskId, true);
   }
-  
+
   public void testQueryCreateStandaloneTaskUserOperationLogWithReadPermissionOnAnyCategoryAndRevokeReadHistoryOnProcessDefinition() {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    
+
     createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
-    createRevokeAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
-    
+    createRevokeAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        READ_HISTORY);
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    
+
     // then
-    verifyQueryResults(query, 1);// "revoke specific process definition" has no effect since task log is not related to a definition
-    
+    verifyQueryResults(query, 1);// "revoke specific process definition" has no effect since task
+                                 // log is not related to a definition
+
     deleteTask(taskId, true);
   }
 
@@ -176,17 +181,17 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    
+
     createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
     createRevokeAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
-    
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    
+
     // then
-    // "grant all categories" should preceed over "revoke all process definitions" 
+    // "grant all categories" should preceed over "revoke all process definitions"
     verifyQueryResults(query, 1);
-    
+
     deleteTask(taskId, true);
   }
 
@@ -204,24 +209,25 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     deleteTask(taskId, true);
   }
-  
+
   public void testQuerySetAssigneeStandaloneTaskUserOperationLogWithReadPermissionOnProcessDefinition() {
     // given
     String taskId = "myTask";
     createTask(taskId);
     setAssignee(taskId, "demo");
-    
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
-    
+
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        READ_HISTORY);
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    
+
     // then
     verifyQueryResults(query, 0);
-    
+
     deleteTask(taskId, true);
   }
-  
+
   // CAM-9888
   public void failing_testQuerySetAssigneeStandaloneTaskUserOperationLogWithReadPermissionOnAnyProcessDefinition() {
     // given
@@ -230,7 +236,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, "demo");
 
     createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
-    
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
@@ -239,14 +245,15 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     deleteTask(taskId, true);
   }
-  
+
   public void testQuerySetAssigneeStandaloneTaskUserOperationLogWithReadPermissionOnCategory() {
     // given
     String taskId = "myTask";
     createTask(taskId);
     setAssignee(taskId, "demo");
-    
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, READ);
+
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER,
+        userId, READ);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -256,13 +263,13 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     deleteTask(taskId, true);
   }
-  
+
   public void testQuerySetAssigneeStandaloneTaskUserOperationLogWithReadPermissionOnAnyCategory() {
     // given
     String taskId = "myTask";
     createTask(taskId);
     setAssignee(taskId, "demo");
-    
+
     createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
 
     // when
@@ -295,7 +302,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -326,7 +334,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, "demo");
 
     createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -334,14 +343,15 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // then
     verifyQueryResults(query, 2);
   }
-  
+
   public void testQuerySetAssigneeTaskUserOperationLogWithReadPermissionOnCategory() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, READ);
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER,
+        userId, READ);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -364,7 +374,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // then
     verifyQueryResults(query, 2);
   }
-  
+
   public void testQuerySetAssigneeTaskUserOperationLogWithReadPermissionOnAnyCategoryAndRevokeOnProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -372,15 +382,17 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, "demo");
 
     createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
-    createRevokeAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createRevokeAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
-    verifyQueryResults(query, 0);// "revoke process definition" wins over "grant all categories" since task log is related to the definition
+    verifyQueryResults(query, 0);// "revoke process definition" wins over "grant all categories"
+                                 // since task log is related to the definition
   }
-  
+
   public void testQuerySetAssigneeTaskUserOperationLogWithReadPermissionOnAnyCategoryAndRevokeOnUnrelatedProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -388,15 +400,17 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, "demo");
 
     createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
-    createRevokeAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_CASE_KEY, userId, READ_HISTORY);
+    createRevokeAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_CASE_KEY, userId,
+        READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
-    verifyQueryResults(query, 2);// "revoke process definition" has no effect since task log is not related to the definition
+    verifyQueryResults(query, 2);// "revoke process definition" has no effect since task log is not
+                                 // related to the definition
   }
-  
+
   public void testQuerySetAssigneeTaskUserOperationLogWithReadPermissionOnAnyCategoryAndRevokeOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -410,7 +424,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
-    verifyQueryResults(query, 0);// "revoke all process definitions" wins over "grant all categories"
+    verifyQueryResults(query, 0);// "revoke all process definitions" wins over "grant all
+                                 // categories"
   }
 
   // (case) human task /////////////////////////////
@@ -427,22 +442,23 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // then
     verifyQueryResults(query, 0);
   }
-  
+
   public void testQuerySetAssigneeHumanTaskUserOperationLogWithReadHistoryPermissionOnProcessDefinition() {
     // given
     createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_CASE_KEY, userId, READ_HISTORY);
-    
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_CASE_KEY, userId,
+        READ_HISTORY);
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
     verifyQueryResults(query, 0);
   }
-  
+
   // CAM-9888
   public void failing_testQuerySetAssigneeHumanTaskUserOperationLogWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
@@ -451,29 +467,30 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, "demo");
 
     createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
-    
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
     verifyQueryResults(query, 0);
   }
-  
+
   public void testQuerySetAssigneeHumanTaskUserOperationLogWithReadPermissionOnCategory() {
     // given
     createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
 
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, READ);
-    
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER,
+        userId, READ);
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then
     verifyQueryResults(query, 1);
   }
-  
+
   public void testQuerySetAssigneeHumanTaskUserOperationLogWithReadPermissionOnAnyCategory() {
     // given
     createCaseInstanceByKey(ONE_TASK_CASE_KEY);
@@ -481,7 +498,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, "demo");
 
     createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
-    
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
@@ -514,31 +531,32 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     clearDatabase();
   }
-  
+
   public void testQuerySetStandaloneJobRetriesUserOperationLogWithReadHistoryPermissionOnProcessDefinition() {
     // given
     disableAuthorization();
     repositoryService.suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY, true, new Date());
     enableAuthorization();
-    
+
     disableAuthorization();
     String jobId = managementService.createJobQuery().singleResult().getId();
     managementService.setJobRetries(jobId, 5);
     enableAuthorization();
-    
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
-    
+
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        READ_HISTORY);
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    
+
     // then only user operation log of non standalone jobs are visible
     verifyQueryResults(query, 1);
     assertEquals(ONE_TASK_PROCESS_KEY, query.singleResult().getProcessDefinitionKey());
-    
+
     disableAuthorization();
     managementService.deleteJob(jobId);
     enableAuthorization();
-    
+
     clearDatabase();
   }
 
@@ -557,7 +575,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
-    
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
@@ -570,7 +588,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     clearDatabase();
   }
-  
+
   public void testQuerySetStandaloneJobRetriesUserOperationLogWithReadPermissionOnCategory() {
     // given
     disableAuthorization();
@@ -582,12 +600,14 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     managementService.setJobRetries(jobId, 5);
     enableAuthorization();
 
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_OPERATOR, userId, READ);
-    
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_OPERATOR, userId,
+        READ);
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
-    // then expect 2 entries (due to necessary permission on 'Operator' category, the definition suspension can be seen as well)
+    // then expect 2 entries (due to necessary permission on 'Operator' category, the definition
+    // suspension can be seen as well)
     verifyQueryResults(query, 2);
 
     disableAuthorization();
@@ -596,7 +616,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     clearDatabase();
   }
-  
+
   public void testQuerySetStandaloneJobRetriesUserOperationLogWithReadPermissionOnAnyCategory() {
     // given
     disableAuthorization();
@@ -609,7 +629,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, READ);
-    
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
@@ -634,8 +654,9 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     managementService.setJobRetries(jobId, 5);
     enableAuthorization();
 
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, READ);
-    
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER,
+        userId, READ);
+
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
@@ -676,7 +697,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     managementService.setJobRetries(jobId, 5);
     enableAuthorization();
 
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY,
+        userId, READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -702,7 +724,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // then
     verifyQueryResults(query, 2);
   }
-  
+
   public void testQuerySetJobRetriesUserOperationLogWithReadPermissionOnCategory() {
     // given
     startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
@@ -712,7 +734,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     managementService.setJobRetries(jobId, 5);
     enableAuthorization();
 
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_OPERATOR, userId, READ);
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_OPERATOR, userId,
+        READ);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -757,7 +780,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   public void testQuerySuspendProcessDefinitionUserOperationLogWithReadHistoryPermissionOnProcessDefinition() {
     // given
     suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -781,11 +805,12 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     clearDatabase();
   }
-  
+
   public void testQuerySuspendProcessDefinitionUserOperationLogWithReadHPermissionOnCategory() {
     // given
     suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_OPERATOR, userId, READ);
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_OPERATOR, userId,
+        READ);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -795,7 +820,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     clearDatabase();
   }
-  
+
   public void testQuerySuspendProcessDefinitionUserOperationLogWithReadHPermissionOnAnyCategory() {
     // given
     suspendProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
@@ -831,7 +856,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        READ_HISTORY);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -857,13 +883,14 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     clearDatabase();
   }
-  
+
   public void testQuerySuspendProcessInstanceUserOperationLogWithReadPermissionOnCategory() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     suspendProcessInstanceById(processInstanceId);
 
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_OPERATOR, userId, READ);
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_OPERATOR, userId,
+        READ);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -873,7 +900,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     clearDatabase();
   }
-  
+
   public void testQuerySuspendProcessInstanceUserOperationLogWithReadPermissionOnAnyCategory() {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
@@ -911,19 +938,21 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 0);
 
     disableAuthorization();
-    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
+        .list();
     for (HistoricProcessInstance instance : instances) {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }
     enableAuthorization();
   }
-  
+
   public void testQueryAfterDeletingDeploymentWithReadHistoryPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        READ_HISTORY);
 
     disableAuthorization();
     taskService.complete(taskId);
@@ -938,13 +967,14 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 3);
 
     disableAuthorization();
-    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
+        .list();
     for (HistoricProcessInstance instance : instances) {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }
     enableAuthorization();
   }
-  
+
   public void testQueryAfterDeletingDeploymentWithReadHistoryPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -965,13 +995,14 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 3);
 
     disableAuthorization();
-    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
+        .list();
     for (HistoricProcessInstance instance : instances) {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }
     enableAuthorization();
   }
-  
+
   public void testQueryAfterDeletingDeploymentWithReadPermissionOnCategory() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -985,26 +1016,29 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId, false);
 
     // when
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_OPERATOR, userId, READ);
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_OPERATOR, userId,
+        READ);
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
 
     // then expect 1 entry (start process instance)
     verifyQueryResults(query, 1);
-    
+
     // and when
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, READ);
-    
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER,
+        userId, READ);
+
     // then expect 3 entries (start process instance, set assignee, complete task)
     verifyQueryResults(query, 3);
 
     disableAuthorization();
-    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
+        .list();
     for (HistoricProcessInstance instance : instances) {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }
     enableAuthorization();
   }
-  
+
   public void testQueryAfterDeletingDeploymentWithReadPermissionOnAnyCategory() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -1025,7 +1059,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 3);
 
     disableAuthorization();
-    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
+        .list();
     for (HistoricProcessInstance instance : instances) {
       historyService.deleteHistoricProcessInstance(instance.getId());
     }
@@ -1038,11 +1073,11 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // given
     String taskId = "myTask";
     createTask(taskId);
-    
+
     disableAuthorization();
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
     enableAuthorization();
-    
+
     // when
     try {
       historyService.deleteUserOperationLogEntry(entryId);
@@ -1055,10 +1090,10 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
       assertTextPresent(OPERATION_LOG_CATEGORY.resourceName(), message);
       assertTextPresent(CATEGORY_TASK_WORKER, message);
     }
-    
+
     deleteTask(taskId, true);
   }
-  
+
   public void testDeleteStandaloneEntryWithDeleteHistoryPermissionOnProcessDefinition() {
     // given
     String taskId = "myTask";
@@ -1067,8 +1102,9 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     disableAuthorization();
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
     enableAuthorization();
-    
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, DELETE_HISTORY);
+
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId,
+        DELETE_HISTORY);
 
     // when
     try {
@@ -1082,10 +1118,10 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
       assertTextPresent(OPERATION_LOG_CATEGORY.resourceName(), message);
       assertTextPresent(CATEGORY_TASK_WORKER, message);
     }
-    
+
     deleteTask(taskId, true);
   }
-  
+
   public void testDeleteStandaloneEntryWithDeleteHistoryPermissionOnAnyProcessDefinition() {
     // given
     String taskId = "myTask";
@@ -1094,7 +1130,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     disableAuthorization();
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
     enableAuthorization();
-    
+
     createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, DELETE_HISTORY);
 
     // when
@@ -1109,10 +1145,10 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
       assertTextPresent(OPERATION_LOG_CATEGORY.resourceName(), message);
       assertTextPresent(CATEGORY_TASK_WORKER, message);
     }
-    
+
     deleteTask(taskId, true);
   }
-  
+
   public void testDeleteStandaloneEntryWithDeletePermissionOnCategory() {
     // given
     String taskId = "myTask";
@@ -1121,8 +1157,9 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     disableAuthorization();
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
     enableAuthorization();
-    
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, DELETE);
+
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER,
+        userId, DELETE);
 
     // when
     historyService.deleteUserOperationLogEntry(entryId);
@@ -1132,7 +1169,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     deleteTask(taskId, true);
   }
-  
+
   public void testDeleteStandaloneEntryWithDeletePermissionOnAnyCategory() {
     // given
     String taskId = "myTask";
@@ -1141,7 +1178,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     disableAuthorization();
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
     enableAuthorization();
-    
+
     createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, DELETE);
 
     // when
@@ -1162,7 +1199,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     setAssignee(taskId, "demo");
 
     disableAuthorization();
-    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult().getId();
+    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult()
+        .getId();
     enableAuthorization();
 
     try {
@@ -1190,7 +1228,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, DELETE_HISTORY);
 
     disableAuthorization();
-    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult().getId();
+    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult()
+        .getId();
     enableAuthorization();
 
     // when
@@ -1210,7 +1249,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, DELETE_HISTORY);
 
     disableAuthorization();
-    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult().getId();
+    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult()
+        .getId();
     enableAuthorization();
 
     // when
@@ -1221,7 +1261,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     assertNull(historyService.createUserOperationLogQuery().entityType("Task").singleResult());
     enableAuthorization();
   }
-  
+
   public void testDeleteEntryWithDeletePermissionOnCategory() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -1230,7 +1270,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, DELETE);
 
     disableAuthorization();
-    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult().getId();
+    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult()
+        .getId();
     enableAuthorization();
 
     // when
@@ -1241,7 +1282,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     assertNull(historyService.createUserOperationLogQuery().entityType("Task").singleResult());
     enableAuthorization();
   }
-  
+
   public void testDeleteEntryWithDeletePermissionOnAnyCategory() {
     // given
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
@@ -1250,7 +1291,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(OPERATION_LOG_CATEGORY, ANY, userId, DELETE);
 
     disableAuthorization();
-    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult().getId();
+    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult()
+        .getId();
     enableAuthorization();
 
     // when
@@ -1266,7 +1308,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY, DELETE_HISTORY);
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_HISTORY,
+        DELETE_HISTORY);
 
     disableAuthorization();
     taskService.complete(taskId);
@@ -1274,7 +1317,8 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
 
     deleteDeployment(deploymentId, false);
 
-    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult().getId();
+    String entryId = historyService.createUserOperationLogQuery().entityType("Task").singleResult()
+        .getId();
 
     // when
     historyService.deleteUserOperationLogEntry(entryId);
@@ -1296,11 +1340,11 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
-    
+
     disableAuthorization();
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
     enableAuthorization();
-    
+
     // when
     try {
       historyService.deleteUserOperationLogEntry(entryId);
@@ -1314,19 +1358,20 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
       assertTextPresent(CATEGORY_TASK_WORKER, message);
     }
   }
-  
+
   public void testCaseDeleteEntryWithDeleteHistoryPermissionOnProcessDefinition() {
     // given
     createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
-    
+
     disableAuthorization();
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
     enableAuthorization();
-    
-    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_CASE_KEY, userId, DELETE_HISTORY);
-    
+
+    createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ONE_TASK_CASE_KEY, userId,
+        DELETE_HISTORY);
+
     // when
     try {
       historyService.deleteUserOperationLogEntry(entryId);
@@ -1340,19 +1385,19 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
       assertTextPresent(CATEGORY_TASK_WORKER, message);
     }
   }
-  
+
   public void testCaseDeleteEntryWithDeleteHistoryPermissionOnAnyProcessDefinition() {
     // given
     createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
-    
+
     disableAuthorization();
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
     enableAuthorization();
-    
+
     createGrantAuthorizationWithoutAuthentication(PROCESS_DEFINITION, ANY, userId, DELETE_HISTORY);
-    
+
     // when
     try {
       historyService.deleteUserOperationLogEntry(entryId);
@@ -1366,41 +1411,42 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
       assertTextPresent(CATEGORY_TASK_WORKER, message);
     }
   }
-  
+
   public void testCaseDeleteEntryWithDeletePermissionOnCategory() {
     // given
     createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
-    
+
     disableAuthorization();
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
     enableAuthorization();
-    
-    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER, userId, DELETE);
-    
+
+    createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, CATEGORY_TASK_WORKER,
+        userId, DELETE);
+
     // when
     historyService.deleteUserOperationLogEntry(entryId);
-    
+
     // then
     assertNull(historyService.createUserOperationLogQuery().singleResult());
   }
-  
+
   public void testCaseDeleteEntryWithDeletePermissionOnAnyCategory() {
     // given
     createCaseInstanceByKey(ONE_TASK_CASE_KEY);
     String taskId = selectSingleTask().getId();
     setAssignee(taskId, "demo");
-    
+
     disableAuthorization();
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
     enableAuthorization();
-    
+
     createGrantAuthorizationWithoutAuthentication(OPERATION_LOG_CATEGORY, ANY, userId, DELETE);
-    
+
     // when
     historyService.deleteUserOperationLogEntry(entryId);
-    
+
     // then
     assertNull(historyService.createUserOperationLogQuery().singleResult());
   }
@@ -1422,8 +1468,10 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
-        List<HistoricIncident> incidents = Context.getProcessEngineConfiguration().getHistoryService().createHistoricIncidentQuery().list();
+        commandContext.getHistoricJobLogManager()
+            .deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
+        List<HistoricIncident> incidents = Context.getProcessEngineConfiguration()
+            .getHistoryService().createHistoricIncidentQuery().list();
         for (HistoricIncident incident : incidents) {
           commandContext.getHistoricIncidentManager().delete((HistoricIncidentEntity) incident);
         }

@@ -44,10 +44,12 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Tassilo Weidner
  */
-public class HistoryCleanupSchedulerActivityInstancesTest extends AbstractHistoryCleanupSchedulerTest {
+public class HistoryCleanupSchedulerActivityInstancesTest
+    extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configure(configuration, HistoryEventTypes.ACTIVITY_INSTANCE_START);
     }
   };
@@ -56,7 +58,8 @@ public class HistoryCleanupSchedulerActivityInstancesTest extends AbstractHistor
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain =  RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -75,10 +78,8 @@ public class HistoryCleanupSchedulerActivityInstancesTest extends AbstractHistor
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .userTask("userTask").name("userTask")
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().userTask("userTask").name("userTask").endEvent()
+      .done();
 
   @Test
   public void shouldScheduleToNow() {

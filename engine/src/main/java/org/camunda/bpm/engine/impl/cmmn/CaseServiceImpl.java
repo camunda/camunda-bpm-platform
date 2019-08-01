@@ -92,7 +92,8 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
     return getVariablesTyped(caseExecutionId, variableNames, true);
   }
 
-  public VariableMap getVariablesTyped(String caseExecutionId, Collection<String> variableNames, boolean deserializeValues) {
+  public VariableMap getVariablesTyped(String caseExecutionId, Collection<String> variableNames,
+      boolean deserializeValues) {
     return getCaseExecutionVariables(caseExecutionId, variableNames, false, deserializeValues);
   }
 
@@ -100,18 +101,19 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
     return getVariablesLocalTyped(caseExecutionId, variableNames, true);
   }
 
-  public VariableMap getVariablesLocalTyped(String caseExecutionId, Collection<String> variableNames, boolean deserializeValues) {
+  public VariableMap getVariablesLocalTyped(String caseExecutionId,
+      Collection<String> variableNames, boolean deserializeValues) {
     return getCaseExecutionVariables(caseExecutionId, variableNames, true, deserializeValues);
   }
 
-  protected VariableMap getCaseExecutionVariables(String caseExecutionId, Collection<String> variableNames, boolean isLocal, boolean deserializeValues) {
+  protected VariableMap getCaseExecutionVariables(String caseExecutionId,
+      Collection<String> variableNames, boolean isLocal, boolean deserializeValues) {
     try {
-      return commandExecutor.execute(new GetCaseExecutionVariablesCmd(caseExecutionId, variableNames, isLocal, deserializeValues));
-    }
-    catch (NullValueException e) {
+      return commandExecutor.execute(new GetCaseExecutionVariablesCmd(caseExecutionId,
+          variableNames, isLocal, deserializeValues));
+    } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
-    }
-    catch (CaseExecutionNotFoundException e) {
+    } catch (CaseExecutionNotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
     }
   }
@@ -124,14 +126,14 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
     return getCaseExecutionVariable(caseExecutionId, variableName, true);
   }
 
-  protected Object getCaseExecutionVariable(String caseExecutionId, String variableName, boolean isLocal) {
+  protected Object getCaseExecutionVariable(String caseExecutionId, String variableName,
+      boolean isLocal) {
     try {
-      return commandExecutor.execute(new GetCaseExecutionVariableCmd(caseExecutionId, variableName, isLocal));
-    }
-    catch (NullValueException e) {
+      return commandExecutor
+          .execute(new GetCaseExecutionVariableCmd(caseExecutionId, variableName, isLocal));
+    } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
-    }
-    catch (CaseExecutionNotFoundException e) {
+    } catch (CaseExecutionNotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
     }
   }
@@ -140,27 +142,30 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
     return getVariableTyped(caseExecutionId, variableName, true);
   }
 
-  public <T extends TypedValue> T getVariableTyped(String caseExecutionId, String variableName, boolean deserializeValue) {
+  public <T extends TypedValue> T getVariableTyped(String caseExecutionId, String variableName,
+      boolean deserializeValue) {
     return getCaseExecutionVariableTyped(caseExecutionId, variableName, false, deserializeValue);
   }
 
-  public <T extends TypedValue> T getVariableLocalTyped(String caseExecutionId, String variableName) {
+  public <T extends TypedValue> T getVariableLocalTyped(String caseExecutionId,
+      String variableName) {
     return getVariableLocalTyped(caseExecutionId, variableName, true);
   }
 
-  public <T extends TypedValue> T getVariableLocalTyped(String caseExecutionId, String variableName, boolean deserializeValue) {
+  public <T extends TypedValue> T getVariableLocalTyped(String caseExecutionId, String variableName,
+      boolean deserializeValue) {
     return getCaseExecutionVariableTyped(caseExecutionId, variableName, true, deserializeValue);
   }
 
   @SuppressWarnings("unchecked")
-  protected <T extends TypedValue> T getCaseExecutionVariableTyped(String caseExecutionId, String variableName, boolean isLocal, boolean deserializeValue) {
+  protected <T extends TypedValue> T getCaseExecutionVariableTyped(String caseExecutionId,
+      String variableName, boolean isLocal, boolean deserializeValue) {
     try {
-      return (T) commandExecutor.execute(new GetCaseExecutionVariableTypedCmd(caseExecutionId, variableName, isLocal, deserializeValue));
-    }
-    catch (NullValueException e) {
+      return (T) commandExecutor.execute(new GetCaseExecutionVariableTypedCmd(caseExecutionId,
+          variableName, isLocal, deserializeValue));
+    } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
-    }
-    catch (CaseExecutionNotFoundException e) {
+    } catch (CaseExecutionNotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
     }
   }
@@ -205,11 +210,13 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
     return withCaseDefinitionByKey(caseDefinitionKey).businessKey(businessKey).create();
   }
 
-  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey, Map<String, Object> variables) {
+  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey,
+      Map<String, Object> variables) {
     return withCaseDefinitionByKey(caseDefinitionKey).setVariables(variables).create();
   }
 
-  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey, Map<String, Object> variables) {
+  public CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey,
+      Map<String, Object> variables) {
     return withCaseDefinitionByKey(caseDefinitionKey).businessKey(businessKey)
         .setVariables(variables).create();
   }
@@ -222,13 +229,15 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
     return withCaseDefinition(caseDefinitionId).businessKey(businessKey).create();
   }
 
-  public CaseInstance createCaseInstanceById(String caseDefinitionId, Map<String, Object> variables) {
+  public CaseInstance createCaseInstanceById(String caseDefinitionId,
+      Map<String, Object> variables) {
     return withCaseDefinition(caseDefinitionId).setVariables(variables).create();
   }
 
-  public CaseInstance createCaseInstanceById(String caseDefinitionId, String businessKey, Map<String, Object> variables) {
-    return withCaseDefinition(caseDefinitionId).businessKey(businessKey)
-        .setVariables(variables).create();
+  public CaseInstance createCaseInstanceById(String caseDefinitionId, String businessKey,
+      Map<String, Object> variables) {
+    return withCaseDefinition(caseDefinitionId).businessKey(businessKey).setVariables(variables)
+        .create();
   }
 
   public void manuallyStartCaseExecution(String caseExecutionId) {

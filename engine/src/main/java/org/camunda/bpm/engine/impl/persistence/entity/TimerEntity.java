@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -82,13 +81,14 @@ public class TimerEntity extends JobEntity {
           // the listener is added to the transaction as SYNC on ROLLABCK,
           // when it is necessary to schedule a new timer job invocation.
           // If the transaction does not rollback, it is ignored.
-          ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-          CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
+          ProcessEngineConfigurationImpl processEngineConfiguration = Context
+              .getProcessEngineConfiguration();
+          CommandExecutor commandExecutor = processEngineConfiguration
+              .getCommandExecutorTxRequiresNew();
           RepeatingFailedJobListener listener = createRepeatingFailedJobListener(commandExecutor);
 
-          commandContext.getTransactionContext().addTransactionListener(
-              TransactionState.ROLLED_BACK,
-              listener);
+          commandContext.getTransactionContext()
+              .addTransactionListener(TransactionState.ROLLED_BACK, listener);
 
           // create a new timer job
           createNewTimerJob(newDueDate);
@@ -97,7 +97,8 @@ public class TimerEntity extends JobEntity {
     }
   }
 
-  protected RepeatingFailedJobListener createRepeatingFailedJobListener(CommandExecutor commandExecutor) {
+  protected RepeatingFailedJobListener createRepeatingFailedJobListener(
+      CommandExecutor commandExecutor) {
     return new RepeatingFailedJobListener(commandExecutor, getId());
   }
 
@@ -105,17 +106,12 @@ public class TimerEntity extends JobEntity {
     // create new timer job
     TimerEntity newTimer = new TimerEntity(this);
     newTimer.setDuedate(dueDate);
-    Context
-      .getCommandContext()
-      .getJobManager()
-      .schedule(newTimer);
+    Context.getCommandContext().getJobManager().schedule(newTimer);
   }
 
   public Date calculateRepeat() {
-    BusinessCalendar businessCalendar = Context
-        .getProcessEngineConfiguration()
-        .getBusinessCalendarManager()
-        .getBusinessCalendar(CycleBusinessCalendar.NAME);
+    BusinessCalendar businessCalendar = Context.getProcessEngineConfiguration()
+        .getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
     return businessCalendar.resolveDuedate(repeat);
   }
 
@@ -142,24 +138,14 @@ public class TimerEntity extends JobEntity {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[repeat=" + repeat
-           + ", id=" + id
-           + ", revision=" + revision
-           + ", duedate=" + duedate
-           + ", lockOwner=" + lockOwner
-           + ", lockExpirationTime=" + lockExpirationTime
-           + ", executionId=" + executionId
-           + ", processInstanceId=" + processInstanceId
-           + ", isExclusive=" + isExclusive
-           + ", retries=" + retries
-           + ", jobHandlerType=" + jobHandlerType
-           + ", jobHandlerConfiguration=" + jobHandlerConfiguration
-           + ", exceptionByteArray=" + exceptionByteArray
-           + ", exceptionByteArrayId=" + exceptionByteArrayId
-           + ", exceptionMessage=" + exceptionMessage
-           + ", deploymentId=" + deploymentId
-           + "]";
+    return this.getClass().getSimpleName() + "[repeat=" + repeat + ", id=" + id + ", revision="
+        + revision + ", duedate=" + duedate + ", lockOwner=" + lockOwner + ", lockExpirationTime="
+        + lockExpirationTime + ", executionId=" + executionId + ", processInstanceId="
+        + processInstanceId + ", isExclusive=" + isExclusive + ", retries=" + retries
+        + ", jobHandlerType=" + jobHandlerType + ", jobHandlerConfiguration="
+        + jobHandlerConfiguration + ", exceptionByteArray=" + exceptionByteArray
+        + ", exceptionByteArrayId=" + exceptionByteArrayId + ", exceptionMessage="
+        + exceptionMessage + ", deploymentId=" + deploymentId + "]";
   }
 
 }

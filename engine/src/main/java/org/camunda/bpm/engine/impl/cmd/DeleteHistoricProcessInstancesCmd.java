@@ -35,7 +35,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-
 /**
  * @author Askar Akhmerov
  */
@@ -44,30 +43,36 @@ public class DeleteHistoricProcessInstancesCmd implements Command<Void>, Seriali
   protected final List<String> processInstanceIds;
   protected final boolean failIfNotExists;
 
-  public DeleteHistoricProcessInstancesCmd(List<String> processInstanceIds, boolean failIfNotExists) {
+  public DeleteHistoricProcessInstancesCmd(List<String> processInstanceIds,
+      boolean failIfNotExists) {
     this.processInstanceIds = processInstanceIds;
     this.failIfNotExists = failIfNotExists;
   }
 
   @Override
   public Void execute(CommandContext commandContext) {
-    ensureNotEmpty(BadUserRequestException.class,"processInstanceIds", processInstanceIds);
-    ensureNotContainsNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceIds", processInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "processInstanceIds", processInstanceIds);
+    ensureNotContainsNull(BadUserRequestException.class, "processInstanceId is null",
+        "processInstanceIds", processInstanceIds);
 
     // Check if process instance is still running
-    List<HistoricProcessInstance> instances = commandContext.runWithoutAuthorization(new Callable<List<HistoricProcessInstance>>() {
-      @Override
-      public List<HistoricProcessInstance> call() throws Exception {
-        return new HistoricProcessInstanceQueryImpl().processInstanceIds(new HashSet<String>(processInstanceIds)).list();
-      }
-    });
+    List<HistoricProcessInstance> instances = commandContext
+        .runWithoutAuthorization(new Callable<List<HistoricProcessInstance>>() {
+          @Override
+          public List<HistoricProcessInstance> call() throws Exception {
+            return new HistoricProcessInstanceQueryImpl()
+                .processInstanceIds(new HashSet<String>(processInstanceIds)).list();
+          }
+        });
 
     if (failIfNotExists) {
       if (processInstanceIds.size() == 1) {
-        ensureNotEmpty(BadUserRequestException.class, "No historic process instance found with id: " + processInstanceIds.get(0), "historicProcessInstanceIds",
-            instances);
+        ensureNotEmpty(BadUserRequestException.class,
+            "No historic process instance found with id: " + processInstanceIds.get(0),
+            "historicProcessInstanceIds", instances);
       } else {
-        ensureNotEmpty(BadUserRequestException.class, "No historic process instances found", "historicProcessInstanceIds", instances);
+        ensureNotEmpty(BadUserRequestException.class, "No historic process instances found",
+            "historicProcessInstanceIds", instances);
       }
     }
 
@@ -76,23 +81,29 @@ public class DeleteHistoricProcessInstancesCmd implements Command<Void>, Seriali
     for (HistoricProcessInstance historicProcessInstance : instances) {
       existingIds.add(historicProcessInstance.getId());
 
-      for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+          .getCommandCheckers()) {
         checker.checkDeleteHistoricProcessInstance(historicProcessInstance);
       }
 
-      ensureNotNull(BadUserRequestException.class, "Process instance is still running, cannot delete historic process instance: " + historicProcessInstance, "instance.getEndTime()", historicProcessInstance.getEndTime());
+      ensureNotNull(BadUserRequestException.class,
+          "Process instance is still running, cannot delete historic process instance: "
+              + historicProcessInstance,
+          "instance.getEndTime()", historicProcessInstance.getEndTime());
     }
 
-    if(failIfNotExists) {
+    if (failIfNotExists) {
       ArrayList<String> nonExistingIds = new ArrayList<String>(processInstanceIds);
       nonExistingIds.removeAll(existingIds);
-      if(nonExistingIds.size() != 0) {
-        throw new BadUserRequestException("No historic process instance found with id: " + nonExistingIds);
+      if (nonExistingIds.size() != 0) {
+        throw new BadUserRequestException(
+            "No historic process instance found with id: " + nonExistingIds);
       }
     }
 
-    if(existingIds.size() > 0) {
-      commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(existingIds);
+    if (existingIds.size() > 0) {
+      commandContext.getHistoricProcessInstanceManager()
+          .deleteHistoricProcessInstanceByIds(existingIds);
     }
     writeUserOperationLog(commandContext, existingIds.size());
 
@@ -105,11 +116,7 @@ public class DeleteHistoricProcessInstancesCmd implements Command<Void>, Seriali
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, false));
 
-    commandContext.getOperationLogManager()
-      .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
-        null,
-        null,
-        null,
-        propertyChanges);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, null, null, null, propertyChanges);
   }
 }

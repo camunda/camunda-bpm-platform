@@ -34,7 +34,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-
 /**
  * @author Thorben Lindhauer
  */
@@ -43,9 +42,7 @@ public class ProcessEngineRuleParameterizedJunit4Test {
 
   @Parameters
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] {
-      { 1 }, { 2 }
-    });
+    return Arrays.asList(new Object[][] { { 1 }, { 2 } });
   }
 
   @Rule

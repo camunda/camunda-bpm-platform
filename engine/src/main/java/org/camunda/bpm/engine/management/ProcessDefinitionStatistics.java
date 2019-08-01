@@ -26,12 +26,12 @@ public interface ProcessDefinitionStatistics extends ProcessDefinition {
    * The number of all process instances of the process definition.
    */
   int getInstances();
-  
+
   /**
    * The number of all failed jobs of all process instances.
    */
   int getFailedJobs();
-  
+
   /**
    * Returns a list of incident statistics.
    */

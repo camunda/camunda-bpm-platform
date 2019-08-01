@@ -173,7 +173,8 @@ public class MilestoneDiscretionaryItemHandlerTest extends CmmnElementHandlerTes
     // given
     ItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", ItemControl.class);
     RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -190,9 +191,11 @@ public class MilestoneDiscretionaryItemHandlerTest extends CmmnElementHandlerTes
   @Test
   public void testRequiredRuleByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(milestone, "ItemControl_1", DefaultControl.class);
+    PlanItemControl defaultControl = createElement(milestone, "ItemControl_1",
+        DefaultControl.class);
     RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);

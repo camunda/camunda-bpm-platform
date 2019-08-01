@@ -44,23 +44,26 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   protected static final String INVALID_MAPPING_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnBusinessRuleTaskResultMappingTest.testInvalidMapping.bpmn20.xml";
   protected static final String OVERRIDE_DECISION_RESULT_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnBusinessRuleTaskResultMappingTest.testOverrideVariable.bpmn20.xml";
 
-  @Deployment(resources = {CUSTOM_MAPPING_BPMN, TEST_DECISION })
+  @Deployment(resources = { CUSTOM_MAPPING_BPMN, TEST_DECISION })
   public void testCustomOutputMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries");
 
     assertEquals("foo", runtimeService.getVariable(processInstance.getId(), "result1"));
-    assertEquals(Variables.stringValue("foo"), runtimeService.getVariableTyped(processInstance.getId(), "result1"));
+    assertEquals(Variables.stringValue("foo"),
+        runtimeService.getVariableTyped(processInstance.getId(), "result1"));
 
     assertEquals("bar", runtimeService.getVariable(processInstance.getId(), "result2"));
-    assertEquals(Variables.stringValue("bar"), runtimeService.getVariableTyped(processInstance.getId(), "result2"));
+    assertEquals(Variables.stringValue("bar"),
+        runtimeService.getVariableTyped(processInstance.getId(), "result2"));
   }
 
-  @Deployment(resources = { SINGLE_ENTRY_BPMN, TEST_DECISION})
+  @Deployment(resources = { SINGLE_ENTRY_BPMN, TEST_DECISION })
   public void testSingleEntryMapping() {
     ProcessInstance processInstance = startTestProcess("single entry");
 
     assertEquals("foo", runtimeService.getVariable(processInstance.getId(), "result"));
-    assertEquals(Variables.stringValue("foo"), runtimeService.getVariableTyped(processInstance.getId(), "result"));
+    assertEquals(Variables.stringValue("foo"),
+        runtimeService.getVariableTyped(processInstance.getId(), "result"));
   }
 
   @Deployment(resources = { SINGLE_RESULT_BPMN, TEST_DECISION })
@@ -68,7 +71,8 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
     ProcessInstance processInstance = startTestProcess("multiple entries");
 
     @SuppressWarnings("unchecked")
-    Map<String, Object> output = (Map<String, Object>) runtimeService.getVariable(processInstance.getId(), "result");
+    Map<String, Object> output = (Map<String, Object>) runtimeService
+        .getVariable(processInstance.getId(), "result");
 
     assertEquals(2, output.size());
     assertEquals("foo", output.get("result1"));
@@ -80,7 +84,8 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
     ProcessInstance processInstance = startTestProcess("single entry list");
 
     @SuppressWarnings("unchecked")
-    List<String> output = (List<String>) runtimeService.getVariable(processInstance.getId(), "result");
+    List<String> output = (List<String>) runtimeService.getVariable(processInstance.getId(),
+        "result");
 
     assertEquals(2, output.size());
     assertEquals("foo", output.get(0));
@@ -92,7 +97,8 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
     ProcessInstance processInstance = startTestProcess("multiple entries list");
 
     @SuppressWarnings("unchecked")
-    List<Map<String, Object>> resultList = (List<Map<String, Object>>) runtimeService.getVariable(processInstance.getId(), "result");
+    List<Map<String, Object>> resultList = (List<Map<String, Object>>) runtimeService
+        .getVariable(processInstance.getId(), "result");
     assertEquals(2, resultList.size());
 
     for (Map<String, Object> valueMap : resultList) {
@@ -108,7 +114,8 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
 
     // default mapping is 'resultList'
     @SuppressWarnings("unchecked")
-    List<Map<String, Object>> resultList = (List<Map<String, Object>>) runtimeService.getVariable(processInstance.getId(), "result");
+    List<Map<String, Object>> resultList = (List<Map<String, Object>>) runtimeService
+        .getVariable(processInstance.getId(), "result");
     assertEquals(2, resultList.size());
 
     for (Map<String, Object> valueMap : resultList) {
@@ -164,11 +171,8 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
 
   public void testInvalidMapping() {
     try {
-      deploymentId = repositoryService
-          .createDeployment()
-          .addClasspathResource(INVALID_MAPPING_BPMN)
-          .deploy()
-          .getId();
+      deploymentId = repositoryService.createDeployment().addClasspathResource(INVALID_MAPPING_BPMN)
+          .deploy().getId();
 
       fail("expect parse exception");
     } catch (ProcessEngineException e) {
@@ -178,24 +182,28 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
 
   @Deployment(resources = { DEFAULT_MAPPING_BPMN, TEST_DECISION })
   public void testTransientDecisionResult() {
-    // when a decision is evaluated and the result is stored in a transient variable "decisionResult"
+    // when a decision is evaluated and the result is stored in a transient variable
+    // "decisionResult"
     ProcessInstance processInstance = startTestProcess("single entry");
 
     // then the variable should not be available outside the business rule task
     assertNull(runtimeService.getVariable(processInstance.getId(), "decisionResult"));
     // and should not create an entry in history since it is not persistent
-    assertNull(historyService.createHistoricVariableInstanceQuery().variableName("decisionResult").singleResult());
+    assertNull(historyService.createHistoricVariableInstanceQuery().variableName("decisionResult")
+        .singleResult());
   }
 
   @Deployment(resources = { OVERRIDE_DECISION_RESULT_BPMN, TEST_DECISION })
   public void testFailedToOverrideDecisionResultVariable() {
     try {
-      // the transient variable "decisionResult" should not be overridden by the task result variable
+      // the transient variable "decisionResult" should not be overridden by the task result
+      // variable
       startTestProcess("single entry");
       fail("expect exception");
 
     } catch (ProcessEngineException e) {
-      assertTextPresent("transient variable with name decisionResult to non-transient", e.getMessage());
+      assertTextPresent("transient variable with name decisionResult to non-transient",
+          e.getMessage());
     }
   }
 
@@ -224,7 +232,8 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   public void testCollectEntriesEmptyResult() {
     ProcessInstance processInstance = startTestProcess("empty result");
 
-    List<Object> result = (List<Object>) runtimeService.getVariable(processInstance.getId(), "result");
+    List<Object> result = (List<Object>) runtimeService.getVariable(processInstance.getId(),
+        "result");
     assertTrue(result.isEmpty());
   }
 
@@ -233,7 +242,8 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   public void testResultListEmptyResult() {
     ProcessInstance processInstance = startTestProcess("empty result");
 
-    List<Object> result = (List<Object>) runtimeService.getVariable(processInstance.getId(), "result");
+    List<Object> result = (List<Object>) runtimeService.getVariable(processInstance.getId(),
+        "result");
     assertTrue(result.isEmpty());
   }
 
@@ -242,12 +252,14 @@ public class DmnBusinessRuleTaskResultMappingTest extends PluggableProcessEngine
   public void testDefaultMappingEmptyResult() {
     ProcessInstance processInstance = startTestProcess("empty result");
 
-    List<Object> result = (List<Object>) runtimeService.getVariable(processInstance.getId(), "result");
+    List<Object> result = (List<Object>) runtimeService.getVariable(processInstance.getId(),
+        "result");
     assertTrue(result.isEmpty());
   }
 
   protected ProcessInstance startTestProcess(String input) {
-    return runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("input", input));
+    return runtimeService.startProcessInstanceByKey("testProcess",
+        Collections.<String, Object> singletonMap("input", input));
   }
 
 }

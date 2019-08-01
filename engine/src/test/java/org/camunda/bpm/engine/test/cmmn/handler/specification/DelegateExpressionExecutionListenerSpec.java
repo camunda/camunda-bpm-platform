@@ -36,7 +36,8 @@ public class DelegateExpressionExecutionListenerSpec extends AbstractExecutionLi
     super(eventName);
   }
 
-  protected void configureCaseExecutionListener(CmmnModelInstance modelInstance, CamundaCaseExecutionListener listener) {
+  protected void configureCaseExecutionListener(CmmnModelInstance modelInstance,
+      CamundaCaseExecutionListener listener) {
     listener.setCamundaDelegateExpression(DELEGATE_EXPRESSION);
   }
 

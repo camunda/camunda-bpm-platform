@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.test.bpmn.tasklistener.util;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 
-
 /**
  * @author Joram Barrez
  */

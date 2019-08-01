@@ -36,28 +36,19 @@ import org.camunda.bpm.engine.test.standalone.pvm.activities.WaitState;
  */
 public class PvmActivityInstanceCompleteTest extends PvmTestCase {
 
-
   /**
-   * +-------+   +-----+
-   * | start |-->| end |
-   * +-------+   +-----+
+   * +-------+ +-----+ | start |-->| end | +-------+ +-----+
    */
   public void testSingleEnd() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
 
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new End())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).transition("end")
+        .endActivity().createActivity("end").behavior(new End())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).endActivity()
+        .buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -67,44 +58,23 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
   }
 
   /**
-   *                   +----+
-   *              +--->|end1|
-   *              |    +----+
-   *              |
-   * +-----+   +----+
-   * |start|-->|fork|
-   * +-----+   +----+
-   *              |
-   *              |    +----+
-   *              +--->|end2|
-   *                   +----+
+   * +----+ +--->|end1| | +----+ | +-----+ +----+ |start|-->|fork| +-----+ +----+ | | +----+
+   * +--->|end2| +----+
    */
   public void testTwoEnds() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
 
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("fork")
-      .endActivity()
-      .createActivity("fork")
-        .behavior(new ParallelGateway())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("end1")
-        .transition("end2")
-      .endActivity()
-      .createActivity("end1")
-        .behavior(new End())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-      .endActivity()
-      .createActivity("end2")
-        .behavior(new End())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).transition("fork")
+        .endActivity().createActivity("fork").behavior(new ParallelGateway())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).transition("end1")
+        .transition("end2").endActivity().createActivity("end1").behavior(new End())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).endActivity()
+        .createActivity("end2").behavior(new End())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).endActivity()
+        .buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -116,54 +86,26 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
   }
 
   /**
-   *                   +----+
-   *              +--->| a1 |---+
-   *              |    +----+   |
-   *              |             v
-   * +-----+   +----+       +------+    +-----+
-   * |start|-->|fork|       | join |--->| end |
-   * +-----+   +----+       +------+    +-----+
-   *              |             ^
-   *              |    +----+   |
-   *              +--->| a2 |---+
-   *                   +----+
+   * +----+ +--->| a1 |---+ | +----+ | | v +-----+ +----+ +------+ +-----+ |start|-->|fork| | join
+   * |--->| end | +-----+ +----+ +------+ +-----+ | ^ | +----+ | +--->| a2 |---+ +----+
    */
   public void testSingleEndAfterParallelJoin() {
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
 
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("fork")
-      .endActivity()
-      .createActivity("fork")
-        .behavior(new ParallelGateway())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("a1")
-        .transition("a2")
-      .endActivity()
-      .createActivity("a1")
-        .behavior(new Automatic())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("join")
-      .endActivity()
-      .createActivity("a2")
-        .behavior(new Automatic())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("join")
-      .endActivity()
-      .createActivity("join")
-        .behavior(new ParallelGateway())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new End())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).transition("fork")
+        .endActivity().createActivity("fork").behavior(new ParallelGateway())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).transition("a1")
+        .transition("a2").endActivity().createActivity("a1").behavior(new Automatic())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).transition("join")
+        .endActivity().createActivity("a2").behavior(new Automatic())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).transition("join")
+        .endActivity().createActivity("join").behavior(new ParallelGateway())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).transition("end")
+        .endActivity().createActivity("end").behavior(new End())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).endActivity()
+        .buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -177,47 +119,26 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
   }
 
   /**
-   *           +-------------------------------+
-   *           | embeddedsubprocess            |
-   *           |                               |
-   * +-----+   |  +-----------+   +---------+  |   +---+
-   * |start|-->|  |startInside|-->|endInside|  |-->|end|
-   * +-----+   |  +-----------+   +---------+  |   +---+
-   *           |                               |
-   *           |                               |
-   *           +-------------------------------+
+   * +-------------------------------+ | embeddedsubprocess | | | +-----+ | +-----------+
+   * +---------+ | +---+ |start|-->| |startInside|-->|endInside| |-->|end| +-----+ | +-----------+
+   * +---------+ | +---+ | | | | +-------------------------------+
    */
   public void testSimpleSubProcess() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
 
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic())
         .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
+        .transition("embeddedsubprocess").endActivity().createActivity("embeddedsubprocess").scope()
         .behavior(new EmbeddedSubProcess())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .createActivity("startInside")
-          .behavior(new Automatic())
-          .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-          .transition("endInside")
-        .endActivity()
-        .createActivity("endInside")
-          .behavior(new End())
-          .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .endActivity()
-        .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new End())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-      .endActivity()
-    .buildProcessDefinition();
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).createActivity("startInside")
+        .behavior(new Automatic()).executionListener(ExecutionListener.EVENTNAME_END, verifier)
+        .transition("endInside").endActivity().createActivity("endInside").behavior(new End())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).endActivity()
+        .transition("end").endActivity().createActivity("end").behavior(new End())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).endActivity()
+        .buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
@@ -230,50 +151,25 @@ public class PvmActivityInstanceCompleteTest extends PvmTestCase {
   }
 
   /**
-   *           +----------+
-   *           | userTask |
-   *           |          |
-   * +-----+   |          |    +------+
-   * |start|-->|          |--->| end1 |
-   * +-----+   | +-----+  |
-   *           +-|timer|--+
-   *             +-----+
-   *                |          +------+
-   *                +--------->| end2 |
-   *                           +------+
+   * +----------+ | userTask | | | +-----+ | | +------+ |start|-->| |--->| end1 | +-----+ | +-----+
+   * | +-|timer|--+ +-----+ | +------+ +--------->| end2 | +------+
    */
   public void testBoundaryEvent() {
 
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
 
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("userTask")
-      .endActivity()
-      .createActivity("userTask")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("end1")
-      .endActivity()
-      .createActivity("timer")
-        .behavior(new WaitState())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .attachedTo("userTask", true)
-        .transition("end2")
-      .endActivity()
-      .createActivity("end1")
-        .behavior(new End())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-      .endActivity()
-      .createActivity("end2")
-        .behavior(new End())
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-      .endActivity()
-    .buildProcessDefinition();
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder().createActivity("start")
+        .initial().behavior(new Automatic())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).transition("userTask")
+        .endActivity().createActivity("userTask").scope().behavior(new EmbeddedSubProcess())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).transition("end1")
+        .endActivity().createActivity("timer").behavior(new WaitState())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).attachedTo("userTask", true)
+        .transition("end2").endActivity().createActivity("end1").behavior(new End())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).endActivity()
+        .createActivity("end2").behavior(new End())
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier).endActivity()
+        .buildProcessDefinition();
 
     PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();

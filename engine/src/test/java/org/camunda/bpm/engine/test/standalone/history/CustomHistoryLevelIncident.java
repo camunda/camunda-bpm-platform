@@ -57,9 +57,9 @@ public class CustomHistoryLevelIncident implements HistoryLevel {
         }
       }
     }
-    if (eventType.equals(HistoryEventTypes.BATCH_START) ||
-        eventType.equals(HistoryEventTypes.BATCH_END) ||
-        eventType.equals(HistoryEventTypes.TASK_INSTANCE_CREATE)) {
+    if (eventType.equals(HistoryEventTypes.BATCH_START)
+        || eventType.equals(HistoryEventTypes.BATCH_END)
+        || eventType.equals(HistoryEventTypes.TASK_INSTANCE_CREATE)) {
       return true;
     }
     return false;

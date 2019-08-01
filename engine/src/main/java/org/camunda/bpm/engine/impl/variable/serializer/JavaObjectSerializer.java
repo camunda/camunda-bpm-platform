@@ -57,8 +57,7 @@ public class JavaObjectSerializer extends AbstractObjectValueSerializer {
     try {
       ois = new ClassloaderAwareObjectInputStream(bais);
       return ois.readObject();
-    }
-    finally {
+    } finally {
       IoUtil.closeSilently(ois);
       IoUtil.closeSilently(bais);
     }
@@ -71,8 +70,7 @@ public class JavaObjectSerializer extends AbstractObjectValueSerializer {
       ois = new ObjectOutputStream(baos);
       ois.writeObject(deserializedObject);
       return baos.toByteArray();
-    }
-    finally {
+    } finally {
       IoUtil.closeSilently(ois);
       IoUtil.closeSilently(baos);
     }
@@ -92,7 +90,8 @@ public class JavaObjectSerializer extends AbstractObjectValueSerializer {
       super(in);
     }
 
-    protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+    protected Class<?> resolveClass(ObjectStreamClass desc)
+        throws IOException, ClassNotFoundException {
       return ReflectUtil.loadClass(desc.getName());
     }
 

@@ -21,29 +21,27 @@ import java.util.List;
 import org.camunda.bpm.application.AbstractProcessApplication;
 
 /**
- * MBean interface for {@link AbstractProcessApplication ProcessApplications}. This
- * interface allows retrieving management information about process
- * applications.
+ * MBean interface for {@link AbstractProcessApplication ProcessApplications}. This interface allows
+ * retrieving management information about process applications.
  * 
  * @author Daniel Meyer
  * 
  */
 public interface JmxManagedProcessApplicationMBean {
-	
+
   /**
    * @return the name of the process application
    */
-	public String getProcessApplicationName();
-	
-	/** 
-	 * @return the ids of the process engine deployments performed by this application
-	 */
-	public List<String> getDeploymentIds();
-	
-	/**
-	 * @return the names of the deployments performed by this application
-	 */
-	public List<String> getDeploymentNames();
-	
+  public String getProcessApplicationName();
+
+  /**
+   * @return the ids of the process engine deployments performed by this application
+   */
+  public List<String> getDeploymentIds();
+
+  /**
+   * @return the names of the deployments performed by this application
+   */
+  public List<String> getDeploymentNames();
 
 }

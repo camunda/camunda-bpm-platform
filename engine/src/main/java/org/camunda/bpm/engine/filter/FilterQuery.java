@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.filter;
 
-
 import org.camunda.bpm.engine.query.Query;
 
 /**
@@ -25,31 +24,36 @@ import org.camunda.bpm.engine.query.Query;
 public interface FilterQuery extends Query<FilterQuery, Filter> {
 
   /**
-   * @param filterId set the filter id to query
+   * @param filterId
+   *          set the filter id to query
    * @return this query
    */
   FilterQuery filterId(String filterId);
 
   /**
-   * @param resourceType set the filter resource type to query
+   * @param resourceType
+   *          set the filter resource type to query
    * @return this query
    */
   FilterQuery filterResourceType(String resourceType);
 
   /**
-   * @param name set the filter name to query
+   * @param name
+   *          set the filter name to query
    * @return this query
    */
   FilterQuery filterName(String name);
 
   /**
-   * @param nameLike set the filter name like to query
+   * @param nameLike
+   *          set the filter name like to query
    * @return this query
    */
   FilterQuery filterNameLike(String nameLike);
 
   /**
-   * @param owner set the filter owner to query
+   * @param owner
+   *          set the filter owner to query
    * @return this query
    */
   FilterQuery filterOwner(String owner);

@@ -48,14 +48,17 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
   protected Group group;
 
   public ResourceAuthorizationProviderTest() {
-    super("org/camunda/bpm/engine/test/api/authorization/resource.authorization.provider.camunda.cfg.xml");
+    super(
+        "org/camunda/bpm/engine/test/api/authorization/resource.authorization.provider.camunda.cfg.xml");
   }
 
   protected void initializeProcessEngine() {
     super.initializeProcessEngine();
 
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
-    processEngineConfiguration.setResourceAuthorizationProvider(new MyResourceAuthorizationProvider());
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+        .getProcessEngineConfiguration();
+    processEngineConfiguration
+        .setResourceAuthorizationProvider(new MyResourceAuthorizationProvider());
 
     identityService = processEngineConfiguration.getIdentityService();
     authorizationService = processEngineConfiguration.getAuthorizationService();
@@ -154,7 +157,8 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.addCandidateUser(taskId, "demo");
 
     // then
-    assertEquals(IdentityLinkType.CANDIDATE, MyResourceAuthorizationProvider.ADD_USER_IDENTITY_LINK_TYPE);
+    assertEquals(IdentityLinkType.CANDIDATE,
+        MyResourceAuthorizationProvider.ADD_USER_IDENTITY_LINK_TYPE);
     assertEquals("demo", MyResourceAuthorizationProvider.ADD_USER_IDENTITY_LINK_USER);
 
     taskService.deleteTask(taskId, true);
@@ -194,7 +198,8 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.addCandidateGroup(taskId, "management");
 
     // then
-    assertEquals(IdentityLinkType.CANDIDATE, MyResourceAuthorizationProvider.ADD_GROUP_IDENTITY_LINK_TYPE);
+    assertEquals(IdentityLinkType.CANDIDATE,
+        MyResourceAuthorizationProvider.ADD_GROUP_IDENTITY_LINK_TYPE);
     assertEquals("management", MyResourceAuthorizationProvider.ADD_GROUP_IDENTITY_LINK_GROUP);
 
     taskService.deleteTask(taskId, true);
@@ -235,7 +240,8 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.deleteCandidateUser(taskId, "demo");
 
     // then
-    assertEquals(IdentityLinkType.CANDIDATE, MyResourceAuthorizationProvider.DELETE_USER_IDENTITY_LINK_TYPE);
+    assertEquals(IdentityLinkType.CANDIDATE,
+        MyResourceAuthorizationProvider.DELETE_USER_IDENTITY_LINK_TYPE);
     assertEquals("demo", MyResourceAuthorizationProvider.DELETE_USER_IDENTITY_LINK_USER);
 
     taskService.deleteTask(taskId, true);
@@ -256,7 +262,8 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     taskService.deleteCandidateGroup(taskId, "management");
 
     // then
-    assertEquals(IdentityLinkType.CANDIDATE, MyResourceAuthorizationProvider.DELETE_GROUP_IDENTITY_LINK_TYPE);
+    assertEquals(IdentityLinkType.CANDIDATE,
+        MyResourceAuthorizationProvider.DELETE_GROUP_IDENTITY_LINK_TYPE);
     assertEquals("management", MyResourceAuthorizationProvider.DELETE_GROUP_IDENTITY_LINK_GROUP);
 
     taskService.deleteTask(taskId, true);
@@ -287,13 +294,15 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
 
   protected Group createGroup(String groupId) {
     Group group = identityService.newGroup(groupId);
-    identityService.saveGroup(group);;
+    identityService.saveGroup(group);
+    ;
     return group;
   }
 
   // authorization ///////////////////////////////////////////////////////
 
-  protected void createGrantAuthorization(Resource resource, String resourceId, Permission permission, String userId) {
+  protected void createGrantAuthorization(Resource resource, String resourceId,
+      Permission permission, String userId) {
     Authorization authorization = createGrantAuthorization(resource, resourceId);
     authorization.setUserId(userId);
     authorization.addPermission(permission);

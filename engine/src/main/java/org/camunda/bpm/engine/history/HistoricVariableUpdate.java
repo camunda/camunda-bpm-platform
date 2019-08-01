@@ -18,8 +18,8 @@ package org.camunda.bpm.engine.history;
 
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-/** Update of a process variable.  This is only available if history
- * level is configured to FULL.
+/**
+ * Update of a process variable. This is only available if history level is configured to FULL.
  *
  * @author Tom Baeyens
  */
@@ -57,6 +57,7 @@ public interface HistoricVariableUpdate extends HistoricDetail {
 
   /**
    * If the variable value could not be loaded, this returns the error message.
+   * 
    * @return an error message indicating why the variable value could not be loaded.
    */
   String getErrorMessage();

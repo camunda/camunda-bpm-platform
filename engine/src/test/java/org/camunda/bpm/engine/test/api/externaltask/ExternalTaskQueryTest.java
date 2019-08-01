@@ -58,7 +58,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testSingleResult() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
 
     // when
     ExternalTask externalTask = externalTaskService.createExternalTaskQuery().singleResult();
@@ -98,7 +99,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
 
     // when
     List<ExternalTask> lockedTasks = externalTaskService.createExternalTaskQuery().locked().list();
-    List<ExternalTask> nonLockedTasks = externalTaskService.createExternalTaskQuery().notLocked().list();
+    List<ExternalTask> nonLockedTasks = externalTaskService.createExternalTaskQuery().notLocked()
+        .list();
 
     // then
     assertEquals(3, lockedTasks.size());
@@ -116,24 +118,22 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByProcessDefinitionId() {
     // given
     org.camunda.bpm.engine.repository.Deployment secondDeployment = repositoryService
-      .createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
-      .deploy();
+        .createDeployment()
+        .addClasspathResource(
+            "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+        .deploy();
 
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .list();
 
     startInstancesById(processDefinitions.get(0).getId(), 3);
     startInstancesById(processDefinitions.get(1).getId(), 2);
 
     // when
-    List<ExternalTask> definition1Tasks = externalTaskService
-        .createExternalTaskQuery()
-        .processDefinitionId(processDefinitions.get(0).getId())
-        .list();
-    List<ExternalTask> definition2Tasks = externalTaskService
-        .createExternalTaskQuery()
-        .processDefinitionId(processDefinitions.get(1).getId())
-        .list();
+    List<ExternalTask> definition1Tasks = externalTaskService.createExternalTaskQuery()
+        .processDefinitionId(processDefinitions.get(0).getId()).list();
+    List<ExternalTask> definition2Tasks = externalTaskService.createExternalTaskQuery()
+        .processDefinitionId(processDefinitions.get(1).getId()).list();
 
     // then
     assertEquals(3, definition1Tasks.size());
@@ -156,10 +156,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     startInstancesByKey("parallelExternalTaskProcess", 3);
 
     // when
-    List<ExternalTask> tasks = externalTaskService
-        .createExternalTaskQuery()
-        .activityId("externalTask2")
-        .list();
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery()
+        .activityId("externalTask2").list();
 
     // then
     assertEquals(3, tasks.size());
@@ -176,10 +174,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     List<String> activityIds = Arrays.asList("externalTask1", "externalTask2");
 
     // when
-    List<ExternalTask> tasks = externalTaskService
-        .createExternalTaskQuery()
-        .activityIdIn(activityIds.toArray(new String[0]))
-        .list();
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery()
+        .activityIdIn(activityIds.toArray(new String[0])).list();
 
     // then
     assertEquals(6, tasks.size());
@@ -190,8 +186,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
 
   public void testFailQueryByActivityIdInNull() {
     try {
-      externalTaskService.createExternalTaskQuery()
-          .activityIdIn((String) null);
+      externalTaskService.createExternalTaskQuery().activityIdIn((String) null);
       fail("expected exception");
     } catch (NullValueException e) {
     }
@@ -203,10 +198,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     startInstancesByKey("parallelExternalTaskProcess", 3);
 
     // when
-    List<ExternalTask> topic1Tasks = externalTaskService
-        .createExternalTaskQuery()
-        .topicName("topic1")
-        .list();
+    List<ExternalTask> topic1Tasks = externalTaskService.createExternalTaskQuery()
+        .topicName("topic1").list();
 
     // then
     assertEquals(3, topic1Tasks.size());
@@ -221,10 +214,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     List<ProcessInstance> processInstances = startInstancesByKey("oneExternalTaskProcess", 3);
 
     // when
-    ExternalTask task = externalTaskService
-      .createExternalTaskQuery()
-      .processInstanceId(processInstances.get(0).getId())
-      .singleResult();
+    ExternalTask task = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstances.get(0).getId()).singleResult();
 
     // then
     assertNotNull(task);
@@ -236,14 +227,13 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     // given
     List<String> processInstances = new ArrayList<String>();
     for (int i = 0; i < 1001; i++) {
-      processInstances.add(runtimeService.startProcessInstanceByKey("oneExternalTaskProcess").getProcessInstanceId());
+      processInstances.add(runtimeService.startProcessInstanceByKey("oneExternalTaskProcess")
+          .getProcessInstanceId());
     }
 
     // when
-    List<ExternalTask> tasks = externalTaskService
-      .createExternalTaskQuery()
-      .processInstanceIdIn(processInstances.toArray(new String[processInstances.size()]))
-      .list();
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery()
+        .processInstanceIdIn(processInstances.toArray(new String[processInstances.size()])).list();
 
     // then
     assertNotNull(tasks);
@@ -258,13 +248,13 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     // given
     List<ProcessInstance> processInstances = startInstancesByKey("oneExternalTaskProcess", 3);
 
-    List<String> processInstanceIds = Arrays.asList(processInstances.get(0).getId(), processInstances.get(1).getId());
+    List<String> processInstanceIds = Arrays.asList(processInstances.get(0).getId(),
+        processInstances.get(1).getId());
 
     // when
-    List<ExternalTask> tasks = externalTaskService
-      .createExternalTaskQuery()
-      .processInstanceIdIn(processInstances.get(0).getId(), processInstances.get(1).getId())
-      .list();
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery()
+        .processInstanceIdIn(processInstances.get(0).getId(), processInstances.get(1).getId())
+        .list();
 
     // then
     assertNotNull(tasks);
@@ -275,8 +265,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByNonExistingProcessInstanceId() {
-    ExternalTaskQuery query = externalTaskService
-        .createExternalTaskQuery()
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery()
         .processInstanceIdIn("nonExisting");
 
     assertEquals(0, query.count());
@@ -284,8 +273,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryByProcessInstanceIdNull() {
     try {
-      externalTaskService.createExternalTaskQuery()
-        .processInstanceIdIn((String) null);
+      externalTaskService.createExternalTaskQuery().processInstanceIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -300,15 +288,12 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     ProcessInstance firstInstance = processInstances.get(0);
 
     ActivityInstance externalTaskActivityInstance = runtimeService
-      .getActivityInstance(firstInstance.getId())
-      .getActivityInstances("externalTask")[0];
+        .getActivityInstance(firstInstance.getId()).getActivityInstances("externalTask")[0];
     String executionId = externalTaskActivityInstance.getExecutionIds()[0];
 
     // when
-    ExternalTask externalTask = externalTaskService
-      .createExternalTaskQuery()
-      .executionId(executionId)
-      .singleResult();
+    ExternalTask externalTask = externalTaskService.createExternalTaskQuery()
+        .executionId(executionId).singleResult();
 
     // then
     assertNotNull(externalTask);
@@ -323,10 +308,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     lockInstances(TOPIC_NAME, 10000L, 4, "worker2");
 
     // when
-    List<ExternalTask> tasks = externalTaskService
-      .createExternalTaskQuery()
-      .workerId("worker1")
-      .list();
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().workerId("worker1")
+        .list();
 
     // then
     assertEquals(3, tasks.size());
@@ -344,15 +327,11 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
 
     // when
     Date lockDate = new Date(ClockUtil.getCurrentTime().getTime() + 7000L);
-    List<ExternalTask> lockedExpirationBeforeTasks = externalTaskService
-        .createExternalTaskQuery()
-        .lockExpirationBefore(lockDate)
-        .list();
+    List<ExternalTask> lockedExpirationBeforeTasks = externalTaskService.createExternalTaskQuery()
+        .lockExpirationBefore(lockDate).list();
 
-    List<ExternalTask> lockedExpirationAfterTasks = externalTaskService
-        .createExternalTaskQuery()
-        .lockExpirationAfter(lockDate)
-        .list();
+    List<ExternalTask> lockedExpirationAfterTasks = externalTaskService.createExternalTaskQuery()
+        .lockExpirationAfter(lockDate).list();
 
     // then
     assertEquals(3, lockedExpirationBeforeTasks.size());
@@ -433,8 +412,9 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   public void testQuerySorting() {
 
     startInstancesByKey("oneExternalTaskProcess", 5);
@@ -444,7 +424,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     lockInstances(TOPIC_NAME, 10000L, 5, WORKER_ID);
 
     // asc
-    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().orderById().asc().list();
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().orderById().asc()
+        .list();
     assertEquals(10, tasks.size());
     verifySorting(tasks, externalTaskById());
 
@@ -456,7 +437,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(10, tasks.size());
     verifySorting(tasks, externalTaskByProcessDefinitionId());
 
-    tasks = externalTaskService.createExternalTaskQuery().orderByProcessDefinitionKey().asc().list();
+    tasks = externalTaskService.createExternalTaskQuery().orderByProcessDefinitionKey().asc()
+        .list();
     assertEquals(10, tasks.size());
     verifySorting(tasks, externalTaskByProcessDefinitionKey());
 
@@ -473,11 +455,13 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(10, tasks.size());
     verifySorting(tasks, inverted(externalTaskByProcessInstanceId()));
 
-    tasks = externalTaskService.createExternalTaskQuery().orderByProcessDefinitionId().desc().list();
+    tasks = externalTaskService.createExternalTaskQuery().orderByProcessDefinitionId().desc()
+        .list();
     assertEquals(10, tasks.size());
     verifySorting(tasks, inverted(externalTaskByProcessDefinitionId()));
 
-    tasks = externalTaskService.createExternalTaskQuery().orderByProcessDefinitionKey().desc().list();
+    tasks = externalTaskService.createExternalTaskQuery().orderByProcessDefinitionKey().desc()
+        .list();
     assertEquals(10, tasks.size());
     verifySorting(tasks, inverted(externalTaskByProcessDefinitionKey()));
 
@@ -493,7 +477,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     suspendInstances(3);
 
     // when
-    List<ExternalTask> suspendedTasks = externalTaskService.createExternalTaskQuery().suspended().list();
+    List<ExternalTask> suspendedTasks = externalTaskService.createExternalTaskQuery().suspended()
+        .list();
     List<ExternalTask> activeTasks = externalTaskService.createExternalTaskQuery().active().list();
 
     // then
@@ -515,14 +500,14 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     startInstancesByKey("oneExternalTaskProcess", 5);
 
     List<LockedExternalTask> tasks = lockInstances(TOPIC_NAME, 10000L, 3, WORKER_ID);
-    failInstances(tasks.subList(0, 2), ERROR_MESSAGE, 0, 5000L);  // two tasks have no retries left
-    failInstances(tasks.subList(2, 3), ERROR_MESSAGE, 4, 5000L);  // one task has retries left
+    failInstances(tasks.subList(0, 2), ERROR_MESSAGE, 0, 5000L); // two tasks have no retries left
+    failInstances(tasks.subList(2, 3), ERROR_MESSAGE, 4, 5000L); // one task has retries left
 
     // when
-    List<ExternalTask> tasksWithRetries = externalTaskService
-        .createExternalTaskQuery().withRetriesLeft().list();
-    List<ExternalTask> tasksWithoutRetries = externalTaskService
-        .createExternalTaskQuery().noRetriesLeft().list();
+    List<ExternalTask> tasksWithRetries = externalTaskService.createExternalTaskQuery()
+        .withRetriesLeft().list();
+    List<ExternalTask> tasksWithoutRetries = externalTaskService.createExternalTaskQuery()
+        .noRetriesLeft().list();
 
     // then
     assertEquals(3, tasksWithRetries.size());
@@ -549,10 +534,8 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     }
 
     // when
-    ExternalTask resultTask =
-        externalTaskService.createExternalTaskQuery()
-          .externalTaskId(firstTask.getId())
-          .singleResult();
+    ExternalTask resultTask = externalTaskService.createExternalTaskQuery()
+        .externalTaskId(firstTask.getId()).singleResult();
 
     // then
     assertEquals(firstTask.getId(), resultTask.getId());
@@ -585,7 +568,6 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-
   protected List<ProcessInstance> startInstancesByKey(String processDefinitionKey, int number) {
     List<ProcessInstance> processInstances = new ArrayList<ProcessInstance>();
     for (int i = 0; i < number; i++) {
@@ -605,24 +587,29 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   protected void suspendInstances(int number) {
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().listPage(0, number);
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().listPage(0,
+        number);
 
     for (ProcessInstance processInstance : processInstances) {
       runtimeService.suspendProcessInstanceById(processInstance.getId());
     }
   }
 
-  protected List<LockedExternalTask> lockInstances(String topic, long duration, int number, String workerId) {
+  protected List<LockedExternalTask> lockInstances(String topic, long duration, int number,
+      String workerId) {
     return externalTaskService.fetchAndLock(number, workerId).topic(topic, duration).execute();
   }
 
-  protected void failInstances(List<LockedExternalTask> tasks, String errorMessage, int retries, long retryTimeout) {
-    this.failInstances(tasks,errorMessage,null,retries,retryTimeout);
+  protected void failInstances(List<LockedExternalTask> tasks, String errorMessage, int retries,
+      long retryTimeout) {
+    this.failInstances(tasks, errorMessage, null, retries, retryTimeout);
   }
 
-  protected void failInstances(List<LockedExternalTask> tasks, String errorMessage, String errorDetails, int retries, long retryTimeout) {
+  protected void failInstances(List<LockedExternalTask> tasks, String errorMessage,
+      String errorDetails, int retries, long retryTimeout) {
     for (LockedExternalTask task : tasks) {
-      externalTaskService.handleFailure(task.getId(), task.getWorkerId(), errorMessage, errorDetails, retries, retryTimeout);
+      externalTaskService.handleFailure(task.getId(), task.getWorkerId(), errorMessage,
+          errorDetails, retries, retryTimeout);
     }
   }
 

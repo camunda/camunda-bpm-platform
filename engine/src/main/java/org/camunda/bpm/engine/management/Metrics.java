@@ -40,9 +40,8 @@ public class Metrics {
   public final static String JOB_ACQUIRED_FAILURE = "job-acquired-failure";
 
   /**
-   * Number of jobs that were submitted for execution but were rejected due to
-   * resource shortage. In the default job executor, this is the case when
-   * the execution queue is full.
+   * Number of jobs that were submitted for execution but were rejected due to resource shortage. In
+   * the default job executor, this is the case when the execution queue is full.
    */
   public final static String JOB_EXECUTION_REJECTED = "job-execution-rejected";
 
@@ -50,8 +49,8 @@ public class Metrics {
   public final static String JOB_FAILED = "job-failed";
 
   /**
-   * Number of jobs that are immediately locked and executed because they are exclusive
-   * and created in the context of job execution
+   * Number of jobs that are immediately locked and executed because they are exclusive and created
+   * in the context of job execution
    */
   public final static String JOB_LOCKED_EXCLUSIVE = "job-locked-exclusive";
 

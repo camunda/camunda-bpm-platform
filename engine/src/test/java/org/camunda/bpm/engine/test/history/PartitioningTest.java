@@ -85,9 +85,7 @@ public class PartitioningTest {
   }
 
   final protected BpmnModelInstance PROCESS_WITH_USERTASK = Bpmn.createExecutableProcess("process")
-    .startEvent()
-      .userTask()
-    .endEvent().done();
+      .startEvent().userTask().endEvent().done();
 
   @Test
   public void shouldUpdateHistoricProcessInstance() {
@@ -97,11 +95,10 @@ public class PartitioningTest {
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        HistoricProcessInstanceEntity historicProcessInstanceEntity =
-          (HistoricProcessInstanceEntity) historyService.createHistoricProcessInstanceQuery().singleResult();
+        HistoricProcessInstanceEntity historicProcessInstanceEntity = (HistoricProcessInstanceEntity) historyService
+            .createHistoricProcessInstanceQuery().singleResult();
 
-        commandContext.getDbEntityManager()
-          .delete(historicProcessInstanceEntity);
+        commandContext.getDbEntityManager().delete(historicProcessInstanceEntity);
 
         return null;
       }
@@ -128,11 +125,10 @@ public class PartitioningTest {
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        HistoricTaskInstanceEntity historicTaskInstanceEntity =
-          (HistoricTaskInstanceEntity) historyService.createHistoricTaskInstanceQuery().singleResult();
+        HistoricTaskInstanceEntity historicTaskInstanceEntity = (HistoricTaskInstanceEntity) historyService
+            .createHistoricTaskInstanceQuery().singleResult();
 
-        commandContext.getDbEntityManager()
-          .delete(historicTaskInstanceEntity);
+        commandContext.getDbEntityManager().delete(historicTaskInstanceEntity);
 
         return null;
       }
@@ -142,9 +138,7 @@ public class PartitioningTest {
     assertThat(historyService.createHistoricTaskInstanceQuery().singleResult(), nullValue());
 
     // when
-    String taskId = taskService.createTaskQuery()
-      .singleResult()
-      .getId();
+    String taskId = taskService.createTaskQuery().singleResult().getId();
 
     taskService.complete(taskId);
 
@@ -161,7 +155,8 @@ public class PartitioningTest {
       public Void execute(CommandContext commandContext) {
 
         commandContext.getHistoricActivityInstanceManager()
-          .deleteHistoricActivityInstancesByProcessInstanceIds(Collections.singletonList(processInstanceId));
+            .deleteHistoricActivityInstancesByProcessInstanceIds(
+                Collections.singletonList(processInstanceId));
 
         return null;
       }
@@ -171,9 +166,7 @@ public class PartitioningTest {
     assertThat(historyService.createHistoricActivityInstanceQuery().count(), is(0L));
 
     // when
-    String taskId = taskService.createTaskQuery()
-      .singleResult()
-      .getId();
+    String taskId = taskService.createTaskQuery().singleResult().getId();
 
     taskService.complete(taskId);
 
@@ -186,16 +179,17 @@ public class PartitioningTest {
     // given
     final String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK).getId();
 
-    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().singleResult();
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .singleResult();
 
     String incidentId = engineRule.getRuntimeService()
-      .createIncident("foo", execution.getId(), execution.getActivityId(), "bar").getId();
+        .createIncident("foo", execution.getId(), execution.getActivityId(), "bar").getId();
 
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        commandContext.getHistoricIncidentManager()
-          .deleteHistoricIncidentsByProcessInstanceIds(Collections.singletonList(processInstanceId));
+        commandContext.getHistoricIncidentManager().deleteHistoricIncidentsByProcessInstanceIds(
+            Collections.singletonList(processInstanceId));
 
         return null;
       }
@@ -218,7 +212,8 @@ public class PartitioningTest {
     // given
     String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK).getId();
 
-    final Batch batch = runtimeService.deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
+    final Batch batch = runtimeService
+        .deleteProcessInstancesAsync(Collections.singletonList(processInstanceId), "aDeleteReason");
 
     // assume
     assertThat(historyService.createHistoricBatchQuery().count(), is(1L));
@@ -226,11 +221,10 @@ public class PartitioningTest {
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        HistoricBatchEntity historicBatchEntity = (HistoricBatchEntity) historyService.createHistoricBatchQuery()
-          .singleResult();
+        HistoricBatchEntity historicBatchEntity = (HistoricBatchEntity) historyService
+            .createHistoricBatchQuery().singleResult();
 
-        commandContext.getDbEntityManager()
-          .delete(historicBatchEntity);
+        commandContext.getDbEntityManager().delete(historicBatchEntity);
 
         return null;
       }
@@ -241,16 +235,19 @@ public class PartitioningTest {
 
     // when
     String seedJobDefinitionId = batch.getSeedJobDefinitionId();
-    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
+    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId)
+        .singleResult();
     managementService.executeJob(seedJob.getId());
 
     String batchJobDefinitionId = batch.getBatchJobDefinitionId();
-    List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId).list();
+    List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId)
+        .list();
     for (Job batchJob : batchJobs) {
       managementService.executeJob(batchJob.getId());
     }
 
-    List<Job> monitorJobs = managementService.createJobQuery().jobDefinitionId(batch.getMonitorJobDefinitionId()).list();
+    List<Job> monitorJobs = managementService.createJobQuery()
+        .jobDefinitionId(batch.getMonitorJobDefinitionId()).list();
     for (Job monitorJob : monitorJobs) {
       managementService.executeJob(monitorJob.getId());
     }
@@ -266,7 +263,8 @@ public class PartitioningTest {
   protected ProcessInstance deployAndStartProcess(BpmnModelInstance bpmnModelInstance) {
     testHelper.deploy(bpmnModelInstance);
 
-    String processDefinitionKey = bpmnModelInstance.getDefinitions().getRootElements().iterator().next().getId();
+    String processDefinitionKey = bpmnModelInstance.getDefinitions().getRootElements().iterator()
+        .next().getId();
     return runtimeService.startProcessInstanceByKey(processDefinitionKey);
   }
 
@@ -275,16 +273,19 @@ public class PartitioningTest {
       public Void execute(CommandContext commandContext) {
 
         commandContext.getHistoricActivityInstanceManager()
-          .deleteHistoricActivityInstancesByProcessInstanceIds(Collections.singletonList(processInstanceId));
+            .deleteHistoricActivityInstancesByProcessInstanceIds(
+                Collections.singletonList(processInstanceId));
 
         commandContext.getHistoricTaskInstanceManager()
-          .deleteHistoricTaskInstancesByProcessInstanceIds(Collections.singletonList(processInstanceId), true);
+            .deleteHistoricTaskInstancesByProcessInstanceIds(
+                Collections.singletonList(processInstanceId), true);
 
         List<HistoricJobLog> historicJobLogs = commandContext.getHistoricJobLogManager()
-          .findHistoricJobLogsByQueryCriteria(new HistoricJobLogQueryImpl(), new Page(0, 100));
+            .findHistoricJobLogsByQueryCriteria(new HistoricJobLogQueryImpl(), new Page(0, 100));
 
         for (HistoricJobLog historicJobLog : historicJobLogs) {
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(historicJobLog.getJobId());
+          commandContext.getHistoricJobLogManager()
+              .deleteHistoricJobLogByJobId(historicJobLog.getJobId());
         }
 
         return null;

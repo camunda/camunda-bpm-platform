@@ -43,17 +43,19 @@ import org.camunda.bpm.engine.impl.util.xml.Element;
 public final class BpmnParseUtil {
 
   /**
-   * Returns the camunda extension element in the camunda namespace
-   * and the given name.
+   * Returns the camunda extension element in the camunda namespace and the given name.
    *
-    * @param element the parent element of the extension element
-   * @param extensionElementName the name of the extension element to find
+   * @param element
+   *          the parent element of the extension element
+   * @param extensionElementName
+   *          the name of the extension element to find
    * @return the extension element or null if not found
    */
   public static Element findCamundaExtensionElement(Element element, String extensionElementName) {
     Element extensionElements = element.element("extensionElements");
-    if(extensionElements != null) {
-      return extensionElements.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, extensionElementName);
+    if (extensionElements != null) {
+      return extensionElements.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,
+          extensionElementName);
     } else {
       return null;
     }
@@ -62,13 +64,16 @@ public final class BpmnParseUtil {
   /**
    * Returns the {@link IoMapping} of an element.
    *
-   * @param element the element to parse
+   * @param element
+   *          the element to parse
    * @return the input output mapping or null if non defined
-   * @throws BpmnParseException if a input/output parameter element is malformed
+   * @throws BpmnParseException
+   *           if a input/output parameter element is malformed
    */
   public static IoMapping parseInputOutput(Element element) {
-    Element inputOutputElement = element.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "inputOutput");
-    if(inputOutputElement != null) {
+    Element inputOutputElement = element.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,
+        "inputOutput");
+    if (inputOutputElement != null) {
       IoMapping ioMapping = new IoMapping();
       parseCamundaInputParameters(inputOutputElement, ioMapping);
       parseCamundaOutputParameters(inputOutputElement, ioMapping);
@@ -78,30 +83,36 @@ public final class BpmnParseUtil {
   }
 
   /**
-   * Parses all input parameters of an input output element and adds them to
-   * the {@link IoMapping}.
+   * Parses all input parameters of an input output element and adds them to the {@link IoMapping}.
    *
-   * @param inputOutputElement the input output element to process
-   * @param ioMapping the input output mapping to add input parameters to
-   * @throws BpmnParseException if a input parameter element is malformed
+   * @param inputOutputElement
+   *          the input output element to process
+   * @param ioMapping
+   *          the input output mapping to add input parameters to
+   * @throws BpmnParseException
+   *           if a input parameter element is malformed
    */
   public static void parseCamundaInputParameters(Element inputOutputElement, IoMapping ioMapping) {
-    List<Element> inputParameters = inputOutputElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "inputParameter");
+    List<Element> inputParameters = inputOutputElement
+        .elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "inputParameter");
     for (Element inputParameterElement : inputParameters) {
       parseInputParameterElement(inputParameterElement, ioMapping);
     }
   }
 
   /**
-   * Parses all output parameters of an input output element and adds them to
-   * the {@link IoMapping}.
+   * Parses all output parameters of an input output element and adds them to the {@link IoMapping}.
    *
-   * @param inputOutputElement the input output element to process
-   * @param ioMapping the input output mapping to add input parameters to
-   * @throws BpmnParseException if a output parameter element is malformed
+   * @param inputOutputElement
+   *          the input output element to process
+   * @param ioMapping
+   *          the input output mapping to add input parameters to
+   * @throws BpmnParseException
+   *           if a output parameter element is malformed
    */
   public static void parseCamundaOutputParameters(Element inputOutputElement, IoMapping ioMapping) {
-    List<Element> outputParameters = inputOutputElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "outputParameter");
+    List<Element> outputParameters = inputOutputElement
+        .elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "outputParameter");
     for (Element outputParameterElement : outputParameters) {
       parseOutputParameterElement(outputParameterElement, ioMapping);
     }
@@ -110,14 +121,19 @@ public final class BpmnParseUtil {
   /**
    * Parses a input parameter and adds it to the {@link IoMapping}.
    *
-   * @param inputParameterElement the input parameter element
-   * @param ioMapping the mapping to add the element
-   * @throws BpmnParseException if the input parameter element is malformed
+   * @param inputParameterElement
+   *          the input parameter element
+   * @param ioMapping
+   *          the mapping to add the element
+   * @throws BpmnParseException
+   *           if the input parameter element is malformed
    */
-  public static void parseInputParameterElement(Element inputParameterElement, IoMapping ioMapping) {
+  public static void parseInputParameterElement(Element inputParameterElement,
+      IoMapping ioMapping) {
     String nameAttribute = inputParameterElement.attribute("name");
-    if(nameAttribute == null || nameAttribute.isEmpty()) {
-      throw new BpmnParseException("Missing attribute 'name' for inputParameter", inputParameterElement);
+    if (nameAttribute == null || nameAttribute.isEmpty()) {
+      throw new BpmnParseException("Missing attribute 'name' for inputParameter",
+          inputParameterElement);
     }
 
     ParameterValueProvider valueProvider = parseNestedParamValueProvider(inputParameterElement);
@@ -129,14 +145,19 @@ public final class BpmnParseUtil {
   /**
    * Parses a output parameter and adds it to the {@link IoMapping}.
    *
-   * @param outputParameterElement the output parameter element
-   * @param ioMapping the mapping to add the element
-   * @throws BpmnParseException if the output parameter element is malformed
+   * @param outputParameterElement
+   *          the output parameter element
+   * @param ioMapping
+   *          the mapping to add the element
+   * @throws BpmnParseException
+   *           if the output parameter element is malformed
    */
-  public static void parseOutputParameterElement(Element outputParameterElement, IoMapping ioMapping) {
+  public static void parseOutputParameterElement(Element outputParameterElement,
+      IoMapping ioMapping) {
     String nameAttribute = outputParameterElement.attribute("name");
-    if(nameAttribute == null || nameAttribute.isEmpty()) {
-      throw new BpmnParseException("Missing attribute 'name' for outputParameter", outputParameterElement);
+    if (nameAttribute == null || nameAttribute.isEmpty()) {
+      throw new BpmnParseException("Missing attribute 'name' for outputParameter",
+          outputParameterElement);
     }
 
     ParameterValueProvider valueProvider = parseNestedParamValueProvider(outputParameterElement);
@@ -146,14 +167,15 @@ public final class BpmnParseUtil {
   }
 
   /**
-   * @throws BpmnParseException if the parameter is invalid
+   * @throws BpmnParseException
+   *           if the parameter is invalid
    */
   protected static ParameterValueProvider parseNestedParamValueProvider(Element element) {
     // parse value provider
-    if(element.elements().size() == 0) {
+    if (element.elements().size() == 0) {
       return parseParamValueProvider(element);
 
-    } else if(element.elements().size() == 1) {
+    } else if (element.elements().size() == 1) {
       return parseParamValueProvider(element.elements().get(0));
 
     } else {
@@ -162,12 +184,13 @@ public final class BpmnParseUtil {
   }
 
   /**
-   * @throws BpmnParseException if the parameter is invalid
+   * @throws BpmnParseException
+   *           if the parameter is invalid
    */
   protected static ParameterValueProvider parseParamValueProvider(Element parameterElement) {
 
     // LIST
-    if("list".equals(parameterElement.getTagName())) {
+    if ("list".equals(parameterElement.getTagName())) {
       List<ParameterValueProvider> providerList = new ArrayList<ParameterValueProvider>();
       for (Element element : parameterElement.elements()) {
         // parse nested provider
@@ -177,35 +200,35 @@ public final class BpmnParseUtil {
     }
 
     // MAP
-    if("map".equals(parameterElement.getTagName())) {
+    if ("map".equals(parameterElement.getTagName())) {
       TreeMap<ParameterValueProvider, ParameterValueProvider> providerMap = new TreeMap<ParameterValueProvider, ParameterValueProvider>();
       for (Element entryElement : parameterElement.elements("entry")) {
         // entry must provide key
         String keyAttribute = entryElement.attribute("key");
-        if(keyAttribute == null || keyAttribute.isEmpty()) {
+        if (keyAttribute == null || keyAttribute.isEmpty()) {
           throw new BpmnParseException("Missing attribute 'key' for 'entry' element", entryElement);
         }
         // parse nested provider
-        providerMap.put(new ElValueProvider(getExpressionManager().createExpression(keyAttribute)), parseNestedParamValueProvider(entryElement));
+        providerMap.put(new ElValueProvider(getExpressionManager().createExpression(keyAttribute)),
+            parseNestedParamValueProvider(entryElement));
       }
       return new MapValueProvider(providerMap);
     }
 
     // SCRIPT
-    if("script".equals(parameterElement.getTagName())) {
+    if ("script".equals(parameterElement.getTagName())) {
       ExecutableScript executableScript = parseCamundaScript(parameterElement);
       if (executableScript != null) {
         return new ScriptValueProvider(executableScript);
-      }
-      else {
+      } else {
         return new NullValueProvider();
       }
     }
 
     String textContent = parameterElement.getText().trim();
-    if(!textContent.isEmpty()) {
-        // EL
-        return new ElValueProvider(getExpressionManager().createExpression(textContent));
+    if (!textContent.isEmpty()) {
+      // EL
+      return new ElValueProvider(getExpressionManager().createExpression(textContent));
     } else {
       // NULL value
       return new NullValueProvider();
@@ -216,22 +239,24 @@ public final class BpmnParseUtil {
   /**
    * Parses a camunda script element.
    *
-   * @param scriptElement the script element ot parse
+   * @param scriptElement
+   *          the script element ot parse
    * @return the generated executable script
-   * @throws BpmnParseException if the a attribute is missing or the script cannot be processed
+   * @throws BpmnParseException
+   *           if the a attribute is missing or the script cannot be processed
    */
   public static ExecutableScript parseCamundaScript(Element scriptElement) {
     String scriptLanguage = scriptElement.attribute("scriptFormat");
     if (scriptLanguage == null || scriptLanguage.isEmpty()) {
-      throw new BpmnParseException("Missing attribute 'scriptFormatAttribute' for 'script' element", scriptElement);
-    }
-    else {
+      throw new BpmnParseException("Missing attribute 'scriptFormatAttribute' for 'script' element",
+          scriptElement);
+    } else {
       String scriptResource = scriptElement.attribute("resource");
       String scriptSource = scriptElement.getText();
       try {
-        return ScriptUtil.getScript(scriptLanguage, scriptSource, scriptResource, getExpressionManager());
-      }
-      catch (ProcessEngineException e) {
+        return ScriptUtil.getScript(scriptLanguage, scriptSource, scriptResource,
+            getExpressionManager());
+      } catch (ProcessEngineException e) {
         throw new BpmnParseException("Unable to process script", scriptElement, e);
       }
     }

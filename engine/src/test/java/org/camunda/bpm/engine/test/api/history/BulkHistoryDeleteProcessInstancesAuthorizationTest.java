@@ -80,22 +80,14 @@ public class BulkHistoryDeleteProcessInstancesAuthorizationTest {
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-        scenario()
-            .failsDueToRequired(
-                grant(Resources.PROCESS_DEFINITION, "processDefinition", "demo", Permissions.DELETE_HISTORY)
-            )
-                ,
-        scenario()
-            .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "processDefinition", "demo", Permissions.DELETE_HISTORY)
-            )
-            .succeeds(),
+        scenario().failsDueToRequired(grant(Resources.PROCESS_DEFINITION, "processDefinition",
+            "demo", Permissions.DELETE_HISTORY)),
+        scenario().withAuthorizations(grant(Resources.PROCESS_DEFINITION, "processDefinition",
+            "demo", Permissions.DELETE_HISTORY)).succeeds(),
         scenario()
             .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)
-            )
-            .succeeds()
-    );
+                grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY))
+            .succeeds());
   }
 
   @After
@@ -104,25 +96,22 @@ public class BulkHistoryDeleteProcessInstancesAuthorizationTest {
   }
 
   @Test
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testCleanupHistory() {
-    //given
+    // given
     final List<String> ids = prepareHistoricProcesses();
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     // when
-    authRule
-        .init(scenario)
-        .bindResource("processDefinition", "oneTaskProcess")
-        .withUser("demo")
+    authRule.init(scenario).bindResource("processDefinition", "oneTaskProcess").withUser("demo")
         .start();
 
-    //when
+    // when
     historyService.deleteHistoricProcessInstancesBulk(ids);
 
     if (authRule.assertScenario(scenario)) {
-      assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+      assertEquals(0, historyService.createHistoricProcessInstanceQuery()
+          .processDefinitionKey(ONE_TASK_PROCESS).count());
     }
 
   }
@@ -139,7 +128,8 @@ public class BulkHistoryDeleteProcessInstancesAuthorizationTest {
     List<String> processInstanceIds = new ArrayList<String>();
 
     for (int i = 0; i < 5; i++) {
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(businessKey, variables);
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(businessKey,
+          variables);
       processInstanceIds.add(processInstance.getId());
     }
 

@@ -27,8 +27,7 @@ public class PvmAtomicOperationActivityStartCreateScope extends PvmAtomicOperati
 
   public boolean isAsync(PvmExecutionImpl execution) {
     PvmActivity activity = execution.getActivity();
-    return activity.isAsyncBefore()
-        && !execution.hasProcessInstanceStartContext();
+    return activity.isAsyncBefore() && !execution.hasProcessInstanceStartContext();
   }
 
   public boolean isAsyncCapable() {

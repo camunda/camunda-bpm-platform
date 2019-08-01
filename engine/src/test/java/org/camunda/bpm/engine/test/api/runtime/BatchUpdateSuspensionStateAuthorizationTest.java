@@ -40,7 +40,6 @@ import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.junit.Assert.assertEquals;
@@ -64,39 +63,27 @@ public class BatchUpdateSuspensionStateAuthorizationTest {
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE)
-        )
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "ProcessDefinition", "userId", Permissions.UPDATE_INSTANCE),
-          grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", ProcessInstancePermissions.SUSPEND),
-          grant(Resources.PROCESS_DEFINITION, "ProcessDefinition", "userId", ProcessDefinitionPermissions.SUSPEND_INSTANCE)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", ProcessInstancePermissions.SUSPEND)
-        ),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND),
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)
-        )
-        .succeeds()
-    );
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+            grant(Resources.BATCH, "*", "userId",
+                BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND)),
+        scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE))
+            .failsDueToRequired(
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.UPDATE),
+                grant(Resources.PROCESS_DEFINITION, "ProcessDefinition", "userId",
+                    Permissions.UPDATE_INSTANCE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId",
+                    ProcessInstancePermissions.SUSPEND),
+                grant(Resources.PROCESS_DEFINITION, "ProcessDefinition", "userId",
+                    ProcessDefinitionPermissions.SUSPEND_INSTANCE)),
+        scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+            grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)),
+        scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+            grant(Resources.PROCESS_INSTANCE, "*", "userId", ProcessInstancePermissions.SUSPEND)),
+        scenario().withAuthorizations(
+            grant(Resources.BATCH, "*", "userId",
+                BatchPermissions.CREATE_BATCH_UPDATE_PROCESS_INSTANCES_SUSPEND),
+            grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE)).succeeds());
   }
 
   @After
@@ -108,14 +95,13 @@ public class BatchUpdateSuspensionStateAuthorizationTest {
   public void cleanBatch() {
     Batch batch = engineRule.getManagementService().createBatchQuery().singleResult();
     if (batch != null) {
-      engineRule.getManagementService().deleteBatch(
-          batch.getId(), true);
+      engineRule.getManagementService().deleteBatch(batch.getId(), true);
     }
 
-    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().singleResult();
+    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
+        .singleResult();
     if (historicBatch != null) {
-      engineRule.getHistoryService().deleteHistoricBatch(
-          historicBatch.getId());
+      engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
     }
   }
 
@@ -126,32 +112,29 @@ public class BatchUpdateSuspensionStateAuthorizationTest {
 
   @Test
   public void executeBatch() {
-    //given
+    // given
     testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
 
-    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
+    ProcessInstance processInstance1 = engineRule.getRuntimeService()
+        .startProcessInstanceByKey("Process");
 
-    authRule
-        .init(scenario)
-        .withUser("userId")
+    authRule.init(scenario).withUser("userId")
         .bindResource("processInstance1", processInstance1.getId())
         .bindResource("updateProcessInstanceSuspensionState", "*")
-        .bindResource("ProcessDefinition","Process")
-        .bindResource("batchId", "*")
-        .start();
+        .bindResource("ProcessDefinition", "Process").bindResource("batchId", "*").start();
 
-    Batch batch = engineRule.getRuntimeService()
-        .updateProcessInstanceSuspensionState()
-        .byProcessInstanceIds(processInstance1.getId())
-        .suspendAsync();
+    Batch batch = engineRule.getRuntimeService().updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(processInstance1.getId()).suspendAsync();
 
     if (batch != null) {
-      Job job = engineRule.getManagementService().createJobQuery().jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
+      Job job = engineRule.getManagementService().createJobQuery()
+          .jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
 
       // seed job
       engineRule.getManagementService().executeJob(job.getId());
 
-      for (Job pending : engineRule.getManagementService().createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
+      for (Job pending : engineRule.getManagementService().createJobQuery()
+          .jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
         engineRule.getManagementService().executeJob(pending.getId());
       }
     }

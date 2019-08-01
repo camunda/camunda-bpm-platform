@@ -25,7 +25,8 @@ import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-public class CreateTenantGroupMembershipCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
+public class CreateTenantGroupMembershipCmd extends AbstractWritableIdentityServiceCmd<Void>
+    implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -42,11 +43,11 @@ public class CreateTenantGroupMembershipCmd extends AbstractWritableIdentityServ
     ensureNotNull("tenantId", tenantId);
     ensureNotNull("groupId", groupId);
 
-    IdentityOperationResult operationResult = commandContext
-      .getWritableIdentityProvider()
-      .createTenantGroupMembership(tenantId, groupId);
-    
-    commandContext.getOperationLogManager().logMembershipOperation(operationResult, null, groupId, tenantId);
+    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider()
+        .createTenantGroupMembership(tenantId, groupId);
+
+    commandContext.getOperationLogManager().logMembershipOperation(operationResult, null, groupId,
+        tenantId);
 
     return null;
   }

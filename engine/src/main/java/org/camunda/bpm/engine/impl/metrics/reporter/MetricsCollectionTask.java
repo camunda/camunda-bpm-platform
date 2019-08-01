@@ -51,12 +51,10 @@ public class MetricsCollectionTask extends TimerTask {
   public void run() {
     try {
       collectMetrics();
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       try {
         LOG.couldNotCollectAndLogMetrics(e);
-      }
-      catch (Exception ex) {
+      } catch (Exception ex) {
         // ignore if log can't be written
       }
     }
@@ -66,9 +64,7 @@ public class MetricsCollectionTask extends TimerTask {
 
     final List<MeterLogEntity> logs = new ArrayList<MeterLogEntity>();
     for (Meter meter : metricsRegistry.getMeters().values()) {
-      logs.add(new MeterLogEntity(meter.getName(),
-          reporterId,
-          meter.getAndClear(),
+      logs.add(new MeterLogEntity(meter.getName(), reporterId, meter.getAndClear(),
           ClockUtil.getCurrentTime()));
 
     }
@@ -91,7 +87,5 @@ public class MetricsCollectionTask extends TimerTask {
   public void setReporter(String reporterId) {
     this.reporterId = reporterId;
   }
-
-
 
 }

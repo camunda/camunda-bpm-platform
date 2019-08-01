@@ -21,7 +21,9 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 
 /**
- * <p>The process engine holds a strong reference to the embedded process application.</p>
+ * <p>
+ * The process engine holds a strong reference to the embedded process application.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -38,7 +40,8 @@ public class EmbeddedProcessApplicationReferenceImpl implements ProcessApplicati
     return application.getName();
   }
 
-  public ProcessApplicationInterface getProcessApplication() throws ProcessApplicationUnavailableException {
+  public ProcessApplicationInterface getProcessApplication()
+      throws ProcessApplicationUnavailableException {
     return application;
   }
 

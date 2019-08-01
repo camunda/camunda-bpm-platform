@@ -32,65 +32,54 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 public class JobExecutorLogger extends ProcessEngineLogger {
 
   public void debugAcquiredJobNotFound(String jobId) {
-    logDebug(
-        "001", "Acquired job with id '{}' not found.", jobId);
+    logDebug("001", "Acquired job with id '{}' not found.", jobId);
   }
 
   public void exceptionWhileExecutingJob(JobEntity job, Throwable exception) {
-    logWarn(
-        "002", "Exception while executing job {}: ", job, exception);
+    logWarn("002", "Exception while executing job {}: ", job, exception);
   }
 
   public void debugFallbackToDefaultRetryStrategy() {
-    logDebug(
-        "003", "Falling back to default retry strategy");
+    logDebug("003", "Falling back to default retry strategy");
   }
 
   public void debugDecrementingRetriesForJob(String id) {
-    logDebug(
-        "004", "Decrementing retries of job {}", id);
+    logDebug("004", "Decrementing retries of job {}", id);
   }
 
   public void debugInitiallyAppyingRetryCycleForJob(String id, int times) {
-    logDebug(
-        "005", "Applying job retry time cycle for the first time for job {}, retires {}", id, times);
+    logDebug("005", "Applying job retry time cycle for the first time for job {}, retires {}", id,
+        times);
   }
 
   public void exceptionWhileExecutingJob(String nextJobId, Throwable t) {
-    if(t instanceof OptimisticLockingException && !isDebugEnabled()) {
-      logWarn(
-          "006", 
-          "Exception while executing job {}: {}. To see the full stacktrace set logging level to DEBUG.", 
+    if (t instanceof OptimisticLockingException && !isDebugEnabled()) {
+      logWarn("006",
+          "Exception while executing job {}: {}. To see the full stacktrace set logging level to DEBUG.",
           nextJobId, t.getClass().getSimpleName());
     } else {
-      logWarn(
-          "006", "Exception while executing job {}: ", nextJobId, t);
+      logWarn("006", "Exception while executing job {}: ", nextJobId, t);
     }
   }
 
-  public void couldNotDeterminePriority(ExecutionEntity execution, Object value, ProcessEngineException e) {
-    logWarn(
-        "007",
+  public void couldNotDeterminePriority(ExecutionEntity execution, Object value,
+      ProcessEngineException e) {
+    logWarn("007",
         "Could not determine priority for job created in context of execution {}. Using default priority {}",
         execution, value, e);
   }
 
   public void debugAddingNewExclusiveJobToJobExecutorCOntext(String jobId) {
-    logDebug(
-        "008",
-        "Adding new exclusive job to job executor context. Job Id='{}'", jobId);
+    logDebug("008", "Adding new exclusive job to job executor context. Job Id='{}'", jobId);
   }
 
   public void timeoutDuringShutdown() {
-    logWarn(
-        "009",
+    logWarn("009",
         "Timeout during shutdown of job executor. The current running jobs could not end within 60 seconds after shutdown operation");
   }
 
   public void interruptedWhileShuttingDownjobExecutor(InterruptedException e) {
-    logWarn(
-        "010",
-        "Interrupted while shutting down the job executor", e);
+    logWarn("010", "Interrupted while shutting down the job executor", e);
   }
 
   public void debugJobAcquisitionThreadSleeping(long millis) {
@@ -106,90 +95,74 @@ public class JobExecutorLogger extends ProcessEngineLogger {
   }
 
   public void startingUpJobExecutor(String name) {
-    logInfo(
-        "014", "Starting up the JobExecutor[{}].", name);
+    logInfo("014", "Starting up the JobExecutor[{}].", name);
   }
 
   public void shuttingDownTheJobExecutor(String name) {
-    logInfo(
-        "015", "Shutting down the JobExecutor[{}]", name);
+    logInfo("015", "Shutting down the JobExecutor[{}]", name);
   }
 
   public void ignoringSuspendedJob(ProcessDefinition processDefinition) {
-    logDebug(
-        "016",
-        "Ignoring job of suspended {}", processDefinition);
+    logDebug("016", "Ignoring job of suspended {}", processDefinition);
   }
 
   public void debugNotifyingJobExecutor(String string) {
-    logDebug(
-        "017", "Notifying Job Executor of new job {}", string);
+    logDebug("017", "Notifying Job Executor of new job {}", string);
   }
 
   public void startingToAcquireJobs(String name) {
-    logInfo(
-        "018", "{} starting to acquire jobs", name);
+    logInfo("018", "{} starting to acquire jobs", name);
   }
 
   public void exceptionDuringJobAcquisition(Exception e) {
-    logError(
-        "019", "Exception during job acquisition {}", e.getMessage(), e);
+    logError("019", "Exception during job acquisition {}", e.getMessage(), e);
   }
 
   public void stoppedJobAcquisition(String name) {
-    logInfo(
-        "020", "{} stopped job acquisition", name);
+    logInfo("020", "{} stopped job acquisition", name);
   }
 
   public void exceptionWhileUnlockingJob(String jobId, Throwable t) {
-    logWarn(
-        "021",
-        "Exception while unaquiring job {}: ", jobId, t);
+    logWarn("021", "Exception while unaquiring job {}: ", jobId, t);
   }
 
   public void acquiredJobs(String processEngine, AcquiredJobs acquiredJobs) {
-    logDebug(
-        "022",
-        "Acquired {} jobs for process engine '{}': {}", acquiredJobs.size(), processEngine, acquiredJobs.getJobIdBatches());
+    logDebug("022", "Acquired {} jobs for process engine '{}': {}", acquiredJobs.size(),
+        processEngine, acquiredJobs.getJobIdBatches());
   }
 
   public void executeJobs(String processEngine, Collection<String> jobs) {
-    logDebug(
-        "023",
-        "Execute jobs for process engine '{}': {}", processEngine, jobs);
+    logDebug("023", "Execute jobs for process engine '{}': {}", processEngine, jobs);
   }
 
   public void debugFailedJobNotFound(String jobId) {
-    logDebug(
-        "024", "Failed job with id '{}' not found.", jobId);
+    logDebug("024", "Failed job with id '{}' not found.", jobId);
   }
 
-  public ProcessEngineException wrapJobExecutionFailure(JobFailureCollector jobFailureCollector, Throwable cause) {
+  public ProcessEngineException wrapJobExecutionFailure(JobFailureCollector jobFailureCollector,
+      Throwable cause) {
     JobEntity job = jobFailureCollector.getJob();
     if (job != null) {
-      return new ProcessEngineException(exceptionMessage(
-        "025", "Exception while executing job {}: ", jobFailureCollector.getJob()), cause);
-    }
-    else {
-      return new ProcessEngineException(exceptionMessage(
-         "025", "Exception while executing job {}: ", jobFailureCollector.getJobId()), cause);
+      return new ProcessEngineException(exceptionMessage("025",
+          "Exception while executing job {}: ", jobFailureCollector.getJob()), cause);
+    } else {
+      return new ProcessEngineException(exceptionMessage("025",
+          "Exception while executing job {}: ", jobFailureCollector.getJobId()), cause);
     }
   }
 
   public ProcessEngineException jobNotFoundException(String jobId) {
-    return new ProcessEngineException(exceptionMessage(
-        "026", "No job found with id '{}'", jobId));
+    return new ProcessEngineException(exceptionMessage("026", "No job found with id '{}'", jobId));
   }
 
   public void exceptionWhileParsingExpression(String jobId, String exceptionMessage) {
-    logWarn(
-        "027", "Falling back to default retry strategy. Exception while executing job {}: {}", jobId, exceptionMessage);
+    logWarn("027", "Falling back to default retry strategy. Exception while executing job {}: {}",
+        jobId, exceptionMessage);
   }
 
   public void warnHistoryCleanupBatchWindowNotFound() {
-    logWarn(
-      "028",
-      "Batch window for history cleanup was not calculated. History cleanup job(s) will be suspended.");
+    logWarn("028",
+        "Batch window for history cleanup was not calculated. History cleanup job(s) will be suspended.");
   }
 
 }

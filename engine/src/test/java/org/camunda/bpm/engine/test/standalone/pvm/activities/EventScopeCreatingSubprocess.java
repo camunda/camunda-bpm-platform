@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
  * @author Daniel Meyer
  */
@@ -33,25 +32,26 @@ public class EventScopeCreatingSubprocess implements CompositeActivityBehavior {
 
   public void execute(ActivityExecution execution) throws Exception {
     List<PvmActivity> startActivities = new ArrayList<PvmActivity>();
-    for (PvmActivity activity: execution.getActivity().getActivities()) {
+    for (PvmActivity activity : execution.getActivity().getActivities()) {
       if (activity.getIncomingTransitions().isEmpty()) {
         startActivities.add(activity);
       }
     }
 
-    for (PvmActivity startActivity: startActivities) {
+    for (PvmActivity startActivity : startActivities) {
       execution.executeActivity(startActivity);
     }
   }
 
-  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
+  public void concurrentChildExecutionEnded(ActivityExecution scopeExecution,
+      ActivityExecution endedExecution) {
     endedExecution.remove();
     scopeExecution.tryPruneLastConcurrentChild();
   }
 
   /*
-   * Incoming execution is transformed into an event scope,
-   * new, non-concurrent execution leaves activity
+   * Incoming execution is transformed into an event scope, new, non-concurrent execution leaves
+   * activity
    */
   public void complete(ActivityExecution execution) {
 
@@ -62,12 +62,12 @@ public class EventScopeCreatingSubprocess implements CompositeActivityBehavior {
     // eventscope execution
     execution.setConcurrent(false);
     execution.setActive(false);
-    ((PvmExecutionImpl)execution).setEventScope(true);
+    ((PvmExecutionImpl) execution).setEventScope(true);
 
     List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
-    if(outgoingTransitions.isEmpty()) {
+    if (outgoingTransitions.isEmpty()) {
       outgoingExecution.end(true);
-    }else {
+    } else {
       outgoingExecution.leaveActivityViaTransitions(outgoingTransitions, Collections.EMPTY_LIST);
     }
   }

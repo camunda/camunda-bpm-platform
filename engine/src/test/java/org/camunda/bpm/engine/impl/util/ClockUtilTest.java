@@ -57,7 +57,7 @@ public class ClockUtilTest {
     Date target = new Date(new Date().getTime() + duration);
 
     ClockUtil.offset(duration);
-    
+
     Thread.sleep(1100L);
 
     assertThat(ClockUtil.now()).isCloseTo(target, TWO_SECONDS);
@@ -69,7 +69,7 @@ public class ClockUtilTest {
     Date target = new Date(new Date().getTime() + duration);
 
     ClockUtil.setCurrentTime(target);
-    
+
     Thread.sleep(1100L);
 
     assertThat(ClockUtil.now()).isCloseTo(target, ONE_SECOND);

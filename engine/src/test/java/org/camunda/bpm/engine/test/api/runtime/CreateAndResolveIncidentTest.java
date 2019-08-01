@@ -49,19 +49,23 @@ import static org.hamcrest.CoreMatchers.containsString;
 public class CreateAndResolveIncidentTest {
 
   protected ProcessEngineBootstrapRule processEngineBootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setCustomIncidentHandlers(Arrays.asList((IncidentHandler) new CustomIncidentHandler()));
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
+      configuration
+          .setCustomIncidentHandlers(Arrays.asList((IncidentHandler) new CustomIncidentHandler()));
       return configuration;
     }
   };
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(processEngineBootstrapRule);
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(
+      processEngineBootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(processEngineBootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(processEngineBootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
@@ -82,7 +86,8 @@ public class CreateAndResolveIncidentTest {
     Incident incident = runtimeService.createIncident("foo", processInstance.getId(), "aa", "bar");
 
     // then
-    Incident incident2 = runtimeService.createIncidentQuery().executionId(processInstance.getId()).singleResult();
+    Incident incident2 = runtimeService.createIncidentQuery().executionId(processInstance.getId())
+        .singleResult();
     assertEquals(incident2.getId(), incident.getId());
     assertEquals("foo", incident2.getIncidentType());
     assertEquals("aa", incident2.getConfiguration());
@@ -127,13 +132,15 @@ public class CreateAndResolveIncidentTest {
     // given
     testRule.deploy(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
-    Incident incident = runtimeService.createIncident("foo", processInstance.getId(), "userTask1", "bar");
+    Incident incident = runtimeService.createIncident("foo", processInstance.getId(), "userTask1",
+        "bar");
 
     // when
     runtimeService.resolveIncident(incident.getId());
 
     // then
-    Incident incident2 = runtimeService.createIncidentQuery().executionId(processInstance.getId()).singleResult();
+    Incident incident2 = runtimeService.createIncidentQuery().executionId(processInstance.getId())
+        .singleResult();
     assertNull(incident2);
   }
 
@@ -160,7 +167,8 @@ public class CreateAndResolveIncidentTest {
   @Test
   public void resolveIncidentOfTypeFailedJob() {
     // given
-    testRule.deploy("org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn");
+    testRule.deploy(
+        "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
 
     // when
@@ -170,11 +178,13 @@ public class CreateAndResolveIncidentTest {
       engineRule.getManagementService().setJobRetries(job.getId(), 1);
       try {
         engineRule.getManagementService().executeJob(job.getId());
-      } catch (Exception e) {}
+      } catch (Exception e) {
+      }
     }
 
     // then
-    Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
+    Incident incident = runtimeService.createIncidentQuery()
+        .processInstanceId(processInstance.getId()).singleResult();
     try {
       runtimeService.resolveIncident(incident.getId());
       fail("Exception expected");
@@ -190,7 +200,8 @@ public class CreateAndResolveIncidentTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
 
     // when
-    Incident incident = runtimeService.createIncident("custom", processInstance.getId(), "configuration");
+    Incident incident = runtimeService.createIncident("custom", processInstance.getId(),
+        "configuration");
 
     // then
     assertNotNull(incident);

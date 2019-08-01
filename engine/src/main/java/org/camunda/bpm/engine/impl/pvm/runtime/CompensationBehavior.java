@@ -24,26 +24,29 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
  * Contains the oddities required by compensation due to the execution structures it creates.
- * Anything that is a cross-cutting concern, but requires some extra compensation-specific conditions, should go here.
+ * Anything that is a cross-cutting concern, but requires some extra compensation-specific
+ * conditions, should go here.
  *
  * @author Thorben Lindhauer
  */
 public class CompensationBehavior {
 
   /**
-   * With compensation, we have a dedicated scope execution for every handler, even if the handler is not
-   * a scope activity; this must be respected when invoking end listeners, etc.
+   * With compensation, we have a dedicated scope execution for every handler, even if the handler
+   * is not a scope activity; this must be respected when invoking end listeners, etc.
    */
   public static boolean executesNonScopeCompensationHandler(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
 
-    return execution.isScope() && activity != null && activity.isCompensationHandler() && !activity.isScope();
+    return execution.isScope() && activity != null && activity.isCompensationHandler()
+        && !activity.isScope();
   }
 
   public static boolean isCompensationThrowing(PvmExecutionImpl execution) {
     ActivityImpl currentActivity = execution.getActivity();
     if (currentActivity != null) {
-      Boolean isCompensationThrowing = (Boolean) currentActivity.getProperty(BpmnParse.PROPERTYNAME_THROWS_COMPENSATION);
+      Boolean isCompensationThrowing = (Boolean) currentActivity
+          .getProperty(BpmnParse.PROPERTYNAME_THROWS_COMPENSATION);
       if (isCompensationThrowing != null && isCompensationThrowing) {
         return true;
       }
@@ -57,30 +60,30 @@ public class CompensationBehavior {
    *
    * This is the case if
    * <ul>
-   *   <li>the execution has an activity
-   *   <li>the execution is a scope
-   *   <li>the activity is a scope
-   *   <li>the execution has children
-   *   <li>the execution does not throw compensation
+   * <li>the execution has an activity
+   * <li>the execution is a scope
+   * <li>the activity is a scope
+   * <li>the execution has children
+   * <li>the execution does not throw compensation
    * </ul>
    */
   public static boolean executesDefaultCompensationHandler(PvmExecutionImpl scopeExecution) {
     ActivityImpl currentActivity = scopeExecution.getActivity();
 
     if (currentActivity != null) {
-      return scopeExecution.isScope()
-          && currentActivity.isScope()
+      return scopeExecution.isScope() && currentActivity.isScope()
           && !scopeExecution.getNonEventScopeExecutions().isEmpty()
           && !isCompensationThrowing(scopeExecution);
-    }
-    else {
+    } else {
       return false;
     }
   }
 
   public static String getParentActivityInstanceId(PvmExecutionImpl execution) {
-    Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = execution.createActivityExecutionMapping();
-    PvmExecutionImpl parentScopeExecution = activityExecutionMapping.get(execution.getActivity().getFlowScope());
+    Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = execution
+        .createActivityExecutionMapping();
+    PvmExecutionImpl parentScopeExecution = activityExecutionMapping
+        .get(execution.getActivity().getFlowScope());
 
     return parentScopeExecution.getParentActivityInstanceId();
   }

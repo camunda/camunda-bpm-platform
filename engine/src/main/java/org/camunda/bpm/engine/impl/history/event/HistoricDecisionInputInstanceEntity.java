@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * @author Philipp Ossler
  */
-public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements HistoricDecisionInputInstance, ValueFields {
+public class HistoricDecisionInputInstanceEntity extends HistoryEvent
+    implements HistoricDecisionInputInstance, ValueFields {
 
   private static final long serialVersionUID = 1L;
 
@@ -57,7 +58,8 @@ public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements
   public HistoricDecisionInputInstanceEntity(String rootProcessInstanceId, Date removalTime) {
     this.rootProcessInstanceId = rootProcessInstanceId;
     this.removalTime = removalTime;
-    byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY, getRootProcessInstanceId(), getRemovalTime());
+    byteArrayField = new ByteArrayField(this, ResourceTypes.HISTORY, getRootProcessInstanceId(),
+        getRemovalTime());
   }
 
   @Override
@@ -218,10 +220,7 @@ public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements
   public void delete() {
     byteArrayField.deleteByteArrayValue();
 
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .delete(this);
+    Context.getCommandContext().getDbEntityManager().delete(this);
   }
 
 }

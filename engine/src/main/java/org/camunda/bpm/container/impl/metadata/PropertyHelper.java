@@ -39,11 +39,13 @@ public class PropertyHelper {
   /**
    * Regex for Ant-style property placeholders
    */
-  private static final Pattern PROPERTY_TEMPLATE = Pattern.compile("([^\\$]*)\\$\\{(.+?)\\}([^\\$]*)");
+  private static final Pattern PROPERTY_TEMPLATE = Pattern
+      .compile("([^\\$]*)\\$\\{(.+?)\\}([^\\$]*)");
 
-  public static boolean getBooleanProperty(Map<String, String> properties, String name, boolean defaultValue) {
+  public static boolean getBooleanProperty(Map<String, String> properties, String name,
+      boolean defaultValue) {
     String value = properties.get(name);
-    if(value == null) {
+    if (value == null) {
       return defaultValue;
     } else {
       return Boolean.parseBoolean(value);
@@ -52,6 +54,7 @@ public class PropertyHelper {
 
   /**
    * Converts a value to the type of the given field.
+   * 
    * @param value
    * @param field
    * @return
@@ -60,14 +63,11 @@ public class PropertyHelper {
     Object propertyValue;
     if (clazz.isAssignableFrom(int.class)) {
       propertyValue = Integer.parseInt(value);
-    }
-    else if (clazz.isAssignableFrom(long.class)) {
+    } else if (clazz.isAssignableFrom(long.class)) {
       propertyValue = Long.parseLong(value);
-    }
-    else if (clazz.isAssignableFrom(float.class)) {
+    } else if (clazz.isAssignableFrom(float.class)) {
       propertyValue = Float.parseFloat(value);
-    }
-    else if (clazz.isAssignableFrom(boolean.class)) {
+    } else if (clazz.isAssignableFrom(boolean.class)) {
       propertyValue = Boolean.parseBoolean(value);
     } else {
       propertyValue = value;
@@ -80,30 +80,29 @@ public class PropertyHelper {
 
     Method setter = ReflectUtil.getSingleSetter(key, configurationClass);
 
-    if(setter != null) {
+    if (setter != null) {
       try {
         Class<?> parameterClass = setter.getParameterTypes()[0];
         Object value = PropertyHelper.convertToClass(stringValue, parameterClass);
 
         setter.invoke(configuration, value);
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         throw LOG.cannotSetValueForProperty(key, configurationClass.getCanonicalName(), e);
       }
-    }
-    else {
+    } else {
       throw LOG.cannotFindSetterForProperty(key, configurationClass.getCanonicalName());
     }
   }
 
   /**
-   * Sets an objects fields via reflection from String values.
-   * Depending on the field's type the respective values are converted to int or boolean.
+   * Sets an objects fields via reflection from String values. Depending on the field's type the
+   * respective values are converted to int or boolean.
    *
    * @param configuration
    * @param properties
-   * @throws ProcessEngineException if a property is supplied that matches no field or
-   * if the field's type is not String, nor int, nor boolean.
+   * @throws ProcessEngineException
+   *           if a property is supplied that matches no field or if the field's type is not String,
+   *           nor int, nor boolean.
    */
   public static void applyProperties(Object configuration, Map<String, String> properties) {
     for (Map.Entry<String, String> property : properties.entrySet()) {
@@ -111,24 +110,27 @@ public class PropertyHelper {
     }
   }
 
-
   /**
-   * Replaces Ant-style property references if the corresponding keys exist in the provided {@link Properties}.
+   * Replaces Ant-style property references if the corresponding keys exist in the provided
+   * {@link Properties}.
    *
-   * @param props contains possible replacements
-   * @param original may contain Ant-style templates
-   * @return the original string with replaced properties or the unchanged original string if no placeholder found.
+   * @param props
+   *          contains possible replacements
+   * @param original
+   *          may contain Ant-style templates
+   * @return the original string with replaced properties or the unchanged original string if no
+   *         placeholder found.
    */
   public static String resolveProperty(Properties props, String original) {
     Matcher matcher = PROPERTY_TEMPLATE.matcher(original);
     StringBuilder buffer = new StringBuilder();
     boolean found = false;
-    while(matcher.find()) {
+    while (matcher.find()) {
       found = true;
       String propertyName = matcher.group(2).trim();
       buffer.append(matcher.group(1))
-        .append(props.containsKey(propertyName) ? props.getProperty(propertyName) : "")
-        .append(matcher.group(3));
+          .append(props.containsKey(propertyName) ? props.getProperty(propertyName) : "")
+          .append(matcher.group(3));
     }
     return found ? buffer.toString() : original;
   }

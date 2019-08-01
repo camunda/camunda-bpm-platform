@@ -17,7 +17,9 @@
 package org.camunda.bpm.container.impl.metadata;
 
 /**
- * <p>Collection of constant string values used by the parsers.</p>
+ * <p>
+ * Collection of constant string values used by the parsers.
+ * </p>
  *
  * @author Daniel Meyer
  *

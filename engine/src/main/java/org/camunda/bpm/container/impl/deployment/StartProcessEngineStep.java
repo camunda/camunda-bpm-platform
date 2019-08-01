@@ -41,8 +41,10 @@ import static org.camunda.bpm.container.impl.deployment.Attachments.PROCESS_APPL
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
- * <p>Deployment operation step responsible for starting a managed process engine
- * inside the runtime container.</p>
+ * <p>
+ * Deployment operation step responsible for starting a managed process engine inside the runtime
+ * container.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -65,22 +67,24 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
   public void performOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final AbstractProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
+    final AbstractProcessApplication processApplication = operationContext
+        .getAttachment(PROCESS_APPLICATION);
 
     ClassLoader classLoader = null;
 
-    if(processApplication != null) {
+    if (processApplication != null) {
       classLoader = processApplication.getProcessApplicationClassloader();
     }
 
     String configurationClassName = processEngineXml.getConfigurationClass();
 
-    if(configurationClassName == null || configurationClassName.isEmpty()) {
+    if (configurationClassName == null || configurationClassName.isEmpty()) {
       configurationClassName = StandaloneProcessEngineConfiguration.class.getName();
     }
 
     // create & instantiate configuration class
-    Class<? extends ProcessEngineConfigurationImpl> configurationClass = loadClass(configurationClassName, classLoader, ProcessEngineConfigurationImpl.class);
+    Class<? extends ProcessEngineConfigurationImpl> configurationClass = loadClass(
+        configurationClassName, classLoader, ProcessEngineConfigurationImpl.class);
     ProcessEngineConfigurationImpl configuration = createInstance(configurationClass);
 
     // set UUid generator
@@ -103,38 +107,47 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
     // instantiate plugins:
     configurePlugins(configuration, processEngineXml, classLoader);
 
-    if(processEngineXml.getJobAcquisitionName() != null && !processEngineXml.getJobAcquisitionName().isEmpty()) {
+    if (processEngineXml.getJobAcquisitionName() != null
+        && !processEngineXml.getJobAcquisitionName().isEmpty()) {
       JobExecutor jobExecutor = getJobExecutorService(serviceContainer);
-      ensureNotNull("Cannot find referenced job executor with name '" + processEngineXml.getJobAcquisitionName() + "'", "jobExecutor", jobExecutor);
+      ensureNotNull("Cannot find referenced job executor with name '"
+          + processEngineXml.getJobAcquisitionName() + "'", "jobExecutor", jobExecutor);
 
       // set JobExecutor on process engine
       configurationImpl.setJobExecutor(jobExecutor);
     }
 
     // start the process engine inside the container.
-    JmxManagedProcessEngine managedProcessEngineService = createProcessEngineControllerInstance(configuration);
-    serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, configuration.getProcessEngineName(), managedProcessEngineService);
+    JmxManagedProcessEngine managedProcessEngineService = createProcessEngineControllerInstance(
+        configuration);
+    serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, configuration.getProcessEngineName(),
+        managedProcessEngineService);
 
   }
 
-  protected void setJobExecutorActivate(ProcessEngineConfigurationImpl configuration, Map<String, String> properties) {
+  protected void setJobExecutorActivate(ProcessEngineConfigurationImpl configuration,
+      Map<String, String> properties) {
     // override job executor auto activate: set to true in shared engine scenario
     // if it is not specified (see #CAM-4817)
     configuration.setJobExecutorActivate(true);
   }
 
-  protected JmxManagedProcessEngineController createProcessEngineControllerInstance(ProcessEngineConfigurationImpl configuration) {
+  protected JmxManagedProcessEngineController createProcessEngineControllerInstance(
+      ProcessEngineConfigurationImpl configuration) {
     return new JmxManagedProcessEngineController(configuration);
   }
 
   /**
-   * <p>Instantiates and applies all {@link ProcessEnginePlugin}s defined in the processEngineXml
+   * <p>
+   * Instantiates and applies all {@link ProcessEnginePlugin}s defined in the processEngineXml
    */
-  protected void configurePlugins(ProcessEngineConfigurationImpl configuration, ProcessEngineXml processEngineXml, ClassLoader classLoader) {
+  protected void configurePlugins(ProcessEngineConfigurationImpl configuration,
+      ProcessEngineXml processEngineXml, ClassLoader classLoader) {
 
     for (ProcessEnginePluginXml pluginXml : processEngineXml.getPlugins()) {
       // create plugin instance
-      Class<? extends ProcessEnginePlugin> pluginClass = loadClass(pluginXml.getPluginClass(), classLoader, ProcessEnginePlugin.class);
+      Class<? extends ProcessEnginePlugin> pluginClass = loadClass(pluginXml.getPluginClass(),
+          classLoader, ProcessEnginePlugin.class);
       ProcessEnginePlugin plugin = createInstance(pluginClass);
 
       // apply configured properties
@@ -150,7 +163,8 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
   protected JobExecutor getJobExecutorService(final PlatformServiceContainer serviceContainer) {
     // lookup container managed job executor
     String jobAcquisitionName = processEngineXml.getJobAcquisitionName();
-    JobExecutor jobExecutor = serviceContainer.getServiceValue(ServiceTypes.JOB_EXECUTOR, jobAcquisitionName);
+    JobExecutor jobExecutor = serviceContainer.getServiceValue(ServiceTypes.JOB_EXECUTOR,
+        jobAcquisitionName);
     return jobExecutor;
   }
 
@@ -159,19 +173,17 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> Class<? extends T> loadClass(String className, ClassLoader customClassloader, Class<T> clazz) {
+  protected <T> Class<? extends T> loadClass(String className, ClassLoader customClassloader,
+      Class<T> clazz) {
     try {
-      if(customClassloader != null) {
+      if (customClassloader != null) {
         return (Class<? extends T>) customClassloader.loadClass(className);
-      }
-      else {
+      } else {
         return (Class<? extends T>) ReflectUtil.loadClass(className);
       }
-    }
-    catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException e) {
       throw LOG.camnnotLoadConfigurationClass(className, e);
-    }
-    catch (ClassCastException e) {
+    } catch (ClassCastException e) {
       throw LOG.configurationClassHasWrongType(className, clazz, e);
     }
   }

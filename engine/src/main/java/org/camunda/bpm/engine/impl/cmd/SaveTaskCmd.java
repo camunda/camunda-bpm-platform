@@ -35,15 +35,15 @@ import org.camunda.bpm.engine.task.Task;
  */
 public class SaveTaskCmd implements Command<Void>, Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	protected TaskEntity task;
+  protected TaskEntity task;
 
-	public SaveTaskCmd(Task task) {
-		this.task = (TaskEntity) task;
-	}
+  public SaveTaskCmd(Task task) {
+    this.task = (TaskEntity) task;
+  }
 
-	public Void execute(CommandContext commandContext) {
+  public Void execute(CommandContext commandContext) {
     ensureNotNull("task", task);
 
     String operation;
@@ -60,7 +60,6 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         throw new NotValidException(e.getMessage(), e);
       }
 
-
     } else {
       checkTaskAssign(task, commandContext);
       task.update();
@@ -75,13 +74,15 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
   }
 
   protected void checkTaskAssign(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkTaskAssign(task);
     }
   }
 
   protected void checkCreateTask(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateTask(task);
     }
   }

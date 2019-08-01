@@ -30,7 +30,8 @@ public class PasswordPolicyResultImpl implements PasswordPolicyResult {
   protected List<PasswordPolicyRule> violatedRules;
   protected List<PasswordPolicyRule> fulfilledRules;
 
-  public PasswordPolicyResultImpl(List<PasswordPolicyRule> violatedRules, List<PasswordPolicyRule> fulfilledRules) {
+  public PasswordPolicyResultImpl(List<PasswordPolicyRule> violatedRules,
+      List<PasswordPolicyRule> fulfilledRules) {
     this.violatedRules = violatedRules;
     this.fulfilledRules = fulfilledRules;
   }

@@ -56,7 +56,6 @@ import org.slf4j.Logger;
 
 import junit.framework.AssertionFailedError;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -99,14 +98,16 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   @Override
   public void runBare() throws Throwable {
     initializeProcessEngine();
-    if (repositoryService==null) {
+    if (repositoryService == null) {
       initializeServices();
     }
 
     try {
 
-      boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, getClass(), getName());
-      boolean runsWithRequiredDatabase = TestHelper.annotationRequiredDatabaseCheck(processEngine, getClass(), getName());
+      boolean hasRequiredHistoryLevel = TestHelper
+          .annotationRequiredHistoryLevelCheck(processEngine, getClass(), getName());
+      boolean runsWithRequiredDatabase = TestHelper.annotationRequiredDatabaseCheck(processEngine,
+          getClass(), getName());
       // ignore test case when current history level is too low or database doesn't match
       if (hasRequiredHistoryLevel && runsWithRequiredDatabase) {
 
@@ -115,20 +116,17 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
         super.runBare();
       }
 
-    }
-    catch (AssertionFailedError e) {
+    } catch (AssertionFailedError e) {
       LOG.error("ASSERTION FAILED: " + e, e);
       exception = e;
       throw e;
 
-    }
-    catch (Throwable e) {
+    } catch (Throwable e) {
       LOG.error("EXCEPTION: " + e, e);
       exception = e;
       throw e;
 
-    }
-    finally {
+    } finally {
 
       identityService.clearAuthentication();
       processEngineConfiguration.setTenantCheckEnabled(true);
@@ -151,10 +149,10 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
   protected void deleteHistoryCleanupJobs() {
     final List<Job> jobs = historyService.findHistoryCleanupJobs();
-    for (final Job job: jobs) {
+    for (final Job job : jobs) {
       processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
         public Void execute(CommandContext commandContext) {
-            commandContext.getJobManager().deleteJob((JobEntity) job);
+          commandContext.getJobManager().deleteJob((JobEntity) job);
           return null;
         }
       });
@@ -162,11 +160,11 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   }
 
   protected void deleteDeployments() {
-    if(deploymentId != null) {
+    if (deploymentId != null) {
       deploymentIds.add(deploymentId);
     }
 
-    for(String deploymentId : deploymentIds) {
+    for (String deploymentId : deploymentIds) {
       TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
     }
 
@@ -175,7 +173,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   }
 
   protected void initializeServices() {
-    processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+    processEngineConfiguration = ((ProcessEngineImpl) processEngine)
+        .getProcessEngineConfiguration();
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
@@ -207,38 +206,32 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   }
 
   public void assertProcessEnded(final String processInstanceId) {
-    ProcessInstance processInstance = processEngine
-      .getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstanceId)
-      .singleResult();
+    ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).singleResult();
 
-    if (processInstance!=null) {
-      throw new AssertionFailedError("Expected finished process instance '"+processInstanceId+"' but it was still in the db");
+    if (processInstance != null) {
+      throw new AssertionFailedError("Expected finished process instance '" + processInstanceId
+          + "' but it was still in the db");
     }
   }
 
   public void assertProcessNotEnded(final String processInstanceId) {
-    ProcessInstance processInstance = processEngine
-      .getRuntimeService()
-      .createProcessInstanceQuery()
-      .processInstanceId(processInstanceId)
-      .singleResult();
+    ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery()
+        .processInstanceId(processInstanceId).singleResult();
 
-    if (processInstance==null) {
-      throw new AssertionFailedError("Expected process instance '"+processInstanceId+"' to be still active but it was not in the db");
+    if (processInstance == null) {
+      throw new AssertionFailedError("Expected process instance '" + processInstanceId
+          + "' to be still active but it was not in the db");
     }
   }
 
   public void assertCaseEnded(final String caseInstanceId) {
-    CaseInstance caseInstance = processEngine
-      .getCaseService()
-      .createCaseInstanceQuery()
-      .caseInstanceId(caseInstanceId)
-      .singleResult();
+    CaseInstance caseInstance = processEngine.getCaseService().createCaseInstanceQuery()
+        .caseInstanceId(caseInstanceId).singleResult();
 
-    if (caseInstance!=null) {
-      throw new AssertionFailedError("Expected finished case instance '"+caseInstanceId+"' but it was still in the db");
+    if (caseInstance != null) {
+      throw new AssertionFailedError(
+          "Expected finished case instance '" + caseInstanceId + "' but it was still in the db");
     }
   }
 
@@ -253,7 +246,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     long intervalMillis = 1000;
 
     int jobExecutorWaitTime = jobExecutor.getWaitTimeInMillis() * 2;
-    if(maxMillisToWait < jobExecutorWaitTime) {
+    if (maxMillisToWait < jobExecutorWaitTime) {
       maxMillisToWait = jobExecutorWaitTime;
     }
 
@@ -267,7 +260,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
           Thread.sleep(intervalMillis);
           try {
             areJobsAvailable = areJobsAvailable();
-          } catch(Throwable t) {
+          } catch (Throwable t) {
             // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
             // isolation level doesn't allow READ of the table
           }
@@ -286,7 +279,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   }
 
   @Deprecated
-  public void waitForJobExecutorOnCondition(long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
+  public void waitForJobExecutorOnCondition(long maxMillisToWait, long intervalMillis,
+      Callable<Boolean> condition) {
     waitForJobExecutorOnCondition(maxMillisToWait, condition);
   }
 
@@ -295,8 +289,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     jobExecutor.start();
     long intervalMillis = 500;
 
-    if(maxMillisToWait < (jobExecutor.getWaitTimeInMillis()*2)) {
-      maxMillisToWait = (jobExecutor.getWaitTimeInMillis()*2);
+    if (maxMillisToWait < (jobExecutor.getWaitTimeInMillis() * 2)) {
+      maxMillisToWait = (jobExecutor.getWaitTimeInMillis() * 2);
     }
 
     try {
@@ -311,7 +305,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
         }
       } catch (InterruptedException e) {
       } catch (Exception e) {
-        throw new ProcessEngineException("Exception while waiting on condition: "+e.getMessage(), e);
+        throw new ProcessEngineException("Exception while waiting on condition: " + e.getMessage(),
+            e);
       } finally {
         timer.cancel();
       }
@@ -332,24 +327,28 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   }
 
   /**
-   * Execute all available jobs recursively till no more jobs found or the number of executions is higher than expected.
+   * Execute all available jobs recursively till no more jobs found or the number of executions is
+   * higher than expected.
    *
-   * @param expectedExecutions number of expected job executions
+   * @param expectedExecutions
+   *          number of expected job executions
    *
-   * @throws AssertionFailedError when execute less or more jobs than expected
+   * @throws AssertionFailedError
+   *           when execute less or more jobs than expected
    *
    * @see #executeAvailableJobs()
    */
-  public void executeAvailableJobs(int expectedExecutions){
+  public void executeAvailableJobs(int expectedExecutions) {
     executeAvailableJobs(0, expectedExecutions, false);
   }
 
-  private void executeAvailableJobs(int jobsExecuted, int expectedExecutions, boolean ignoreLessExecutions) {
+  private void executeAvailableJobs(int jobsExecuted, int expectedExecutions,
+      boolean ignoreLessExecutions) {
     List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
 
     if (jobs.isEmpty()) {
-      assertTrue("executed less jobs than expected. expected <" + expectedExecutions + "> actual <" + jobsExecuted + ">",
-          jobsExecuted == expectedExecutions || ignoreLessExecutions);
+      assertTrue("executed less jobs than expected. expected <" + expectedExecutions + "> actual <"
+          + jobsExecuted + ">", jobsExecuted == expectedExecutions || ignoreLessExecutions);
       return;
     }
 
@@ -357,11 +356,12 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       try {
         managementService.executeJob(job.getId());
         jobsExecuted += 1;
-      } catch (Exception e) {}
+      } catch (Exception e) {
+      }
     }
 
-    assertTrue("executed more jobs than expected. expected <" + expectedExecutions + "> actual <" + jobsExecuted + ">",
-        jobsExecuted <= expectedExecutions);
+    assertTrue("executed more jobs than expected. expected <" + expectedExecutions + "> actual <"
+        + jobsExecuted + ">", jobsExecuted <= expectedExecutions);
 
     executeAvailableJobs(jobsExecuted, expectedExecutions, ignoreLessExecutions);
   }
@@ -369,7 +369,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   public boolean areJobsAvailable() {
     List<Job> list = managementService.createJobQuery().list();
     for (Job job : list) {
-      if (!job.isSuspended() && job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
+      if (!job.isSuspended() && job.getRetries() > 0
+          && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
         return true;
       }
     }
@@ -379,12 +380,15 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   private static class InterruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
+
     public InterruptTask(Thread thread) {
       this.thread = thread;
     }
+
     public boolean isTimeLimitExceeded() {
       return timeLimitExceeded;
     }
+
     @Override
     public void run() {
       timeLimitExceeded = true;
@@ -393,13 +397,15 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   }
 
   @Deprecated
-  protected List<ActivityInstance> getInstancesForActivitiyId(ActivityInstance activityInstance, String activityId) {
+  protected List<ActivityInstance> getInstancesForActivitiyId(ActivityInstance activityInstance,
+      String activityId) {
     return getInstancesForActivityId(activityInstance, activityId);
   }
 
-  protected List<ActivityInstance> getInstancesForActivityId(ActivityInstance activityInstance, String activityId) {
+  protected List<ActivityInstance> getInstancesForActivityId(ActivityInstance activityInstance,
+      String activityId) {
     List<ActivityInstance> result = new ArrayList<>();
-    if(activityInstance.getActivityId().equals(activityId)) {
+    if (activityInstance.getActivityId().equals(activityId)) {
       result.add(activityInstance);
     }
     for (ActivityInstance childInstance : activityInstance.getChildActivityInstances()) {
@@ -445,16 +451,17 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     return deployment(deploymentBuilder, resources);
   }
 
-  protected String deploymentForTenant(String tenantId, String classpathResource, BpmnModelInstance modelInstance) {
-    return deployment(repositoryService.createDeployment()
-        .tenantId(tenantId)
+  protected String deploymentForTenant(String tenantId, String classpathResource,
+      BpmnModelInstance modelInstance) {
+    return deployment(repositoryService.createDeployment().tenantId(tenantId)
         .addClasspathResource(classpathResource), modelInstance);
   }
 
-  protected String deployment(DeploymentBuilder deploymentBuilder, BpmnModelInstance... bpmnModelInstances) {
+  protected String deployment(DeploymentBuilder deploymentBuilder,
+      BpmnModelInstance... bpmnModelInstances) {
     for (int i = 0; i < bpmnModelInstances.length; i++) {
       BpmnModelInstance bpmnModelInstance = bpmnModelInstances[i];
-      deploymentBuilder.addModelInstance("testProcess-"+i+".bpmn", bpmnModelInstance);
+      deploymentBuilder.addModelInstance("testProcess-" + i + ".bpmn", bpmnModelInstance);
     }
 
     return deploymentWithBuilder(deploymentBuilder);

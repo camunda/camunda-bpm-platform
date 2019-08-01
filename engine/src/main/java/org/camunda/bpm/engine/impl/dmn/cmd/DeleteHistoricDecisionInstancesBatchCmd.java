@@ -44,7 +44,8 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
   protected HistoricDecisionInstanceQuery historicDecisionInstanceQuery;
   protected String deleteReason;
 
-  public DeleteHistoricDecisionInstancesBatchCmd(List<String> historicDecisionInstanceIds, HistoricDecisionInstanceQuery historicDecisionInstanceQuery, String deleteReason) {
+  public DeleteHistoricDecisionInstancesBatchCmd(List<String> historicDecisionInstanceIds,
+      HistoricDecisionInstanceQuery historicDecisionInstanceQuery, String deleteReason) {
     this.historicDecisionInstanceIds = historicDecisionInstanceIds;
     this.historicDecisionInstanceQuery = historicDecisionInstanceQuery;
     this.deleteReason = deleteReason;
@@ -76,7 +77,8 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
   @Override
   public Batch execute(CommandContext commandContext) {
     List<String> decisionInstanceIds = collectHistoricDecisionInstanceIds();
-    ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstanceIds", decisionInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstanceIds",
+        decisionInstanceIds);
 
     checkAuthorizations(commandContext, BatchPermissions.CREATE_BATCH_DELETE_DECISION_INSTANCES);
     writeUserOperationLog(commandContext, decisionInstanceIds.size());
@@ -100,16 +102,18 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
     propertyChanges.add(new PropertyChange("async", null, true));
     propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
-    commandContext.getOperationLogManager()
-      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, propertyChanges);
+    commandContext.getOperationLogManager().logDecisionInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, propertyChanges);
   }
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {
     return new BatchConfiguration(processInstanceIds);
   }
 
-  protected BatchJobHandler<BatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<BatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION);
+  protected BatchJobHandler<BatchConfiguration> getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
+    return (BatchJobHandler<BatchConfiguration>) processEngineConfiguration.getBatchHandlers()
+        .get(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION);
   }
 
 }

@@ -28,11 +28,9 @@ import java.io.Serializable;
  */
 public class FailingSerializable implements Serializable {
 
-
   private static final long serialVersionUID = 1L;
 
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     throw new ClassNotFoundException("Cannot load class FailingSerializable");
   }
 }
-

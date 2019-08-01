@@ -23,7 +23,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionOccur extends AbstractAtomicOperationCaseExecutionComplete {
+public class AtomicOperationCaseExecutionOccur
+    extends AbstractAtomicOperationCaseExecutionComplete {
 
   protected String getEventName() {
     return "occur";

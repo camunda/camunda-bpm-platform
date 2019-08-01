@@ -89,13 +89,15 @@ public class DelegateTaskTest {
     assertNotNull(task);
 
     @SuppressWarnings("unchecked")
-    Set<String> candidateUsers = (Set<String>) taskService.getVariable(task.getId(), DelegateTaskTestTaskListener.VARNAME_CANDIDATE_USERS);
+    Set<String> candidateUsers = (Set<String>) taskService.getVariable(task.getId(),
+        DelegateTaskTestTaskListener.VARNAME_CANDIDATE_USERS);
     assertEquals(2, candidateUsers.size());
     assertTrue(candidateUsers.contains("kermit"));
     assertTrue(candidateUsers.contains("gonzo"));
 
     @SuppressWarnings("unchecked")
-    Set<String> candidateGroups = (Set<String>) taskService.getVariable(task.getId(), DelegateTaskTestTaskListener.VARNAME_CANDIDATE_GROUPS);
+    Set<String> candidateGroups = (Set<String>) taskService.getVariable(task.getId(),
+        DelegateTaskTestTaskListener.VARNAME_CANDIDATE_GROUPS);
     assertEquals(2, candidateGroups.size());
     assertTrue(candidateGroups.contains("management"));
     assertTrue(candidateGroups.contains("accountancy"));
@@ -104,13 +106,9 @@ public class DelegateTaskTest {
   @Test
   public void testGetFollowUpDate() {
     // given
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask()
-        .camundaFollowUpDate(FOLLOW_UP_DATE_STRING)
-        .camundaTaskListenerClass("create", GetFollowUpDateListener.class)
-      .endEvent()
-      .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask().camundaFollowUpDate(FOLLOW_UP_DATE_STRING)
+        .camundaTaskListenerClass("create", GetFollowUpDateListener.class).endEvent().done();
 
     testRule.deploy(modelInstance);
 
@@ -128,12 +126,9 @@ public class DelegateTaskTest {
   @Test
   public void testSetFollowUpDate() {
     // given
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask()
-        .camundaTaskListenerClass("create", SetFollowUpDateListener.class)
-      .endEvent()
-      .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process").startEvent()
+        .userTask().camundaTaskListenerClass("create", SetFollowUpDateListener.class).endEvent()
+        .done();
 
     testRule.deploy(modelInstance);
 

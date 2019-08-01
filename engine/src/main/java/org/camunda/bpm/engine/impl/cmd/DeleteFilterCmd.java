@@ -36,11 +36,10 @@ public class DeleteFilterCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-    commandContext.getOperationLogManager().logFilterOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, filterId);
-    
-    commandContext
-      .getFilterManager()
-      .deleteFilter(filterId);
+    commandContext.getOperationLogManager()
+        .logFilterOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, filterId);
+
+    commandContext.getFilterManager().deleteFilter(filterId);
     return null;
   }
 

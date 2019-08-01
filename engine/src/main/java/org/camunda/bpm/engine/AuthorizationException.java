@@ -23,12 +23,16 @@ import java.util.List;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
 
 /**
- * <p>Exception thrown by the process engine in case a user tries to
- * interact with a resource in an unauthorized way.</p>
+ * <p>
+ * Exception thrown by the process engine in case a user tries to interact with a resource in an
+ * unauthorized way.
+ * </p>
  *
- * <p>The exception contains a list of Missing authorizations. The List is a
- * disjunction i.e. a user should have any of the authorization for the engine
- * to continue the execution beyond the point where it failed.</p>
+ * <p>
+ * The exception contains a list of Missing authorizations. The List is a disjunction i.e. a user
+ * should have any of the authorization for the engine to continue the execution beyond the point
+ * where it failed.
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -56,14 +60,14 @@ public class AuthorizationException extends ProcessEngineException {
     missingAuthorizations = new ArrayList<MissingAuthorization>();
   }
 
-  public AuthorizationException(String userId, String permissionName, String resourceType, String resourceId) {
+  public AuthorizationException(String userId, String permissionName, String resourceType,
+      String resourceId) {
     this(userId, new MissingAuthorization(permissionName, resourceType, resourceId));
   }
 
   public AuthorizationException(String userId, MissingAuthorization exceptionInfo) {
-    super(
-        "The user with id '"+userId+
-        "' does not have "+generateMissingAuthorizationMessage(exceptionInfo)+".");
+    super("The user with id '" + userId + "' does not have "
+        + generateMissingAuthorizationMessage(exceptionInfo) + ".");
     this.userId = userId;
     missingAuthorizations = new ArrayList<MissingAuthorization>();
     missingAuthorizations.add(exceptionInfo);
@@ -80,11 +84,11 @@ public class AuthorizationException extends ProcessEngineException {
   }
 
   /**
-   * @return the type of the resource if there
-   * is only one {@link MissingAuthorization}, {@code null} otherwise
+   * @return the type of the resource if there is only one {@link MissingAuthorization},
+   *         {@code null} otherwise
    *
-   * @deprecated Use {@link #getMissingAuthorizations()} to get the type of the resource
-   * of the {@link MissingAuthorization}(s). This method may be removed in future versions.
+   * @deprecated Use {@link #getMissingAuthorizations()} to get the type of the resource of the
+   *             {@link MissingAuthorization}(s). This method may be removed in future versions.
    */
   @Deprecated
   public String getResourceType() {
@@ -96,11 +100,11 @@ public class AuthorizationException extends ProcessEngineException {
   }
 
   /**
-   * @return the type of the violated permission name if there
-   * is only one {@link MissingAuthorization}, {@code null} otherwise
+   * @return the type of the violated permission name if there is only one
+   *         {@link MissingAuthorization}, {@code null} otherwise
    *
-   * @deprecated Use {@link #getMissingAuthorizations()} to get the violated permission name
-   * of the {@link MissingAuthorization}(s). This method may be removed in future versions.
+   * @deprecated Use {@link #getMissingAuthorizations()} to get the violated permission name of the
+   *             {@link MissingAuthorization}(s). This method may be removed in future versions.
    */
   @Deprecated
   public String getViolatedPermissionName() {
@@ -111,19 +115,19 @@ public class AuthorizationException extends ProcessEngineException {
   }
 
   /**
-   * @return id of the user in which context the request was made and who misses authorizations
-   *  to perform it successfully
+   * @return id of the user in which context the request was made and who misses authorizations to
+   *         perform it successfully
    */
   public String getUserId() {
     return userId;
   }
 
   /**
-   * @return the id of the resource if there
-   * is only one {@link MissingAuthorization}, {@code null} otherwise
+   * @return the id of the resource if there is only one {@link MissingAuthorization}, {@code null}
+   *         otherwise
    *
-   * @deprecated Use {@link #getMissingAuthorizations()} to get the id of the resource
-   * of the {@link MissingAuthorization}(s). This method may be removed in future versions.
+   * @deprecated Use {@link #getMissingAuthorizations()} to get the id of the resource of the
+   *             {@link MissingAuthorization}(s). This method may be removed in future versions.
    */
   @Deprecated
   public String getResourceId() {
@@ -134,8 +138,8 @@ public class AuthorizationException extends ProcessEngineException {
   }
 
   /**
-   * @return Disjunctive list of {@link MissingAuthorization} from
-   * which a user needs to have at least one for the authorization to pass
+   * @return Disjunctive list of {@link MissingAuthorization} from which a user needs to have at
+   *         least one for the authorization to pass
    */
   public List<MissingAuthorization> getMissingAuthorizations() {
     return Collections.unmodifiableList(missingAuthorizations);
@@ -144,17 +148,20 @@ public class AuthorizationException extends ProcessEngineException {
   /**
    * Generate exception message from the missing authorizations.
    *
-   * @param userId to use
-   * @param missingAuthorizations to use
+   * @param userId
+   *          to use
+   * @param missingAuthorizations
+   *          to use
    * @return The prepared exception message
    */
-  private static String generateExceptionMessage(String userId, List<MissingAuthorization> missingAuthorizations) {
+  private static String generateExceptionMessage(String userId,
+      List<MissingAuthorization> missingAuthorizations) {
     StringBuilder sBuilder = new StringBuilder();
     sBuilder.append("The user with id '");
     sBuilder.append(userId);
     sBuilder.append("' does not have one of the following permissions: ");
     boolean first = true;
-    for(MissingAuthorization missingAuthorization: missingAuthorizations) {
+    for (MissingAuthorization missingAuthorization : missingAuthorizations) {
       if (!first) {
         sBuilder.append(" or ");
       } else {
@@ -168,7 +175,8 @@ public class AuthorizationException extends ProcessEngineException {
   /**
    * Generated exception message for the missing authorization.
    *
-   * @param exceptionInfo to use
+   * @param exceptionInfo
+   *          to use
    */
   private static String generateMissingAuthorizationMessage(MissingAuthorization exceptionInfo) {
     StringBuilder builder = new StringBuilder();
@@ -178,7 +186,7 @@ public class AuthorizationException extends ProcessEngineException {
     builder.append("'");
     builder.append(permissionName);
     builder.append("' permission on resource '");
-    builder.append((resourceId != null ? (resourceId+"' of type '") : "" ));
+    builder.append((resourceId != null ? (resourceId + "' of type '") : ""));
     builder.append(resourceType);
     builder.append("'");
 

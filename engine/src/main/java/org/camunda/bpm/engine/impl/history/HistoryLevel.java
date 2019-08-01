@@ -24,29 +24,33 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 /**
- * <p>The history level controls what kind of data is logged to the history database.
- * More formally, it controls which history events are produced by the {@link HistoryEventProducer}.</p>
+ * <p>
+ * The history level controls what kind of data is logged to the history database. More formally, it
+ * controls which history events are produced by the {@link HistoryEventProducer}.
+ * </p>
  *
- * <p><strong>Built-in history levels:</strong> The process engine provides a set of built-in history levels
- * as default configuration. The built-in history levels are:
+ * <p>
+ * <strong>Built-in history levels:</strong> The process engine provides a set of built-in history
+ * levels as default configuration. The built-in history levels are:
  * <ul>
- *   <li>{@link #HISTORY_LEVEL_NONE}</li>
- *   <li>{@link #HISTORY_LEVEL_ACTIVITY}</li>
- *   <li>{@link #HISTORY_LEVEL_AUDIT}</li>
- *   <li>{@link #HISTORY_LEVEL_FULL}</li>
+ * <li>{@link #HISTORY_LEVEL_NONE}</li>
+ * <li>{@link #HISTORY_LEVEL_ACTIVITY}</li>
+ * <li>{@link #HISTORY_LEVEL_AUDIT}</li>
+ * <li>{@link #HISTORY_LEVEL_FULL}</li>
  * </ul>
  * This class provides singleton instances of these history levels as constants.
  * </p>
  *
- * <p><strong>Custom history levels:</strong>In order to implement a custom history level,
- * the following steps are necessary:
+ * <p>
+ * <strong>Custom history levels:</strong>In order to implement a custom history level, the
+ * following steps are necessary:
  * <ul>
- *   <li>Provide a custom implementation of this interface. Note: Make sure you choose unique values for
- *   {@link #getName()} and {@link #getId()}</li>
- *   <li>Add an instance of the custom implementation through
- *   {@link ProcessEngineConfigurationImpl#setCustomHistoryLevels(java.util.List)}</li>
- *   <li>use the name of your history level (as returned by {@link #getName()} as value for
- *   {@link ProcessEngineConfiguration#setHistory(String)}</li>
+ * <li>Provide a custom implementation of this interface. Note: Make sure you choose unique values
+ * for {@link #getName()} and {@link #getId()}</li>
+ * <li>Add an instance of the custom implementation through
+ * {@link ProcessEngineConfigurationImpl#setCustomHistoryLevels(java.util.List)}</li>
+ * <li>use the name of your history level (as returned by {@link #getName()} as value for
+ * {@link ProcessEngineConfiguration#setHistory(String)}</li>
  * </ul>
  * </p>
  *
@@ -60,23 +64,30 @@ public interface HistoryLevel {
   static HistoryLevel HISTORY_LEVEL_AUDIT = new HistoryLevelAudit();
   static HistoryLevel HISTORY_LEVEL_FULL = new HistoryLevelFull();
 
-  /** An unique id identifying the history level.
-   * The id is used internally to uniquely identify the history level and also stored in the database.
+  /**
+   * An unique id identifying the history level. The id is used internally to uniquely identify the
+   * history level and also stored in the database.
    */
   int getId();
 
-  /** An unique name identifying the history level.
-   * The name of the history level can be used when configuring the process engine.
+  /**
+   * An unique name identifying the history level. The name of the history level can be used when
+   * configuring the process engine.
+   * 
    * @see {@link ProcessEngineConfiguration#setHistory(String)}
    */
   String getName();
 
   /**
    * Returns true if a given history event should be produced.
-   * @param eventType the type of the history event which is about to be produced
-   * @param entity the runtime structure used to produce the history event. Examples {@link ExecutionEntity},
-   * {@link TaskEntity}, {@link VariableInstanceEntity}, ... If a 'null' value is provided, the implementation
-   * should return true if events of this type should be produced "in general".
+   * 
+   * @param eventType
+   *          the type of the history event which is about to be produced
+   * @param entity
+   *          the runtime structure used to produce the history event. Examples
+   *          {@link ExecutionEntity}, {@link TaskEntity}, {@link VariableInstanceEntity}, ... If a
+   *          'null' value is provided, the implementation should return true if events of this type
+   *          should be produced "in general".
    */
   boolean isHistoryEventProduced(HistoryEventType eventType, Object entity);
 

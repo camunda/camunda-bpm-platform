@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 /**
  * @author Bernd Ruecker
  */
@@ -38,20 +37,23 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
 
     List<String> activeActivities = runtimeService.getActiveActivityIds(pi.getId());
     // assert that now the first receive task is active
-    assertEquals(Arrays.asList(new String []{"waitAfterLink1"}), activeActivities);
+    assertEquals(Arrays.asList(new String[] { "waitAfterLink1" }), activeActivities);
 
     runtimeService.signal(pi.getId());
 
     activeActivities = runtimeService.getActiveActivityIds(pi.getId());
     // assert that now the second receive task is active
-    assertEquals(Arrays.asList(new String []{"waitAfterLink2"}), activeActivities);
+    assertEquals(Arrays.asList(new String[] { "waitAfterLink2" }), activeActivities);
 
     runtimeService.signal(pi.getId());
     assertProcessEnded(pi.getId());
 
     // validate history
-    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).orderByActivityId().asc().list();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+      List<HistoricActivityInstance> activities = historyService
+          .createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).orderByActivityId()
+          .asc().list();
       assertEquals(4, activities.size());
       assertEquals("EndEvent_1", activities.get(0).getActivityId());
       assertEquals("StartEvent_1", activities.get(1).getActivityId());
@@ -67,13 +69,17 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
     List<String> activeActivities = runtimeService.getActiveActivityIds(pi.getId());
 
     // assert that the link event was triggered and that we are
-    assertEquals(Arrays.asList(new String []{"WaitAfterLink", "WaitAfterLink"}), activeActivities);
+    assertEquals(Arrays.asList(new String[] { "WaitAfterLink", "WaitAfterLink" }),
+        activeActivities);
 
     runtimeService.deleteProcessInstance(pi.getId(), "test done");
 
     // validate history
-    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).orderByActivityId().asc().list();
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+      List<HistoricActivityInstance> activities = historyService
+          .createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).orderByActivityId()
+          .asc().list();
       assertEquals(5, activities.size());
       assertEquals("ManualTask_1", activities.get(0).getActivityId());
       assertEquals("ParallelGateway_1", activities.get(1).getActivityId());
@@ -86,21 +92,27 @@ public class LinkEventTest extends PluggableProcessEngineTestCase {
 
   public void testInvalidEventLinkMultipleTargets() {
     try {
-      repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/link/LinkEventTest.testInvalidEventLinkMultipleTargets.bpmn20.xml").deploy();
-      fail("process should not deploy because it contains multiple event link targets which is invalid in the BPMN 2.0 spec");
-    }
-    catch (Exception ex) {
-      assertTrue(ex.getMessage().contains("Multiple Intermediate Catch Events with the same link event name ('LinkA') are not allowed"));
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/event/link/LinkEventTest.testInvalidEventLinkMultipleTargets.bpmn20.xml")
+          .deploy();
+      fail(
+          "process should not deploy because it contains multiple event link targets which is invalid in the BPMN 2.0 spec");
+    } catch (Exception ex) {
+      assertTrue(ex.getMessage().contains(
+          "Multiple Intermediate Catch Events with the same link event name ('LinkA') are not allowed"));
     }
   }
 
   public void testCatchLinkEventAfterEventBasedGatewayNotAllowed() {
     try {
-      repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/link/LinkEventTest.testCatchLinkEventAfterEventBasedGatewayNotAllowed.bpmn20.xml").deploy();
-      fail("process should not deploy because it contains multiple event link targets which is invalid in the BPMN 2.0 spec");
-    }
-    catch (Exception ex) {
-      assertTrue(ex.getMessage().contains("IntermediateCatchLinkEvent is not allowed after an EventBasedGateway."));
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/event/link/LinkEventTest.testCatchLinkEventAfterEventBasedGatewayNotAllowed.bpmn20.xml")
+          .deploy();
+      fail(
+          "process should not deploy because it contains multiple event link targets which is invalid in the BPMN 2.0 spec");
+    } catch (Exception ex) {
+      assertTrue(ex.getMessage()
+          .contains("IntermediateCatchLinkEvent is not allowed after an EventBasedGateway."));
     }
   }
 }

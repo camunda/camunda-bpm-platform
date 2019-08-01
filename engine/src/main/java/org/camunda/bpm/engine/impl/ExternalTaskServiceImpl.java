@@ -52,16 +52,21 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
     complete(externalTaskId, workerId, variables, null);
   }
 
-  public void complete(String externalTaskId, String workerId, Map<String, Object> variables, Map<String, Object> localVariables) {
-    commandExecutor.execute(new CompleteExternalTaskCmd(externalTaskId, workerId, variables, localVariables));
+  public void complete(String externalTaskId, String workerId, Map<String, Object> variables,
+      Map<String, Object> localVariables) {
+    commandExecutor
+        .execute(new CompleteExternalTaskCmd(externalTaskId, workerId, variables, localVariables));
   }
 
-  public void handleFailure(String externalTaskId, String workerId, String errorMessage, int retries, long retryDuration) {
-    this.handleFailure(externalTaskId,workerId,errorMessage,null,retries,retryDuration);
+  public void handleFailure(String externalTaskId, String workerId, String errorMessage,
+      int retries, long retryDuration) {
+    this.handleFailure(externalTaskId, workerId, errorMessage, null, retries, retryDuration);
   }
 
-  public void handleFailure(String externalTaskId, String workerId, String errorMessage, String errorDetails, int retries, long retryDuration) {
-    commandExecutor.execute(new HandleExternalTaskFailureCmd(externalTaskId, workerId, errorMessage, errorDetails, retries, retryDuration));
+  public void handleFailure(String externalTaskId, String workerId, String errorMessage,
+      String errorDetails, int retries, long retryDuration) {
+    commandExecutor.execute(new HandleExternalTaskFailureCmd(externalTaskId, workerId, errorMessage,
+        errorDetails, retries, retryDuration));
   }
 
   @Override
@@ -70,13 +75,16 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   }
 
   @Override
-  public void handleBpmnError(String externalTaskId, String workerId, String errorCode, String errorMessage) {
+  public void handleBpmnError(String externalTaskId, String workerId, String errorCode,
+      String errorMessage) {
     handleBpmnError(externalTaskId, workerId, errorCode, errorMessage, null);
   }
 
   @Override
-  public void handleBpmnError(String externalTaskId, String workerId, String errorCode, String errorMessage, Map<String, Object> variables) {
-    commandExecutor.execute(new HandleExternalTaskBpmnErrorCmd(externalTaskId, workerId, errorCode, errorMessage, variables));
+  public void handleBpmnError(String externalTaskId, String workerId, String errorCode,
+      String errorMessage, Map<String, Object> variables) {
+    commandExecutor.execute(new HandleExternalTaskBpmnErrorCmd(externalTaskId, workerId, errorCode,
+        errorMessage, variables));
   }
 
   public void unlock(String externalTaskId) {
@@ -84,7 +92,8 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   }
 
   public void setRetries(String externalTaskId, int retries, boolean writeUserOperationLog) {
-    commandExecutor.execute(new SetExternalTaskRetriesCmd(externalTaskId, retries, writeUserOperationLog));
+    commandExecutor
+        .execute(new SetExternalTaskRetriesCmd(externalTaskId, retries, writeUserOperationLog));
   }
 
   @Override
@@ -105,15 +114,12 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   }
 
   public void setRetries(List<String> externalTaskIds, int retries) {
-    updateRetries()
-      .externalTaskIds(externalTaskIds)
-      .set(retries);
+    updateRetries().externalTaskIds(externalTaskIds).set(retries);
   }
 
-  public Batch setRetriesAsync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries) {
-    return updateRetries()
-        .externalTaskIds(externalTaskIds)
-        .externalTaskQuery(externalTaskQuery)
+  public Batch setRetriesAsync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery,
+      int retries) {
+    return updateRetries().externalTaskIds(externalTaskIds).externalTaskQuery(externalTaskQuery)
         .setAsync(retries);
   }
 
@@ -123,7 +129,8 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
 
   @Override
   public void extendLock(String externalTaskId, String workerId, long lockDuration) {
-    commandExecutor.execute(new ExtendLockOnExternalTaskCmd(externalTaskId, workerId, lockDuration));
+    commandExecutor
+        .execute(new ExtendLockOnExternalTaskCmd(externalTaskId, workerId, lockDuration));
   }
 
 }

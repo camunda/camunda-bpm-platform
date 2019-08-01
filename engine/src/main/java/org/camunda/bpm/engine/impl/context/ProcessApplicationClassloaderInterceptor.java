@@ -21,10 +21,9 @@ import java.util.concurrent.Callable;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 
 /**
- * Wrapps the user-provided {@link Callable} and records the
- * Thread Context Classloader after the context switch has been performed.
- * This allows detecting if the Thread Context has been manipulated by the container after that
- * (Usually due to cross application EJB invocations).
+ * Wrapps the user-provided {@link Callable} and records the Thread Context Classloader after the
+ * context switch has been performed. This allows detecting if the Thread Context has been
+ * manipulated by the container after that (Usually due to cross application EJB invocations).
  *
  * @author Daniel Meyer
  *
@@ -47,8 +46,7 @@ public class ProcessApplicationClassloaderInterceptor<T> implements Callable<T> 
       // proceed with delegate callable invocation
       return delegate.call();
 
-    }
-    finally {
+    } finally {
       PA_CLASSLOADER.remove();
     }
   }

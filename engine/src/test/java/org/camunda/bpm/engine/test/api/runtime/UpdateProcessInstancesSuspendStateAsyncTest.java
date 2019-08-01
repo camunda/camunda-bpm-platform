@@ -37,12 +37,10 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import org.python.google.common.collect.Sets;
 
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 
 public class UpdateProcessInstancesSuspendStateAsyncTest {
 
@@ -55,7 +53,6 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
-
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
@@ -71,147 +68,191 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
     helper.removeAllRunningAndHistoricBatches();
   }
 
-
-
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   public void testBatchSuspensionById() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     // when
-    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
+    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+        .suspendAsync();
     helper.executeSeedJob(suspendprocess);
     helper.executeJobs(suspendprocess);
 
-
     // then
-    ProcessInstance p1c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance1.getId()).singleResult();
+    ProcessInstance p1c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
     assertTrue(p1c.isSuspended());
-    ProcessInstance p2c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).singleResult();
+    ProcessInstance p2c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
     assertTrue(p2c.isSuspended());
 
   }
 
-
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   public void testBatchActivationById() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     // when
-    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).suspendAsync();
+    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+        .suspendAsync();
     helper.executeSeedJob(suspendprocess);
     helper.executeJobs(suspendprocess);
-    Batch activateprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId())).activateAsync();
+    Batch activateprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId()))
+        .activateAsync();
     helper.executeSeedJob(activateprocess);
     helper.executeJobs(activateprocess);
 
-
     // then
-    ProcessInstance p1c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance1.getId()).singleResult();
+    ProcessInstance p1c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
     assertFalse(p1c.isSuspended());
-    ProcessInstance p2c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).singleResult();
+    ProcessInstance p2c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
     assertFalse(p2c.isSuspended());
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   public void testBatchSuspensionByProcessInstanceQuery() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     // when
-    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().active()).suspendAsync();
+    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().active())
+        .suspendAsync();
     helper.executeSeedJob(suspendprocess);
     helper.executeJobs(suspendprocess);
 
-
     // then
-    ProcessInstance p1c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance1.getId()).singleResult();
+    ProcessInstance p1c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
     assertTrue(p1c.isSuspended());
-    ProcessInstance p2c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).singleResult();
+    ProcessInstance p2c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
     assertTrue(p2c.isSuspended());
 
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   public void testBatchActivationByProcessInstanceQuery() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     // when
-    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().active()).suspendAsync();
+    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().active())
+        .suspendAsync();
     helper.executeSeedJob(suspendprocess);
     helper.executeJobs(suspendprocess);
-    Batch activateprocess = runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().suspended()).activateAsync();
+    Batch activateprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceQuery(runtimeService.createProcessInstanceQuery().suspended())
+        .activateAsync();
     helper.executeSeedJob(activateprocess);
     helper.executeJobs(activateprocess);
 
-
     // then
-    ProcessInstance p1c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance1.getId()).singleResult();
+    ProcessInstance p1c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
     assertFalse(p1c.isSuspended());
-    ProcessInstance p2c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).singleResult();
+    ProcessInstance p2c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
     assertFalse(p2c.isSuspended());
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testBatchSuspensionByHistoricProcessInstanceQuery() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     // when
-    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byHistoricProcessInstanceQuery(historyService.createHistoricProcessInstanceQuery().processInstanceIds(Sets.newHashSet(processInstance1.getId(), processInstance2.getId()))).suspendAsync();
+    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byHistoricProcessInstanceQuery(
+            historyService.createHistoricProcessInstanceQuery().processInstanceIds(
+                Sets.newHashSet(processInstance1.getId(), processInstance2.getId())))
+        .suspendAsync();
     helper.executeSeedJob(suspendprocess);
     helper.executeJobs(suspendprocess);
 
-
     // then
-    ProcessInstance p1c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance1.getId()).singleResult();
+    ProcessInstance p1c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
     assertTrue(p1c.isSuspended());
-    ProcessInstance p2c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).singleResult();
+    ProcessInstance p2c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
     assertTrue(p2c.isSuspended());
 
   }
 
-
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testBatchActivationByHistoricProcessInstanceQuery() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     // when
-    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState().byHistoricProcessInstanceQuery(historyService.createHistoricProcessInstanceQuery().processInstanceIds(Sets.newHashSet(processInstance1.getId(), processInstance2.getId()))).suspendAsync();
+    Batch suspendprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byHistoricProcessInstanceQuery(
+            historyService.createHistoricProcessInstanceQuery().processInstanceIds(
+                Sets.newHashSet(processInstance1.getId(), processInstance2.getId())))
+        .suspendAsync();
     helper.executeSeedJob(suspendprocess);
     helper.executeJobs(suspendprocess);
-    Batch activateprocess = runtimeService.updateProcessInstanceSuspensionState().byHistoricProcessInstanceQuery(historyService.createHistoricProcessInstanceQuery().processInstanceIds(Sets.newHashSet(processInstance1.getId(), processInstance2.getId()))).activateAsync();
+    Batch activateprocess = runtimeService.updateProcessInstanceSuspensionState()
+        .byHistoricProcessInstanceQuery(
+            historyService.createHistoricProcessInstanceQuery().processInstanceIds(
+                Sets.newHashSet(processInstance1.getId(), processInstance2.getId())))
+        .activateAsync();
     helper.executeSeedJob(activateprocess);
     helper.executeJobs(activateprocess);
 
-
     // then
-    ProcessInstance p1c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance1.getId()).singleResult();
+    ProcessInstance p1c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
     assertFalse(p1c.isSuspended());
-    ProcessInstance p2c = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance2.getId()).singleResult();
+    ProcessInstance p2c = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
     assertFalse(p2c.isSuspended());
   }
 
@@ -239,39 +280,47 @@ public class UpdateProcessInstancesSuspendStateAsyncTest {
     // when
     runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().activateAsync();
 
-
   }
 
-
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   public void testNullProcessInstanceListActivateAsync() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     thrown.expect(BadUserRequestException.class);
     thrown.expectMessage("Cannot be null");
 
     // when
-    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).activateAsync();
+    runtimeService.updateProcessInstanceSuspensionState()
+        .byProcessInstanceIds(
+            Arrays.asList(processInstance1.getId(), processInstance2.getId(), null))
+        .activateAsync();
 
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
-    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml" })
   public void testNullProcessInstanceListSuspendAsync() {
     // given
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+    ProcessInstance processInstance1 = runtimeService
+        .startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService
+        .startProcessInstanceByKey("twoExternalTaskProcess");
 
     thrown.expect(BadUserRequestException.class);
     thrown.expectMessage("Cannot be null");
 
     // when
-    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).suspendAsync();
+    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(
+        Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).suspendAsync();
 
   }
 }

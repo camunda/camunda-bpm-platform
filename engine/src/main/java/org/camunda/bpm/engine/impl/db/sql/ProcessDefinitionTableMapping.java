@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.db.sql;
 
-
 /**
  * @author Thorben Lindhauer
  *

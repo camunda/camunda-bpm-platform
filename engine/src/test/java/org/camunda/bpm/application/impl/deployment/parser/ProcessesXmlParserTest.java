@@ -29,7 +29,9 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import junit.framework.TestCase;
 
 /**
- * <p>The testcases for the {@link ProcessesXmlParser}</p>
+ * <p>
+ * The testcases for the {@link ProcessesXmlParser}
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -51,9 +53,7 @@ public class ProcessesXmlParserTest extends TestCase {
   public void testParseProcessesXmlOneEngine() {
 
     ProcessesXml processesXml = parser.createParse()
-      .sourceUrl(getStreamUrl("process_xml_one_engine.xml"))
-      .execute()
-      .getProcessesXml();
+        .sourceUrl(getStreamUrl("process_xml_one_engine.xml")).execute().getProcessesXml();
 
     assertNotNull(processesXml);
 
@@ -78,9 +78,7 @@ public class ProcessesXmlParserTest extends TestCase {
   public void testParseProcessesXmlTwoEngines() {
 
     ProcessesXml processesXml = parser.createParse()
-      .sourceUrl(getStreamUrl("process_xml_two_engines.xml"))
-      .execute()
-      .getProcessesXml();
+        .sourceUrl(getStreamUrl("process_xml_two_engines.xml")).execute().getProcessesXml();
 
     assertNotNull(processesXml);
 
@@ -114,9 +112,7 @@ public class ProcessesXmlParserTest extends TestCase {
   public void testParseProcessesXmlOneArchive() {
 
     ProcessesXml processesXml = parser.createParse()
-      .sourceUrl(getStreamUrl("process_xml_one_archive.xml"))
-      .execute()
-      .getProcessesXml();
+        .sourceUrl(getStreamUrl("process_xml_one_archive.xml")).execute().getProcessesXml();
 
     assertNotNull(processesXml);
 
@@ -144,15 +140,12 @@ public class ProcessesXmlParserTest extends TestCase {
   public void testParseProcessesXmlTwoArchives() {
 
     ProcessesXml processesXml = parser.createParse()
-      .sourceUrl(getStreamUrl("process_xml_two_archives.xml"))
-      .execute()
-      .getProcessesXml();
+        .sourceUrl(getStreamUrl("process_xml_two_archives.xml")).execute().getProcessesXml();
 
     assertNotNull(processesXml);
 
     assertEquals(0, processesXml.getProcessEngines().size());
     assertEquals(2, processesXml.getProcessArchives().size());
-
 
     ProcessArchiveXml archiveXml1 = processesXml.getProcessArchives().get(0);
     assertEquals("pa1", archiveXml1.getName());
@@ -188,9 +181,8 @@ public class ProcessesXmlParserTest extends TestCase {
   public void testParseProcessesXmlTwoArchivesAndTwoEngines() {
 
     ProcessesXml processesXml = parser.createParse()
-      .sourceUrl(getStreamUrl("process_xml_two_archives_two_engines.xml"))
-      .execute()
-      .getProcessesXml();
+        .sourceUrl(getStreamUrl("process_xml_two_archives_two_engines.xml")).execute()
+        .getProcessesXml();
 
     assertNotNull(processesXml);
 
@@ -258,13 +250,11 @@ public class ProcessesXmlParserTest extends TestCase {
 
     // this test is to make sure that XML Schema Validation works.
     try {
-      parser.createParse()
-        .sourceUrl(getStreamUrl("process_xml_engine_no_name.xml"))
-        .execute();
+      parser.createParse().sourceUrl(getStreamUrl("process_xml_engine_no_name.xml")).execute();
 
       fail("exception expected");
 
-    } catch(ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       // expected
     }
 
@@ -273,8 +263,7 @@ public class ProcessesXmlParserTest extends TestCase {
   public void FAILING_testParseProcessesXmlClassLineBreak() {
 
     ProcessesXml processesXml = parser.createParse()
-        .sourceUrl(getStreamUrl("process_xml_one_archive_with_line_break.xml"))
-        .execute()
+        .sourceUrl(getStreamUrl("process_xml_one_archive_with_line_break.xml")).execute()
         .getProcessesXml();
 
     assertNotNull(processesXml);
@@ -289,9 +278,7 @@ public class ProcessesXmlParserTest extends TestCase {
   public void testParseProcessesXmlNsPrefix() {
 
     ProcessesXml processesXml = parser.createParse()
-      .sourceUrl(getStreamUrl("process_xml_ns_prefix.xml"))
-      .execute()
-      .getProcessesXml();
+        .sourceUrl(getStreamUrl("process_xml_ns_prefix.xml")).execute().getProcessesXml();
 
     assertNotNull(processesXml);
 
@@ -303,9 +290,7 @@ public class ProcessesXmlParserTest extends TestCase {
   public void testParseProcessesXmlTenantId() {
 
     ProcessesXml processesXml = parser.createParse()
-      .sourceUrl(getStreamUrl("process_xml_tenant_id.xml"))
-      .execute()
-      .getProcessesXml();
+        .sourceUrl(getStreamUrl("process_xml_tenant_id.xml")).execute().getProcessesXml();
 
     assertNotNull(processesXml);
     assertEquals(2, processesXml.getProcessArchives().size());

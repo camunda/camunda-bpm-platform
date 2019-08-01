@@ -65,14 +65,8 @@ public class ModificationExecutionSyncTest {
 
   @Before
   public void createBpmnModelInstance() {
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .userTask("user1")
-        .sequenceFlowId("seq")
-        .userTask("user2")
-        .userTask("user3")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").userTask("user1")
+        .sequenceFlowId("seq").userTask("user2").userTask("user3").endEvent("end").done();
   }
 
   @Before
@@ -89,7 +83,8 @@ public class ModificationExecutionSyncTest {
   public void createSimpleModificationPlan() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     List<String> instances = helper.startInstances("process1", 2);
-    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("user2").cancelAllForActivity("user1").processInstanceIds(instances).execute();
+    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("user2")
+        .cancelAllForActivity("user1").processInstanceIds(instances).execute();
 
     for (String instanceId : instances) {
 
@@ -103,7 +98,8 @@ public class ModificationExecutionSyncTest {
   public void createModificationWithNullProcessInstanceIdsList() {
 
     try {
-     runtimeService.createModification("processDefinitionId").startAfterActivity("user1") .processInstanceIds((List<String>) null).execute();
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1")
+          .processInstanceIds((List<String>) null).execute();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids is empty"));
@@ -114,7 +110,8 @@ public class ModificationExecutionSyncTest {
   public void createModificationUsingProcessInstanceIdsListWithNullValue() {
 
     try {
-      runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds(Arrays.asList("foo", null, "bar")).execute();
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1")
+          .processInstanceIds(Arrays.asList("foo", null, "bar")).execute();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids contains null value"));
@@ -125,7 +122,8 @@ public class ModificationExecutionSyncTest {
   public void createModificationWithEmptyProcessInstanceIdsList() {
 
     try {
-      runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds(Collections.<String> emptyList()).execute();
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1")
+          .processInstanceIds(Collections.<String> emptyList()).execute();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids is empty"));
@@ -135,7 +133,8 @@ public class ModificationExecutionSyncTest {
   @Test
   public void createModificationWithNullProcessDefinitionId() {
     try {
-      runtimeService.createModification(null).cancelAllForActivity("activityId").processInstanceIds(Arrays.asList("20", "1--0")).execute();
+      runtimeService.createModification(null).cancelAllForActivity("activityId")
+          .processInstanceIds(Arrays.asList("20", "1--0")).execute();
       fail("Should not succed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("processDefinitionId is null"));
@@ -146,9 +145,8 @@ public class ModificationExecutionSyncTest {
   public void createModificationWithNullProcessInstanceIdsArray() {
 
     try {
-      runtimeService.createModification("processDefinitionId")
-      .startAfterActivity("user1")
-      .processInstanceIds((String[]) null).execute();
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1")
+          .processInstanceIds((String[]) null).execute();
       fail("Should not be able to modify");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), CoreMatchers.containsString("Process instance ids is empty"));
@@ -159,7 +157,8 @@ public class ModificationExecutionSyncTest {
   public void createModificationUsingProcessInstanceIdsArrayWithNullValue() {
 
     try {
-      runtimeService.createModification("processDefinitionId").cancelAllForActivity("user1").processInstanceIds("foo", null, "bar").execute();
+      runtimeService.createModification("processDefinitionId").cancelAllForActivity("user1")
+          .processInstanceIds("foo", null, "bar").execute();
       fail("Should not be able to modify");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids contains null value"));
@@ -169,13 +168,14 @@ public class ModificationExecutionSyncTest {
   @Test
   public void testNullProcessInstanceQuery() {
     try {
-      runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceQuery(null).execute();
+      runtimeService.createModification("processDefinitionId").startAfterActivity("user1")
+          .processInstanceQuery(null).execute();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids is empty"));
     }
   }
-  
+
   @Test
   public void createModificationWithNotMatchingProcessDefinitionId() {
     DeploymentWithDefinitions deployment = testRule.deploy(instance);
@@ -183,13 +183,14 @@ public class ModificationExecutionSyncTest {
 
     List<String> processInstanceIds = helper.startInstances("process1", 2);
     try {
-      runtimeService.createModification("foo").cancelAllForActivity("activityId").processInstanceIds(processInstanceIds).execute();
+      runtimeService.createModification("foo").cancelAllForActivity("activityId")
+          .processInstanceIds(processInstanceIds).execute();
       fail("Should not succed");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("processDefinition is null"));
     }
   }
-  
+
   @Test
   public void testStartBefore() {
     DeploymentWithDefinitions deployment = testRule.deploy(instance);
@@ -197,19 +198,16 @@ public class ModificationExecutionSyncTest {
 
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    runtimeService.createModification(definition.getId()).startBeforeActivity("user2").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).startBeforeActivity("user2")
+        .processInstanceIds(processInstanceIds).execute();
 
     for (String processInstanceId : processInstanceIds) {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
       assertNotNull(updatedTree);
       assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-      assertThat(updatedTree).hasStructure(
-          describeActivityInstanceTree(
-              definition.getId())
-          .activity("user1")
-          .activity("user2")
-          .done());
+      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId())
+          .activity("user1").activity("user2").done());
     }
   }
 
@@ -220,14 +218,16 @@ public class ModificationExecutionSyncTest {
 
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    runtimeService.createModification(definition.getId()).startAfterActivity("user2").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).startAfterActivity("user2")
+        .processInstanceIds(processInstanceIds).execute();
 
     for (String processInstanceId : processInstanceIds) {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
       assertNotNull(updatedTree);
       assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId()).activity("user1").activity("user3").done());
+      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId())
+          .activity("user1").activity("user3").done());
     }
   }
 
@@ -238,14 +238,16 @@ public class ModificationExecutionSyncTest {
 
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    runtimeService.createModification(definition.getId()).startTransition("seq").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).startTransition("seq")
+        .processInstanceIds(processInstanceIds).execute();
 
     for (String processInstanceId : processInstanceIds) {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
       assertNotNull(updatedTree);
       assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId()).activity("user1").activity("user2").done());
+      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId())
+          .activity("user1").activity("user2").done());
     }
   }
 
@@ -254,7 +256,8 @@ public class ModificationExecutionSyncTest {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    runtimeService.createModification(processDefinition.getId()).cancelAllForActivity("user1").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(processDefinition.getId()).cancelAllForActivity("user1")
+        .processInstanceIds(processInstanceIds).execute();
 
     for (String processInstanceId : processInstanceIds) {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -269,14 +272,16 @@ public class ModificationExecutionSyncTest {
 
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    runtimeService.createModification(definition.getId()).cancelAllForActivity("user1").startBeforeActivity("user2").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).cancelAllForActivity("user1")
+        .startBeforeActivity("user2").processInstanceIds(processInstanceIds).execute();
 
     for (String processInstanceId : processInstanceIds) {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
       assertNotNull(updatedTree);
       assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId()).activity("user2").done());
+      assertThat(updatedTree)
+          .hasStructure(describeActivityInstanceTree(definition.getId()).activity("user2").done());
     }
   }
 
@@ -292,42 +297,38 @@ public class ModificationExecutionSyncTest {
     List<String> anotherProcessInstanceIds = helper.startInstances("process1", 1);
     processInstanceIds.addAll(anotherProcessInstanceIds);
 
-    runtimeService.createModification(definition.getId()).startBeforeActivity("user3").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).startBeforeActivity("user3")
+        .processInstanceIds(processInstanceIds).execute();
 
     ActivityInstance updatedTree = null;
     String processInstanceId = processInstanceIds.get(0);
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
-    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId()).activity("user2").activity("user3").done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId())
+        .activity("user2").activity("user3").done());
 
     processInstanceId = processInstanceIds.get(1);
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
-    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId()).activity("user1").activity("user3").done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId())
+        .activity("user1").activity("user3").done());
   }
 
   @Test
   public void testCancelWithoutFlag() {
     // given
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .serviceTask("ser").camundaExpression("${true}")
-        .userTask("user")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").serviceTask("ser")
+        .camundaExpression("${true}").userTask("user").endEvent("end").done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
     List<String> processInstanceIds = helper.startInstances("process1", 1);
 
     // when
-    runtimeService.createModification(processDefinition.getId())
-      .startBeforeActivity("ser")
-      .cancelAllForActivity("user")
-      .processInstanceIds(processInstanceIds)
-      .execute();
+    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("ser")
+        .cancelAllForActivity("user").processInstanceIds(processInstanceIds).execute();
 
     // then
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
@@ -336,23 +337,16 @@ public class ModificationExecutionSyncTest {
   @Test
   public void testCancelWithoutFlag2() {
     // given
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .serviceTask("ser").camundaExpression("${true}")
-        .userTask("user")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").serviceTask("ser")
+        .camundaExpression("${true}").userTask("user").endEvent("end").done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
     List<String> processInstanceIds = helper.startInstances("process1", 1);
 
     // when
-    runtimeService.createModification(processDefinition.getId())
-      .startBeforeActivity("ser")
-      .cancelAllForActivity("user", false)
-      .processInstanceIds(processInstanceIds)
-      .execute();
+    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("ser")
+        .cancelAllForActivity("user", false).processInstanceIds(processInstanceIds).execute();
 
     // then
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
@@ -361,26 +355,20 @@ public class ModificationExecutionSyncTest {
   @Test
   public void testCancelWithFlag() {
     // given
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .serviceTask("ser").camundaExpression("${true}")
-        .userTask("user")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").serviceTask("ser")
+        .camundaExpression("${true}").userTask("user").endEvent("end").done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
     List<String> processInstanceIds = helper.startInstances("process1", 1);
 
     // when
-    runtimeService.createModification(processDefinition.getId())
-      .startBeforeActivity("ser")
-      .cancelAllForActivity("user", true)
-      .processInstanceIds(processInstanceIds)
-      .execute();
+    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("ser")
+        .cancelAllForActivity("user", true).processInstanceIds(processInstanceIds).execute();
 
     // then
-    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().singleResult();
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery()
+        .singleResult();
     assertNotNull(execution);
     assertEquals("user", execution.getActivityId());
   }
@@ -388,27 +376,21 @@ public class ModificationExecutionSyncTest {
   @Test
   public void testCancelWithFlagForManyInstances() {
     // given
-    this.instance = Bpmn.createExecutableProcess("process1")
-        .startEvent("start")
-        .serviceTask("ser").camundaExpression("${true}")
-        .userTask("user")
-        .endEvent("end")
-        .done();
+    this.instance = Bpmn.createExecutableProcess("process1").startEvent("start").serviceTask("ser")
+        .camundaExpression("${true}").userTask("user").endEvent("end").done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
     List<String> processInstanceIds = helper.startInstances("process1", 10);
 
     // when
-    runtimeService.createModification(processDefinition.getId())
-      .startBeforeActivity("ser")
-      .cancelAllForActivity("user", true)
-      .processInstanceIds(processInstanceIds)
-      .execute();
+    runtimeService.createModification(processDefinition.getId()).startBeforeActivity("ser")
+        .cancelAllForActivity("user", true).processInstanceIds(processInstanceIds).execute();
 
     // then
     for (String processInstanceId : processInstanceIds) {
-      Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).singleResult();
+      Execution execution = runtimeService.createExecutionQuery()
+          .processInstanceId(processInstanceId).singleResult();
       assertNotNull(execution);
       assertEquals("user", ((ExecutionEntity) execution).getActivityId());
     }

@@ -27,10 +27,13 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 
 /**
- * <p>SPI interface for read-only identity Service Providers.</p>
+ * <p>
+ * SPI interface for read-only identity Service Providers.
+ * </p>
  *
- * <p>This interface provides access to a read-only user / group
- * repository</p>
+ * <p>
+ * This interface provides access to a read-only user / group repository
+ * </p>
  *
  *
  * @author Daniel Meyer
@@ -42,32 +45,36 @@ public interface ReadOnlyIdentityProvider extends Session {
 
   /**
    * @return a {@link User} object for the given user id or null if no such user exists.
-   * @throws IdentityProviderException in case an error occurs
+   * @throws IdentityProviderException
+   *           in case an error occurs
    */
   public User findUserById(String userId);
 
-
   /**
    * @return a {@link UserQuery} object which can be used for querying for users.
-   * @throws IdentityProviderException in case an error occurs
+   * @throws IdentityProviderException
+   *           in case an error occurs
    */
   public UserQuery createUserQuery();
 
   /**
    * @return a {@link UserQuery} object which can be used in the current command context
-   * @throws IdentityProviderException in case an error occurs
+   * @throws IdentityProviderException
+   *           in case an error occurs
    */
   public UserQuery createUserQuery(CommandContext commandContext);
 
   /**
    * Creates a {@link NativeUserQuery} that allows to select users with native queries.
+   * 
    * @return NativeUserQuery
    */
   public NativeUserQuery createNativeUserQuery();
 
   /**
    * @return 'true' if the password matches the
-   * @throws IdentityProviderException in case an error occurs
+   * @throws IdentityProviderException
+   *           in case an error occurs
    */
   public boolean checkPassword(String userId, String password);
 
@@ -75,43 +82,45 @@ public interface ReadOnlyIdentityProvider extends Session {
 
   /**
    * @return a {@link Group} object for the given group id or null if no such group exists.
-   * @throws IdentityProviderException in case an error occurs
+   * @throws IdentityProviderException
+   *           in case an error occurs
    */
   public Group findGroupById(String groupId);
 
   /**
    * @return a {@link GroupQuery} object which can be used for querying for groups.
-   * @throws IdentityProviderException in case an error occurs
+   * @throws IdentityProviderException
+   *           in case an error occurs
    */
   public GroupQuery createGroupQuery();
 
   /**
-   * @return a {@link GroupQuery} object which can be used for querying for groups and can be reused in the current command context.
-   * @throws IdentityProviderException in case an error occurs
+   * @return a {@link GroupQuery} object which can be used for querying for groups and can be reused
+   *         in the current command context.
+   * @throws IdentityProviderException
+   *           in case an error occurs
    */
   public GroupQuery createGroupQuery(CommandContext commandContext);
 
   // tenants //////////////////////////////////////
 
   /**
-   * @return a {@link Tenant} object for the given id or null if no such tenant
-   *         exists.
+   * @return a {@link Tenant} object for the given id or null if no such tenant exists.
    * @throws IdentityProviderException
    *           in case an error occurs
    */
   public Tenant findTenantById(String tenantId);
 
   /**
-   * @return a {@link TenantQuery} object which can be used for querying for
-   *         tenants.
+   * @return a {@link TenantQuery} object which can be used for querying for tenants.
    * @throws IdentityProviderException
    *           in case an error occurs
    */
   public TenantQuery createTenantQuery();
 
   /**
-   * @return a {@link TenantQuery} object which can be used for querying for
-   *         tenants and can be reused in the current command context.
+   * @return a {@link TenantQuery} object which can be used for querying for tenants and can be
+   *         reused in the current command context.
    * @throws IdentityProviderException
    *           in case an error occurs
    */

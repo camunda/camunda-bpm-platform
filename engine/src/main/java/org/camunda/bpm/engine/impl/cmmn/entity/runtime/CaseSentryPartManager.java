@@ -37,16 +37,20 @@ public class CaseSentryPartManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<CaseSentryPartEntity> findCaseSentryPartsByCaseExecutionId(String caseExecutionId) {
-    return getDbEntityManager().selectList("selectCaseSentryPartsByCaseExecutionId", caseExecutionId);
+    return getDbEntityManager().selectList("selectCaseSentryPartsByCaseExecutionId",
+        caseExecutionId);
   }
 
   public long findCaseSentryPartCountByQueryCriteria(CaseSentryPartQueryImpl caseSentryPartQuery) {
-    return (Long) getDbEntityManager().selectOne("selectCaseSentryPartsCountByQueryCriteria", caseSentryPartQuery);
+    return (Long) getDbEntityManager().selectOne("selectCaseSentryPartsCountByQueryCriteria",
+        caseSentryPartQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<CaseSentryPartEntity> findCaseSentryPartByQueryCriteria(CaseSentryPartQueryImpl caseSentryPartQuery, Page page) {
-    return getDbEntityManager().selectList("selectCaseSentryPartsByQueryCriteria", caseSentryPartQuery, page);
+  public List<CaseSentryPartEntity> findCaseSentryPartByQueryCriteria(
+      CaseSentryPartQueryImpl caseSentryPartQuery, Page page) {
+    return getDbEntityManager().selectList("selectCaseSentryPartsByQueryCriteria",
+        caseSentryPartQuery, page);
   }
 
 }

@@ -46,7 +46,7 @@ public class MyCaseExecutionListener implements Serializable {
     caseExecution.setVariable(event, true);
     caseExecution.setVariable(eventCounterName, eventCounter + 1);
     caseExecution.setVariable("eventCounter", counter + 1);
-    caseExecution.setVariable(event+"OnCaseExecutionId", caseExecution.getId());
+    caseExecution.setVariable(event + "OnCaseExecutionId", caseExecution.getId());
 
   }
 

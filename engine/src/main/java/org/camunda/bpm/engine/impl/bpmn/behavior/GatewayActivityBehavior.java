@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-
 /**
  * super class for all gateway activity implementations.
  *
@@ -34,7 +33,7 @@ public abstract class GatewayActivityBehavior extends FlowNodeActivityBehavior {
     } else {
       concurrentRoot = execution;
     }
-    ((ExecutionEntity)concurrentRoot).forceUpdate();
+    ((ExecutionEntity) concurrentRoot).forceUpdate();
   }
 
 }

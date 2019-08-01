@@ -23,8 +23,8 @@ import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedGenerator;
 
 /**
- * {@link IdGenerator} implementation based on the current time and the ethernet
- * address of the machine it is running on.
+ * {@link IdGenerator} implementation based on the current time and the ethernet address of the
+ * machine it is running on.
  * 
  * @author Daniel Meyer
  */

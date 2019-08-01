@@ -44,10 +44,12 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Tassilo Weidner
  */
-public class HistoryCleanupSchedulerVariableInstancesTest extends AbstractHistoryCleanupSchedulerTest {
+public class HistoryCleanupSchedulerVariableInstancesTest
+    extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configure(configuration, HistoryEventTypes.VARIABLE_INSTANCE_CREATE);
     }
   };
@@ -68,17 +70,15 @@ public class HistoryCleanupSchedulerVariableInstancesTest extends AbstractHistor
   }
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .userTask()
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().userTask().endEvent().done();
 
   protected final Date END_DATE = new Date(1363608000000L);
 
@@ -91,8 +91,8 @@ public class HistoryCleanupSchedulerVariableInstancesTest extends AbstractHistor
 
     String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
 
-    for (int i = 0; i<5; i++) {
-      runtimeService.setVariable(processInstanceId,"aVariableName"+i, "aVariableValue");
+    for (int i = 0; i < 5; i++) {
+      runtimeService.setVariable(processInstanceId, "aVariableName" + i, "aVariableValue");
     }
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -122,8 +122,8 @@ public class HistoryCleanupSchedulerVariableInstancesTest extends AbstractHistor
 
     String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
 
-    for (int i = 0; i<5; i++) {
-      runtimeService.setVariable(processInstanceId,"aVariableName"+i, "aVariableValue");
+    for (int i = 0; i < 5; i++) {
+      runtimeService.setVariable(processInstanceId, "aVariableName" + i, "aVariableValue");
     }
 
     String taskId = taskService.createTaskQuery().singleResult().getId();

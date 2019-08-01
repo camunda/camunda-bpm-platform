@@ -24,11 +24,11 @@ import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
  * @author Tom Baeyens
  */
-public class DeleteMembershipCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
+public class DeleteMembershipCmd extends AbstractWritableIdentityServiceCmd<Void>
+    implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   String userId;
@@ -38,16 +38,16 @@ public class DeleteMembershipCmd extends AbstractWritableIdentityServiceCmd<Void
     this.userId = userId;
     this.groupId = groupId;
   }
-  
+
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("userId", userId);
     ensureNotNull("groupId", groupId);
 
-    IdentityOperationResult operationResult = commandContext
-      .getWritableIdentityProvider()
-      .deleteMembership(userId, groupId);
+    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider()
+        .deleteMembership(userId, groupId);
 
-    commandContext.getOperationLogManager().logMembershipOperation(operationResult, userId, groupId, null);
+    commandContext.getOperationLogManager().logMembershipOperation(operationResult, userId, groupId,
+        null);
 
     return null;
   }

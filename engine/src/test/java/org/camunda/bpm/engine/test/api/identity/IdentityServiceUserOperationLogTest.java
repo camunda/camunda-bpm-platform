@@ -303,7 +303,8 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLog(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.TENANT, null, TEST_TENANT_ID);
+    assertLog(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.TENANT, null,
+        TEST_TENANT_ID);
   }
 
   @Test
@@ -336,7 +337,8 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLog(UserOperationLogEntry.OPERATION_TYPE_UPDATE, EntityTypes.TENANT, null, TEST_TENANT_ID);
+    assertLog(UserOperationLogEntry.OPERATION_TYPE_UPDATE, EntityTypes.TENANT, null,
+        TEST_TENANT_ID);
   }
 
   @Test
@@ -352,7 +354,8 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLog(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.TENANT, null, TEST_TENANT_ID);
+    assertLog(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.TENANT, null,
+        TEST_TENANT_ID);
   }
 
   @Test
@@ -382,7 +385,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.GROUP_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.GROUP_MEMBERSHIP,
         Triple.of("userId", (String) null, TEST_USER_ID),
         Triple.of("groupId", (String) null, TEST_GROUP_ID));
   }
@@ -419,7 +422,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.GROUP_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.GROUP_MEMBERSHIP,
         Triple.of("userId", (String) null, TEST_USER_ID),
         Triple.of("groupId", (String) null, TEST_GROUP_ID));
   }
@@ -451,7 +454,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.TENANT_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.TENANT_MEMBERSHIP,
         Triple.of("userId", (String) null, TEST_USER_ID),
         Triple.of("tenantId", (String) null, TEST_TENANT_ID));
   }
@@ -488,7 +491,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.TENANT_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.TENANT_MEMBERSHIP,
         Triple.of("userId", (String) null, TEST_USER_ID),
         Triple.of("tenantId", (String) null, TEST_TENANT_ID));
   }
@@ -520,7 +523,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.TENANT_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_CREATE, EntityTypes.TENANT_MEMBERSHIP,
         Triple.of("groupId", (String) null, TEST_GROUP_ID),
         Triple.of("tenantId", (String) null, TEST_TENANT_ID));
   }
@@ -557,7 +560,7 @@ public class IdentityServiceUserOperationLogTest {
     identityService.clearAuthentication();
 
     // then
-    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.TENANT_MEMBERSHIP, 
+    assertLogs(UserOperationLogEntry.OPERATION_TYPE_DELETE, EntityTypes.TENANT_MEMBERSHIP,
         Triple.of("groupId", (String) null, TEST_GROUP_ID),
         Triple.of("tenantId", (String) null, TEST_TENANT_ID));
   }
@@ -587,7 +590,8 @@ public class IdentityServiceUserOperationLogTest {
   }
 
   @SafeVarargs
-  protected final void assertLogs(String operation, String entity, Triple<String, String, String>... values) {
+  protected final void assertLogs(String operation, String entity,
+      Triple<String, String, String>... values) {
     assertEquals(values.length, query.count());
     for (Triple<String, String, String> valueTriple : values) {
       UserOperationLogEntry entry = query.property(valueTriple.getLeft()).singleResult();

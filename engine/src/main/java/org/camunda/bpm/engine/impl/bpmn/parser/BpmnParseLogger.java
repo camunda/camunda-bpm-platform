@@ -31,13 +31,17 @@ public class BpmnParseLogger extends ProcessEngineLogger {
   }
 
   public void ignoringNonExecutableProcess(String elementId) {
-    logInfo("002", "Ignoring non-executable process with id '{}'. Set the attribute isExecutable=\"true\" to deploy " +
-      "this process.", elementId);
+    logInfo("002",
+        "Ignoring non-executable process with id '{}'. Set the attribute isExecutable=\"true\" to deploy "
+            + "this process.",
+        elementId);
   }
 
   public void missingIsExecutableAttribute(String elementId) {
-    logInfo("003", "Process with id '{}' has no attribute isExecutable. Better set the attribute explicitly, " +
-      "especially to be compatible with future engine versions which might change the default behavior.", elementId);
+    logInfo("003",
+        "Process with id '{}' has no attribute isExecutable. Better set the attribute explicitly, "
+            + "especially to be compatible with future engine versions which might change the default behavior.",
+        elementId);
   }
 
   public void parsingFailure(Throwable cause) {
@@ -47,19 +51,20 @@ public class BpmnParseLogger extends ProcessEngineLogger {
   // EXCEPTIONS
 
   public ProcessEngineException parsingProcessException(Exception cause) {
-    return new ProcessEngineException(exceptionMessage("009", "Error while parsing process. {}.", cause.getMessage()), cause);
+    return new ProcessEngineException(
+        exceptionMessage("009", "Error while parsing process. {}.", cause.getMessage()), cause);
   }
 
   public void exceptionWhileGeneratingProcessDiagram(Throwable t) {
-    logError(
-        "010",
+    logError("010",
         "Error while generating process diagram, image will not be stored in repository", t);
   }
 
-  public ProcessEngineException messageEventSubscriptionWithSameNameExists(String resourceName, String eventName) {
-    throw new ProcessEngineException(exceptionMessage(
-        "011",
-        "Cannot deploy process definition '{}': there already is a message event subscription for the message with name '{}'.", resourceName, eventName));
+  public ProcessEngineException messageEventSubscriptionWithSameNameExists(String resourceName,
+      String eventName) {
+    throw new ProcessEngineException(exceptionMessage("011",
+        "Cannot deploy process definition '{}': there already is a message event subscription for the message with name '{}'.",
+        resourceName, eventName));
   }
 
 }

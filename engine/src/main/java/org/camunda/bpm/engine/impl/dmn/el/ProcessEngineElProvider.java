@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.dmn.el;
 
-
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;

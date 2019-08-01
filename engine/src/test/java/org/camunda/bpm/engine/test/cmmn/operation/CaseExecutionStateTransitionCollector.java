@@ -49,16 +49,17 @@ public class CaseExecutionStateTransitionCollector implements CaseExecutionListe
 
     CaseExecutionState newState = execution.getCurrentState();
 
-    String stateTransition = previousStateName + " --" + execution.getEventName() + "(" + activityId + ")--> " + newState;
+    String stateTransition = previousStateName + " --" + execution.getEventName() + "(" + activityId
+        + ")--> " + newState;
 
-    LOG.debug("collecting state transition: " +  stateTransition);
+    LOG.debug("collecting state transition: " + stateTransition);
 
     stateTransitions.add(stateTransition);
   }
 
   public String toString() {
     StringBuilder text = new StringBuilder();
-    for (String event: stateTransitions) {
+    for (String event : stateTransitions) {
       text.append(event);
       text.append("\n");
     }

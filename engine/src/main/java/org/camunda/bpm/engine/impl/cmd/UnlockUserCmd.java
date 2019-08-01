@@ -42,7 +42,8 @@ public class UnlockUserCmd implements Command<Object>, Serializable {
   public Object execute(CommandContext commandContext) {
     commandContext.getAuthorizationManager().checkCamundaAdmin();
 
-    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider().unlockUser(userId);
+    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider()
+        .unlockUser(userId);
 
     commandContext.getOperationLogManager().logUserOperation(operationResult, userId);
     return null;

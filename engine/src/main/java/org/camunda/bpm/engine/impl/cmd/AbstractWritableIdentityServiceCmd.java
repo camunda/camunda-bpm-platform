@@ -31,14 +31,14 @@ public abstract class AbstractWritableIdentityServiceCmd<T> implements Command<T
   private static final long serialVersionUID = 1L;
 
   public final T execute(CommandContext commandContext) {
-    
+
     // check identity service implementation
-    if(!commandContext.getSessionFactories().containsKey(WritableIdentityProvider.class)) {
+    if (!commandContext.getSessionFactories().containsKey(WritableIdentityProvider.class)) {
       throw new UnsupportedOperationException("This identity service implementation is read-only.");
     }
-    
+
     T result = executeCmd(commandContext);
-    return result; 
+    return result;
   }
 
   protected abstract T executeCmd(CommandContext commandContext);

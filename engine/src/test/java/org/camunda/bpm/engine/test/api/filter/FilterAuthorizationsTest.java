@@ -74,8 +74,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     try {
       filterService.newTaskFilter();
       fail("Exception expected");
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       // expected
     }
   }
@@ -91,15 +90,13 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     try {
       filterService.saveFilter(filter);
       fail("Exception expected");
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       // expected
     }
   }
 
   public void testSaveFilterPermitted() {
-    Filter filter = new FilterEntity(EntityTypes.TASK)
-      .setName("testFilter");
+    Filter filter = new FilterEntity(EntityTypes.TASK).setName("testFilter");
 
     grantCreateFilter();
 
@@ -116,8 +113,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     try {
       filterService.saveFilter(filter);
       fail("Exception expected");
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       // expected
     }
   }
@@ -139,8 +135,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     try {
       filterService.deleteFilter(filter.getId());
       fail("Exception expected");
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       // expected
     }
   }
@@ -162,46 +157,42 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     long count = filterService.createFilterQuery().count();
     assertEquals(0, count);
 
-    Filter returnedFilter = filterService.createFilterQuery().filterId(filter.getId()).singleResult();
+    Filter returnedFilter = filterService.createFilterQuery().filterId(filter.getId())
+        .singleResult();
     assertNull(returnedFilter);
 
     try {
       filterService.getFilter(filter.getId());
       fail("Exception expected");
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       // expected
     }
 
     try {
       filterService.singleResult(filter.getId());
       fail("Exception expected");
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       // expected
     }
 
     try {
       filterService.list(filter.getId());
       fail("Exception expected");
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       // expected
     }
 
     try {
       filterService.listPage(filter.getId(), 1, 2);
       fail("Exception expected");
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       // expected
     }
 
     try {
       filterService.count(filter.getId());
       fail("Exception expected");
-    }
-    catch (AuthorizationException e) {
+    } catch (AuthorizationException e) {
       // expected
     }
   }
@@ -214,7 +205,8 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     long count = filterService.createFilterQuery().count();
     assertEquals(1, count);
 
-    Filter returnedFilter = filterService.createFilterQuery().filterId(filter.getId()).singleResult();
+    Filter returnedFilter = filterService.createFilterQuery().filterId(filter.getId())
+        .singleResult();
     assertNotNull(returnedFilter);
 
     returnedFilter = filterService.getFilter(filter.getId());
@@ -249,7 +241,8 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     Filter filter = createTestFilter();
 
     grantReadFilter(filter.getId());
-    Authorization authorization = processEngine.getAuthorizationService().createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    Authorization authorization = processEngine.getAuthorizationService()
+        .createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
     authorization.addPermission(Permissions.READ);
     authorization.setUserId(Authorization.ANY);
     authorization.setResource(Resources.FILTER);
@@ -259,7 +252,8 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     long count = filterService.createFilterQuery().count();
     assertEquals(1, count);
 
-    Filter returnedFilter = filterService.createFilterQuery().filterId(filter.getId()).singleResult();
+    Filter returnedFilter = filterService.createFilterQuery().filterId(filter.getId())
+        .singleResult();
     assertNotNull(returnedFilter);
 
     returnedFilter = filterService.getFilter(filter.getId());
@@ -338,7 +332,8 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     identityService.saveUser(user);
 
     // give user all permission to manipulate authorisations
-    Authorization authorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    Authorization authorization = authorizationService
+        .createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
     authorization.setUserId(user.getId());
     authorization.setResource(Resources.AUTHORIZATION);
     authorization.setResourceId(Authorization.ANY);
@@ -370,7 +365,8 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
   }
 
   protected Authorization createAuthorization(Permission permission, String resourceId) {
-    Authorization authorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    Authorization authorization = authorizationService
+        .createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
     authorization.setUserId(testUser.getId());
     authorization.setResource(Resources.FILTER);
     authorization.addPermission(permission);
@@ -407,13 +403,15 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     authorizationService.saveAuthorization(authorization);
   }
 
-  protected void assertFilterPermission(Permission permission, User user, String filterId, boolean expected) {
+  protected void assertFilterPermission(Permission permission, User user, String filterId,
+      boolean expected) {
     boolean result;
     if (filterId != null) {
-      result = authorizationService.isUserAuthorized(user.getId(), null, permission, Resources.FILTER, filterId);
-    }
-    else {
-      result = authorizationService.isUserAuthorized(user.getId(), null, permission, Resources.FILTER);
+      result = authorizationService.isUserAuthorized(user.getId(), null, permission,
+          Resources.FILTER, filterId);
+    } else {
+      result = authorizationService.isUserAuthorized(user.getId(), null, permission,
+          Resources.FILTER);
     }
     assertEquals(expected, result);
   }

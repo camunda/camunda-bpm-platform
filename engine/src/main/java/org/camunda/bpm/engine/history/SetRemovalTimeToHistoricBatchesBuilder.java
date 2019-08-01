@@ -25,8 +25,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 
 /**
- * Fluent builder to set the removal time to historic batches and
- * all associated historic entities.
+ * Fluent builder to set the removal time to historic batches and all associated historic entities.
  *
  * @author Tassilo Weidner
  */
@@ -35,7 +34,8 @@ public interface SetRemovalTimeToHistoricBatchesBuilder {
   /**
    * Selects historic batches by the given query.
    *
-   * @param historicBatchQuery to be evaluated.
+   * @param historicBatchQuery
+   *          to be evaluated.
    * @return the builder.
    */
   SetRemovalTimeToHistoricBatchesBuilder byQuery(HistoricBatchQuery historicBatchQuery);
@@ -43,19 +43,22 @@ public interface SetRemovalTimeToHistoricBatchesBuilder {
   /**
    * Selects historic batches by the given ids.
    *
-   * @param historicBatchIds supposed to be affected.
+   * @param historicBatchIds
+   *          supposed to be affected.
    * @return the builder.
    */
   SetRemovalTimeToHistoricBatchesBuilder byIds(String... historicBatchIds);
 
   /**
-   * Sets the removal time asynchronously as batch. The returned batch can be used to
-   * track the progress of setting a removal time.
+   * Sets the removal time asynchronously as batch. The returned batch can be used to track the
+   * progress of setting a removal time.
    *
-   * @throws BadUserRequestException when no historic batches could be found.
+   * @throws BadUserRequestException
+   *           when no historic batches could be found.
    * @throws AuthorizationException
-   * when no {@link BatchPermissions#CREATE_BATCH_SET_REMOVAL_TIME CREATE_BATCH_SET_REMOVAL_TIME}
-   * or no permission {@link Permissions#CREATE CREATE} permission is granted on {@link Resources#BATCH}.
+   *           when no {@link BatchPermissions#CREATE_BATCH_SET_REMOVAL_TIME
+   *           CREATE_BATCH_SET_REMOVAL_TIME} or no permission {@link Permissions#CREATE CREATE}
+   *           permission is granted on {@link Resources#BATCH}.
    *
    * @return the batch which sets the removal time asynchronously.
    */

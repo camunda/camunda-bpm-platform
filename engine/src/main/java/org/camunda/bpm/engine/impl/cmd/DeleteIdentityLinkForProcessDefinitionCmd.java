@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-
 /**
  * @author Tijs Rademakers
  */
@@ -34,18 +33,19 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
   private static final long serialVersionUID = 1L;
 
   protected String processDefinitionId;
-  
+
   protected String userId;
-  
+
   protected String groupId;
-  
-  public DeleteIdentityLinkForProcessDefinitionCmd(String processDefinitionId, String userId, String groupId) {
+
+  public DeleteIdentityLinkForProcessDefinitionCmd(String processDefinitionId, String userId,
+      String groupId) {
     validateParams(userId, groupId, processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     this.userId = userId;
     this.groupId = groupId;
   }
-  
+
   protected void validateParams(String userId, String groupId, String processDefinitionId) {
     ensureNotNull("processDefinitionId", processDefinitionId);
 
@@ -53,17 +53,16 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
       throw new ProcessEngineException("userId and groupId cannot both be null");
     }
   }
-  
-  public Void execute(CommandContext commandContext) {
-    ProcessDefinitionEntity processDefinition = Context
-      .getCommandContext()
-      .getProcessDefinitionManager()
-      .findLatestProcessDefinitionById(processDefinitionId);
 
-    ensureNotNull("Cannot find process definition with id " + processDefinitionId, "processDefinition", processDefinition);
+  public Void execute(CommandContext commandContext) {
+    ProcessDefinitionEntity processDefinition = Context.getCommandContext()
+        .getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+
+    ensureNotNull("Cannot find process definition with id " + processDefinitionId,
+        "processDefinition", processDefinition);
     processDefinition.deleteIdentityLink(userId, groupId);
 
     return null;
   }
-  
+
 }

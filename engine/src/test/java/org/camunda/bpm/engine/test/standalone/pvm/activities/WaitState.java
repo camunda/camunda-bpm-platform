@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -31,7 +30,8 @@ public class WaitState implements SignallableActivityBehavior {
 
   }
 
-  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void signal(ActivityExecution execution, String signalName, Object signalData)
+      throws Exception {
     PvmTransition transition = execution.getActivity().getOutgoingTransitions().get(0);
     execution.leaveActivityViaTransition(transition);
   }

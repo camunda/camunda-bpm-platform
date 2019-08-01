@@ -44,25 +44,19 @@ import static org.hamcrest.core.IsNull.notNullValue;
 public class RootProcessInstanceTest {
 
   protected final String CALLED_PROCESS_KEY = "calledProcess";
-  protected final BpmnModelInstance CALLED_PROCESS = Bpmn.createExecutableProcess(CALLED_PROCESS_KEY)
-    .startEvent()
-      .userTask("userTask")
-    .endEvent().done();
+  protected final BpmnModelInstance CALLED_PROCESS = Bpmn
+      .createExecutableProcess(CALLED_PROCESS_KEY).startEvent().userTask("userTask").endEvent()
+      .done();
 
   protected final String CALLED_AND_CALLING_PROCESS_KEY = "calledAndCallingProcess";
-  protected final BpmnModelInstance CALLED_AND_CALLING_PROCESS =
-    Bpmn.createExecutableProcess(CALLED_AND_CALLING_PROCESS_KEY)
-    .startEvent()
-      .callActivity()
-        .calledElement(CALLED_PROCESS_KEY)
-    .endEvent().done();
+  protected final BpmnModelInstance CALLED_AND_CALLING_PROCESS = Bpmn
+      .createExecutableProcess(CALLED_AND_CALLING_PROCESS_KEY).startEvent().callActivity()
+      .calledElement(CALLED_PROCESS_KEY).endEvent().done();
 
   protected final String CALLING_PROCESS_KEY = "callingProcess";
-  protected final BpmnModelInstance CALLING_PROCESS = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
-    .startEvent()
-      .callActivity()
-        .calledElement(CALLED_AND_CALLING_PROCESS_KEY)
-    .endEvent().done();
+  protected final BpmnModelInstance CALLING_PROCESS = Bpmn
+      .createExecutableProcess(CALLING_PROCESS_KEY).startEvent().callActivity()
+      .calledElement(CALLED_AND_CALLING_PROCESS_KEY).endEvent().done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -91,7 +85,8 @@ public class RootProcessInstanceTest {
     assertThat(processInstance.getRootProcessInstanceId(), notNullValue());
 
     // then
-    assertThat(processInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(processInstance.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -109,7 +104,8 @@ public class RootProcessInstanceTest {
     assertThat(processInstance.getRootProcessInstanceId(), notNullValue());
 
     // then
-    assertThat(processInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(processInstance.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -119,14 +115,14 @@ public class RootProcessInstanceTest {
 
     // when
     ProcessInstance processInstance = runtimeService.createProcessInstanceByKey(CALLED_PROCESS_KEY)
-      .startAfterActivity("userTask")
-      .execute();
+        .startAfterActivity("userTask").execute();
 
     // assume
     assertThat(processInstance.getRootProcessInstanceId(), notNullValue());
 
     // then
-    assertThat(processInstance.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
+    assertThat(processInstance.getRootProcessInstanceId(),
+        is(processInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -140,16 +136,13 @@ public class RootProcessInstanceTest {
     runtimeService.startProcessInstanceByKey(CALLING_PROCESS_KEY);
 
     ProcessInstance calledProcessInstance = runtimeService.createProcessInstanceQuery()
-      .processDefinitionKey(CALLED_PROCESS_KEY)
-      .singleResult();
+        .processDefinitionKey(CALLED_PROCESS_KEY).singleResult();
 
     ProcessInstance calledAndCallingProcessInstance = runtimeService.createProcessInstanceQuery()
-      .processDefinitionKey(CALLED_AND_CALLING_PROCESS_KEY)
-      .singleResult();
+        .processDefinitionKey(CALLED_AND_CALLING_PROCESS_KEY).singleResult();
 
     ProcessInstance callingProcessInstance = runtimeService.createProcessInstanceQuery()
-      .processDefinitionKey(CALLING_PROCESS_KEY)
-      .singleResult();
+        .processDefinitionKey(CALLING_PROCESS_KEY).singleResult();
 
     // assume
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(3L));
@@ -157,11 +150,11 @@ public class RootProcessInstanceTest {
 
     // then
     assertThat(callingProcessInstance.getRootProcessInstanceId(),
-      is(callingProcessInstance.getProcessInstanceId()));
+        is(callingProcessInstance.getProcessInstanceId()));
     assertThat(calledProcessInstance.getRootProcessInstanceId(),
-      is(callingProcessInstance.getProcessInstanceId()));
+        is(callingProcessInstance.getProcessInstanceId()));
     assertThat(calledAndCallingProcessInstance.getRootProcessInstanceId(),
-      is(callingProcessInstance.getProcessInstanceId()));
+        is(callingProcessInstance.getProcessInstanceId()));
   }
 
   @Test
@@ -171,30 +164,22 @@ public class RootProcessInstanceTest {
 
     testRule.deploy(CALLED_AND_CALLING_PROCESS);
 
-    testRule.deploy(Bpmn.createExecutableProcess("callingProcessWithGateway")
-      .startEvent()
-        .parallelGateway("split")
-          .callActivity()
-            .calledElement(CALLED_AND_CALLING_PROCESS_KEY)
-          .moveToNode("split")
-            .callActivity()
-              .calledElement(CALLED_AND_CALLING_PROCESS_KEY)
-      .endEvent().done());
+    testRule.deploy(Bpmn.createExecutableProcess("callingProcessWithGateway").startEvent()
+        .parallelGateway("split").callActivity().calledElement(CALLED_AND_CALLING_PROCESS_KEY)
+        .moveToNode("split").callActivity().calledElement(CALLED_AND_CALLING_PROCESS_KEY).endEvent()
+        .done());
 
     // when
     runtimeService.startProcessInstanceByKey("callingProcessWithGateway");
 
     List<ProcessInstance> calledProcessInstances = runtimeService.createProcessInstanceQuery()
-      .processDefinitionKey(CALLED_PROCESS_KEY)
-      .list();
+        .processDefinitionKey(CALLED_PROCESS_KEY).list();
 
-    List<ProcessInstance> calledAndCallingProcessInstances = runtimeService.createProcessInstanceQuery()
-      .processDefinitionKey(CALLED_AND_CALLING_PROCESS_KEY)
-      .list();
+    List<ProcessInstance> calledAndCallingProcessInstances = runtimeService
+        .createProcessInstanceQuery().processDefinitionKey(CALLED_AND_CALLING_PROCESS_KEY).list();
 
     ProcessInstance callingProcessInstance = runtimeService.createProcessInstanceQuery()
-      .processDefinitionKey("callingProcessWithGateway")
-      .singleResult();
+        .processDefinitionKey("callingProcessWithGateway").singleResult();
 
     // assume
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(5L));
@@ -205,17 +190,17 @@ public class RootProcessInstanceTest {
 
     // then
     assertThat(callingProcessInstance.getRootProcessInstanceId(),
-      is(callingProcessInstance.getProcessInstanceId()));
+        is(callingProcessInstance.getProcessInstanceId()));
 
     assertThat(calledProcessInstances.get(0).getRootProcessInstanceId(),
-      is(callingProcessInstance.getProcessInstanceId()));
+        is(callingProcessInstance.getProcessInstanceId()));
     assertThat(calledProcessInstances.get(1).getRootProcessInstanceId(),
-      is(callingProcessInstance.getProcessInstanceId()));
+        is(callingProcessInstance.getProcessInstanceId()));
 
     assertThat(calledAndCallingProcessInstances.get(0).getRootProcessInstanceId(),
-      is(callingProcessInstance.getProcessInstanceId()));
+        is(callingProcessInstance.getProcessInstanceId()));
     assertThat(calledAndCallingProcessInstances.get(1).getRootProcessInstanceId(),
-      is(callingProcessInstance.getProcessInstanceId()));
+        is(callingProcessInstance.getProcessInstanceId()));
   }
 
 }

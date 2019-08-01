@@ -32,7 +32,7 @@ import org.slf4j.Logger;
  */
 public class CompetingSentrySatisfactionTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   Thread testThread = Thread.currentThread();
   static ControllableThread activeThread;
@@ -55,14 +55,13 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
     public void run() {
       try {
-        processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, cmd));
+        processEngineConfiguration.getCommandExecutorTxRequired()
+            .execute(new ControlledCommand(activeThread, cmd));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      LOG.debug(getName()+" ends");
+      LOG.debug(getName() + " ends");
     }
   }
 
@@ -77,31 +76,22 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   public class ManualStartSingleThread extends SingleThread {
 
     public ManualStartSingleThread(String caseExecutionId) {
-      super(caseExecutionId, new ManualStartCaseExecutionCmd(caseExecutionId, null, null, null, null));
+      super(caseExecutionId,
+          new ManualStartCaseExecutionCmd(caseExecutionId, null, null, null, null));
     }
 
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testEntryCriteriaWithAndSentry.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testEntryCriteriaWithAndSentry.cmmn" })
   public void testEntryCriteriaWithAndSentry() {
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String firstHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String firstHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_1").singleResult().getId();
 
-    String secondHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String secondHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_2").singleResult().getId();
 
     LOG.debug("test thread starts thread one");
     SingleThread threadOne = new ManualStartSingleThread(firstHumanTaskId);
@@ -124,26 +114,16 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertTextPresent("was updated by another transaction concurrently", message);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testExitCriteriaWithAndSentry.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testExitCriteriaWithAndSentry.cmmn" })
   public void testExitCriteriaWithAndSentry() {
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String firstHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String firstHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_1").singleResult().getId();
 
-    String secondHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String secondHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_2").singleResult().getId();
 
     LOG.debug("test thread starts thread one");
     SingleThread threadOne = new ManualStartSingleThread(firstHumanTaskId);
@@ -166,26 +146,16 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertTextPresent("was updated by another transaction concurrently", message);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testEntryCriteriaWithOrSentry.cmmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testEntryCriteriaWithOrSentry.cmmn" })
   public void testEntryCriteriaWithOrSentry() {
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String firstHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String firstHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_1").singleResult().getId();
 
-    String secondHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String secondHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_2").singleResult().getId();
 
     LOG.debug("test thread starts thread one");
     SingleThread threadOne = new ManualStartSingleThread(firstHumanTaskId);
@@ -208,35 +178,22 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertTextPresent("was updated by another transaction concurrently", message);
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testExitCriteriaWithOrSentry.cmmn",
-      "org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.testExitCriteriaWithOrSentry.cmmn",
+      "org/camunda/bpm/engine/test/concurrency/CompetingSentrySatisfactionTest.oneTaskProcess.bpmn20.xml" })
   public void testExitCriteriaWithOrSentry() {
-    String caseInstanceId = caseService
-        .withCaseDefinitionByKey("case")
-        .create()
-        .getId();
+    String caseInstanceId = caseService.withCaseDefinitionByKey("case").create().getId();
 
-    String firstHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
+    String firstHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_1").singleResult().getId();
 
-    String secondHumanTaskId = caseService
-        .createCaseExecutionQuery()
-        .caseInstanceId(caseInstanceId)
-        .activityId("PI_HumanTask_2")
-        .singleResult()
-        .getId();
+    String secondHumanTaskId = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_2").singleResult().getId();
 
-    CaseExecution thirdTask = caseService
-      .createCaseExecutionQuery()
-      .caseInstanceId(caseInstanceId)
-      .activityId("ProcessTask_3")
-      .singleResult();
+    CaseExecution thirdTask = caseService.createCaseExecutionQuery().caseInstanceId(caseInstanceId)
+        .activityId("ProcessTask_3").singleResult();
     caseService.manuallyStartCaseExecution(thirdTask.getId());
-    
+
     LOG.debug("test thread starts thread one");
     SingleThread threadOne = new ManualStartSingleThread(firstHumanTaskId);
     threadOne.startAndWaitUntilControlIsReturned();

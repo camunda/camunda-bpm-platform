@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInvocationContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -72,7 +71,8 @@ public class Context {
     return stack.peek();
   }
 
-  public static void setCommandInvocationContext(CommandInvocationContext commandInvocationContext) {
+  public static void setCommandInvocationContext(
+      CommandInvocationContext commandInvocationContext) {
     getStack(commandInvocationContextThreadLocal).push(commandInvocationContext);
   }
 
@@ -81,14 +81,16 @@ public class Context {
   }
 
   public static ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    Stack<ProcessEngineConfigurationImpl> stack = getStack(processEngineConfigurationStackThreadLocal);
+    Stack<ProcessEngineConfigurationImpl> stack = getStack(
+        processEngineConfigurationStackThreadLocal);
     if (stack.isEmpty()) {
       return null;
     }
     return stack.peek();
   }
 
-  public static void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  public static void setProcessEngineConfiguration(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     getStack(processEngineConfigurationStackThreadLocal).push(processEngineConfiguration);
   }
 
@@ -113,8 +115,9 @@ public class Context {
   }
 
   public static CoreExecutionContext<? extends CoreExecution> getCoreExecutionContext() {
-    Stack<CoreExecutionContext<? extends CoreExecution>> stack = getStack(executionContextStackThreadLocal);
-    if(stack == null || stack.isEmpty()) {
+    Stack<CoreExecutionContext<? extends CoreExecution>> stack = getStack(
+        executionContextStackThreadLocal);
+    if (stack == null || stack.isEmpty()) {
       return null;
     } else {
       return stack.peek();
@@ -135,7 +138,7 @@ public class Context {
 
   protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
     Stack<T> stack = threadLocal.get();
-    if (stack==null) {
+    if (stack == null) {
       stack = new Stack<T>();
       threadLocal.set(stack);
     }
@@ -154,10 +157,9 @@ public class Context {
     jobExecutorContextThreadLocal.remove();
   }
 
-
   public static ProcessApplicationReference getCurrentProcessApplication() {
     Stack<ProcessApplicationReference> stack = getStack(processApplicationContext);
-    if(stack.isEmpty()) {
+    if (stack.isEmpty()) {
       return null;
     } else {
       return stack.peek();
@@ -175,41 +177,49 @@ public class Context {
   }
 
   /**
-   * Use {@link #executeWithinProcessApplication(Callable, ProcessApplicationReference, InvocationContext)}
+   * Use
+   * {@link #executeWithinProcessApplication(Callable, ProcessApplicationReference, InvocationContext)}
    * instead if an {@link InvocationContext} is available.
    */
-  public static <T> T executeWithinProcessApplication(Callable<T> callback, ProcessApplicationReference processApplicationReference) {
+  public static <T> T executeWithinProcessApplication(Callable<T> callback,
+      ProcessApplicationReference processApplicationReference) {
     return executeWithinProcessApplication(callback, processApplicationReference, null);
   }
 
-  public static <T> T executeWithinProcessApplication(Callable<T> callback, ProcessApplicationReference processApplicationReference, InvocationContext invocationContext) {
+  public static <T> T executeWithinProcessApplication(Callable<T> callback,
+      ProcessApplicationReference processApplicationReference,
+      InvocationContext invocationContext) {
     String paName = processApplicationReference.getName();
     try {
-      ProcessApplicationInterface processApplication = processApplicationReference.getProcessApplication();
+      ProcessApplicationInterface processApplication = processApplicationReference
+          .getProcessApplication();
       setCurrentProcessApplication(processApplicationReference);
 
       try {
         // wrap callback
-        ProcessApplicationClassloaderInterceptor<T> wrappedCallback = new ProcessApplicationClassloaderInterceptor<T>(callback);
+        ProcessApplicationClassloaderInterceptor<T> wrappedCallback = new ProcessApplicationClassloaderInterceptor<T>(
+            callback);
         // execute wrapped callback
         return processApplication.execute(wrappedCallback, invocationContext);
 
       } catch (Exception e) {
 
         // unwrap exception
-        if(e.getCause() != null && e.getCause() instanceof RuntimeException) {
+        if (e.getCause() != null && e.getCause() instanceof RuntimeException) {
           throw (RuntimeException) e.getCause();
-        }else {
-          throw new ProcessEngineException("Unexpected exeption while executing within process application ", e);
+        } else {
+          throw new ProcessEngineException(
+              "Unexpected exeption while executing within process application ", e);
         }
 
       } finally {
         removeCurrentProcessApplication();
       }
 
-
     } catch (ProcessApplicationUnavailableException e) {
-      throw new ProcessEngineException("Cannot switch to process application '"+paName+"' for execution: "+e.getMessage(), e);
+      throw new ProcessEngineException(
+          "Cannot switch to process application '" + paName + "' for execution: " + e.getMessage(),
+          e);
     }
   }
 }

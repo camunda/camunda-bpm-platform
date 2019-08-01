@@ -30,25 +30,30 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
   public void testNoTables() {
     try {
       ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/notables.camunda.cfg.xml")
-        .buildProcessEngine();
+          .createProcessEngineConfigurationFromResource(
+              "org/camunda/bpm/engine/test/standalone/initialization/notables.camunda.cfg.xml")
+          .buildProcessEngine();
       fail("expected exception");
     } catch (Exception e) {
       // OK
-      assertTextPresent("ENGINE-03057 There are no Camunda tables in the database. Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in camunda.cfg.xml for automatic schema creation", e.getMessage());
+      assertTextPresent(
+          "ENGINE-03057 There are no Camunda tables in the database. Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in camunda.cfg.xml for automatic schema creation",
+          e.getMessage());
     }
   }
 
   public void testDefaultRetries() {
     ProcessEngineConfiguration configuration = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/defaultretries.camunda.cfg.xml");
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/standalone/initialization/defaultretries.camunda.cfg.xml");
 
     assertEquals(JobEntity.DEFAULT_RETRIES, configuration.getDefaultNumberOfRetries());
   }
 
   public void testCustomDefaultRetries() {
     ProcessEngineConfiguration configuration = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/initialization/customdefaultretries.camunda.cfg.xml");
+        .createProcessEngineConfigurationFromResource(
+            "org/camunda/bpm/engine/test/standalone/initialization/customdefaultretries.camunda.cfg.xml");
 
     assertEquals(5, configuration.getDefaultNumberOfRetries());
   }

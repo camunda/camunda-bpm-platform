@@ -31,7 +31,8 @@ public class ExpressionSetInvocation extends DelegateInvocation {
   protected final Object value;
   protected ELContext elContext;
 
-  public ExpressionSetInvocation(ValueExpression valueExpression, ELContext elContext, Object value, BaseDelegateExecution contextExecution) {
+  public ExpressionSetInvocation(ValueExpression valueExpression, ELContext elContext, Object value,
+      BaseDelegateExecution contextExecution) {
     super(contextExecution, null);
     this.valueExpression = valueExpression;
     this.value = value;

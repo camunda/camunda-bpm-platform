@@ -136,8 +136,7 @@ public class BatchQueryTest {
     try {
       managementService.createBatchQuery().batchId(null).singleResult();
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Batch id is null"));
     }
   }
@@ -172,8 +171,7 @@ public class BatchQueryTest {
     try {
       managementService.createBatchQuery().type(null).singleResult();
       Assert.fail("exception expected");
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Type is null"));
     }
   }
@@ -222,10 +220,9 @@ public class BatchQueryTest {
     try {
       managementService.createBatchQuery().orderById().singleResult();
       Assert.fail("exception expected");
-    }
-    catch (NotValidException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Invalid query: "
-          + "call asc() or desc() after using orderByXX()"));
+    } catch (NotValidException e) {
+      Assert.assertThat(e.getMessage(), CoreMatchers
+          .containsString("Invalid query: " + "call asc() or desc() after using orderByXX()"));
     }
   }
 
@@ -234,10 +231,9 @@ public class BatchQueryTest {
     try {
       managementService.createBatchQuery().asc().singleResult();
       Assert.fail("exception expected");
-    }
-    catch (NotValidException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("You should call any of the orderBy methods "
-          + "first before specifying a direction"));
+    } catch (NotValidException e) {
+      Assert.assertThat(e.getMessage(), CoreMatchers.containsString(
+          "You should call any of the orderBy methods " + "first before specifying a direction"));
     }
   }
 
@@ -281,10 +277,7 @@ public class BatchQueryTest {
     for (Batch batch : query.list()) {
       foundIds.add(batch.getId());
     }
-    Assert.assertThat(foundIds, hasItems(
-      batch1.getId(),
-      batch3.getId()
-    ));
+    Assert.assertThat(foundIds, hasItems(batch1.getId(), batch3.getId()));
   }
 
 }

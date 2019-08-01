@@ -21,14 +21,16 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
- * Validates that the target process definition cannot add a new inner activity to a migrating multi-instance body.
+ * Validates that the target process definition cannot add a new inner activity to a migrating
+ * multi-instance body.
  *
  * @author Thorben Lindhauer
  */
 public class CannotAddMultiInstanceInnerActivityValidator implements MigrationInstructionValidator {
 
   @Override
-  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions,
+  public void validate(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
       MigrationInstructionValidationReportImpl report) {
     ActivityImpl targetActivity = instruction.getTargetActivity();
 
@@ -36,7 +38,8 @@ public class CannotAddMultiInstanceInnerActivityValidator implements MigrationIn
       ActivityImpl innerActivity = getInnerActivity(targetActivity);
 
       if (instructions.getInstructionsByTargetScope(innerActivity).isEmpty()) {
-        report.addFailure("Must map the inner activity of a multi-instance body when the body is mapped");
+        report.addFailure(
+            "Must map the inner activity of a multi-instance body when the body is mapped");
       }
     }
   }
@@ -46,7 +49,8 @@ public class CannotAddMultiInstanceInnerActivityValidator implements MigrationIn
   }
 
   protected ActivityImpl getInnerActivity(ActivityImpl multiInstanceBody) {
-    MultiInstanceActivityBehavior activityBehavior = (MultiInstanceActivityBehavior) multiInstanceBody.getActivityBehavior();
+    MultiInstanceActivityBehavior activityBehavior = (MultiInstanceActivityBehavior) multiInstanceBody
+        .getActivityBehavior();
     return activityBehavior.getInnerActivity(multiInstanceBody);
   }
 

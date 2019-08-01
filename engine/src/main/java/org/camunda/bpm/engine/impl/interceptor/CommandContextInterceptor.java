@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -24,28 +23,36 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessEngineContextImpl;
 
 /**
- * <p>Interceptor used for opening the {@link CommandContext} and {@link CommandInvocationContext}.</p>
+ * <p>
+ * Interceptor used for opening the {@link CommandContext} and {@link CommandInvocationContext}.
+ * </p>
  *
- * <p>Since 7.1, this interceptor will not always open a new command context but instead reuse an existing
- * command context if possible. This is required for supporting process engine public API access from
- * delegation code (see {@link ProcessEngineServicesAware}.). However, for every command, a new
- * command invocation context is created. While a command context holds resources that are
- * shared between multiple commands, such as database sessions, a command invocation context holds
- * resources specific for a single command.</p>
+ * <p>
+ * Since 7.1, this interceptor will not always open a new command context but instead reuse an
+ * existing command context if possible. This is required for supporting process engine public API
+ * access from delegation code (see {@link ProcessEngineServicesAware}.). However, for every
+ * command, a new command invocation context is created. While a command context holds resources
+ * that are shared between multiple commands, such as database sessions, a command invocation
+ * context holds resources specific for a single command.
+ * </p>
  *
- * <p>The interceptor will check whether an open command context exists. If true, it will reuse the
+ * <p>
+ * The interceptor will check whether an open command context exists. If true, it will reuse the
  * command context. If false, it will open a new one. We will always push the context to the
- * {@link Context} stack. So ins some situations, you will see the same context being pushed to the sack
- * multiple times. The rationale is that the size of  the stack should allow you to determine whether
- * you are currently running an 'inner' command or an 'outer' command as well as your current stack size.
- * Existing code may rely on this behavior.</p>
+ * {@link Context} stack. So ins some situations, you will see the same context being pushed to the
+ * sack multiple times. The rationale is that the size of the stack should allow you to determine
+ * whether you are currently running an 'inner' command or an 'outer' command as well as your
+ * current stack size. Existing code may rely on this behavior.
+ * </p>
  *
- * <p>The interceptor can be configured using the property {@link #alwaysOpenNew}.
- * If this property is set to true, we will always open a new context regardless whether there already
- * exists an active context or not. This is required for properly supporting REQUIRES_NEW semantics for
- * commands run through the {@link ProcessEngineConfigurationImpl#getCommandInterceptorsTxRequiresNew()}
- * chain. In that context the 'inner' command must be able to succeed / fail independently from the
- * 'outer' command.</p>
+ * <p>
+ * The interceptor can be configured using the property {@link #alwaysOpenNew}. If this property is
+ * set to true, we will always open a new context regardless whether there already exists an active
+ * context or not. This is required for properly supporting REQUIRES_NEW semantics for commands run
+ * through the {@link ProcessEngineConfigurationImpl#getCommandInterceptorsTxRequiresNew()} chain.
+ * In that context the 'inner' command must be able to succeed / fail independently from the 'outer'
+ * command.
+ * </p>
  *
  *
  * @author Tom Baeyens
@@ -65,12 +72,14 @@ public class CommandContextInterceptor extends CommandInterceptor {
   public CommandContextInterceptor() {
   }
 
-  public CommandContextInterceptor(CommandContextFactory commandContextFactory, ProcessEngineConfigurationImpl processEngineConfiguration) {
+  public CommandContextInterceptor(CommandContextFactory commandContextFactory,
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.commandContextFactory = commandContextFactory;
     this.processEngineConfiguration = processEngineConfiguration;
   }
 
-  public CommandContextInterceptor(CommandContextFactory commandContextFactory, ProcessEngineConfigurationImpl processEngineConfiguration, boolean alwaysOpenNew) {
+  public CommandContextInterceptor(CommandContextFactory commandContextFactory,
+      ProcessEngineConfigurationImpl processEngineConfiguration, boolean alwaysOpenNew) {
     this(commandContextFactory, processEngineConfiguration);
     this.alwaysOpenNew = alwaysOpenNew;
   }
@@ -78,10 +87,10 @@ public class CommandContextInterceptor extends CommandInterceptor {
   public <T> T execute(Command<T> command) {
     CommandContext context = null;
 
-    if(!alwaysOpenNew) {
+    if (!alwaysOpenNew) {
       // check whether we can reuse the command context
       CommandContext existingCommandContext = Context.getCommandContext();
-      if(existingCommandContext != null && isFromSameEngine(existingCommandContext)) {
+      if (existingCommandContext != null && isFromSameEngine(existingCommandContext)) {
         context = existingCommandContext;
       }
     }
@@ -94,7 +103,7 @@ public class CommandContextInterceptor extends CommandInterceptor {
     Context.setCommandInvocationContext(commandInvocationContext);
 
     try {
-      if(openNew) {
+      if (openNew) {
         LOG.debugOpeningNewCommandContext();
         context = commandContextFactory.createCommandContext();
 

@@ -232,7 +232,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
     // there exists a callableElement
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
 
     assertNotNull(behavior.getCallableElement());
   }
@@ -247,10 +248,12 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
-    ParameterValueProvider processRefValueProvider = callableElement.getDefinitionKeyValueProvider();
+    ParameterValueProvider processRefValueProvider = callableElement
+        .getDefinitionKeyValueProvider();
     assertNotNull(processRefValueProvider);
 
     assertTrue(processRefValueProvider instanceof ConstantValueProvider);
@@ -268,10 +271,12 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
-    ParameterValueProvider processRefValueProvider = callableElement.getDefinitionKeyValueProvider();
+    ParameterValueProvider processRefValueProvider = callableElement
+        .getDefinitionKeyValueProvider();
     assertNotNull(processRefValueProvider);
 
     assertTrue(processRefValueProvider instanceof ElValueProvider);
@@ -289,7 +294,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     CallableElementBinding binding = callableElement.getBinding();
@@ -307,7 +313,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     ParameterValueProvider processVersionValueProvider = callableElement.getVersionValueProvider();
@@ -327,7 +334,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     ParameterValueProvider processVersionValueProvider = callableElement.getVersionValueProvider();
@@ -350,7 +358,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     ParameterValueProvider businessKeyValueProvider = callableElement.getBusinessKeyValueProvider();
@@ -372,7 +381,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     ParameterValueProvider businessKeyValueProvider = callableElement.getBusinessKeyValueProvider();
@@ -399,7 +409,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
 
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     List<CallableElementParameter> inputs = callableElement.getInputs();
@@ -420,7 +431,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
 
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getInputs().get(0);
 
@@ -440,7 +452,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getInputs().get(0);
 
@@ -466,7 +479,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getInputs().get(0);
 
@@ -493,7 +507,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getInputs().get(0);
 
@@ -519,7 +534,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
 
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
 
     List<CallableElementParameter> outputs = callableElement.getOutputs();
@@ -540,7 +556,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
 
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getOutputs().get(0);
 
@@ -560,7 +577,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getOutputs().get(0);
 
@@ -586,7 +604,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getOutputs().get(0);
 
@@ -613,7 +632,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity.getActivityBehavior();
+    ProcessTaskActivityBehavior behavior = (ProcessTaskActivityBehavior) activity
+        .getActivityBehavior();
     CallableElement callableElement = behavior.getCallableElement();
     CallableElementParameter parameter = callableElement.getOutputs().get(0);
 
@@ -630,7 +650,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     Body body = createElement(conditionExpression, null, Body.class);
     body.setTextContent("${test}");
 
@@ -665,7 +686,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
-    ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression1 = createElement(ifPart1, "def",
+        ConditionExpression.class);
     conditionExpression1.setText("${test}");
 
     // set first exitCriteria
@@ -675,7 +697,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
-    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
+    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl",
+        ConditionExpression.class);
     conditionExpression2.setText("${test}");
 
     // set second exitCriteria
@@ -687,8 +710,10 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     context.setParent(parent);
 
     // transform Sentry
-    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1, context);
-    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2, context);
+    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1,
+        context);
+    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2,
+        context);
 
     // when
     CmmnActivity newActivity = handler.handleElement(planItem, context);
@@ -711,7 +736,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     conditionExpression.setText("${test}");
 
     // set entryCriteria
@@ -745,7 +771,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
-    ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression1 = createElement(ifPart1, "def",
+        ConditionExpression.class);
     conditionExpression1.setText("${test}");
 
     // set first entryCriteria
@@ -755,7 +782,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
-    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
+    ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl",
+        ConditionExpression.class);
     conditionExpression2.setText("${test}");
 
     // set second entryCriteria
@@ -767,8 +795,10 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     context.setParent(parent);
 
     // transform Sentry
-    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1, context);
-    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2, context);
+    CmmnSentryDeclaration firstSentryDeclaration = new SentryHandler().handleElement(sentry1,
+        context);
+    CmmnSentryDeclaration secondSentryDeclaration = new SentryHandler().handleElement(sentry2,
+        context);
 
     // when
     CmmnActivity newActivity = handler.handleElement(planItem, context);
@@ -791,7 +821,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // create sentry containing ifPart
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
-    ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
+    ConditionExpression conditionExpression = createElement(ifPart, "def",
+        ConditionExpression.class);
     conditionExpression.setText("${test}");
 
     // set entry-/exitCriteria
@@ -825,8 +856,10 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testManualActivationRule() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
-    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1",
+        ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -843,9 +876,12 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testManualActivationRuleByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(processTask, "ItemControl_1", DefaultControl.class);
-    ManualActivationRule manualActivationRule = createElement(defaultControl, "ManualActivationRule_1", ManualActivationRule.class);
-    ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
+    PlanItemControl defaultControl = createElement(processTask, "ItemControl_1",
+        DefaultControl.class);
+    ManualActivationRule manualActivationRule = createElement(defaultControl,
+        "ManualActivationRule_1", ManualActivationRule.class);
+    ConditionExpression expression = createElement(manualActivationRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -864,7 +900,8 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
     RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -881,9 +918,11 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testRequiredRuleByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(processTask, "ItemControl_1", DefaultControl.class);
+    PlanItemControl defaultControl = createElement(processTask, "ItemControl_1",
+        DefaultControl.class);
     RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
-    ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
+    ConditionExpression expression = createElement(requiredRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -901,8 +940,10 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRule() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -919,9 +960,12 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testRepetitionRuleByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(processTask, "DefaultControl_1", DefaultControl.class);
-    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    PlanItemControl defaultControl = createElement(processTask, "DefaultControl_1",
+        DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -939,8 +983,10 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRuleStandardEvents() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -959,9 +1005,12 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testRepetitionRuleStandardEventsByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(processTask, "DefaultControl_1", DefaultControl.class);
-    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    PlanItemControl defaultControl = createElement(processTask, "DefaultControl_1",
+        DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
@@ -981,8 +1030,10 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   public void testRepetitionRuleCustomStandardEvents() {
     // given
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
-    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     repetitionRule.setCamundaRepeatOnStandardEvent(CaseExecutionListener.DISABLE);
@@ -1002,9 +1053,12 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testRepetitionRuleCustomStandardEventsByDefaultPlanItemControl() {
     // given
-    PlanItemControl defaultControl = createElement(processTask, "DefaultControl_1", DefaultControl.class);
-    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
-    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    PlanItemControl defaultControl = createElement(processTask, "DefaultControl_1",
+        DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1",
+        RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1",
+        ConditionExpression.class);
     expression.setText("${true}");
 
     repetitionRule.setCamundaRepeatOnStandardEvent(CaseExecutionListener.DISABLE);

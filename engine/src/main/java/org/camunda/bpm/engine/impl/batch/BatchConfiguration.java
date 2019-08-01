@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.impl.batch;
 
 import java.util.List;
 
-
 public class BatchConfiguration {
 
   protected List<String> ids;

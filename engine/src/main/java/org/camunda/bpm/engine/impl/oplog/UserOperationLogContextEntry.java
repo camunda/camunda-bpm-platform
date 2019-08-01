@@ -21,8 +21,9 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 /**
- * One op log context entry represents an operation on a set of entities of the same type (see entityType field).
- * It consist multiple {@link PropertyChange}s that end up as multiple history events.
+ * One op log context entry represents an operation on a set of entities of the same type (see
+ * entityType field). It consist multiple {@link PropertyChange}s that end up as multiple history
+ * events.
  *
  * @author Thorben Lindhauer
  */
@@ -187,11 +188,11 @@ public class UserOperationLogContextEntry {
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
-  
+
   public String getExternalTaskId() {
     return externalTaskId;
   }
-  
+
   public void setExternalTaskId(String externalTaskId) {
     this.externalTaskId = externalTaskId;
   }

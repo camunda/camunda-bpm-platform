@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.application;
 
-
 /**
  * @author Daniel Meyer
  *

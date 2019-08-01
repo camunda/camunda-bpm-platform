@@ -34,22 +34,13 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCase {
 
   protected BpmnModelInstance signalStartProcess(String processId) {
-    return Bpmn.createExecutableProcess(processId)
-      .startEvent()
-        .signal("signal")
-      .userTask()
-      .endEvent()
-      .done();
+    return Bpmn.createExecutableProcess(processId).startEvent().signal("signal").userTask()
+        .endEvent().done();
   }
 
   protected BpmnModelInstance signalCatchProcess(String processId) {
-    return Bpmn.createExecutableProcess(processId)
-      .startEvent()
-      .intermediateCatchEvent()
-        .signal("signal")
-      .userTask()
-      .endEvent()
-      .done();
+    return Bpmn.createExecutableProcess(processId).startEvent().intermediateCatchEvent()
+        .signal("signal").userTask().endEvent().done();
   }
 
   public void testSendSignalToStartEvent() {
@@ -105,7 +96,8 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalCatch");
     runtimeService.startProcessInstanceByKey("signalCatch2");
 
-    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery()
+        .processInstanceId(processInstance.getId()).singleResult();
     String executionId = eventSubscription.getExecutionId();
 
     runtimeService.createSignalEvent("signal").executionId(executionId).send();
@@ -116,8 +108,7 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
   public void testSendSignalToStartEventWithVariables() {
     deployment(signalStartProcess("signalStart"));
 
-    Map<String, Object> variables = Variables.createVariables()
-        .putValue("var1", "a")
+    Map<String, Object> variables = Variables.createVariables().putValue("var1", "a")
         .putValue("var2", "b");
 
     runtimeService.createSignalEvent("signal").setVariables(variables).send();
@@ -131,8 +122,7 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
 
     runtimeService.startProcessInstanceByKey("signalCatch");
 
-    Map<String, Object> variables = Variables.createVariables()
-        .putValue("var1", "a")
+    Map<String, Object> variables = Variables.createVariables().putValue("var1", "a")
         .putValue("var2", "b");
 
     runtimeService.createSignalEvent("signal").setVariables(variables).send();
@@ -157,11 +147,7 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
   }
 
   public void testNoSignalEventSubscriptionWithExecutionId() {
-    deployment(Bpmn.createExecutableProcess("noSignal")
-        .startEvent()
-        .userTask()
-        .endEvent()
-        .done());
+    deployment(Bpmn.createExecutableProcess("noSignal").startEvent().userTask().endEvent().done());
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("noSignal");
     String executionId = processInstance.getId();
@@ -170,7 +156,8 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTestCa
       runtimeService.createSignalEvent("signal").executionId(executionId).send();
 
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Execution '" + executionId + "' has not subscribed to a signal event with name 'signal'"));
+      assertThat(e.getMessage(), containsString("Execution '" + executionId
+          + "' has not subscribed to a signal event with name 'signal'"));
     }
   }
 

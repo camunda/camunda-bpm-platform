@@ -26,7 +26,8 @@ import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-public class SaveTenantCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
+public class SaveTenantCmd extends AbstractWritableIdentityServiceCmd<Void>
+    implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected Tenant tenant;
@@ -40,9 +41,8 @@ public class SaveTenantCmd extends AbstractWritableIdentityServiceCmd<Void> impl
     ensureNotNull("tenant", tenant);
     ensureWhitelistedResourceId(commandContext, "Tenant", tenant.getId());
 
-    IdentityOperationResult operationResult = commandContext
-      .getWritableIdentityProvider()
-      .saveTenant(tenant);
+    IdentityOperationResult operationResult = commandContext.getWritableIdentityProvider()
+        .saveTenant(tenant);
 
     commandContext.getOperationLogManager().logTenantOperation(operationResult, tenant.getId());
 

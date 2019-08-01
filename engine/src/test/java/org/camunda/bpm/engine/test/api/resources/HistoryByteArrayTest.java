@@ -116,9 +116,11 @@ public class HistoryByteArrayTest {
     testRule.deploy(instance);
     FileValue fileValue = createFile();
 
-    runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValueTyped("fileVar", fileValue));
+    runtimeService.startProcessInstanceByKey("Process",
+        Variables.createVariables().putValueTyped("fileVar", fileValue));
 
-    String byteArrayValueId = ((HistoricVariableInstanceEntity)historyService.createHistoricVariableInstanceQuery().singleResult()).getByteArrayValueId();
+    String byteArrayValueId = ((HistoricVariableInstanceEntity) historyService
+        .createHistoricVariableInstanceQuery().singleResult()).getByteArrayValueId();
 
     // when
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
@@ -139,7 +141,8 @@ public class HistoryByteArrayTest {
     taskId = task.getId();
     taskService.setVariablesLocal(taskId, variables);
 
-    String byteArrayValueId = ((HistoricVariableInstanceEntity)historyService.createHistoricVariableInstanceQuery().singleResult()).getByteArrayValueId();
+    String byteArrayValueId = ((HistoricVariableInstanceEntity) historyService
+        .createHistoricVariableInstanceQuery().singleResult()).getByteArrayValueId();
 
     // when
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
@@ -156,9 +159,11 @@ public class HistoryByteArrayTest {
     testRule.deploy(instance);
     FileValue fileValue = createFile();
 
-    runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValueTyped("fileVar", fileValue));
+    runtimeService.startProcessInstanceByKey("Process",
+        Variables.createVariables().putValueTyped("fileVar", fileValue));
 
-    String byteArrayValueId = ((HistoricDetailVariableInstanceUpdateEntity) historyService.createHistoricDetailQuery().singleResult()).getByteArrayValueId();
+    String byteArrayValueId = ((HistoricDetailVariableInstanceUpdateEntity) historyService
+        .createHistoricDetailQuery().singleResult()).getByteArrayValueId();
 
     // when
     ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
@@ -173,14 +178,17 @@ public class HistoryByteArrayTest {
 
     startProcessInstanceAndEvaluateDecision(new JavaSerializable("foo"));
 
-    HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService().createHistoricDecisionInstanceQuery().includeInputs().singleResult();
+    HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService()
+        .createHistoricDecisionInstanceQuery().includeInputs().singleResult();
     List<HistoricDecisionInputInstance> inputInstances = historicDecisionInstance.getInputs();
     assertEquals(1, inputInstances.size());
 
-    String byteArrayValueId = ((HistoricDecisionInputInstanceEntity) inputInstances.get(0)).getByteArrayValueId();
+    String byteArrayValueId = ((HistoricDecisionInputInstanceEntity) inputInstances.get(0))
+        .getByteArrayValueId();
 
     // when
-    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(byteArrayValueId));
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
+        .execute(new GetByteArrayCommand(byteArrayValueId));
 
     checkBinary(byteArrayEntity);
   }
@@ -191,32 +199,37 @@ public class HistoryByteArrayTest {
 
     startProcessInstanceAndEvaluateDecision(new JavaSerializable("foo"));
 
-    HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService().createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
+    HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService()
+        .createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
     List<HistoricDecisionOutputInstance> outputInstances = historicDecisionInstance.getOutputs();
     assertEquals(1, outputInstances.size());
 
-
-    String byteArrayValueId = ((HistoricDecisionOutputInstanceEntity) outputInstances.get(0)).getByteArrayValueId();
+    String byteArrayValueId = ((HistoricDecisionOutputInstanceEntity) outputInstances.get(0))
+        .getByteArrayValueId();
 
     // when
-    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(byteArrayValueId));
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
+        .execute(new GetByteArrayCommand(byteArrayValueId));
 
     checkBinary(byteArrayEntity);
   }
 
   @Test
   public void testAttachmentContentBinaries() {
-      // create and save task
-      Task task = taskService.newTask();
-      taskService.saveTask(task);
-      taskId = task.getId();
+    // create and save task
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+    taskId = task.getId();
 
-      // when
-      AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment("web page", taskId, "someprocessinstanceid", "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+    // when
+    AttachmentEntity attachment = (AttachmentEntity) taskService.createAttachment("web page",
+        taskId, "someprocessinstanceid", "weatherforcast", "temperatures and more",
+        new ByteArrayInputStream("someContent".getBytes()));
 
-      ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(attachment.getContentId()));
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
+        .execute(new GetByteArrayCommand(attachment.getContentId()));
 
-      checkBinary(byteArrayEntity);
+    checkBinary(byteArrayEntity);
   }
 
   @Test
@@ -236,12 +249,11 @@ public class HistoryByteArrayTest {
     }
 
     HistoricJobLogEventEntity entity = (HistoricJobLogEventEntity) historyService
-        .createHistoricJobLogQuery()
-        .failureLog()
-        .singleResult();
+        .createHistoricJobLogQuery().failureLog().singleResult();
     assertNotNull(entity);
 
-    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(entity.getExceptionByteArrayId()));
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
+        .execute(new GetByteArrayCommand(entity.getExceptionByteArrayId()));
 
     checkBinary(byteArrayEntity);
   }
@@ -249,12 +261,12 @@ public class HistoryByteArrayTest {
   @Test
   public void testHistoricExternalTaskJobLogStacktraceBinary() {
     // given
-    testRule.deploy("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml");
+    testRule
+        .deploy("org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml");
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-        .topic(TOPIC_NAME, LOCK_TIME)
-        .execute();
+        .topic(TOPIC_NAME, LOCK_TIME).execute();
 
     LockedExternalTask task = tasks.get(0);
 
@@ -271,12 +283,15 @@ public class HistoryByteArrayTest {
     }
     assertNotNull(exceptionStackTrace);
 
-    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, exceptionStackTrace, 5, 3000L);
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, exceptionStackTrace, 5,
+        3000L);
 
-    HistoricExternalTaskLogEntity entity = (HistoricExternalTaskLogEntity) historyService.createHistoricExternalTaskLogQuery().errorMessage(errorMessage).singleResult();
+    HistoricExternalTaskLogEntity entity = (HistoricExternalTaskLogEntity) historyService
+        .createHistoricExternalTaskLogQuery().errorMessage(errorMessage).singleResult();
     assertNotNull(entity);
 
-    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired().execute(new GetByteArrayCommand(entity.getErrorDetailsByteArrayId()));
+    ByteArrayEntity byteArrayEntity = configuration.getCommandExecutorTxRequired()
+        .execute(new GetByteArrayCommand(entity.getErrorDetailsByteArrayId()));
 
     // then
     checkBinary(byteArrayEntity);
@@ -293,39 +308,25 @@ public class HistoryByteArrayTest {
     String encoding = "crazy-encoding";
     String mimeType = "martini/dry";
 
-    FileValue fileValue = Variables
-        .fileValue(fileName)
-        .file("ABC".getBytes())
-        .encoding(encoding)
-        .mimeType(mimeType)
-        .create();
+    FileValue fileValue = Variables.fileValue(fileName).file("ABC".getBytes()).encoding(encoding)
+        .mimeType(mimeType).create();
     return fileValue;
   }
 
   protected BpmnModelInstance createProcess() {
-    return Bpmn.createExecutableProcess("Process")
-      .startEvent()
-      .userTask("user")
-      .endEvent()
-      .done();
+    return Bpmn.createExecutableProcess("Process").startEvent().userTask("user").endEvent().done();
   }
 
   protected BpmnModelInstance createFailingProcess() {
-    return Bpmn.createExecutableProcess("Process")
-      .startEvent()
-      .serviceTask("failing")
-      .camundaAsyncAfter()
-      .camundaAsyncBefore()
-      .camundaClass(FailingDelegate.class)
-      .endEvent()
-      .done();
+    return Bpmn.createExecutableProcess("Process").startEvent().serviceTask("failing")
+        .camundaAsyncAfter().camundaAsyncBefore().camundaClass(FailingDelegate.class).endEvent()
+        .done();
   }
 
   protected ProcessInstance startProcessInstanceAndEvaluateDecision(Object input) {
     return engineRule.getRuntimeService().startProcessInstanceByKey("testProcess",
         Variables.createVariables().putValue("input1", input));
   }
-
 
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);

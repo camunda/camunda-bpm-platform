@@ -47,7 +47,8 @@ public class GlobalRetryConfigurationTest {
   private static final int JOB_RETRIES = 4;
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       configuration.setFailedJobRetryTimeCycle(SCHEDULE);
       return configuration;
     }
@@ -60,7 +61,8 @@ public class GlobalRetryConfigurationTest {
   public ExpectedException thrown = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   private RuntimeService runtimeService;
   private ManagementService managementService;
@@ -129,19 +131,10 @@ public class GlobalRetryConfigurationTest {
   public void testFailedCallActivity() {
 
     testRule.deploy(
-      Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-        .callActivity()
-          .calledElement("testProcess2")
-        .endEvent()
-        .done(),
-      Bpmn.createExecutableProcess("testProcess2")
-        .startEvent()
-        .serviceTask()
-          .camundaClass(FAILING_CLASS)
-          .camundaAsyncBefore()
-        .endEvent()
-      .done());
+        Bpmn.createExecutableProcess(PROCESS_ID).startEvent().callActivity()
+            .calledElement("testProcess2").endEvent().done(),
+        Bpmn.createExecutableProcess("testProcess2").startEvent().serviceTask()
+            .camundaClass(FAILING_CLASS).camundaAsyncBefore().endEvent().done());
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess2");
 
@@ -172,14 +165,9 @@ public class GlobalRetryConfigurationTest {
 
   @Test
   public void testRetryOnAsyncStartEvent() throws Exception {
-    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
-        .startEvent()
-          .camundaAsyncBefore()
-          .camundaFailedJobRetryTimeCycle("R5/PT5M")
-        .serviceTask()
-          .camundaClass("bar")
-        .endEvent()
-        .done();
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process").startEvent()
+        .camundaAsyncBefore().camundaFailedJobRetryTimeCycle("R5/PT5M").serviceTask()
+        .camundaClass("bar").endEvent().done();
 
     testRule.deploy(bpmnModelInstance);
 
@@ -209,78 +197,42 @@ public class GlobalRetryConfigurationTest {
   }
 
   private BpmnModelInstance prepareSignalEventProcessWithoutRetry() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-          .intermediateThrowEvent(FAILING_EVENT)
-            .camundaAsyncBefore(true)
-            .signal("start")
-          .serviceTask()
-            .camundaClass(FAILING_CLASS)
-        .endEvent()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .intermediateThrowEvent(FAILING_EVENT).camundaAsyncBefore(true).signal("start")
+        .serviceTask().camundaClass(FAILING_CLASS).endEvent().done();
     return modelInstance;
   }
 
   private BpmnModelInstance prepareFailingServiceTask() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-        .serviceTask()
-          .camundaClass(FAILING_CLASS)
-          .camundaAsyncBefore()
-        .endEvent()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .serviceTask().camundaClass(FAILING_CLASS).camundaAsyncBefore().endEvent().done();
     return modelInstance;
   }
 
   private BpmnModelInstance prepareFailingServiceTaskWithRetryCycle() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-        .serviceTask()
-          .camundaClass(FAILING_CLASS)
-          .camundaAsyncBefore()
-          .camundaFailedJobRetryTimeCycle("R10/PT5M")
-        .endEvent()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .serviceTask().camundaClass(FAILING_CLASS).camundaAsyncBefore()
+        .camundaFailedJobRetryTimeCycle("R10/PT5M").endEvent().done();
     return modelInstance;
   }
 
   private BpmnModelInstance prepareFailingBusinessRuleTask() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-        .businessRuleTask()
-          .camundaClass(FAILING_CLASS)
-          .camundaAsyncBefore()
-        .endEvent()
-        .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .businessRuleTask().camundaClass(FAILING_CLASS).camundaAsyncBefore().endEvent().done();
     return modelInstance;
   }
 
   private BpmnModelInstance prepareFailingScriptTask() {
-    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-      .startEvent()
-      .scriptTask()
-        .scriptFormat("groovy")
-        .scriptText("x = 5 / 0")
-        .camundaAsyncBefore()
-      .userTask()
-      .endEvent()
-    .done();
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .scriptTask().scriptFormat("groovy").scriptText("x = 5 / 0").camundaAsyncBefore().userTask()
+        .endEvent().done();
     return bpmnModelInstance;
   }
 
   private BpmnModelInstance prepareFailingSubProcess() {
-    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-      .startEvent()
-      .subProcess()
-        .embeddedSubProcess()
-          .startEvent()
-          .serviceTask()
-            .camundaClass(FAILING_CLASS)
-            .camundaAsyncBefore()
-          .endEvent()
-      .subProcessDone()
-      .endEvent()
-    .done();
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .subProcess().embeddedSubProcess().startEvent().serviceTask().camundaClass(FAILING_CLASS)
+        .camundaAsyncBefore().endEvent().subProcessDone().endEvent().done();
     return bpmnModelInstance;
   }
 }

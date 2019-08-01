@@ -28,7 +28,10 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 
-public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirementsGraphImpl implements DecisionRequirementsDefinition, ResourceDefinitionEntity<DecisionRequirementsDefinitionEntity>, DbEntity, HasDbRevision, Serializable {
+public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirementsGraphImpl
+    implements DecisionRequirementsDefinition,
+    ResourceDefinitionEntity<DecisionRequirementsDefinitionEntity>, DbEntity, HasDbRevision,
+    Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -177,7 +180,8 @@ public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirement
         previousDecisionDefinitionId = getPreviousDecisionRequirementsDefinitionId();
 
         if (previousDecisionDefinitionId != null) {
-          previousDecisionDefinition = loadDecisionRequirementsDefinition(previousDecisionDefinitionId);
+          previousDecisionDefinition = loadDecisionRequirementsDefinition(
+              previousDecisionDefinitionId);
         }
       }
     }
@@ -186,25 +190,31 @@ public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirement
   }
 
   @Override
-  public void updateModifiableFieldsFromEntity(DecisionRequirementsDefinitionEntity updatingDefinition) {
+  public void updateModifiableFieldsFromEntity(
+      DecisionRequirementsDefinitionEntity updatingDefinition) {
   }
 
   /**
    * Returns the cached version if exists; does not update the entity from the database in that case
    */
-  protected DecisionRequirementsDefinitionEntity loadDecisionRequirementsDefinition(String decisionRequirementsDefinitionId) {
+  protected DecisionRequirementsDefinitionEntity loadDecisionRequirementsDefinition(
+      String decisionRequirementsDefinitionId) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     DeploymentCache deploymentCache = configuration.getDeploymentCache();
 
-    DecisionRequirementsDefinitionEntity decisionRequirementsDefinition = deploymentCache.findDecisionRequirementsDefinitionFromCache(decisionRequirementsDefinitionId);
+    DecisionRequirementsDefinitionEntity decisionRequirementsDefinition = deploymentCache
+        .findDecisionRequirementsDefinitionFromCache(decisionRequirementsDefinitionId);
 
     if (decisionRequirementsDefinition == null) {
       CommandContext commandContext = Context.getCommandContext();
-      DecisionRequirementsDefinitionManager manager = commandContext.getDecisionRequirementsDefinitionManager();
-      decisionRequirementsDefinition = manager.findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
+      DecisionRequirementsDefinitionManager manager = commandContext
+          .getDecisionRequirementsDefinitionManager();
+      decisionRequirementsDefinition = manager
+          .findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
 
       if (decisionRequirementsDefinition != null) {
-        decisionRequirementsDefinition = deploymentCache.resolveDecisionRequirementsDefinition(decisionRequirementsDefinition);
+        decisionRequirementsDefinition = deploymentCache
+            .resolveDecisionRequirementsDefinition(decisionRequirementsDefinition);
       }
     }
 
@@ -227,8 +237,7 @@ public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirement
 
   protected void ensurePreviousDecisionRequirementsDefinitionIdInitialized() {
     if (previousDecisionRequirementsDefinitionId == null && !firstVersion) {
-      previousDecisionRequirementsDefinitionId = Context
-          .getCommandContext()
+      previousDecisionRequirementsDefinitionId = Context.getCommandContext()
           .getDecisionRequirementsDefinitionManager()
           .findPreviousDecisionRequirementsDefinitionId(key, version, tenantId);
 
@@ -244,8 +253,9 @@ public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirement
 
   @Override
   public String toString() {
-    return "DecisionRequirementsDefinitionEntity [id=" + id + ", revision=" + revision + ", name=" + name + ", category=" + category + ", key=" + key
-        + ", version=" + version + ", deploymentId=" + deploymentId + ", tenantId=" + tenantId + "]";
+    return "DecisionRequirementsDefinitionEntity [id=" + id + ", revision=" + revision + ", name="
+        + name + ", category=" + category + ", key=" + key + ", version=" + version
+        + ", deploymentId=" + deploymentId + ", tenantId=" + tenantId + "]";
   }
 
 }

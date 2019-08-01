@@ -31,17 +31,14 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 public class SameBehaviorInstructionValidator implements MigrationInstructionValidator {
 
-  public static final List<Set<Class<?>>> EQUIVALENT_BEHAVIORS =
-      new ArrayList<Set<Class<?>>>();
+  public static final List<Set<Class<?>>> EQUIVALENT_BEHAVIORS = new ArrayList<Set<Class<?>>>();
 
   static {
-    EQUIVALENT_BEHAVIORS.add(CollectionUtil.<Class<?>>asHashSet(
-      CallActivityBehavior.class, CaseCallActivityBehavior.class
-    ));
+    EQUIVALENT_BEHAVIORS.add(CollectionUtil.<Class<?>> asHashSet(CallActivityBehavior.class,
+        CaseCallActivityBehavior.class));
 
-    EQUIVALENT_BEHAVIORS.add(CollectionUtil.<Class<?>>asHashSet(
-      SubProcessActivityBehavior.class, EventSubProcessActivityBehavior.class
-    ));
+    EQUIVALENT_BEHAVIORS.add(CollectionUtil.<Class<?>> asHashSet(SubProcessActivityBehavior.class,
+        EventSubProcessActivityBehavior.class));
   }
 
   protected Map<Class<?>, Set<Class<?>>> equivalentBehaviors = new HashMap<Class<?>, Set<Class<?>>>();
@@ -58,7 +55,9 @@ public class SameBehaviorInstructionValidator implements MigrationInstructionVal
     }
   }
 
-  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions, MigrationInstructionValidationReportImpl report) {
+  public void validate(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
+      MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
     ActivityImpl targetActivity = instruction.getTargetActivity();
 
@@ -66,8 +65,9 @@ public class SameBehaviorInstructionValidator implements MigrationInstructionVal
     Class<?> targetBehaviorClass = targetActivity.getActivityBehavior().getClass();
 
     if (!sameBehavior(sourceBehaviorClass, targetBehaviorClass)) {
-      report.addFailure("Activities have incompatible types "
-          + "(" + sourceBehaviorClass.getSimpleName() + " is not compatible with " + targetBehaviorClass.getSimpleName() + ")");
+      report.addFailure(
+          "Activities have incompatible types " + "(" + sourceBehaviorClass.getSimpleName()
+              + " is not compatible with " + targetBehaviorClass.getSimpleName() + ")");
     }
   }
 
@@ -75,13 +75,11 @@ public class SameBehaviorInstructionValidator implements MigrationInstructionVal
 
     if (sourceBehavior == targetBehavior) {
       return true;
-    }
-    else {
+    } else {
       Set<Class<?>> equivalentBehaviors = this.equivalentBehaviors.get(sourceBehavior);
       if (equivalentBehaviors != null) {
         return equivalentBehaviors.contains(targetBehavior);
-      }
-      else {
+      } else {
         return false;
       }
     }

@@ -42,43 +42,35 @@ public class ModificationBatchAuthorizationTest extends BatchCreationAuthorizati
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
+        scenario().withoutAuthorizations().failsDueToRequired(
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+            grant(Resources.BATCH, "batchId", "userId",
+                BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES)),
         scenario()
-            .withoutAuthorizations()
-            .failsDueToRequired(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES)
-            ).succeeds()
-    );
+            .withAuthorizations(grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
+        scenario().withAuthorizations(grant(Resources.BATCH, "batchId", "userId",
+            BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES)).succeeds());
   }
 
   @Test
   public void createBatchModification() {
-    //given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("process1").startEvent().userTask("user1").userTask("user2").endEvent().done();
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process1").startEvent()
+        .userTask("user1").userTask("user2").endEvent().done();
     ProcessDefinition processDefinition = testHelper.deployAndGetDefinition(instance);
 
     List<String> instances = new ArrayList<String>();
     for (int i = 0; i < 2; i++) {
-      ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process1");
+      ProcessInstance processInstance = engineRule.getRuntimeService()
+          .startProcessInstanceByKey("process1");
       instances.add(processInstance.getId());
     }
 
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("batchId", "*")
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", "*").start();
 
     // when
-    engineRule.getRuntimeService().createModification(processDefinition.getId()).startAfterActivity("user1").processInstanceIds(instances).executeAsync();
+    engineRule.getRuntimeService().createModification(processDefinition.getId())
+        .startAfterActivity("user1").processInstanceIds(instances).executeAsync();
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -86,6 +78,5 @@ public class ModificationBatchAuthorizationTest extends BatchCreationAuthorizati
       assertEquals("userId", batch.getCreateUserId());
     }
   }
-
 
 }

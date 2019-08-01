@@ -26,8 +26,8 @@ import org.camunda.bpm.engine.test.api.delegate.AssertingTaskListener;
 import org.camunda.bpm.engine.test.api.delegate.AssertingTaskListener.DelegateTaskAsserter;
 
 /**
- * Tests if a {@link DelegateTask} has the correct tenant-id. The
- * assertions are checked inside the task listener.
+ * Tests if a {@link DelegateTask} has the correct tenant-id. The assertions are checked inside the
+ * task listener.
  */
 public class MultiTenancyDelegateTaskTest extends PluggableProcessEngineTestCase {
 
@@ -38,7 +38,8 @@ public class MultiTenancyDelegateTaskTest extends PluggableProcessEngineTestCase
 
     AssertingTaskListener.addAsserts(hasTenantId("tenant1"));
 
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .singleResult();
     runtimeService.startProcessInstanceById(processDefinition.getId());
   }
 

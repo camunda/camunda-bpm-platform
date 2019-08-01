@@ -46,20 +46,17 @@ public class MultiTenancyHistoricProcessInstanceStateTest {
   public ProcessEngineTestRule processEngineTestRule = new ProcessEngineTestRule(processEngineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain
-      .outerRule(processEngineTestRule)
-      .around(processEngineRule);
+  public RuleChain ruleChain = RuleChain.outerRule(processEngineTestRule).around(processEngineRule);
 
   @Test
   public void testSuspensionWithTenancy() throws Exception {
-    BpmnModelInstance instance = Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-        .userTask()
-        .endEvent()
-        .done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent().userTask()
+        .endEvent().done();
     ProcessDefinition processDefinition = processEngineTestRule.deployAndGetDefinition(instance);
-    ProcessDefinition processDefinition1 = processEngineTestRule.deployForTenantAndGetDefinition(TENANT_ONE, instance);
-    ProcessDefinition processDefinition2 = processEngineTestRule.deployForTenantAndGetDefinition(TENANT_TWO, instance);
+    ProcessDefinition processDefinition1 = processEngineTestRule
+        .deployForTenantAndGetDefinition(TENANT_ONE, instance);
+    ProcessDefinition processDefinition2 = processEngineTestRule
+        .deployForTenantAndGetDefinition(TENANT_TWO, instance);
 
     ProcessInstance processInstance = processEngineRule.getRuntimeService()
         .startProcessInstanceById(processDefinition.getId());
@@ -68,53 +65,38 @@ public class MultiTenancyHistoricProcessInstanceStateTest {
     ProcessInstance processInstance2 = processEngineRule.getRuntimeService()
         .startProcessInstanceById(processDefinition2.getId());
 
-    //suspend Tenant one
+    // suspend Tenant one
     processEngineRule.getRuntimeService().updateProcessInstanceSuspensionState()
         .byProcessDefinitionKey(processDefinition1.getKey())
         .processDefinitionTenantId(processDefinition1.getTenantId()).suspend();
 
-    String[] processInstances = {
-        processInstance1.getId(),
-        processInstance2.getId(),
-        processInstance.getId()};
+    String[] processInstances = { processInstance1.getId(), processInstance2.getId(),
+        processInstance.getId() };
 
-    verifyStates(processInstances,
-        new String[]{
-            HistoricProcessInstance.STATE_SUSPENDED,
-            HistoricProcessInstance.STATE_ACTIVE,
-            HistoricProcessInstance.STATE_ACTIVE});
+    verifyStates(processInstances, new String[] { HistoricProcessInstance.STATE_SUSPENDED,
+        HistoricProcessInstance.STATE_ACTIVE, HistoricProcessInstance.STATE_ACTIVE });
 
-
-    //suspend without tenant
+    // suspend without tenant
     processEngineRule.getRuntimeService().updateProcessInstanceSuspensionState()
-        .byProcessDefinitionKey(processDefinition.getKey())
-        .processDefinitionWithoutTenantId().suspend();
+        .byProcessDefinitionKey(processDefinition.getKey()).processDefinitionWithoutTenantId()
+        .suspend();
 
-    verifyStates(processInstances,
-        new String[]{
-            HistoricProcessInstance.STATE_SUSPENDED,
-            HistoricProcessInstance.STATE_ACTIVE,
-            HistoricProcessInstance.STATE_SUSPENDED});
+    verifyStates(processInstances, new String[] { HistoricProcessInstance.STATE_SUSPENDED,
+        HistoricProcessInstance.STATE_ACTIVE, HistoricProcessInstance.STATE_SUSPENDED });
 
-    //reactivate without tenant
+    // reactivate without tenant
     processEngineRule.getRuntimeService().updateProcessInstanceSuspensionState()
-        .byProcessDefinitionKey(processDefinition.getKey())
-        .processDefinitionWithoutTenantId().activate();
+        .byProcessDefinitionKey(processDefinition.getKey()).processDefinitionWithoutTenantId()
+        .activate();
 
-
-    verifyStates(processInstances,
-        new String[]{
-            HistoricProcessInstance.STATE_SUSPENDED,
-            HistoricProcessInstance.STATE_ACTIVE,
-            HistoricProcessInstance.STATE_ACTIVE});
+    verifyStates(processInstances, new String[] { HistoricProcessInstance.STATE_SUSPENDED,
+        HistoricProcessInstance.STATE_ACTIVE, HistoricProcessInstance.STATE_ACTIVE });
   }
 
   protected void verifyStates(String[] processInstances, String[] states) {
     for (int i = 0; i < processInstances.length; i++) {
-      assertThat(
-          processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
-              .processInstanceId(processInstances[i]).singleResult().getState(),
-          is(states[i]));
+      assertThat(processEngineRule.getHistoryService().createHistoricProcessInstanceQuery()
+          .processInstanceId(processInstances[i]).singleResult().getState(), is(states[i]));
     }
   }
 }

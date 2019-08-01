@@ -48,22 +48,13 @@ public class BatchStatisticsEntity extends BatchEntity implements BatchStatistic
   }
 
   public String toString() {
-    return "BatchStatisticsEntity{" +
-      "batchHandler=" + batchJobHandler +
-      ", id='" + id + '\'' +
-      ", type='" + type + '\'' +
-      ", size=" + totalJobs +
-      ", jobCreated=" + jobsCreated +
-      ", remainingJobs=" + remainingJobs +
-      ", failedJobs=" + failedJobs +
-      ", batchJobsPerSeed=" + batchJobsPerSeed +
-      ", invocationsPerBatchJob=" + invocationsPerBatchJob +
-      ", seedJobDefinitionId='" + seedJobDefinitionId + '\'' +
-      ", monitorJobDefinitionId='" + seedJobDefinitionId + '\'' +
-      ", batchJobDefinitionId='" + batchJobDefinitionId + '\'' +
-      ", configurationId='" + configuration.getByteArrayId() + '\'' +
-      '}';
+    return "BatchStatisticsEntity{" + "batchHandler=" + batchJobHandler + ", id='" + id + '\''
+        + ", type='" + type + '\'' + ", size=" + totalJobs + ", jobCreated=" + jobsCreated
+        + ", remainingJobs=" + remainingJobs + ", failedJobs=" + failedJobs + ", batchJobsPerSeed="
+        + batchJobsPerSeed + ", invocationsPerBatchJob=" + invocationsPerBatchJob
+        + ", seedJobDefinitionId='" + seedJobDefinitionId + '\'' + ", monitorJobDefinitionId='"
+        + seedJobDefinitionId + '\'' + ", batchJobDefinitionId='" + batchJobDefinitionId + '\''
+        + ", configurationId='" + configuration.getByteArrayId() + '\'' + '}';
   }
-
 
 }

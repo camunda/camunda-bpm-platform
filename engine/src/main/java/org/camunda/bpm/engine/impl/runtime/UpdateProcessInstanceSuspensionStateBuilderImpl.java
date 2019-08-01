@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.runtime;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
-
 import java.util.List;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -34,8 +33,9 @@ import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelect
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 
-public class UpdateProcessInstanceSuspensionStateBuilderImpl implements UpdateProcessInstanceSuspensionStateBuilder,
-    UpdateProcessInstanceSuspensionStateSelectBuilder, UpdateProcessInstanceSuspensionStateTenantBuilder {
+public class UpdateProcessInstanceSuspensionStateBuilderImpl implements
+    UpdateProcessInstanceSuspensionStateBuilder, UpdateProcessInstanceSuspensionStateSelectBuilder,
+    UpdateProcessInstanceSuspensionStateTenantBuilder {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -54,51 +54,61 @@ public class UpdateProcessInstanceSuspensionStateBuilderImpl implements UpdatePr
   }
 
   /**
-   * Creates a builder without CommandExecutor which can not be used to update
-   * the suspension state via {@link #activate()} or {@link #suspend()}. Can be
-   * used in combination with your own command.
+   * Creates a builder without CommandExecutor which can not be used to update the suspension state
+   * via {@link #activate()} or {@link #suspend()}. Can be used in combination with your own
+   * command.
    */
   public UpdateProcessInstanceSuspensionStateBuilderImpl() {
     this(null);
   }
 
   @Override
-  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds){
-    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor).byProcessInstanceIds(processInstanceIds);
+  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(
+      List<String> processInstanceIds) {
+    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
+        .byProcessInstanceIds(processInstanceIds);
   }
 
   @Override
-  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(String... processInstanceIds) {
-    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor).byProcessInstanceIds(processInstanceIds);
+  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(
+      String... processInstanceIds) {
+    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
+        .byProcessInstanceIds(processInstanceIds);
   }
 
   @Override
-  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
-    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor).byProcessInstanceQuery(processInstanceQuery);
+  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(
+      ProcessInstanceQuery processInstanceQuery) {
+    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
+        .byProcessInstanceQuery(processInstanceQuery);
   }
 
   @Override
-  public UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
-    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor).byHistoricProcessInstanceQuery(historicProcessInstanceQuery);
+  public UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(
+      HistoricProcessInstanceQuery historicProcessInstanceQuery) {
+    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
+        .byHistoricProcessInstanceQuery(historicProcessInstanceQuery);
   }
 
-
   @Override
-  public UpdateProcessInstanceSuspensionStateBuilderImpl byProcessInstanceId(String processInstanceId) {
+  public UpdateProcessInstanceSuspensionStateBuilderImpl byProcessInstanceId(
+      String processInstanceId) {
     ensureNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
     return this;
   }
 
   @Override
-  public UpdateProcessInstanceSuspensionStateBuilderImpl byProcessDefinitionId(String processDefinitionId) {
+  public UpdateProcessInstanceSuspensionStateBuilderImpl byProcessDefinitionId(
+      String processDefinitionId) {
     ensureNotNull("processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   @Override
-  public UpdateProcessInstanceSuspensionStateBuilderImpl byProcessDefinitionKey(String processDefinitionKey) {
+  public UpdateProcessInstanceSuspensionStateBuilderImpl byProcessDefinitionKey(
+      String processDefinitionKey) {
     ensureNotNull("processDefinitionKey", processDefinitionKey);
     this.processDefinitionKey = processDefinitionKey;
     return this;
@@ -112,7 +122,8 @@ public class UpdateProcessInstanceSuspensionStateBuilderImpl implements UpdatePr
   }
 
   @Override
-  public UpdateProcessInstanceSuspensionStateBuilderImpl processDefinitionTenantId(String tenantId) {
+  public UpdateProcessInstanceSuspensionStateBuilderImpl processDefinitionTenantId(
+      String tenantId) {
     ensureNotNull("tenantId", tenantId);
 
     this.processDefinitionTenantId = tenantId;
@@ -137,9 +148,12 @@ public class UpdateProcessInstanceSuspensionStateBuilderImpl implements UpdatePr
   }
 
   protected void validateParameters() {
-    ensureOnlyOneNotNull("Need to specify either a process instance id, a process definition id or a process definition key.", processInstanceId, processDefinitionId, processDefinitionKey);
+    ensureOnlyOneNotNull(
+        "Need to specify either a process instance id, a process definition id or a process definition key.",
+        processInstanceId, processDefinitionId, processDefinitionKey);
 
-    if (isProcessDefinitionTenantIdSet && (processInstanceId != null || processDefinitionId != null)) {
+    if (isProcessDefinitionTenantIdSet
+        && (processInstanceId != null || processDefinitionId != null)) {
       throw LOG.exceptionUpdateSuspensionStateForTenantOnlyByProcessDefinitionKey();
     }
 

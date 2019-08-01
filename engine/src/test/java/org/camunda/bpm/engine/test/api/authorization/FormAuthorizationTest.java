@@ -59,14 +59,16 @@ public class FormAuthorizationTest extends AuthorizationTest {
         "org/camunda/bpm/engine/test/api/form/task.form",
         "org/camunda/bpm/engine/test/api/authorization/renderedFormProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
-    ensureSpecificVariablePermission = processEngineConfiguration.isEnforceSpecificVariablePermission();
+    ensureSpecificVariablePermission = processEngineConfiguration
+        .isEnforceSpecificVariablePermission();
     super.setUp();
   }
 
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
-    processEngineConfiguration.setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
+    processEngineConfiguration
+        .setEnforceSpecificVariablePermission(ensureSpecificVariablePermission);
   }
 
   // get start form data ///////////////////////////////////////////
@@ -99,7 +101,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
     // then
     assertNotNull(startFormData);
-    assertEquals("deployment:org/camunda/bpm/engine/test/api/form/start.form", startFormData.getFormKey());
+    assertEquals("deployment:org/camunda/bpm/engine/test/api/form/start.form",
+        startFormData.getFormKey());
   }
 
   // get rendered start form /////////////////////////////////////
@@ -469,7 +472,6 @@ public class FormAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TASK.resourceName(), message);
     }
 
-
     deleteTask(taskId, true);
   }
 
@@ -483,7 +485,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
       // when
       // Standalone task, no TaskFormData available
       formService.getRenderedTaskForm(taskId);
-    } catch (NullValueException e) {}
+    } catch (NullValueException e) {
+    }
 
     deleteTask(taskId, true);
   }
@@ -499,7 +502,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
       // when
       // Standalone task, no TaskFormData available
       formService.getRenderedTaskForm(taskId);
-    } catch (NullValueException e) {}
+    } catch (NullValueException e) {
+    }
 
     deleteTask(taskId, true);
   }
@@ -578,7 +582,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
     setReadVariableAsDefaultReadVariablePermission();
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK_VARIABLE);
+    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId,
+        READ_TASK_VARIABLE);
 
     // when
     Object taskForm = formService.getRenderedTaskForm(taskId);
@@ -791,10 +796,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, READ_VARIABLE);
-  
+
     // when
     VariableMap variables = formService.getTaskFormVariables(taskId);
-  
+
     // then
     assertNotNull(variables);
     assertEquals(1, variables.size());
@@ -805,7 +810,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
     setReadVariableAsDefaultReadVariablePermission();
     startProcessInstanceByKey(RENDERED_FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId, READ_TASK_VARIABLE);
+    createGrantAuthorization(PROCESS_DEFINITION, RENDERED_FORM_PROCESS_KEY, userId,
+        READ_TASK_VARIABLE);
 
     // when
     VariableMap variables = formService.getTaskFormVariables(taskId);

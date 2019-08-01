@@ -46,12 +46,11 @@ public class GetDeploymentCaseModelCmd implements Command<InputStream>, Serializ
   public InputStream execute(final CommandContext commandContext) {
     ensureNotNull("caseDefinitionId", caseDefinitionId);
 
-    CaseDefinitionEntity caseDefinition = Context
-            .getProcessEngineConfiguration()
-            .getDeploymentCache()
-            .findDeployedCaseDefinitionById(caseDefinitionId);
+    CaseDefinitionEntity caseDefinition = Context.getProcessEngineConfiguration()
+        .getDeploymentCache().findDeployedCaseDefinitionById(caseDefinitionId);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadCaseDefinition(caseDefinition);
     }
 

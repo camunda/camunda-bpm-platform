@@ -37,10 +37,8 @@ public class UpdateHistoricValueDelegate implements JavaDelegate, Serializable {
   public void execute(DelegateExecution execution) throws Exception {
     HistoryService historyService = execution.getProcessEngineServices().getHistoryService();
 
-    HistoricVariableInstance variableInstance = historyService
-        .createHistoricVariableInstanceQuery()
-        .variableName("listVar")
-        .singleResult();
+    HistoricVariableInstance variableInstance = historyService.createHistoricVariableInstanceQuery()
+        .variableName("listVar").singleResult();
 
     List<String> list = (List<String>) variableInstance.getValue();
 

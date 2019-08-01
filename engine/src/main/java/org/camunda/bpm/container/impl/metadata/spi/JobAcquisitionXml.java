@@ -18,9 +18,10 @@ package org.camunda.bpm.container.impl.metadata.spi;
 
 import java.util.Map;
 
-
 /**
- * <p>Java API to the JobAcquisition deployment metadata</p>
+ * <p>
+ * Java API to the JobAcquisition deployment metadata
+ * </p>
  * 
  * @author Daniel Meyer
  * 
@@ -35,16 +36,15 @@ public interface JobAcquisitionXml {
    * @return the name of the JobExecutor.
    */
   public String getName();
-  
+
   /**
    * @return the fully qualified classname of the JobExecutor to be used.
    */
   public String getJobExecutorClassName();
 
   /**
-   * @return a set of properties to configure the Job Executor. The
-   *         properties are mapped to bean properties of the JobExecutor
-   *         class used.
+   * @return a set of properties to configure the Job Executor. The properties are mapped to bean
+   *         properties of the JobExecutor class used.
    * 
    * @see #LOCK_TIME_IN_MILLIS
    * @see #WAIT_TIME_IN_MILLIS

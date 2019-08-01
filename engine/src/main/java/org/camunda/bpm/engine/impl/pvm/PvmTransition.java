@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.pvm;
 
-
-
 /**
  * @author Tom Baeyens
  */

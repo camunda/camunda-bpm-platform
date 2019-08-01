@@ -99,36 +99,40 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
 
   protected void writeTree(StringWriter writer, String prefix, boolean isTail) {
     writer.append(prefix);
-    if(isTail) {
+    if (isTail) {
       writer.append("└── ");
     } else {
       writer.append("├── ");
     }
 
-    writer.append(getActivityId()+"=>"+getId() +"\n");
+    writer.append(getActivityId() + "=>" + getId() + "\n");
 
     for (int i = 0; i < childTransitionInstances.length; i++) {
       TransitionInstance transitionInstance = childTransitionInstances[i];
-      boolean transitionIsTail = (i==(childTransitionInstances.length-1))
+      boolean transitionIsTail = (i == (childTransitionInstances.length - 1))
           && (childActivityInstances.length == 0);
-      writeTransition(transitionInstance, writer, prefix +  (isTail ? "    " : "│   "), transitionIsTail);
+      writeTransition(transitionInstance, writer, prefix + (isTail ? "    " : "│   "),
+          transitionIsTail);
     }
 
     for (int i = 0; i < childActivityInstances.length; i++) {
       ActivityInstanceImpl child = (ActivityInstanceImpl) childActivityInstances[i];
-      child.writeTree(writer, prefix + (isTail ? "    " : "│   "), (i==(childActivityInstances.length-1)));
+      child.writeTree(writer, prefix + (isTail ? "    " : "│   "),
+          (i == (childActivityInstances.length - 1)));
     }
   }
 
-  protected void writeTransition(TransitionInstance transition, StringWriter writer, String prefix, boolean isTail) {
+  protected void writeTransition(TransitionInstance transition, StringWriter writer, String prefix,
+      boolean isTail) {
     writer.append(prefix);
-    if(isTail) {
+    if (isTail) {
       writer.append("└── ");
     } else {
       writer.append("├── ");
     }
 
-    writer.append("transition to/from " + transition.getActivityId() + ":" + transition.getId() + "\n");
+    writer.append(
+        "transition to/from " + transition.getActivityId() + ":" + transition.getId() + "\n");
   }
 
   public String toString() {
@@ -149,8 +153,7 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
   protected void collectActivityInstances(String activityId, List<ActivityInstance> instances) {
     if (this.activityId.equals(activityId)) {
       instances.add(this);
-    }
-    else {
+    } else {
       for (ActivityInstance childInstance : childActivityInstances) {
         ((ActivityInstanceImpl) childInstance).collectActivityInstances(activityId, instances);
       }
@@ -178,7 +181,8 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
 
     if (!instanceFound) {
       for (ActivityInstance childActivityInstance : childActivityInstances) {
-        ((ActivityInstanceImpl) childActivityInstance).collectTransitionInstances(activityId, instances);
+        ((ActivityInstanceImpl) childActivityInstance).collectTransitionInstances(activityId,
+            instances);
       }
     }
   }

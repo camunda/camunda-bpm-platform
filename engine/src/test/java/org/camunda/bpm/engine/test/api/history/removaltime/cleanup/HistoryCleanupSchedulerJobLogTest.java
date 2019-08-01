@@ -47,7 +47,8 @@ import static org.junit.Assert.assertThat;
 public class HistoryCleanupSchedulerJobLogTest extends AbstractHistoryCleanupSchedulerTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
       return configure(configuration, HistoryEventTypes.JOB_FAIL);
     }
   };
@@ -56,7 +57,8 @@ public class HistoryCleanupSchedulerJobLogTest extends AbstractHistoryCleanupSch
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -75,14 +77,11 @@ public class HistoryCleanupSchedulerJobLogTest extends AbstractHistoryCleanupSch
 
   protected final String PROCESS_KEY = "process";
   protected final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess(PROCESS_KEY)
-    .camundaHistoryTimeToLive(5)
-    .startEvent()
-      .scriptTask()
-        .camundaAsyncBefore()
-        .scriptFormat("groovy")
-        .scriptText("if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
-      .userTask("userTask")
-    .endEvent().done();
+      .camundaHistoryTimeToLive(5).startEvent().scriptTask().camundaAsyncBefore()
+      .scriptFormat("groovy")
+      .scriptText(
+          "if(execution.getIncidents().size() == 0) throw new RuntimeException(\"I'm supposed to fail!\")")
+      .userTask("userTask").endEvent().done();
 
   @Test
   public void shouldScheduleToNow() {
@@ -91,9 +90,7 @@ public class HistoryCleanupSchedulerJobLogTest extends AbstractHistoryCleanupSch
 
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     managementService.setJobRetries(jobId, 5);
 
@@ -102,7 +99,8 @@ public class HistoryCleanupSchedulerJobLogTest extends AbstractHistoryCleanupSch
     for (int i = 0; i < 5; i++) {
       try {
         managementService.executeJob(jobId);
-      } catch (Exception ignored) { }
+      } catch (Exception ignored) {
+      }
     }
 
     managementService.executeJob(jobId);
@@ -132,9 +130,7 @@ public class HistoryCleanupSchedulerJobLogTest extends AbstractHistoryCleanupSch
 
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    String jobId = managementService.createJobQuery()
-      .singleResult()
-      .getId();
+    String jobId = managementService.createJobQuery().singleResult().getId();
 
     managementService.setJobRetries(jobId, 5);
 
@@ -143,7 +139,8 @@ public class HistoryCleanupSchedulerJobLogTest extends AbstractHistoryCleanupSch
     for (int i = 0; i < 5; i++) {
       try {
         managementService.executeJob(jobId);
-      } catch (Exception ignored) { }
+      } catch (Exception ignored) {
+      }
     }
 
     managementService.executeJob(jobId);

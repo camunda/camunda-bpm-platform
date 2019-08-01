@@ -67,7 +67,7 @@ public class MetricsUserOperationLogTest {
   public void testDeleteMetrics() {
     // given
     identityService.setAuthenticatedUserId("userId");
-    
+
     // when
     managementService.deleteMetrics(null);
     identityService.clearAuthentication();
@@ -87,7 +87,7 @@ public class MetricsUserOperationLogTest {
     // given
     Date timestamp = ClockUtil.getCurrentTime();
     identityService.setAuthenticatedUserId("userId");
-    
+
     // when
     managementService.deleteMetrics(timestamp);
     identityService.clearAuthentication();
@@ -106,7 +106,7 @@ public class MetricsUserOperationLogTest {
   public void testDeleteMetricsWithReporterId() {
     // given
     identityService.setAuthenticatedUserId("userId");
-    
+
     // when
     managementService.deleteMetrics(null, "reporter1");
     identityService.clearAuthentication();
@@ -120,26 +120,27 @@ public class MetricsUserOperationLogTest {
     assertThat(logEntry.getOrgValue(), nullValue());
     assertThat(logEntry.getNewValue(), is("reporter1"));
   }
-  
+
   @Test
   public void testDeleteMetricsWithTimestampAndReporterId() {
     // given
     Date timestamp = ClockUtil.getCurrentTime();
     identityService.setAuthenticatedUserId("userId");
-    
+
     // when
     managementService.deleteMetrics(timestamp, "reporter1");
     identityService.clearAuthentication();
 
     // then
     assertThat(historyService.createUserOperationLogQuery().count(), is(2L));
-    UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().property("reporter").singleResult();
+    UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery()
+        .property("reporter").singleResult();
     assertThat(logEntry.getEntityType(), is(EntityTypes.METRICS));
     assertThat(logEntry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_DELETE));
     assertThat(logEntry.getProperty(), is("reporter"));
     assertThat(logEntry.getOrgValue(), nullValue());
     assertThat(logEntry.getNewValue(), is("reporter1"));
-    
+
     logEntry = historyService.createUserOperationLogQuery().property("timestamp").singleResult();
     assertThat(logEntry.getEntityType(), is(EntityTypes.METRICS));
     assertThat(logEntry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_DELETE));

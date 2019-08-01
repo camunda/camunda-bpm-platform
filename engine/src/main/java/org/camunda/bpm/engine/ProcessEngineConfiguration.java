@@ -34,53 +34,56 @@ import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 
-
-/** Configuration information from which a process engine can be build.
+/**
+ * Configuration information from which a process engine can be build.
  *
- * <p>Most common is to create a process engine based on the default configuration file:
- * <pre>ProcessEngine processEngine = ProcessEngineConfiguration
- *   .createProcessEngineConfigurationFromResourceDefault()
- *   .buildProcessEngine();
+ * <p>
+ * Most common is to create a process engine based on the default configuration file:
+ * 
+ * <pre>
+ * ProcessEngine processEngine = ProcessEngineConfiguration
+ *     .createProcessEngineConfigurationFromResourceDefault().buildProcessEngine();
  * </pre>
  * </p>
  *
- * <p>To create a process engine programatic, without a configuration file,
- * the first option is {@link #createStandaloneProcessEngineConfiguration()}
- * <pre>ProcessEngine processEngine = ProcessEngineConfiguration
- *   .createStandaloneProcessEngineConfiguration()
- *   .buildProcessEngine();
+ * <p>
+ * To create a process engine programatic, without a configuration file, the first option is
+ * {@link #createStandaloneProcessEngineConfiguration()}
+ * 
+ * <pre>
+ * ProcessEngine processEngine = ProcessEngineConfiguration
+ *     .createStandaloneProcessEngineConfiguration().buildProcessEngine();
  * </pre>
- * This creates a new process engine with all the defaults to connect to
- * a remote h2 database (jdbc:h2:tcp://localhost/activiti) in standalone
- * mode.  Standalone mode means that Activiti will manage the transactions
- * on the JDBC connections that it creates.  One transaction per
- * service method.
- * For a description of how to write the configuration files, see the
- * userguide.
+ * 
+ * This creates a new process engine with all the defaults to connect to a remote h2 database
+ * (jdbc:h2:tcp://localhost/activiti) in standalone mode. Standalone mode means that Activiti will
+ * manage the transactions on the JDBC connections that it creates. One transaction per service
+ * method. For a description of how to write the configuration files, see the userguide.
  * </p>
  *
- * <p>The second option is great for testing: {@link #createStandaloneInMemProcessEngineConfiguration()}
- * <pre>ProcessEngine processEngine = ProcessEngineConfiguration
- *   .createStandaloneInMemProcessEngineConfiguration()
- *   .buildProcessEngine();
+ * <p>
+ * The second option is great for testing:
+ * {@link #createStandaloneInMemProcessEngineConfiguration()}
+ * 
+ * <pre>
+ * ProcessEngine processEngine = ProcessEngineConfiguration
+ *     .createStandaloneInMemProcessEngineConfiguration().buildProcessEngine();
  * </pre>
- * This creates a new process engine with all the defaults to connect to
- * an memory h2 database (jdbc:h2:tcp://localhost/activiti) in standalone
- * mode.  The DB schema strategy default is in this case <code>create-drop</code>.
- * Standalone mode means that Activiti will manage the transactions
- * on the JDBC connections that it creates.  One transaction per
- * service method.
+ * 
+ * This creates a new process engine with all the defaults to connect to an memory h2 database
+ * (jdbc:h2:tcp://localhost/activiti) in standalone mode. The DB schema strategy default is in this
+ * case <code>create-drop</code>. Standalone mode means that Activiti will manage the transactions
+ * on the JDBC connections that it creates. One transaction per service method.
  * </p>
  *
- * <p>On all forms of creating a process engine, you can first customize the configuration
- * before calling the {@link #buildProcessEngine()} method by calling any of the
- * setters like this:
- * <pre>ProcessEngine processEngine = ProcessEngineConfiguration
- *   .createProcessEngineConfigurationFromResourceDefault()
- *   .setMailServerHost("gmail.com")
- *   .setJdbcUsername("mickey")
- *   .setJdbcPassword("mouse")
- *   .buildProcessEngine();
+ * <p>
+ * On all forms of creating a process engine, you can first customize the configuration before
+ * calling the {@link #buildProcessEngine()} method by calling any of the setters like this:
+ * 
+ * <pre>
+ * ProcessEngine processEngine = ProcessEngineConfiguration
+ *     .createProcessEngineConfigurationFromResourceDefault().setMailServerHost("gmail.com")
+ *     .setJdbcUsername("mickey").setJdbcPassword("mouse").buildProcessEngine();
  * </pre>
  * </p>
  *
@@ -90,21 +93,20 @@ import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 public abstract class ProcessEngineConfiguration {
 
   /**
-   * Checks the version of the DB schema against the library when
-   * the process engine is being created and throws an exception
-   * if the versions don't match.
+   * Checks the version of the DB schema against the library when the process engine is being
+   * created and throws an exception if the versions don't match.
    */
   public static final String DB_SCHEMA_UPDATE_FALSE = "false";
 
   /**
-   * Creates the schema when the process engine is being created and
-   * drops the schema when the process engine is being closed.
+   * Creates the schema when the process engine is being created and drops the schema when the
+   * process engine is being closed.
    */
   public static final String DB_SCHEMA_UPDATE_CREATE_DROP = "create-drop";
 
   /**
-   * Upon building of the process engine, a check is performed and
-   * an update of the schema is performed if it is necessary.
+   * Upon building of the process engine, a check is performed and an update of the schema is
+   * performed if it is necessary.
    */
   public static final String DB_SCHEMA_UPDATE_TRUE = "true";
 
@@ -114,31 +116,33 @@ public abstract class ProcessEngineConfiguration {
   public static final String HISTORY_NONE = "none";
   /**
    * Value for {@link #setHistory(String)} to ensure that only historic process instances and
-   * historic activity instances are being recorded.
-   * This means no details for those entities.
+   * historic activity instances are being recorded. This means no details for those entities.
    */
   public static final String HISTORY_ACTIVITY = "activity";
   /**
-   * Value for {@link #setHistory(String)} to ensure that only historic process instances,
-   * historic activity instances and last process variable values are being recorded.
-   * <p><strong>NOTE:</strong> This history level has been deprecated. Use level {@link #HISTORY_ACTIVITY} instead.</p>
+   * Value for {@link #setHistory(String)} to ensure that only historic process instances, historic
+   * activity instances and last process variable values are being recorded.
+   * <p>
+   * <strong>NOTE:</strong> This history level has been deprecated. Use level
+   * {@link #HISTORY_ACTIVITY} instead.
+   * </p>
    */
   @Deprecated
   public static final String HISTORY_VARIABLE = "variable";
   /**
-   * Value for {@link #setHistory(String)} to ensure that only historic process instances,
-   * historic activity instances and submitted form property values are being recorded.
+   * Value for {@link #setHistory(String)} to ensure that only historic process instances, historic
+   * activity instances and submitted form property values are being recorded.
    */
   public static final String HISTORY_AUDIT = "audit";
   /**
-   * Value for {@link #setHistory(String)} to ensure that all historic information is
-   * being recorded, including the variable updates.
+   * Value for {@link #setHistory(String)} to ensure that all historic information is being
+   * recorded, including the variable updates.
    */
   public static final String HISTORY_FULL = "full";
 
   /**
-   * Value for {@link #setHistory(String)}. Choosing auto causes the configuration to choose the level
-   * already present on the database. If none can be found, "audit" is taken.
+   * Value for {@link #setHistory(String)}. Choosing auto causes the configuration to choose the
+   * level already present on the database. If none can be found, "audit" is taken.
    */
   public static final String HISTORY_AUTO = "auto";
 
@@ -173,32 +177,34 @@ public abstract class ProcessEngineConfiguration {
   public static final String HISTORY_REMOVAL_TIME_STRATEGY_NONE = "none";
 
   /**
-   * Always enables check for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations.
-   * This mode is equal to the &lt; 7.5 behavior.
-   *<p />
+   * Always enables check for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations. This
+   * mode is equal to the &lt; 7.5 behavior.
+   * <p />
    * *NOTE:* Checking revoke authorizations is very expensive for resources with a high potential
-   * cardinality like tasks or process instances and can render authorized access to the process engine
-   * effectively unusable on most databases. You are therefore strongly discouraged from using this mode.
+   * cardinality like tasks or process instances and can render authorized access to the process
+   * engine effectively unusable on most databases. You are therefore strongly discouraged from
+   * using this mode.
    *
    */
   public static final String AUTHORIZATION_CHECK_REVOKE_ALWAYS = "always";
 
   /**
-   * Never checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations. This mode
-   * has best performance effectively disables the use of {@link Authorization#AUTH_TYPE_REVOKE}.
+   * Never checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations. This mode has
+   * best performance effectively disables the use of {@link Authorization#AUTH_TYPE_REVOKE}.
    * *Note*: It is strongly recommended to use this mode.
    */
   public static final String AUTHORIZATION_CHECK_REVOKE_NEVER = "never";
 
   /**
-   * This mode only checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations if at least
-   * one revoke authorization currently exits for the current user or one of the groups the user is a member
-   * of. To achieve this it is checked once per command whether potentially applicable revoke authorizations
-   * exist. Based on the outcome, the authorization check then uses revoke or not.
-   *<p />
+   * This mode only checks for {@link Authorization#AUTH_TYPE_REVOKE revoke} authorizations if at
+   * least one revoke authorization currently exits for the current user or one of the groups the
+   * user is a member of. To achieve this it is checked once per command whether potentially
+   * applicable revoke authorizations exist. Based on the outcome, the authorization check then uses
+   * revoke or not.
+   * <p />
    * *NOTE:* Checking revoke authorizations is very expensive for resources with a high potential
-   * cardinality like tasks or process instances and can render authorized access to the process engine
-   * effectively unusable on most databases.
+   * cardinality like tasks or process instances and can render authorized access to the process
+   * engine effectively unusable on most databases.
    */
   public static final String AUTHORIZATION_CHECK_REVOKE_AUTO = "auto";
 
@@ -216,9 +222,9 @@ public abstract class ProcessEngineConfiguration {
   protected boolean producePrioritizedExternalTasks = true;
 
   /**
-   * The flag will be used inside the method "JobManager#send()". It will be used to decide whether to notify the
-   * job executor that a new job has been created. It will be used for performance improvement, so that the new job could
-   * be executed in some situations immediately.
+   * The flag will be used inside the method "JobManager#send()". It will be used to decide whether
+   * to notify the job executor that a new job has been created. It will be used for performance
+   * improvement, so that the new job could be executed in some situations immediately.
    */
   protected boolean hintJobExecutor = true;
 
@@ -269,40 +275,41 @@ public abstract class ProcessEngineConfiguration {
   protected PasswordPolicy passwordPolicy;
 
   /**
-   * switch for controlling whether the process engine performs authorization checks.
-   * The default value is false.
+   * switch for controlling whether the process engine performs authorization checks. The default
+   * value is false.
    */
   protected boolean authorizationEnabled = false;
 
   /**
-   * Provides the default task permission for the user related to a task
-   * User can be related to a task in the following ways
-   * - Candidate user
-   * - Part of candidate group
-   * - Assignee
-   * - Owner
-   * The default value is UPDATE.
+   * Provides the default task permission for the user related to a task User can be related to a
+   * task in the following ways - Candidate user - Part of candidate group - Assignee - Owner The
+   * default value is UPDATE.
    */
   protected String defaultUserPermissionNameForTask = "UPDATE";
 
   /**
-   * <p>The following flag <code>authorizationEnabledForCustomCode</code> will
-   * only be taken into account iff <code>authorizationEnabled</code> is set
-   * <code>true</code>.</p>
+   * <p>
+   * The following flag <code>authorizationEnabledForCustomCode</code> will only be taken into
+   * account iff <code>authorizationEnabled</code> is set <code>true</code>.
+   * </p>
    *
-   * <p>If the value of the flag <code>authorizationEnabledForCustomCode</code>
-   * is set <code>true</code> then an authorization check will be performed by
-   * executing commands inside custom code (e.g. inside {@link JavaDelegate}).</p>
+   * <p>
+   * If the value of the flag <code>authorizationEnabledForCustomCode</code> is set
+   * <code>true</code> then an authorization check will be performed by executing commands inside
+   * custom code (e.g. inside {@link JavaDelegate}).
+   * </p>
    *
-   * <p>The default value is <code>false</code>.</p>
+   * <p>
+   * The default value is <code>false</code>.
+   * </p>
    *
    */
   protected boolean authorizationEnabledForCustomCode = false;
 
   /**
-   * If the value of this flag is set <code>true</code> then the process engine
-   * performs tenant checks to ensure that an authenticated user can only access
-   * data that belongs to one of his tenants.
+   * If the value of this flag is set <code>true</code> then the process engine performs tenant
+   * checks to ensure that an authenticated user can only access data that belongs to one of his
+   * tenants.
    */
   protected boolean tenantCheckEnabled = true;
 
@@ -311,90 +318,93 @@ public abstract class ProcessEngineConfiguration {
   protected String authorizationCheckRevokes = AUTHORIZATION_CHECK_REVOKE_AUTO;
 
   /**
-   * A parameter used for defining acceptable values for the User, Group
-   * and Tenant IDs. The pattern can be defined by using the standard
-   * Java Regular Expression syntax should be used.
+   * A parameter used for defining acceptable values for the User, Group and Tenant IDs. The pattern
+   * can be defined by using the standard Java Regular Expression syntax should be used.
    *
-   * <p>By default only alphanumeric values (or 'camunda-admin') will be accepted.</p>
+   * <p>
+   * By default only alphanumeric values (or 'camunda-admin') will be accepted.
+   * </p>
    */
-  protected String generalResourceWhitelistPattern =  "[a-zA-Z0-9]+|camunda-admin";
+  protected String generalResourceWhitelistPattern = "[a-zA-Z0-9]+|camunda-admin";
 
   /**
-   * A parameter used for defining acceptable values for the User IDs.
-   * The pattern can be defined by using the standard Java Regular
-   * Expression syntax should be used.
+   * A parameter used for defining acceptable values for the User IDs. The pattern can be defined by
+   * using the standard Java Regular Expression syntax should be used.
    *
-   * <p>If not defined, the general pattern is used. Only alphanumeric
-   * values (or 'camunda-admin') will be accepted.</p>
+   * <p>
+   * If not defined, the general pattern is used. Only alphanumeric values (or 'camunda-admin') will
+   * be accepted.
+   * </p>
    */
   protected String userResourceWhitelistPattern;
 
   /**
-   * A parameter used for defining acceptable values for the Group IDs.
-   * The pattern can be defined by using the standard Java Regular
-   * Expression syntax should be used.
+   * A parameter used for defining acceptable values for the Group IDs. The pattern can be defined
+   * by using the standard Java Regular Expression syntax should be used.
    *
-   * <p>If not defined, the general pattern is used. Only alphanumeric
-   * values (or 'camunda-admin') will be accepted.</p>
+   * <p>
+   * If not defined, the general pattern is used. Only alphanumeric values (or 'camunda-admin') will
+   * be accepted.
+   * </p>
    */
   protected String groupResourceWhitelistPattern;
 
   /**
-   * A parameter used for defining acceptable values for the Tenant IDs.
-   * The pattern can be defined by using the standard Java Regular
-   * Expression syntax should be used.
+   * A parameter used for defining acceptable values for the Tenant IDs. The pattern can be defined
+   * by using the standard Java Regular Expression syntax should be used.
    *
-   * <p>If not defined, the general pattern is used. Only alphanumeric
-   * values (or 'camunda-admin') will be accepted.</p>
+   * <p>
+   * If not defined, the general pattern is used. Only alphanumeric values (or 'camunda-admin') will
+   * be accepted.
+   * </p>
    */
   protected String tenantResourceWhitelistPattern;
 
   /**
-   * If the value of this flag is set <code>true</code> then the process engine
-   * throws {@link ProcessEngineException} when no catching boundary event was
-   * defined for an error event.
+   * If the value of this flag is set <code>true</code> then the process engine throws
+   * {@link ProcessEngineException} when no catching boundary event was defined for an error event.
    *
-   * <p>The default value is <code>false</code>.</p>
+   * <p>
+   * The default value is <code>false</code>.
+   * </p>
    */
   protected boolean enableExceptionsAfterUnhandledBpmnError = false;
 
   /**
-   * If the value of this flag is set to <code>false</code>, {@link OptimisticLockingException}s
-   * are not skipped for UPDATE or DELETE operations applied to historic entities.
+   * If the value of this flag is set to <code>false</code>, {@link OptimisticLockingException}s are
+   * not skipped for UPDATE or DELETE operations applied to historic entities.
    *
-   * <p>The default value is <code>true</code>.</p>
+   * <p>
+   * The default value is <code>true</code>.
+   * </p>
    */
   protected boolean skipHistoryOptimisticLockingExceptions = true;
 
   /**
-   * If the value of this flag is set to <code>true</code>,
-   * READ_INSTANCE_VARIABLE,
-   * READ_HISTORY_VARIABLE, or
-   * READ_TASK_VARIABLE on Process Definition resource, and
-   * READ_VARIABLE on Task resource
-   * will be required to fetch variables when the autorizations are enabled.
+   * If the value of this flag is set to <code>true</code>, READ_INSTANCE_VARIABLE,
+   * READ_HISTORY_VARIABLE, or READ_TASK_VARIABLE on Process Definition resource, and READ_VARIABLE
+   * on Task resource will be required to fetch variables when the autorizations are enabled.
    */
   protected boolean enforceSpecificVariablePermission = false;
 
   /**
-   * Specifies which permissions will not be taken into account in the
-   * authorizations checks if authorization is enabled.
+   * Specifies which permissions will not be taken into account in the authorizations checks if
+   * authorization is enabled.
    */
   protected List<String> disabledPermissions = Collections.emptyList();
 
   /**
-   * If the value of this flag is set to <code>false</code> exceptions that occur
-   * during command execution will not be logged before re-thrown. This can prevent
-   * multiple logs of the same exception (e.g. exceptions that occur during job execution)
-   * but can also hide valuable debugging/rootcausing information.
+   * If the value of this flag is set to <code>false</code> exceptions that occur during command
+   * execution will not be logged before re-thrown. This can prevent multiple logs of the same
+   * exception (e.g. exceptions that occur during job execution) but can also hide valuable
+   * debugging/rootcausing information.
    */
   protected boolean enableCmdExceptionLogging = true;
 
   /**
-   * If the value of this flag is set to <code>true</code> exceptions that occur
-   * during the execution of a job that still has retries left will not be logged.
-   * If the job does not have any retries left, the exception will still be logged
-   * on logging level WARN.
+   * If the value of this flag is set to <code>true</code> exceptions that occur during the
+   * execution of a job that still has retries left will not be logged. If the job does not have any
+   * retries left, the exception will still be logged on logging level WARN.
    */
   protected boolean enableReducedJobExceptionLogging = false;
 
@@ -407,27 +417,35 @@ public abstract class ProcessEngineConfiguration {
   public static ProcessEngineConfiguration createProcessEngineConfigurationFromResourceDefault() {
     ProcessEngineConfiguration processEngineConfiguration = null;
     try {
-      processEngineConfiguration = createProcessEngineConfigurationFromResource("camunda.cfg.xml", "processEngineConfiguration");
+      processEngineConfiguration = createProcessEngineConfigurationFromResource("camunda.cfg.xml",
+          "processEngineConfiguration");
     } catch (RuntimeException ex) {
-      processEngineConfiguration = createProcessEngineConfigurationFromResource("activiti.cfg.xml", "processEngineConfiguration");
+      processEngineConfiguration = createProcessEngineConfigurationFromResource("activiti.cfg.xml",
+          "processEngineConfiguration");
     }
     return processEngineConfiguration;
   }
 
-  public static ProcessEngineConfiguration createProcessEngineConfigurationFromResource(String resource) {
+  public static ProcessEngineConfiguration createProcessEngineConfigurationFromResource(
+      String resource) {
     return createProcessEngineConfigurationFromResource(resource, "processEngineConfiguration");
   }
 
-  public static ProcessEngineConfiguration createProcessEngineConfigurationFromResource(String resource, String beanName) {
+  public static ProcessEngineConfiguration createProcessEngineConfigurationFromResource(
+      String resource, String beanName) {
     return BeansConfigurationHelper.parseProcessEngineConfigurationFromResource(resource, beanName);
   }
 
-  public static ProcessEngineConfiguration createProcessEngineConfigurationFromInputStream(InputStream inputStream) {
-    return createProcessEngineConfigurationFromInputStream(inputStream, "processEngineConfiguration");
+  public static ProcessEngineConfiguration createProcessEngineConfigurationFromInputStream(
+      InputStream inputStream) {
+    return createProcessEngineConfigurationFromInputStream(inputStream,
+        "processEngineConfiguration");
   }
 
-  public static ProcessEngineConfiguration createProcessEngineConfigurationFromInputStream(InputStream inputStream, String beanName) {
-    return BeansConfigurationHelper.parseProcessEngineConfigurationFromInputStream(inputStream, beanName);
+  public static ProcessEngineConfiguration createProcessEngineConfigurationFromInputStream(
+      InputStream inputStream, String beanName) {
+    return BeansConfigurationHelper.parseProcessEngineConfigurationFromInputStream(inputStream,
+        beanName);
   }
 
   public static ProcessEngineConfiguration createStandaloneProcessEngineConfiguration() {
@@ -438,11 +456,10 @@ public abstract class ProcessEngineConfiguration {
     return new StandaloneInMemProcessEngineConfiguration();
   }
 
-// TODO add later when we have test coverage for this
-//  public static ProcessEngineConfiguration createJtaProcessEngineConfiguration() {
-//    return new JtaProcessEngineConfiguration();
-//  }
-
+  // TODO add later when we have test coverage for this
+  // public static ProcessEngineConfiguration createJtaProcessEngineConfiguration() {
+  // return new JtaProcessEngineConfiguration();
+  // }
 
   // getters and setters //////////////////////////////////////////////////////
 
@@ -618,7 +635,8 @@ public abstract class ProcessEngineConfiguration {
     return transactionsExternallyManaged;
   }
 
-  public ProcessEngineConfiguration setTransactionsExternallyManaged(boolean transactionsExternallyManaged) {
+  public ProcessEngineConfiguration setTransactionsExternallyManaged(
+      boolean transactionsExternallyManaged) {
     this.transactionsExternallyManaged = transactionsExternallyManaged;
     return this;
   }
@@ -719,7 +737,8 @@ public abstract class ProcessEngineConfiguration {
     return jobExecutorDeploymentAware;
   }
 
-  public ProcessEngineConfiguration setJobExecutorDeploymentAware(boolean jobExecutorDeploymentAware) {
+  public ProcessEngineConfiguration setJobExecutorDeploymentAware(
+      boolean jobExecutorDeploymentAware) {
     this.jobExecutorDeploymentAware = jobExecutorDeploymentAware;
     return this;
   }
@@ -728,7 +747,8 @@ public abstract class ProcessEngineConfiguration {
     return jobExecutorAcquireByDueDate;
   }
 
-  public ProcessEngineConfiguration setJobExecutorAcquireByDueDate(boolean jobExecutorAcquireByDueDate) {
+  public ProcessEngineConfiguration setJobExecutorAcquireByDueDate(
+      boolean jobExecutorAcquireByDueDate) {
     this.jobExecutorAcquireByDueDate = jobExecutorAcquireByDueDate;
     return this;
   }
@@ -737,7 +757,8 @@ public abstract class ProcessEngineConfiguration {
     return jobExecutorPreferTimerJobs;
   }
 
-  public ProcessEngineConfiguration setJobExecutorPreferTimerJobs(boolean jobExecutorPreferTimerJobs) {
+  public ProcessEngineConfiguration setJobExecutorPreferTimerJobs(
+      boolean jobExecutorPreferTimerJobs) {
     this.jobExecutorPreferTimerJobs = jobExecutorPreferTimerJobs;
     return this;
   }
@@ -807,7 +828,8 @@ public abstract class ProcessEngineConfiguration {
     return createIncidentOnFailedJobEnabled;
   }
 
-  public ProcessEngineConfiguration setCreateIncidentOnFailedJobEnabled(boolean createIncidentOnFailedJobEnabled) {
+  public ProcessEngineConfiguration setCreateIncidentOnFailedJobEnabled(
+      boolean createIncidentOnFailedJobEnabled) {
     this.createIncidentOnFailedJobEnabled = createIncidentOnFailedJobEnabled;
     return this;
   }
@@ -825,7 +847,8 @@ public abstract class ProcessEngineConfiguration {
     return defaultUserPermissionNameForTask;
   }
 
-  public ProcessEngineConfiguration setDefaultUserPermissionNameForTask(String defaultUserPermissionNameForTask) {
+  public ProcessEngineConfiguration setDefaultUserPermissionNameForTask(
+      String defaultUserPermissionNameForTask) {
     this.defaultUserPermissionNameForTask = defaultUserPermissionNameForTask;
     return this;
   }
@@ -834,7 +857,8 @@ public abstract class ProcessEngineConfiguration {
     return authorizationEnabledForCustomCode;
   }
 
-  public ProcessEngineConfiguration setAuthorizationEnabledForCustomCode(boolean authorizationEnabledForCustomCode) {
+  public ProcessEngineConfiguration setAuthorizationEnabledForCustomCode(
+      boolean authorizationEnabledForCustomCode) {
     this.authorizationEnabledForCustomCode = authorizationEnabledForCustomCode;
     return this;
   }
@@ -941,7 +965,8 @@ public abstract class ProcessEngineConfiguration {
     return enableExceptionsAfterUnhandledBpmnError;
   }
 
-  public void setEnableExceptionsAfterUnhandledBpmnError(boolean enableExceptionsAfterUnhandledBpmnError) {
+  public void setEnableExceptionsAfterUnhandledBpmnError(
+      boolean enableExceptionsAfterUnhandledBpmnError) {
     this.enableExceptionsAfterUnhandledBpmnError = enableExceptionsAfterUnhandledBpmnError;
   }
 
@@ -949,7 +974,8 @@ public abstract class ProcessEngineConfiguration {
     return skipHistoryOptimisticLockingExceptions;
   }
 
-  public ProcessEngineConfiguration setSkipHistoryOptimisticLockingExceptions(boolean skipHistoryOptimisticLockingExceptions) {
+  public ProcessEngineConfiguration setSkipHistoryOptimisticLockingExceptions(
+      boolean skipHistoryOptimisticLockingExceptions) {
     this.skipHistoryOptimisticLockingExceptions = skipHistoryOptimisticLockingExceptions;
     return this;
   }
@@ -992,7 +1018,8 @@ public abstract class ProcessEngineConfiguration {
     return enableCmdExceptionLogging;
   }
 
-  public ProcessEngineConfiguration setEnableCmdExceptionLogging(boolean enableCmdExceptionLogging) {
+  public ProcessEngineConfiguration setEnableCmdExceptionLogging(
+      boolean enableCmdExceptionLogging) {
     this.enableCmdExceptionLogging = enableCmdExceptionLogging;
     return this;
   }
@@ -1001,7 +1028,8 @@ public abstract class ProcessEngineConfiguration {
     return enableReducedJobExceptionLogging;
   }
 
-  public ProcessEngineConfiguration setEnableReducedJobExceptionLogging(boolean enableReducedJobExceptionLogging) {
+  public ProcessEngineConfiguration setEnableReducedJobExceptionLogging(
+      boolean enableReducedJobExceptionLogging) {
     this.enableReducedJobExceptionLogging = enableReducedJobExceptionLogging;
     return this;
   }

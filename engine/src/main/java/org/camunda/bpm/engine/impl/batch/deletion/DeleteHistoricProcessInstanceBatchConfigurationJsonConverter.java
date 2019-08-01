@@ -26,8 +26,8 @@ import java.util.List;
 /**
  * @author Askar Akhmerov
  */
-public class DeleteHistoricProcessInstanceBatchConfigurationJsonConverter extends JsonObjectConverter<BatchConfiguration> {
-
+public class DeleteHistoricProcessInstanceBatchConfigurationJsonConverter
+    extends JsonObjectConverter<BatchConfiguration> {
 
   public static final DeleteHistoricProcessInstanceBatchConfigurationJsonConverter INSTANCE = new DeleteHistoricProcessInstanceBatchConfigurationJsonConverter();
 
@@ -43,7 +43,8 @@ public class DeleteHistoricProcessInstanceBatchConfigurationJsonConverter extend
   }
 
   public BatchConfiguration toObject(JsonObject json) {
-    BatchConfiguration configuration = new BatchConfiguration(readProcessInstanceIds(json), JsonUtil.getBoolean(json, FAIL_IF_NOT_EXISTS));
+    BatchConfiguration configuration = new BatchConfiguration(readProcessInstanceIds(json),
+        JsonUtil.getBoolean(json, FAIL_IF_NOT_EXISTS));
     return configuration;
   }
 

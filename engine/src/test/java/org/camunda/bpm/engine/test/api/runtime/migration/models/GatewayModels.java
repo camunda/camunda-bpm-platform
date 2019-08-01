@@ -24,75 +24,43 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  */
 public class GatewayModels {
 
-  public static final BpmnModelInstance PARALLEL_GW = ProcessModels.newModel()
-      .startEvent()
-      .parallelGateway("fork")
-      .userTask("parallel1")
-      .parallelGateway("join")
+  public static final BpmnModelInstance PARALLEL_GW = ProcessModels.newModel().startEvent()
+      .parallelGateway("fork").userTask("parallel1").parallelGateway("join")
 
-      .moveToNode("fork")
-      .userTask("parallel2")
-      .connectTo("join")
+      .moveToNode("fork").userTask("parallel2").connectTo("join")
 
-      .userTask("afterJoin")
-      .endEvent()
-      .done();
+      .userTask("afterJoin").endEvent().done();
 
   public static final BpmnModelInstance PARALLEL_GW_IN_SUBPROCESS = ProcessModels.newModel()
       .startEvent()
 
-      .subProcess("subProcess")
-      .embeddedSubProcess()
-      .startEvent()
+      .subProcess("subProcess").embeddedSubProcess().startEvent()
 
-        .parallelGateway("fork")
-        .userTask("parallel1")
-        .parallelGateway("join")
+      .parallelGateway("fork").userTask("parallel1").parallelGateway("join")
 
-        .moveToNode("fork")
-        .userTask("parallel2")
-        .connectTo("join")
+      .moveToNode("fork").userTask("parallel2").connectTo("join")
 
-        .userTask("afterJoin")
-        .endEvent()
+      .userTask("afterJoin").endEvent()
 
-      .subProcessDone()
-      .endEvent()
-      .done();
+      .subProcessDone().endEvent().done();
 
-  public static final BpmnModelInstance INCLUSIVE_GW = ProcessModels.newModel()
-      .startEvent()
-      .inclusiveGateway("fork")
-      .userTask("parallel1")
-      .inclusiveGateway("join")
+  public static final BpmnModelInstance INCLUSIVE_GW = ProcessModels.newModel().startEvent()
+      .inclusiveGateway("fork").userTask("parallel1").inclusiveGateway("join")
 
-      .moveToNode("fork")
-      .userTask("parallel2")
-      .connectTo("join")
+      .moveToNode("fork").userTask("parallel2").connectTo("join")
 
-      .userTask("afterJoin")
-      .endEvent()
-      .done();
+      .userTask("afterJoin").endEvent().done();
 
   public static final BpmnModelInstance INCLUSIVE_GW_IN_SUBPROCESS = ProcessModels.newModel()
       .startEvent()
 
-      .subProcess()
-      .embeddedSubProcess()
-      .startEvent()
+      .subProcess().embeddedSubProcess().startEvent()
 
-        .inclusiveGateway("fork")
-        .userTask("parallel1")
-        .inclusiveGateway("join")
+      .inclusiveGateway("fork").userTask("parallel1").inclusiveGateway("join")
 
-        .moveToNode("fork")
-        .userTask("parallel2")
-        .connectTo("join")
+      .moveToNode("fork").userTask("parallel2").connectTo("join")
 
-        .userTask("afterJoin")
-        .endEvent()
+      .userTask("afterJoin").endEvent()
 
-      .subProcessDone()
-      .endEvent()
-      .done();
+      .subProcessDone().endEvent().done();
 }

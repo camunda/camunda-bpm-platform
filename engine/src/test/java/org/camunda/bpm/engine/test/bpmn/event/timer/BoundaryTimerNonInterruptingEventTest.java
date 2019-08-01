@@ -47,7 +47,8 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
     Date startTime = new Date();
 
     // After process start, there should be 3 timers created
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingTimersOnUserTask");
+    ProcessInstance pi = runtimeService
+        .startProcessInstanceByKey("nonInterruptingTimersOnUserTask");
     Task task1 = taskService.createTaskQuery().singleResult();
     assertEquals("First Task", task1.getName());
 
@@ -106,26 +107,22 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
   public void testTimerOnMiUserTask() {
 
     // After process start, there should be 1 timer created
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingTimersOnUserTask");
+    ProcessInstance pi = runtimeService
+        .startProcessInstanceByKey("nonInterruptingTimersOnUserTask");
     List<Task> taskList = taskService.createTaskQuery().list();
     assertEquals(5, taskList.size());
     for (Task task : taskList) {
       assertEquals("First Task", task.getName());
     }
 
-    Job job = managementService.createJobQuery()
-        .processInstanceId(pi.getId())
-        .singleResult();
+    Job job = managementService.createJobQuery().processInstanceId(pi.getId()).singleResult();
     assertNotNull(job);
 
     // execute the timer
     managementService.executeJob(job.getId());
 
     // now there are 6 tasks
-    taskList = taskService.createTaskQuery()
-        .orderByTaskName()
-        .asc()
-        .list();
+    taskList = taskService.createTaskQuery().orderByTaskName().asc().list();
     assertEquals(6, taskList.size());
 
     // first task is the escalation task
@@ -179,10 +176,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
 
     // After process start, there should be 1 timer created
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("timerOnConcurrentMiTasks");
-    List<Task> taskList = taskService.createTaskQuery()
-        .orderByTaskName()
-        .desc()
-        .list();
+    List<Task> taskList = taskService.createTaskQuery().orderByTaskName().desc().list();
     assertEquals(6, taskList.size());
     Task secondTask = taskList.remove(0);
     assertEquals("Second Task", secondTask.getName());
@@ -190,19 +184,14 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
       assertEquals("First Task", task.getName());
     }
 
-    Job job = managementService.createJobQuery()
-        .processInstanceId(pi.getId())
-        .singleResult();
+    Job job = managementService.createJobQuery().processInstanceId(pi.getId()).singleResult();
     assertNotNull(job);
 
     // execute the timer
     managementService.executeJob(job.getId());
 
     // now there are 7 tasks
-    taskList = taskService.createTaskQuery()
-        .orderByTaskName()
-        .asc()
-        .list();
+    taskList = taskService.createTaskQuery().orderByTaskName().asc().list();
     assertEquals(7, taskList.size());
 
     // first task is the escalation task
@@ -222,7 +211,8 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
 
   @Deployment
   public void testTimerOnConcurrentTasks() {
-    String procId = runtimeService.startProcessInstanceByKey("nonInterruptingOnConcurrentTasks").getId();
+    String procId = runtimeService.startProcessInstanceByKey("nonInterruptingOnConcurrentTasks")
+        .getId();
     assertEquals(2, taskService.createTaskQuery().count());
 
     Job timer = managementService.createJobQuery().singleResult();
@@ -242,9 +232,11 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
   }
 
   // Difference with previous test: now the join will be reached first
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.testTimerOnConcurrentTasks.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.testTimerOnConcurrentTasks.bpmn20.xml" })
   public void testTimerOnConcurrentTasks2() {
-    String procId = runtimeService.startProcessInstanceByKey("nonInterruptingOnConcurrentTasks").getId();
+    String procId = runtimeService.startProcessInstanceByKey("nonInterruptingOnConcurrentTasks")
+        .getId();
     assertEquals(2, taskService.createTaskQuery().count());
 
     Job timer = managementService.createJobQuery().singleResult();
@@ -287,7 +279,8 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
    * see http://jira.codehaus.org/browse/ACT-1173
    */
   public void testTimerOnEmbeddedSubprocess() {
-    String id = runtimeService.startProcessInstanceByKey("nonInterruptingTimerOnEmbeddedSubprocess").getId();
+    String id = runtimeService.startProcessInstanceByKey("nonInterruptingTimerOnEmbeddedSubprocess")
+        .getId();
 
     TaskQuery tq = taskService.createTaskQuery().taskAssignee("kermit");
 
@@ -313,7 +306,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
   /**
    * see http://jira.codehaus.org/browse/ACT-1106
    */
-  public void testReceiveTaskWithBoundaryTimer(){
+  public void testReceiveTaskWithBoundaryTimer() {
     // Set the clock fixed
     Date startTime = new Date();
 
@@ -321,16 +314,15 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
     variables.put("timeCycle", "R/PT1H");
 
     // After process start, there should be a timer created
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingCycle",variables);
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingCycle",
+        variables);
 
     JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getId());
     List<Job> jobs = jobQuery.list();
     assertEquals(1, jobs.size());
 
     // The Execution Query should work normally and find executions in state "task"
-    List<Execution> executions = runtimeService.createExecutionQuery()
-      .activityId("task")
-      .list();
+    List<Execution> executions = runtimeService.createExecutionQuery().activityId("task").list();
     assertEquals(1, executions.size());
     List<String> activeActivityIds = runtimeService.getActiveActivityIds(executions.get(0).getId());
     assertEquals(1, activeActivityIds.size());
@@ -338,10 +330,10 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
 
     runtimeService.signal(executions.get(0).getId());
 
-//    // After setting the clock to time '1 hour and 5 seconds', the second timer should fire
-//    ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-//    waitForJobExecutorToProcessAllJobs(5000L);
-//    assertEquals(0L, jobQuery.count());
+    // // After setting the clock to time '1 hour and 5 seconds', the second timer should fire
+    // ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
+    // waitForJobExecutorToProcessAllJobs(5000L);
+    // assertEquals(0L, jobQuery.count());
 
     // which means the process has ended
     assertProcessEnded(pi.getId());
@@ -349,7 +341,8 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
 
   @Deployment
   public void testTimerOnConcurrentSubprocess() {
-    String procId = runtimeService.startProcessInstanceByKey("testTimerOnConcurrentSubprocess").getId();
+    String procId = runtimeService.startProcessInstanceByKey("testTimerOnConcurrentSubprocess")
+        .getId();
     assertEquals(4, taskService.createTaskQuery().count());
 
     Job timer = managementService.createJobQuery().singleResult();
@@ -374,9 +367,10 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
     assertProcessEnded(procId);
   }
 
-  @Deployment(resources="org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.testTimerOnConcurrentSubprocess.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.testTimerOnConcurrentSubprocess.bpmn20.xml")
   public void testTimerOnConcurrentSubprocess2() {
-    String procId = runtimeService.startProcessInstanceByKey("testTimerOnConcurrentSubprocess").getId();
+    String procId = runtimeService.startProcessInstanceByKey("testTimerOnConcurrentSubprocess")
+        .getId();
     assertEquals(4, taskService.createTaskQuery().count());
 
     Job timer = managementService.createJobQuery().singleResult();
@@ -401,9 +395,10 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
     assertProcessEnded(procId);
   }
 
-  //we cannot use waitForExecutor... method since there will always be one job left
+  // we cannot use waitForExecutor... method since there will always be one job left
   private void moveByHours(int hours) throws Exception {
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + ((hours * 60 * 1000 * 60) + 5000)));
+    ClockUtil.setCurrentTime(
+        new Date(ClockUtil.getCurrentTime().getTime() + ((hours * 60 * 1000 * 60) + 5000)));
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
     Thread.sleep(1000);
@@ -507,7 +502,8 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
     assertProcessEnded(pi.getId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.testTimerWithCycle.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/timer/BoundaryTimerNonInterruptingEventTest.testTimerWithCycle.bpmn20.xml" })
   public void testTimeCycle() throws Exception {
     // given
     runtimeService.startProcessInstanceByKey("nonInterruptingCycle");
@@ -605,9 +601,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
       public Void execute(CommandContext commandContext) {
 
         TimerEntity timerEntity = (TimerEntity) commandContext.getProcessEngineConfiguration()
-          .getManagementService()
-          .createJobQuery()
-          .singleResult();
+            .getManagementService().createJobQuery().singleResult();
 
         // update repeat property
         timerEntity.setRepeat("R3/PT3H");

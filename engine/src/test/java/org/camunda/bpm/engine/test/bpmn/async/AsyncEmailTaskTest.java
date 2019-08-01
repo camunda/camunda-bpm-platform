@@ -45,8 +45,8 @@ public class AsyncEmailTaskTest extends EmailTestCase {
     assertEquals(1, messages.size());
 
     WiserMessage message = messages.get(0);
-    EmailServiceTaskTest.assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "camunda@localhost",
-            Arrays.asList("kermit@camunda.org"), null);
+    EmailServiceTaskTest.assertEmailSend(message, false, "Hello Kermit!",
+        "This a text only e-mail.", "camunda@localhost", Arrays.asList("kermit@camunda.org"), null);
     assertProcessEnded(procId);
   }
 
@@ -64,8 +64,8 @@ public class AsyncEmailTaskTest extends EmailTestCase {
     assertEquals(1, messages.size());
 
     WiserMessage message = messages.get(0);
-    EmailServiceTaskTest.assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "camunda@localhost",
-            Arrays.asList("kermit@camunda.org"), null);
+    EmailServiceTaskTest.assertEmailSend(message, false, "Hello Kermit!",
+        "This a text only e-mail.", "camunda@localhost", Arrays.asList("kermit@camunda.org"), null);
   }
 
 }

@@ -26,18 +26,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>A DeploymentOperation allows bundling multiple deployment steps into a
- * composite operation that succeeds or fails atomically.</p>
+ * <p>
+ * A DeploymentOperation allows bundling multiple deployment steps into a composite operation that
+ * succeeds or fails atomically.
+ * </p>
  *
- * <p>The DeploymentOperation is composed of a list of individual steps (
- * {@link DeploymentOperationStep}). Each step may or may not install new
- * services into the container. If one of the steps fails, the operation makes
- * sure that
+ * <p>
+ * The DeploymentOperation is composed of a list of individual steps (
+ * {@link DeploymentOperationStep}). Each step may or may not install new services into the
+ * container. If one of the steps fails, the operation makes sure that
  * <ul>
- *  <li>all successfully completed steps are notified by calling their
- *  {@link DeploymentOperationStep#cancelOperationStep(DeploymentOperation)}
- *  method.</li>
- *  <li>all services installed in the context of the operation are removed from the container.</li>
+ * <li>all successfully completed steps are notified by calling their
+ * {@link DeploymentOperationStep#cancelOperationStep(DeploymentOperation)} method.</li>
+ * <li>all services installed in the context of the operation are removed from the container.</li>
  * </ul>
  *
  * @author Daniel Meyer
@@ -59,8 +60,10 @@ public class DeploymentOperation {
   /** a list of steps that completed successfully */
   protected final List<DeploymentOperationStep> successfulSteps = new ArrayList<DeploymentOperationStep>();
 
-  /** the list of services installed by this operation. The {@link #rollbackOperation()} must make sure
-   * all these services are removed if the operation fails. */
+  /**
+   * the list of services installed by this operation. The {@link #rollbackOperation()} must make
+   * sure all these services are removed if the operation fails.
+   */
   protected List<String> installedServices = new ArrayList<String>();
 
   /** a list of attachments allows to pass state from one operation to another */
@@ -70,7 +73,8 @@ public class DeploymentOperation {
 
   protected DeploymentOperationStep currentStep;
 
-  public DeploymentOperation(String name, PlatformServiceContainer container, List<DeploymentOperationStep> steps) {
+  public DeploymentOperation(String name, PlatformServiceContainer container,
+      List<DeploymentOperationStep> steps) {
     this.name = name;
     this.serviceContainer = container;
     this.steps = steps;
@@ -88,12 +92,12 @@ public class DeploymentOperation {
   }
 
   /**
-   * Add a new atomic step to the composite operation.
-   * If the operation is currently executing a step, the step is added after the current step.
+   * Add a new atomic step to the composite operation. If the operation is currently executing a
+   * step, the step is added after the current step.
    */
   public void addStep(DeploymentOperationStep step) {
-    if(currentStep != null) {
-      steps.add(steps.indexOf(currentStep)+1, step);
+    if (currentStep != null) {
+      steps.add(steps.indexOf(currentStep) + 1, step);
     } else {
       steps.add(step);
     }
@@ -121,15 +125,13 @@ public class DeploymentOperation {
         successfulSteps.add(currentStep);
 
         LOG.debugSuccessfullyPerformedOperationStep(currentStep.getName());
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
 
-        if(isRollbackOnFailure) {
+        if (isRollbackOnFailure) {
 
           try {
             rollbackOperation();
-          }
-          catch(Exception e2) {
+          } catch (Exception e2) {
             LOG.exceptionWhileRollingBackOperation(e2);
           }
           // re-throw the original exception
@@ -151,8 +153,7 @@ public class DeploymentOperation {
     for (DeploymentOperationStep step : successfulSteps) {
       try {
         step.cancelOperationStep(this);
-      }
-      catch(Exception e) {
+      } catch (Exception e) {
         LOG.exceptionWhileRollingBackOperation(e);
       }
     }
@@ -161,8 +162,7 @@ public class DeploymentOperation {
     for (String serviceName : installedServices) {
       try {
         serviceContainer.stopService(serviceName);
-      }
-      catch(Exception e) {
+      } catch (Exception e) {
         LOG.exceptionWhileStopping("service", serviceName, e);
       }
     }
@@ -193,7 +193,7 @@ public class DeploymentOperation {
     }
 
     public DeploymentOperationBuilder addSteps(Collection<DeploymentOperationStep> steps) {
-      for (DeploymentOperationStep step: steps) {
+      for (DeploymentOperationStep step : steps) {
         addStep(step);
       }
       return this;
@@ -217,6 +217,5 @@ public class DeploymentOperation {
     }
 
   }
-
 
 }

@@ -37,61 +37,52 @@ public class MultiTenancyProcessInstanceQueryTest extends PluggableProcessEngine
 
   @Override
   protected void setUp() {
-    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .userTask()
-      .endEvent()
-    .done();
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess").startEvent()
+        .userTask().endEvent().done();
 
     deployment(oneTaskProcess);
     deploymentForTenant(TENANT_ONE, oneTaskProcess);
     deploymentForTenant(TENANT_TWO, oneTaskProcess);
 
-    runtimeService.createProcessInstanceByKey("testProcess").processDefinitionWithoutTenantId().execute();
-    runtimeService.createProcessInstanceByKey("testProcess").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("testProcess").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("testProcess").processDefinitionWithoutTenantId()
+        .execute();
+    runtimeService.createProcessInstanceByKey("testProcess").processDefinitionTenantId(TENANT_ONE)
+        .execute();
+    runtimeService.createProcessInstanceByKey("testProcess").processDefinitionTenantId(TENANT_TWO)
+        .execute();
   }
 
   public void testQueryNoTenantIdSet() {
-    ProcessInstanceQuery query = runtimeService.
-        createProcessInstanceQuery();
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
 
     assertThat(query.count(), is(3L));
   }
 
   public void testQueryByTenantId() {
-    ProcessInstanceQuery query = runtimeService
-        .createProcessInstanceQuery()
-        .tenantIdIn(TENANT_ONE);
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = runtimeService
-        .createProcessInstanceQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    ProcessInstanceQuery query = runtimeService
-        .createProcessInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO);
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE,
+        TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByInstancesWithoutTenantId() {
-    ProcessInstanceQuery query = runtimeService
-        .createProcessInstanceQuery()
-        .withoutTenantId();
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().withoutTenantId();
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    ProcessInstanceQuery query = runtimeService
-        .createProcessInstanceQuery()
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -99,8 +90,7 @@ public class MultiTenancyProcessInstanceQueryTest extends PluggableProcessEngine
 
   public void testFailQueryByTenantIdNull() {
     try {
-      runtimeService.createProcessInstanceQuery()
-        .tenantIdIn((String) null);
+      runtimeService.createProcessInstanceQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -110,10 +100,7 @@ public class MultiTenancyProcessInstanceQueryTest extends PluggableProcessEngine
   public void testQuerySortingAsc() {
     // exclude instances without tenant id because of database-specific ordering
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .asc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().asc().list();
 
     assertThat(processInstances.size(), is(2));
     assertThat(processInstances.get(0).getTenantId(), is(TENANT_ONE));
@@ -123,10 +110,7 @@ public class MultiTenancyProcessInstanceQueryTest extends PluggableProcessEngine
   public void testQuerySortingDesc() {
     // exclude instances without tenant id because of database-specific ordering
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO)
-        .orderByTenantId()
-        .desc()
-        .list();
+        .tenantIdIn(TENANT_ONE, TENANT_TWO).orderByTenantId().desc().list();
 
     assertThat(processInstances.size(), is(2));
     assertThat(processInstances.get(0).getTenantId(), is(TENANT_TWO));
@@ -173,7 +157,7 @@ public class MultiTenancyProcessInstanceQueryTest extends PluggableProcessEngine
   public void testQueryByProcessDefinitionWithoutTenantId() {
     // when
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
-      .processDefinitionWithoutTenantId();
+        .processDefinitionWithoutTenantId();
 
     // then
     assertThat(query.count(), is(1L));
@@ -187,13 +171,12 @@ public class MultiTenancyProcessInstanceQueryTest extends PluggableProcessEngine
 
     tenantIdProvider.setTenantIdProvider("anotherTenantId");
 
-    runtimeService.createProcessInstanceByKey("testProcess")
-      .processDefinitionWithoutTenantId()
-      .execute();
+    runtimeService.createProcessInstanceByKey("testProcess").processDefinitionWithoutTenantId()
+        .execute();
 
     // when
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
-      .processDefinitionWithoutTenantId();
+        .processDefinitionWithoutTenantId();
 
     // then
     assertThat(query.count(), is(2L));

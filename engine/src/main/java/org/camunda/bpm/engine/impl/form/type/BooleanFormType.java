@@ -33,26 +33,23 @@ public class BooleanFormType extends SimpleFormFieldType {
   }
 
   public TypedValue convertValue(TypedValue propertyValue) {
-    if(propertyValue instanceof BooleanValue) {
+    if (propertyValue instanceof BooleanValue) {
       return propertyValue;
-    }
-    else {
+    } else {
       Object value = propertyValue.getValue();
-      if(value == null) {
+      if (value == null) {
         return Variables.booleanValue(null, propertyValue.isTransient());
-      }
-      else if((value instanceof Boolean) || (value instanceof String)) {
+      } else if ((value instanceof Boolean) || (value instanceof String)) {
         return Variables.booleanValue(new Boolean(value.toString()), propertyValue.isTransient());
-      }
-      else {
-        throw new ProcessEngineException("Value '"+value+"' is not of type Boolean.");
+      } else {
+        throw new ProcessEngineException("Value '" + value + "' is not of type Boolean.");
       }
     }
   }
   // deprecated /////////////////////////////////////////////////
 
   public Object convertFormValueToModelValue(Object propertyValue) {
-    if (propertyValue==null || "".equals(propertyValue)) {
+    if (propertyValue == null || "".equals(propertyValue)) {
       return null;
     }
     return Boolean.valueOf(propertyValue.toString());
@@ -60,15 +57,16 @@ public class BooleanFormType extends SimpleFormFieldType {
 
   public String convertModelValueToFormValue(Object modelValue) {
 
-    if (modelValue==null) {
+    if (modelValue == null) {
       return null;
     }
 
-    if(Boolean.class.isAssignableFrom(modelValue.getClass())
-            || boolean.class.isAssignableFrom(modelValue.getClass())) {
+    if (Boolean.class.isAssignableFrom(modelValue.getClass())
+        || boolean.class.isAssignableFrom(modelValue.getClass())) {
       return modelValue.toString();
     }
-    throw new ProcessEngineException("Model value is not of type boolean, but of type " + modelValue.getClass().getName());
+    throw new ProcessEngineException(
+        "Model value is not of type boolean, but of type " + modelValue.getClass().getName());
   }
 
 }

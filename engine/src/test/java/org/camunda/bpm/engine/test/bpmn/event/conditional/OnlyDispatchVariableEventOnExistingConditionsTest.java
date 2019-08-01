@@ -43,12 +43,12 @@ public class OnlyDispatchVariableEventOnExistingConditionsTest {
   public static class CheckDelayedVariablesDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-      //given conditional event exist
+      // given conditional event exist
 
-      //when variable is set
+      // when variable is set
       execution.setVariable("v", 1);
 
-      //then variable events should be delayed
+      // then variable events should be delayed
       List<DelayedVariableEvent> delayedEvents = ((ExecutionEntity) execution).getDelayedEvents();
       assertEquals(1, delayedEvents.size());
       assertEquals("v", delayedEvents.get(0).getEvent().getVariableInstance().getName());
@@ -58,12 +58,12 @@ public class OnlyDispatchVariableEventOnExistingConditionsTest {
   public static class CheckNoDelayedVariablesDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-      //given no conditional event exist
+      // given no conditional event exist
 
-      //when variable is set
+      // when variable is set
       execution.setVariable("v", 1);
 
-      //then no variable events should be delayed
+      // then no variable events should be delayed
       List<DelayedVariableEvent> delayedEvents = ((ExecutionEntity) execution).getDelayedEvents();
       assertEquals(0, delayedEvents.size());
     }
@@ -74,105 +74,89 @@ public class OnlyDispatchVariableEventOnExistingConditionsTest {
 
   @Test
   public void testProcessWithIntermediateConditionalEvent() {
-    //given
+    // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .serviceTask()
-      .camundaClass(CheckDelayedVariablesDelegate.class.getName())
-      .intermediateCatchEvent()
-      .conditionalEventDefinition()
-        .condition("${var==1}")
-      .conditionalEventDefinitionDone()
-      .endEvent()
-      .done();
+        .startEvent().serviceTask().camundaClass(CheckDelayedVariablesDelegate.class.getName())
+        .intermediateCatchEvent().conditionalEventDefinition().condition("${var==1}")
+        .conditionalEventDefinitionDone().endEvent().done();
 
-    //when process is deployed and instance created
-    rule.manageDeployment(rule.getRepositoryService().createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
-    ProcessInstanceWithVariablesImpl processInstance = (ProcessInstanceWithVariablesImpl) rule.getRuntimeService().startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    // when process is deployed and instance created
+    rule.manageDeployment(rule.getRepositoryService().createDeployment()
+        .addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+    ProcessInstanceWithVariablesImpl processInstance = (ProcessInstanceWithVariablesImpl) rule
+        .getRuntimeService().startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
-    //then process definition contains property which indicates that conditional events exists
-    Object property = processInstance.getExecutionEntity().getProcessDefinition().getProperty(BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
+    // then process definition contains property which indicates that conditional events exists
+    Object property = processInstance.getExecutionEntity().getProcessDefinition()
+        .getProperty(BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
     assertNotNull(property);
     assertEquals(Boolean.TRUE, property);
   }
 
   @Test
   public void testProcessWithBoundaryConditionalEvent() {
-    //given
+    // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .serviceTask()
-      .camundaClass(CheckDelayedVariablesDelegate.class.getName())
-      .userTask(TASK_WITH_CONDITION_ID)
-      .endEvent()
-      .done();
+        .startEvent().serviceTask().camundaClass(CheckDelayedVariablesDelegate.class.getName())
+        .userTask(TASK_WITH_CONDITION_ID).endEvent().done();
 
-    modelInstance = modify(modelInstance).userTaskBuilder(TASK_WITH_CONDITION_ID)
-      .boundaryEvent()
-      .conditionalEventDefinition()
-      .condition("${var==1}")
-      .conditionalEventDefinitionDone()
-      .endEvent()
-      .done();
+    modelInstance = modify(modelInstance).userTaskBuilder(TASK_WITH_CONDITION_ID).boundaryEvent()
+        .conditionalEventDefinition().condition("${var==1}").conditionalEventDefinitionDone()
+        .endEvent().done();
 
-    //when process is deployed and instance created
-    rule.manageDeployment(rule.getRepositoryService().createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
-    ProcessInstanceWithVariablesImpl processInstance = (ProcessInstanceWithVariablesImpl) rule.getRuntimeService().startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    // when process is deployed and instance created
+    rule.manageDeployment(rule.getRepositoryService().createDeployment()
+        .addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+    ProcessInstanceWithVariablesImpl processInstance = (ProcessInstanceWithVariablesImpl) rule
+        .getRuntimeService().startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
-    //then process definition contains property which indicates that conditional events exists
-    Object property = processInstance.getExecutionEntity().getProcessDefinition().getProperty(BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
+    // then process definition contains property which indicates that conditional events exists
+    Object property = processInstance.getExecutionEntity().getProcessDefinition()
+        .getProperty(BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
     assertNotNull(property);
     assertEquals(Boolean.TRUE, property);
   }
 
   @Test
   public void testProcessWithEventSubProcessConditionalEvent() {
-    //given
+    // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .serviceTask()
-      .camundaClass(CheckDelayedVariablesDelegate.class.getName())
-      .userTask()
-      .endEvent()
-      .done();
+        .startEvent().serviceTask().camundaClass(CheckDelayedVariablesDelegate.class.getName())
+        .userTask().endEvent().done();
 
     modelInstance = modify(modelInstance).addSubProcessTo(CONDITIONAL_EVENT_PROCESS_KEY)
-      .triggerByEvent()
-      .embeddedSubProcess()
-      .startEvent()
-      .conditionalEventDefinition()
-      .condition("${var==1}")
-      .conditionalEventDefinitionDone()
-      .endEvent()
-      .done();
+        .triggerByEvent().embeddedSubProcess().startEvent().conditionalEventDefinition()
+        .condition("${var==1}").conditionalEventDefinitionDone().endEvent().done();
 
-    //when process is deployed and instance created
-    rule.manageDeployment(rule.getRepositoryService().createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
-    ProcessInstanceWithVariablesImpl processInstance = (ProcessInstanceWithVariablesImpl) rule.getRuntimeService().startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    // when process is deployed and instance created
+    rule.manageDeployment(rule.getRepositoryService().createDeployment()
+        .addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+    ProcessInstanceWithVariablesImpl processInstance = (ProcessInstanceWithVariablesImpl) rule
+        .getRuntimeService().startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
-    //then process definition contains property which indicates that conditional events exists
-    Object property = processInstance.getExecutionEntity().getProcessDefinition().getProperty(BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
+    // then process definition contains property which indicates that conditional events exists
+    Object property = processInstance.getExecutionEntity().getProcessDefinition()
+        .getProperty(BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
     assertNotNull(property);
     assertEquals(Boolean.TRUE, property);
   }
 
   @Test
   public void testProcessWithoutConditionalEvent() {
-    //given
+    // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
-      .startEvent()
-      .serviceTask()
-      .camundaClass(CheckNoDelayedVariablesDelegate.class.getName())
-      .userTask()
-      .endEvent()
-      .done();
+        .startEvent().serviceTask().camundaClass(CheckNoDelayedVariablesDelegate.class.getName())
+        .userTask().endEvent().done();
 
-    //when process is deployed and instance created
-    rule.manageDeployment(rule.getRepositoryService().createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
-    ProcessInstanceWithVariablesImpl processInstance = (ProcessInstanceWithVariablesImpl) rule.getRuntimeService().startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    // when process is deployed and instance created
+    rule.manageDeployment(rule.getRepositoryService().createDeployment()
+        .addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+    ProcessInstanceWithVariablesImpl processInstance = (ProcessInstanceWithVariablesImpl) rule
+        .getRuntimeService().startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
-    //then process definition contains no property which indicates that conditional events exists
-    Object property = processInstance.getExecutionEntity().getProcessDefinition().getProperty(BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
+    // then process definition contains no property which indicates that conditional events exists
+    Object property = processInstance.getExecutionEntity().getProcessDefinition()
+        .getProperty(BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
     assertNull(property);
   }
 }

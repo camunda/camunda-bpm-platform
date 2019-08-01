@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.impl.util.ModificationUtil;
  * @author Thorben Lindhauer
  *
  */
-public abstract class AbstractInstanceCancellationCmd extends AbstractProcessInstanceModificationCommand {
+public abstract class AbstractInstanceCancellationCmd
+    extends AbstractProcessInstanceModificationCommand {
 
   protected String cancellationReason;
 
@@ -43,38 +44,46 @@ public abstract class AbstractInstanceCancellationCmd extends AbstractProcessIns
 
     // Outline:
     // 1. find topmost scope execution beginning at scopeExecution that has exactly
-    //    one child (this is the topmost scope we can cancel)
+    // one child (this is the topmost scope we can cancel)
     // 2. cancel all children of the topmost execution
     // 3. cancel the activity of the topmost execution itself (if applicable)
-    // 4. remove topmost execution (and concurrent parent) if topmostExecution is not the process instance
+    // 4. remove topmost execution (and concurrent parent) if topmostExecution is not the process
+    // instance
 
     ExecutionEntity topmostCancellableExecution = sourceInstanceExecution;
-    ExecutionEntity parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(false);
+    ExecutionEntity parentScopeExecution = (ExecutionEntity) topmostCancellableExecution
+        .getParentScopeExecution(false);
 
     // if topmostCancellableExecution's scope execution has no other non-event-scope children,
     // we have reached the correct execution
-    while (parentScopeExecution != null && (parentScopeExecution.getNonEventScopeExecutions().size() <= 1)) {
-        topmostCancellableExecution = parentScopeExecution;
-        parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(false);
+    while (parentScopeExecution != null
+        && (parentScopeExecution.getNonEventScopeExecutions().size() <= 1)) {
+      topmostCancellableExecution = parentScopeExecution;
+      parentScopeExecution = (ExecutionEntity) topmostCancellableExecution
+          .getParentScopeExecution(false);
     }
 
     if (topmostCancellableExecution.isPreserveScope()) {
-      topmostCancellableExecution.interrupt(cancellationReason, skipCustomListeners, skipIoMappings);
+      topmostCancellableExecution.interrupt(cancellationReason, skipCustomListeners,
+          skipIoMappings);
       topmostCancellableExecution.leaveActivityInstance();
       topmostCancellableExecution.setActivity(null);
     } else {
-      topmostCancellableExecution.deleteCascade(cancellationReason, skipCustomListeners, skipIoMappings);
+      topmostCancellableExecution.deleteCascade(cancellationReason, skipCustomListeners,
+          skipIoMappings);
       ModificationUtil.handleChildRemovalInScope(topmostCancellableExecution);
     }
 
     return null;
   }
 
-  protected abstract ExecutionEntity determineSourceInstanceExecution(CommandContext commandContext);
+  protected abstract ExecutionEntity determineSourceInstanceExecution(
+      CommandContext commandContext);
 
-  protected ExecutionEntity findSuperExecution(ExecutionEntity parentScopeExecution, ExecutionEntity topmostCancellableExecution){
+  protected ExecutionEntity findSuperExecution(ExecutionEntity parentScopeExecution,
+      ExecutionEntity topmostCancellableExecution) {
     ExecutionEntity superExecution = null;
-    if(parentScopeExecution == null) {
+    if (parentScopeExecution == null) {
       superExecution = topmostCancellableExecution.getSuperExecution();
 
     }

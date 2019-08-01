@@ -20,26 +20,25 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-
 /**
  * @author Frederik Heremans
  */
 public class ToUpperCaseSetterInjected implements JavaDelegate {
-  
+
   private Expression text;
   private boolean setterInvoked = false;
-  
+
   public void execute(DelegateExecution execution) {
-    
-    if(!setterInvoked) {
+
+    if (!setterInvoked) {
       throw new RuntimeException("Setter was not invoked");
     }
-    execution.setVariable("setterVar", ((String)text.getValue(execution)).toUpperCase());
+    execution.setVariable("setterVar", ((String) text.getValue(execution)).toUpperCase());
   }
-  
+
   public void setText(Expression text) {
     setterInvoked = true;
     this.text = text;
   }
-  
+
 }

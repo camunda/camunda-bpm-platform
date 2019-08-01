@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.runtime.IncidentQuery;
 /**
  * @author roman.smirnov
  */
-public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> implements IncidentQuery, Serializable {
+public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident>
+    implements IncidentQuery, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -115,7 +116,7 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     return this;
   }
 
-  //ordering ////////////////////////////////////////////////////
+  // ordering ////////////////////////////////////////////////////
 
   public IncidentQuery orderByIncidentId() {
     orderBy(IncidentQueryProperty.INCIDENT_ID);
@@ -176,22 +177,18 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     return orderBy(IncidentQueryProperty.INCIDENT_MESSAGE);
   }
 
-  //results ////////////////////////////////////////////////////
+  // results ////////////////////////////////////////////////////
 
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getIncidentManager()
-      .findIncidentCountByQueryCriteria(this);
+    return commandContext.getIncidentManager().findIncidentCountByQueryCriteria(this);
   }
 
   @Override
   public List<Incident> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return commandContext
-      .getIncidentManager()
-      .findIncidentByQueryCriteria(this, page);
+    return commandContext.getIncidentManager().findIncidentByQueryCriteria(this, page);
   }
 
 }

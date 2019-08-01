@@ -95,123 +95,118 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldRestartSimpleProcessInstance() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
 
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active()
+        .singleResult();
     // process instance was deleted
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask")
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask").processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active().singleResult();
-    Task restartedTask = engineRule.getTaskService().createTaskQuery().processInstanceId(restartedProcessInstance.getId()).active().singleResult();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active()
+        .singleResult();
+    Task restartedTask = engineRule.getTaskService().createTaskQuery()
+        .processInstanceId(restartedProcessInstance.getId()).active().singleResult();
     Assert.assertEquals(task.getTaskDefinitionKey(), restartedTask.getTaskDefinitionKey());
   }
 
   @Test
   public void shouldRestartProcessInstanceWithTwoTasks() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
 
     // the first task is completed
-    Task userTask1 = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().singleResult();
+    Task userTask1 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .active().singleResult();
     taskService.complete(userTask1.getId());
-    Task userTask2 = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().singleResult();
+    Task userTask2 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        .active().singleResult();
     // delete process instance
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask2")
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask2").processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active().singleResult();
-    Task restartedTask = taskService.createTaskQuery().processInstanceId(restartedProcessInstance.getId()).active().singleResult();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active()
+        .singleResult();
+    Task restartedTask = taskService.createTaskQuery()
+        .processInstanceId(restartedProcessInstance.getId()).active().singleResult();
     Assert.assertEquals(userTask2.getTaskDefinitionKey(), restartedTask.getTaskDefinitionKey());
 
-    ActivityInstance updatedTree = runtimeService.getActivityInstance(restartedProcessInstance.getId());
+    ActivityInstance updatedTree = runtimeService
+        .getActivityInstance(restartedProcessInstance.getId());
     assertNotNull(updatedTree);
     assertEquals(restartedProcessInstance.getId(), updatedTree.getProcessInstanceId());
     assertThat(updatedTree).hasStructure(
-        describeActivityInstanceTree(
-            processDefinition.getId())
-        .activity("userTask2")
-        .done());
+        describeActivityInstanceTree(processDefinition.getId()).activity("userTask2").done());
 
   }
 
   @Test
   public void shouldRestartProcessInstanceWithParallelGateway() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.PARALLEL_GATEWAY_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .startBeforeActivity("userTask2")
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask1").startBeforeActivity("userTask2")
+        .processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active().singleResult();
-    ActivityInstance updatedTree = runtimeService.getActivityInstance(restartedProcessInstance.getId());
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active()
+        .singleResult();
+    ActivityInstance updatedTree = runtimeService
+        .getActivityInstance(restartedProcessInstance.getId());
     assertNotNull(updatedTree);
     assertEquals(restartedProcessInstance.getId(), updatedTree.getProcessInstanceId());
-    assertThat(updatedTree).hasStructure(
-        describeActivityInstanceTree(
-            processDefinition.getId())
-        .activity("userTask1")
-        .activity("userTask2")
-        .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId())
+        .activity("userTask1").activity("userTask2").done());
   }
 
   @Test
   public void shouldRestartProcessInstanceWithSubProcess() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("subProcess")
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("subProcess").processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active().singleResult();
-    ActivityInstance updatedTree = runtimeService.getActivityInstance(restartedProcessInstance.getId());
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active()
+        .singleResult();
+    ActivityInstance updatedTree = runtimeService
+        .getActivityInstance(restartedProcessInstance.getId());
     assertNotNull(updatedTree);
     assertEquals(restartedProcessInstance.getId(), updatedTree.getProcessInstanceId());
-    assertThat(updatedTree).hasStructure(
-        describeActivityInstanceTree(
-            processDefinition.getId())
-        .beginScope("subProcess")
-        .activity("userTask")
-        .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId())
+        .beginScope("subProcess").activity("userTask").done());
   }
 
   @Test
   public void shouldRestartProcessInstanceWithVariables() {
     // given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
-        .startEvent()
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process").startEvent()
         .userTask("userTask1")
-        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, SetVariableExecutionListenerImpl.class.getName())
-        .userTask("userTask2")
-        .endEvent()
-        .done();
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END,
+            SetVariableExecutionListenerImpl.class.getName())
+        .userTask("userTask2").endEvent().done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
@@ -219,20 +214,21 @@ public class RestartProcessInstanceSyncTest {
     runtimeService.setVariable(processInstance.getId(), "var", "bar");
 
     // variable is changed
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active()
+        .singleResult();
     taskService.complete(task.getId());
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask1").processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active().singleResult();
-    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).singleResult();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active()
+        .singleResult();
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(restartedProcessInstance.getId()).singleResult();
 
     assertEquals(variableInstance.getExecutionId(), restartedProcessInstance.getId());
     assertEquals("var", variableInstance.getName());
@@ -242,20 +238,20 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldRestartProcessInstanceWithInitialVariables() {
     // given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
-        .startEvent("startEvent")
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process").startEvent("startEvent")
         .userTask("userTask1")
-        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, SetVariableExecutionListenerImpl.class.getName())
-        .userTask("userTask2")
-        .endEvent()
-        .done();
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END,
+            SetVariableExecutionListenerImpl.class.getName())
+        .userTask("userTask2").endEvent().done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     // initial variable
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValue("var", "bar"));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process",
+        Variables.createVariables().putValue("var", "bar"));
 
     // variable update
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active()
+        .singleResult();
     taskService.complete(task.getId());
 
     // delete process instance
@@ -263,14 +259,14 @@ public class RestartProcessInstanceSyncTest {
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .initialSetOfVariables()
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask1").initialSetOfVariables()
+        .processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active().singleResult();
-    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).singleResult();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active()
+        .singleResult();
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(restartedProcessInstance.getId()).singleResult();
 
     assertEquals(variableInstance.getExecutionId(), restartedProcessInstance.getId());
     assertEquals("var", variableInstance.getName());
@@ -280,10 +276,12 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldNotSetLocalVariables() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
 
-    Execution subProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("userTask").singleResult();
+    Execution subProcess = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId()).activityId("userTask").singleResult();
     runtimeService.setVariableLocal(subProcess.getId(), "local", "foo");
     runtimeService.setVariable(processInstance.getId(), "var", "bar");
 
@@ -291,13 +289,13 @@ public class RestartProcessInstanceSyncTest {
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask")
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask").processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
-    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).list();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(processDefinition.getId()).active().singleResult();
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(restartedProcessInstance.getId()).list();
     assertEquals(1, variables.size());
     assertEquals("var", variables.get(0).getName());
     assertEquals("bar", variables.get(0).getValue());
@@ -306,24 +304,27 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldNotSetInitialVersionOfLocalVariables() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValue("var", "bar"));
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process",
+        Variables.createVariables().putValue("var", "bar"));
 
-    Execution subProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("userTask").singleResult();
+    Execution subProcess = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId()).activityId("userTask").singleResult();
     runtimeService.setVariableLocal(subProcess.getId(), "local", "foo");
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-      .startBeforeActivity("userTask")
-      .processInstanceIds(processInstance.getId())
-      .initialSetOfVariables()
-      .execute();
+        .startBeforeActivity("userTask").processInstanceIds(processInstance.getId())
+        .initialSetOfVariables().execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
-    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).list();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(processDefinition.getId()).active().singleResult();
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(restartedProcessInstance.getId()).list();
     assertEquals(1, variables.size());
     assertEquals("var", variables.get(0).getName());
     assertEquals("bar", variables.get(0).getValue());
@@ -332,22 +333,24 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldNotSetInitialVersionOfVariables() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValue("var", "bar"));
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process",
+        Variables.createVariables().putValue("var", "bar"));
     runtimeService.setVariable(processInstance.getId(), "bar", "foo");
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-      .startBeforeActivity("userTask")
-      .processInstanceIds(processInstance.getId())
-      .initialSetOfVariables()
-      .execute();
+        .startBeforeActivity("userTask").processInstanceIds(processInstance.getId())
+        .initialSetOfVariables().execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
-    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).list();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(processDefinition.getId()).active().singleResult();
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(restartedProcessInstance.getId()).list();
     assertEquals(1, variables.size());
     assertEquals("var", variables.get(0).getName());
     assertEquals("bar", variables.get(0).getValue());
@@ -356,31 +359,29 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldRestartProcessInstanceUsingHistoricProcessInstanceQuery() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     HistoricProcessInstanceQuery historicProcessInstanceQuery = engineRule.getHistoryService()
-        .createHistoricProcessInstanceQuery()
-        .processDefinitionId(processDefinition.getId());
+        .createHistoricProcessInstanceQuery().processDefinitionId(processDefinition.getId());
 
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .historicProcessInstanceQuery(historicProcessInstanceQuery)
-    .execute();
+        .startBeforeActivity("userTask1").historicProcessInstanceQuery(historicProcessInstanceQuery)
+        .execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active().singleResult();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active()
+        .singleResult();
 
-    ActivityInstance updatedTree = runtimeService.getActivityInstance(restartedProcessInstance.getId());
+    ActivityInstance updatedTree = runtimeService
+        .getActivityInstance(restartedProcessInstance.getId());
     assertNotNull(updatedTree);
     assertEquals(restartedProcessInstance.getId(), updatedTree.getProcessInstanceId());
     assertThat(updatedTree).hasStructure(
-        describeActivityInstanceTree(
-            processDefinition.getId())
-        .activity("userTask1")
-        .done());
+        describeActivityInstanceTree(processDefinition.getId()).activity("userTask1").done());
   }
 
   @Test
@@ -415,9 +416,11 @@ public class RestartProcessInstanceSyncTest {
 
   @Test
   public void restartProcessInstanceWithNullProcessInstanceId() {
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     try {
-      runtimeService.restartProcessInstances(processDefinition.getId()).startAfterActivity("bar").processInstanceIds((String) null).execute();
+      runtimeService.restartProcessInstances(processDefinition.getId()).startAfterActivity("bar")
+          .processInstanceIds((String) null).execute();
       fail("exception expected");
     } catch (BadUserRequestException e) {
       Assert.assertThat(e.getMessage(), containsString("Process instance ids cannot be null"));
@@ -426,64 +429,74 @@ public class RestartProcessInstanceSyncTest {
 
   @Test
   public void restartNotExistingProcessInstance() {
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     try {
-      runtimeService.restartProcessInstances(processDefinition.getId()).startBeforeActivity("bar").processInstanceIds("aaa").execute();
+      runtimeService.restartProcessInstances(processDefinition.getId()).startBeforeActivity("bar")
+          .processInstanceIds("aaa").execute();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("Historic process instance cannot be found"));
+      Assert.assertThat(e.getMessage(),
+          containsString("Historic process instance cannot be found"));
     }
   }
 
   @Test
   public void restartProcessInstanceWithNotMatchingProcessDefinition() {
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process2").startEvent().userTask().endEvent().done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process2").startEvent().userTask()
+        .endEvent().done();
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
-    ProcessDefinition processDefinition2 = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessDefinition processDefinition2 = testRule
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
     try {
-      runtimeService.restartProcessInstances(processDefinition.getId()).startBeforeActivity("userTask").processInstanceIds(processInstance.getId()).execute();
+      runtimeService.restartProcessInstances(processDefinition.getId())
+          .startBeforeActivity("userTask").processInstanceIds(processInstance.getId()).execute();
       fail("exception expected");
     } catch (ProcessEngineException e) {
-      Assert.assertThat(e.getMessage(), containsString("Its process definition '" + processDefinition2.getId() + "' does not match given process definition '" + processDefinition.getId() +"'" ));
+      Assert.assertThat(e.getMessage(),
+          containsString("Its process definition '" + processDefinition2.getId()
+              + "' does not match given process definition '" + processDefinition.getId() + "'"));
     }
   }
 
   @Test
   public void shouldRestartProcessInstanceWithoutBusinessKey() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", "businessKey", (String) null);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process",
+        "businessKey", (String) null);
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .processInstanceIds(processInstance.getId())
-    .withoutBusinessKey()
-    .execute();
+        .startBeforeActivity("userTask1").processInstanceIds(processInstance.getId())
+        .withoutBusinessKey().execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(processDefinition.getId()).active().singleResult();
     assertNull(restartedProcessInstance.getBusinessKey());
   }
 
   @Test
   public void shouldRestartProcessInstanceWithBusinessKey() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", "businessKey", (String) null);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process",
+        "businessKey", (String) null);
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask1").processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(processDefinition.getId()).active().singleResult();
     assertNotNull(restartedProcessInstance.getBusinessKey());
     assertEquals("businessKey", restartedProcessInstance.getBusinessKey());
   }
@@ -491,36 +504,37 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldRestartProcessInstanceWithoutCaseInstanceId() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", null, "caseInstanceId");
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", null,
+        "caseInstanceId");
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask1").processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(processDefinition.getId()).active().singleResult();
     assertNull(restartedProcessInstance.getCaseInstanceId());
   }
 
   @Test
   public void shouldRestartProcessInstanceWithTenant() {
     // given
-    ProcessDefinition processDefinition = testRule.deployForTenantAndGetDefinition("tenantId", ProcessModels.TWO_TASKS_PROCESS);
+    ProcessDefinition processDefinition = testRule.deployForTenantAndGetDefinition("tenantId",
+        ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask1").processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(processDefinition.getId()).active().singleResult();
     assertNotNull(restartedProcessInstance.getTenantId());
     assertEquals(processInstance.getTenantId(), restartedProcessInstance.getTenantId());
   }
@@ -528,8 +542,11 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldSkipCustomListeners() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(modify(ProcessModels.TWO_TASKS_PROCESS).activityBuilder("userTask1")
-        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, IncrementCounterListener.class.getName()).done());
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(modify(ProcessModels.TWO_TASKS_PROCESS).activityBuilder("userTask1")
+            .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START,
+                IncrementCounterListener.class.getName())
+            .done());
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
@@ -537,10 +554,8 @@ public class RestartProcessInstanceSyncTest {
     IncrementCounterListener.counter = 0;
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .processInstanceIds(processInstance.getId())
-    .skipCustomListeners()
-    .execute();
+        .startBeforeActivity("userTask1").processInstanceIds(processInstance.getId())
+        .skipCustomListeners().execute();
 
     // then
     assertEquals(0, IncrementCounterListener.counter);
@@ -549,21 +564,21 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldSkipIoMappings() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(
-        modify(ProcessModels.TWO_TASKS_PROCESS).activityBuilder("userTask1").camundaInputParameter("foo", "bar").done());
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(modify(ProcessModels.TWO_TASKS_PROCESS).activityBuilder("userTask1")
+            .camundaInputParameter("foo", "bar").done());
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .skipIoMappings()
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask1").skipIoMappings()
+        .processInstanceIds(processInstance.getId()).execute();
 
     // then
-    Execution task1Execution = runtimeService.createExecutionQuery().activityId("userTask1").singleResult();
+    Execution task1Execution = runtimeService.createExecutionQuery().activityId("userTask1")
+        .singleResult();
     assertNotNull(task1Execution);
     assertNull(runtimeService.getVariable(task1Execution.getId(), "foo"));
   }
@@ -571,18 +586,18 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldRetainTenantIdOfSharedProcessDefinition() {
     // given
-    engineRule.getProcessEngineConfiguration()
-      .setTenantIdProvider(new TestTenantIdProvider());
+    engineRule.getProcessEngineConfiguration().setTenantIdProvider(new TestTenantIdProvider());
 
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     assertEquals(processInstance.getTenantId(), TestTenantIdProvider.TENANT_ID);
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-        .startBeforeActivity(ProcessModels.USER_TASK_ID)
-        .processInstanceIds(processInstance.getId())
+        .startBeforeActivity(ProcessModels.USER_TASK_ID).processInstanceIds(processInstance.getId())
         .execute();
 
     // then
@@ -596,27 +611,26 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldSkipTenantIdProviderOnRestart() {
     // given
-    engineRule.getProcessEngineConfiguration()
-        .setTenantIdProvider(new TestTenantIdProvider());
+    engineRule.getProcessEngineConfiguration().setTenantIdProvider(new TestTenantIdProvider());
 
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
     assertEquals(processInstance.getTenantId(), TestTenantIdProvider.TENANT_ID);
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // set tenant id provider to fail to verify it is not called during instantiation
-    engineRule.getProcessEngineConfiguration()
-        .setTenantIdProvider(new FailingTenantIdProvider());
+    engineRule.getProcessEngineConfiguration().setTenantIdProvider(new FailingTenantIdProvider());
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-      .startBeforeActivity(ProcessModels.USER_TASK_ID)
-      .processInstanceIds(processInstance.getId())
-      .execute();
+        .startBeforeActivity(ProcessModels.USER_TASK_ID).processInstanceIds(processInstance.getId())
+        .execute();
 
     // then
     ProcessInstance restartedInstance = runtimeService.createProcessInstanceQuery().active()
-      .processDefinitionId(processDefinition.getId()).singleResult();
+        .processDefinitionId(processDefinition.getId()).singleResult();
 
     assertNotNull(restartedInstance);
     assertEquals(restartedInstance.getTenantId(), TestTenantIdProvider.TENANT_ID);
@@ -625,44 +639,43 @@ public class RestartProcessInstanceSyncTest {
   @Test
   public void shouldNotSetInitialVariablesIfThereIsNoUniqueStartActivity() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
 
-    ProcessInstance processInstance = runtimeService.createProcessInstanceById(processDefinition.getId())
-        .startBeforeActivity("userTask1")
-        .startBeforeActivity("userTask2")
-        .setVariable("foo", "bar")
-        .execute();
+    ProcessInstance processInstance = runtimeService
+        .createProcessInstanceById(processDefinition.getId()).startBeforeActivity("userTask1")
+        .startBeforeActivity("userTask2").setVariable("foo", "bar").execute();
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-    .startBeforeActivity("userTask1")
-    .initialSetOfVariables()
-    .processInstanceIds(processInstance.getId())
-    .execute();
+        .startBeforeActivity("userTask1").initialSetOfVariables()
+        .processInstanceIds(processInstance.getId()).execute();
 
     // then
-    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).singleResult();
-    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).list();
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery()
+        .processDefinitionId(processDefinition.getId()).singleResult();
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(restartedProcessInstance.getId()).list();
     Assert.assertEquals(0, variables.size());
   }
 
   @Test
   public void shouldNotRestartActiveProcessInstance() {
     // given
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessDefinition processDefinition = testRule
+        .deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceById(processDefinition.getId());
 
     // then
     thrown.expect(ProcessEngineException.class);
 
     // when
     runtimeService.restartProcessInstances(processDefinition.getId())
-      .startBeforeActivity("userTask1")
-      .initialSetOfVariables()
-      .processInstanceIds(processInstance.getId())
-      .execute();
+        .startBeforeActivity("userTask1").initialSetOfVariables()
+        .processInstanceIds(processInstance.getId()).execute();
   }
 
   public static class SetVariableExecutionListenerImpl implements ExecutionListener {
@@ -697,7 +710,8 @@ public class RestartProcessInstanceSyncTest {
     }
 
     @Override
-    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+    public String provideTenantIdForHistoricDecisionInstance(
+        TenantIdProviderHistoricDecisionInstanceContext ctx) {
       throw new UnsupportedOperationException();
     }
   }

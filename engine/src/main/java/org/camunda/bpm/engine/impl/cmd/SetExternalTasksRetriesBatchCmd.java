@@ -47,10 +47,7 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
 
     checkPermissions(commandContext);
 
-    writeUserOperationLog(commandContext,
-        builder.getRetries(),
-        externalTaskIds.size(),
-        true);
+    writeUserOperationLog(commandContext, builder.getRetries(), externalTaskIds.size(), true);
 
     BatchEntity batch = createBatch(commandContext, externalTaskIds);
 
@@ -66,16 +63,21 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
   }
 
   protected void checkPermissions(CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateBatch(BatchPermissions.CREATE_BATCH_SET_EXTERNAL_TASK_RETRIES);
     }
   }
 
-  protected BatchEntity createBatch(CommandContext commandContext, Collection<String> processInstanceIds) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    BatchJobHandler<SetRetriesBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
+  protected BatchEntity createBatch(CommandContext commandContext,
+      Collection<String> processInstanceIds) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext
+        .getProcessEngineConfiguration();
+    BatchJobHandler<SetRetriesBatchConfiguration> batchJobHandler = getBatchJobHandler(
+        processEngineConfiguration);
 
-    SetRetriesBatchConfiguration configuration = new SetRetriesBatchConfiguration(new ArrayList<String>(processInstanceIds), builder.getRetries());
+    SetRetriesBatchConfiguration configuration = new SetRetriesBatchConfiguration(
+        new ArrayList<String>(processInstanceIds), builder.getRetries());
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
@@ -88,8 +90,9 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
     return batch;
   }
 
-
-  protected BatchJobHandler<SetRetriesBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<SetRetriesBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES);
+  protected BatchJobHandler<SetRetriesBatchConfiguration> getBatchJobHandler(
+      ProcessEngineConfigurationImpl processEngineConfiguration) {
+    return (BatchJobHandler<SetRetriesBatchConfiguration>) processEngineConfiguration
+        .getBatchHandlers().get(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES);
   }
 }

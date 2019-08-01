@@ -35,7 +35,8 @@ public class MigratingVariableInstance implements MigratingInstance {
   protected VariableInstanceEntity variable;
   protected boolean isConcurrentLocalInParentScope;
 
-  public MigratingVariableInstance(VariableInstanceEntity variable, boolean isConcurrentLocalInParentScope) {
+  public MigratingVariableInstance(VariableInstanceEntity variable,
+      boolean isConcurrentLocalInParentScope) {
     this.variable = variable;
     this.isConcurrentLocalInParentScope = isConcurrentLocalInParentScope;
   }
@@ -52,7 +53,8 @@ public class MigratingVariableInstance implements MigratingInstance {
 
   @Override
   public void attachState(MigratingScopeInstance owningActivityInstance) {
-    ExecutionEntity representativeExecution = owningActivityInstance.resolveRepresentativeExecution();
+    ExecutionEntity representativeExecution = owningActivityInstance
+        .resolveRepresentativeExecution();
     ScopeImpl currentScope = owningActivityInstance.getCurrentScope();
 
     ExecutionEntity newOwningExecution = representativeExecution;
@@ -66,7 +68,8 @@ public class MigratingVariableInstance implements MigratingInstance {
 
   @Override
   public void attachState(MigratingTransitionInstance owningActivityInstance) {
-    ExecutionEntity representativeExecution = owningActivityInstance.resolveRepresentativeExecution();
+    ExecutionEntity representativeExecution = owningActivityInstance
+        .resolveRepresentativeExecution();
 
     representativeExecution.addVariableInternal(variable);
   }

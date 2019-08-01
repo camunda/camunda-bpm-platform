@@ -34,11 +34,11 @@ public class DelegateStartFormHandler extends DelegateFormHandler implements Sta
   }
 
   public StartFormData createStartFormData(final ProcessDefinitionEntity processDefinition) {
-    return performContextSwitch(new Callable<StartFormData> () {
+    return performContextSwitch(new Callable<StartFormData>() {
       public StartFormData call() throws Exception {
-        CreateStartFormInvocation invocation = new CreateStartFormInvocation((StartFormHandler) formHandler, processDefinition);
-        Context.getProcessEngineConfiguration()
-            .getDelegateInterceptor()
+        CreateStartFormInvocation invocation = new CreateStartFormInvocation(
+            (StartFormHandler) formHandler, processDefinition);
+        Context.getProcessEngineConfiguration().getDelegateInterceptor()
             .handleInvocation(invocation);
         return (StartFormData) invocation.getInvocationResult();
       }

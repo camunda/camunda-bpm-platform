@@ -28,7 +28,6 @@ import org.camunda.bpm.model.bpmn.instance.Task;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
-
 /**
  * @author Sebastian Menski
  */
@@ -46,9 +45,11 @@ public class ServiceTaskBpmnModelExecutionContextTest extends PluggableProcessEn
     assertNotNull(modelInstance);
 
     Model model = modelInstance.getModel();
-    Collection<ModelElementInstance> events = modelInstance.getModelElementsByType(model.getType(Event.class));
+    Collection<ModelElementInstance> events = modelInstance
+        .getModelElementsByType(model.getType(Event.class));
     assertEquals(2, events.size());
-    Collection<ModelElementInstance> tasks = modelInstance.getModelElementsByType(model.getType(Task.class));
+    Collection<ModelElementInstance> tasks = modelInstance
+        .getModelElementsByType(model.getType(Task.class));
     assertEquals(1, tasks.size());
 
     Process process = (Process) modelInstance.getDefinitions().getRootElements().iterator().next();
@@ -61,14 +62,12 @@ public class ServiceTaskBpmnModelExecutionContextTest extends PluggableProcessEn
   }
 
   private void deploy() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-      .startEvent()
-      .serviceTask()
-        .camundaClass(ModelExecutionContextServiceTask.class.getName())
-      .endEvent()
-      .done();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID).startEvent()
+        .serviceTask().camundaClass(ModelExecutionContextServiceTask.class.getName()).endEvent()
+        .done();
 
-    deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("process.bpmn", modelInstance).deploy().getId();
   }
 
   public void tearDown() {

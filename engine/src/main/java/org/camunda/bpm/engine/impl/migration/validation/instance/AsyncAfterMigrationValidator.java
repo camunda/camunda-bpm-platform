@@ -26,25 +26,27 @@ import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 public class AsyncAfterMigrationValidator implements MigratingTransitionInstanceValidator {
 
   @Override
-  public void validate(MigratingTransitionInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+  public void validate(MigratingTransitionInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
       MigratingTransitionInstanceValidationReportImpl instanceReport) {
     ActivityImpl targetActivity = (ActivityImpl) migratingInstance.getTargetScope();
 
     if (targetActivity != null && migratingInstance.isAsyncAfter()) {
       MigratingJobInstance jobInstance = migratingInstance.getJobInstance();
-      AsyncContinuationConfiguration config = (AsyncContinuationConfiguration) jobInstance.getJobEntity().getJobHandlerConfiguration();
+      AsyncContinuationConfiguration config = (AsyncContinuationConfiguration) jobInstance
+          .getJobEntity().getJobHandlerConfiguration();
       String sourceTransitionId = config.getTransitionId();
 
       if (targetActivity.getOutgoingTransitions().size() > 1) {
         if (sourceTransitionId == null) {
           instanceReport.addFailure("Transition instance is assigned to no sequence flow"
               + " and target activity has more than one outgoing sequence flow");
-        }
-        else {
-          TransitionImpl matchingOutgoingTransition = targetActivity.findOutgoingTransition(sourceTransitionId);
+        } else {
+          TransitionImpl matchingOutgoingTransition = targetActivity
+              .findOutgoingTransition(sourceTransitionId);
           if (matchingOutgoingTransition == null) {
             instanceReport.addFailure("Transition instance is assigned to a sequence flow"
-              + " that cannot be matched in the target activity");
+                + " that cannot be matched in the target activity");
           }
         }
       }

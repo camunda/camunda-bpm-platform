@@ -29,46 +29,57 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
-
 /**
  * @author Tom Baeyens
  */
 public class HistoricActivityInstanceManager extends AbstractHistoricManager {
 
-  public void deleteHistoricActivityInstancesByProcessInstanceIds(List<String> historicProcessInstanceIds) {
-    getDbEntityManager().deletePreserveOrder(HistoricActivityInstanceEntity.class, "deleteHistoricActivityInstancesByProcessInstanceIds", historicProcessInstanceIds);
+  public void deleteHistoricActivityInstancesByProcessInstanceIds(
+      List<String> historicProcessInstanceIds) {
+    getDbEntityManager().deletePreserveOrder(HistoricActivityInstanceEntity.class,
+        "deleteHistoricActivityInstancesByProcessInstanceIds", historicProcessInstanceIds);
   }
 
-  public void insertHistoricActivityInstance(HistoricActivityInstanceEntity historicActivityInstance) {
+  public void insertHistoricActivityInstance(
+      HistoricActivityInstanceEntity historicActivityInstance) {
     getDbEntityManager().insert(historicActivityInstance);
   }
 
-  public HistoricActivityInstanceEntity findHistoricActivityInstance(String activityId, String processInstanceId) {
+  public HistoricActivityInstanceEntity findHistoricActivityInstance(String activityId,
+      String processInstanceId) {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("activityId", activityId);
     parameters.put("processInstanceId", processInstanceId);
 
-    return (HistoricActivityInstanceEntity) getDbEntityManager().selectOne("selectHistoricActivityInstance", parameters);
+    return (HistoricActivityInstanceEntity) getDbEntityManager()
+        .selectOne("selectHistoricActivityInstance", parameters);
   }
 
-  public long findHistoricActivityInstanceCountByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+  public long findHistoricActivityInstanceCountByQueryCriteria(
+      HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
     configureQuery(historicActivityInstanceQuery);
-    return (Long) getDbEntityManager().selectOne("selectHistoricActivityInstanceCountByQueryCriteria", historicActivityInstanceQuery);
+    return (Long) getDbEntityManager().selectOne(
+        "selectHistoricActivityInstanceCountByQueryCriteria", historicActivityInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery, Page page) {
+  public List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(
+      HistoricActivityInstanceQueryImpl historicActivityInstanceQuery, Page page) {
     configureQuery(historicActivityInstanceQuery);
-    return getDbEntityManager().selectList("selectHistoricActivityInstancesByQueryCriteria", historicActivityInstanceQuery, page);
+    return getDbEntityManager().selectList("selectHistoricActivityInstancesByQueryCriteria",
+        historicActivityInstanceQuery, page);
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return getDbEntityManager().selectListWithRawParameter("selectHistoricActivityInstanceByNativeQuery", parameterMap, firstResult, maxResults);
+  public List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return getDbEntityManager().selectListWithRawParameter(
+        "selectHistoricActivityInstanceByNativeQuery", parameterMap, firstResult, maxResults);
   }
 
   public long findHistoricActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
-    return (Long) getDbEntityManager().selectOne("selectHistoricActivityInstanceCountByNativeQuery", parameterMap);
+    return (Long) getDbEntityManager().selectOne("selectHistoricActivityInstanceCountByNativeQuery",
+        parameterMap);
   }
 
   protected void configureQuery(HistoricActivityInstanceQueryImpl query) {
@@ -76,25 +87,28 @@ public class HistoricActivityInstanceManager extends AbstractHistoricManager {
     getTenantManager().configureQuery(query);
   }
 
-  public void addRemovalTimeToActivityInstancesByRootProcessInstanceId(String rootProcessInstanceId, Date removalTime) {
+  public void addRemovalTimeToActivityInstancesByRootProcessInstanceId(String rootProcessInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("rootProcessInstanceId", rootProcessInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricActivityInstanceEventEntity.class, "updateHistoricActivityInstancesByRootProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricActivityInstanceEventEntity.class,
+        "updateHistoricActivityInstancesByRootProcessInstanceId", parameters);
   }
 
-  public void addRemovalTimeToActivityInstancesByProcessInstanceId(String processInstanceId, Date removalTime) {
+  public void addRemovalTimeToActivityInstancesByProcessInstanceId(String processInstanceId,
+      Date removalTime) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("processInstanceId", processInstanceId);
     parameters.put("removalTime", removalTime);
 
-    getDbEntityManager()
-      .updatePreserveOrder(HistoricActivityInstanceEventEntity.class, "updateHistoricActivityInstancesByProcessInstanceId", parameters);
+    getDbEntityManager().updatePreserveOrder(HistoricActivityInstanceEventEntity.class,
+        "updateHistoricActivityInstancesByProcessInstanceId", parameters);
   }
 
-  public DbOperation deleteHistoricActivityInstancesByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
+  public DbOperation deleteHistoricActivityInstancesByRemovalTime(Date removalTime, int minuteFrom,
+      int minuteTo, int batchSize) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
@@ -103,8 +117,8 @@ public class HistoricActivityInstanceManager extends AbstractHistoricManager {
     }
     parameters.put("batchSize", batchSize);
 
-    return getDbEntityManager()
-      .deletePreserveOrder(HistoricActivityInstanceEntity.class, "deleteHistoricActivityInstancesByRemovalTime",
+    return getDbEntityManager().deletePreserveOrder(HistoricActivityInstanceEntity.class,
+        "deleteHistoricActivityInstancesByRemovalTime",
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 

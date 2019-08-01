@@ -26,7 +26,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  *
  * @author Daniel Meyer
  */
-public abstract class AbstractTypedValueSerializer<T extends TypedValue> implements TypedValueSerializer<T> {
+public abstract class AbstractTypedValueSerializer<T extends TypedValue>
+    implements TypedValueSerializer<T> {
 
   public static final Set<String> BINARY_VALUE_TYPES = new HashSet<String>();
   static {
@@ -50,10 +51,10 @@ public abstract class AbstractTypedValueSerializer<T extends TypedValue> impleme
   }
 
   public boolean canHandle(TypedValue value) {
-    if(value.getType() != null && !valueType.getClass().isAssignableFrom(value.getType().getClass())) {
+    if (value.getType() != null
+        && !valueType.getClass().isAssignableFrom(value.getType().getClass())) {
       return false;
-    }
-    else {
+    } else {
       return canWriteValue(value);
     }
   }

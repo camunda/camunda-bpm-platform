@@ -35,7 +35,8 @@ public class AsyncEndEventTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testAsyncEndEvent() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncEndEvent");
-    long count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).active().count();
+    long count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).active()
+        .count();
 
     Assert.assertEquals(1, runtimeService.createExecutionQuery().activityId("endEvent").count());
     Assert.assertEquals(1, count);
@@ -43,14 +44,16 @@ public class AsyncEndEventTest extends PluggableProcessEngineTestCase {
     executeAvailableJobs();
     count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count();
 
-    Assert.assertEquals(0, runtimeService.createExecutionQuery().activityId("endEvent").active().count());
+    Assert.assertEquals(0,
+        runtimeService.createExecutionQuery().activityId("endEvent").active().count());
     Assert.assertEquals(0, count);
   }
 
   @Deployment
   public void testAsyncEndEventListeners() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncEndEvent");
-    long count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).active().count();
+    long count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).active()
+        .count();
 
     Assert.assertNull(runtimeService.getVariable(pi.getId(), "listener"));
     Assert.assertEquals(1, runtimeService.createExecutionQuery().activityId("endEvent").count());
@@ -59,15 +62,16 @@ public class AsyncEndEventTest extends PluggableProcessEngineTestCase {
     // as we are standing at the end event, we execute it.
     executeAvailableJobs();
 
-    count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).active().count();
+    count = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).active()
+        .count();
     Assert.assertEquals(0, count);
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
 
       // after the end event we have a event listener
       HistoricVariableInstanceQuery name = historyService.createHistoricVariableInstanceQuery()
-                                                          .processInstanceId(pi.getId())
-                                                          .variableName("listener");
+          .processInstanceId(pi.getId()).variableName("listener");
       Assert.assertNotNull(name);
       Assert.assertEquals("listener invoked", name.singleResult().getValue());
     }
@@ -92,12 +96,12 @@ public class AsyncEndEventTest extends PluggableProcessEngineTestCase {
     // assert that we have finished our instance now
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+    if (processEngineConfiguration.getHistoryLevel()
+        .getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
 
       // after the end event we have a event listener
       HistoricVariableInstanceQuery name = historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(pi.getId())
-        .variableName("message");
+          .processInstanceId(pi.getId()).variableName("message");
       Assert.assertNotNull(name);
       Assert.assertEquals(true, name.singleResult().getValue());
 
@@ -106,19 +110,16 @@ public class AsyncEndEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/async/AsyncEndEventTest.testCallActivity-super.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/async/AsyncEndEventTest.testCallActivity-sub.bpmn20.xml"
-  })
+      "org/camunda/bpm/engine/test/bpmn/async/AsyncEndEventTest.testCallActivity-sub.bpmn20.xml" })
   public void testCallActivity() {
     runtimeService.startProcessInstanceByKey("super");
 
-    ProcessInstance pi = runtimeService
-        .createProcessInstanceQuery()
-        .processDefinitionKey("sub")
+    ProcessInstance pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("sub")
         .singleResult();
 
     assertTrue(pi instanceof ExecutionEntity);
 
-    assertEquals("theSubEnd", ((ExecutionEntity)pi).getActivityId());
+    assertEquals("theSubEnd", ((ExecutionEntity) pi).getActivityId());
 
   }
 

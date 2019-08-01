@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.task.Comment;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
-
 /**
  * @author kristin.polenz@camunda.com
  */
@@ -43,9 +42,7 @@ public class GetTaskCommentCmd implements Command<Comment>, Serializable {
     ensureNotNull("taskId", taskId);
     ensureNotNull("commentId", commentId);
 
-    return commandContext
-      .getCommentManager()
-      .findCommentByTaskIdAndCommentId(taskId, commentId);
+    return commandContext.getCommentManager().findCommentByTaskIdAndCommentId(taskId, commentId);
   }
 
 }

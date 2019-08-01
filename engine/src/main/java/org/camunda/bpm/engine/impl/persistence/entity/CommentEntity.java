@@ -27,21 +27,20 @@ import org.camunda.bpm.engine.impl.db.HistoricEntity;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
 
-
 /**
  * @author Tom Baeyens
  */
 public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, Serializable {
-  
+
   private static final long serialVersionUID = 1L;
-  
+
   public static final String TYPE_EVENT = "event";
   public static final String TYPE_COMMENT = "comment";
-  
+
   protected String id;
-  
+
   // If comments would be removeable, revision needs to be added!
-  
+
   protected String type;
   protected String userId;
   protected Date time;
@@ -59,19 +58,19 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
   }
 
   public byte[] getFullMessageBytes() {
-    return (fullMessage!=null ? fullMessage.getBytes() : null);
+    return (fullMessage != null ? fullMessage.getBytes() : null);
   }
 
   public void setFullMessageBytes(byte[] fullMessageBytes) {
-    fullMessage = (fullMessageBytes!=null ? new String(fullMessageBytes) : null );
+    fullMessage = (fullMessageBytes != null ? new String(fullMessageBytes) : null);
   }
-  
+
   public static String MESSAGE_PARTS_MARKER = "_|_";
-  
+
   public void setMessage(String[] messageParts) {
     StringBuilder stringBuilder = new StringBuilder();
-    for (String part: messageParts) {
-      if (part!=null) {
+    for (String part : messageParts) {
+      if (part != null) {
         stringBuilder.append(part.replace(MESSAGE_PARTS_MARKER, " | "));
         stringBuilder.append(MESSAGE_PARTS_MARKER);
       } else {
@@ -79,14 +78,14 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
         stringBuilder.append(MESSAGE_PARTS_MARKER);
       }
     }
-    for (int i=0; i<MESSAGE_PARTS_MARKER.length(); i++) {
-      stringBuilder.deleteCharAt(stringBuilder.length()-1);
+    for (int i = 0; i < MESSAGE_PARTS_MARKER.length(); i++) {
+      stringBuilder.deleteCharAt(stringBuilder.length() - 1);
     }
     message = stringBuilder.toString();
   }
-  
+
   public List<String> getMessageParts() {
-    if (message==null) {
+    if (message == null) {
       return null;
     }
     List<String> messageParts = new ArrayList<String>();
@@ -101,53 +100,53 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     }
     return messageParts;
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getId() {
     return id;
   }
-  
+
   public void setId(String id) {
     this.id = id;
   }
-  
+
   public String getUserId() {
     return userId;
   }
-  
+
   public void setUserId(String userId) {
     this.userId = userId;
   }
-  
+
   public String getTaskId() {
     return taskId;
   }
-  
+
   public void setTaskId(String taskId) {
     this.taskId = taskId;
   }
-  
+
   public String getMessage() {
     return message;
   }
-  
+
   public void setMessage(String message) {
     this.message = message;
   }
-  
+
   public Date getTime() {
     return time;
   }
-  
+
   public void setTime(Date time) {
     this.time = time;
   }
-  
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
-  
+
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
@@ -155,7 +154,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
   public String getType() {
     return type;
   }
-  
+
   public void setType(String type) {
     this.type = type;
   }
@@ -171,7 +170,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
   public String getAction() {
     return action;
   }
-  
+
   public void setAction(String action) {
     this.action = action;
   }
@@ -202,19 +201,10 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", type=" + type
-           + ", userId=" + userId
-           + ", time=" + time
-           + ", taskId=" + taskId
-           + ", processInstanceId=" + processInstanceId
-           + ", rootProcessInstanceId=" + rootProcessInstanceId
-           + ", removalTime=" + removalTime
-           + ", action=" + action
-           + ", message=" + message
-           + ", fullMessage=" + fullMessage
-           + ", tenantId=" + tenantId
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", type=" + type + ", userId=" + userId
+        + ", time=" + time + ", taskId=" + taskId + ", processInstanceId=" + processInstanceId
+        + ", rootProcessInstanceId=" + rootProcessInstanceId + ", removalTime=" + removalTime
+        + ", action=" + action + ", message=" + message + ", fullMessage=" + fullMessage
+        + ", tenantId=" + tenantId + "]";
   }
 }

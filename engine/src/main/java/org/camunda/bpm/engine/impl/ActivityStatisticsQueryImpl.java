@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 
 public class ActivityStatisticsQueryImpl extends
-    AbstractQuery<ActivityStatisticsQuery, ActivityStatistics> implements ActivityStatisticsQuery{
+    AbstractQuery<ActivityStatisticsQuery, ActivityStatistics> implements ActivityStatisticsQuery {
 
   protected static final long serialVersionUID = 1L;
   protected boolean includeFailedJobs = false;
@@ -49,19 +49,12 @@ public class ActivityStatisticsQueryImpl extends
 
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return
-      commandContext
-        .getStatisticsManager()
-        .getStatisticsCountGroupedByActivity(this);
+    return commandContext.getStatisticsManager().getStatisticsCountGroupedByActivity(this);
   }
 
-  public List<ActivityStatistics> executeList(
-      CommandContext commandContext, Page page) {
+  public List<ActivityStatistics> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    return
-      commandContext
-        .getStatisticsManager()
-        .getStatisticsGroupedByActivity(this, page);
+    return commandContext.getStatisticsManager().getStatisticsGroupedByActivity(this, page);
   }
 
   public ActivityStatisticsQuery includeFailedJobs() {
@@ -93,9 +86,11 @@ public class ActivityStatisticsQueryImpl extends
 
   protected void checkQueryOk() {
     super.checkQueryOk();
-    ensureNotNull("No valid process definition id supplied", "processDefinitionId", processDefinitionId);
+    ensureNotNull("No valid process definition id supplied", "processDefinitionId",
+        processDefinitionId);
     if (includeIncidents && includeIncidentsForType != null) {
-      throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
+      throw new ProcessEngineException(
+          "Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
     }
   }
 
@@ -105,7 +100,8 @@ public class ActivityStatisticsQueryImpl extends
     return processInstancePermissionChecks;
   }
 
-  public void setProcessInstancePermissionChecks(List<PermissionCheck> processInstancePermissionChecks) {
+  public void setProcessInstancePermissionChecks(
+      List<PermissionCheck> processInstancePermissionChecks) {
     this.processInstancePermissionChecks = processInstancePermissionChecks;
   }
 

@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 /**
  * @author Philipp Ossler
  */
-public class NativeHistoryDecisionInstanceQueryImpl extends AbstractNativeQuery<NativeHistoricDecisionInstanceQuery, HistoricDecisionInstance>
+public class NativeHistoryDecisionInstanceQueryImpl
+    extends AbstractNativeQuery<NativeHistoricDecisionInstanceQuery, HistoricDecisionInstance>
     implements NativeHistoricDecisionInstanceQuery {
 
   private static final long serialVersionUID = 1L;
@@ -42,15 +43,14 @@ public class NativeHistoryDecisionInstanceQueryImpl extends AbstractNativeQuery<
 
   @Override
   public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-    return commandContext
-        .getHistoricDecisionInstanceManager()
+    return commandContext.getHistoricDecisionInstanceManager()
         .findHistoricDecisionInstanceCountByNativeQuery(parameterMap);
   }
 
   @Override
-  public List<HistoricDecisionInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
-    return commandContext
-        .getHistoricDecisionInstanceManager()
+  public List<HistoricDecisionInstance> executeList(CommandContext commandContext,
+      Map<String, Object> parameterMap, int firstResult, int maxResults) {
+    return commandContext.getHistoricDecisionInstanceManager()
         .findHistoricDecisionInstancesByNativeQuery(parameterMap, firstResult, maxResults);
   }
 

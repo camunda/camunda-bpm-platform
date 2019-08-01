@@ -24,8 +24,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 
 /**
- * <p>Java API representation of a ProcessEngine definition inside an XML
- * deployment descriptor.</p>
+ * <p>
+ * Java API representation of a ProcessEngine definition inside an XML deployment descriptor.
+ * </p>
  * 
  * @author Daniel Meyer
  * 
@@ -43,33 +44,31 @@ public interface ProcessEngineXml {
   public boolean isDefault();
 
   /**
-   * @return the name of the Java Class that is to be used in order to create
-   *         the process engine instance. Must be a subclass of
-   *         {@link ProcessEngineConfiguration}. If no value is specified,
-   *         {@link StandaloneProcessEngineConfiguration} is used.
+   * @return the name of the Java Class that is to be used in order to create the process engine
+   *         instance. Must be a subclass of {@link ProcessEngineConfiguration}. If no value is
+   *         specified, {@link StandaloneProcessEngineConfiguration} is used.
    */
   public String getConfigurationClass();
-  
+
   /**
-   * @return the JNDI Name of the datasource to be used. 
+   * @return the JNDI Name of the datasource to be used.
    */
   public String getDatasource();
 
   /**
-   * @return a set of additional properties. The properties are directly set on
-   *         the {@link ProcessEngineConfiguration} class (see
-   *         {@link #getConfigurationClass()}). This means that each property
-   *         name used here must be a bean property name on the process engine
-   *         configuration class and the bean property must be of type
-   *         {@link String}, {@link Integer} or {@link Boolean}.
+   * @return a set of additional properties. The properties are directly set on the
+   *         {@link ProcessEngineConfiguration} class (see {@link #getConfigurationClass()}). This
+   *         means that each property name used here must be a bean property name on the process
+   *         engine configuration class and the bean property must be of type {@link String},
+   *         {@link Integer} or {@link Boolean}.
    */
   public Map<String, String> getProperties();
-  
+
   /**
    * @return the name of the job acquisition to be used.
    */
   public String getJobAcquisitionName();
-  
+
   /**
    * @return a list of {@link ProcessEnginePlugin} definitions.
    */

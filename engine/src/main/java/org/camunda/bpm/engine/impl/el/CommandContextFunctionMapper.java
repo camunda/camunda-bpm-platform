@@ -52,16 +52,17 @@ public class CommandContextFunctionMapper extends FunctionMapper {
 
   protected void createMethodBindings() {
     Class<?> mapperClass = getClass();
-    COMMAND_CONTEXT_FUNCTION_MAP.put("currentUser", ReflectUtil.getMethod(mapperClass, "currentUser"));
-    COMMAND_CONTEXT_FUNCTION_MAP.put("currentUserGroups", ReflectUtil.getMethod(mapperClass, "currentUserGroups"));
+    COMMAND_CONTEXT_FUNCTION_MAP.put("currentUser",
+        ReflectUtil.getMethod(mapperClass, "currentUser"));
+    COMMAND_CONTEXT_FUNCTION_MAP.put("currentUserGroups",
+        ReflectUtil.getMethod(mapperClass, "currentUserGroups"));
   }
 
   public static String currentUser() {
     CommandContext commandContext = Context.getCommandContext();
     if (commandContext != null) {
       return commandContext.getAuthenticatedUserId();
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -70,8 +71,7 @@ public class CommandContextFunctionMapper extends FunctionMapper {
     CommandContext commandContext = Context.getCommandContext();
     if (commandContext != null) {
       return commandContext.getAuthenticatedGroupIds();
-    }
-    else {
+    } else {
       return null;
     }
   }

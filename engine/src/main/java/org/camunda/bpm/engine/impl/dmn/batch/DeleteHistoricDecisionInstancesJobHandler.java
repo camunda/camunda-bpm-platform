@@ -30,9 +30,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
-public class DeleteHistoricDecisionInstancesJobHandler extends AbstractBatchJobHandler<BatchConfiguration> {
+public class DeleteHistoricDecisionInstancesJobHandler
+    extends AbstractBatchJobHandler<BatchConfiguration> {
 
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(
+      Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION);
 
   @Override
   public String getType() {
@@ -49,24 +51,25 @@ public class DeleteHistoricDecisionInstancesJobHandler extends AbstractBatchJobH
   }
 
   @Override
-  protected BatchConfiguration createJobConfiguration(BatchConfiguration configuration, List<String> decisionIdsForJob) {
+  protected BatchConfiguration createJobConfiguration(BatchConfiguration configuration,
+      List<String> decisionIdsForJob) {
     return new BatchConfiguration(decisionIdsForJob);
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
+  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
+    ByteArrayEntity configurationEntity = commandContext.getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
     BatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
+    boolean initialLegacyRestrictions = commandContext
+        .isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();
     commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
     try {
-      commandContext.getProcessEngineConfiguration()
-          .getHistoryService()
+      commandContext.getProcessEngineConfiguration().getHistoryService()
           .deleteHistoricDecisionInstancesBulk(batchConfiguration.getIds());
     } finally {
       commandContext.enableUserOperationLog();

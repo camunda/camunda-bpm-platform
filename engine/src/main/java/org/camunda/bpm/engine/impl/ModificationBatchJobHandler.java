@@ -33,9 +33,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
-public class ModificationBatchJobHandler extends AbstractBatchJobHandler<ModificationBatchConfiguration>{
+public class ModificationBatchJobHandler
+    extends AbstractBatchJobHandler<ModificationBatchConfiguration> {
 
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(
+      Batch.TYPE_PROCESS_INSTANCE_MODIFICATION);
 
   @Override
   public String getType() {
@@ -45,20 +47,23 @@ public class ModificationBatchJobHandler extends AbstractBatchJobHandler<Modific
   @Override
   protected void postProcessJob(ModificationBatchConfiguration configuration, JobEntity job) {
     CommandContext commandContext = Context.getCommandContext();
-    ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(configuration.getProcessDefinitionId());
+    ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionById(configuration.getProcessDefinitionId());
     job.setDeploymentId(processDefinitionEntity.getDeploymentId());
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
+  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
+    ByteArrayEntity configurationEntity = commandContext.getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    ModificationBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    ModificationBatchConfiguration batchConfiguration = readConfiguration(
+        configurationEntity.getBytes());
 
-    ModificationBuilderImpl executionBuilder = (ModificationBuilderImpl) commandContext.getProcessEngineConfiguration()
-        .getRuntimeService()
+    ModificationBuilderImpl executionBuilder = (ModificationBuilderImpl) commandContext
+        .getProcessEngineConfiguration().getRuntimeService()
         .createModification(batchConfiguration.getProcessDefinitionId())
         .processInstanceIds(batchConfiguration.getIds());
 
@@ -83,25 +88,21 @@ public class ModificationBatchJobHandler extends AbstractBatchJobHandler<Modific
   }
 
   @Override
-  protected ModificationBatchConfiguration createJobConfiguration(ModificationBatchConfiguration configuration, List<String> processIdsForJob) {
-    return new ModificationBatchConfiguration(
-        processIdsForJob,
-        configuration.getProcessDefinitionId(),
-        configuration.getInstructions(),
-        configuration.isSkipCustomListeners(),
-        configuration.isSkipIoMappings()
-    );
+  protected ModificationBatchConfiguration createJobConfiguration(
+      ModificationBatchConfiguration configuration, List<String> processIdsForJob) {
+    return new ModificationBatchConfiguration(processIdsForJob,
+        configuration.getProcessDefinitionId(), configuration.getInstructions(),
+        configuration.isSkipCustomListeners(), configuration.isSkipIoMappings());
   }
-
 
   @Override
   protected ModificationBatchConfigurationJsonConverter getJsonConverterInstance() {
     return ModificationBatchConfigurationJsonConverter.INSTANCE;
   }
 
-  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String processDefinitionId) {
-    return commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache()
+  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext,
+      String processDefinitionId) {
+    return commandContext.getProcessEngineConfiguration().getDeploymentCache()
         .findDeployedProcessDefinitionById(processDefinitionId);
   }
 

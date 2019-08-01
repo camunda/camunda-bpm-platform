@@ -30,7 +30,8 @@ public class ExpressionGetInvocation extends DelegateInvocation {
   protected final ValueExpression valueExpression;
   protected final ELContext elContext;
 
-  public ExpressionGetInvocation(ValueExpression valueExpression, ELContext elContext, BaseDelegateExecution contextExecution) {
+  public ExpressionGetInvocation(ValueExpression valueExpression, ELContext elContext,
+      BaseDelegateExecution contextExecution) {
     super(contextExecution, null);
     this.valueExpression = valueExpression;
     this.elContext = elContext;

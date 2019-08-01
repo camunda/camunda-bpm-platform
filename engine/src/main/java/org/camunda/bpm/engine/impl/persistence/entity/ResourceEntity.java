@@ -22,7 +22,6 @@ import java.util.Date;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.repository.Resource;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -80,8 +79,8 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
   }
 
   /**
-   * Indicated whether or not the resource has been generated while deploying rather than
-   * being actual part of the deployment.
+   * Indicated whether or not the resource has been generated while deploying rather than being
+   * actual part of the deployment.
    */
   public boolean isGenerated() {
     return generated;
@@ -113,14 +112,8 @@ public class ResourceEntity implements Serializable, DbEntity, Resource {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", name=" + name
-           + ", deploymentId=" + deploymentId
-           + ", generated=" + generated
-           + ", tenantId=" + tenantId
-           + ", type=" + type
-           + ", createTime=" + createTime
-           + "]";
+    return this.getClass().getSimpleName() + "[id=" + id + ", name=" + name + ", deploymentId="
+        + deploymentId + ", generated=" + generated + ", tenantId=" + tenantId + ", type=" + type
+        + ", createTime=" + createTime + "]";
   }
 }

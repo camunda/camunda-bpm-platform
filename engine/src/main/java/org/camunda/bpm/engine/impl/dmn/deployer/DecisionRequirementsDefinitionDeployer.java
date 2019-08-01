@@ -37,7 +37,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
  * {@link Deployer} responsible to parse DMN 1.1 XML files and create the proper
  * {@link DecisionRequirementsDefinitionEntity}s.
  */
-public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDeployer<DecisionRequirementsDefinitionEntity> {
+public class DecisionRequirementsDefinitionDeployer
+    extends AbstractDefinitionDeployer<DecisionRequirementsDefinitionEntity> {
 
   protected static final DecisionLogger LOG = ProcessEngineLogger.DECISION_LOGGER;
 
@@ -51,15 +52,14 @@ public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDe
   }
 
   @Override
-  protected List<DecisionRequirementsDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
+  protected List<DecisionRequirementsDefinitionEntity> transformDefinitions(
+      DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
     byte[] bytes = resource.getBytes();
     ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 
     try {
-      DecisionRequirementsDefinitionEntity drd = transformer
-          .createTransform()
-          .modelInstance(inputStream)
-          .transformDecisionRequirementsGraph();
+      DecisionRequirementsDefinitionEntity drd = transformer.createTransform()
+          .modelInstance(inputStream).transformDecisionRequirementsGraph();
 
       return Collections.singletonList(drd);
 
@@ -69,13 +69,17 @@ public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDe
   }
 
   @Override
-  protected DecisionRequirementsDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
-    return getDecisionRequirementsDefinitionManager().findDecisionRequirementsDefinitionByDeploymentAndKey(deploymentId, definitionKey);
+  protected DecisionRequirementsDefinitionEntity findDefinitionByDeploymentAndKey(
+      String deploymentId, String definitionKey) {
+    return getDecisionRequirementsDefinitionManager()
+        .findDecisionRequirementsDefinitionByDeploymentAndKey(deploymentId, definitionKey);
   }
 
   @Override
-  protected DecisionRequirementsDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
-    return getDecisionRequirementsDefinitionManager().findLatestDecisionRequirementsDefinitionByKeyAndTenantId(definitionKey, tenantId);
+  protected DecisionRequirementsDefinitionEntity findLatestDefinitionByKeyAndTenantId(
+      String definitionKey, String tenantId) {
+    return getDecisionRequirementsDefinitionManager()
+        .findLatestDecisionRequirementsDefinitionByKeyAndTenantId(definitionKey, tenantId);
   }
 
   @Override
@@ -86,14 +90,16 @@ public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDe
   }
 
   @Override
-  protected void addDefinitionToDeploymentCache(DeploymentCache deploymentCache, DecisionRequirementsDefinitionEntity definition) {
+  protected void addDefinitionToDeploymentCache(DeploymentCache deploymentCache,
+      DecisionRequirementsDefinitionEntity definition) {
     if (isDecisionRequirementsDefinitionPersistable(definition)) {
       deploymentCache.addDecisionRequirementsDefinition(definition);
     }
   }
 
   @Override
-  protected void ensureNoDuplicateDefinitionKeys(List<DecisionRequirementsDefinitionEntity> definitions) {
+  protected void ensureNoDuplicateDefinitionKeys(
+      List<DecisionRequirementsDefinitionEntity> definitions) {
     // ignore decision requirements definitions which will not be persistent
     ArrayList<DecisionRequirementsDefinitionEntity> persistableDefinitions = new ArrayList<DecisionRequirementsDefinitionEntity>();
     for (DecisionRequirementsDefinitionEntity definition : definitions) {
@@ -105,13 +111,15 @@ public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDe
     super.ensureNoDuplicateDefinitionKeys(persistableDefinitions);
   }
 
-  public static boolean isDecisionRequirementsDefinitionPersistable(DecisionRequirementsDefinitionEntity definition) {
+  public static boolean isDecisionRequirementsDefinitionPersistable(
+      DecisionRequirementsDefinitionEntity definition) {
     // persist no decision requirements definition for a single decision
     return definition.getDecisions().size() > 1;
   }
 
   @Override
-  protected void updateDefinitionByPersistedDefinition(DeploymentEntity deployment, DecisionRequirementsDefinitionEntity definition,
+  protected void updateDefinitionByPersistedDefinition(DeploymentEntity deployment,
+      DecisionRequirementsDefinitionEntity definition,
       DecisionRequirementsDefinitionEntity persistedDefinition) {
     // cannot update the definition if it is not persistent
     if (persistedDefinition != null) {
@@ -119,13 +127,15 @@ public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDe
     }
   }
 
-  //context ///////////////////////////////////////////////////////////////////////////////////////////
+  // context
+  // ///////////////////////////////////////////////////////////////////////////////////////////
 
   protected DecisionRequirementsDefinitionManager getDecisionRequirementsDefinitionManager() {
     return getCommandContext().getDecisionRequirementsDefinitionManager();
   }
 
-  // getters/setters ///////////////////////////////////////////////////////////////////////////////////
+  // getters/setters
+  // ///////////////////////////////////////////////////////////////////////////////////
 
   public DmnTransformer getTransformer() {
     return transformer;

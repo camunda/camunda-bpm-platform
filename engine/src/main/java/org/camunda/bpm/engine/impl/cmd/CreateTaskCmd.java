@@ -43,7 +43,8 @@ public class CreateTaskCmd implements Command<Task> {
   }
 
   protected void checkCreateTask(CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkCreateTask();
     }
   }

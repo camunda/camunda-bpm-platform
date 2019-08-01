@@ -21,8 +21,9 @@ import org.camunda.bpm.model.cmmn.instance.CmmnModelElementInstance;
 
 public class SpecUtil {
 
-  public static <T extends CmmnModelElementInstance> T createElement(CmmnModelInstance modelInstance,
-      CmmnModelElementInstance parentElement, String id, Class<T> elementClass) {
+  public static <T extends CmmnModelElementInstance> T createElement(
+      CmmnModelInstance modelInstance, CmmnModelElementInstance parentElement, String id,
+      Class<T> elementClass) {
     T element = modelInstance.newInstance(elementClass);
     element.setAttributeValue("id", id, true);
     parentElement.addChildElement(element);

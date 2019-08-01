@@ -23,7 +23,7 @@ import org.junit.runners.model.Statement;
 import javax.naming.Context;
 
 public class MockInitialContextRule implements TestRule {
-  
+
   private final Context context;
 
   public MockInitialContextRule(Context context) {
@@ -35,7 +35,8 @@ public class MockInitialContextRule implements TestRule {
     return new Statement() {
       @Override
       public void evaluate() throws Throwable {
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, MockInitialContextFactory.class.getName());
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY,
+            MockInitialContextFactory.class.getName());
         MockInitialContextFactory.setCurrentContext(context);
         try {
           base.evaluate();

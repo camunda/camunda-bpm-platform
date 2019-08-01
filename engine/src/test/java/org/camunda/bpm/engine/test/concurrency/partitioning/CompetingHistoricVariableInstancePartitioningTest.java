@@ -38,7 +38,7 @@ public class CompetingHistoricVariableInstancePartitioningTest extends AbstractP
   public void testConcurrentFetchAndDelete() {
     // given
     String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK,
-      Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE)).getId();
+        Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE)).getId();
 
     ThreadControl asyncThread = executeControllableCommand(new AsyncThread(processInstanceId));
 
@@ -46,8 +46,8 @@ public class CompetingHistoricVariableInstancePartitioningTest extends AbstractP
 
     commandExecutor.execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
-        HistoricVariableInstanceEntity historicVariableInstanceEntity =
-          (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().singleResult();
+        HistoricVariableInstanceEntity historicVariableInstanceEntity = (HistoricVariableInstanceEntity) historyService
+            .createHistoricVariableInstanceQuery().singleResult();
 
         commandContext.getDbEntityManager().delete(historicVariableInstanceEntity);
 
@@ -63,8 +63,10 @@ public class CompetingHistoricVariableInstancePartitioningTest extends AbstractP
     asyncThread.waitUntilDone();
 
     // then
-    assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName(), is(VARIABLE_NAME));
-    assertThat((String) runtimeService.createVariableInstanceQuery().singleResult().getValue(), is(ANOTHER_VARIABLE_VALUE));
+    assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName(),
+        is(VARIABLE_NAME));
+    assertThat((String) runtimeService.createVariableInstanceQuery().singleResult().getValue(),
+        is(ANOTHER_VARIABLE_VALUE));
   }
 
   public class AsyncThread extends ControllableCommand<Void> {
@@ -76,15 +78,12 @@ public class CompetingHistoricVariableInstancePartitioningTest extends AbstractP
     }
 
     public Void execute(CommandContext commandContext) {
-     historyService.createHistoricVariableInstanceQuery()
-        .singleResult()
-        .getId(); // cache
+      historyService.createHistoricVariableInstanceQuery().singleResult().getId(); // cache
 
       monitor.sync();
 
-      commandContext.getProcessEngineConfiguration()
-        .getRuntimeService()
-        .setVariable(processInstanceId, VARIABLE_NAME, ANOTHER_VARIABLE_VALUE);
+      commandContext.getProcessEngineConfiguration().getRuntimeService()
+          .setVariable(processInstanceId, VARIABLE_NAME, ANOTHER_VARIABLE_VALUE);
 
       return null;
     }

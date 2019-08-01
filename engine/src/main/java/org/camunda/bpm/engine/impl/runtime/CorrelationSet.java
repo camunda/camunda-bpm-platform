@@ -70,8 +70,10 @@ public class CorrelationSet {
 
   @Override
   public String toString() {
-    return "CorrelationSet [businessKey=" + businessKey + ", processInstanceId=" + processInstanceId + ", processDefinitionId=" + processDefinitionId
-        + ", correlationKeys=" + correlationKeys + ", localCorrelationKeys=" + localCorrelationKeys + ", tenantId=" + tenantId + ", isTenantIdSet=" + isTenantIdSet + "]";
+    return "CorrelationSet [businessKey=" + businessKey + ", processInstanceId=" + processInstanceId
+        + ", processDefinitionId=" + processDefinitionId + ", correlationKeys=" + correlationKeys
+        + ", localCorrelationKeys=" + localCorrelationKeys + ", tenantId=" + tenantId
+        + ", isTenantIdSet=" + isTenantIdSet + "]";
   }
 
 }

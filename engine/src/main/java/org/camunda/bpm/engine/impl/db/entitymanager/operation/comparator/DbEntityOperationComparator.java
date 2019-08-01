@@ -29,7 +29,7 @@ public class DbEntityOperationComparator implements Comparator<DbEntityOperation
 
   public int compare(DbEntityOperation firstOperation, DbEntityOperation secondOperation) {
 
-    if(firstOperation.equals(secondOperation)) {
+    if (firstOperation.equals(secondOperation)) {
       return 0;
     }
 

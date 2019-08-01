@@ -32,7 +32,8 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Daniel Meyer
  *
  */
-public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderImpl implements ProcessApplicationDeploymentBuilder {
+public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderImpl
+    implements ProcessApplicationDeploymentBuilder {
 
   private static final long serialVersionUID = 1L;
 
@@ -40,7 +41,8 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   protected boolean isResumePreviousVersions = false;
   protected String resumePreviousVersionsBy = ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY;
 
-  public ProcessApplicationDeploymentBuilderImpl(RepositoryServiceImpl repositoryService, ProcessApplicationReference reference) {
+  public ProcessApplicationDeploymentBuilderImpl(RepositoryServiceImpl repositoryService,
+      ProcessApplicationReference reference) {
     super(repositoryService);
     this.processApplicationReference = reference;
     source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
@@ -52,7 +54,8 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   }
 
   @Override
-  public ProcessApplicationDeploymentBuilder resumePreviousVersionsBy(String resumePreviousVersionsBy) {
+  public ProcessApplicationDeploymentBuilder resumePreviousVersionsBy(
+      String resumePreviousVersionsBy) {
     this.resumePreviousVersionsBy = resumePreviousVersionsBy;
     return this;
   }
@@ -69,8 +72,10 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   }
 
   @Override
-  public ProcessApplicationDeploymentBuilderImpl addInputStream(String resourceName, InputStream inputStream) {
-    return (ProcessApplicationDeploymentBuilderImpl) super.addInputStream(resourceName, inputStream);
+  public ProcessApplicationDeploymentBuilderImpl addInputStream(String resourceName,
+      InputStream inputStream) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addInputStream(resourceName,
+        inputStream);
   }
 
   @Override
@@ -84,8 +89,10 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   }
 
   @Override
-  public ProcessApplicationDeploymentBuilderImpl addModelInstance(String resourceName, BpmnModelInstance modelInstance) {
-    return (ProcessApplicationDeploymentBuilderImpl) super.addModelInstance(resourceName, modelInstance);
+  public ProcessApplicationDeploymentBuilderImpl addModelInstance(String resourceName,
+      BpmnModelInstance modelInstance) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addModelInstance(resourceName,
+        modelInstance);
   }
 
   @Override
@@ -119,8 +126,10 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   }
 
   @Override
-  public ProcessApplicationDeploymentBuilderImpl enableDuplicateFiltering(boolean deployChangedOnly) {
-    return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering(deployChangedOnly);
+  public ProcessApplicationDeploymentBuilderImpl enableDuplicateFiltering(
+      boolean deployChangedOnly) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering(
+        deployChangedOnly);
   }
 
   @Override
@@ -129,23 +138,31 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   }
 
   @Override
-  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourceById(String deploymentId, String resourceId) {
-    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourceById(deploymentId, resourceId);
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourceById(String deploymentId,
+      String resourceId) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourceById(deploymentId,
+        resourceId);
   }
 
   @Override
-  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourcesById(String deploymentId, List<String> resourceIds) {
-    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourcesById(deploymentId, resourceIds);
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourcesById(String deploymentId,
+      List<String> resourceIds) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourcesById(deploymentId,
+        resourceIds);
   }
 
   @Override
-  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourceByName(String deploymentId, String resourceName) {
-    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourceByName(deploymentId, resourceName);
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourceByName(String deploymentId,
+      String resourceName) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourceByName(deploymentId,
+        resourceName);
   }
 
   @Override
-  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourcesByName(String deploymentId, List<String> resourceNames) {
-    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourcesByName(deploymentId, resourceNames);
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourcesByName(String deploymentId,
+      List<String> resourceNames) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourcesByName(
+        deploymentId, resourceNames);
   }
 
   // getters / setters ///////////////////////////////////////////////

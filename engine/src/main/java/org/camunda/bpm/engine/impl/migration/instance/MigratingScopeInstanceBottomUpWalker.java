@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.impl.tree.SingleReferenceWalker;
  * @author Thorben Lindhauer
  *
  */
-public class MigratingScopeInstanceBottomUpWalker extends SingleReferenceWalker<MigratingScopeInstance> {
+public class MigratingScopeInstanceBottomUpWalker
+    extends SingleReferenceWalker<MigratingScopeInstance> {
 
   protected MigratingScopeInstance parent = null;
 

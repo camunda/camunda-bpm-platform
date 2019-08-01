@@ -46,11 +46,13 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   protected boolean usePriority;
   protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<String, TopicFetchInstruction>();
 
-  public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions) {
+  public FetchExternalTasksCmd(String workerId, int maxResults,
+      Map<String, TopicFetchInstruction> instructions) {
     this(workerId, maxResults, instructions, false);
   }
 
-  public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions, boolean usePriority) {
+  public FetchExternalTasksCmd(String workerId, int maxResults,
+      Map<String, TopicFetchInstruction> instructions, boolean usePriority) {
     this.workerId = workerId;
     this.maxResults = maxResults;
     this.fetchInstructions = instructions;
@@ -65,9 +67,8 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
       instruction.ensureVariablesInitialized();
     }
 
-    List<ExternalTaskEntity> externalTasks = commandContext
-      .getExternalTaskManager()
-      .selectExternalTasksForTopics(fetchInstructions.values(), maxResults, usePriority);
+    List<ExternalTaskEntity> externalTasks = commandContext.getExternalTaskManager()
+        .selectExternalTasksForTopics(fetchInstructions.values(), maxResults, usePriority);
 
     final List<LockedExternalTask> result = new ArrayList<LockedExternalTask>();
 
@@ -77,7 +78,8 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
       entity.lock(workerId, fetchInstruction.getLockDuration());
 
       LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity,
-          fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables() , fetchInstruction.isDeserializeVariables());
+          fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
+          fetchInstruction.isDeserializeVariables());
 
       result.add(resultTask);
     }
@@ -87,36 +89,38 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
     return result;
   }
 
-  protected void filterOnOptimisticLockingFailure(CommandContext commandContext, final List<LockedExternalTask> tasks) {
-    commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
+  protected void filterOnOptimisticLockingFailure(CommandContext commandContext,
+      final List<LockedExternalTask> tasks) {
+    commandContext.getDbEntityManager()
+        .registerOptimisticLockingListener(new OptimisticLockingListener() {
 
-      public Class<? extends DbEntity> getEntityType() {
-        return ExternalTaskEntity.class;
-      }
+          public Class<? extends DbEntity> getEntityType() {
+            return ExternalTaskEntity.class;
+          }
 
-      public void failedOperation(DbOperation operation) {
-        if (operation instanceof DbEntityOperation) {
-          DbEntityOperation dbEntityOperation = (DbEntityOperation) operation;
-          DbEntity dbEntity = dbEntityOperation.getEntity();
+          public void failedOperation(DbOperation operation) {
+            if (operation instanceof DbEntityOperation) {
+              DbEntityOperation dbEntityOperation = (DbEntityOperation) operation;
+              DbEntity dbEntity = dbEntityOperation.getEntity();
 
-          boolean failedOperationEntityInList = false;
+              boolean failedOperationEntityInList = false;
 
-          Iterator<LockedExternalTask> it = tasks.iterator();
-          while (it.hasNext()) {
-            LockedExternalTask resultTask = it.next();
-            if (resultTask.getId().equals(dbEntity.getId())) {
-              it.remove();
-              failedOperationEntityInList = true;
-              break;
+              Iterator<LockedExternalTask> it = tasks.iterator();
+              while (it.hasNext()) {
+                LockedExternalTask resultTask = it.next();
+                if (resultTask.getId().equals(dbEntity.getId())) {
+                  it.remove();
+                  failedOperationEntityInList = true;
+                  break;
+                }
+              }
+
+              if (!failedOperationEntityInList) {
+                throw LOG.concurrentUpdateDbEntityException(operation);
+              }
             }
           }
-
-          if (!failedOperationEntityInList) {
-            throw LOG.concurrentUpdateDbEntityException(operation);
-          }
-        }
-      }
-    });
+        });
   }
 
   protected void validateInput() {

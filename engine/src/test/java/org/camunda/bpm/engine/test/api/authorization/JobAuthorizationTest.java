@@ -68,7 +68,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerSuspendJobDefinitionHandler.TYPE);
+        commandContext.getHistoricJobLogManager()
+            .deleteHistoricJobLogsByHandlerType(TimerSuspendJobDefinitionHandler.TYPE);
         return null;
       }
     });
@@ -181,7 +182,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
     disableAuthorization();
     // creates a new "standalone" job
-    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, true, new Date(oneWeekFromStartTime));
+    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, true,
+        new Date(oneWeekFromStartTime));
     enableAuthorization();
 
     // when
@@ -254,7 +256,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testExecuteJobWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
     // when
@@ -293,7 +296,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
     disableAuthorization();
     // creates a new "standalone" job
-    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false, new Date(oneWeekFromStartTime));
+    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false,
+        new Date(oneWeekFromStartTime));
     enableAuthorization();
 
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -302,7 +306,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     managementService.executeJob(jobId);
 
     // then
-    JobDefinition jobDefinition = selectJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY);
+    JobDefinition jobDefinition = selectJobDefinitionByProcessDefinitionKey(
+        TIMER_START_PROCESS_KEY);
     assertTrue(jobDefinition.isSuspended());
   }
 
@@ -360,7 +365,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testDeleteJobWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
     // when
@@ -396,7 +402,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
     disableAuthorization();
     // creates a new "standalone" job
-    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false, new Date(oneWeekFromStartTime));
+    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false,
+        new Date(oneWeekFromStartTime));
     enableAuthorization();
 
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -438,7 +445,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, processInstanceId, userId, UPDATE);
-    createRevokeAuthorization(PROCESS_DEFINITION, processInstanceId, userId, ProcessDefinitionPermissions.RETRY_JOB);
+    createRevokeAuthorization(PROCESS_DEFINITION, processInstanceId, userId,
+        ProcessDefinitionPermissions.RETRY_JOB);
     Job job = selectJobByProcessInstanceId(processInstanceId);
 
     try {
@@ -477,7 +485,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobRetriesWithRetryJobPermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, ProcessInstancePermissions.RETRY_JOB);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId,
+        ProcessInstancePermissions.RETRY_JOB);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
     // when
@@ -522,7 +531,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobRetriesWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
     // when
@@ -537,7 +547,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobRetriesWithRetryJobInstancePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, ProcessDefinitionPermissions.RETRY_JOB);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        ProcessDefinitionPermissions.RETRY_JOB);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
     // when
@@ -567,7 +578,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobRetriesWithUpdateRetryJobPermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, ProcessDefinitionPermissions.RETRY_JOB);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId,
+        ProcessDefinitionPermissions.RETRY_JOB);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
     // when
@@ -591,7 +603,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
     disableAuthorization();
     // creates a new "standalone" job
-    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false, new Date(oneWeekFromStartTime));
+    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false,
+        new Date(oneWeekFromStartTime));
     enableAuthorization();
 
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -611,7 +624,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobRetriesByJobDefinitionIdWithoutAuthorization() {
     // given
     disableAuthorization();
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().listPage(0, 1).get(0);
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().listPage(0, 1)
+        .get(0);
     enableAuthorization();
 
     String jobDefinitionId = jobDefinition.getId();
@@ -638,8 +652,10 @@ public class JobAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_DEFINITION, processInstanceId, userId, UPDATE);
-    createRevokeAuthorization(PROCESS_DEFINITION, processInstanceId, userId, ProcessDefinitionPermissions.RETRY_JOB);
-    JobDefinition jobDefinition = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY);
+    createRevokeAuthorization(PROCESS_DEFINITION, processInstanceId, userId,
+        ProcessDefinitionPermissions.RETRY_JOB);
+    JobDefinition jobDefinition = selectJobDefinitionByProcessDefinitionKey(
+        TIMER_BOUNDARY_PROCESS_KEY);
 
     try {
       // when
@@ -663,7 +679,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     try {
       // when
@@ -693,7 +710,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     managementService.setJobRetries(jobId, 0);
     enableAuthorization();
 
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     // when
     managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, 1);
@@ -714,7 +732,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     managementService.setJobRetries(jobId, 0);
     enableAuthorization();
 
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     // when
     managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, 1);
@@ -728,14 +747,16 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobRetriesByJobDefinitionIdWithUpdateInstancePermissionOnProcessDefinition() {
     // given
     ProcessInstance processInstance = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, processInstance.getProcessDefinitionId(), userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, processInstance.getProcessDefinitionId(), userId,
+        UPDATE_INSTANCE);
     String jobId = selectJobByProcessInstanceId(processInstance.getId()).getId();
 
     disableAuthorization();
     managementService.setJobRetries(jobId, 0);
     enableAuthorization();
 
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     // when
     managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, 1);
@@ -749,14 +770,16 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobRetriesByJobDefinitionIdWithRetryJobPermissionOnProcessDefinition() {
     // given
     ProcessInstance processInstance = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, processInstance.getProcessDefinitionId(), userId, ProcessDefinitionPermissions.RETRY_JOB);
+    createGrantAuthorization(PROCESS_DEFINITION, processInstance.getProcessDefinitionId(), userId,
+        ProcessDefinitionPermissions.RETRY_JOB);
     String jobId = selectJobByProcessInstanceId(processInstance.getId()).getId();
 
     disableAuthorization();
     managementService.setJobRetries(jobId, 0);
     enableAuthorization();
 
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     // when
     managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, 1);
@@ -773,7 +796,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     disableAuthorization();
     managementService.setJobRetries(jobId, 0);
@@ -791,10 +815,12 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobRetriesByJobDefinitionIdWithRetryJobPermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, ProcessDefinitionPermissions.RETRY_JOB);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId,
+        ProcessDefinitionPermissions.RETRY_JOB);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     disableAuthorization();
     managementService.setJobRetries(jobId, 0);
@@ -864,7 +890,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSetJobDueDateWithUpdateInstancePermissionOnTimerBoundaryProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
     // when
@@ -901,7 +928,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
     disableAuthorization();
     // creates a new "standalone" job
-    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false, new Date(oneWeekFromStartTime));
+    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false,
+        new Date(oneWeekFromStartTime));
     enableAuthorization();
 
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -1008,7 +1036,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
     disableAuthorization();
     // creates a new "standalone" job
-    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false, new Date(oneWeekFromStartTime));
+    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false,
+        new Date(oneWeekFromStartTime));
     enableAuthorization();
 
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -1083,7 +1112,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     managementService.suspendJobById(jobId);
@@ -1120,7 +1150,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
     disableAuthorization();
     // creates a new "standalone" job
-    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false, new Date(oneWeekFromStartTime));
+    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false,
+        new Date(oneWeekFromStartTime));
     enableAuthorization();
 
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -1201,7 +1232,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
     suspendJobById(jobId);
 
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     managementService.activateJobById(jobId);
@@ -1239,7 +1271,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
     disableAuthorization();
     // creates a new "standalone" job
-    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false, new Date(oneWeekFromStartTime));
+    managementService.suspendJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY, false,
+        new Date(oneWeekFromStartTime));
     enableAuthorization();
 
     String jobId = managementService.createJobQuery().singleResult().getId();
@@ -1313,7 +1346,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     managementService.suspendJobByProcessInstanceId(processInstanceId);
@@ -1400,7 +1434,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
     suspendJobByProcessInstanceId(processInstanceId);
 
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     managementService.activateJobByProcessInstanceId(processInstanceId);
@@ -1432,7 +1467,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSuspendJobByJobDefinitionIdWihtoutAuthorization() {
     // given
     startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     try {
       // when
@@ -1453,7 +1489,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSuspendJobByJobDefinitionIdWihtUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
 
@@ -1476,7 +1513,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSuspendJobByJobDefinitionIdWihtUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
@@ -1492,9 +1530,11 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSuspendJobByJobDefinitionIdWihtUpdatePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     managementService.suspendJobByJobDefinitionId(jobDefinitionId);
@@ -1508,7 +1548,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSuspendJobByJobDefinitionIdWihtUpdatePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
 
@@ -1526,7 +1567,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testActivateJobByJobDefinitionIdWihtoutAuthorization() {
     // given
     startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY);
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
     suspendJobByJobDefinitionId(jobDefinitionId);
 
     try {
@@ -1548,7 +1590,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testActivateJobByJobDefinitionIdWihtUpdatePermissionOnProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
     suspendJobByJobDefinitionId(jobDefinitionId);
 
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
@@ -1572,7 +1615,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testActivateJobByJobDefinitionIdWihtUpdatePermissionOnAnyProcessInstance() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
     suspendJobByJobDefinitionId(jobDefinitionId);
 
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
@@ -1589,10 +1633,12 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testActivateJobByJobDefinitionIdWihtUpdatePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
     suspendJobByJobDefinitionId(jobDefinitionId);
 
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     managementService.activateJobByJobDefinitionId(jobDefinitionId);
@@ -1606,7 +1652,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testActivateJobByJobDefinitionIdWihtUpdatePermissionOnAnyProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    String jobDefinitionId = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY)
+        .getId();
     suspendJobByJobDefinitionId(jobDefinitionId);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
@@ -1687,7 +1734,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
     String processDefinitionId = selectProcessDefinitionByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
 
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     managementService.suspendJobByProcessDefinitionId(processDefinitionId);
@@ -1785,7 +1833,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     String processDefinitionId = selectProcessDefinitionByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
     suspendJobByProcessDefinitionId(processDefinitionId);
 
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     managementService.activateJobByProcessDefinitionId(processDefinitionId);
@@ -1873,7 +1922,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
   public void testSuspendJobByProcessDefinitionKeyWihtUpdatePermissionOnProcessDefinition() {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     managementService.suspendJobByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY);
@@ -1962,7 +2012,8 @@ public class JobAuthorizationTest extends AuthorizationTest {
     // given
     String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
     suspendJobByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, TIMER_BOUNDARY_PROCESS_KEY, userId,
+        UPDATE_INSTANCE);
 
     // when
     managementService.activateJobByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY);
@@ -2009,9 +2060,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
   protected Job selectJobByProcessInstanceId(String processInstanceId) {
     disableAuthorization();
-    Job job = managementService
-        .createJobQuery()
-        .processInstanceId(processInstanceId)
+    Job job = managementService.createJobQuery().processInstanceId(processInstanceId)
         .singleResult();
     enableAuthorization();
     return job;
@@ -2019,20 +2068,15 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
   protected Job selectJobById(String jobId) {
     disableAuthorization();
-    Job job = managementService
-        .createJobQuery()
-        .jobId(jobId)
-        .singleResult();
+    Job job = managementService.createJobQuery().jobId(jobId).singleResult();
     enableAuthorization();
     return job;
   }
 
   protected JobDefinition selectJobDefinitionByProcessDefinitionKey(String processDefinitionKey) {
     disableAuthorization();
-    JobDefinition jobDefinition = managementService
-        .createJobDefinitionQuery()
-        .processDefinitionKey(processDefinitionKey)
-        .singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+        .processDefinitionKey(processDefinitionKey).singleResult();
     enableAuthorization();
     return jobDefinition;
   }

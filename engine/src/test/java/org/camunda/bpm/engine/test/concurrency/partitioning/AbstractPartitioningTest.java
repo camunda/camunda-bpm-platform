@@ -44,20 +44,19 @@ public abstract class AbstractPartitioningTest extends ConcurrencyTestCase {
   }
 
   final protected BpmnModelInstance PROCESS_WITH_USERTASK = Bpmn.createExecutableProcess("process")
-    .startEvent()
-      .userTask()
-    .endEvent().done();
+      .startEvent().userTask().endEvent().done();
 
   protected ProcessInstance deployAndStartProcess(BpmnModelInstance bpmnModelInstance) {
     return deployAndStartProcess(bpmnModelInstance, null);
   }
 
-  protected ProcessInstance deployAndStartProcess(BpmnModelInstance bpmnModelInstance, Map<String, Object> variablesMap) {
+  protected ProcessInstance deployAndStartProcess(BpmnModelInstance bpmnModelInstance,
+      Map<String, Object> variablesMap) {
     deploymentId = repositoryService.createDeployment()
-      .addModelInstance("process.bpmn", bpmnModelInstance)
-      .deploy().getId();
+        .addModelInstance("process.bpmn", bpmnModelInstance).deploy().getId();
 
-    String processDefinitionKey = bpmnModelInstance.getDefinitions().getRootElements().iterator().next().getId();
+    String processDefinitionKey = bpmnModelInstance.getDefinitions().getRootElements().iterator()
+        .next().getId();
     return runtimeService.startProcessInstanceByKey(processDefinitionKey, variablesMap);
   }
 

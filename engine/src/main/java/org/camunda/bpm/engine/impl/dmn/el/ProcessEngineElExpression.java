@@ -36,13 +36,13 @@ public class ProcessEngineElExpression implements ElExpression {
   }
 
   public Object getValue(VariableContext variableContext) {
-    if(Context.getCommandContext() == null) {
-      throw new ProcessEngineException("Expression can only be evaluated inside the context of the process engine");
+    if (Context.getCommandContext() == null) {
+      throw new ProcessEngineException(
+          "Expression can only be evaluated inside the context of the process engine");
     }
 
-    ELContext context = Context.getProcessEngineConfiguration()
-      .getExpressionManager()
-      .createElContext(variableContext);
+    ELContext context = Context.getProcessEngineConfiguration().getExpressionManager()
+        .createElContext(variableContext);
 
     return valueExpression.getValue(context);
 

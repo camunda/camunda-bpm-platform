@@ -25,9 +25,8 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Wraps a variable scope as if it has no parent such that it is reduced to its local
- * variables. For example {@link #getVariable(String)} simply delegates to
- * {@link #getVariableLocal(String)}.
+ * Wraps a variable scope as if it has no parent such that it is reduced to its local variables. For
+ * example {@link #getVariable(String)} simply delegates to {@link #getVariableLocal(String)}.
  *
  * @author Thorben Lindhauer
  */
@@ -87,7 +86,8 @@ public class VariableScopeLocalAdapter implements VariableScope {
     return wrappedScope.getVariableLocalTyped(variableName);
   }
 
-  public <T extends TypedValue> T getVariableLocalTyped(String variableName, boolean deserializeValue) {
+  public <T extends TypedValue> T getVariableLocalTyped(String variableName,
+      boolean deserializeValue) {
     return wrappedScope.getVariableLocalTyped(variableName, deserializeValue);
   }
 

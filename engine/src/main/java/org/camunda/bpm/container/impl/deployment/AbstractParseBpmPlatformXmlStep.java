@@ -37,7 +37,9 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
- * <p>Deployment operation step responsible for parsing and attaching the bpm-platform.xml file.</p>
+ * <p>
+ * Deployment operation step responsible for parsing and attaching the bpm-platform.xml file.
+ * </p>
  *
  * @author Daniel Meyer
  * @author Christian Lipphardt
@@ -52,7 +54,8 @@ public abstract class AbstractParseBpmPlatformXmlStep extends DeploymentOperatio
   public static final String BPM_PLATFORM_XML_LOCATION = "bpm-platform-xml";
   public static final String BPM_PLATFORM_XML_ENVIRONMENT_VARIABLE = "BPM_PLATFORM_XML";
   public static final String BPM_PLATFORM_XML_SYSTEM_PROPERTY = "bpm.platform.xml";
-  public static final String BPM_PLATFORM_XML_RESOURCE_LOCATION = "META-INF/" + BPM_PLATFORM_XML_FILE;
+  public static final String BPM_PLATFORM_XML_RESOURCE_LOCATION = "META-INF/"
+      + BPM_PLATFORM_XML_FILE;
 
   public String getName() {
     return "Parsing bpm-platform.xml file";
@@ -61,13 +64,13 @@ public abstract class AbstractParseBpmPlatformXmlStep extends DeploymentOperatio
   public void performOperationStep(DeploymentOperation operationContext) {
 
     URL bpmPlatformXmlSource = getBpmPlatformXmlStream(operationContext);
-    ensureNotNull("Unable to find bpm-platform.xml. This file is necessary for deploying the camunda BPM platform", "bpmPlatformXmlSource", bpmPlatformXmlSource);
+    ensureNotNull(
+        "Unable to find bpm-platform.xml. This file is necessary for deploying the camunda BPM platform",
+        "bpmPlatformXmlSource", bpmPlatformXmlSource);
 
     // parse the bpm platform xml
     BpmPlatformXml bpmPlatformXml = new BpmPlatformXmlParser().createParse()
-      .sourceUrl(bpmPlatformXmlSource)
-      .execute()
-      .getBpmPlatformXml();
+        .sourceUrl(bpmPlatformXmlSource).execute().getBpmPlatformXml();
 
     // attach to operation context
     operationContext.addAttachment(Attachments.BPM_PLATFORM_XML, bpmPlatformXml);
@@ -84,9 +87,9 @@ public abstract class AbstractParseBpmPlatformXmlStep extends DeploymentOperatio
       if (fileLocation == null) {
         fileLocation = checkValidFileLocation(url);
       }
-    }
-    catch (MalformedURLException e) {
-      throw new ProcessEngineException("'" + url + "' is not a valid camunda bpm platform configuration resource location.", e);
+    } catch (MalformedURLException e) {
+      throw new ProcessEngineException(
+          "'" + url + "' is not a valid camunda bpm platform configuration resource location.", e);
     }
 
     return fileLocation;
@@ -122,7 +125,8 @@ public abstract class AbstractParseBpmPlatformXmlStep extends DeploymentOperatio
       return null;
     }
 
-    Pattern urlPattern = Pattern.compile("^(https?://).*/bpm-platform\\.xml$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    Pattern urlPattern = Pattern.compile("^(https?://).*/bpm-platform\\.xml$",
+        Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     Matcher urlMatcher = urlPattern.matcher(url);
     if (urlMatcher.matches()) {
       return new URL(url);
@@ -136,7 +140,8 @@ public abstract class AbstractParseBpmPlatformXmlStep extends DeploymentOperatio
       return null;
     }
 
-    Pattern filePattern = Pattern.compile("^(/|[A-z]://?|[A-z]:\\\\).*[/|\\\\]bpm-platform\\.xml$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    Pattern filePattern = Pattern.compile("^(/|[A-z]://?|[A-z]:\\\\).*[/|\\\\]bpm-platform\\.xml$",
+        Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     Matcher fileMatcher = filePattern.matcher(url);
     if (fileMatcher.matches()) {
       File configurationLocation = new File(url);
@@ -162,8 +167,7 @@ public abstract class AbstractParseBpmPlatformXmlStep extends DeploymentOperatio
       }
 
       return fileLocation;
-    }
-    catch (NamingException e) {
+    } catch (NamingException e) {
       LOG.debugExceptionWhileGettingConfigFromJndi(jndi, e);
       return null;
     }

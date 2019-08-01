@@ -23,21 +23,22 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
-
 /**
- * <p>{@link AcquireJobsRunnable} able to serve multiple process engines.</p>
- *
  * <p>
- *   Continuously acquires jobs for all registered process engines until interruption.
- *   For every such <i>acquisition cycle</i>, jobs are acquired and submitted for execution.
+ * {@link AcquireJobsRunnable} able to serve multiple process engines.
  * </p>
  *
  * <p>
- *   For one cycle, all acquisition-related events (acquired jobs by engine, rejected jobs by engine,
- *   exceptions during acquisition, etc.) are collected in an instance of {@link JobAcquisitionContext}.
- *   The context is then handed to a {@link JobAcquisitionStrategy} that
- *   determines the there is before the next acquisition cycles begins and how many jobs
- *   are to be acquired next.
+ * Continuously acquires jobs for all registered process engines until interruption. For every such
+ * <i>acquisition cycle</i>, jobs are acquired and submitted for execution.
+ * </p>
+ *
+ * <p>
+ * For one cycle, all acquisition-related events (acquired jobs by engine, rejected jobs by engine,
+ * exceptions during acquisition, etc.) are collected in an instance of
+ * {@link JobAcquisitionContext}. The context is then handed to a {@link JobAcquisitionStrategy}
+ * that determines the there is before the next acquisition cycles begins and how many jobs are to
+ * be acquired next.
  * </p>
  *
  * @author Daniel Meyer
@@ -62,7 +63,6 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
       acquisitionContext.reset();
       acquisitionContext.setAcquisitionTime(System.currentTimeMillis());
 
-
       Iterator<ProcessEngineImpl> engineIterator = jobExecutor.engineIterator();
 
       try {
@@ -73,7 +73,8 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
             continue;
           }
 
-          AcquiredJobs acquiredJobs = acquireJobs(acquisitionContext, acquisitionStrategy, currentProcessEngine);
+          AcquiredJobs acquiredJobs = acquireJobs(acquisitionContext, acquisitionStrategy,
+              currentProcessEngine);
           executeJobs(acquisitionContext, currentProcessEngine, acquiredJobs);
         }
       } catch (Exception e) {
@@ -84,16 +85,17 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
 
       acquisitionContext.setJobAdded(isJobAdded);
       configureNextAcquisitionCycle(acquisitionContext, acquisitionStrategy);
-      //The clear had to be done after the configuration, since a hint can be
-      //appear in the suspend and the flag shouldn't be cleaned in this case.
-      //The loop will restart after suspend with the isJobAdded flag and
-      //reconfigure with this flag
+      // The clear had to be done after the configuration, since a hint can be
+      // appear in the suspend and the flag shouldn't be cleaned in this case.
+      // The loop will restart after suspend with the isJobAdded flag and
+      // reconfigure with this flag
       clearJobAddedNotification();
 
       long waitTime = acquisitionStrategy.getWaitTime();
       // wait the requested wait time minus the time that acquisition itself took
       // this makes the intervals of job acquisition more constant and therefore predictable
-      waitTime = Math.max(0, (acquisitionContext.getAcquisitionTime() + waitTime) - System.currentTimeMillis());
+      waitTime = Math.max(0,
+          (acquisitionContext.getAcquisitionTime() + waitTime) - System.currentTimeMillis());
 
       suspendAcquisition(waitTime);
     }
@@ -106,11 +108,12 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
   }
 
   /**
-   * Reconfigure the acquisition strategy based on the current cycle's acquisition context.
-   * A strategy implementation may update internal data structure to calculate a different wait time
+   * Reconfigure the acquisition strategy based on the current cycle's acquisition context. A
+   * strategy implementation may update internal data structure to calculate a different wait time
    * before the next cycle of acquisition is performed.
    */
-  protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext, JobAcquisitionStrategy acquisitionStrategy) {
+  protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext,
+      JobAcquisitionStrategy acquisitionStrategy) {
     acquisitionStrategy.reconfigure(acquisitionContext);
   }
 
@@ -123,9 +126,12 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
 
   }
 
-  protected void executeJobs(JobAcquisitionContext context, ProcessEngineImpl currentProcessEngine, AcquiredJobs acquiredJobs) {
-    // submit those jobs that were acquired in previous cycles but could not be scheduled for execution
-    List<List<String>> additionalJobs = context.getAdditionalJobsByEngine().get(currentProcessEngine.getName());
+  protected void executeJobs(JobAcquisitionContext context, ProcessEngineImpl currentProcessEngine,
+      AcquiredJobs acquiredJobs) {
+    // submit those jobs that were acquired in previous cycles but could not be scheduled for
+    // execution
+    List<List<String>> additionalJobs = context.getAdditionalJobsByEngine()
+        .get(currentProcessEngine.getName());
     if (additionalJobs != null) {
       for (List<String> jobBatch : additionalJobs) {
         LOG.executeJobs(currentProcessEngine.getName(), jobBatch);
@@ -142,10 +148,8 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
     }
   }
 
-  protected AcquiredJobs acquireJobs(
-      JobAcquisitionContext context,
-      JobAcquisitionStrategy acquisitionStrategy,
-      ProcessEngineImpl currentProcessEngine) {
+  protected AcquiredJobs acquireJobs(JobAcquisitionContext context,
+      JobAcquisitionStrategy acquisitionStrategy, ProcessEngineImpl currentProcessEngine) {
     CommandExecutor commandExecutor = currentProcessEngine.getProcessEngineConfiguration()
         .getCommandExecutorTxRequired();
 
@@ -156,15 +160,15 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
     if (numJobsToAcquire > 0) {
       jobExecutor.logAcquisitionAttempt(currentProcessEngine);
       acquiredJobs = commandExecutor.execute(jobExecutor.getAcquireJobsCmd(numJobsToAcquire));
-    }
-    else {
+    } else {
       acquiredJobs = new AcquiredJobs(numJobsToAcquire);
     }
 
     context.submitAcquiredJobs(currentProcessEngine.getName(), acquiredJobs);
 
     jobExecutor.logAcquiredJobs(currentProcessEngine, acquiredJobs.size());
-    jobExecutor.logAcquisitionFailureJobs(currentProcessEngine, acquiredJobs.getNumberOfJobsFailedToLock());
+    jobExecutor.logAcquisitionFailureJobs(currentProcessEngine,
+        acquiredJobs.getNumberOfJobsFailedToLock());
 
     LOG.acquiredJobs(currentProcessEngine.getName(), acquiredJobs);
 

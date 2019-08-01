@@ -39,7 +39,8 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
 
   private static final long serialVersionUID = 1L;
 
-  public GetTaskFormVariablesCmd(String taskId, Collection<String> variableNames, boolean deserializeObjectValues) {
+  public GetTaskFormVariablesCmd(String taskId, Collection<String> variableNames,
+      boolean deserializeObjectValues) {
     super(taskId, variableNames, deserializeObjectValues);
   }
 
@@ -47,7 +48,8 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
     final TaskManager taskManager = commandContext.getTaskManager();
     TaskEntity task = taskManager.findTaskById(resourceId);
 
-    ensureNotNull(BadUserRequestException.class, "Cannot find task with id '" + resourceId + "'.", "task", task);
+    ensureNotNull(BadUserRequestException.class, "Cannot find task with id '" + resourceId + "'.",
+        "task", task);
 
     checkGetTaskFormVariables(task, commandContext);
 
@@ -58,7 +60,7 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
     if (taskDefinition != null) {
       TaskFormData taskFormData = taskDefinition.getTaskFormHandler().createTaskForm(task);
       for (FormField formField : taskFormData.getFormFields()) {
-        if(formVariableNames == null || formVariableNames.contains(formField.getId())) {
+        if (formVariableNames == null || formVariableNames.contains(formField.getId())) {
           result.put(formField.getId(), createVariable(formField, task));
         }
       }
@@ -71,7 +73,8 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
   }
 
   protected void checkGetTaskFormVariables(TaskEntity task, CommandContext commandContext) {
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadTaskVariable(task);
     }
   }

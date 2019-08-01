@@ -30,12 +30,12 @@ public class TestExecutionListener implements ExecutionListener {
   public static List<String> collectedEvents = new ArrayList<String>();
 
   public void notify(DelegateExecution execution) throws Exception {
-    String counterKey = execution.getCurrentActivityId() + "-" +execution.getEventName();
+    String counterKey = execution.getCurrentActivityId() + "-" + execution.getEventName();
     collectedEvents.add(counterKey);
   }
-  
+
   public static void reset() {
     collectedEvents.clear();
   }
-  
+
 }

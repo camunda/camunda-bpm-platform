@@ -52,12 +52,9 @@ public class MigrateEventSubProcessAndTriggerTest {
 
   @Parameters
   public static Collection<Object[]> data() {
-      return Arrays.asList(new Object[][] {
-               new Object[]{ new TimerEventFactory() },
-               new Object[]{ new MessageEventFactory() },
-               new Object[]{ new SignalEventFactory() },
-               new Object[]{ new ConditionalEventFactory() }
-         });
+    return Arrays.asList(new Object[][] { new Object[] { new TimerEventFactory() },
+        new Object[] { new MessageEventFactory() }, new Object[] { new SignalEventFactory() },
+        new Object[] { new ConditionalEventFactory() } });
   }
 
   @Parameter
@@ -78,25 +75,21 @@ public class MigrateEventSubProcessAndTriggerTest {
   public void testMigrateEventSubprocessSignalTrigger() {
     BpmnModelInstance processModel = ProcessModels.ONE_TASK_PROCESS.clone();
     MigratingBpmnEventTrigger eventTrigger = eventFactory.addEventSubProcess(
-        rule.getProcessEngine(),
-        processModel,
-        ProcessModels.PROCESS_KEY,
-        "eventSubProcess",
+        rule.getProcessEngine(), processModel, ProcessModels.PROCESS_KEY, "eventSubProcess",
         "eventSubProcessStart");
     ModifiableBpmnModelInstance.wrap(processModel).startEventBuilder("eventSubProcessStart")
-        .userTask("eventSubProcessTask")
-        .endEvent()
-        .done();
+        .userTask("eventSubProcessTask").endEvent().done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(processModel);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(processModel);
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
 
-    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask", "userTask")
-        .mapActivities("eventSubProcessStart", "eventSubProcessStart").updateEventTrigger()
-        .build();
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart").updateEventTrigger().build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);

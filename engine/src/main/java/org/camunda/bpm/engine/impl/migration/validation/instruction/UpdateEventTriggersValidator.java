@@ -29,12 +29,14 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 public class UpdateEventTriggersValidator implements MigrationInstructionValidator {
 
   @Override
-  public void validate(ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions,
+  public void validate(ValidatingMigrationInstruction instruction,
+      ValidatingMigrationInstructions instructions,
       MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
 
     if (instruction.isUpdateEventTrigger() && !definesPersistentEventTrigger(sourceActivity)) {
-      report.addFailure("Cannot update event trigger because the activity does not define a persistent event trigger");
+      report.addFailure(
+          "Cannot update event trigger because the activity does not define a persistent event trigger");
     }
   }
 
@@ -43,9 +45,9 @@ public class UpdateEventTriggersValidator implements MigrationInstructionValidat
 
     if (eventScope != null) {
       return TimerDeclarationImpl.getDeclarationsForScope(eventScope).containsKey(activity.getId())
-          || EventSubscriptionDeclaration.getDeclarationsForScope(eventScope).containsKey(activity.getId());
-    }
-    else {
+          || EventSubscriptionDeclaration.getDeclarationsForScope(eventScope)
+              .containsKey(activity.getId());
+    } else {
       return false;
     }
   }

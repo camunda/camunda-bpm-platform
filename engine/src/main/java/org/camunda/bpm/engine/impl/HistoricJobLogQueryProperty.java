@@ -29,9 +29,12 @@ public interface HistoricJobLogQueryProperty {
   public static final QueryProperty TIMESTAMP = new QueryPropertyImpl("TIMESTAMP_");
   public static final QueryProperty ACTIVITY_ID = new QueryPropertyImpl("ACT_ID_");
   public static final QueryProperty EXECUTION_ID = new QueryPropertyImpl("EXECUTION_ID_");
-  public static final QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROCESS_INSTANCE_ID_");
-  public static final QueryProperty PROCESS_DEFINITION_ID = new QueryPropertyImpl("PROCESS_DEF_ID_");
-  public static final QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl("PROCESS_DEF_KEY_");
+  public static final QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl(
+      "PROCESS_INSTANCE_ID_");
+  public static final QueryProperty PROCESS_DEFINITION_ID = new QueryPropertyImpl(
+      "PROCESS_DEF_ID_");
+  public static final QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl(
+      "PROCESS_DEF_KEY_");
   public static final QueryProperty DEPLOYMENT_ID = new QueryPropertyImpl("DEPLOYMENT_ID_");
   public static final QueryProperty DUEDATE = new QueryPropertyImpl("JOB_DUEDATE_");
   public static final QueryProperty RETRIES = new QueryPropertyImpl("JOB_RETRIES_");

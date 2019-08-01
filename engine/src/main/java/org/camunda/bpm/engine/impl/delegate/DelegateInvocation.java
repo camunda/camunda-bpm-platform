@@ -21,8 +21,7 @@ import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 /**
- * Provides context about the invocation of usercode and handles the actual
- * invocation
+ * Provides context about the invocation of usercode and handles the actual invocation
  *
  * @author Daniel Meyer
  * @see DelegateInterceptor
@@ -34,13 +33,14 @@ public abstract class DelegateInvocation {
   protected ResourceDefinitionEntity contextResource;
 
   /**
-   * Provide a context execution or resource definition in which context the invocation
-   *   should be performed. If both parameters are null, the invocation is performed in the
-   *   current context.
+   * Provide a context execution or resource definition in which context the invocation should be
+   * performed. If both parameters are null, the invocation is performed in the current context.
    *
-   * @param contextExecution set to an execution
+   * @param contextExecution
+   *          set to an execution
    */
-  public DelegateInvocation(BaseDelegateExecution contextExecution, ResourceDefinitionEntity contextResource) {
+  public DelegateInvocation(BaseDelegateExecution contextExecution,
+      ResourceDefinitionEntity contextResource) {
     // This constructor forces sub classes to call it, thereby making it more visible
     // whether a context switch is going to be performed for them.
     this.contextExecution = contextExecution;
@@ -48,8 +48,7 @@ public abstract class DelegateInvocation {
   }
 
   /**
-   * make the invocation proceed, performing the actual invocation of the user
-   * code.
+   * make the invocation proceed, performing the actual invocation of the user code.
    *
    * @throws Exception
    *           the exception thrown by the user code
@@ -61,8 +60,7 @@ public abstract class DelegateInvocation {
   protected abstract void invoke() throws Exception;
 
   /**
-   * @return the result of the invocation (can be null if the invocation does
-   *         not return a result)
+   * @return the result of the invocation (can be null if the invocation does not return a result)
    */
   public Object getInvocationResult() {
     return invocationResult;

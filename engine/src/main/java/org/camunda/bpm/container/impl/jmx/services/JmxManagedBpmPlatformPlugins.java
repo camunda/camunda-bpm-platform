@@ -27,7 +27,8 @@ import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
  * @author Thorben Lindhauer
  *
  */
-public class JmxManagedBpmPlatformPlugins implements PlatformService<BpmPlatformPlugins>, JmxManagedBpmPlatformPluginsMBean {
+public class JmxManagedBpmPlatformPlugins
+    implements PlatformService<BpmPlatformPlugins>, JmxManagedBpmPlatformPluginsMBean {
 
   protected BpmPlatformPlugins plugins;
 
@@ -57,7 +58,7 @@ public class JmxManagedBpmPlatformPlugins implements PlatformService<BpmPlatform
     String[] names = new String[pluginList.size()];
     for (int i = 0; i < names.length; i++) {
       BpmPlatformPlugin bpmPlatformPlugin = pluginList.get(i);
-      if(bpmPlatformPlugin != null) {
+      if (bpmPlatformPlugin != null) {
         names[i] = bpmPlatformPlugin.getClass().getName();
       }
     }

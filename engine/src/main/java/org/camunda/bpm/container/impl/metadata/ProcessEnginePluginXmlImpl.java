@@ -21,25 +21,30 @@ import java.util.Map;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 
 /**
- * <p>Implementation of the {@link ProcessEnginePluginXml} descriptor</p>
+ * <p>
+ * Implementation of the {@link ProcessEnginePluginXml} descriptor
+ * </p>
  * 
  * @author Daniel Meyer
  *
  */
 public class ProcessEnginePluginXmlImpl implements ProcessEnginePluginXml {
-  
+
   protected String pluginClass;
   protected Map<String, String> properties;
-  
+
   public String getPluginClass() {
     return pluginClass;
   }
+
   public void setPluginClass(String pluginClass) {
     this.pluginClass = pluginClass;
   }
+
   public Map<String, String> getProperties() {
     return properties;
   }
+
   public void setProperties(Map<String, String> properties) {
     this.properties = properties;
   }

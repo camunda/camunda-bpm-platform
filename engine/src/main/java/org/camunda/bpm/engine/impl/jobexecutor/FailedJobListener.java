@@ -55,9 +55,7 @@ public class FailedJobListener implements Command<Void> {
     commandExecutor.execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {
-        JobEntity job = commandContext
-                .getJobManager()
-                .findJobById(jobId);
+        JobEntity job = commandContext.getJobManager().findJobById(jobId);
 
         if (job != null) {
           fireHistoricJobFailedEvt(job);
@@ -84,16 +82,13 @@ public class FailedJobListener implements Command<Void> {
     // sequence counter once again
     job.incrementSequenceCounter();
 
-    commandContext
-            .getHistoricJobLogManager()
-            .fireJobFailedEvent(job, exception);
+    commandContext.getHistoricJobLogManager().fireJobFailedEvent(job, exception);
   }
 
   protected void logJobFailure(CommandContext commandContext) {
     if (commandContext.getProcessEngineConfiguration().isMetricsEnabled()) {
-      commandContext.getProcessEngineConfiguration()
-              .getMetricsRegistry()
-              .markOccurrence(Metrics.JOB_FAILED);
+      commandContext.getProcessEngineConfiguration().getMetricsRegistry()
+          .markOccurrence(Metrics.JOB_FAILED);
     }
   }
 

@@ -18,10 +18,9 @@ package org.camunda.bpm.engine.task;
 
 import org.camunda.bpm.engine.TaskService;
 
-
 /**
- * Contains constants for all types of identity links that can be used to involve a 
- * user or group with a certain task. 
+ * Contains constants for all types of identity links that can be used to involve a user or group
+ * with a certain task.
  * 
  * @see TaskService#addUserIdentityLink(String, String, String)
  * @see TaskService#addGroupIdentityLink(String, String, String)
@@ -29,11 +28,11 @@ import org.camunda.bpm.engine.TaskService;
  * @author Joram Barrez
  */
 public class IdentityLinkType {
-  
+
   /* Activiti native roles */
-  
+
   public static final String ASSIGNEE = "assignee";
-  
+
   public static final String CANDIDATE = "candidate";
 
   public static final String OWNER = "owner";

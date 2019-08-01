@@ -25,12 +25,12 @@ import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-
 /**
  * @author Daniel Meyer
  *
  */
-public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmEventAtomicOperation {
+public abstract class PvmAtomicOperationActivityInstanceEnd
+    extends AbstractPvmEventAtomicOperation {
 
   private final static PvmLogger LOG = ProcessEngineLogger.PVM_LOGGER;
 
@@ -43,11 +43,10 @@ public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmE
     // execution before calling END listeners.
     PvmExecutionImpl parent = execution.getParent();
     PvmActivity activity = execution.getActivity();
-    if (parent != null && execution.isScope() &&
-        activity != null && activity.isScope() &&
-        (activity.getActivityBehavior() instanceof CompositeActivityBehavior
+    if (parent != null && execution.isScope() && activity != null && activity.isScope()
+        && (activity.getActivityBehavior() instanceof CompositeActivityBehavior
             || (CompensationBehavior.isCompensationThrowing(execution))
-              && !LegacyBehavior.isCompensationThrowing(execution))) {
+                && !LegacyBehavior.isCompensationThrowing(execution))) {
 
       LOG.debugLeavesActivityInstance(execution, execution.getActivityInstanceId());
 
@@ -55,7 +54,6 @@ public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmE
       execution.setActivityInstanceId(parent.getActivityInstanceId());
       // make parent go one scope up.
       parent.leaveActivityInstance();
-
 
     }
     execution.setTransition(null);
@@ -74,9 +72,7 @@ public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmE
   protected boolean isSkipNotifyListeners(PvmExecutionImpl execution) {
     // listeners are skipped if this execution is not part of an activity instance.
     // or if the end listeners for this activity instance were triggered before already and failed.
-    return execution.hasFailedOnEndListeners() ||
-        execution.getActivityInstanceId() == null;
+    return execution.hasFailedOnEndListeners() || execution.getActivityInstanceId() == null;
   }
-
 
 }

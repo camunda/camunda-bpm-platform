@@ -58,7 +58,8 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
 
   protected boolean writeUserOperationLog;
 
-  public RestartProcessInstancesCmd(CommandExecutor commandExecutor, RestartProcessInstanceBuilderImpl builder, boolean writeUserOperationLog) {
+  public RestartProcessInstancesCmd(CommandExecutor commandExecutor,
+      RestartProcessInstanceBuilderImpl builder, boolean writeUserOperationLog) {
     super(commandExecutor, builder);
     this.writeUserOperationLog = writeUserOperationLog;
   }
@@ -68,11 +69,15 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     final Collection<String> processInstanceIds = collectProcessInstanceIds();
     final List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
 
-    ensureNotEmpty(BadUserRequestException.class, "Restart instructions cannot be empty", "instructions", instructions);
-    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty", "Process instance ids", processInstanceIds);
-    ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null", "Process instance ids", processInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "Restart instructions cannot be empty",
+        "instructions", instructions);
+    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty",
+        "Process instance ids", processInstanceIds);
+    ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null",
+        "Process instance ids", processInstanceIds);
 
-    final ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
+    final ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext,
+        builder.getProcessDefinitionId());
     ensureNotNull("Process definition cannot be found", "processDefinition", processDefinition);
 
     checkAuthorization(commandContext, processDefinition);
@@ -84,19 +89,24 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     final String processDefinitionId = builder.getProcessDefinitionId();
 
     Runnable runnable = new Runnable() {
-      @Override public void run() {
+      @Override
+      public void run() {
 
         for (String processInstanceId : processInstanceIds) {
-          HistoricProcessInstance historicProcessInstance = getHistoricProcessInstance(commandContext, processInstanceId);
+          HistoricProcessInstance historicProcessInstance = getHistoricProcessInstance(
+              commandContext, processInstanceId);
 
-          ensureNotNull(BadUserRequestException.class, "Historic process instance cannot be found", "historicProcessInstanceId", historicProcessInstance);
+          ensureNotNull(BadUserRequestException.class, "Historic process instance cannot be found",
+              "historicProcessInstanceId", historicProcessInstance);
           ensureHistoricProcessInstanceNotActive(historicProcessInstance);
           ensureSameProcessDefinition(historicProcessInstance, processDefinitionId);
 
-          ProcessInstantiationBuilderImpl instantiationBuilder = getProcessInstantiationBuilder(commandExecutor, processDefinitionId);
+          ProcessInstantiationBuilderImpl instantiationBuilder = getProcessInstantiationBuilder(
+              commandExecutor, processDefinitionId);
           applyProperties(instantiationBuilder, processDefinition, historicProcessInstance);
 
-          ProcessInstanceModificationBuilderImpl modificationBuilder = instantiationBuilder.getModificationBuilder();
+          ProcessInstanceModificationBuilderImpl modificationBuilder = instantiationBuilder
+              .getModificationBuilder();
           modificationBuilder.setModificationOperations(instructions);
 
           VariableMap variables = collectVariables(commandContext, historicProcessInstance);
@@ -111,20 +121,25 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     return null;
   }
 
-  protected void checkAuthorization(CommandContext commandContext, ProcessDefinition processDefinition) {
-    commandContext.getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY, Resources.PROCESS_DEFINITION, processDefinition.getKey());
+  protected void checkAuthorization(CommandContext commandContext,
+      ProcessDefinition processDefinition) {
+    commandContext.getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY,
+        Resources.PROCESS_DEFINITION, processDefinition.getKey());
   }
 
-  protected HistoricProcessInstance getHistoricProcessInstance(CommandContext commandContext, String processInstanceId) {
-    HistoryService historyService = commandContext.getProcessEngineConfiguration().getHistoryService();
-    return historyService.createHistoricProcessInstanceQuery()
-        .processInstanceId(processInstanceId)
+  protected HistoricProcessInstance getHistoricProcessInstance(CommandContext commandContext,
+      String processInstanceId) {
+    HistoryService historyService = commandContext.getProcessEngineConfiguration()
+        .getHistoryService();
+    return historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId)
         .singleResult();
   }
 
-  protected void ensureSameProcessDefinition(HistoricProcessInstance instance, String processDefinitionId) {
+  protected void ensureSameProcessDefinition(HistoricProcessInstance instance,
+      String processDefinitionId) {
     if (!processDefinitionId.equals(instance.getProcessDefinitionId())) {
-      throw LOG.processDefinitionOfHistoricInstanceDoesNotMatchTheGivenOne(instance, processDefinitionId);
+      throw LOG.processDefinitionOfHistoricInstanceDoesNotMatchTheGivenOne(instance,
+          processDefinitionId);
     }
   }
 
@@ -134,11 +149,14 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     }
   }
 
-  protected ProcessInstantiationBuilderImpl getProcessInstantiationBuilder(CommandExecutor commandExecutor, String processDefinitionId) {
-    return (ProcessInstantiationBuilderImpl) ProcessInstantiationBuilderImpl.createProcessInstanceById(commandExecutor, processDefinitionId);
+  protected ProcessInstantiationBuilderImpl getProcessInstantiationBuilder(
+      CommandExecutor commandExecutor, String processDefinitionId) {
+    return (ProcessInstantiationBuilderImpl) ProcessInstantiationBuilderImpl
+        .createProcessInstanceById(commandExecutor, processDefinitionId);
   }
 
-  protected void applyProperties(ProcessInstantiationBuilderImpl instantiationBuilder, ProcessDefinition processDefinition, HistoricProcessInstance processInstance) {
+  protected void applyProperties(ProcessInstantiationBuilderImpl instantiationBuilder,
+      ProcessDefinition processDefinition, HistoricProcessInstance processInstance) {
     String tenantId = processInstance.getTenantId();
     if (processDefinition.getTenantId() == null && tenantId != null) {
       instantiationBuilder.tenantId(tenantId);
@@ -150,32 +168,31 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
 
   }
 
-  protected VariableMap collectVariables(CommandContext commandContext, HistoricProcessInstance processInstance) {
+  protected VariableMap collectVariables(CommandContext commandContext,
+      HistoricProcessInstance processInstance) {
     VariableMap variables = null;
 
     if (builder.isInitialVariables()) {
       variables = collectInitialVariables(commandContext, processInstance);
-    }
-    else {
+    } else {
       variables = collectLastVariables(commandContext, processInstance);
     }
 
     return variables;
   }
 
-  protected VariableMap collectInitialVariables(CommandContext commandContext, HistoricProcessInstance processInstance) {
-    HistoryService historyService = commandContext.getProcessEngineConfiguration().getHistoryService();
+  protected VariableMap collectInitialVariables(CommandContext commandContext,
+      HistoricProcessInstance processInstance) {
+    HistoryService historyService = commandContext.getProcessEngineConfiguration()
+        .getHistoryService();
 
     HistoricActivityInstance startActivityInstance = resolveStartActivityInstance(processInstance);
 
-    HistoricDetailQueryImpl query = (HistoricDetailQueryImpl) historyService.createHistoricDetailQuery()
-        .variableUpdates()
-        .executionId(processInstance.getId())
+    HistoricDetailQueryImpl query = (HistoricDetailQueryImpl) historyService
+        .createHistoricDetailQuery().variableUpdates().executionId(processInstance.getId())
         .activityInstanceId(startActivityInstance.getId());
 
-    List<HistoricDetail> historicDetails = query
-        .sequenceCounter(1)
-        .list();
+    List<HistoricDetail> historicDetails = query.sequenceCounter(1).list();
 
     VariableMap variables = new VariableMapImpl();
     for (HistoricDetail detail : historicDetails) {
@@ -186,12 +203,13 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     return variables;
   }
 
-  protected VariableMap collectLastVariables(CommandContext commandContext, HistoricProcessInstance processInstance) {
-    HistoryService historyService = commandContext.getProcessEngineConfiguration().getHistoryService();
+  protected VariableMap collectLastVariables(CommandContext commandContext,
+      HistoricProcessInstance processInstance) {
+    HistoryService historyService = commandContext.getProcessEngineConfiguration()
+        .getHistoryService();
 
-    List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery()
-        .executionIdIn(processInstance.getId())
-        .list();
+    List<HistoricVariableInstance> historicVariables = historyService
+        .createHistoricVariableInstanceQuery().executionIdIn(processInstance.getId()).list();
 
     VariableMap variables = new VariableMapImpl();
     for (HistoricVariableInstance variable : historicVariables) {
@@ -201,7 +219,8 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     return variables;
   }
 
-  protected HistoricActivityInstance resolveStartActivityInstance(HistoricProcessInstance processInstance) {
+  protected HistoricActivityInstance resolveStartActivityInstance(
+      HistoricProcessInstance processInstance) {
     HistoryService historyService = Context.getProcessEngineConfiguration().getHistoryService();
 
     String processInstanceId = processInstance.getId();
@@ -210,12 +229,8 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     ensureNotNull("startActivityId", startActivityId);
 
     List<HistoricActivityInstance> historicActivityInstances = historyService
-        .createHistoricActivityInstanceQuery()
-        .processInstanceId(processInstanceId)
-        .activityId(startActivityId)
-        .orderPartiallyByOccurrence()
-        .asc()
-        .list();
+        .createHistoricActivityInstanceQuery().processInstanceId(processInstanceId)
+        .activityId(startActivityId).orderPartiallyByOccurrence().asc().list();
 
     ensureNotEmpty("historicActivityInstances", historicActivityInstances);
 

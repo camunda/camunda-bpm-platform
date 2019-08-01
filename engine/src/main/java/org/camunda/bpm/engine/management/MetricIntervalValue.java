@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.management;
 import java.util.Date;
 
 /**
- * Represents a metric which contains a name, reporter like the node,
- * timestamp and corresponding value.
+ * Represents a metric which contains a name, reporter like the node, timestamp and corresponding
+ * value.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  * @since 7.6.0
@@ -37,9 +37,8 @@ public interface MetricIntervalValue {
   String getName();
 
   /**
-   * Returns
-   *        the reporter name of the metric, identifies the node which generates this metric.
-   *        'null' when the metrics are aggregated by reporter.
+   * Returns the reporter name of the metric, identifies the node which generates this metric.
+   * 'null' when the metrics are aggregated by reporter.
    *
    * @return the reporter name
    */

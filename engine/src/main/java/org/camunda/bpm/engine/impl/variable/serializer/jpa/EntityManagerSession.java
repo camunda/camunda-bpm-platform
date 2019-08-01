@@ -22,15 +22,15 @@ import javax.persistence.EntityManagerFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 
-
 /**
  * @author Frederik Heremans
  */
 public interface EntityManagerSession extends Session {
   /**
    * Get an {@link EntityManager} instance associated with this session.
-   * @throws ProcessEngineException when no {@link EntityManagerFactory} instance 
-   * is configured for the process engine.
+   * 
+   * @throws ProcessEngineException
+   *           when no {@link EntityManagerFactory} instance is configured for the process engine.
    */
   EntityManager getEntityManager();
 }

@@ -23,11 +23,11 @@ import javax.script.Bindings;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 
-
 /**
- * <p>Factory for the Bindings used by the {@link ScriptingEngines}. The default
- * implementation will wrap the provided default bindings using an {@link ScriptBindings}
- * implementation.</p>
+ * <p>
+ * Factory for the Bindings used by the {@link ScriptingEngines}. The default implementation will
+ * wrap the provided default bindings using an {@link ScriptBindings} implementation.
+ * </p>
  *
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -42,9 +42,9 @@ public class ScriptBindingsFactory {
 
   public Bindings createBindings(VariableScope variableScope, Bindings engineBindings) {
     List<Resolver> scriptResolvers = new ArrayList<Resolver>();
-    for (ResolverFactory scriptResolverFactory: resolverFactories) {
+    for (ResolverFactory scriptResolverFactory : resolverFactories) {
       Resolver resolver = scriptResolverFactory.createResolver(variableScope);
-      if (resolver!=null) {
+      if (resolver != null) {
         scriptResolvers.add(resolver);
       }
     }

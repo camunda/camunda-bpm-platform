@@ -40,10 +40,10 @@ public class MultiTenancySharedDefinitionPropagationTest {
 
   protected static final String TENANT_ID = "tenant1";
 
-
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+    public ProcessEngineConfiguration configureEngine(
+        ProcessEngineConfigurationImpl configuration) {
 
       TenantIdProvider tenantIdProvider = new StaticTenantIdTestProvider(TENANT_ID);
       configuration.setTenantIdProvider(tenantIdProvider);
@@ -56,19 +56,18 @@ public class MultiTenancySharedDefinitionPropagationTest {
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule)
+      .around(testRule);
 
   @Test
   public void propagateTenantIdToProcessInstance() {
-    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
-        .startEvent()
-        .userTask()
-        .endEvent()
-       .done());
+    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().userTask()
+        .endEvent().done());
 
     engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery().singleResult();
+    ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery()
+        .singleResult();
     assertThat(processInstance, is(notNullValue()));
     // get the tenant id from the provider
     assertThat(processInstance.getTenantId(), is(TENANT_ID));
@@ -76,12 +75,8 @@ public class MultiTenancySharedDefinitionPropagationTest {
 
   @Test
   public void propagateTenantIdToIntermediateTimerJob() {
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .intermediateCatchEvent()
-        .timerWithDuration("PT1M")
-      .endEvent()
-    .done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().intermediateCatchEvent()
+        .timerWithDuration("PT1M").endEvent().done());
 
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
 
@@ -94,12 +89,8 @@ public class MultiTenancySharedDefinitionPropagationTest {
 
   @Test
   public void propagateTenantIdToAsyncJob() {
-    testRule.deploy(Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask()
-        .camundaAsyncBefore()
-      .endEvent()
-    .done());
+    testRule.deploy(Bpmn.createExecutableProcess("process").startEvent().userTask()
+        .camundaAsyncBefore().endEvent().done());
 
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
 

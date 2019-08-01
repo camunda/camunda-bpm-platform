@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine.query;
 
 /**
- * <p>Specifies a unit for a span of time (i.e. period).</p>
+ * <p>
+ * Specifies a unit for a span of time (i.e. period).
+ * </p>
  *
  * @author Roman Smirnov
  */

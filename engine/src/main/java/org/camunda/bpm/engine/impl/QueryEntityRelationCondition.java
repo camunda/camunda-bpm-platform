@@ -19,9 +19,8 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
- * Specifies a condition by which two entity types can be related.
- * <code>comparisonProperty</code> and <code>scalarValue</code>
- * are exclusive, i.e. one of the should be <code>null</code>.
+ * Specifies a condition by which two entity types can be related. <code>comparisonProperty</code>
+ * and <code>scalarValue</code> are exclusive, i.e. one of the should be <code>null</code>.
  *
  * @author Thorben Lindhauer
  */
@@ -35,7 +34,8 @@ public class QueryEntityRelationCondition {
     this(queryProperty, null, scalarValue);
   }
 
-  public QueryEntityRelationCondition(QueryProperty queryProperty, QueryProperty comparisonProperty) {
+  public QueryEntityRelationCondition(QueryProperty queryProperty,
+      QueryProperty comparisonProperty) {
     this(queryProperty, comparisonProperty, null);
   }
 
@@ -59,18 +59,15 @@ public class QueryEntityRelationCondition {
   }
 
   /**
-   * This assumes that scalarValue and comparisonProperty are mutually exclusive.
-   * Either a condition is expressed is by a scalar value, or with a property of another entity.
+   * This assumes that scalarValue and comparisonProperty are mutually exclusive. Either a condition
+   * is expressed is by a scalar value, or with a property of another entity.
    */
   public boolean isPropertyComparison() {
     return comparisonProperty != null;
   }
 
   public String toString() {
-    return "QueryEntityRelationCondition["
-      + "property=" + property
-      + ", comparisonProperty=" + comparisonProperty
-      + ", scalarValue=" + scalarValue
-      + "]";
+    return "QueryEntityRelationCondition[" + "property=" + property + ", comparisonProperty="
+        + comparisonProperty + ", scalarValue=" + scalarValue + "]";
   }
 }

@@ -38,7 +38,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 /**
  *
  * @author Daniel Meyer
@@ -46,8 +45,10 @@ import org.junit.Test;
  */
 public class SequentialJobAcquisitionTest {
 
-  private static final String RESOURCE_BASE = SequentialJobAcquisitionTest.class.getPackage().getName().replace(".", "/");
-  private static final String PROCESS_RESOURCE = RESOURCE_BASE + "/IntermediateTimerEventTest.testCatchingTimerEvent.bpmn20.xml";
+  private static final String RESOURCE_BASE = SequentialJobAcquisitionTest.class.getPackage()
+      .getName().replace(".", "/");
+  private static final String PROCESS_RESOURCE = RESOURCE_BASE
+      + "/IntermediateTimerEventTest.testCatchingTimerEvent.bpmn20.xml";
 
   private JobExecutor jobExecutor = new DefaultJobExecutor();
   private List<ProcessEngine> createdProcessEngines = new ArrayList<>();
@@ -86,14 +87,12 @@ public class SequentialJobAcquisitionTest {
 
     createdProcessEngines.add(engine);
 
-    engine.getRepositoryService().createDeployment()
-      .addClasspathResource(PROCESS_RESOURCE)
-      .deploy();
+    engine.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE)
+        .deploy();
 
     jobExecutor.shutdown();
 
-    engine.getRuntimeService()
-      .startProcessInstanceByKey("intermediateTimerEventExample");
+    engine.getRuntimeService().startProcessInstanceByKey("intermediateTimerEventExample");
 
     Assert.assertEquals(1, engine.getManagementService().createJobQuery().count());
 
@@ -101,7 +100,8 @@ public class SequentialJobAcquisitionTest {
     calendar.add(Field.DAY_OF_YEAR.getCalendarField(), 6);
     ClockUtil.setCurrentTime(calendar.getTime());
     jobExecutor.start();
-    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine.getManagementService(), true);
+    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine.getManagementService(),
+        true);
 
     Assert.assertEquals(0, engine.getManagementService().createJobQuery().count());
   }
@@ -133,13 +133,11 @@ public class SequentialJobAcquisitionTest {
 
     // deploy the processes
 
-    engine1.getRepositoryService().createDeployment()
-      .addClasspathResource(PROCESS_RESOURCE)
-      .deploy();
+    engine1.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE)
+        .deploy();
 
-    engine2.getRepositoryService().createDeployment()
-     .addClasspathResource(PROCESS_RESOURCE)
-     .deploy();
+    engine2.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE)
+        .deploy();
 
     // start one instance for each engine:
 
@@ -155,20 +153,21 @@ public class SequentialJobAcquisitionTest {
 
     jobExecutor.start();
     // assert task completed for the first engine
-    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine1.getManagementService(), true);
+    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine1.getManagementService(),
+        true);
 
     jobExecutor.start();
     // assert task completed for the second engine
-    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine2.getManagementService(), true);
+    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine2.getManagementService(),
+        true);
 
     Assert.assertEquals(0, engine1.getManagementService().createJobQuery().count());
     Assert.assertEquals(0, engine2.getManagementService().createJobQuery().count());
   }
 
-
   @Test
   public void testJobAddedGuardForTwoEnginesSameAcquisition() throws InterruptedException {
-   // configure and build a process engine
+    // configure and build a process engine
     StandaloneProcessEngineConfiguration engineConfiguration1 = new StandaloneInMemProcessEngineConfiguration();
     engineConfiguration1.setProcessEngineName(getClass().getName() + "-engine1");
     engineConfiguration1.setJdbcUrl("jdbc:h2:mem:activiti1");
@@ -193,13 +192,11 @@ public class SequentialJobAcquisitionTest {
 
     // deploy the processes
 
-    engine1.getRepositoryService().createDeployment()
-      .addClasspathResource(PROCESS_RESOURCE)
-      .deploy();
+    engine1.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE)
+        .deploy();
 
-    engine2.getRepositoryService().createDeployment()
-     .addClasspathResource(PROCESS_RESOURCE)
-     .deploy();
+    engine2.getRepositoryService().createDeployment().addClasspathResource(PROCESS_RESOURCE)
+        .deploy();
 
     // start one instance for each engine:
 
@@ -215,25 +212,27 @@ public class SequentialJobAcquisitionTest {
 
     // assert task completed for the first engine
     jobExecutor.start();
-    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine1.getManagementService(), false);
+    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine1.getManagementService(),
+        false);
 
     // assert task completed for the second engine
     jobExecutor.start();
-    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine2.getManagementService(), false);
+    waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine2.getManagementService(),
+        false);
 
     Thread.sleep(2000);
 
-    Assert.assertFalse(((SequentialJobAcquisitionRunnable) jobExecutor.getAcquireJobsRunnable()).isJobAdded());
+    Assert.assertFalse(
+        ((SequentialJobAcquisitionRunnable) jobExecutor.getAcquireJobsRunnable()).isJobAdded());
 
     Assert.assertEquals(0, engine1.getManagementService().createJobQuery().count());
     Assert.assertEquals(0, engine2.getManagementService().createJobQuery().count());
   }
 
-
   ////////// helper methods ////////////////////////////
 
-
-  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor, ManagementService managementService, boolean shutdown) {
+  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis,
+      JobExecutor jobExecutor, ManagementService managementService, boolean shutdown) {
 
     try {
       Timer timer = new Timer();
@@ -261,22 +260,21 @@ public class SequentialJobAcquisitionTest {
   }
 
   public boolean areJobsAvailable(ManagementService managementService) {
-    return !managementService
-      .createJobQuery()
-      .executable()
-      .list()
-      .isEmpty();
+    return !managementService.createJobQuery().executable().list().isEmpty();
   }
 
   private static class InteruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
+
     public InteruptTask(Thread thread) {
       this.thread = thread;
     }
+
     public boolean isTimeLimitExceeded() {
       return timeLimitExceeded;
     }
+
     public void run() {
       timeLimitExceeded = true;
       thread.interrupt();

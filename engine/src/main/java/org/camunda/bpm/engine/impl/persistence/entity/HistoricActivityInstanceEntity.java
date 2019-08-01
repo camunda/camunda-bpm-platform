@@ -22,8 +22,9 @@ import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEn
 /**
  * @author Christian Stettler
  */
-public class HistoricActivityInstanceEntity extends HistoricActivityInstanceEventEntity implements HistoricActivityInstance {
+public class HistoricActivityInstanceEntity extends HistoricActivityInstanceEventEntity
+    implements HistoricActivityInstance {
 
   private static final long serialVersionUID = 1L;
-    
+
 }

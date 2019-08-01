@@ -45,12 +45,14 @@ public class SuspendProcessDefinitionCmd extends AbstractSetProcessDefinitionSta
   }
 
   @Override
-  protected AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd(UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder) {
+  protected AbstractSetJobDefinitionStateCmd getSetJobDefinitionStateCmd(
+      UpdateJobDefinitionSuspensionStateBuilderImpl jobDefinitionSuspensionStateBuilder) {
     return new SuspendJobDefinitionCmd(jobDefinitionSuspensionStateBuilder);
   }
 
   @Override
-  protected SuspendProcessInstanceCmd getNextCommand(UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder) {
+  protected SuspendProcessInstanceCmd getNextCommand(
+      UpdateProcessInstanceSuspensionStateBuilderImpl processInstanceCommandBuilder) {
     return new SuspendProcessInstanceCmd(processInstanceCommandBuilder);
   }
 

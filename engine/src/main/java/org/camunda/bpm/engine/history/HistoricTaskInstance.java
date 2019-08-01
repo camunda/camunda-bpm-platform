@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.history;
 
 import java.util.Date;
 
-
 /**
  * Represents a historic task instance (waiting, finished or deleted) that is stored permanent for
  * statistics, audit and other business intelligence purposes.
@@ -69,7 +68,10 @@ public interface HistoricTaskInstance {
   /** The latest description given to this task. */
   String getDescription();
 
-  /** The reason why this task was deleted {'completed' | 'deleted' | any other user defined string }. */
+  /**
+   * The reason why this task was deleted {'completed' | 'deleted' | any other user defined string
+   * }.
+   */
   String getDeleteReason();
 
   /** Task owner */
@@ -84,7 +86,7 @@ public interface HistoricTaskInstance {
   /** Time when the task was deleted or completed. */
   Date getEndTime();
 
-  /** Difference between {@link #getEndTime()} and {@link #getStartTime()} in milliseconds.  */
+  /** Difference between {@link #getEndTime()} and {@link #getStartTime()} in milliseconds. */
   Long getDurationInMillis();
 
   /** Task definition key. */
@@ -103,8 +105,8 @@ public interface HistoricTaskInstance {
   Date getFollowUpDate();
 
   /**
-   * The id of the tenant this historic task instance belongs to. Can be <code>null</code>
-   * if the historic task instance belongs to no single tenant.
+   * The id of the tenant this historic task instance belongs to. Can be <code>null</code> if the
+   * historic task instance belongs to no single tenant.
    */
   String getTenantId();
 

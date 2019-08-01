@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.form.handler.DefaultFormHandler;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -36,33 +35,36 @@ public class FormTypes {
     formTypes.put(formType.getName(), formType);
   }
 
-  public AbstractFormFieldType parseFormPropertyType(Element formFieldElement, BpmnParse bpmnParse) {
+  public AbstractFormFieldType parseFormPropertyType(Element formFieldElement,
+      BpmnParse bpmnParse) {
     AbstractFormFieldType formType = null;
 
     String typeText = formFieldElement.attribute("type");
     String datePatternText = formFieldElement.attribute("datePattern");
 
-    if (typeText == null && DefaultFormHandler.FORM_FIELD_ELEMENT.equals(formFieldElement.getTagName())) {
+    if (typeText == null
+        && DefaultFormHandler.FORM_FIELD_ELEMENT.equals(formFieldElement.getTagName())) {
       bpmnParse.addError("form field must have a 'type' attribute", formFieldElement);
     }
 
-    if ("date".equals(typeText) && datePatternText!=null) {
+    if ("date".equals(typeText) && datePatternText != null) {
       formType = new DateFormType(datePatternText);
 
     } else if ("enum".equals(typeText)) {
       // ACT-1023: Using linked hashmap to preserve the order in which the entries are defined
       Map<String, String> values = new LinkedHashMap<String, String>();
-      for (Element valueElement: formFieldElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,"value")) {
+      for (Element valueElement : formFieldElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,
+          "value")) {
         String valueId = valueElement.attribute("id");
         String valueName = valueElement.attribute("name");
         values.put(valueId, valueName);
       }
       formType = new EnumFormType(values);
 
-    } else if (typeText!=null) {
+    } else if (typeText != null) {
       formType = formTypes.get(typeText);
-      if (formType==null) {
-        bpmnParse.addError("unknown type '"+typeText+"'", formFieldElement);
+      if (formType == null) {
+        bpmnParse.addError("unknown type '" + typeText + "'", formFieldElement);
       }
     }
     return formType;

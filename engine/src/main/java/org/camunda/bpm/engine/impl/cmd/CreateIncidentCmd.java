@@ -41,7 +41,8 @@ public class CreateIncidentCmd implements Command<Incident> {
   protected String configuration;
   protected String message;
 
-  public CreateIncidentCmd(String incidentType, String executionId, String configuration, String message) {
+  public CreateIncidentCmd(String incidentType, String executionId, String configuration,
+      String message) {
     this.incidentType = incidentType;
     this.executionId = executionId;
     this.configuration = configuration;
@@ -50,26 +51,28 @@ public class CreateIncidentCmd implements Command<Incident> {
 
   @Override
   public Incident execute(CommandContext commandContext) {
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Execution id cannot be null", "executionId", executionId);
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Execution id cannot be null",
+        "executionId", executionId);
     EnsureUtil.ensureNotNull(BadUserRequestException.class, "incidentType", incidentType);
 
     ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(executionId);
     EnsureUtil.ensureNotNull(BadUserRequestException.class,
         "Cannot find an execution with executionId '" + executionId + "'", "execution", execution);
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Execution must be related to an activity", "activity",
-        execution.getActivity());
+    EnsureUtil.ensureNotNull(BadUserRequestException.class,
+        "Execution must be related to an activity", "activity", execution.getActivity());
 
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateProcessInstance(execution);
     }
-    
+
     List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("incidentType", null, incidentType));
     propertyChanges.add(new PropertyChange("configuration", null, configuration));
-    
-    commandContext.getOperationLogManager().logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_CREATE_INCIDENT, 
-        execution.getProcessInstanceId(), execution.getProcessDefinitionId(), null, 
-        propertyChanges);
+
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_CREATE_INCIDENT, execution.getProcessInstanceId(),
+        execution.getProcessDefinitionId(), null, propertyChanges);
 
     return execution.createIncident(incidentType, configuration, message);
   }

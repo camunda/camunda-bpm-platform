@@ -19,34 +19,32 @@ package org.camunda.bpm.engine.management;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * Structure containing meta data (column names, column types, etc.) 
- * about a certain database table.
+ * Structure containing meta data (column names, column types, etc.) about a certain database table.
  * 
  * @author Joram Barrez
  */
 public class TableMetaData {
-  
+
   protected String tableName;
-  
+
   protected List<String> columnNames = new ArrayList<String>();
-  
+
   protected List<String> columnTypes = new ArrayList<String>();
 
   public TableMetaData() {
-    
+
   }
-  
+
   public TableMetaData(String tableName) {
     this.tableName = tableName;
   }
-  
+
   public void addColumnMetaData(String columnName, String columnType) {
     columnNames.add(columnName);
     columnTypes.add(columnType);
   }
-  
+
   public String getTableName() {
     return tableName;
   }

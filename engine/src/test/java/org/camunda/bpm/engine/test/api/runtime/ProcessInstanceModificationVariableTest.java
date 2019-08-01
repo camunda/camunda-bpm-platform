@@ -51,12 +51,11 @@ public class ProcessInstanceModificationVariableTest {
   public void modifyAProcessInstanceWithLocalVariableCreation() {
 
     // given a process that sets a local variable when entering the user task
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
-      .startEvent()
-      .userTask("userTask")
-        .camundaTaskListenerClass("create", "org.camunda.bpm.engine.test.api.runtime.util.CreateLocalVariableEventListener")
-      .endEvent()
-      .done();
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process").startEvent()
+        .userTask("userTask")
+        .camundaTaskListenerClass("create",
+            "org.camunda.bpm.engine.test.api.runtime.util.CreateLocalVariableEventListener")
+        .endEvent().done();
 
     testHelper.deployAndGetDefinition(instance);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
@@ -64,11 +63,10 @@ public class ProcessInstanceModificationVariableTest {
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstance.getId());
 
     // when I start another activity and delete the old one
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("userTask")
-      .cancelActivityInstance(updatedTree.getActivityInstances("userTask")[0].getId())
-      .execute(false, false);
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("userTask")
+        .cancelActivityInstance(updatedTree.getActivityInstances("userTask")[0].getId())
+        .execute(false, false);
 
     // then migration was successful and I can finish the process
     Task task = taskService.createTaskQuery().singleResult();

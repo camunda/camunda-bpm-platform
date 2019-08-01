@@ -42,10 +42,10 @@ public class MBeanServiceContainerTest extends TestCase {
 
   private MBeanServiceContainer serviceContainer;
 
-  private String service1Name = TestServiceType.TYPE1.getTypeName()+ ":type=service1";
-  private String service2Name = TestServiceType.TYPE1.getTypeName()+ ":type=service2";
-  private String service3Name = TestServiceType.TYPE2.getTypeName()+ ":type=service3";
-  private String service4Name = TestServiceType.TYPE2.getTypeName()+ ":type=service4";
+  private String service1Name = TestServiceType.TYPE1.getTypeName() + ":type=service1";
+  private String service2Name = TestServiceType.TYPE1.getTypeName() + ":type=service2";
+  private String service3Name = TestServiceType.TYPE2.getTypeName() + ":type=service3";
+  private String service4Name = TestServiceType.TYPE2.getTypeName() + ":type=service4";
 
   private ObjectName service1ObjectName = MBeanServiceContainer.getObjectName(service1Name);
   private ObjectName service2ObjectName = MBeanServiceContainer.getObjectName(service2Name);
@@ -66,16 +66,16 @@ public class MBeanServiceContainerTest extends TestCase {
   protected void tearDown() throws Exception {
     // make sure all MBeans are removed after each test
     MBeanServer mBeanServer = serviceContainer.getmBeanServer();
-    if(mBeanServer.isRegistered(service1ObjectName)) {
+    if (mBeanServer.isRegistered(service1ObjectName)) {
       mBeanServer.unregisterMBean(service1ObjectName);
     }
-    if(mBeanServer.isRegistered(service2ObjectName)) {
+    if (mBeanServer.isRegistered(service2ObjectName)) {
       mBeanServer.unregisterMBean(service2ObjectName);
     }
-    if(mBeanServer.isRegistered(service3ObjectName)) {
+    if (mBeanServer.isRegistered(service3ObjectName)) {
       mBeanServer.unregisterMBean(service3ObjectName);
     }
-    if(mBeanServer.isRegistered(service4ObjectName)) {
+    if (mBeanServer.isRegistered(service4ObjectName)) {
       mBeanServer.unregisterMBean(service4ObjectName);
     }
     super.tearDown();
@@ -95,7 +95,7 @@ public class MBeanServiceContainerTest extends TestCase {
     try {
       serviceContainer.startService(service1Name, service1);
       fail("exception expected");
-    } catch(Exception e) {
+    } catch (Exception e) {
       assertTrue(e.getMessage().contains("service with same name already registered"));
     }
 
@@ -121,7 +121,7 @@ public class MBeanServiceContainerTest extends TestCase {
     try {
       serviceContainer.stopService(service1Name);
       fail("exception expected");
-    }catch(Exception e) {
+    } catch (Exception e) {
       assertTrue(e.getMessage().contains("no such service registered"));
     }
 
@@ -132,10 +132,12 @@ public class MBeanServiceContainerTest extends TestCase {
     serviceContainer.startService(service1Name, service1);
     serviceContainer.startService(service2Name, service2);
 
-    List<PlatformService<TestService>> servicesByType1 = serviceContainer.getServicesByType(TestServiceType.TYPE1);
+    List<PlatformService<TestService>> servicesByType1 = serviceContainer
+        .getServicesByType(TestServiceType.TYPE1);
     assertEquals(2, servicesByType1.size());
 
-    List<PlatformService<TestService>> servicesByType2 = serviceContainer.getServicesByType(TestServiceType.TYPE2);
+    List<PlatformService<TestService>> servicesByType2 = serviceContainer
+        .getServicesByType(TestServiceType.TYPE2);
     assertEquals(0, servicesByType2.size());
 
     serviceContainer.startService(service3Name, service3);
@@ -155,12 +157,14 @@ public class MBeanServiceContainerTest extends TestCase {
     serviceContainer.startService(service1Name, service1);
     serviceContainer.startService(service2Name, service2);
 
-    List<PlatformService<TestService>> servicesByType1 = serviceContainer.getServiceValuesByType(TestServiceType.TYPE1);
+    List<PlatformService<TestService>> servicesByType1 = serviceContainer
+        .getServiceValuesByType(TestServiceType.TYPE1);
     assertEquals(2, servicesByType1.size());
     assertTrue(servicesByType1.contains(service1));
     assertTrue(servicesByType1.contains(service2));
 
-    List<PlatformService<TestService>> servicesByType2 = serviceContainer.getServicesByType(TestServiceType.TYPE2);
+    List<PlatformService<TestService>> servicesByType2 = serviceContainer
+        .getServicesByType(TestServiceType.TYPE2);
     assertEquals(0, servicesByType2.size());
 
     // start more services
@@ -210,9 +214,8 @@ public class MBeanServiceContainerTest extends TestCase {
   public void testDeploymentOperation() {
 
     serviceContainer.createDeploymentOperation("test op")
-      .addStep(new StartServiceDeploymentOperationStep(service1Name, service1))
-      .addStep(new StartServiceDeploymentOperationStep(service2Name, service2))
-      .execute();
+        .addStep(new StartServiceDeploymentOperationStep(service1Name, service1))
+        .addStep(new StartServiceDeploymentOperationStep(service2Name, service2)).execute();
 
     // both services were registered.
     assertEquals(service1, serviceContainer.getService(service1ObjectName));
@@ -224,15 +227,15 @@ public class MBeanServiceContainerTest extends TestCase {
 
     try {
       serviceContainer.createDeploymentOperation("test failing op")
-        .addStep(new StartServiceDeploymentOperationStep(service1Name, service1))
-        .addStep(new FailingDeploymentOperationStep())                               // <- this step fails
-        .addStep(new StartServiceDeploymentOperationStep(service2Name, service2))
-        .execute();
+          .addStep(new StartServiceDeploymentOperationStep(service1Name, service1))
+          .addStep(new FailingDeploymentOperationStep()) // <- this step fails
+          .addStep(new StartServiceDeploymentOperationStep(service2Name, service2)).execute();
 
       fail("Exception expected");
 
-    } catch(Exception e) {
-      assertTrue(e.getMessage().contains("Exception while performing 'test failing op' => 'failing step'"));
+    } catch (Exception e) {
+      assertTrue(e.getMessage()
+          .contains("Exception while performing 'test failing op' => 'failing step'"));
 
     }
 
@@ -244,15 +247,16 @@ public class MBeanServiceContainerTest extends TestCase {
 
     try {
       serviceContainer.createDeploymentOperation("test failing op")
-        .addStep(new StartServiceDeploymentOperationStep(service1Name, service1))
-        .addStep(new StartServiceDeploymentOperationStep(service2Name, service2))
-        .addStep(new FailingDeploymentOperationStep())                               // <- this step fails
-        .execute();
+          .addStep(new StartServiceDeploymentOperationStep(service1Name, service1))
+          .addStep(new StartServiceDeploymentOperationStep(service2Name, service2))
+          .addStep(new FailingDeploymentOperationStep()) // <- this step fails
+          .execute();
 
       fail("Exception expected");
 
-    } catch(Exception e) {
-      assertTrue(e.getMessage().contains("Exception while performing 'test failing op' => 'failing step'"));
+    } catch (Exception e) {
+      assertTrue(e.getMessage()
+          .contains("Exception while performing 'test failing op' => 'failing step'"));
 
     }
 
@@ -270,9 +274,8 @@ public class MBeanServiceContainerTest extends TestCase {
 
     // run a composite undeployment operation
     serviceContainer.createUndeploymentOperation("test op")
-      .addStep(new StopServiceDeploymentOperationStep(service1Name))
-      .addStep(new StopServiceDeploymentOperationStep(service2Name))
-      .execute();
+        .addStep(new StopServiceDeploymentOperationStep(service1Name))
+        .addStep(new StopServiceDeploymentOperationStep(service2Name)).execute();
 
     // both services were stopped.
     assertNull(serviceContainer.getService(service1ObjectName));
@@ -288,11 +291,15 @@ public class MBeanServiceContainerTest extends TestCase {
 
     // run a composite undeployment operation with a failing step
     serviceContainer.createUndeploymentOperation("test failing op")
-      .addStep(new StopServiceDeploymentOperationStep(service1Name))
-      .addStep(new FailingDeploymentOperationStep())                               // <- this step fails
-      .addStep(new StopServiceDeploymentOperationStep(service2Name))
-      .execute(); // this does not throw an exception even if some steps fail. (exceptions are logged)
-
+        .addStep(new StopServiceDeploymentOperationStep(service1Name))
+        .addStep(new FailingDeploymentOperationStep()) // <- this step fails
+        .addStep(new StopServiceDeploymentOperationStep(service2Name)).execute(); // this does not
+                                                                                  // throw an
+                                                                                  // exception even
+                                                                                  // if some steps
+                                                                                  // fail.
+                                                                                  // (exceptions are
+                                                                                  // logged)
 
     // both services were stopped.
     assertNull(serviceContainer.getService(service1ObjectName));
@@ -305,10 +312,9 @@ public class MBeanServiceContainerTest extends TestCase {
 
     // run a composite undeployment operation with a failing step
     serviceContainer.createUndeploymentOperation("test failing op")
-      .addStep(new FailingDeploymentOperationStep())                               // <- this step fails
-      .addStep(new StopServiceDeploymentOperationStep(service1Name))
-      .addStep(new StopServiceDeploymentOperationStep(service2Name))
-      .execute();
+        .addStep(new FailingDeploymentOperationStep()) // <- this step fails
+        .addStep(new StopServiceDeploymentOperationStep(service1Name))
+        .addStep(new StopServiceDeploymentOperationStep(service2Name)).execute();
 
     // both services were stopped.
     assertNull(serviceContainer.getService(service1ObjectName));

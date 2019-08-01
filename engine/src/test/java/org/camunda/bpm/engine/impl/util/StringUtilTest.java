@@ -30,11 +30,13 @@ public class StringUtilTest {
   public void testTrimToMaximumLengthAllowed() {
     String fittingThreeByteMessage = repeatCharacter("\u9faf", StringUtil.DB_MAX_STRING_LENGTH);
     String exceedingMessage = repeatCharacter("a", StringUtil.DB_MAX_STRING_LENGTH * 2);
-    
-    assertEquals(fittingThreeByteMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH), StringUtil.trimToMaximumLengthAllowed(fittingThreeByteMessage));
-    assertEquals(exceedingMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH), StringUtil.trimToMaximumLengthAllowed(exceedingMessage));
+
+    assertEquals(fittingThreeByteMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH),
+        StringUtil.trimToMaximumLengthAllowed(fittingThreeByteMessage));
+    assertEquals(exceedingMessage.substring(0, StringUtil.DB_MAX_STRING_LENGTH),
+        StringUtil.trimToMaximumLengthAllowed(exceedingMessage));
   }
-  
+
   protected static String repeatCharacter(String encodedCharacter, int numCharacters) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < numCharacters; i++) {

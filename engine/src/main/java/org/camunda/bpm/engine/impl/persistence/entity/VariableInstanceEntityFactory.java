@@ -18,11 +18,13 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * @author Thorben Lindhauer
  *
  */
-public class VariableInstanceEntityFactory implements VariableInstanceFactory<VariableInstanceEntity> {
+public class VariableInstanceEntityFactory
+    implements VariableInstanceFactory<VariableInstanceEntity> {
 
   public static final VariableInstanceEntityFactory INSTANCE = new VariableInstanceEntityFactory();
 

@@ -26,14 +26,15 @@ import org.camunda.bpm.engine.identity.PasswordPolicyRule;
  */
 public class PasswordPolicyLowerCaseRuleImpl implements PasswordPolicyRule {
 
-  public static final String PLACEHOLDER = DefaultPasswordPolicyImpl.PLACEHOLDER_PREFIX + "LOWERCASE";
-  
+  public static final String PLACEHOLDER = DefaultPasswordPolicyImpl.PLACEHOLDER_PREFIX
+      + "LOWERCASE";
+
   protected int minLowerCase;
-  
+
   public PasswordPolicyLowerCaseRuleImpl(int minLowerCase) {
     this.minLowerCase = minLowerCase;
   }
-  
+
   @Override
   public String getPlaceholder() {
     return PasswordPolicyLowerCaseRuleImpl.PLACEHOLDER;
@@ -50,10 +51,10 @@ public class PasswordPolicyLowerCaseRuleImpl implements PasswordPolicyRule {
   public boolean execute(String password) {
     int lowerCaseCount = 0;
     for (Character c : password.toCharArray()) {
-      if(Character.isLowerCase(c)) {
+      if (Character.isLowerCase(c)) {
         lowerCaseCount++;
       }
-      if(lowerCaseCount >= this.minLowerCase) {
+      if (lowerCaseCount >= this.minLowerCase) {
         return true;
       }
     }

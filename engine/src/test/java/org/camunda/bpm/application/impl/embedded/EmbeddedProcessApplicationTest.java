@@ -35,7 +35,8 @@ import org.camunda.bpm.engine.repository.Resource;
  */
 public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCase {
 
-  protected RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
+  protected RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE
+      .get();
   protected boolean defaultEngineRegistered;
 
   public void registerProcessEngine() {
@@ -84,11 +85,13 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     TestApplicationWithCustomEngine processApplication = new TestApplicationWithCustomEngine();
     processApplication.deploy();
 
-    ProcessEngine processEngine = BpmPlatform.getProcessEngineService().getProcessEngine("embeddedEngine");
+    ProcessEngine processEngine = BpmPlatform.getProcessEngineService()
+        .getProcessEngine("embeddedEngine");
     assertNotNull(processEngine);
     assertEquals("embeddedEngine", processEngine.getName());
 
-    ProcessEngineConfiguration configuration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+    ProcessEngineConfiguration configuration = ((ProcessEngineImpl) processEngine)
+        .getProcessEngineConfiguration();
 
     // assert engine properties specified
     assertTrue(configuration.isJobExecutorDeploymentAware());
@@ -112,10 +115,8 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     processApplication.deploy();
 
     String deployedToProcessEngineName = runtimeContainerDelegate.getProcessApplicationService()
-      .getProcessApplicationInfo(processApplicationName)
-      .getDeploymentInfo()
-      .get(0)
-      .getProcessEngineName();
+        .getProcessApplicationInfo(processApplicationName).getDeploymentInfo().get(0)
+        .getProcessEngineName();
 
     assertEquals(customEngineName, processApplication.getDefaultDeployToEngineName());
     assertEquals(customEngineName, deployedToProcessEngineName);
@@ -144,12 +145,12 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     TestApplicationWithAdditionalResourceSuffixes processApplication = new TestApplicationWithAdditionalResourceSuffixes();
     processApplication.deploy();
 
-
     Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
 
     assertNotNull(deployment);
 
-    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deployment.getId());
+    List<Resource> deploymentResources = repositoryService
+        .getDeploymentResources(deployment.getId());
     assertEquals(4, deploymentResources.size());
 
     processApplication.undeploy();
@@ -166,7 +167,8 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
     assertNotNull(deployment);
 
-    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deployment.getId());
+    List<Resource> deploymentResources = repositoryService
+        .getDeploymentResources(deployment.getId());
     assertEquals(4, deploymentResources.size());
 
     processApplication.undeploy();
@@ -182,7 +184,8 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
 
     assertNotNull(deployment);
-    assertEquals(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE, deployment.getSource());
+    assertEquals(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE,
+        deployment.getSource());
 
     processApplication.undeploy();
   }
@@ -192,7 +195,8 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
     pa.deploy();
 
-    Set<String> deployedPAs = runtimeContainerDelegate.getProcessApplicationService().getProcessApplicationNames();
+    Set<String> deployedPAs = runtimeContainerDelegate.getProcessApplicationService()
+        .getProcessApplicationNames();
     assertEquals(1, deployedPAs.size());
     assertTrue(deployedPAs.contains(TestApplicationWithCustomName.NAME));
 
@@ -205,10 +209,7 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     TestApplicationWithTenantId processApplication = new TestApplicationWithTenantId();
     processApplication.deploy();
 
-    List<Deployment> deployments = repositoryService
-        .createDeploymentQuery()
-        .orderByTenantId()
-        .asc()
+    List<Deployment> deployments = repositoryService.createDeploymentQuery().orderByTenantId().asc()
         .list();
 
     assertEquals(2, deployments.size());

@@ -45,7 +45,6 @@ public class DecisionEvaluationBuilderImpl implements DecisionsEvaluationBuilder
   protected String decisionDefinitionTenantId;
   protected boolean isTenantIdSet = false;
 
-
   public DecisionEvaluationBuilderImpl(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
   }
@@ -73,30 +72,32 @@ public class DecisionEvaluationBuilderImpl implements DecisionsEvaluationBuilder
   }
 
   public DmnDecisionResult evaluate() {
-     ensureOnlyOneNotNull(NotValidException.class, "either decision definition id or key must be set", decisionDefinitionId, decisionDefinitionKey);
+    ensureOnlyOneNotNull(NotValidException.class,
+        "either decision definition id or key must be set", decisionDefinitionId,
+        decisionDefinitionKey);
 
-     if (isTenantIdSet && decisionDefinitionId != null) {
-       throw LOG.exceptionEvaluateDecisionDefinitionByIdAndTenantId();
-     }
+    if (isTenantIdSet && decisionDefinitionId != null) {
+      throw LOG.exceptionEvaluateDecisionDefinitionByIdAndTenantId();
+    }
 
     try {
       return commandExecutor.execute(new EvaluateDecisionCmd(this));
-    }
-    catch (NullValueException e) {
+    } catch (NullValueException e) {
       throw new NotValidException(e.getMessage(), e);
-    }
-    catch (DecisionDefinitionNotFoundException e) {
+    } catch (DecisionDefinitionNotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
     }
   }
 
-  public static DecisionsEvaluationBuilder evaluateDecisionByKey(CommandExecutor commandExecutor, String decisionDefinitionKey) {
+  public static DecisionsEvaluationBuilder evaluateDecisionByKey(CommandExecutor commandExecutor,
+      String decisionDefinitionKey) {
     DecisionEvaluationBuilderImpl builder = new DecisionEvaluationBuilderImpl(commandExecutor);
     builder.decisionDefinitionKey = decisionDefinitionKey;
     return builder;
   }
 
-  public static DecisionsEvaluationBuilder evaluateDecisionById(CommandExecutor commandExecutor, String decisionDefinitionId) {
+  public static DecisionsEvaluationBuilder evaluateDecisionById(CommandExecutor commandExecutor,
+      String decisionDefinitionId) {
     DecisionEvaluationBuilderImpl builder = new DecisionEvaluationBuilderImpl(commandExecutor);
     builder.decisionDefinitionId = decisionDefinitionId;
     return builder;

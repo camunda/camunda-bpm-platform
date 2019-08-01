@@ -25,18 +25,23 @@ import org.camunda.bpm.engine.impl.persistence.entity.Nameable;
 public interface ValueFields extends Nameable {
 
   String getTextValue();
+
   void setTextValue(String textValue);
 
   String getTextValue2();
+
   void setTextValue2(String textValue2);
 
   Long getLongValue();
+
   void setLongValue(Long longValue);
 
   Double getDoubleValue();
+
   void setDoubleValue(Double doubleValue);
 
   byte[] getByteArrayValue();
+
   void setByteArrayValue(byte[] bytes);
 
 }

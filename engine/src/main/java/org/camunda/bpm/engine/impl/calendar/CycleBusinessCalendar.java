@@ -31,7 +31,7 @@ public class CycleBusinessCalendar implements BusinessCalendar {
   public Date resolveDuedate(String duedateDescription) {
     return resolveDuedate(duedateDescription, null);
   }
-  
+
   public Date resolveDuedate(String duedateDescription, Date startDate) {
     try {
       if (duedateDescription.startsWith("R")) {
@@ -41,8 +41,7 @@ public class CycleBusinessCalendar implements BusinessCalendar {
         return ce.getTimeAfter(startDate == null ? ClockUtil.getCurrentTime() : startDate);
       }
 
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileParsingCronExpresison(duedateDescription, e);
     }
 

@@ -18,8 +18,8 @@ package org.camunda.bpm.engine.form;
 
 import org.camunda.bpm.engine.task.Task;
 
-
-/** Specific {@link FormData} for completing a task.
+/**
+ * Specific {@link FormData} for completing a task.
  * 
  * @author Tom Baeyens
  */

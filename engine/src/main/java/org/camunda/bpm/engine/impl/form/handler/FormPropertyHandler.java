@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -47,7 +46,7 @@ public class FormPropertyHandler {
     FormPropertyImpl formProperty = new FormPropertyImpl(this);
     Object modelValue = null;
 
-    if (execution!=null) {
+    if (execution != null) {
       if (variableName != null || variableExpression == null) {
         final String varName = variableName != null ? variableName : id;
         if (execution.hasVariable(varName)) {
@@ -80,11 +79,11 @@ public class FormPropertyHandler {
 
   public void submitFormProperty(VariableScope variableScope, VariableMap variables) {
     if (!isWritable && variables.containsKey(id)) {
-      throw new ProcessEngineException("form property '"+id+"' is not writable");
+      throw new ProcessEngineException("form property '" + id + "' is not writable");
     }
 
     if (isRequired && !variables.containsKey(id) && defaultExpression == null) {
-      throw new ProcessEngineException("form property '"+id+"' is required");
+      throw new ProcessEngineException("form property '" + id + "' is required");
     }
 
     Object modelValue = null;
@@ -102,7 +101,7 @@ public class FormPropertyHandler {
       } else if (expressionValue != null) {
         modelValue = expressionValue.toString();
       } else if (isRequired) {
-        throw new ProcessEngineException("form property '"+id+"' is required");
+        throw new ProcessEngineException("form property '" + id + "' is required");
       }
     }
 

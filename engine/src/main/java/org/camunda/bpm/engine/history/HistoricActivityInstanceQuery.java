@@ -20,19 +20,23 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.query.Query;
 
-
 /**
  * Programmatic querying for {@link HistoricActivityInstance}s.
  *
  * @author Tom Baeyens
  */
-public interface HistoricActivityInstanceQuery extends Query<HistoricActivityInstanceQuery, HistoricActivityInstance>{
+public interface HistoricActivityInstanceQuery
+    extends Query<HistoricActivityInstanceQuery, HistoricActivityInstance> {
 
-  /** Only select historic activity instances with the given id (primary key within history tables). */
+  /**
+   * Only select historic activity instances with the given id (primary key within history tables).
+   */
   HistoricActivityInstanceQuery activityInstanceId(String activityInstanceId);
 
-  /** Only select historic activity instances with the given process instance.
-   * {@link ProcessInstance) ids and {@link HistoricProcessInstance} ids match. */
+  /**
+   * Only select historic activity instances with the given process instance.
+   * {@link ProcessInstance) ids and {@link HistoricProcessInstance} ids match.
+   */
   HistoricActivityInstanceQuery processInstanceId(String processInstanceId);
 
   /** Only select historic activity instances for the given process definition */
@@ -109,21 +113,27 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
   HistoricActivityInstanceQuery orderByProcessDefinitionId();
 
   /**
-   * <p>Sort the {@link HistoricActivityInstance activity instances} in the order in which
-   * they occurred (ie. started) and needs to be followed by {@link #asc()} or {@link #desc()}.</p>
+   * <p>
+   * Sort the {@link HistoricActivityInstance activity instances} in the order in which they
+   * occurred (ie. started) and needs to be followed by {@link #asc()} or {@link #desc()}.
+   * </p>
    *
-   * <p>The set of all {@link HistoricActivityInstance activity instances} is a <strong>partially
-   * ordered set</strong>. At a BPMN level this means that instances of concurrent activities (example:
-   * activities on different parallel branched after a parallel gateway) cannot be compared to each other.
-   * Instances of activities which are part of happens-before relation at the BPMN level will be ordered
-   * in respect to that relation.</p>
+   * <p>
+   * The set of all {@link HistoricActivityInstance activity instances} is a <strong>partially
+   * ordered set</strong>. At a BPMN level this means that instances of concurrent activities
+   * (example: activities on different parallel branched after a parallel gateway) cannot be
+   * compared to each other. Instances of activities which are part of happens-before relation at
+   * the BPMN level will be ordered in respect to that relation.
+   * </p>
    *
-   * <p>Technically this means that {@link HistoricActivityInstance activity instances}
-   * with different {@link HistoricActivityInstance#getExecutionId() execution ids} are
+   * <p>
+   * Technically this means that {@link HistoricActivityInstance activity instances} with different
+   * {@link HistoricActivityInstance#getExecutionId() execution ids} are
    * <strong>incomparable</strong>. Only {@link HistoricActivityInstance activity instances} with
    * the same {@link HistoricActivityInstance#getExecutionId() execution id} can be <strong>totally
-   * ordered</strong> by using {@link #executionId(String)} and {@link #orderPartiallyByOccurrence()}
-   * which will return a result set ordered by its occurrence.</p>
+   * ordered</strong> by using {@link #executionId(String)} and
+   * {@link #orderPartiallyByOccurrence()} which will return a result set ordered by its occurrence.
+   * </p>
    *
    * @since 7.3
    */
@@ -133,8 +143,8 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
   HistoricActivityInstanceQuery tenantIdIn(String... tenantIds);
 
   /**
-   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of historic activity instances without tenant id is database-specific.
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). Note that the
+   * ordering of historic activity instances without tenant id is database-specific.
    */
   HistoricActivityInstanceQuery orderByTenantId();
 

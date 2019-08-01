@@ -29,7 +29,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 public class SupportedActivityInstanceValidator implements MigratingActivityInstanceValidator {
 
   @Override
-  public void validate(MigratingActivityInstance migratingInstance, MigratingProcessInstance migratingProcessInstance,
+  public void validate(MigratingActivityInstance migratingInstance,
+      MigratingProcessInstance migratingProcessInstance,
       MigratingActivityInstanceValidationReportImpl instanceReport) {
 
     ScopeImpl sourceScope = migratingInstance.getSourceScope();
@@ -38,7 +39,8 @@ public class SupportedActivityInstanceValidator implements MigratingActivityInst
       ActivityImpl sourceActivity = (ActivityImpl) migratingInstance.getSourceScope();
 
       if (!SupportedActivityValidator.INSTANCE.isSupportedActivity(sourceActivity)) {
-        instanceReport.addFailure("The type of the source activity is not supported for activity instance migration");
+        instanceReport.addFailure(
+            "The type of the source activity is not supported for activity instance migration");
       }
     }
   }

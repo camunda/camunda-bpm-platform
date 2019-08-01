@@ -59,7 +59,8 @@ public abstract class AbstractAsyncOperationsTest {
 
   protected void executeSeedJob(Batch batch) {
     String seedJobDefinitionId = batch.getSeedJobDefinitionId();
-    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
+    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId)
+        .singleResult();
     assertNotNull(seedJob);
     managementService.executeJob(seedJob.getId());
   }
@@ -67,12 +68,14 @@ public abstract class AbstractAsyncOperationsTest {
   /**
    * Execute all batch jobs of batch once and collect exceptions during job execution.
    *
-   * @param batch the batch for which the batch jobs should be executed
+   * @param batch
+   *          the batch for which the batch jobs should be executed
    * @return the catched exceptions of the batch job executions, is empty if non where thrown
    */
   protected List<Exception> executeBatchJobs(Batch batch) {
     String batchJobDefinitionId = batch.getBatchJobDefinitionId();
-    List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId).list();
+    List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId)
+        .list();
     assertFalse(batchJobs.isEmpty());
 
     List<Exception> catchedExceptions = new ArrayList<Exception>();
@@ -98,14 +101,13 @@ public abstract class AbstractAsyncOperationsTest {
     return ids;
   }
 
-  protected void assertHistoricTaskDeletionPresent(List<String> processIds, String deleteReason, ProcessEngineTestRule testRule) {
+  protected void assertHistoricTaskDeletionPresent(List<String> processIds, String deleteReason,
+      ProcessEngineTestRule testRule) {
     if (!testRule.isHistoryLevelNone()) {
 
       for (String processId : processIds) {
-        HistoricTaskInstance historicTaskInstance = historyService
-            .createHistoricTaskInstanceQuery()
-            .processInstanceId(processId)
-            .singleResult();
+        HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery()
+            .processInstanceId(processId).singleResult();
 
         assertThat(historicTaskInstance.getDeleteReason(), is(deleteReason));
       }

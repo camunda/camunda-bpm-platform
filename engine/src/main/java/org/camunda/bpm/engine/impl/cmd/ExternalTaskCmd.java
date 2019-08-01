@@ -30,9 +30,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
- * Represents a base class for the external task commands.
- * Contains functionality to get the external task by id and check
- * the authorization for the execution of a command on the requested external task.
+ * Represents a base class for the external task commands. Contains functionality to get the
+ * external task by id and check the authorization for the execution of a command on the requested
+ * external task.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
@@ -52,42 +52,48 @@ public abstract class ExternalTaskCmd implements Command<Void> {
     EnsureUtil.ensureNotNull("externalTaskId", externalTaskId);
     validateInput();
 
-    ExternalTaskEntity externalTask = commandContext.getExternalTaskManager().findExternalTaskById(externalTaskId);
-    ensureNotNull(NotFoundException.class,
-        "Cannot find external task with id " + externalTaskId, "externalTask", externalTask);
+    ExternalTaskEntity externalTask = commandContext.getExternalTaskManager()
+        .findExternalTaskById(externalTaskId);
+    ensureNotNull(NotFoundException.class, "Cannot find external task with id " + externalTaskId,
+        "externalTask", externalTask);
 
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
     }
-    
-    writeUserOperationLog(commandContext, externalTask, getUserOperationLogOperationType(), 
+
+    writeUserOperationLog(commandContext, externalTask, getUserOperationLogOperationType(),
         getUserOperationLogPropertyChanges(externalTask));
-    
+
     execute(externalTask);
 
     return null;
   }
-  
-  protected void writeUserOperationLog(CommandContext commandContext, ExternalTaskEntity externalTask, String operationType, List<PropertyChange> propertyChanges) {
+
+  protected void writeUserOperationLog(CommandContext commandContext,
+      ExternalTaskEntity externalTask, String operationType, List<PropertyChange> propertyChanges) {
     if (operationType != null) {
       commandContext.getOperationLogManager().logExternalTaskOperation(operationType, externalTask,
-          propertyChanges == null || propertyChanges.isEmpty() ? 
-              Collections.singletonList(PropertyChange.EMPTY_CHANGE) : propertyChanges);
+          propertyChanges == null || propertyChanges.isEmpty()
+              ? Collections.singletonList(PropertyChange.EMPTY_CHANGE)
+              : propertyChanges);
     }
   }
-  
+
   protected String getUserOperationLogOperationType() {
     return null;
   }
-  
-  protected List<PropertyChange> getUserOperationLogPropertyChanges(ExternalTaskEntity externalTask) {
+
+  protected List<PropertyChange> getUserOperationLogPropertyChanges(
+      ExternalTaskEntity externalTask) {
     return Collections.emptyList();
   }
 
   /**
    * Executes the specific external task commands, which belongs to the current sub class.
    *
-   * @param externalTask the external task which is used for the command execution
+   * @param externalTask
+   *          the external task which is used for the command execution
    */
   protected abstract void execute(ExternalTaskEntity externalTask);
 

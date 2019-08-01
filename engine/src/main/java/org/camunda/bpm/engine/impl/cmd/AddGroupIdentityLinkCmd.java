@@ -38,8 +38,8 @@ public class AddGroupIdentityLinkCmd extends AddIdentityLinkCmd {
 
     PropertyChange propertyChange = new PropertyChange(type, null, groupId);
 
-    commandContext.getOperationLogManager()
-      .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK, task, propertyChange);
+    commandContext.getOperationLogManager().logLinkOperation(
+        UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK, task, propertyChange);
 
     return null;
   }

@@ -34,8 +34,8 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
- * Maps an activity (plain activities + their containing flow scopes) to the scope executions
- * that are executing them. For every instance of a scope, there is one such execution.
+ * Maps an activity (plain activities + their containing flow scopes) to the scope executions that
+ * are executing them. For every instance of a scope, there is one such execution.
  *
  * @author Thorben Lindhauer
  */
@@ -73,14 +73,11 @@ public class ActivityExecutionTreeMapping {
 
     if (activityInstance.getId().equals(activityInstance.getProcessInstanceId())) {
       scope = processDefinition;
-    }
-    else {
+    } else {
       scope = processDefinition.findActivity(activityInstance.getActivityId());
     }
 
-    return intersect(
-        getExecutions(scope),
-        activityInstance.getExecutionIds());
+    return intersect(getExecutions(scope), activityInstance.getExecutionIds());
   }
 
   protected ExecutionEntity intersect(Set<ExecutionEntity> executions, String[] executionIds) {
@@ -98,7 +95,8 @@ public class ActivityExecutionTreeMapping {
   }
 
   protected void initialize() {
-    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    ExecutionEntity processInstance = commandContext.getExecutionManager()
+        .findExecutionById(processInstanceId);
     this.processDefinition = processInstance.getProcessDefinition();
 
     List<ExecutionEntity> executions = fetchExecutionsForProcessInstance(processInstance);
@@ -120,9 +118,7 @@ public class ActivityExecutionTreeMapping {
         }
         mergeScopeExecutions(leaf);
 
-
-      }
-      else if (leaf.isProcessInstanceExecution()) {
+      } else if (leaf.isProcessInstanceExecution()) {
         submitExecution(leaf, leaf.getProcessDefinition());
       }
     }
@@ -137,7 +133,6 @@ public class ActivityExecutionTreeMapping {
 
       submitExecution(scopeExecution, scope);
     }
-
 
   }
 
@@ -169,8 +164,7 @@ public class ActivityExecutionTreeMapping {
   protected boolean isLeaf(ExecutionEntity execution) {
     if (CompensationBehavior.isCompensationThrowing(execution)) {
       return true;
-    }
-    else {
+    } else {
       return !execution.isEventScope() && execution.getNonEventScopeExecutions().isEmpty();
     }
   }

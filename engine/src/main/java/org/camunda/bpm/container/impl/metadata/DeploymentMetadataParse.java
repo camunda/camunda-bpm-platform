@@ -31,9 +31,13 @@ import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.util.xml.Parser;
 
 /**
- * <p>{@link Parse} implementation for Deployment Metadata.</p>
+ * <p>
+ * {@link Parse} implementation for Deployment Metadata.
+ * </p>
  *
- * <p>This class is NOT Threadsafe</p>
+ * <p>
+ * This class is NOT Threadsafe
+ * </p>
  *
  * @author Daniel Meyer
  *
@@ -51,11 +55,9 @@ public abstract class DeploymentMetadataParse extends Parse {
 
     try {
       parseRootElement();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.unknownExceptionWhileParsingDeploymentDescriptor(e);
-    }
-    finally {
+    } finally {
       if (hasWarnings()) {
         logWarnings();
       }
@@ -73,7 +75,8 @@ public abstract class DeploymentMetadataParse extends Parse {
   protected abstract void parseRootElement();
 
   /**
-   * parse a <code>&lt;process-engine .../&gt;</code> element and add it to the list of parsed elements
+   * parse a <code>&lt;process-engine .../&gt;</code> element and add it to the list of parsed
+   * elements
    */
   protected void parseProcessEngine(Element element, List<ProcessEngineXml> parsedProcessEngines) {
 
@@ -84,7 +87,7 @@ public abstract class DeploymentMetadataParse extends Parse {
 
     // set default
     String defaultValue = element.attribute(DEFAULT);
-    if(defaultValue == null || defaultValue.isEmpty()) {
+    if (defaultValue == null || defaultValue.isEmpty()) {
       processEngine.setDefault(false);
     } else {
       processEngine.setDefault(Boolean.parseBoolean(defaultValue));
@@ -94,19 +97,19 @@ public abstract class DeploymentMetadataParse extends Parse {
     List<ProcessEnginePluginXml> plugins = new ArrayList<ProcessEnginePluginXml>();
 
     for (Element childElement : element.elements()) {
-      if(CONFIGURATION.equals(childElement.getTagName())) {
+      if (CONFIGURATION.equals(childElement.getTagName())) {
         processEngine.setConfigurationClass(childElement.getText());
 
-      } else if(DATASOURCE.equals(childElement.getTagName())) {
+      } else if (DATASOURCE.equals(childElement.getTagName())) {
         processEngine.setDatasource(childElement.getText());
 
-      } else if(JOB_ACQUISITION.equals(childElement.getTagName())) {
+      } else if (JOB_ACQUISITION.equals(childElement.getTagName())) {
         processEngine.setJobAcquisitionName(childElement.getText());
 
-      } else if(PROPERTIES.equals(childElement.getTagName())) {
+      } else if (PROPERTIES.equals(childElement.getTagName())) {
         parseProperties(childElement, properties);
 
-      } else if(PLUGINS.equals(childElement.getTagName())) {
+      } else if (PLUGINS.equals(childElement.getTagName())) {
         parseProcessEnginePlugins(childElement, plugins);
 
       }
@@ -126,7 +129,7 @@ public abstract class DeploymentMetadataParse extends Parse {
    */
   protected void parseProcessEnginePlugins(Element element, List<ProcessEnginePluginXml> plugins) {
     for (Element chidElement : element.elements()) {
-      if(PLUGIN.equals(chidElement.getTagName())) {
+      if (PLUGIN.equals(chidElement.getTagName())) {
         parseProcessEnginePlugin(chidElement, plugins);
       }
     }
@@ -142,10 +145,10 @@ public abstract class DeploymentMetadataParse extends Parse {
     Map<String, String> properties = new HashMap<String, String>();
 
     for (Element childElement : element.elements()) {
-      if(PLUGIN_CLASS.equals(childElement.getTagName())) {
+      if (PLUGIN_CLASS.equals(childElement.getTagName())) {
         plugin.setPluginClass(childElement.getText());
 
-      } else if(PROPERTIES.equals(childElement.getTagName())) {
+      } else if (PROPERTIES.equals(childElement.getTagName())) {
         parseProperties(childElement, properties);
 
       }
@@ -158,11 +161,13 @@ public abstract class DeploymentMetadataParse extends Parse {
 
   /**
    * Transform a
+   * 
    * <pre>
    * &lt;properties&gt;
    *   &lt;property name="name"&gt;value&lt;/property&gt;
    * &lt;/properties&gt;
    * </pre>
+   * 
    * structure into a properties {@link Map}
    *
    * Supports resolution of Ant-style placeholders against system properties.
@@ -171,8 +176,9 @@ public abstract class DeploymentMetadataParse extends Parse {
   protected void parseProperties(Element element, Map<String, String> properties) {
 
     for (Element childElement : element.elements()) {
-      if(PROPERTY.equals(childElement.getTagName())) {
-        String resolved = PropertyHelper.resolveProperty(System.getProperties(), childElement.getText());
+      if (PROPERTY.equals(childElement.getTagName())) {
+        String resolved = PropertyHelper.resolveProperty(System.getProperties(),
+            childElement.getText());
         properties.put(childElement.attribute(NAME), resolved);
       }
     }

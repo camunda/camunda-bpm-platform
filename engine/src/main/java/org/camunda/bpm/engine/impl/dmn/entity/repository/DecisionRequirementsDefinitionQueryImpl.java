@@ -29,7 +29,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 
-public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<DecisionRequirementsDefinitionQuery, DecisionRequirementsDefinition> implements DecisionRequirementsDefinitionQuery {
+public class DecisionRequirementsDefinitionQueryImpl
+    extends AbstractQuery<DecisionRequirementsDefinitionQuery, DecisionRequirementsDefinition>
+    implements DecisionRequirementsDefinitionQuery {
 
   private static final long serialVersionUID = 1L;
 
@@ -71,13 +73,15 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
     return this;
   }
 
-  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionCategory(String category) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionCategory(
+      String category) {
     ensureNotNull(NotValidException.class, "category", category);
     this.category = category;
     return this;
   }
 
-  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionCategoryLike(String categoryLike) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionCategoryLike(
+      String categoryLike) {
     ensureNotNull(NotValidException.class, "categoryLike", categoryLike);
     this.categoryLike = categoryLike;
     return this;
@@ -89,7 +93,8 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
     return this;
   }
 
-  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionNameLike(String nameLike) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionNameLike(
+      String nameLike) {
     ensureNotNull(NotValidException.class, "nameLike", nameLike);
     this.nameLike = nameLike;
     return this;
@@ -113,7 +118,8 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
     return this;
   }
 
-  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionVersion(Integer version) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionVersion(
+      Integer version) {
     ensureNotNull(NotValidException.class, "version", version);
     ensurePositive(NotValidException.class, "version", version.longValue());
     this.version = version;
@@ -125,13 +131,15 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
     return this;
   }
 
-  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionResourceName(String resourceName) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionResourceName(
+      String resourceName) {
     ensureNotNull(NotValidException.class, "resourceName", resourceName);
     this.resourceName = resourceName;
     return this;
   }
 
-  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionResourceNameLike(String resourceNameLike) {
+  public DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionResourceNameLike(
+      String resourceNameLike) {
     ensureNotNull(NotValidException.class, "resourceNameLike", resourceNameLike);
     this.resourceNameLike = resourceNameLike;
     return this;
@@ -151,7 +159,7 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
   }
 
   public DecisionRequirementsDefinitionQuery includeDecisionRequirementsDefinitionsWithoutTenantId() {
-    this.includeDefinitionsWithoutTenantId  = true;
+    this.includeDefinitionsWithoutTenantId = true;
     return this;
   }
 
@@ -189,22 +197,21 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
     return orderBy(DecisionRequirementsDefinitionQueryProperty.TENANT_ID);
   }
 
-  //results ////////////////////////////////////////////
+  // results ////////////////////////////////////////////
 
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    return commandContext
-      .getDecisionRequirementsDefinitionManager()
-      .findDecisionRequirementsDefinitionCountByQueryCriteria(this);
+    return commandContext.getDecisionRequirementsDefinitionManager()
+        .findDecisionRequirementsDefinitionCountByQueryCriteria(this);
   }
 
   @Override
-  public List<DecisionRequirementsDefinition> executeList(CommandContext commandContext, Page page) {
+  public List<DecisionRequirementsDefinition> executeList(CommandContext commandContext,
+      Page page) {
     checkQueryOk();
-    return commandContext
-      .getDecisionRequirementsDefinitionManager()
-      .findDecisionRequirementsDefinitionsByQueryCriteria(this, page);
+    return commandContext.getDecisionRequirementsDefinitionManager()
+        .findDecisionRequirementsDefinitionsByQueryCriteria(this, page);
   }
 
   @Override
@@ -212,8 +219,10 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
     super.checkQueryOk();
 
     // latest() makes only sense when used with key() or keyLike()
-    if (latest && ( (id != null) || (name != null) || (nameLike != null) || (version != null) || (deploymentId != null) ) ){
-      throw new NotValidException("Calling latest() can only be used in combination with key(String) and keyLike(String)");
+    if (latest && ((id != null) || (name != null) || (nameLike != null) || (version != null)
+        || (deploymentId != null))) {
+      throw new NotValidException(
+          "Calling latest() can only be used in combination with key(String) and keyLike(String)");
     }
   }
 

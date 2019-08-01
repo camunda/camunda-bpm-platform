@@ -49,10 +49,11 @@ public class DeletePropertyCmd implements Command<Object> {
 
     PropertyEntity propertyEntity = propertyManager.findPropertyById(name);
 
-    if(propertyEntity != null) {
+    if (propertyEntity != null) {
       propertyManager.delete(propertyEntity);
-      
-      commandContext.getOperationLogManager().logPropertyOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, 
+
+      commandContext.getOperationLogManager().logPropertyOperation(
+          UserOperationLogEntry.OPERATION_TYPE_DELETE,
           Collections.singletonList(new PropertyChange("name", null, name)));
     }
 

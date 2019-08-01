@@ -60,21 +60,19 @@ public class DefaultPasswordPolicyTest {
   public void init() {
     identityService = rule.getIdentityService();
 
-    rule.getProcessEngineConfiguration()
-      .setPasswordPolicy(new DefaultPasswordPolicyImpl())
-      .setEnablePasswordPolicy(true);
+    rule.getProcessEngineConfiguration().setPasswordPolicy(new DefaultPasswordPolicyImpl())
+        .setEnablePasswordPolicy(true);
   }
 
   @After
   public void resetProcessEngineConfig() {
-    rule.getProcessEngineConfiguration()
-      .setPasswordPolicy(null)
-      .setEnablePasswordPolicy(false);
+    rule.getProcessEngineConfiguration().setPasswordPolicy(null).setEnablePasswordPolicy(false);
   }
 
   @Test
   public void testGoodPassword() {
-    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPas$w0rd");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy,
+        "LongPas$w0rd");
     assertThat(result.getViolatedRules().size(), is(0));
     assertThat(result.getFulfilledRules().size(), is(5));
     assertThat(result.isValid(), is(true));
@@ -93,7 +91,8 @@ public class DefaultPasswordPolicyTest {
 
   @Test
   public void testPasswordWithoutLowerCase() {
-    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LONGPAS$W0RD");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy,
+        "LONGPAS$W0RD");
     checkThatPasswordWasInvalid(result);
 
     PasswordPolicyRule rule = result.getViolatedRules().get(0);
@@ -103,7 +102,8 @@ public class DefaultPasswordPolicyTest {
 
   @Test
   public void testPasswordWithoutUpperCase() {
-    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "longpas$w0rd");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy,
+        "longpas$w0rd");
     checkThatPasswordWasInvalid(result);
 
     PasswordPolicyRule rule = result.getViolatedRules().get(0);
@@ -113,7 +113,8 @@ public class DefaultPasswordPolicyTest {
 
   @Test
   public void testPasswordWithoutSpecialChar() {
-    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPassw0rd");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy,
+        "LongPassw0rd");
     checkThatPasswordWasInvalid(result);
 
     PasswordPolicyRule rule = result.getViolatedRules().get(0);
@@ -123,7 +124,8 @@ public class DefaultPasswordPolicyTest {
 
   @Test
   public void testPasswordWithoutDigit() {
-    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy, "LongPas$word");
+    PasswordPolicyResult result = identityService.checkPasswordAgainstPolicy(policy,
+        "LongPas$word");
     checkThatPasswordWasInvalid(result);
 
     PasswordPolicyRule rule = result.getViolatedRules().get(0);

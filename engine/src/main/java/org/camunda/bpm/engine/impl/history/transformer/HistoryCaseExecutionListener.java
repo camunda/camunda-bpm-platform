@@ -39,13 +39,11 @@ public abstract class HistoryCaseExecutionListener implements CaseExecutionListe
     HistoryEvent historyEvent = createHistoryEvent(caseExecution);
 
     if (historyEvent != null) {
-      Context.getProcessEngineConfiguration()
-        .getHistoryEventHandler()
-        .handleEvent(historyEvent);
+      Context.getProcessEngineConfiguration().getHistoryEventHandler().handleEvent(historyEvent);
     }
 
   }
-  
+
   protected void ensureHistoryLevelInitialized() {
     if (historyLevel == null) {
       historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();

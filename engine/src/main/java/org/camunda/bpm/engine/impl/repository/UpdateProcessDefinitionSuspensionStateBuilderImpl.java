@@ -30,8 +30,10 @@ import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateB
 import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateTenantBuilder;
 
-public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements UpdateProcessDefinitionSuspensionStateBuilder,
-    UpdateProcessDefinitionSuspensionStateSelectBuilder, UpdateProcessDefinitionSuspensionStateTenantBuilder {
+public class UpdateProcessDefinitionSuspensionStateBuilderImpl
+    implements UpdateProcessDefinitionSuspensionStateBuilder,
+    UpdateProcessDefinitionSuspensionStateSelectBuilder,
+    UpdateProcessDefinitionSuspensionStateTenantBuilder {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -51,30 +53,33 @@ public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements Update
   }
 
   /**
-   * Creates a builder without CommandExecutor which can not be used to update
-   * the suspension state via {@link #activate()} or {@link #suspend()}. Can be
-   * used in combination with your own command.
+   * Creates a builder without CommandExecutor which can not be used to update the suspension state
+   * via {@link #activate()} or {@link #suspend()}. Can be used in combination with your own
+   * command.
    */
   public UpdateProcessDefinitionSuspensionStateBuilderImpl() {
     this(null);
   }
 
   @Override
-  public UpdateProcessDefinitionSuspensionStateBuilderImpl byProcessDefinitionId(String processDefinitionId) {
+  public UpdateProcessDefinitionSuspensionStateBuilderImpl byProcessDefinitionId(
+      String processDefinitionId) {
     ensureNotNull("processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   @Override
-  public UpdateProcessDefinitionSuspensionStateBuilderImpl byProcessDefinitionKey(String processDefinitionKey) {
+  public UpdateProcessDefinitionSuspensionStateBuilderImpl byProcessDefinitionKey(
+      String processDefinitionKey) {
     ensureNotNull("processDefinitionKey", processDefinitionKey);
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
   @Override
-  public UpdateProcessDefinitionSuspensionStateBuilderImpl includeProcessInstances(boolean includeProcessInstance) {
+  public UpdateProcessDefinitionSuspensionStateBuilderImpl includeProcessInstances(
+      boolean includeProcessInstance) {
     this.includeProcessInstances = includeProcessInstance;
     return this;
   }
@@ -93,7 +98,8 @@ public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements Update
   }
 
   @Override
-  public UpdateProcessDefinitionSuspensionStateBuilderImpl processDefinitionTenantId(String tenantId) {
+  public UpdateProcessDefinitionSuspensionStateBuilderImpl processDefinitionTenantId(
+      String tenantId) {
     ensureNotNull("tenantId", tenantId);
 
     this.processDefinitionTenantId = tenantId;
@@ -118,9 +124,11 @@ public class UpdateProcessDefinitionSuspensionStateBuilderImpl implements Update
   }
 
   protected void validateParameters() {
-    ensureOnlyOneNotNull("Need to specify either a process instance id or a process definition key.", processDefinitionId, processDefinitionKey);
+    ensureOnlyOneNotNull(
+        "Need to specify either a process instance id or a process definition key.",
+        processDefinitionId, processDefinitionKey);
 
-    if(processDefinitionId != null && isTenantIdSet) {
+    if (processDefinitionId != null && isTenantIdSet) {
       throw LOG.exceptionUpdateSuspensionStateForTenantOnlyByProcessDefinitionKey();
     }
 

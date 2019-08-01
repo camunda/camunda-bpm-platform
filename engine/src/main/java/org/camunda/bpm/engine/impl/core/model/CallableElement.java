@@ -57,7 +57,7 @@ public class CallableElement extends BaseCallableElement {
     Object result = businessKeyValueProvider.getValue(variableScope);
 
     if (result != null && !(result instanceof String)) {
-      throw new ClassCastException("Cannot cast '"+result+"' to String");
+      throw new ClassCastException("Cannot cast '" + result + "' to String");
     }
 
     return (String) result;
@@ -124,7 +124,8 @@ public class CallableElement extends BaseCallableElement {
 
   // variables //////////////////////////////////////////////////////////////////
 
-  protected VariableMap getVariables(List<CallableElementParameter> params, VariableScope variableScope) {
+  protected VariableMap getVariables(List<CallableElementParameter> params,
+      VariableScope variableScope) {
     VariableMap result = Variables.createVariables();
 
     for (CallableElementParameter param : params) {

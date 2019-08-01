@@ -27,7 +27,8 @@ import org.camunda.bpm.engine.variable.VariableMap;
  * @author Roman Smirnov
  *
  */
-public abstract class ProcessOrCaseTaskActivityBehavior extends CallingTaskActivityBehavior implements TransferVariablesActivityBehavior {
+public abstract class ProcessOrCaseTaskActivityBehavior extends CallingTaskActivityBehavior
+    implements TransferVariablesActivityBehavior {
 
   protected void performStart(CmmnActivityExecution execution) {
     VariableMap variables = getInputVariables(execution);
@@ -60,6 +61,7 @@ public abstract class ProcessOrCaseTaskActivityBehavior extends CallingTaskActiv
     return getCallableElement().getOutputVariables(variableScope);
   }
 
-  protected abstract void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey);
+  protected abstract void triggerCallableElement(CmmnActivityExecution execution,
+      Map<String, Object> variables, String businessKey);
 
 }

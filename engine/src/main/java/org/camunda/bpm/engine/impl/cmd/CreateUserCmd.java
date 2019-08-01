@@ -27,22 +27,21 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureWhitelistedResou
 /**
  * @author Tom Baeyens
  */
-public class CreateUserCmd extends AbstractWritableIdentityServiceCmd<User> implements Command<User>, Serializable {
+public class CreateUserCmd extends AbstractWritableIdentityServiceCmd<User>
+    implements Command<User>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   protected String userId;
-  
+
   public CreateUserCmd(String userId) {
     ensureNotNull("userId", userId);
     this.userId = userId;
   }
-  
+
   protected User executeCmd(CommandContext commandContext) {
     ensureWhitelistedResourceId(commandContext, "User", userId);
 
-    return commandContext
-      .getWritableIdentityProvider()
-      .createNewUser(userId);
+    return commandContext.getWritableIdentityProvider().createNewUser(userId);
   }
 }

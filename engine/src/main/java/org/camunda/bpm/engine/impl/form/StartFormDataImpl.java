@@ -19,18 +19,17 @@ package org.camunda.bpm.engine.impl.form;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
-
 /**
  * @author Tom Baeyens
  */
 public class StartFormDataImpl extends FormDataImpl implements StartFormData {
-  
+
   private static final long serialVersionUID = 1L;
-  
+
   protected ProcessDefinition processDefinition;
 
   // getters and setters //////////////////////////////////////////////////////
-  
+
   public ProcessDefinition getProcessDefinition() {
     return processDefinition;
   }

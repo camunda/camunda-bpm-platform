@@ -55,7 +55,7 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
   public List<HistoricTaskInstanceReportResult> countByProcessDefinitionKey() {
     CommandContext commandContext = Context.getCommandContext();
 
-    if(commandContext == null) {
+    if (commandContext == null) {
       return commandExecutor.execute(new Command<List<HistoricTaskInstanceReportResult>>() {
 
         @Override
@@ -64,23 +64,23 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
         }
 
       });
-    }
-    else {
+    } else {
       return executeCountByProcessDefinitionKey(commandContext);
     }
   }
 
-  protected List<HistoricTaskInstanceReportResult> executeCountByProcessDefinitionKey(CommandContext commandContext) {
+  protected List<HistoricTaskInstanceReportResult> executeCountByProcessDefinitionKey(
+      CommandContext commandContext) {
     doAuthCheck(commandContext);
     return commandContext.getTaskReportManager()
-      .selectHistoricTaskInstanceCountByProcDefKeyReport(this);
+        .selectHistoricTaskInstanceCountByProcDefKeyReport(this);
   }
 
   @Override
   public List<HistoricTaskInstanceReportResult> countByTaskName() {
     CommandContext commandContext = Context.getCommandContext();
 
-    if(commandContext == null) {
+    if (commandContext == null) {
       return commandExecutor.execute(new Command<List<HistoricTaskInstanceReportResult>>() {
 
         @Override
@@ -89,16 +89,16 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
         }
 
       });
-    }
-    else {
+    } else {
       return executeCountByTaskName(commandContext);
     }
   }
 
-  protected List<HistoricTaskInstanceReportResult> executeCountByTaskName(CommandContext commandContext) {
+  protected List<HistoricTaskInstanceReportResult> executeCountByTaskName(
+      CommandContext commandContext) {
     doAuthCheck(commandContext);
     return commandContext.getTaskReportManager()
-      .selectHistoricTaskInstanceCountByTaskNameReport(this);
+        .selectHistoricTaskInstanceCountByTaskNameReport(this);
   }
 
   @Override
@@ -108,7 +108,7 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
 
     CommandContext commandContext = Context.getCommandContext();
 
-    if(commandContext == null) {
+    if (commandContext == null) {
       return commandExecutor.execute(new Command<List<DurationReportResult>>() {
 
         @Override
@@ -117,23 +117,21 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
         }
 
       });
-    }
-    else {
+    } else {
       return executeDuration(commandContext);
     }
   }
 
-
   protected List<DurationReportResult> executeDuration(CommandContext commandContext) {
     doAuthCheck(commandContext);
-    return commandContext.getTaskReportManager()
-      .createHistoricTaskDurationReport(this);
+    return commandContext.getTaskReportManager().createHistoricTaskDurationReport(this);
   }
 
   protected void doAuthCheck(CommandContext commandContext) {
     // since a report does only make sense in context of historic
     // data, the authorization check will be performed here
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration()
+        .getCommandCheckers()) {
       checker.checkReadHistoryAnyProcessDefinition();
     }
   }

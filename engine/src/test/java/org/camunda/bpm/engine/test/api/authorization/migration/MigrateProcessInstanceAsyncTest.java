@@ -71,55 +71,58 @@ public class MigrateProcessInstanceAsyncTest {
   @Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ))
-        .failsDueToRequired(
-          grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE),
-          grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
-          grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE))
-        .failsDueToRequired(
-          grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE),
-          grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
-          grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE))
-        .failsDueToRequired(
-          grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE),
-          grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
-          grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE),
-          grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId", Permissions.MIGRATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.MIGRATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES),
-          grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.MIGRATE_INSTANCE))
-        .succeeds(),
-      scenario()
-         .withAuthorizations(
-           grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ))
-         .failsDueToRequired(
-           grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-           grant(Resources.BATCH, "*", "userId", BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES))
-         );
+        scenario()
+            .withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ))
+            .failsDueToRequired(
+                grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId",
+                    Permissions.MIGRATE_INSTANCE),
+                grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId",
+                    Permissions.MIGRATE_INSTANCE)),
+        scenario()
+            .withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
+                grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId",
+                    Permissions.MIGRATE_INSTANCE))
+            .failsDueToRequired(
+                grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId",
+                    Permissions.MIGRATE_INSTANCE),
+                grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId",
+                    Permissions.MIGRATE_INSTANCE)),
+        scenario()
+            .withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
+                grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId",
+                    Permissions.MIGRATE_INSTANCE))
+            .failsDueToRequired(
+                grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId",
+                    Permissions.MIGRATE_INSTANCE),
+                grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId",
+                    Permissions.MIGRATE_INSTANCE)),
+        scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+            grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
+            grant(Resources.PROCESS_DEFINITION, "sourceDefinitionKey", "userId",
+                Permissions.MIGRATE_INSTANCE),
+            grant(Resources.PROCESS_DEFINITION, "targetDefinitionKey", "userId",
+                Permissions.MIGRATE_INSTANCE))
+            .succeeds(),
+        scenario().withAuthorizations(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+            grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
+            grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.MIGRATE_INSTANCE))
+            .succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.BATCH, "*", "userId",
+                    BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES),
+                grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ),
+                grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.MIGRATE_INSTANCE))
+            .succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_INSTANCE, "processInstance", "userId", Permissions.READ))
+            .failsDueToRequired(grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.BATCH, "*", "userId",
+                    BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES)));
   }
 
   @Before
@@ -141,29 +144,27 @@ public class MigrateProcessInstanceAsyncTest {
   public void testMigrate() {
 
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
-        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
     MigrationPlan migrationPlan = engineRule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("sourceDefinitionKey", sourceDefinition.getKey())
-      .bindResource("targetDefinitionKey", targetDefinition.getKey())
-      .bindResource("processInstance", processInstance.getId())
-      .start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("sourceDefinitionKey", sourceDefinition.getKey())
+        .bindResource("targetDefinitionKey", targetDefinition.getKey())
+        .bindResource("processInstance", processInstance.getId()).start();
 
     batch = engineRule.getRuntimeService().newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(processInstance.getId()))
-      .executeAsync();
+        .processInstanceIds(Arrays.asList(processInstance.getId())).executeAsync();
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -179,31 +180,29 @@ public class MigrateProcessInstanceAsyncTest {
   public void testMigrateWithQuery() {
 
     // given
-    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
-        .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
+    ProcessDefinition sourceDefinition = testHelper
+        .deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS)
+            .changeElementId(ProcessModels.PROCESS_KEY, "new" + ProcessModels.PROCESS_KEY));
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+        .startProcessInstanceById(sourceDefinition.getId());
 
     MigrationPlan migrationPlan = engineRule.getRuntimeService()
         .createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-        .mapEqualActivities()
-        .build();
+        .mapEqualActivities().build();
 
     ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery();
 
     // when
-    authRule
-      .init(scenario)
-      .withUser("userId")
-      .bindResource("sourceDefinitionKey", sourceDefinition.getKey())
-      .bindResource("targetDefinitionKey", targetDefinition.getKey())
-      .bindResource("processInstance", processInstance.getId())
-      .start();
+    authRule.init(scenario).withUser("userId")
+        .bindResource("sourceDefinitionKey", sourceDefinition.getKey())
+        .bindResource("targetDefinitionKey", targetDefinition.getKey())
+        .bindResource("processInstance", processInstance.getId()).start();
 
-    batch = engineRule.getRuntimeService().newMigration(migrationPlan)
-      .processInstanceQuery(query)
-      .executeAsync();
+    batch = engineRule.getRuntimeService().newMigration(migrationPlan).processInstanceQuery(query)
+        .executeAsync();
 
     // then
     if (authRule.assertScenario(scenario)) {

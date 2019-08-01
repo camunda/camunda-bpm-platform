@@ -35,7 +35,8 @@ public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implement
   protected CommandExecutor commandExecutor;
   protected boolean suspending;
 
-  public AbstractUpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStateBuilderImpl builder, boolean suspending) {
+  public AbstractUpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor,
+      UpdateProcessInstancesSuspensionStateBuilderImpl builder, boolean suspending) {
     this.commandExecutor = commandExecutor;
     this.builder = builder;
     this.suspending = suspending;
@@ -49,41 +50,36 @@ public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implement
       allProcessInstanceIds.addAll(processInstanceIds);
     }
 
-    ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) builder.getProcessInstanceQuery();
-    if( processInstanceQuery != null) {
+    ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) builder
+        .getProcessInstanceQuery();
+    if (processInstanceQuery != null) {
       allProcessInstanceIds.addAll(processInstanceQuery.listIds());
     }
 
-    HistoricProcessInstanceQueryImpl historicProcessInstanceQuery = (HistoricProcessInstanceQueryImpl ) builder.getHistoricProcessInstanceQuery();
-    if( historicProcessInstanceQuery != null) {
+    HistoricProcessInstanceQueryImpl historicProcessInstanceQuery = (HistoricProcessInstanceQueryImpl) builder
+        .getHistoricProcessInstanceQuery();
+    if (historicProcessInstanceQuery != null) {
       allProcessInstanceIds.addAll(historicProcessInstanceQuery.listIds());
     }
 
     return allProcessInstanceIds;
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext,
-                                       int numInstances,
-                                       boolean async) {
+  protected void writeUserOperationLog(CommandContext commandContext, int numInstances,
+      boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
-    propertyChanges.add(new PropertyChange("nrOfInstances",
-      null,
-      numInstances));
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
 
     String operationType;
-    if(suspending) {
+    if (suspending) {
       operationType = UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB;
 
     } else {
       operationType = UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB;
     }
-    commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(operationType,
-          null,
-          null,
-          null,
-          propertyChanges);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(operationType, null, null,
+        null, propertyChanges);
   }
 }

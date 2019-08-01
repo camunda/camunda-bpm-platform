@@ -23,9 +23,8 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
- * Tests things that BPMN describes as 'uncontrolled flow':
- * Activities with more than one incoming sequence flow or with more than one
- * outgoing flow.
+ * Tests things that BPMN describes as 'uncontrolled flow': Activities with more than one incoming
+ * sequence flow or with more than one outgoing flow.
  *
  * @author Thorben Lindhauer
  */

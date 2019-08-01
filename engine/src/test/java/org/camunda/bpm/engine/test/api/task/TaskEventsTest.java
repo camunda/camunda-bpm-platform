@@ -188,7 +188,8 @@ public class TaskEventsTest extends AbstractUserOperationLogTest {
     assertTrue(taskService.getTaskEvents(task.getId()).isEmpty());
 
     identityService.setAuthenticatedUserId(JONNY);
-    Attachment attachment = taskService.createAttachment(IMAGE_PNG, task.getId(), null, IMAGE_NAME, IMAGE_DESC, IMAGE_URL);
+    Attachment attachment = taskService.createAttachment(IMAGE_PNG, task.getId(), null, IMAGE_NAME,
+        IMAGE_DESC, IMAGE_URL);
 
     ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 5000));
 
@@ -208,7 +209,6 @@ public class TaskEventsTest extends AbstractUserOperationLogTest {
 
     assertNoCommentsForTask();
   }
-
 
   private void assertNoCommentsForTask() {
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {

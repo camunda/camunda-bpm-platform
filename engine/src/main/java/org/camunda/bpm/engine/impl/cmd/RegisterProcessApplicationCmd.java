@@ -42,7 +42,8 @@ public class RegisterProcessApplicationCmd implements Command<ProcessApplication
     this(Collections.singleton(deploymentId), reference);
   }
 
-  public RegisterProcessApplicationCmd(Set<String> deploymentsToRegister, ProcessApplicationReference appReference) {
+  public RegisterProcessApplicationCmd(Set<String> deploymentsToRegister,
+      ProcessApplicationReference appReference) {
     this.deploymentsToRegister = deploymentsToRegister;
     reference = appReference;
 
@@ -51,10 +52,13 @@ public class RegisterProcessApplicationCmd implements Command<ProcessApplication
   public ProcessApplicationRegistration execute(CommandContext commandContext) {
     commandContext.getAuthorizationManager().checkCamundaAdmin();
 
-    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    final ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context
+        .getProcessEngineConfiguration();
+    final ProcessApplicationManager processApplicationManager = processEngineConfiguration
+        .getProcessApplicationManager();
 
-    return processApplicationManager.registerProcessApplicationForDeployments(deploymentsToRegister, reference);
+    return processApplicationManager.registerProcessApplicationForDeployments(deploymentsToRegister,
+        reference);
   }
 
 }

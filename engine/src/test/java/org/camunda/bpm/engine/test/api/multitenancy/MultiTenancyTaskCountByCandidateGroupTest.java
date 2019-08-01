@@ -46,10 +46,7 @@ public class MultiTenancyTaskCountByCandidateGroupTest {
   public ProcessEngineTestRule processEngineTestRule = new ProcessEngineTestRule(processEngineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain
-    .outerRule(processEngineTestRule)
-    .around(processEngineRule);
-
+  public RuleChain ruleChain = RuleChain.outerRule(processEngineTestRule).around(processEngineRule);
 
   protected TaskService taskService;
   protected IdentityService identityService;
@@ -93,7 +90,8 @@ public class MultiTenancyTaskCountByCandidateGroupTest {
     identityService.setAuthentication(userId, null, Collections.singletonList(tenantId));
 
     // when
-    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport().taskCountByCandidateGroup();
+    List<TaskCountByCandidateGroupResult> results = taskService.createTaskReport()
+        .taskCountByCandidateGroup();
 
     // then
     assertEquals(1, results.size());

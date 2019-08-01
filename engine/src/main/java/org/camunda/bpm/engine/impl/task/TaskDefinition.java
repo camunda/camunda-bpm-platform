@@ -177,7 +177,6 @@ public class TaskDefinition {
     CollectionUtil.addToMapOfLists(builtinTaskListeners, eventName, taskListener);
   }
 
-
   public Expression getFormKey() {
     return formKey;
   }

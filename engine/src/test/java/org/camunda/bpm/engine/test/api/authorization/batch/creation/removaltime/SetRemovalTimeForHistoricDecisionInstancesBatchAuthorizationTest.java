@@ -40,64 +40,52 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSp
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeForHistoricDecisionInstancesBatchAuthorizationTest extends BatchCreationAuthorizationTest {
+public class SetRemovalTimeForHistoricDecisionInstancesBatchAuthorizationTest
+    extends BatchCreationAuthorizationTest {
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
         scenario()
-            .withAuthorizations(
-              grant(Resources.DECISION_DEFINITION, "dish-decision", "userId", Permissions.READ_HISTORY)
-            )
-            .failsDueToRequired(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.DECISION_DEFINITION, "dish-decision", "userId", Permissions.READ_HISTORY),
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)
-            ),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.DECISION_DEFINITION, "dish-decision", "userId", Permissions.READ_HISTORY),
-                grant(Resources.BATCH, "batchId", "userId", BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)
-            ).succeeds()
-    );
+            .withAuthorizations(grant(Resources.DECISION_DEFINITION, "dish-decision", "userId",
+                Permissions.READ_HISTORY))
+            .failsDueToRequired(grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+                grant(Resources.BATCH, "batchId", "userId",
+                    BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME)),
+        scenario().withAuthorizations(
+            grant(Resources.DECISION_DEFINITION, "dish-decision", "userId",
+                Permissions.READ_HISTORY),
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
+        scenario().withAuthorizations(
+            grant(Resources.DECISION_DEFINITION, "dish-decision", "userId",
+                Permissions.READ_HISTORY),
+            grant(Resources.BATCH, "batchId", "userId",
+                BatchPermissions.CREATE_BATCH_SET_REMOVAL_TIME))
+            .succeeds());
   }
 
   @Test
-  @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldAuthorizeSetRemovalTimeForHistoricDecisionInstancesBatch() {
     // given
     setupHistory();
 
-    authRule
-        .init(scenario)
-        .withUser("userId")
-        .bindResource("batchId", "*")
-        .start();
+    authRule.init(scenario).withUser("userId").bindResource("batchId", "*").start();
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
     // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .absoluteRemovalTime(new Date())
-      .byQuery(query)
-      .executeAsync();
+    historyService.setRemovalTimeToHistoricDecisionInstances().absoluteRemovalTime(new Date())
+        .byQuery(query).executeAsync();
 
     // then
     authRule.assertScenario(scenario);
   }
 
   protected List<String> setupHistory() {
-    engineRule.getDecisionService()
-      .evaluateDecisionTableByKey("dish-decision", Variables.createVariables()
-        .putValue("temperature", 32)
-        .putValue("dayType", "Weekend"));
+    engineRule.getDecisionService().evaluateDecisionTableByKey("dish-decision",
+        Variables.createVariables().putValue("temperature", 32).putValue("dayType", "Weekend"));
 
     return null;
   }

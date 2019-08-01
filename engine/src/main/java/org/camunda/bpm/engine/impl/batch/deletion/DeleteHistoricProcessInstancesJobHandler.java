@@ -34,9 +34,11 @@ import java.util.List;
 /**
  * @author Askar Akhmerov
  */
-public class DeleteHistoricProcessInstancesJobHandler extends AbstractBatchJobHandler<BatchConfiguration> {
+public class DeleteHistoricProcessInstancesJobHandler
+    extends AbstractBatchJobHandler<BatchConfiguration> {
 
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(
+      Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION);
 
   @Override
   public String getType() {
@@ -53,26 +55,29 @@ public class DeleteHistoricProcessInstancesJobHandler extends AbstractBatchJobHa
   }
 
   @Override
-  protected BatchConfiguration createJobConfiguration(BatchConfiguration configuration, List<String> processIdsForJob) {
+  protected BatchConfiguration createJobConfiguration(BatchConfiguration configuration,
+      List<String> processIdsForJob) {
     return new BatchConfiguration(processIdsForJob, configuration.isFailIfNotExists());
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
+  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
+    ByteArrayEntity configurationEntity = commandContext.getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
     BatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
+    boolean initialLegacyRestrictions = commandContext
+        .isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();
     commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
     try {
-      HistoryService historyService = commandContext.getProcessEngineConfiguration().getHistoryService();
-      if(batchConfiguration.isFailIfNotExists()) {
+      HistoryService historyService = commandContext.getProcessEngineConfiguration()
+          .getHistoryService();
+      if (batchConfiguration.isFailIfNotExists()) {
         historyService.deleteHistoricProcessInstances(batchConfiguration.getIds());
-      }else {
+      } else {
         historyService.deleteHistoricProcessInstancesIfExists(batchConfiguration.getIds());
       }
     } finally {

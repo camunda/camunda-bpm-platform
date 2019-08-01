@@ -33,7 +33,7 @@ public class ActivityInstanceEndListener extends HistoryExecutionListener {
 
   protected HistoryEvent createHistoryEvent(DelegateExecution execution) {
     ensureHistoryLevelInitialized();
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_END, execution)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.ACTIVITY_INSTANCE_END, execution)) {
       return eventProducer.createActivityInstanceEndEvt(execution);
     } else {
       return null;

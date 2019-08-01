@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISOPeriodFormat;
 
-
 public class DueDateBusinessCalendar implements BusinessCalendar {
 
   private final static EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
@@ -33,23 +32,22 @@ public class DueDateBusinessCalendar implements BusinessCalendar {
   public Date resolveDuedate(String duedate) {
     return resolveDuedate(duedate, null);
   }
-  
+
   public Date resolveDuedate(String duedate, Date startDate) {
     try {
-      if (duedate.startsWith("P")){
+      if (duedate.startsWith("P")) {
         DateTime start = null;
         if (startDate == null) {
           start = DateTimeUtil.now();
         } else {
-          start = new DateTime(startDate); 
+          start = new DateTime(startDate);
         }
         return start.plus(ISOPeriodFormat.standard().parsePeriod(duedate)).toDate();
       }
 
       return DateTimeUtil.parseDateTime(duedate).toDate();
 
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileResolvingDuedate(duedate, e);
     }
   }

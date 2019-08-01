@@ -30,14 +30,14 @@ public class DbBulkOperationComparator implements Comparator<DbBulkOperation> {
 
   public int compare(DbBulkOperation firstOperation, DbBulkOperation secondOperation) {
 
-    if(firstOperation.equals(secondOperation)) {
+    if (firstOperation.equals(secondOperation)) {
       return 0;
     }
 
     // order by statement
     int statementOrder = firstOperation.getStatement().compareTo(secondOperation.getStatement());
 
-    if(statementOrder == 0) {
+    if (statementOrder == 0) {
       return firstOperation.hashCode() < secondOperation.hashCode() ? -1 : 1;
 
     } else {

@@ -29,8 +29,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 
-
-
 /**
  * @author Tom Baeyens
  */
@@ -66,16 +64,14 @@ public class ProcessDefinitionBuilder {
     ActivityImpl activity = getActivity();
     activity.setEventScope(processDefinition.findActivity(id));
 
-    if(isInterrupting) {
+    if (isInterrupting) {
       activity.setActivityStartBehavior(ActivityStartBehavior.INTERRUPT_EVENT_SCOPE);
-    }
-    else {
+    } else {
       activity.setActivityStartBehavior(ActivityStartBehavior.CONCURRENT_IN_FLOW_SCOPE);
     }
 
     return this;
   }
-
 
   public ProcessDefinitionBuilder endActivity() {
     scopeStack.pop();
@@ -95,13 +91,14 @@ public class ProcessDefinitionBuilder {
     return startTransition(destinationActivityId, null);
   }
 
-  public ProcessDefinitionBuilder startTransition(String destinationActivityId, String transitionId) {
-    if (destinationActivityId==null) {
+  public ProcessDefinitionBuilder startTransition(String destinationActivityId,
+      String transitionId) {
+    if (destinationActivityId == null) {
       throw new PvmException("destinationActivityId is null");
     }
     ActivityImpl activity = getActivity();
     transition = activity.createOutgoingTransition(transitionId);
-    unresolvedTransitions.add(new Object[]{transition, destinationActivityId});
+    unresolvedTransitions.add(new Object[] { transition, destinationActivityId });
     processElement = transition;
     return this;
   }
@@ -133,12 +130,14 @@ public class ProcessDefinitionBuilder {
   }
 
   public PvmProcessDefinition buildProcessDefinition() {
-    for (Object[] unresolvedTransition: unresolvedTransitions) {
+    for (Object[] unresolvedTransition : unresolvedTransitions) {
       TransitionImpl transition = (TransitionImpl) unresolvedTransition[0];
       String destinationActivityName = (String) unresolvedTransition[1];
       ActivityImpl destination = processDefinition.findActivity(destinationActivityName);
       if (destination == null) {
-        throw new RuntimeException("destination '"+destinationActivityName+"' not found.  (referenced from transition in '"+transition.getSource().getId()+"')");
+        throw new RuntimeException("destination '" + destinationActivityName
+            + "' not found.  (referenced from transition in '" + transition.getSource().getId()
+            + "')");
       }
       transition.setDestination(destination);
     }
@@ -155,7 +154,7 @@ public class ProcessDefinitionBuilder {
   }
 
   public ProcessDefinitionBuilder executionListener(ExecutionListener executionListener) {
-    if (transition!=null) {
+    if (transition != null) {
       transition.addExecutionListener(executionListener);
     } else {
       throw new PvmException("not in a transition scope");
@@ -163,8 +162,9 @@ public class ProcessDefinitionBuilder {
     return this;
   }
 
-  public ProcessDefinitionBuilder executionListener(String eventName, ExecutionListener executionListener) {
-    if (transition==null) {
+  public ProcessDefinitionBuilder executionListener(String eventName,
+      ExecutionListener executionListener) {
+    if (transition == null) {
       scopeStack.peek().addExecutionListener(eventName, executionListener);
     } else {
       transition.addExecutionListener(executionListener);

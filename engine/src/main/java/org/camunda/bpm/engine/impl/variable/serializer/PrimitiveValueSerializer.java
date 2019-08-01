@@ -24,7 +24,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  * @author Daniel Meyer
  *
  */
-public abstract class PrimitiveValueSerializer<T extends PrimitiveValue<?>> extends AbstractTypedValueSerializer<T> {
+public abstract class PrimitiveValueSerializer<T extends PrimitiveValue<?>>
+    extends AbstractTypedValueSerializer<T> {
 
   public PrimitiveValueSerializer(PrimitiveValueType variableType) {
     super(variableType);

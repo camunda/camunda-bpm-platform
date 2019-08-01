@@ -31,52 +31,64 @@ public class VariableSpec {
   public String getName() {
     return name;
   }
+
   public VariableSpec name(String name) {
     this.name = name;
     return this;
   }
+
   public Object getValue() {
     return value;
   }
+
   public VariableSpec value(Object value) {
     this.value = value;
     return this;
   }
+
   public String getVariableTypeName() {
     return variableTypeName;
   }
+
   public VariableSpec variableTypeName(String variableTypeName) {
     this.variableTypeName = variableTypeName;
     return this;
   }
+
   public String getValueTypeName() {
     return valueTypeName;
   }
+
   public VariableSpec valueTypeName(String valueTypeName) {
     this.valueTypeName = valueTypeName;
     return this;
   }
+
   public Object getSerializedValue() {
     return serializedValue;
   }
+
   public VariableSpec serializedValue(Object serializedValue) {
     this.serializedValue = serializedValue;
     return this;
   }
+
   public Map<String, Object> getConfiguration() {
     return configuration;
   }
+
   public VariableSpec configuration(Map<String, Object> configuration) {
     this.configuration = configuration;
     return this;
   }
+
   public boolean getStoresCustomObjects() {
     return storesCustomObjects;
   }
+
   public VariableSpec storesCustomObjects(boolean storesCustomObjects) {
     this.storesCustomObjects = storesCustomObjects;
     return this;
   }
-
 
 }

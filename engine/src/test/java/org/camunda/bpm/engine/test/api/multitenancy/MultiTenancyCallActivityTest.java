@@ -37,97 +37,91 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
   protected static final String CMMN = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testSimpleDeployment.cmmn";
 
   protected static final BpmnModelInstance SUB_PROCESS = Bpmn.createExecutableProcess("subProcess")
-      .startEvent()
-      .userTask()
-      .endEvent()
-      .done();
+      .startEvent().userTask().endEvent().done();
 
   public void testStartProcessInstanceWithDeploymentBinding() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .calledElement("subProcess")
-        .camundaCalledElementBinding("deployment")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().calledElement("subProcess").camundaCalledElementBinding("deployment")
+        .endEvent().done();
 
     deploymentForTenant(TENANT_ONE, callingProcess, SUB_PROCESS);
     deploymentForTenant(TENANT_TWO, callingProcess, SUB_PROCESS);
 
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
   public void testStartProcessInstanceWithLatestBindingSameVersion() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .calledElement("subProcess")
-        .camundaCalledElementBinding("latest")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().calledElement("subProcess").camundaCalledElementBinding("latest").endEvent()
+        .done();
 
     deploymentForTenant(TENANT_ONE, callingProcess, SUB_PROCESS);
     deploymentForTenant(TENANT_TWO, callingProcess, SUB_PROCESS);
 
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
   public void testStartProcessInstanceWithLatestBindingDifferentVersion() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .calledElement("subProcess")
-        .camundaCalledElementBinding("latest")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().calledElement("subProcess").camundaCalledElementBinding("latest").endEvent()
+        .done();
 
     deploymentForTenant(TENANT_ONE, callingProcess, SUB_PROCESS);
 
     deploymentForTenant(TENANT_TWO, callingProcess, SUB_PROCESS);
     deploymentForTenant(TENANT_TWO, SUB_PROCESS);
 
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     ProcessDefinition latestSubProcessTenantTwo = repositoryService.createProcessDefinitionQuery()
         .tenantIdIn(TENANT_TWO).processDefinitionKey("subProcess").latestVersion().singleResult();
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).processDefinitionId(latestSubProcessTenantTwo.getId()).count(), is(1L));
+    assertThat(
+        query.tenantIdIn(TENANT_TWO).processDefinitionId(latestSubProcessTenantTwo.getId()).count(),
+        is(1L));
   }
 
   public void testStartProcessInstanceWithVersionBinding() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .calledElement("subProcess")
-        .camundaCalledElementBinding("version")
-        .camundaCalledElementVersion("1")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().calledElement("subProcess").camundaCalledElementBinding("version")
+        .camundaCalledElementVersion("1").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, callingProcess, SUB_PROCESS);
     deploymentForTenant(TENANT_TWO, callingProcess, SUB_PROCESS);
 
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
@@ -137,37 +131,37 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     BpmnModelInstance callingProcess = createCallingProcess("callingProcess", "ver_tag_1");
 
     deploymentForTenant(TENANT_ONE, callingProcess);
-    deploymentForTenant(TENANT_ONE, "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml");
+    deploymentForTenant(TENANT_ONE,
+        "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml");
     deploymentForTenant(TENANT_TWO, callingProcess);
-    deploymentForTenant(TENANT_TWO, "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag2.bpmn20.xml");
+    deploymentForTenant(TENANT_TWO,
+        "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag2.bpmn20.xml");
 
     // when
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     // then
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subProcess");
     assertThat(query.activityIdIn("Task_1").tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.activityIdIn("Task_2").tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
   public void testFailStartProcessInstanceFromOtherTenantWithDeploymentBinding() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .calledElement("subProcess")
-        .camundaCalledElementBinding("deployment")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().calledElement("subProcess").camundaCalledElementBinding("deployment")
+        .endEvent().done();
 
     deploymentForTenant(TENANT_ONE, callingProcess);
     deploymentForTenant(TENANT_TWO, SUB_PROCESS);
 
     try {
       runtimeService.createProcessInstanceByKey("callingProcess")
-        .processDefinitionTenantId(TENANT_ONE)
-        .execute();
+          .processDefinitionTenantId(TENANT_ONE).execute();
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -177,21 +171,16 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testFailStartProcessInstanceFromOtherTenantWithLatestBinding() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .calledElement("subProcess")
-        .camundaCalledElementBinding("latest")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().calledElement("subProcess").camundaCalledElementBinding("latest").endEvent()
+        .done();
 
     deploymentForTenant(TENANT_ONE, callingProcess);
     deploymentForTenant(TENANT_TWO, SUB_PROCESS);
 
     try {
       runtimeService.createProcessInstanceByKey("callingProcess")
-        .processDefinitionTenantId(TENANT_ONE)
-        .execute();
+          .processDefinitionTenantId(TENANT_ONE).execute();
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -201,14 +190,9 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testFailStartProcessInstanceFromOtherTenantWithVersionBinding() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .calledElement("subProcess")
-        .camundaCalledElementBinding("version")
-        .camundaCalledElementVersion("2")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().calledElement("subProcess").camundaCalledElementBinding("version")
+        .camundaCalledElementVersion("2").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, callingProcess, SUB_PROCESS);
 
@@ -217,8 +201,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
     try {
       runtimeService.createProcessInstanceByKey("callingProcess")
-        .processDefinitionTenantId(TENANT_ONE)
-        .execute();
+          .processDefinitionTenantId(TENANT_ONE).execute();
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -230,13 +213,13 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     // given
     BpmnModelInstance callingProcess = createCallingProcess("callingProcess", "ver_tag_2");
     deploymentForTenant(TENANT_ONE, callingProcess);
-    deploymentForTenant(TENANT_TWO, "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag2.bpmn20.xml");
+    deploymentForTenant(TENANT_TWO,
+        "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag2.bpmn20.xml");
 
     try {
       // when
       runtimeService.createProcessInstanceByKey("callingProcess")
-        .processDefinitionTenantId(TENANT_ONE)
-        .execute();
+          .processDefinitionTenantId(TENANT_ONE).execute();
       fail("expected exception");
     } catch (ProcessEngineException e) {
       // then
@@ -246,19 +229,16 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testStartCaseInstanceWithDeploymentBinding() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .camundaCaseRef("Case_1")
-        .camundaCaseBinding("deployment")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().camundaCaseRef("Case_1").camundaCaseBinding("deployment").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, CMMN, callingProcess);
     deploymentForTenant(TENANT_TWO, CMMN, callingProcess);
 
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -267,19 +247,16 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testStartCaseInstanceWithLatestBindingSameVersion() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .camundaCaseRef("Case_1")
-        .camundaCaseBinding("latest")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().camundaCaseRef("Case_1").camundaCaseBinding("latest").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, CMMN, callingProcess);
     deploymentForTenant(TENANT_TWO, CMMN, callingProcess);
 
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -288,46 +265,42 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testStartCaseInstanceWithLatestBindingDifferentVersion() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-        .startEvent()
-        .callActivity()
-          .camundaCaseRef("Case_1")
-          .camundaCaseBinding("latest")
-        .endEvent()
-        .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().camundaCaseRef("Case_1").camundaCaseBinding("latest").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, CMMN, callingProcess);
 
     deploymentForTenant(TENANT_TWO, CMMN, callingProcess);
     deploymentForTenant(TENANT_TWO, CMMN);
 
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
 
-    CaseDefinition latestCaseDefinitionTenantTwo = repositoryService.createCaseDefinitionQuery().tenantIdIn(TENANT_TWO).latestVersion().singleResult();
-    query = caseService.createCaseInstanceQuery().caseDefinitionId(latestCaseDefinitionTenantTwo.getId());
+    CaseDefinition latestCaseDefinitionTenantTwo = repositoryService.createCaseDefinitionQuery()
+        .tenantIdIn(TENANT_TWO).latestVersion().singleResult();
+    query = caseService.createCaseInstanceQuery()
+        .caseDefinitionId(latestCaseDefinitionTenantTwo.getId());
     assertThat(query.count(), is(1L));
   }
 
   public void testStartCaseInstanceWithVersionBinding() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .camundaCaseRef("Case_1")
-        .camundaCaseBinding("version")
-        .camundaCaseVersion("1")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().camundaCaseRef("Case_1").camundaCaseBinding("version")
+        .camundaCaseVersion("1").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, CMMN, callingProcess);
     deploymentForTenant(TENANT_TWO, CMMN, callingProcess);
 
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
-    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_TWO).execute();
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -336,21 +309,15 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testFailStartCaseInstanceFromOtherTenantWithDeploymentBinding() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-        .startEvent()
-        .callActivity()
-          .camundaCaseRef("Case_1")
-          .camundaCaseBinding("deployment")
-        .endEvent()
-        .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().camundaCaseRef("Case_1").camundaCaseBinding("deployment").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, callingProcess);
     deploymentForTenant(TENANT_TWO, CMMN);
 
     try {
       runtimeService.createProcessInstanceByKey("callingProcess")
-        .processDefinitionTenantId(TENANT_ONE)
-        .execute();
+          .processDefinitionTenantId(TENANT_ONE).execute();
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -360,21 +327,15 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testFailStartCaseInstanceFromOtherTenantWithLatestBinding() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-        .startEvent()
-        .callActivity()
-          .camundaCaseRef("Case_1")
-          .camundaCaseBinding("latest")
-        .endEvent()
-        .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().camundaCaseRef("Case_1").camundaCaseBinding("latest").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, callingProcess);
     deploymentForTenant(TENANT_TWO, CMMN);
 
     try {
       runtimeService.createProcessInstanceByKey("callingProcess")
-        .processDefinitionTenantId(TENANT_ONE)
-        .execute();
+          .processDefinitionTenantId(TENANT_ONE).execute();
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -384,14 +345,9 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testFailStartCaseInstanceFromOtherTenantWithVersionBinding() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-        .startEvent()
-        .callActivity()
-          .camundaCaseRef("Case_1")
-          .camundaCaseBinding("version")
-          .camundaCaseVersion("2")
-        .endEvent()
-        .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().camundaCaseRef("Case_1").camundaCaseBinding("version")
+        .camundaCaseVersion("2").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, CMMN, callingProcess);
 
@@ -400,8 +356,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
     try {
       runtimeService.createProcessInstanceByKey("callingProcess")
-        .processDefinitionTenantId(TENANT_ONE)
-        .execute();
+          .processDefinitionTenantId(TENANT_ONE).execute();
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
@@ -411,51 +366,40 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testCalledElementTenantIdConstant() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-        .startEvent()
-        .callActivity()
-          .calledElement("subProcess")
-          .camundaCalledElementTenantId(TENANT_ONE)
-        .endEvent()
-        .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().calledElement("subProcess").camundaCalledElementTenantId(TENANT_ONE)
+        .endEvent().done();
 
     deploymentForTenant(TENANT_ONE, SUB_PROCESS);
     deployment(callingProcess);
 
     runtimeService.startProcessInstanceByKey("callingProcess");
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
   public void testCalledElementTenantIdExpression() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-        .startEvent()
-        .callActivity()
-          .calledElement("subProcess")
-          .camundaCalledElementTenantId("${'"+TENANT_ONE+"'}")
-        .endEvent()
-        .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().calledElement("subProcess")
+        .camundaCalledElementTenantId("${'" + TENANT_ONE + "'}").endEvent().done();
 
     deploymentForTenant(TENANT_ONE, SUB_PROCESS);
     deployment(callingProcess);
 
     runtimeService.startProcessInstanceByKey("callingProcess");
 
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subProcess");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
   public void testCaseRefTenantIdConstant() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .camundaCaseRef("Case_1")
-        .camundaCaseTenantId(TENANT_ONE)
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().camundaCaseRef("Case_1").camundaCaseTenantId(TENANT_ONE).endEvent().done();
 
     deploymentForTenant(TENANT_ONE, CMMN);
     deployment(callingProcess);
@@ -469,13 +413,9 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testCaseRefTenantIdExpression() {
 
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-        .camundaCaseRef("Case_1")
-        .camundaCaseTenantId("${'"+TENANT_ONE+"'}")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().camundaCaseRef("Case_1").camundaCaseTenantId("${'" + TENANT_ONE + "'}")
+        .endEvent().done();
 
     deploymentForTenant(TENANT_ONE, CMMN);
     deployment(callingProcess);
@@ -488,13 +428,9 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
   public void testCaseRefTenantIdCompositeExpression() {
     // given
-    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
-      .startEvent()
-      .callActivity()
-      .camundaCaseRef("Case_1")
-      .camundaCaseTenantId("tenant${'1'}")
-      .endEvent()
-      .done();
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess").startEvent()
+        .callActivity().camundaCaseRef("Case_1").camundaCaseTenantId("tenant${'1'}").endEvent()
+        .done();
 
     deploymentForTenant(TENANT_ONE, CMMN);
     deployment(callingProcess);
@@ -508,14 +444,9 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
   }
 
   protected BpmnModelInstance createCallingProcess(String processId, String versionTagValue) {
-    return Bpmn.createExecutableProcess(processId)
-        .startEvent()
-        .callActivity()
-          .calledElement("subProcess")
-          .camundaCalledElementBinding("versionTag")
-          .camundaCalledElementVersionTag(versionTagValue)
-        .endEvent()
-        .done();
+    return Bpmn.createExecutableProcess(processId).startEvent().callActivity()
+        .calledElement("subProcess").camundaCalledElementBinding("versionTag")
+        .camundaCalledElementVersionTag(versionTagValue).endEvent().done();
   }
 
 }

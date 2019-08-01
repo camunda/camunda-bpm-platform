@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDef
 import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.management.JobDefinition;
 
-
 /**
  * Compares operations by Entity type.
  *
@@ -88,7 +87,7 @@ public class EntityTypeComparatorForModifications implements Comparator<Class<?>
 
   public int compare(Class<?> firstEntityType, Class<?> secondEntityType) {
 
-    if(firstEntityType == secondEntityType) {
+    if (firstEntityType == secondEntityType) {
       return 0;
     }
 
@@ -96,15 +95,15 @@ public class EntityTypeComparatorForModifications implements Comparator<Class<?>
     Integer secondIndex = TYPE_ORDER.get(secondEntityType);
 
     // unknown type happens before / after everything else
-    if(firstIndex == null) {
+    if (firstIndex == null) {
       firstIndex = Integer.MAX_VALUE;
     }
-    if(secondIndex == null) {
+    if (secondIndex == null) {
       secondIndex = Integer.MAX_VALUE;
     }
 
     int result = firstIndex.compareTo(secondIndex);
-    if(result == 0) {
+    if (result == 0) {
       return firstEntityType.getName().compareTo(secondEntityType.getName());
 
     } else {

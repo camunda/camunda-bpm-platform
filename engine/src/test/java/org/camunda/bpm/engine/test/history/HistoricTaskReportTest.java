@@ -52,16 +52,13 @@ public class HistoricTaskReportTest {
   public ProcessEngineTestRule processEngineTestRule = new ProcessEngineTestRule(processEngineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain
-    .outerRule(processEngineTestRule)
-    .around(processEngineRule);
+  public RuleChain ruleChain = RuleChain.outerRule(processEngineTestRule).around(processEngineRule);
 
   protected ProcessEngineConfiguration processEngineConfiguration;
   protected HistoryService historyService;
 
   protected static final String PROCESS_DEFINITION_KEY = "HISTORIC_TASK_INST_REPORT";
   protected static final String ANOTHER_PROCESS_DEFINITION_KEY = "ANOTHER_HISTORIC_TASK_INST_REPORT";
-
 
   @Before
   public void setUp() {
@@ -75,7 +72,7 @@ public class HistoricTaskReportTest {
   @After
   public void cleanUp() {
     List<Task> list = processEngineRule.getTaskService().createTaskQuery().list();
-    for( Task task : list ) {
+    for (Task task : list) {
       processEngineRule.getTaskService().deleteTask(task.getId(), true);
     }
   }
@@ -93,15 +90,17 @@ public class HistoricTaskReportTest {
 
     // when
     List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
-      .createHistoricTaskInstanceReport()
-      .countByTaskName();
+        .createHistoricTaskInstanceReport().countByTaskName();
 
     // then
     assertEquals(2, historicTaskInstanceReportResults.size());
     assertEquals(2, historicTaskInstanceReportResults.get(0).getCount(), 0);
-    assertEquals(ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionKey());
-    assertEquals("name_" + ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionName());
-    assertEquals(ANOTHER_PROCESS_DEFINITION_KEY + " Task 1", historicTaskInstanceReportResults.get(0).getTaskName());
+    assertEquals(ANOTHER_PROCESS_DEFINITION_KEY,
+        historicTaskInstanceReportResults.get(0).getProcessDefinitionKey());
+    assertEquals("name_" + ANOTHER_PROCESS_DEFINITION_KEY,
+        historicTaskInstanceReportResults.get(0).getProcessDefinitionName());
+    assertEquals(ANOTHER_PROCESS_DEFINITION_KEY + " Task 1",
+        historicTaskInstanceReportResults.get(0).getTaskName());
 
     assertTrue(historicTaskInstanceReportResults.get(1).getProcessDefinitionId().contains(":2:"));
   }
@@ -119,15 +118,16 @@ public class HistoricTaskReportTest {
 
     // when
     List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
-      .createHistoricTaskInstanceReport()
-      .countByProcessDefinitionKey();
+        .createHistoricTaskInstanceReport().countByProcessDefinitionKey();
 
     // then
     assertEquals(2, historicTaskInstanceReportResults.size());
     assertTrue(historicTaskInstanceReportResults.get(0).getProcessDefinitionId().contains(":1:"));
-    assertEquals("name_" + ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionName());
+    assertEquals("name_" + ANOTHER_PROCESS_DEFINITION_KEY,
+        historicTaskInstanceReportResults.get(0).getProcessDefinitionName());
 
-    assertEquals(ANOTHER_PROCESS_DEFINITION_KEY, historicTaskInstanceReportResults.get(0).getProcessDefinitionKey());
+    assertEquals(ANOTHER_PROCESS_DEFINITION_KEY,
+        historicTaskInstanceReportResults.get(0).getProcessDefinitionKey());
   }
 
   @Test
@@ -142,9 +142,8 @@ public class HistoricTaskReportTest {
     calendar.set(2016, 11, 14, 12, 5);
 
     List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
-      .createHistoricTaskInstanceReport()
-      .completedAfter(calendar.getTime())
-      .countByProcessDefinitionKey();
+        .createHistoricTaskInstanceReport().completedAfter(calendar.getTime())
+        .countByProcessDefinitionKey();
 
     // then
     assertEquals(1, historicTaskInstanceReportResults.size());
@@ -163,9 +162,8 @@ public class HistoricTaskReportTest {
     calendar.set(2016, 11, 14, 12, 5);
 
     List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
-      .createHistoricTaskInstanceReport()
-      .completedBefore(calendar.getTime())
-      .countByProcessDefinitionKey();
+        .createHistoricTaskInstanceReport().completedBefore(calendar.getTime())
+        .countByProcessDefinitionKey();
 
     // then
     assertEquals(2, historicTaskInstanceReportResults.size());
@@ -175,13 +173,11 @@ public class HistoricTaskReportTest {
   @Test
   public void testCompletedAfterWithNullValue() {
     try {
-      historyService
-        .createHistoricTaskInstanceReport()
-        .completedAfter(null)
-        .countByProcessDefinitionKey();
+      historyService.createHistoricTaskInstanceReport().completedAfter(null)
+          .countByProcessDefinitionKey();
 
       fail("Expected NotValidException");
-    } catch( NotValidException nve) {
+    } catch (NotValidException nve) {
       assertTrue(nve.getMessage().contains("completedAfter"));
     }
   }
@@ -189,13 +185,11 @@ public class HistoricTaskReportTest {
   @Test
   public void testCompletedBeforeWithNullValue() {
     try {
-      historyService
-        .createHistoricTaskInstanceReport()
-        .completedBefore(null)
-        .countByProcessDefinitionKey();
+      historyService.createHistoricTaskInstanceReport().completedBefore(null)
+          .countByProcessDefinitionKey();
 
       fail("Expected NotValidException");
-    } catch( NotValidException nve) {
+    } catch (NotValidException nve) {
       assertTrue(nve.getMessage().contains("completedBefore"));
     }
   }
@@ -207,12 +201,8 @@ public class HistoricTaskReportTest {
 
     // when
     BpmnModelInstance instance = Bpmn.createExecutableProcess(ANOTHER_PROCESS_DEFINITION_KEY)
-      .name("name_" + ANOTHER_PROCESS_DEFINITION_KEY)
-      .startEvent()
-        .userTask("task1_" + ANOTHER_PROCESS_DEFINITION_KEY)
-        .name(null)
-        .endEvent()
-      .done();
+        .name("name_" + ANOTHER_PROCESS_DEFINITION_KEY).startEvent()
+        .userTask("task1_" + ANOTHER_PROCESS_DEFINITION_KEY).name(null).endEvent().done();
 
     processEngineTestRule.deploy(instance);
     startAndCompleteProcessInstance(ANOTHER_PROCESS_DEFINITION_KEY, 2016, 7, 14, 12, 1);
@@ -221,9 +211,7 @@ public class HistoricTaskReportTest {
     calendar.set(2016, 11, 14, 12, 5);
 
     List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
-      .createHistoricTaskInstanceReport()
-      .completedBefore(calendar.getTime())
-      .countByTaskName();
+        .createHistoricTaskInstanceReport().completedBefore(calendar.getTime()).countByTaskName();
 
     assertEquals(1, historicTaskInstanceReportResults.size());
     assertEquals(1, historicTaskInstanceReportResults.get(0).getCount(), 0);
@@ -236,12 +224,8 @@ public class HistoricTaskReportTest {
 
     // when
     BpmnModelInstance instance = Bpmn.createExecutableProcess(ANOTHER_PROCESS_DEFINITION_KEY)
-      .name("name_" + ANOTHER_PROCESS_DEFINITION_KEY)
-      .startEvent()
-        .userTask("task1_" + ANOTHER_PROCESS_DEFINITION_KEY)
-        .name("")
-      .endEvent()
-      .done();
+        .name("name_" + ANOTHER_PROCESS_DEFINITION_KEY).startEvent()
+        .userTask("task1_" + ANOTHER_PROCESS_DEFINITION_KEY).name("").endEvent().done();
 
     processEngineTestRule.deploy(instance);
     startAndCompleteProcessInstance(ANOTHER_PROCESS_DEFINITION_KEY, 2016, 7, 14, 12, 1);
@@ -250,9 +234,7 @@ public class HistoricTaskReportTest {
     calendar.set(2016, 11, 14, 12, 5);
 
     List<HistoricTaskInstanceReportResult> historicTaskInstanceReportResults = historyService
-      .createHistoricTaskInstanceReport()
-      .completedBefore(calendar.getTime())
-      .countByTaskName();
+        .createHistoricTaskInstanceReport().completedBefore(calendar.getTime()).countByTaskName();
 
     assertEquals(1, historicTaskInstanceReportResults.size());
     assertEquals(1, historicTaskInstanceReportResults.get(0).getCount(), 0);
@@ -260,17 +242,13 @@ public class HistoricTaskReportTest {
 
   protected BpmnModelInstance createProcessWithUserTask(String key) {
     double random = Math.random();
-    return Bpmn.createExecutableProcess(key)
-      .name("name_" + key)
-      .startEvent()
-        .userTask(key + "_" + random + "_task1")
-          .name(key + " Task 1")
-      .endEvent()
-      .done();
+    return Bpmn.createExecutableProcess(key).name("name_" + key).startEvent()
+        .userTask(key + "_" + random + "_task1").name(key + " Task 1").endEvent().done();
   }
 
   protected void completeTask(String pid) {
-    Task task = processEngineRule.getTaskService().createTaskQuery().processInstanceId(pid).singleResult();
+    Task task = processEngineRule.getTaskService().createTaskQuery().processInstanceId(pid)
+        .singleResult();
     processEngineRule.getTaskService().complete(task.getId());
   }
 
@@ -288,8 +266,9 @@ public class HistoricTaskReportTest {
     ClockUtil.setCurrentTime(calendar.getTime());
   }
 
-  protected void startAndCompleteProcessInstance(String key, int year, int month, int dayOfMonth, int hourOfDay, int minute) {
-    setCurrentTime(year, month, dayOfMonth , hourOfDay, minute);
+  protected void startAndCompleteProcessInstance(String key, int year, int month, int dayOfMonth,
+      int hourOfDay, int minute) {
+    setCurrentTime(year, month, dayOfMonth, hourOfDay, minute);
 
     ProcessInstance pi = processEngineRule.getRuntimeService().startProcessInstanceByKey(key);
 

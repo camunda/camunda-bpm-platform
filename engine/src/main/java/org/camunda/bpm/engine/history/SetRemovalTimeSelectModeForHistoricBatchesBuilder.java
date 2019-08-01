@@ -23,26 +23,29 @@ import java.util.Date;
  *
  * @author Tassilo Weidner
  */
-public interface SetRemovalTimeSelectModeForHistoricBatchesBuilder extends SetRemovalTimeToHistoricBatchesBuilder {
+public interface SetRemovalTimeSelectModeForHistoricBatchesBuilder
+    extends SetRemovalTimeToHistoricBatchesBuilder {
 
   /**
    * Sets the removal time to an absolute date.
    *
-   * @param removalTime supposed to be set to historic entities.
+   * @param removalTime
+   *          supposed to be set to historic entities.
    * @return the builder.
    */
   SetRemovalTimeToHistoricBatchesBuilder absoluteRemovalTime(Date removalTime);
 
   /**
-   * Calculates the removal time dynamically based on the time to
-   * live of the respective batch and the engine's removal time strategy.
+   * Calculates the removal time dynamically based on the time to live of the respective batch and
+   * the engine's removal time strategy.
    *
    * @return the builder.
    */
   SetRemovalTimeToHistoricBatchesBuilder calculatedRemovalTime();
 
   /**
-   * <p> Sets the removal time to {@code null}.
+   * <p>
+   * Sets the removal time to {@code null}.
    *
    * @return the builder.
    */

@@ -31,20 +31,18 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-
 /**
  * @author Daniel Meyer
  */
 public class MessageStartEventTest extends PluggableProcessEngineTestCase {
 
   public void testDeploymentCreatesSubscriptions() {
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment().addClasspathResource(
+        "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
+        .deploy().getId();
 
-    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery()
+        .list();
 
     assertEquals(1, eventSubscriptions.size());
 
@@ -52,22 +50,21 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
   }
 
   public void testSameMessageNameFails() {
-    repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
-        .deploy()
-        .getId();
+    repositoryService.createDeployment().addClasspathResource(
+        "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
+        .deploy().getId();
     try {
-      repositoryService
-          .createDeployment()
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/otherProcessWithNewInvoiceMessage.bpmn20.xml")
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/event/message/otherProcessWithNewInvoiceMessage.bpmn20.xml")
           .deploy();
       fail("exception expected");
     } catch (ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("there already is a message event subscription for the message with name"));
+      assertTrue(e.getMessage()
+          .contains("there already is a message event subscription for the message with name"));
     } finally {
       // clean db:
-      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
+      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService
+          .createDeploymentQuery().list();
       for (org.camunda.bpm.engine.repository.Deployment deployment : deployments) {
         repositoryService.deleteDeployment(deployment.getId(), true);
       }
@@ -80,49 +77,49 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
   // SEE: https://app.camunda.com/jira/browse/CAM-1448
   public void testEmptyMessageNameFails() {
     try {
-      repositoryService
-          .createDeployment()
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testEmptyMessageNameFails.bpmn20.xml")
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testEmptyMessageNameFails.bpmn20.xml")
           .deploy();
       fail("exception expected");
     } catch (ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("Cannot have a message event subscription with an empty or missing name"));
+      assertTrue(e.getMessage()
+          .contains("Cannot have a message event subscription with an empty or missing name"));
     }
   }
 
   public void testSameMessageNameInSameProcessFails() {
     try {
-      repositoryService
-          .createDeployment()
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/testSameMessageNameInSameProcessFails.bpmn20.xml")
+      repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/event/message/testSameMessageNameInSameProcessFails.bpmn20.xml")
           .deploy();
       fail("exception expected");
     } catch (ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("Cannot have more than one message event subscription with name 'newInvoiceMessage' for scope"));
+      assertTrue(e.getMessage().contains(
+          "Cannot have more than one message event subscription with name 'newInvoiceMessage' for scope"));
     }
   }
 
   public void testUpdateProcessVersionCancelsSubscriptions() {
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
-        .deploy()
-        .getId();
+    String deploymentId = repositoryService.createDeployment().addClasspathResource(
+        "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
+        .deploy().getId();
 
-    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery()
+        .list();
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+        .list();
 
     assertEquals(1, eventSubscriptions.size());
     assertEquals(1, processDefinitions.size());
 
-    String newDeploymentId = repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
-        .deploy()
-        .getId();
+    String newDeploymentId = repositoryService.createDeployment().addClasspathResource(
+        "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
+        .deploy().getId();
 
-    List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
-    List<ProcessDefinition> newProcessDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery()
+        .list();
+    List<ProcessDefinition> newProcessDefinitions = repositoryService.createProcessDefinitionQuery()
+        .list();
 
     assertEquals(1, newEventSubscriptions.size());
     assertEquals(2, newProcessDefinitions.size());
@@ -150,7 +147,8 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
 
     // using startProcessInstanceByMessage triggers the message start event
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByMessage("newInvoiceMessage");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByMessage("newInvoiceMessage");
 
     assertFalse(processInstance.isEnded());
 
@@ -161,7 +159,8 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(processInstance.getId());
 
-    // using startProcessInstanceByKey also triggers the message event, if there is a single start event
+    // using startProcessInstanceByKey also triggers the message event, if there is a single start
+    // event
 
     processInstance = runtimeService.startProcessInstanceByKey("singleMessageStartEvent");
 
@@ -176,7 +175,6 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
 
   }
 
-
   @Deployment
   public void testMessageStartEventAndNoneStartEvent() {
 
@@ -186,7 +184,8 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
 
     assertFalse(processInstance.isEnded());
 
-    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterNoneStart").singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterNoneStart")
+        .singleResult();
     assertNotNull(task);
 
     taskService.complete(task.getId());
@@ -213,11 +212,13 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
 
     // sending newInvoiceMessage
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByMessage("newInvoiceMessage");
+    ProcessInstance processInstance = runtimeService
+        .startProcessInstanceByMessage("newInvoiceMessage");
 
     assertFalse(processInstance.isEnded());
 
-    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessageStart").singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessageStart")
+        .singleResult();
     assertNotNull(task);
 
     taskService.complete(task.getId());
@@ -242,7 +243,8 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
       runtimeService.startProcessInstanceByKey("testProcess");
       fail("exception expected");
     } catch (ProcessEngineException e) {
-      assertTrue("different exception expected, not " + e.getMessage(), e.getMessage().contains("has no default start activity"));
+      assertTrue("different exception expected, not " + e.getMessage(),
+          e.getMessage().contains("has no default start activity"));
     }
 
   }
@@ -255,16 +257,17 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
       pi = runtimeService.createProcessInstanceQuery().singleResult();
       assertThat(pi.isEnded(), is(false));
 
-      String deploymentId = repositoryService
-          .createDeployment()
-          .addClasspathResource(
-              "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageInSameProcess.bpmn")
+      String deploymentId = repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageInSameProcess.bpmn")
           .name("deployment2").deploy().getId();
-      assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult(), is(notNullValue()));
+      assertThat(
+          repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult(),
+          is(notNullValue()));
     } finally {
       // clean db:
       runtimeService.deleteProcessInstance(pi.getId(), "failure");
-      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
+      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService
+          .createDeploymentQuery().list();
       for (org.camunda.bpm.engine.repository.Deployment d : deployments) {
         repositoryService.deleteDeployment(d.getId(), true);
       }
@@ -275,7 +278,8 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses.bpmn" })
   public void testDeployStartAndIntermediateEventWithSameMessageDifferentProcessesFirstStartEvent() {
     ProcessInstance pi = null;
     try {
@@ -283,16 +287,17 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
       pi = runtimeService.createProcessInstanceQuery().singleResult();
       assertThat(pi.isEnded(), is(false));
 
-      String deploymentId = repositoryService
-          .createDeployment()
-          .addClasspathResource(
-              "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses2.bpmn")
+      String deploymentId = repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses2.bpmn")
           .name("deployment2").deploy().getId();
-      assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult(), is(notNullValue()));
+      assertThat(
+          repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult(),
+          is(notNullValue()));
     } finally {
       // clean db:
       runtimeService.deleteProcessInstance(pi.getId(), "failure");
-      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
+      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService
+          .createDeploymentQuery().list();
       for (org.camunda.bpm.engine.repository.Deployment d : deployments) {
         repositoryService.deleteDeployment(d.getId(), true);
       }
@@ -303,7 +308,8 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses2.bpmn"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses2.bpmn" })
   public void testDeployStartAndIntermediateEventWithSameMessageDifferentProcessesFirstIntermediateEvent() {
     ProcessInstance pi = null;
     try {
@@ -311,16 +317,17 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
       pi = runtimeService.createProcessInstanceQuery().singleResult();
       assertThat(pi.isEnded(), is(false));
 
-      String deploymentId = repositoryService
-          .createDeployment()
-          .addClasspathResource(
-              "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses.bpmn")
+      String deploymentId = repositoryService.createDeployment().addClasspathResource(
+          "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses.bpmn")
           .name("deployment2").deploy().getId();
-      assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult(), is(notNullValue()));
+      assertThat(
+          repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult(),
+          is(notNullValue()));
     } finally {
       // clean db:
       runtimeService.deleteProcessInstance(pi.getId(), "failure");
-      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
+      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService
+          .createDeploymentQuery().list();
       for (org.camunda.bpm.engine.repository.Deployment d : deployments) {
         repositoryService.deleteDeployment(d.getId(), true);
       }
@@ -333,41 +340,37 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
 
   public void testUsingExpressionWithDollarTagInMessageStartEventNameThrowsException() {
 
-    // given a process definition with a start message event that has a message name which contains an expression
-    String processDefinition =
-        "org/camunda/bpm/engine/test/bpmn/event/message/" +
-            "MessageStartEventTest.testUsingExpressionWithDollarTagInMessageStartEventNameThrowsException.bpmn20.xml";
+    // given a process definition with a start message event that has a message name which contains
+    // an expression
+    String processDefinition = "org/camunda/bpm/engine/test/bpmn/event/message/"
+        + "MessageStartEventTest.testUsingExpressionWithDollarTagInMessageStartEventNameThrowsException.bpmn20.xml";
     try {
       // when deploying the process
-      repositoryService
-          .createDeployment()
-          .addClasspathResource(processDefinition)
-          .deploy();
+      repositoryService.createDeployment().addClasspathResource(processDefinition).deploy();
       fail("exception expected");
     } catch (ProcessEngineException e) {
       // then a process engine exception should be thrown with a certain message
       assertTrue(e.getMessage().contains("Invalid message name"));
-      assertTrue(e.getMessage().contains("expressions in the message start event name are not allowed!"));
+      assertTrue(
+          e.getMessage().contains("expressions in the message start event name are not allowed!"));
     }
   }
 
   public void testUsingExpressionWithHashTagInMessageStartEventNameThrowsException() {
 
-    // given a process definition with a start message event that has a message name which contains an expression
-    String processDefinition =
-        "org/camunda/bpm/engine/test/bpmn/event/message/" +
-            "MessageStartEventTest.testUsingExpressionWithHashTagInMessageStartEventNameThrowsException.bpmn20.xml";
+    // given a process definition with a start message event that has a message name which contains
+    // an expression
+    String processDefinition = "org/camunda/bpm/engine/test/bpmn/event/message/"
+        + "MessageStartEventTest.testUsingExpressionWithHashTagInMessageStartEventNameThrowsException.bpmn20.xml";
     try {
       // when deploying the process
-      repositoryService
-          .createDeployment()
-          .addClasspathResource(processDefinition)
-          .deploy();
+      repositoryService.createDeployment().addClasspathResource(processDefinition).deploy();
       fail("exception expected");
     } catch (ProcessEngineException e) {
       // then a process engine exception should be thrown with a certain message
       assertTrue(e.getMessage().contains("Invalid message name"));
-      assertTrue(e.getMessage().contains("expressions in the message start event name are not allowed!"));
+      assertTrue(
+          e.getMessage().contains("expressions in the message start event name are not allowed!"));
     }
   }
 }

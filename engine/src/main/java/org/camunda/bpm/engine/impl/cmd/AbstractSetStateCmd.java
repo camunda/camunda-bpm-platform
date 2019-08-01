@@ -128,7 +128,8 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
 
   protected abstract void checkParameters(CommandContext commandContext);
 
-  protected abstract void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState);
+  protected abstract void updateSuspensionState(CommandContext commandContext,
+      SuspensionState suspensionState);
 
   protected abstract void logUserOperation(CommandContext commandContext);
 

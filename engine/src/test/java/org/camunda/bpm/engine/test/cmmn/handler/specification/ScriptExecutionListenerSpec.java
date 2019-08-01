@@ -30,15 +30,17 @@ import org.camunda.bpm.model.cmmn.instance.camunda.CamundaScript;
 
 public class ScriptExecutionListenerSpec extends AbstractExecutionListenerSpec {
 
-  //could be configurable
+  // could be configurable
   protected static final String SCRIPT_FORMAT = "org.camunda.bpm.test.caseexecutionlistener.ABC";
 
   public ScriptExecutionListenerSpec(String eventName) {
     super(eventName);
   }
 
-  protected void configureCaseExecutionListener(CmmnModelInstance modelInstance, CamundaCaseExecutionListener listener) {
-    CamundaScript script = SpecUtil.createElement(modelInstance, listener, null, CamundaScript.class);
+  protected void configureCaseExecutionListener(CmmnModelInstance modelInstance,
+      CamundaCaseExecutionListener listener) {
+    CamundaScript script = SpecUtil.createElement(modelInstance, listener, null,
+        CamundaScript.class);
     String scriptValue = "${myScript}";
     script.setCamundaScriptFormat(SCRIPT_FORMAT);
     script.setTextContent(scriptValue);

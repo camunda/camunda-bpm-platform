@@ -56,16 +56,18 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
   protected List<String> batchIds = new ArrayList<>();
 
-  public BatchSetRemovalTimeRule(ProcessEngineRule engineRule, ProcessEngineTestRule engineTestRule) {
+  public BatchSetRemovalTimeRule(ProcessEngineRule engineRule,
+      ProcessEngineTestRule engineTestRule) {
     this.engineRule = engineRule;
     this.engineTestRule = engineTestRule;
   }
 
   protected void starting(Description description) {
     getProcessEngineConfiguration()
-      .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
-      .setHistoryRemovalTimeStrategy(ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START)
-      .initHistoryRemovalTime();
+        .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
+        .setHistoryRemovalTimeStrategy(
+            ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_START)
+        .initHistoryRemovalTime();
 
     ClockUtil.setCurrentTime(CURRENT_DATE);
 
@@ -73,10 +75,8 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
   }
 
   protected void finished(Description description) {
-    getProcessEngineConfiguration()
-      .setHistoryRemovalTimeProvider(null)
-      .setHistoryRemovalTimeStrategy(null)
-      .initHistoryRemovalTime();
+    getProcessEngineConfiguration().setHistoryRemovalTimeProvider(null)
+        .setHistoryRemovalTimeStrategy(null).initHistoryRemovalTime();
 
     getProcessEngineConfiguration().setBatchOperationHistoryTimeToLive(null);
     getProcessEngineConfiguration().setBatchOperationsForHistoryCleanup(null);
@@ -100,8 +100,7 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     if (!batchIds.isEmpty()) {
       for (String batchId : batchIds) {
         HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery()
-          .batchId(batchId)
-          .singleResult();
+            .batchId(batchId).singleResult();
 
         if (historicBatch != null) {
           engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
@@ -110,7 +109,8 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     }
   }
 
-  // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // helper
+  // ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   public TestProcessBuilder process() {
     return new TestProcessBuilder();
@@ -126,13 +126,11 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
 
   public void updateHistoryTimeToLive(int ttl, String... keys) {
     for (String key : keys) {
-      String processDefinitionId = engineRule.getRepositoryService()
-        .createProcessDefinitionQuery()
-        .processDefinitionKey(key)
-        .singleResult()
-        .getId();
+      String processDefinitionId = engineRule.getRepositoryService().createProcessDefinitionQuery()
+          .processDefinitionKey(key).singleResult().getId();
 
-      engineRule.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitionId, ttl);
+      engineRule.getRepositoryService()
+          .updateProcessDefinitionHistoryTimeToLive(processDefinitionId, ttl);
     }
   }
 
@@ -143,12 +141,10 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
   public void updateHistoryTimeToLiveDmn(int ttl, String... keys) {
     for (String key : keys) {
       String decisionDefinitionId = engineRule.getRepositoryService()
-        .createDecisionDefinitionQuery()
-        .decisionDefinitionKey(key)
-        .singleResult()
-        .getId();
+          .createDecisionDefinitionQuery().decisionDefinitionKey(key).singleResult().getId();
 
-      engineRule.getRepositoryService().updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, ttl);
+      engineRule.getRepositoryService()
+          .updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, ttl);
     }
   }
 
@@ -175,9 +171,7 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     }
 
     public TestProcessBuilder ruleTask(String ref) {
-      startEventBuilder
-        .businessRuleTask()
-        .camundaDecisionRef(ref);
+      startEventBuilder.businessRuleTask().camundaDecisionRef(ref);
 
       return this;
     }
@@ -185,9 +179,7 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     public TestProcessBuilder call() {
       rootProcessBuilder = Bpmn.createExecutableProcess(ROOT_PROCESS_KEY);
 
-      callActivityBuilder = rootProcessBuilder
-        .startEvent()
-        .callActivity()
+      callActivityBuilder = rootProcessBuilder.startEvent().callActivity()
           .calledElement(PROCESS_KEY);
 
       return this;
@@ -204,43 +196,33 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     }
 
     public TestProcessBuilder userTask() {
-      startEventBuilder
-        .userTask("userTask")
-        .name("userTask")
-        .camundaAssignee("anAssignee");
+      startEventBuilder.userTask("userTask").name("userTask").camundaAssignee("anAssignee");
 
       return this;
     }
 
     public TestProcessBuilder scriptTask() {
-      startEventBuilder
-        .scriptTask()
-        .scriptFormat("groovy")
-        .scriptText("throw new RuntimeException()");
+      startEventBuilder.scriptTask().scriptFormat("groovy")
+          .scriptText("throw new RuntimeException()");
 
       return this;
     }
 
     public TestProcessBuilder externalTask() {
-      startEventBuilder
-        .serviceTask()
-        .camundaExternalTask("aTopicName");
+      startEventBuilder.serviceTask().camundaExternalTask("aTopicName");
 
       return this;
     }
 
     public TestProcessBuilder serviceTask() {
-      startEventBuilder
-        .serviceTask()
-        .camundaExpression("${true}");
+      startEventBuilder.serviceTask().camundaExpression("${true}");
 
       return this;
     }
 
     public TestProcessBuilder failingCustomListener() {
-      startEventBuilder
-        .userTask()
-        .camundaExecutionListenerClass("end", FailingExecutionListener.class);
+      startEventBuilder.userTask().camundaExecutionListenerClass("end",
+          FailingExecutionListener.class);
 
       return this;
     }
@@ -294,17 +276,14 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     String seedJobDefinitionId = batch.getSeedJobDefinitionId();
 
     String jobId = engineRule.getManagementService().createJobQuery()
-      .jobDefinitionId(seedJobDefinitionId)
-      .singleResult()
-      .getId();
+        .jobDefinitionId(seedJobDefinitionId).singleResult().getId();
 
     engineRule.getManagementService().executeJob(jobId);
 
     String batchJobDefinitionId = batch.getBatchJobDefinitionId();
 
     List<Job> jobs = engineRule.getManagementService().createJobQuery()
-      .jobDefinitionId(batchJobDefinitionId)
-      .list();
+        .jobDefinitionId(batchJobDefinitionId).list();
 
     for (Job job : jobs) {
       engineRule.getManagementService().executeJob(job.getId());
@@ -313,9 +292,7 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
     String monitorJobDefinitionId = batch.getMonitorJobDefinitionId();
 
     jobId = engineRule.getManagementService().createJobQuery()
-      .jobDefinitionId(monitorJobDefinitionId)
-      .singleResult()
-      .getId();
+        .jobDefinitionId(monitorJobDefinitionId).singleResult().getId();
 
     engineRule.getManagementService().executeJob(jobId);
   }
@@ -328,7 +305,8 @@ public class BatchSetRemovalTimeRule extends TestWatcher {
   }
 
   public ByteArrayEntity findByteArrayById(String byteArrayId) {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
     return commandExecutor.execute(new GetByteArrayCommand(byteArrayId));
   }
 

@@ -45,10 +45,9 @@ public class LongValueSerlializer extends PrimitiveValueSerializer<LongValue> {
 
     valueFields.setLongValue(longValue);
 
-    if (longValue!=null) {
+    if (longValue != null) {
       valueFields.setTextValue(longValue.toString());
-    }
-    else {
+    } else {
       valueFields.setTextValue(null);
     }
   }

@@ -71,13 +71,10 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  public ExpectedException thrown = ExpectedException.none();
 
-  protected static final BpmnModelInstance BPMN_PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
-      .startEvent()
-      .userTask()
-      .endEvent()
-    .done();
+  protected static final BpmnModelInstance BPMN_PROCESS = Bpmn
+      .createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().userTask().endEvent().done();
 
   @Before
   public void init() {
@@ -97,8 +94,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(MONTH);
 
     assertThat(result.size(), is(0));
@@ -112,8 +108,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(MONTH);
 
     assertThat(result.size(), is(1));
@@ -128,8 +123,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
         .duration(MONTH);
 
     assertThat(result.size(), is(1));
@@ -143,15 +137,15 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
     startAndCompleteProcessInstance(TENANT_ONE);
     startAndCompleteProcessInstance(TENANT_TWO);
 
-    String processDefinitionIdOne = repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).singleResult().getId();
-    String processDefinitionIdTwo = repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_TWO).singleResult().getId();
+    String processDefinitionIdOne = repositoryService.createProcessDefinitionQuery()
+        .tenantIdIn(TENANT_ONE).singleResult().getId();
+    String processDefinitionIdTwo = repositoryService.createProcessDefinitionQuery()
+        .tenantIdIn(TENANT_TWO).singleResult().getId();
 
     identityService.setAuthentication("user", null, null);
 
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionIdIn(processDefinitionIdOne, processDefinitionIdTwo)
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionIdIn(processDefinitionIdOne, processDefinitionIdTwo).duration(MONTH);
 
     assertThat(result.size(), is(0));
   }
@@ -164,15 +158,15 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
     startAndCompleteProcessInstance(TENANT_ONE);
     startAndCompleteProcessInstance(TENANT_TWO);
 
-    String processDefinitionIdOne = repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).singleResult().getId();
-    String processDefinitionIdTwo = repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_TWO).singleResult().getId();
+    String processDefinitionIdOne = repositoryService.createProcessDefinitionQuery()
+        .tenantIdIn(TENANT_ONE).singleResult().getId();
+    String processDefinitionIdTwo = repositoryService.createProcessDefinitionQuery()
+        .tenantIdIn(TENANT_TWO).singleResult().getId();
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionIdIn(processDefinitionIdOne, processDefinitionIdTwo)
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionIdIn(processDefinitionIdOne, processDefinitionIdTwo).duration(MONTH);
 
     assertThat(result.size(), is(1));
   }
@@ -185,16 +179,16 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
     startAndCompleteProcessInstance(TENANT_ONE);
     startAndCompleteProcessInstance(TENANT_TWO);
 
-    String processDefinitionIdOne = repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).singleResult().getId();
-    String processDefinitionIdTwo = repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_TWO).singleResult().getId();
+    String processDefinitionIdOne = repositoryService.createProcessDefinitionQuery()
+        .tenantIdIn(TENANT_ONE).singleResult().getId();
+    String processDefinitionIdTwo = repositoryService.createProcessDefinitionQuery()
+        .tenantIdIn(TENANT_TWO).singleResult().getId();
 
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionIdIn(processDefinitionIdOne, processDefinitionIdTwo)
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionIdIn(processDefinitionIdOne, processDefinitionIdTwo).duration(MONTH);
 
     assertThat(result.size(), is(2));
   }
@@ -209,10 +203,8 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionKeyIn(PROCESS_DEFINITION_KEY)
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionKeyIn(PROCESS_DEFINITION_KEY).duration(MONTH);
 
     assertThat(result.size(), is(0));
   }
@@ -227,10 +219,8 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionKeyIn(PROCESS_DEFINITION_KEY)
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionKeyIn(PROCESS_DEFINITION_KEY).duration(MONTH);
 
     assertThat(result.size(), is(1));
   }
@@ -246,10 +236,8 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
-    List<DurationReportResult> result = historyService
-        .createHistoricProcessInstanceReport()
-        .processDefinitionKeyIn(PROCESS_DEFINITION_KEY)
-        .duration(MONTH);
+    List<DurationReportResult> result = historyService.createHistoricProcessInstanceReport()
+        .processDefinitionKeyIn(PROCESS_DEFINITION_KEY).duration(MONTH);
 
     assertThat(result.size(), is(2));
   }
@@ -267,9 +255,7 @@ public class MultiTenancyHistoricProcessInstanceReportCmdTenantCheckTest {
 
     addToCalendar(Calendar.MONTH, 5);
 
-    Task task = taskService.createTaskQuery()
-        .processInstanceId(processInstanceId)
-        .singleResult();
+    Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
 
     taskService.complete(task.getId());
 

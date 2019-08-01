@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -36,11 +35,14 @@ public class TimerExecuteNestedActivityJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(TimerJobConfiguration configuration, ExecutionEntity execution,
+      CommandContext commandContext, String tenantId) {
     String activityId = configuration.getTimerElementKey();
     ActivityImpl activity = execution.getProcessDefinition().findActivity(activityId);
 
-    ensureNotNull("Error while firing timer: boundary event activity " + configuration + " not found", "boundary event activity", activity);
+    ensureNotNull(
+        "Error while firing timer: boundary event activity " + configuration + " not found",
+        "boundary event activity", activity);
 
     try {
 

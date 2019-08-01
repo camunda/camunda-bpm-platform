@@ -36,13 +36,11 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
   public void testRequiredRuleEvaluatesToTrue() {
-    CaseInstance caseInstance =
-        caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("case",
+        Collections.<String, Object> singletonMap("required", true));
 
-    CaseExecution taskExecution = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
     assertNotNull(taskExecution);
     assertTrue(taskExecution.isRequired());
 
@@ -56,13 +54,11 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testVariableBasedRule.cmmn")
   public void testRequiredRuleEvaluatesToFalse() {
-    CaseInstance caseInstance =
-        caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("case",
+        Collections.<String, Object> singletonMap("required", false));
 
-    CaseExecution taskExecution = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
 
     assertNotNull(taskExecution);
     assertFalse(taskExecution.isRequired());
@@ -73,13 +69,11 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testDefaultVariableBasedRule.cmmn")
   public void testDefaultRequiredRuleEvaluatesToTrue() {
-    CaseInstance caseInstance =
-        caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", true));
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("case",
+        Collections.<String, Object> singletonMap("required", true));
 
-    CaseExecution taskExecution = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
 
     assertNotNull(taskExecution);
     assertTrue(taskExecution.isRequired());
@@ -94,13 +88,11 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/required/RequiredRuleTest.testDefaultVariableBasedRule.cmmn")
   public void testDefaultRequiredRuleEvaluatesToFalse() {
-    CaseInstance caseInstance =
-        caseService.createCaseInstanceByKey("case", Collections.<String, Object>singletonMap("required", false));
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("case",
+        Collections.<String, Object> singletonMap("required", false));
 
-    CaseExecution taskExecution = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
 
     assertNotNull(taskExecution);
     assertFalse(taskExecution.isRequired());
@@ -113,10 +105,8 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
   public void testDefaultRequiredRuleWithoutConditionEvaluatesToTrue() {
     caseService.createCaseInstanceByKey("case");
 
-    CaseExecution taskExecution = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
 
     assertThat(taskExecution, is(notNullValue()));
     assertThat(taskExecution.isRequired(), is(true));
@@ -126,10 +116,8 @@ public class RequiredRuleTest extends CmmnProcessEngineTestCase {
   public void testDefaultRequiredRuleWithEmptyConditionEvaluatesToTrue() {
     caseService.createCaseInstanceByKey("case");
 
-    CaseExecution taskExecution = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult();
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1").singleResult();
 
     assertThat(taskExecution, is(notNullValue()));
     assertThat(taskExecution.isRequired(), is(true));

@@ -23,12 +23,14 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 
-
-/** Exposes twitter-like feeds for tasks and process instances.
+/**
+ * Exposes twitter-like feeds for tasks and process instances.
  *
- * <p><strong>Deprecation</strong>
- * This class has been deprecated as of camunda BPM 7.1. It has been replaced with
- * the operation log. See {@link UserOperationLogEntry} and {@link UserOperationLogQuery}.</p>
+ * <p>
+ * <strong>Deprecation</strong> This class has been deprecated as of camunda BPM 7.1. It has been
+ * replaced with the operation log. See {@link UserOperationLogEntry} and
+ * {@link UserOperationLogQuery}.
+ * </p>
  *
  * @see {@link TaskService#getTaskEvents(String)
  * @author Tom Baeyens
@@ -36,24 +38,28 @@ import org.camunda.bpm.engine.history.UserOperationLogQuery;
 @Deprecated
 public interface Event {
 
-  /** A user identity link was added with following message parts:
-   * [0] userId
-   * [1] identity link type (aka role) */
+  /**
+   * A user identity link was added with following message parts: [0] userId [1] identity link type
+   * (aka role)
+   */
   String ACTION_ADD_USER_LINK = UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK;
 
-  /** A user identity link was added with following message parts:
-   * [0] userId
-   * [1] identity link type (aka role) */
+  /**
+   * A user identity link was added with following message parts: [0] userId [1] identity link type
+   * (aka role)
+   */
   String ACTION_DELETE_USER_LINK = UserOperationLogEntry.OPERATION_TYPE_DELETE_USER_LINK;
 
-  /** A group identity link was added with following message parts:
-   * [0] groupId
-   * [1] identity link type (aka role) */
+  /**
+   * A group identity link was added with following message parts: [0] groupId [1] identity link
+   * type (aka role)
+   */
   String ACTION_ADD_GROUP_LINK = UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK;
 
-  /** A group identity link was added with following message parts:
-   * [0] groupId
-   * [1] identity link type (aka role) */
+  /**
+   * A group identity link was added with following message parts: [0] groupId [1] identity link
+   * type (aka role)
+   */
   String ACTION_DELETE_GROUP_LINK = UserOperationLogEntry.OPERATION_TYPE_DELETE_GROUP_LINK;
 
   /** An user comment was added with the short version of the comment as message. */
@@ -65,10 +71,16 @@ public interface Event {
   /** An attachment was deleted with the attachment name as message. */
   String ACTION_DELETE_ATTACHMENT = UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT;
 
-  /** Indicates the type of of action and also indicates the meaning of the parts as exposed in {@link #getMessageParts()}  */
+  /**
+   * Indicates the type of of action and also indicates the meaning of the parts as exposed in
+   * {@link #getMessageParts()}
+   */
   String getAction();
 
-  /** The meaning of the message parts is defined by the action as you can find in {@link #getAction()} */
+  /**
+   * The meaning of the message parts is defined by the action as you can find in
+   * {@link #getAction()}
+   */
   List<String> getMessageParts();
 
   /** The message that can be used in case this action only has a single message part. */

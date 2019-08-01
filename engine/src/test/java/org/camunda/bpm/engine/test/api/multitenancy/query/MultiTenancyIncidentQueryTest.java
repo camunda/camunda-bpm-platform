@@ -32,11 +32,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 public class MultiTenancyIncidentQueryTest extends PluggableProcessEngineTestCase {
 
   protected static final BpmnModelInstance BPMN = Bpmn.createExecutableProcess("failingProcess")
-      .startEvent()
-      .serviceTask()
-        .camundaExpression("${failing}")
-        .camundaAsyncBefore()
-      .endEvent()
+      .startEvent().serviceTask().camundaExpression("${failing}").camundaAsyncBefore().endEvent()
       .done();
 
   protected static final String TENANT_ONE = "tenant1";
@@ -52,46 +48,36 @@ public class MultiTenancyIncidentQueryTest extends PluggableProcessEngineTestCas
   }
 
   public void testQueryWithoutTenantId() {
-    IncidentQuery query = runtimeService
-        .createIncidentQuery();
+    IncidentQuery query = runtimeService.createIncidentQuery();
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
-    IncidentQuery query = runtimeService
-        .createIncidentQuery()
-        .tenantIdIn(TENANT_ONE);
+    IncidentQuery query = runtimeService.createIncidentQuery().tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
-    query = runtimeService
-        .createIncidentQuery()
-        .tenantIdIn(TENANT_TWO);
+    query = runtimeService.createIncidentQuery().tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    IncidentQuery query = runtimeService
-        .createIncidentQuery()
-        .tenantIdIn(TENANT_ONE, TENANT_TWO);
+    IncidentQuery query = runtimeService.createIncidentQuery().tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    IncidentQuery query = runtimeService
-        .createIncidentQuery()
-        .tenantIdIn("nonExisting");
+    IncidentQuery query = runtimeService.createIncidentQuery().tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
   }
 
   public void testFailQueryByTenantIdNull() {
     try {
-      runtimeService.createIncidentQuery()
-        .tenantIdIn((String) null);
+      runtimeService.createIncidentQuery().tenantIdIn((String) null);
 
       fail("expected exception");
     } catch (NullValueException e) {
@@ -99,10 +85,7 @@ public class MultiTenancyIncidentQueryTest extends PluggableProcessEngineTestCas
   }
 
   public void testQuerySortingAsc() {
-    List<Incident> incidents = runtimeService.createIncidentQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
+    List<Incident> incidents = runtimeService.createIncidentQuery().orderByTenantId().asc().list();
 
     assertThat(incidents.size(), is(2));
     assertThat(incidents.get(0).getTenantId(), is(TENANT_ONE));
@@ -110,10 +93,7 @@ public class MultiTenancyIncidentQueryTest extends PluggableProcessEngineTestCas
   }
 
   public void testQuerySortingDesc() {
-    List<Incident> incidents = runtimeService.createIncidentQuery()
-        .orderByTenantId()
-        .desc()
-        .list();
+    List<Incident> incidents = runtimeService.createIncidentQuery().orderByTenantId().desc().list();
 
     assertThat(incidents.size(), is(2));
     assertThat(incidents.get(0).getTenantId(), is(TENANT_TWO));
@@ -157,7 +137,8 @@ public class MultiTenancyIncidentQueryTest extends PluggableProcessEngineTestCas
   }
 
   protected void startProcessInstanceAndExecuteFailingJobForTenant(String tenant) {
-    runtimeService.createProcessInstanceByKey("failingProcess").processDefinitionTenantId(tenant).execute();
+    runtimeService.createProcessInstanceByKey("failingProcess").processDefinitionTenantId(tenant)
+        .execute();
 
     executeAvailableJobs();
   }
