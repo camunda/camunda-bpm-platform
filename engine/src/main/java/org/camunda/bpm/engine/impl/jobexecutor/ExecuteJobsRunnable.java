@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
@@ -52,6 +53,10 @@ public class ExecuteJobsRunnable implements Runnable {
     currentProcessorJobQueue.addAll(jobIds);
 
     Context.setJobExecutorContext(jobExecutorContext);
+
+    ClassLoader classLoaderBeforeExecution = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(ProcessEngine.class.getClassLoader());
+
     try {
       while (!currentProcessorJobQueue.isEmpty()) {
 
@@ -83,6 +88,7 @@ public class ExecuteJobsRunnable implements Runnable {
 
     } finally {
       Context.removeJobExecutorContext();
+      Thread.currentThread().setContextClassLoader(classLoaderBeforeExecution);
     }
   }
 
