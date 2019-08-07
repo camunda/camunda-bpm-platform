@@ -53,6 +53,12 @@ var Controller = [
       function(task) {
         var deferred = $q.defer();
 
+        // Nothing changed, return already loaded form
+        if (task.id === $scope.task.id && $scope.taskForm) {
+          deferred.resolve(angular.copy($scope.taskForm));
+          return deferred.promise;
+        }
+
         if (!task || !task.id) {
           return deferred.resolve(null);
         }
@@ -96,7 +102,9 @@ var Controller = [
     ]);
 
     $scope.taskFormState = taskFormData.observe('taskForm', function(taskForm) {
-      $scope.taskForm = angular.copy(taskForm);
+      if (!angular.equals(taskForm, $scope.taskForm)) {
+        $scope.taskForm = angular.copy(taskForm);
+      }
     });
 
     // task form /////////////////////////////////////////////////////////////////////////
