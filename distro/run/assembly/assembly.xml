@@ -24,13 +24,13 @@
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>../modules/target/camunda-rest-modules-${project.version}.jar</source>
+      <source>../modules/rest/target/camunda-rest-distro-${project.version}.jar</source>
       <outputDirectory>lib/</outputDirectory>
     </file>
-<!--    <file>-->
-<!--      <source>../modules/target/camunda-webapps-${project.version}.jar</source>-->
-<!--      <outputDirectory>lib/webapps</outputDirectory>-->
-<!--    </file>-->
+    <file>
+      <source>../modules/webapps/target/camunda-rest-distro-webapps-${project.version}.jar</source>
+      <outputDirectory>lib/webapps</outputDirectory>
+    </file>
     <file>
       <source>src/application.properties</source>
       <outputDirectory>config/</outputDirectory>

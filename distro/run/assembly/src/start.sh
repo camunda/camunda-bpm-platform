@@ -1,3 +1,3 @@
 #!/bin/bash
 
-java -jar ../lib/camunda-rest-modules-1.0-SNAPSHOT.jar
+java -Dloader.path="../lib/webapps/camunda-rest-distro-webapps-1.0-SNAPSHOT.jar" -jar ../lib/camunda-rest-distro-1.0-SNAPSHOT.jar
