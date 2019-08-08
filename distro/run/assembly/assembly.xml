@@ -32,7 +32,7 @@
       <outputDirectory>lib/webapps</outputDirectory>
     </file>
     <file>
-      <source>src/application.properties</source>
+      <source>src/application.yml</source>
       <outputDirectory>config/</outputDirectory>
     </file>
   </files>
