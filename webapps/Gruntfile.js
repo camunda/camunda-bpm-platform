@@ -146,6 +146,7 @@ module.exports = function(grunt) {
   require('./ui/common/grunt/config/eslint')(config, eslintConf);
 
   require('./grunt/tasks/license-book')(grunt);
+  require('./grunt/tasks/license-check')(grunt);
 
   grunt.initConfig({
     buildMode:        'dev',
@@ -219,6 +220,7 @@ grunt.registerTask('build', function(mode, app) {
 
     var tasksToRun = [];
 
+    tasksToRun.push('license-check');
     if(grunt.config.data.buildMode === 'prod') {
       tasksToRun.push('eslint');
     } else {
