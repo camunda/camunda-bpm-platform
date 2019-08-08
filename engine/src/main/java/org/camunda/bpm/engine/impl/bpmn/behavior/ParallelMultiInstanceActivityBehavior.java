@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.Callback;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.spike.SubTreeActivityBehavior;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,8 @@ import java.util.List;
  */
 public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivityBehavior implements MigrationObserverBehavior {
 
+  protected boolean useSubTree;
+
   @Override
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
     PvmActivity innerActivity = getInnerActivity(execution.getActivity());
@@ -43,15 +46,30 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     // initialize the scope and create the desired number of child executions
     prepareScopeExecution(execution, nrOfInstances);
 
-    List<ActivityExecution> concurrentExecutions = new ArrayList<ActivityExecution>();
-    for (int i = 0; i < nrOfInstances; i++) {
-      concurrentExecutions.add(createConcurrentExecution(execution));
+    int numberOfChildExecutions = nrOfInstances;
+    int nrOfSubtrees = (int) Math.ceil(Math.sqrt(nrOfInstances));
+    if (useSubTree) {
+      numberOfChildExecutions = nrOfSubtrees;
+    }
+
+    List<ActivityExecution> concurrentExecutions = new ArrayList<>();
+    for (int i = 0; i < numberOfChildExecutions; i++) {
+      ActivityExecution concurrentExecution = createConcurrentExecution(execution);
+      concurrentExecutions.add(concurrentExecution);
+
+      if (useSubTree) {
+        int nrOfInnerInstances = (int) Math.ceil(nrOfInstances / nrOfSubtrees);
+
+        concurrentExecution.setVariableLocal(SubTreeActivityBehavior.LOOP_RANGE_START, i * nrOfInnerInstances);
+        concurrentExecution.setVariableLocal(SubTreeActivityBehavior.LOOP_RANGE_END,
+            Math.min((i + 1) * nrOfInnerInstances, nrOfInstances));
+      }
     }
 
     // start the concurrent child executions
     // start executions in reverse order (order will be reversed again in command context with the effect that they are
     // actually be started in correct order :) )
-    for (int i = (nrOfInstances - 1); i >= 0; i--) {
+    for (int i = (numberOfChildExecutions - 1); i >= 0; i--) {
       ActivityExecution activityExecution = concurrentExecutions.get(i);
       performInstance(activityExecution, innerActivity, i);
     }
@@ -72,6 +90,10 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     concurrentChild.setConcurrent(true);
     concurrentChild.setScope(false);
     return concurrentChild;
+  }
+
+  public void setUseSubTree(boolean useSubTree) {
+    this.useSubTree = useSubTree;
   }
 
   @Override
@@ -130,7 +152,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
 
     prepareScopeExecution(scopeExecution, numberOfInstances);
 
-    List<ActivityExecution> executions = new ArrayList<ActivityExecution>();
+    List<ActivityExecution> executions = new ArrayList<>();
     for (int i = 0; i < numberOfInstances; i++) {
       ActivityExecution concurrentChild = createConcurrentExecution(scopeExecution);
       setLoopVariable(concurrentChild, LOOP_COUNTER, i);

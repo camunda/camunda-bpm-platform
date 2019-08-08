@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptCondition;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
+import org.camunda.bpm.engine.impl.spike.SubTreeActivityBehavior;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.task.listener.ClassDelegateTaskListener;
@@ -1699,9 +1700,12 @@ public class BpmnParse extends Parse {
 
       String useSubTrees = miLoopCharacteristics.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "funky");
       ActivityImpl subTreeScope = null;
-      if ("true".equals(useSubTrees)) {
+      if (!isSequential && "true".equals(useSubTrees)) {
         subTreeScope = miBodyScope.createActivity(getIdForSubTreeScope(id));
-        subTreeScope.setActivityBehavior(null); // TODO
+        subTreeScope.setActivityBehavior(new SubTreeActivityBehavior());
+        subTreeScope.setScope(true);
+
+        ((ParallelMultiInstanceActivityBehavior) behavior).setUseSubTree(true);
       }
 
       // loopCardinality
@@ -3104,7 +3108,13 @@ public class BpmnParse extends Parse {
 
   protected ActivityImpl getMultiInstanceScope(ActivityImpl activity) {
     if (activity.isMultiInstance()) {
-      return activity.getParentFlowScopeActivity();
+      ActivityImpl parentFlowScopeActivity = activity.getParentFlowScopeActivity();
+      if (parentFlowScopeActivity.getActivityBehavior() instanceof SubTreeActivityBehavior) {
+        return parentFlowScopeActivity.getParentFlowScopeActivity();
+      }
+      else {
+        return parentFlowScopeActivity;
+      }
     } else {
       return null;
     }

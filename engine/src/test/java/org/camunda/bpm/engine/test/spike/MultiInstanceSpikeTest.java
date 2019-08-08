@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -71,7 +72,7 @@ public class MultiInstanceSpikeTest {
     // given
     testRule.deploy(MI_USER_TASK);
 
-    int nrOfInstances = 100;
+    int nrOfInstances = 10;
     VariableMap variables = Variables.createVariables().putValue("cnt", nrOfInstances);
 
     // when
@@ -79,6 +80,9 @@ public class MultiInstanceSpikeTest {
 
     // then
     assertThat(processInstance).isNotNull();
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+    System.out.println(activityInstance);
+
   }
 
   public static void declareFunkyMultiInstance(BpmnModelInstance instance, String miActivityId) {
