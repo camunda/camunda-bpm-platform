@@ -2,11 +2,17 @@ camunda.bpm:
   webapp:
     index-redirect-enabled: true
   admin-user:
-    id: kermit
-    password: superSecret
+    id: demo
+    password: demo
 
 spring.datasource:
-  url: jdbc:mariadb://localhost:3306/process-engine
-  driver-class-name: org.mariadb.jdbc.Driver
-  username: camunda
-  password: camunda
+  url: jdbc:h2:./camunda-h2-dbs/process-engine;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE
+  driver-class-name: org.h2.Driver
+  username: sa
+  password: sa
+
+#spring.datasource:
+#  url: jdbc:mariadb://cam-int-1:30065/process-engine
+#  driver-class-name: org.mariadb.jdbc.Driver
+#  username: camunda
+#  password: camunda
