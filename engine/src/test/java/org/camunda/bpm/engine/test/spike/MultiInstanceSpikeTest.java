@@ -17,6 +17,8 @@
 package org.camunda.bpm.engine.test.spike;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
@@ -85,11 +87,9 @@ public class MultiInstanceSpikeTest {
 
     // then
     assertThat(processInstance).isNotNull();
-    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
-    System.out.println(activityInstance);
-
+    assertThat(taskService.createTaskQuery().count()).isEqualTo(nrOfInstances);
   }
-  
+
   @Test
   public void shouldUseSubTreeScopeAndJoin() {
     // given
@@ -108,6 +108,43 @@ public class MultiInstanceSpikeTest {
     // then
     long count = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count();
     assertEquals(0, count);
+  }
+
+  @Test
+  public void shouldGenerateCorrectActivityInstanceTree() {
+    // given
+    String processDefinitionId = testRule.deploy(MI_USER_TASK).getDeployedProcessDefinitions().get(0).getId();
+
+    int nrOfInstances = 10;
+    VariableMap variables = Variables.createVariables().putValue("cnt", nrOfInstances);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasStructure(
+        describeActivityInstanceTree(processDefinitionId)
+          .beginMiBody("task")
+            .beginScope("task#multiInstanceBody#subTree")
+              .activity("task")
+              .activity("task")
+              .activity("task")
+            .endScope()
+            .beginScope("task#multiInstanceBody#subTree")
+              .activity("task")
+              .activity("task")
+              .activity("task")
+            .endScope()
+            .beginScope("task#multiInstanceBody#subTree")
+              .activity("task")
+              .activity("task")
+              .activity("task")
+            .endScope()
+            .beginScope("task#multiInstanceBody#subTree")
+              .activity("task")
+            .endScope()
+            .done());
   }
 
   public static void declareFunkyMultiInstance(BpmnModelInstance instance, String miActivityId) {

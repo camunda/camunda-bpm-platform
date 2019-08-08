@@ -65,7 +65,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
 
         concurrentExecution.setVariableLocal(SubTreeActivityBehavior.LOOP_RANGE_START, i * nrOfInnerInstances);
         concurrentExecution.setVariableLocal(SubTreeActivityBehavior.LOOP_RANGE_END,
-            Math.min((i + 1) * nrOfInnerInstances-1, nrOfInstances));
+            Math.min((i + 1) * nrOfInnerInstances-1, nrOfInstances - 1));
       }
     }
 
@@ -102,10 +102,15 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
   @Override
   public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
 
-    int nrOfCompletedInstances = getLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
-    setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
-    int nrOfActiveInstances = getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) - 1;
-    setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances);
+
+    boolean usesSubTree = endedExecution.getActivity() instanceof SubTreeActivityBehavior;
+
+    if (!usesSubTree) { // in case of subtree, the counters are managed in the subtree behavior
+      int nrOfCompletedInstances = getLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
+      setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
+      int nrOfActiveInstances = getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) - 1;
+      setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances);
+    }
 
     // inactivate the concurrent execution
     endedExecution.inactivate();
