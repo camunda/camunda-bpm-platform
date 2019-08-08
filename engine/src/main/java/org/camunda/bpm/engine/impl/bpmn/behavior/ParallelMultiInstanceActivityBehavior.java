@@ -58,11 +58,14 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
       concurrentExecutions.add(concurrentExecution);
 
       if (useSubTree) {
-        int nrOfInnerInstances = (int) Math.ceil(nrOfInstances / nrOfSubtrees);
+        int nrOfInnerInstances = nrOfInstances / nrOfSubtrees;
+        if (nrOfInstances % nrOfSubtrees > 0) {
+          nrOfInnerInstances ++;
+        }
 
         concurrentExecution.setVariableLocal(SubTreeActivityBehavior.LOOP_RANGE_START, i * nrOfInnerInstances);
         concurrentExecution.setVariableLocal(SubTreeActivityBehavior.LOOP_RANGE_END,
-            Math.min((i + 1) * nrOfInnerInstances, nrOfInstances));
+            Math.min((i + 1) * nrOfInnerInstances-1, nrOfInstances));
       }
     }
 

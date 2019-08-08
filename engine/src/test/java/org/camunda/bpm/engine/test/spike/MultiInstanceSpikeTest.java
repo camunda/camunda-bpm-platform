@@ -17,12 +17,15 @@
 package org.camunda.bpm.engine.test.spike;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -61,10 +64,12 @@ public class MultiInstanceSpikeTest {
   }
 
   protected RuntimeService runtimeService;
+  protected TaskService taskService;
 
   @Before
   public void setUp() {
     runtimeService = providedEngineRule.getRuntimeService();
+    taskService = providedEngineRule.getTaskService();
   }
 
   @Test
@@ -83,6 +88,26 @@ public class MultiInstanceSpikeTest {
     ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
     System.out.println(activityInstance);
 
+  }
+  
+  @Test
+  public void shouldUseSubTreeScopeAndJoin() {
+    // given
+    testRule.deploy(MI_USER_TASK);
+
+    int nrOfInstances = 10;
+    VariableMap variables = Variables.createVariables().putValue("cnt", nrOfInstances);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    // then
+    long count = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count();
+    assertEquals(0, count);
   }
 
   public static void declareFunkyMultiInstance(BpmnModelInstance instance, String miActivityId) {

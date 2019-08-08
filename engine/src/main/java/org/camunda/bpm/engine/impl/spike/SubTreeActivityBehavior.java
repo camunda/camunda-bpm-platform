@@ -36,12 +36,12 @@ public class SubTreeActivityBehavior extends AbstractBpmnActivityBehavior {
     PvmActivity childActivity = execution.getActivity().getActivities().get(0);
 
     List<ActivityExecution> children = new ArrayList<>();
-    for (int i = rangeStart; i < rangeEnd; i++) {
+    for (int i = rangeStart; i <= rangeEnd; i++) {
       ActivityExecution child = createConcurrentExecution(execution);
       children.add(child);
     }
 
-    for (int i = rangeStart; i < rangeEnd; i++) {
+    for (int i = rangeStart; i <= rangeEnd; i++) {
       ActivityExecution child = children.get(i - rangeStart);
       performInstance(child, childActivity, i);
     }
