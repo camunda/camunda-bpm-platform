@@ -30,12 +30,14 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.comparator.DbBulkOperationComparator;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.comparator.DbEntityOperationComparator;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.comparator.EntityTypeComparatorForInserts;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.comparator.EntityTypeComparatorForModifications;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 
 /**
  * Manages a set of {@link DbOperation database operations}.
@@ -44,6 +46,8 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.comparator.EntityT
  *
  */
 public class DbOperationManager {
+
+  protected static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   // comparators ////////////////
 
@@ -139,6 +143,7 @@ public class DbOperationManager {
   /** Adds the insert operations to the flush (in correct order).
    * @param operationsForFlush */
   protected void addSortedInserts(List<DbOperation> flush) {
+    LOG.logJsonException(new Exception("start sort"));
     for (Entry<Class<?>, SortedSet<DbEntityOperation>> operationsForType : inserts.entrySet()) {
 
       // add inserts to flush
@@ -149,6 +154,7 @@ public class DbOperationManager {
         flush.addAll(operationsForType.getValue());
       }
     }
+    LOG.logJsonException(new Exception("end sort"));
   }
 
   /** Adds a correctly ordered list of UPDATE and DELETE operations to the flush.

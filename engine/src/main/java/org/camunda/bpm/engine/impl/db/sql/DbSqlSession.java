@@ -51,6 +51,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -67,6 +68,7 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
+  protected static final EngineUtilLogger LOG1 = ProcessEngineLogger.UTIL_LOGGER;
 
   protected SqlSession sqlSession;
   protected DbSqlSessionFactory dbSqlSessionFactory;

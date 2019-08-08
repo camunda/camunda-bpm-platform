@@ -77,6 +77,7 @@ import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.repository.ResourceTypes;
 
@@ -89,6 +90,7 @@ import org.camunda.bpm.engine.repository.ResourceTypes;
 public class DbEntityManager implements Session, EntityLoadListener {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
+  protected static final EngineUtilLogger LOG1 = ProcessEngineLogger.UTIL_LOGGER;
   protected static final String TOGGLE_FOREIGN_KEY_STMT = "toggleForeignKey";
   public static final int BATCH_SIZE = 50;
 
@@ -307,6 +309,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
 
     LOG.databaseFlushSummary(operationsToFlush);
+    LOG1.logJsonException(new Exception("start flush"));
 
     // If we want to delete all table data as bulk operation, on tables which have self references,
     // We need to turn the foreign key check off on MySQL and MariaDB.
@@ -328,6 +331,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
         isIgnoreForeignKeysForNextFlush = false;
       }
     }
+    LOG1.logJsonException(new Exception("end flush"));
   }
 
   protected void flushDbOperations(List<DbOperation> operationsToFlush, List<DbOperation> allOperations) {
