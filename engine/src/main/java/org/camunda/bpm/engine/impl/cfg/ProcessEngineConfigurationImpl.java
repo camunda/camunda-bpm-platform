@@ -3192,8 +3192,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return deploymentHandlerFactory;
   }
 
-  public void setDeploymentHandlerFactory(DeploymentHandlerFactory deploymentHandlerFactory) {
+  public ProcessEngineConfigurationImpl setDeploymentHandlerFactory(DeploymentHandlerFactory deploymentHandlerFactory) {
     this.deploymentHandlerFactory = deploymentHandlerFactory;
+    return this;
   }
 
   public ProcessEngineConfigurationImpl setDelegateInterceptor(DelegateInterceptor delegateInterceptor) {

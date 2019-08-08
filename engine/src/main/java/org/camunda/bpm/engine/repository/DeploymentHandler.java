@@ -96,19 +96,15 @@ public interface DeploymentHandler {
    * @param processDefinitionKeys are the Process Definition Keys of a subset of Process Resources
    *                              provided for deployment. The subset includes Process Definition
    *                              Keys from:
-   *                              <li>
-   *                                <ul>
-   *                                  Processes from Resources that will not be deployed to the
+   *                              <ul>
+   *                              <li>Processes from Resources that will not be deployed to the
    *                                  Process Engine database due to the outcome of the
-   *                                  {@link #shouldDeployResource(Resource, Resource)} method.
-   *                                </ul>
-   *                                <ul>
-   *                                  Processes from Resources that will be deployed to the Process
+   *                                  {@link #shouldDeployResource(Resource, Resource)} method.</li>
+   *                              <li>Processes from Resources that will be deployed to the Process
    *                                  Engine database, that update an existing Process Definition,
    *                                  i.e. there is a Process Definition with the same key present
-   *                                  in the Process Engine database.
-   *                                </ul>
-   *                              </li>
+   *                                  in the Process Engine database.</li>
+   *                              </ul>
    *                              It should be noted that, if {@link #shouldDeployResource(Resource, Resource)}
    *                              determines that all of the provided resources should be deployed
    *                              to the database, and there are no Process Definitions with the
