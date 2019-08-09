@@ -45,21 +45,6 @@ var Controller = [
   ) {
     $scope.searchConfig = angular.copy(searchConfig);
 
-    angular.forEach(searchConfig.tooltips, function(translation, tooltip) {
-      $scope.searchConfig.tooltips[tooltip] = $translate.instant(translation);
-    });
-
-    $scope.searchConfig.types.map(function(type) {
-      type.id.value = $translate.instant(type.id.value);
-      if (type.operators) {
-        type.operators = type.operators.map(function(op) {
-          op.value = $translate.instant(op.value);
-          return op;
-        });
-      }
-      return type;
-    });
-
     $scope.blocked = true;
     $scope.onSearchChange = updateView;
 

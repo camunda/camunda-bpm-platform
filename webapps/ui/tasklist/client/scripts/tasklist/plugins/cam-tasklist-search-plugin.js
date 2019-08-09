@@ -122,25 +122,9 @@ var Controller = [
     $scope.variableCaseHandling =
       $location.search()['variableCaseHandling'] || 'all';
 
-    angular.forEach(searchConfig.tooltips, function(value, key) {
-      $scope.translations[key] = $translate.instant(value);
-    });
-
-    $scope.types = searchConfig.types.map(function(el) {
-      el.id.value = $translate.instant(el.id.value);
-      if (el.operators) {
-        el.operators = el.operators.map(function(op) {
-          op.value = $translate.instant(op.value);
-          return op;
-        });
-      }
-      return el;
-    });
-
+    $scope.translations = searchConfig.tooltips;
+    $scope.types = searchConfig.types;
     $scope.operators = searchConfig.operators;
-    angular.forEach($scope.operators.date, function(el) {
-      el.value = $translate.instant(el.value);
-    });
 
     var searchData = $scope.tasklistData.newChild($scope);
     $scope.$watch(
