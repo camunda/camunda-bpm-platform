@@ -19,7 +19,6 @@
 
 var fs = require('fs');
 var lodash = require('camunda-commons-ui/vendor/lodash');
-var angular = require('angular');
 
 var template = fs.readFileSync(
   __dirname + '/cam-cockpit-deployments.html',
@@ -47,40 +46,13 @@ module.exports = [
         'search',
         'Notifications',
         'camAPI',
-        '$translate',
-        function(
-          $scope,
-          $location,
-          $rootScope,
-          search,
-          Notifications,
-          camAPI,
-          $translate
-        ) {
+        function($scope, $location, $rootScope, search, Notifications, camAPI) {
           var Deployment = camAPI.resource('deployment');
           var deploymentsListData = ($scope.deploymentsListData = $scope.deploymentsData.newChild(
             $scope
           ));
           $scope.searchConfig = JSON.parse(searchConfigJSON);
-          angular.forEach(JSON.parse(searchConfigJSON).tooltips, function(
-            translation,
-            tooltip
-          ) {
-            $scope.searchConfig.tooltips[tooltip] = $translate.instant(
-              translation
-            );
-          });
 
-          $scope.searchConfig.types.map(function(type) {
-            type.id.value = $translate.instant(type.id.value);
-            if (type.operators) {
-              type.operators = type.operators.map(function(op) {
-                op.value = $translate.instant(op.value);
-                return op;
-              });
-            }
-            return type;
-          });
           $scope.loadingState = 'INITIAL';
 
           // control ///////////////////////////////////////////////////////////////////

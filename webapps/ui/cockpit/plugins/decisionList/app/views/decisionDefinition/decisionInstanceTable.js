@@ -123,25 +123,6 @@ module.exports = [
           };
 
           $scope.searchConfig = angular.copy(decisionSearchConfig);
-          angular.forEach(decisionSearchConfig.tooltips, function(
-            translation,
-            tooltip
-          ) {
-            $scope.searchConfig.tooltips[tooltip] = $translate.instant(
-              translation
-            );
-          });
-
-          $scope.searchConfig.types.map(function(type) {
-            type.id.value = $translate.instant(type.id.value);
-            if (type.operators) {
-              type.operators = type.operators.map(function(op) {
-                op.value = $translate.instant(op.value);
-                return op;
-              });
-            }
-            return type;
-          });
 
           var historyService = camAPI.resource('history');
 
