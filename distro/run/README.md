@@ -1,5 +1,62 @@
 # Camunda REST Distribution
 
-1. Install JDK >= 8
-2. Download distro
-3. Run `bin/start.sh`
+## How to run the Camunda Rest distro
+1. Build the project
+2. In `assembly/target`, a `camunda-bpm-rest-assembly-{project.version}.zip` will be available.
+3. Extract the archive and go into the `bin` folder.
+4. Run `start.sh` (or `start.bat` if you're using Windows).
+  * Add the `--webapps` flag if you want to run the Camunda Webapps.
+  
+## Configuration
+
+The distro can be configured through the `application.yml` file found in the `config/` directory
+ of the distro archive. You can use the configuration properties available [here](https://docs.camunda.org/manual/latest/user-guide/spring-boot-integration/configuration/#camunda-engine-properties).
+ 
+## Default values
+
+By default, the admin credentials are set to `demo:demo`. This can be changed in the `config
+/application.yml` configuration file.
+
+### Security
+
+In addition to the configuration properties mentioned above, the distro makes available the
+ following security configuration properties:
+ * `camunda.bpm.rest-distro.authentication` - sets the authentication method for the Camunda Rest
+  API. By default Http Basic Authentication is enabled (default value: `basic`).
+ * `camunda.bpm.rest-distro.cors` - sets the CORS allowed origins (default value: `*`)
+   
+### Database
+
+The distro will use the H2 database by default. You will be able to find the database file in the
+ `bin/camunda-h2-dbs` directory after the initial run. To connect to a different database (out of
+  the ones [supported by Camunda](https://docs.camunda.org/manual/latest/introduction/supported-environments/#databases))
+ , you will need to perform the following steps:
+1. Put the appropriate JDBC driver `.jar` archive into the `lib/db` directory.
+ * Optionally remove the `h2` JDBC driver that is already there. It will not be needed anymore.
+2. Modify the following code of the `config/application.yml` configuration file with the correct DB
+ connection info:
+```yaml
+spring.datasource:
+  # the DB url and DB Schema name (common template: jdbc:{db-type}://{ip-address}:{port}/{db-schema-name}
+  url: jdbc:h2:./camunda-h2-dbs/process-engine;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE
+  # the JDBC driver class
+  driver-class-name: org.h2.Driver
+  # the DB user
+  username: sa
+  # the DB password
+  password: sa
+```
+
+## Learnings
+
+* New authentication methods have to be implemented in the Engine Rest project through `Filters
+`. Implementing custom authentication methods using `Spring Security` that make use of the
+ Engines's authentication layer is not straightforward (however, this means that any new
+  authentication methods are available anywhere the Engine Rest API is integrated).
+* Spring (Boot) uses a custom `maven` property for adding external libraries to the classpath
+ (`loader.path`). Using the default `java -cp` or `java -classpath` doesn't work.
+* The `--spring.config.location` argument that passes the location of an external `application.yml
+` configuration file should be passed after the `-jar` argument.
+* The `spring-boot-maven-plugin` provides a `fatjar`. It also packages dependencies with a
+ `provided` scope. We needed to explicitly exclude all of the `webapps` dependencies since we
+  optionally include them if the user wants the Camunda Webapps loaded. 
