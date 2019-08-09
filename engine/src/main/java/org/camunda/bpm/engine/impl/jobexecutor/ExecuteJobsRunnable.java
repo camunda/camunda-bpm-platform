@@ -23,6 +23,8 @@ import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.UnlockJobCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
+
 import java.util.List;
 
 
@@ -54,8 +56,7 @@ public class ExecuteJobsRunnable implements Runnable {
 
     Context.setJobExecutorContext(jobExecutorContext);
 
-    ClassLoader classLoaderBeforeExecution = Thread.currentThread().getContextClassLoader();
-    Thread.currentThread().setContextClassLoader(ProcessEngine.class.getClassLoader());
+    ClassLoader classLoaderBeforeExecution = setContextClassloader(ProcessEngine.class.getClassLoader());
 
     try {
       while (!currentProcessorJobQueue.isEmpty()) {
@@ -88,7 +89,7 @@ public class ExecuteJobsRunnable implements Runnable {
 
     } finally {
       Context.removeJobExecutorContext();
-      Thread.currentThread().setContextClassLoader(classLoaderBeforeExecution);
+      ClassLoaderUtil.setContextClassloader(classLoaderBeforeExecution);
     }
   }
 
@@ -102,6 +103,12 @@ public class ExecuteJobsRunnable implements Runnable {
 
   protected void unlockJob(String nextJobId, CommandExecutor commandExecutor) {
     commandExecutor.execute(new UnlockJobCmd(nextJobId));
+  }
+
+  protected ClassLoader setContextClassloader(ClassLoader classLoader) {
+    ClassLoader classLoaderBeforeExecution = Thread.currentThread().getContextClassLoader();
+    ClassLoaderUtil.setContextClassloader(ProcessEngine.class.getClassLoader());
+    return classLoaderBeforeExecution;
   }
 
 }
