@@ -195,7 +195,7 @@ module.exports = [
             // filter selected
             Filter.getTasks(angular.copy(taskListQuery), function(err, res) {
               if (err) {
-                deferred.reject(err);
+                deferred.resolve(err);
               } else {
                 deferred.resolve(res);
               }
