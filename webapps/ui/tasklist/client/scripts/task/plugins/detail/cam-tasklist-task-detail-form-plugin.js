@@ -33,6 +33,7 @@ var Controller = [
   'assignNotification',
   function($scope, $location, $q, camAPI, assignNotification) {
     // setup ///////////////////////////////////////////////////////////
+    $scope.loadingState = 'LOADING';
 
     var Task = camAPI.resource('task');
 
@@ -58,15 +59,18 @@ var Controller = [
           deferred.resolve(angular.copy($scope.taskForm));
           return deferred.promise;
         }
-
+        $scope.loadingState = 'LOADING';
         if (!task || !task.id) {
+          $scope.loadingState = 'ERROR';
           return deferred.resolve(null);
         }
 
         Task.form(task.id, function(err, res) {
           if (err) {
+            $scope.loadingState = 'ERROR';
             deferred.reject(err);
           } else {
+            $scope.loadingState = 'DONE';
             deferred.resolve(res);
           }
         });
@@ -101,7 +105,7 @@ var Controller = [
       }
     ]);
 
-    $scope.taskFormState = taskFormData.observe('taskForm', function(taskForm) {
+    taskFormData.observe('taskForm', function(taskForm) {
       if (!angular.equals(taskForm, $scope.taskForm)) {
         $scope.taskForm = angular.copy(taskForm);
       }
