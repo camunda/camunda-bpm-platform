@@ -9,7 +9,7 @@
      role="alert">
   <span class="glyphicon glyphicon-exclamation-sign"></span>
   <strong class="status">{{ 'FAILURE' | translate }}:</strong>
-  <span class="message">{{ 'TASK_LIST_LOADING_FAILURE' | translate }}</span>
+  <span class="message">{{ error.message }}</span>
 </div>
 
 <div ng-if="state.$loaded && !state.$error">

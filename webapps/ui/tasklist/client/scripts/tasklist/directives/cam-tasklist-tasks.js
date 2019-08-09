@@ -108,6 +108,11 @@ module.exports = [
            * observe the list of tasks
            */
           $scope.state = tasksData.observe('taskList', function(taskList) {
+            if (taskList instanceof Error) {
+              $scope.error = taskList;
+              throw taskList;
+            }
+
             $scope.totalItems = taskList.count;
             $scope.tasks = taskList._embedded.task;
             if (taskList._embedded.assignee) {
