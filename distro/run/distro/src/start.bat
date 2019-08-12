@@ -10,5 +10,5 @@ IF "%1"=="--webapps" (
 	SET classPath=%libPath%
 	ECHO starting without webapps
 	)
-	
-start java -Dloader.path="%classPath%" -jar ..\lib\camunda-rest-distro-rest-1.0-SNAPSHOT.jar --spring.config.location=file:..\config\application.yml
+	ECHO %classPath%
+start java -agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=y -Dloader.path="%classPath%" -jar ..\lib\camunda-rest-distro-rest-1.0-SNAPSHOT.jar --spring.config.location=file:..\config\application.yml 

@@ -1,5 +1,8 @@
 package org.camunda.camunda.rest.distro.rest;
 
+
+import javax.servlet.Filter;
+
 import org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmAutoConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +11,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.servlet.Filter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @EnableConfigurationProperties(CamundaRestDistroProperties.class)
 @Configuration
@@ -41,5 +44,16 @@ public class CamundaSecurityConfiguration {
   @Bean
   public Filter getProcessEngineAuthenticationFilter() {
     return new ProcessEngineAuthenticationFilter();
+  }
+
+  @Bean
+  public WebMvcConfigurer getCrossOriginResourceConfiguration() {
+    return new WebMvcConfigurer() {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/rest/**")
+        .allowedOrigins("https://domain1.com");
+      }
+    };
   }
 }

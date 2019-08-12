@@ -13,7 +13,10 @@ public class CamundaRestDistroProperties {
   public static final String DEFAULT_AUTH = "basic";
   public static final List<String> AUTH_METHODS = Arrays.asList(DEFAULT_AUTH);
 
+  public static final String[] DEFAULT_ORIGINS = {"*"};
+
   String authentication = DEFAULT_AUTH;
+  String[] allowedOrigins = DEFAULT_ORIGINS;
 
   public String getAuthentication() {
     return authentication;
@@ -27,6 +30,17 @@ public class CamundaRestDistroProperties {
     }
 
     this.authentication = authentication;
+  }
+
+  public String[] getAllowedOrigins() {
+    return allowedOrigins;
+  }
+  
+  public void setAllowedOrigins(String[] allowedOrigins) {
+    if(allowedOrigins == null || allowedOrigins.length == 0) {
+      this.allowedOrigins = DEFAULT_ORIGINS;
+    }
+    this.allowedOrigins = allowedOrigins;
   }
 
   @Override
