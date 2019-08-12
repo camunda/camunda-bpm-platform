@@ -110,7 +110,8 @@ public class DatabaseTablePrefixTest {
     @Override
     public ProcessEngine buildProcessEngine() {
       init();
-      return new NoSchemaProcessEngineImpl(this);
+      processEngine =  new NoSchemaProcessEngineImpl(this);
+      return processEngine;
     }
 
     class NoSchemaProcessEngineImpl extends ProcessEngineImpl {

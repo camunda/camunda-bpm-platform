@@ -14,20 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.repository;
+package org.camunda.bpm.engine.impl.repository;
 
-/**
- * @author kristin.polenz@camunda.com
- */
-public interface Resource {
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.repository.DeploymentHandler;
+import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 
 
-  String getId();
+public class DefaultDeploymentHandlerFactory implements DeploymentHandlerFactory {
 
-  String getName();
-
-  String getDeploymentId();
-
-  byte[] getBytes();
-
+  @Override
+  public DeploymentHandler buildDeploymentHandler(ProcessEngine processEngine) {
+    return new DefaultDeploymentHandler(processEngine);
+  }
 }
