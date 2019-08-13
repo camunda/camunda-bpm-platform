@@ -23,7 +23,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.camunda</groupId>
+            <groupId>org.camunda.bpm.rest-distro</groupId>
             <artifactId>camunda-rest-distro-webapps</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -33,7 +33,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
