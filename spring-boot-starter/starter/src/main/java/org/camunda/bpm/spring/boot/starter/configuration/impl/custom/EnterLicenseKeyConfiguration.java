@@ -39,19 +39,31 @@ public class EnterLicenseKeyConfiguration extends AbstractCamundaConfiguration {
 
   @Override
   public void postProcessEngineBuild(ProcessEngine processEngine) {
+    // if version is not enterprise
     if (!version.isEnterprise()) {
       return;
     }
 
+    // try to load the license from the provided URL
     URL fileUrl = camundaBpmProperties.getLicenseFile();
-
     Optional<String> licenseKey = readLicenseKeyFromUrl(fileUrl);
+
+    // if not, try to find the license key on the classpath
     if (!licenseKey.isPresent()) {
       fileUrl = EnterLicenseKeyConfiguration.class.getClassLoader().getResource(DEFAULT_LICENSE_FILE);
       licenseKey = readLicenseKeyFromUrl(fileUrl);
     }
 
+    // if no license key is provided, return
     if (!licenseKey.isPresent()) {
+      return;
+    }
+
+    // if a license key is already present in the database, return
+    Optional<String> existingLicenseKey = Optional.ofNullable(processEngine.getManagementService()
+                     .getProperties()
+                     .get(LICENSE_KEY_PROPERTY));
+    if (existingLicenseKey.isPresent()) {
       return;
     }
 
