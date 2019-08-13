@@ -22,10 +22,10 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.1" name="org.joda.time" slot="2.1">
+<module xmlns="urn:jboss:module:1.1" name="org.joda.time" slot="2.10.3">
 
     <resources>
-        <resource-root path="joda-time-2.1.jar"/>
+        <resource-root path="joda-time-2.10.3.jar"/>
         <!-- Insert resources here -->
     </resources>
 
