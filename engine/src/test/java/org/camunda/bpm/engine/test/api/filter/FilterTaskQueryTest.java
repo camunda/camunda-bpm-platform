@@ -714,6 +714,30 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testExtendingTaskQueryWithAssigneeIn() {
+    // given
+    Task task = taskService.newTask("assigneeTask");
+    task.setName("Task 4");
+    task.setOwner(testUser.getId());
+    taskService.saveTask(task);
+    taskService.setAssignee(task.getId(), "john");
+
+    // then
+    TaskQuery query = taskService.createTaskQuery().taskAssigneeIn("john");
+    saveQuery(query);
+    List<Task> origQueryTasks = filterService.list(filter.getId());
+    List<Task> selfExtendQueryTasks = filterService.list(filter.getId(), query);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+    extendingQuery.taskAssigneeIn("john", "kermit");
+    List<Task> extendingQueryTasks = filterService.list(filter.getId(), extendingQuery);
+
+    // then
+    assertEquals(1, origQueryTasks.size());
+    assertEquals(1, selfExtendQueryTasks.size());
+    assertEquals(2, extendingQueryTasks.size());
+  }
+
   public void testExtendingTaskQueryListWithCandidateGroups() {
     TaskQuery query = taskService.createTaskQuery();
 

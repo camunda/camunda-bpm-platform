@@ -1688,6 +1688,16 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       extendedQuery.taskAssigneeLike(this.getAssigneeLike());
     }
 
+    if (extendingQuery.getAssigneeIn() != null) {
+      extendedQuery.taskAssigneeIn(extendingQuery
+                                       .getAssigneeIn()
+                                       .toArray(new String[extendingQuery.getAssigneeIn().size()]));
+    }
+    else if (this.getAssigneeIn() != null) {
+      extendedQuery.taskAssigneeIn(this.getAssigneeIn()
+                                       .toArray(new String[this.getAssigneeIn().size()]));
+    }
+
     if (extendingQuery.getInvolvedUser() != null) {
       extendedQuery.taskInvolvedUser(extendingQuery.getInvolvedUser());
     }
