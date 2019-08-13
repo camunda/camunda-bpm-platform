@@ -18,76 +18,65 @@ package org.camunda.bpm.spring.boot.starter.configuration.impl.custom;
 
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.spring.boot.starter.CamundaBpmNestedRuntimeException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaConfiguration;
 import org.camunda.bpm.spring.boot.starter.util.CamundaBpmVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Scanner;
 
 public class EnterLicenseKeyConfiguration extends AbstractCamundaConfiguration {
 
-  private static final String TABLE_PREFIX_PLACEHOLDER = "{TABLE_PREFIX}";
-
-
-
-  private static final String INSERT_SQL = "INSERT INTO " + TABLE_PREFIX_PLACEHOLDER + "ACT_GE_PROPERTY VALUES ('camunda-license-key', ?, 1)";
-  private static final String SELECT_SQL = "SELECT VALUE_ FROM " + TABLE_PREFIX_PLACEHOLDER + "ACT_GE_PROPERTY where NAME_ = 'camunda-license-key'";
+  protected static final String LICENSE_KEY_PROPERTY = "camunda-license-key";
+  protected static final String DEFAULT_LICENSE_FILE = "camunda-license.txt";
 
   @Autowired
-  private CamundaBpmVersion version;
-
-  private String defaultLicenseFile = "camunda-license.txt";
+  protected CamundaBpmVersion version;
 
   @Override
   public void postProcessEngineBuild(ProcessEngine processEngine) {
+    // if version is not enterprise
     if (!version.isEnterprise()) {
       return;
     }
 
+    // try to load the license from the provided URL
     URL fileUrl = camundaBpmProperties.getLicenseFile();
-
-
     Optional<String> licenseKey = readLicenseKeyFromUrl(fileUrl);
+
+    // if not, try to find the license key on the classpath
     if (!licenseKey.isPresent()) {
-      fileUrl = EnterLicenseKeyConfiguration.class.getClassLoader().getResource(defaultLicenseFile);
+      fileUrl = EnterLicenseKeyConfiguration.class.getClassLoader().getResource(DEFAULT_LICENSE_FILE);
       licenseKey = readLicenseKeyFromUrl(fileUrl);
     }
 
+    // if no license key is provided, return
     if (!licenseKey.isPresent()) {
       return;
     }
 
-    try (Connection connection = dataSource(processEngine).getConnection()) {
-      if (readLicenseKeyFromDatasource(connection).isPresent()) {
-        return;
-      }
-      try (PreparedStatement statement = connection.prepareStatement(getSql(INSERT_SQL))) {
-        statement.setString(1, licenseKey.get());
-        statement.execute();
-      }
-      connection.commit();
-      LOG.enterLicenseKey(fileUrl);
-    } catch (SQLException ex) {
-      throw new CamundaBpmNestedRuntimeException(ex.getMessage(), ex);
+    // if a license key is already present in the database, return
+    Optional<String> existingLicenseKey = Optional.ofNullable(processEngine.getManagementService()
+                     .getProperties()
+                     .get(LICENSE_KEY_PROPERTY));
+    if (existingLicenseKey.isPresent()) {
+      return;
     }
-  }
 
-  private  DataSource dataSource(ProcessEngine processEngine) {
-    return processEngine.getProcessEngineConfiguration().getDataSource();
-  }
+    Optional<String> finalLicenseKey = licenseKey;
+    ProcessEngineConfigurationImpl processEngineConfiguration =
+      (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
+      processEngineConfiguration.getManagementService()
+                                .setProperty(LICENSE_KEY_PROPERTY, finalLicenseKey.get());
+      return null;
+    });
 
-  protected Optional<String> readLicenseKeyFromDatasource(Connection connection) throws SQLException {
-    final ResultSet resultSet = connection.createStatement().executeQuery(getSql(SELECT_SQL));
-    return resultSet.next() ? Optional.ofNullable(resultSet.getString(1)) : Optional.empty();
+    LOG.enterLicenseKey(fileUrl);
   }
 
   protected Optional<String> readLicenseKeyFromUrl(URL licenseFileUrl) {
@@ -105,13 +94,4 @@ public class EnterLicenseKeyConfiguration extends AbstractCamundaConfiguration {
       return Optional.empty();
     }
   }
-
-  private String getSql(String sqlTemplate) {
-    String tablePrefix = camundaBpmProperties.getDatabase().getTablePrefix();
-    if (tablePrefix == null) {
-      tablePrefix = "";
-    }
-    return sqlTemplate.replace(TABLE_PREFIX_PLACEHOLDER, tablePrefix);
-  }
-
 }
