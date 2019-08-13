@@ -1,5 +1,21 @@
 # Camunda REST Distribution
 
+## Requirements
+
+1. User profile:
+ * Non-Java developer
+ * Able to install the required JDK
+ * Familiar with the command line and Rest APIs
+2. No Application Server configuration, i.e., straightforward configuration
+3. Pre-set security configuration
+
+## Design Decisions
+
+We decided to use the Camunda Spring Boot Starter. Reasons:
+1. It produces an uberjar with all the dependencies provided.
+2. It's straightforward to configure (`application.yml`) and to start.
+3. Camunda already supports the technology, and it's easily extendable.
+
 ## How to run the Camunda Rest distro
 1. Build the project
 2. In `assembly/target`, a `camunda-bpm-rest-assembly-{project.version}.zip` will be available.
