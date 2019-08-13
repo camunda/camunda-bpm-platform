@@ -23,7 +23,6 @@ In addition to the configuration properties mentioned above, the distro makes av
  following security configuration properties:
  * `camunda.bpm.rest-distro.authentication` - sets the authentication method for the Camunda Rest
   API. By default Http Basic Authentication is enabled (default value: `basic`).
- * `camunda.bpm.rest-distro.cors` - sets the CORS allowed origins (default value: `*`)
    
 ### Database
 
@@ -60,3 +59,5 @@ spring.datasource:
 * The `spring-boot-maven-plugin` provides a `fatjar`. It also packages dependencies with a
  `provided` scope. We needed to explicitly exclude all of the `webapps` dependencies since we
   optionally include them if the user wants the Camunda Webapps loaded. 
+* Enabling CORS is not straight-forward. The officially documented techniques to enable CORS as well as a filter-based
+approach failed to attach the necessary response headers
