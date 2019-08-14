@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -47,7 +48,8 @@ import java.util.Map;
  */
 public class SignalEventPayloadTest {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
       return configuration;
@@ -59,7 +61,7 @@ public class SignalEventPayloadTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -86,7 +88,7 @@ public class SignalEventPayloadTest {
     "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventPayloadTests.catchSignalWithPayloadStart.bpmn20.xml" })
   public void testSignalPayloadStart() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("payloadVar1", "payloadVal1");
     variables.put("payloadVar2", "payloadVal2");
 
@@ -120,7 +122,7 @@ public class SignalEventPayloadTest {
     "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventPayloadTests.catchSignalWithPayloadIntermediate.bpmn20.xml" })
   public void testSignalPayloadIntermediate() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("payloadVar1", "payloadVal1");
     variables.put("payloadVar2", "payloadVal2");
     ProcessInstance catchingPI = runtimeService.startProcessInstanceByKey("catchIntermediatePayloadSignal");
@@ -153,7 +155,7 @@ public class SignalEventPayloadTest {
     "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventPayloadTests.catchSignalWithPayloadIntermediate.bpmn20.xml" })
   public void testSignalSourceExpressionPayload() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("payloadVar", "Val");
     ProcessInstance catchingPI = runtimeService.startProcessInstanceByKey("catchIntermediatePayloadSignal");
 
@@ -181,7 +183,7 @@ public class SignalEventPayloadTest {
     "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventPayloadTests.catchSignalWithPayloadIntermediate.bpmn20.xml" })
   public void testSignalAllSourceVariablesPayload() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("payloadVar1", "payloadVal1");
     variables.put("payloadVar2", "payloadVal2");
     ProcessInstance catchingPI = runtimeService.startProcessInstanceByKey("catchIntermediatePayloadSignal");
@@ -215,7 +217,7 @@ public class SignalEventPayloadTest {
     "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventPayloadTests.catchSignalWithPayloadIntermediate.bpmn20.xml" })
   public void testSignalAllLocalSourceVariablesPayload() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("payloadVar1", "payloadVal1");
     String localVar1 = "localVar1";
     String localVal1 = "localVal1";;
@@ -271,7 +273,7 @@ public class SignalEventPayloadTest {
     "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventPayloadTests.catchSignalWithPayloadStart.bpmn20.xml"})
   public void testSignalPayloadWithAllOptions() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     String globalVar1 = "payloadVar1";
     String globalVal1 = "payloadVar1";
     String globalVar2 = "payloadVar2";
