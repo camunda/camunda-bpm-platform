@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -55,13 +56,11 @@ import org.junit.rules.RuleChain;
  */
 public class JobDefinitionCreationAndDeletionWithParseListenerTest {
 
-  /**
-   * The custom rule which adjust the process engine configuration.
-   */
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      List<BpmnParseListener> listeners = new ArrayList<BpmnParseListener>();
+      List<BpmnParseListener> listeners = new ArrayList<>();
       listeners.add(new AbstractBpmnParseListener(){
 
         @Override
@@ -76,16 +75,8 @@ public class JobDefinitionCreationAndDeletionWithParseListenerTest {
     }
   };
 
-  /**
-   * The engine rule.
-   */
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-
-  /**
-   * The rule chain for the defined rules.
-   */
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
 
   @Test
   public void testDeleteNonExistingAndCreateNewJobDefinitionWithParseListener() {

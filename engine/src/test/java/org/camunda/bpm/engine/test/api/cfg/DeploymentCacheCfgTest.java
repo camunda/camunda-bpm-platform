@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.commons.utils.cache.Cache;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -48,7 +49,8 @@ import static org.junit.Assert.*;
  */
 public class DeploymentCacheCfgTest {
 
-  protected ProcessEngineBootstrapRule cacheFactoryBootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule cacheFactoryBootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       // apply configuration options here
       configuration.setCacheCapacity(2);
@@ -63,7 +65,7 @@ public class DeploymentCacheCfgTest {
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(cacheFactoryEngineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(cacheFactoryBootstrapRule).around(cacheFactoryEngineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(cacheFactoryEngineRule).around(testRule);
   RepositoryService repositoryService;
   ProcessEngineConfigurationImpl processEngineConfiguration;
   RuntimeService runtimeService;
@@ -228,7 +230,7 @@ public class DeploymentCacheCfgTest {
     deploy(modelInstances);
 
     // when we start the first process 0
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("NextProcess", "Process1");
     runtimeService.startProcessInstanceByKey("Process0", variables);
 
@@ -246,7 +248,7 @@ public class DeploymentCacheCfgTest {
     deploy(modelInstances);
 
     // when we start the first process 0
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("NextProcess", "Process1");
     runtimeService.startProcessInstanceByKey("Process0", variables);
     Job job = managementService.createJobQuery().singleResult();
@@ -270,7 +272,7 @@ public class DeploymentCacheCfgTest {
     Deployment deployment =  deploy(modelInstances);
 
     // when we start the first process 0
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("NextProcess", "Process1");
     runtimeService.startProcessInstanceByKey("Process0", variables);
     Job job = managementService.createJobQuery().singleResult();
@@ -281,7 +283,7 @@ public class DeploymentCacheCfgTest {
   }
 
   protected List<BpmnModelInstance> createSequentialCallActivityProcess() {
-    List<BpmnModelInstance> modelInstances = new LinkedList<BpmnModelInstance>();
+    List<BpmnModelInstance> modelInstances = new LinkedList<>();
 
     modelInstances.add(CallActivityModels.oneBpmnCallActivityProcessAsExpression(0));
     modelInstances.add(CallActivityModels.oneBpmnCallActivityProcessPassingVariables(1, 2));
@@ -292,7 +294,7 @@ public class DeploymentCacheCfgTest {
   }
 
   protected List<BpmnModelInstance> createSequentialCallActivityProcessAsync() {
-    List<BpmnModelInstance> modelInstances = new LinkedList<BpmnModelInstance>();
+    List<BpmnModelInstance> modelInstances = new LinkedList<>();
 
     modelInstances.add(CallActivityModels.oneBpmnCallActivityProcessAsExpressionAsync(0));
     modelInstances.add(CallActivityModels.oneBpmnCallActivityProcessPassingVariables(1, 2));
@@ -320,7 +322,7 @@ public class DeploymentCacheCfgTest {
 
   protected List<BpmnModelInstance> createProcesses(int numberOfProcesses) {
 
-    List<BpmnModelInstance> result = new ArrayList<BpmnModelInstance>(numberOfProcesses);
+    List<BpmnModelInstance> result = new ArrayList<>(numberOfProcesses);
     for (int i = 0; i < numberOfProcesses; i++) {
       result.add(ProcessModels.oneTaskProcess(i));
     }

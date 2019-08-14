@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -42,7 +43,8 @@ import static org.junit.Assert.assertEquals;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class BulkHistoryDeleteDmnDisabledTest {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setDmnEnabled(false);
       return configuration;
@@ -53,7 +55,7 @@ public class BulkHistoryDeleteDmnDisabledTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   private RuntimeService runtimeService;
   private HistoryService historyService;
@@ -84,7 +86,7 @@ public class BulkHistoryDeleteDmnDisabledTest {
   }
 
   private List<String> prepareHistoricProcesses(String businessKey) {
-    List<String> processInstanceIds = new ArrayList<String>();
+    List<String> processInstanceIds = new ArrayList<>();
 
     for (int i = 0; i < 5; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(businessKey);

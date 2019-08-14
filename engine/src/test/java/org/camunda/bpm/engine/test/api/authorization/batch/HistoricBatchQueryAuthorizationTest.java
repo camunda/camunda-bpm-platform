@@ -61,13 +61,12 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricBatchQueryAuthorizationTest {
 
-  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestBaseRule authRule = new AuthorizationTestBaseRule(engineRule);
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(authRule).around(testHelper);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
 
   @Rule
   public final ExpectedException thrown = ExpectedException.none();
@@ -228,7 +227,7 @@ public class HistoricBatchQueryAuthorizationTest {
 
   private void prepareBatch(String migrationOperationsTTL) {
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("instance-migration", migrationOperationsTTL);
     engineRule.getProcessEngineConfiguration().setBatchOperationsForHistoryCleanup(map);
     engineRule.getProcessEngineConfiguration().initHistoryCleanup();
