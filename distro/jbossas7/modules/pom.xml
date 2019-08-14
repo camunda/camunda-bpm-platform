@@ -92,14 +92,6 @@
       <artifactId>camunda-template-engines-freemarker</artifactId>
     </dependency>
 
-    <!-- exclude slf4j as it is part of jboss distro -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.7</version>
-      <scope>provided</scope>
-    </dependency>
-
   </dependencies>
 
   <build>

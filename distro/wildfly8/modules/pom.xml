@@ -95,14 +95,6 @@
       <artifactId>camunda-template-engines-freemarker</artifactId>
     </dependency>
 
-    <!-- exclude slf4j as it is part of wildfly distro -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.7</version>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
