@@ -51,6 +51,7 @@ import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -67,7 +68,8 @@ import static org.junit.Assert.fail;
  */
 public class SignalEventTest {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
       return configuration;
@@ -77,7 +79,7 @@ public class SignalEventTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -144,11 +146,11 @@ public class SignalEventTest {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignal.bpmn20.xml"})
   @Test
   public void testSignalCatchBoundaryWithVariables() {
-    HashMap<String, Object> variables1 = new HashMap<String, Object>();
+    HashMap<String, Object> variables1 = new HashMap<>();
     variables1.put("processName", "catchSignal");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("catchSignal", variables1);
 
-    HashMap<String, Object> variables2 = new HashMap<String, Object>();
+    HashMap<String, Object> variables2 = new HashMap<>();
     variables2.put("processName", "throwSignal");
     runtimeService.startProcessInstanceByKey("throwSignal", variables2);
 

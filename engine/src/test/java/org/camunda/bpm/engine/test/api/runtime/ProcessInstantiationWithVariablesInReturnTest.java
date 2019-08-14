@@ -46,6 +46,7 @@ import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValu
 import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 /**
@@ -62,7 +63,8 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   protected static final String SET_VARIABLE_IN_DELEGATE_WITH_WAIT_STATE_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationWithVariablesInReturn.setVariableInDelegateWithWaitState.bpmn20.xml";
   protected static final String SIMPLE_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationWithVariablesInReturn.simpleProcess.bpmn20.xml";
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
       return configuration;
@@ -72,7 +74,7 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain chain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testHelper);
+  public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
 
   private void checkVariables(VariableMap map, int expectedSize) {
     List<HistoricVariableInstance> variables = engineRule.getHistoryService()

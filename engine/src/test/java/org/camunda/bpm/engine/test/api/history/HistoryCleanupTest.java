@@ -531,7 +531,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST));
 
     //create 3 process instances
-    List<String> processInstanceIds = new ArrayList<String>();
+    List<String> processInstanceIds = new ArrayList<>();
     Map<String, Object> variables = Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37));
     for (int i = 0; i < PROCESS_INSTANCES_COUNT; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
@@ -1140,11 +1140,11 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupBatchSize(500);
     processEngineConfiguration.initHistoryCleanup();
     assertEquals(processEngineConfiguration.getHistoryCleanupBatchSize(), 500);
-    
+
     processEngineConfiguration.setHistoryTimeToLive("5");
     processEngineConfiguration.initHistoryCleanup();
     assertEquals(5, ParseUtil.parseHistoryTimeToLive(processEngineConfiguration.getHistoryTimeToLive()).intValue());
-    
+
     processEngineConfiguration.setHistoryTimeToLive("P6D");
     processEngineConfiguration.initHistoryCleanup();
     assertEquals(6, ParseUtil.parseHistoryTimeToLive(processEngineConfiguration.getHistoryTimeToLive()).intValue());
@@ -1246,7 +1246,7 @@ public class HistoryCleanupTest {
 
     processEngineConfiguration.initHistoryCleanup();
   }
-  
+
   @Test
   public void testConfigurationFailureMalformedHistoryTimeToLive() {
     processEngineConfiguration.setHistoryTimeToLive("PP5555DDDD");
@@ -1256,7 +1256,7 @@ public class HistoryCleanupTest {
 
     processEngineConfiguration.initHistoryCleanup();
   }
-  
+
   @Test
   public void testConfigurationFailureInvalidHistoryTimeToLive() {
     processEngineConfiguration.setHistoryTimeToLive("invalidValue");
@@ -1266,7 +1266,7 @@ public class HistoryCleanupTest {
 
     processEngineConfiguration.initHistoryCleanup();
   }
-  
+
   @Test
   public void testConfigurationFailureNegativeHistoryTimeToLive() {
     processEngineConfiguration.setHistoryTimeToLive("-6");
@@ -1276,7 +1276,7 @@ public class HistoryCleanupTest {
 
     processEngineConfiguration.initHistoryCleanup();
   }
-  
+
   private Date getNextRunWithinBatchWindow(Date currentTime) {
     return processEngineConfiguration.getBatchWindowManager().getNextBatchWindow(currentTime, processEngineConfiguration).getStart();
   }
@@ -1336,7 +1336,7 @@ public class HistoryCleanupTest {
   }
 
   private List<String> prepareHistoricProcesses(String businessKey, VariableMap variables, Integer processInstanceCount) {
-    List<String> processInstanceIds = new ArrayList<String>();
+    List<String> processInstanceIds = new ArrayList<>();
 
     for (int i = 0; i < processInstanceCount; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(businessKey, variables);

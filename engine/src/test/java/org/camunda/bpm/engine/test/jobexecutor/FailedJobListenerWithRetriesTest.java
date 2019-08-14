@@ -137,7 +137,7 @@ public class FailedJobListenerWithRetriesTest {
 
   private class OLEFailedJobCommandFactory extends DefaultFailedJobCommandFactory {
 
-    private Map<String, OLEFoxJobRetryCmd> oleFoxJobRetryCmds = new HashMap<String, OLEFoxJobRetryCmd>();
+    private Map<String, OLEFoxJobRetryCmd> oleFoxJobRetryCmds = new HashMap<>();
 
     public Command<Object> getCommand(String jobId, Throwable exception) {
       return getOleFoxJobRetryCmds(jobId, exception);

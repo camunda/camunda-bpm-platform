@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -47,7 +48,8 @@ import static org.junit.Assert.assertThat;
  */
 public class HistoryCleanupSchedulerExternalTaskLogsTest extends AbstractHistoryCleanupSchedulerTest {
 
-  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       return configure(configuration, HistoryEventTypes.EXTERNAL_TASK_SUCCESS);
     }
@@ -57,7 +59,7 @@ public class HistoryCleanupSchedulerExternalTaskLogsTest extends AbstractHistory
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected RuntimeService runtimeService;
   protected ExternalTaskService externalTaskService;
