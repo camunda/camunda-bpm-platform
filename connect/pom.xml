@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.connect</groupId>
     <artifactId>camunda-connect-bom</artifactId>
-    <version>1.2.1</version>
+    <version>1.3.0-SNAPSHOT</version>
     <relativePath>bom</relativePath>
   </parent>
 
@@ -119,7 +119,7 @@
     <url>https://github.com/camunda/camunda-connect</url>
     <connection>scm:git:git@github.com:camunda/camunda-connect.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-connect.git</developerConnection>
-    <tag>1.2.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
 </project>
