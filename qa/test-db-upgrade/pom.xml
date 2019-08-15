@@ -358,6 +358,10 @@
 
                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                 <exclude>**/ProcessDiagramParseTest.java</exclude>
+
+                <!-- as the patch scripts of current version are not applied for db-upgrade test suite
+                     this must be skipped, it is already tested in the unit tests -->
+                <exclude>**/SchemaLogEnsureSqlScriptTest.java</exclude>
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
