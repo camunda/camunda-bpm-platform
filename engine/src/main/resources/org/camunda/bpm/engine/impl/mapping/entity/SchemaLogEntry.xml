@@ -51,8 +51,9 @@
   </resultMap>
 
   <select id="selectSchemaLogEntryCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.SchemaLogQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectSchemaLogEntrySql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <select id="selectSchemaLogEntryByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.SchemaLogQueryImpl" resultMap="schemaLogEntryResultMap">

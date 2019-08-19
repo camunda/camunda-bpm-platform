@@ -240,8 +240,9 @@
 
   <select id="selectHistoricProcessInstanceCountByQueryCriteria"
           parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
@@ -605,8 +606,9 @@
 
   <!-- Select History Cleanup Report Entities -->
   <select id="selectFinishedProcessInstancesReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl" resultType="long">
-    SELECT COUNT(DISTINCT RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectFinishedProcessInstancesReportEntitiesSql" />
+    ${countDistinctAfterEnd}
   </select>
 
   <select id="selectFinishedProcessInstancesReportEntities" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl" resultMap="finishedReportResultMap">

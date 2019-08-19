@@ -151,8 +151,9 @@
   </select>
 
   <select id="selectAuthorizationCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectAuthorizationByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectAuthorizationByQueryCriteriaSql">
@@ -610,7 +611,7 @@
   </sql>
 
   <sql id="authCheckJoinWithoutOnClauseWithBinding">
-    left JOIN (
+    inner JOIN (
     SELECT A.*
     FROM ${prefix}ACT_RU_AUTHORIZATION A
     WHERE A.TYPE_ &lt; 2     

@@ -56,6 +56,10 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificLimitBetweenStatements = new HashMap<>();
   public static final Map<String, String> databaseSpecificLimitBetweenFilterStatements = new HashMap<>();
   public static final Map<String, String> databaseSpecificLimitBetweenAcquisitionStatements = new HashMap<>();
+  // count distinct statements
+  public static final Map<String, String> databaseSpecificCountDistinctBeforeStart = new HashMap<>();
+  public static final Map<String, String> databaseSpecificCountDistinctBeforeEnd = new HashMap<>();
+  public static final Map<String, String> databaseSpecificCountDistinctAfterEnd = new HashMap<>();
 
   public static final Map<String, String> optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements = new HashMap<>();
   public static final Map<String, String> optimizeDatabaseSpecificLimitAfterWithoutOffsetStatements = new HashMap<>();
@@ -100,6 +104,10 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     String defaultEscapeChar = "'\\'";
 
+    String defaultDistinctCountBeforeStart = "select count(distinct";
+    String defaultDistinctCountBeforeEnd = ")";
+    String defaultDistinctCountAfterEnd = "";
+
     // h2
     databaseSpecificLimitBeforeStatements.put(H2, "");
     optimizeDatabaseSpecificLimitBeforeWithoutOffsetStatements.put(H2, "");
@@ -114,6 +122,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(H2, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(H2, "");
     databaseSpecificDistinct.put(H2, "distinct");
+
+    databaseSpecificCountDistinctBeforeStart.put(H2, defaultDistinctCountBeforeStart);
+    databaseSpecificCountDistinctBeforeEnd.put(H2, defaultDistinctCountBeforeEnd);
+    databaseSpecificCountDistinctAfterEnd.put(H2, defaultDistinctCountAfterEnd);
 
     databaseSpecificEscapeChar.put(H2, defaultEscapeChar);
 
@@ -163,6 +175,10 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificOrderByStatements.put(mysqlLikeDatabase, defaultOrderBy);
       databaseSpecificLimitBeforeNativeQueryStatements.put(mysqlLikeDatabase, "");
       databaseSpecificDistinct.put(mysqlLikeDatabase, "distinct");
+
+      databaseSpecificCountDistinctBeforeStart.put(mysqlLikeDatabase, defaultDistinctCountBeforeStart);
+      databaseSpecificCountDistinctBeforeEnd.put(mysqlLikeDatabase, defaultDistinctCountBeforeEnd);
+      databaseSpecificCountDistinctAfterEnd.put(mysqlLikeDatabase, defaultDistinctCountAfterEnd);
 
       databaseSpecificEscapeChar.put(mysqlLikeDatabase, "'\\\\'");
 
@@ -249,6 +265,14 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(POSTGRES, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(POSTGRES, "");
     databaseSpecificDistinct.put(POSTGRES, "distinct");
+
+    databaseSpecificCountDistinctBeforeStart.put(POSTGRES, "SELECT COUNT(*) FROM (SELECT DISTINCT");
+    databaseSpecificCountDistinctBeforeEnd.put(POSTGRES, "");
+    databaseSpecificCountDistinctAfterEnd.put(POSTGRES, ") countDistinct");
+
+    databaseSpecificCountDistinctBeforeStart.put(POSTGRES, defaultDistinctCountBeforeStart);
+    databaseSpecificCountDistinctBeforeEnd.put(POSTGRES, defaultDistinctCountBeforeEnd);
+    databaseSpecificCountDistinctAfterEnd.put(POSTGRES, defaultDistinctCountAfterEnd);
 
     databaseSpecificEscapeChar.put(POSTGRES, defaultEscapeChar);
 
@@ -338,6 +362,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBeforeNativeQueryStatements.put(ORACLE, "");
     databaseSpecificDistinct.put(ORACLE, "distinct");
 
+    databaseSpecificCountDistinctBeforeStart.put(ORACLE, defaultDistinctCountBeforeStart);
+    databaseSpecificCountDistinctBeforeEnd.put(ORACLE, defaultDistinctCountBeforeEnd);
+    databaseSpecificCountDistinctAfterEnd.put(ORACLE, defaultDistinctCountAfterEnd);
+
     databaseSpecificEscapeChar.put(ORACLE, defaultEscapeChar);
 
     databaseSpecificDummyTable.put(ORACLE, "FROM DUAL");
@@ -412,6 +440,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(DB2, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${internalOrderBy}) rnk FROM (");
     databaseSpecificDistinct.put(DB2, "");
+
+    databaseSpecificCountDistinctBeforeStart.put(DB2, defaultDistinctCountBeforeStart);
+    databaseSpecificCountDistinctBeforeEnd.put(DB2, defaultDistinctCountBeforeEnd);
+    databaseSpecificCountDistinctAfterEnd.put(DB2, defaultDistinctCountAfterEnd);
 
     databaseSpecificEscapeChar.put(DB2, defaultEscapeChar);
 
@@ -491,6 +523,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(MSSQL, "");
     databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${internalOrderBy}) rnk FROM (");
     databaseSpecificDistinct.put(MSSQL, "");
+
+    databaseSpecificCountDistinctBeforeStart.put(MSSQL, defaultDistinctCountBeforeStart);
+    databaseSpecificCountDistinctBeforeEnd.put(MSSQL, defaultDistinctCountBeforeEnd);
+    databaseSpecificCountDistinctAfterEnd.put(MSSQL, defaultDistinctCountAfterEnd);
 
     databaseSpecificEscapeChar.put(MSSQL, defaultEscapeChar);
 

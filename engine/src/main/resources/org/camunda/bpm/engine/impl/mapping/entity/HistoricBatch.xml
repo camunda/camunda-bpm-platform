@@ -172,8 +172,9 @@
   </select>
 
   <select id="selectHistoricBatchCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectHistoricBatchesByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectHistoricBatchesByQueryCriteriaSql">
@@ -272,8 +273,9 @@
 
   <!-- Select History Cleanup Report Entities -->
   <select id="selectFinishedBatchesReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricBatchReportImpl" resultType="long">
-    SELECT COUNT(DISTINCT RES.TYPE_)
+    ${countDistinctBeforeStart} RES.TYPE_ ${countDistinctBeforeEnd}
     <include refid="selectFinishedBatchesReportEntitiesSql" />
+    ${countDistinctAfterEnd}
   </select>
 
   <select id="selectFinishedBatchesReportEntities" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricBatchReportImpl" resultMap="finishedReportResultMap">
@@ -336,8 +338,9 @@
   </select>
 
   <select id="selectOnlyFinishedBatchesReportEntitiesCount" resultType="long">
-    SELECT COUNT(DISTINCT RES.TYPE_)
+    ${countDistinctBeforeStart} RES.TYPE_ ${countDistinctBeforeEnd}
     <include refid="selectOnlyFinishedBatchesReportEntitiesSql" />
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectOnlyFinishedBatchesReportEntitiesSql">
