@@ -214,8 +214,9 @@
   </select>
 
   <select id="selectTaskCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TaskQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectTaskByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
   
   <sql id="columnSelection">

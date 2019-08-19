@@ -271,8 +271,9 @@
   </select>
 
   <select id="selectJobCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectJobByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectJobByQueryCriteriaSql">
