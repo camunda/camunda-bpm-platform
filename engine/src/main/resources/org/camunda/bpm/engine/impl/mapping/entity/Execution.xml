@@ -191,8 +191,9 @@
   </select>
   
   <select id="selectExecutionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExecutionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectExecutionsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
   
   <select id="selectProcessInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultMap="executionResultMap">
@@ -207,8 +208,9 @@
   </select>
   
   <select id="selectProcessInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectProcessInstanceByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <select id="selectProcessInstanceIdsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="string">

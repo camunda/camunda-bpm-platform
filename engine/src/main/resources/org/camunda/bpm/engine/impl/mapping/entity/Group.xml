@@ -93,8 +93,9 @@
   </select>
   
    <select id="selectGroupCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.GroupQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectGroupByQueryCriteriaSql" />
+    ${countDistinctAfterEnd}
   </select>
   
   <sql id="selectGroupByQueryCriteriaSql">

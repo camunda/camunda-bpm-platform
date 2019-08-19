@@ -234,8 +234,9 @@
   </select>
 
   <select id="selectUserOperationLogEntryCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.UserOperationLogQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectUserOperationLogEntriesByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectUserOperationLogEntriesByQueryCriteriaSql">

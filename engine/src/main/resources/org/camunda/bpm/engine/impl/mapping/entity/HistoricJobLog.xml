@@ -297,8 +297,9 @@
   </select>
 
   <select id="selectHistoricJobLogCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectHistoricJobLogByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectHistoricJobLogByQueryCriteriaSql">

@@ -215,8 +215,9 @@
   </select>
 
   <select id="selectDecisionDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <!-- mysql specific sql -->
@@ -232,8 +233,9 @@
 
   <!-- mysql specific sql -->
   <select id="selectDecisionDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectDecisionDefinitionsByQueryCriteriaSql">

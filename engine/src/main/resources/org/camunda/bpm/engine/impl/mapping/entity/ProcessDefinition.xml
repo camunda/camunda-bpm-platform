@@ -209,8 +209,9 @@
   </select>
 
   <select id="selectProcessDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectProcessDefinitionsByQueryCriteriaSql">
@@ -416,7 +417,8 @@
 
   <!-- mysql specific sql -->
   <select id="selectProcessDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 </mapper>

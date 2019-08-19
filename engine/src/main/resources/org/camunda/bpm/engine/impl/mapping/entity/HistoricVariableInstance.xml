@@ -281,8 +281,9 @@
   </select>
 
   <select id="selectHistoricVariableInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectHistoricVariableInstanceByQueryCriteriaSql">

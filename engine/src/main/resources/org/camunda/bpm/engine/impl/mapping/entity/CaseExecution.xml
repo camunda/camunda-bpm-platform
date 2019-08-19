@@ -140,8 +140,9 @@
   </select>
 
   <select id="selectCaseExecutionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <!--  same as selectCaseExecutionByQueryCriteria, but with different parameterType -->
@@ -157,8 +158,9 @@
   </select>
 
   <select id="selectCaseInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectCaseExecutionsByQueryCriteriaSql">
