@@ -2,6 +2,7 @@
 <definitions
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:camunda="http://activiti.org/bpmn"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   targetNamespace="http://camunda.org/test">
 
   <!-- NOTE: this document is not valid and is only used to test all camunda extensions -->
@@ -63,6 +64,9 @@
           <camunda:field name="test">
             <camunda:string>test</camunda:string>
           </camunda:field>
+          <timerEventDefinition>
+            <timeDuration xsi:type="tFormalExpression">PT1H</timeDuration>
+          </timerEventDefinition>
         </camunda:taskListener>
         <camunda:taskListener>
           <camunda:script scriptFormat="groovy" resource="test.groovy" />

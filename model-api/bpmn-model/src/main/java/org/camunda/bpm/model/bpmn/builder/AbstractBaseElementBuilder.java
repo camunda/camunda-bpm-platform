@@ -525,4 +525,28 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
       }
     }
   }
+
+  protected TimerEventDefinition createTimeCycle(String timerCycle) {
+    TimeCycle timeCycle = createInstance(TimeCycle.class);
+    timeCycle.setTextContent(timerCycle);
+    TimerEventDefinition timerDefinition = createInstance(TimerEventDefinition.class);
+    timerDefinition.setTimeCycle(timeCycle);
+    return timerDefinition;
+  }
+
+  protected TimerEventDefinition createTimeDate(String timerDate) {
+    TimeDate timeDate = createInstance(TimeDate.class);
+    timeDate.setTextContent(timerDate);
+    TimerEventDefinition timerDefinition = createInstance(TimerEventDefinition.class);
+    timerDefinition.setTimeDate(timeDate);
+    return timerDefinition;
+  }
+
+  protected TimerEventDefinition createTimeDuration(String timerDuration) {
+    TimeDuration timeDuration = createInstance(TimeDuration.class);
+    timeDuration.setTextContent(timerDuration);
+    TimerEventDefinition timerDefinition = createInstance(TimerEventDefinition.class);
+    timerDefinition.setTimeDuration(timeDuration);
+    return timerDefinition;
+  }
 }

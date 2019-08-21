@@ -19,8 +19,9 @@ package org.camunda.bpm.model.bpmn.builder;
 import java.util.List;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.impl.BpmnModelConstants;
+import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
@@ -134,7 +135,7 @@ public abstract class AbstractUserTaskBuilder<B extends AbstractUserTaskBuilder<
   public B camundaFormHandlerClass(Class camundaFormHandlerClass) {
     return camundaFormHandlerClass(camundaFormHandlerClass.getName());
   }
-  
+
   /**
    * Sets the camunda form handler class attribute.
    *
@@ -190,7 +191,7 @@ public abstract class AbstractUserTaskBuilder<B extends AbstractUserTaskBuilder<
   public B camundaTaskListenerClass(String eventName, Class listenerClass) {
     return camundaTaskListenerClass(eventName, listenerClass.getName());
   }
-  
+
   /**
    * Add a class based task listener with specified event name
    *
@@ -226,5 +227,83 @@ public abstract class AbstractUserTaskBuilder<B extends AbstractUserTaskBuilder<
     addExtensionElement(executionListener);
 
     return myself;
+  }
+
+  @SuppressWarnings("rawtypes")
+  public B camundaTaskListenerClassTimeoutWithCycle(String id, Class listenerClass, String timerCycle) {
+    return camundaTaskListenerClassTimeoutWithCycle(id, listenerClass.getName(), timerCycle);
+  }
+
+  @SuppressWarnings("rawtypes")
+  public B camundaTaskListenerClassTimeoutWithDate(String id, Class listenerClass, String timerDate) {
+    return camundaTaskListenerClassTimeoutWithDate(id, listenerClass.getName(), timerDate);
+  }
+
+  @SuppressWarnings("rawtypes")
+  public B camundaTaskListenerClassTimeoutWithDuration(String id, Class listenerClass, String timerDuration) {
+    return camundaTaskListenerClassTimeoutWithDuration(id, listenerClass.getName(), timerDuration);
+  }
+
+  public B camundaTaskListenerClassTimeoutWithCycle(String id, String fullQualifiedClassName, String timerCycle) {
+    return createCamundaTaskListenerClassTimeout(id, fullQualifiedClassName, createTimeCycle(timerCycle));
+  }
+
+  public B camundaTaskListenerClassTimeoutWithDate(String id, String fullQualifiedClassName, String timerDate) {
+    return createCamundaTaskListenerClassTimeout(id, fullQualifiedClassName, createTimeDate(timerDate));
+  }
+
+  public B camundaTaskListenerClassTimeoutWithDuration(String id, String fullQualifiedClassName, String timerDuration) {
+    return createCamundaTaskListenerClassTimeout(id, fullQualifiedClassName, createTimeDuration(timerDuration));
+  }
+
+  public B camundaTaskListenerExpressionTimeoutWithCycle(String id, String expression, String timerCycle) {
+    return createCamundaTaskListenerExpressionTimeout(id, expression, createTimeCycle(timerCycle));
+  }
+
+  public B camundaTaskListenerExpressionTimeoutWithDate(String id, String expression, String timerDate) {
+    return createCamundaTaskListenerExpressionTimeout(id, expression, createTimeDate(timerDate));
+  }
+
+  public B camundaTaskListenerExpressionTimeoutWithDuration(String id, String expression, String timerDuration) {
+    return createCamundaTaskListenerExpressionTimeout(id, expression, createTimeDuration(timerDuration));
+  }
+
+  public B camundaTaskListenerDelegateExpressionTimeoutWithCycle(String id, String delegateExpression, String timerCycle) {
+    return createCamundaTaskListenerDelegateExpressionTimeout(id, delegateExpression, createTimeCycle(timerCycle));
+  }
+
+  public B camundaTaskListenerDelegateExpressionTimeoutWithDate(String id, String delegateExpression, String timerDate) {
+    return createCamundaTaskListenerDelegateExpressionTimeout(id, delegateExpression, createTimeDate(timerDate));
+  }
+
+  public B camundaTaskListenerDelegateExpressionTimeoutWithDuration(String id, String delegateExpression, String timerDuration) {
+    return createCamundaTaskListenerDelegateExpressionTimeout(id, delegateExpression, createTimeDuration(timerDuration));
+  }
+
+  protected B createCamundaTaskListenerClassTimeout(String id, String fullQualifiedClassName, TimerEventDefinition timerDefinition) {
+    CamundaTaskListener executionListener = createCamundaTaskListenerTimeout(id, timerDefinition);
+    executionListener.setCamundaClass(fullQualifiedClassName);
+    return myself;
+  }
+
+  protected B createCamundaTaskListenerExpressionTimeout(String id, String expression, TimerEventDefinition timerDefinition) {
+    CamundaTaskListener executionListener = createCamundaTaskListenerTimeout(id, timerDefinition);
+    executionListener.setCamundaExpression(expression);
+    return myself;
+  }
+
+  protected B createCamundaTaskListenerDelegateExpressionTimeout(String id, String delegateExpression, TimerEventDefinition timerDefinition) {
+    CamundaTaskListener executionListener = createCamundaTaskListenerTimeout(id, timerDefinition);
+    executionListener.setCamundaDelegateExpression(delegateExpression);
+    return myself;
+  }
+
+  protected CamundaTaskListener createCamundaTaskListenerTimeout(String id, TimerEventDefinition timerDefinition) {
+    CamundaTaskListener executionListener = createInstance(CamundaTaskListener.class);
+    executionListener.setAttributeValue(BpmnModelConstants.BPMN_ATTRIBUTE_ID, id, true);
+    executionListener.setCamundaEvent("timeout");
+    executionListener.addChildElement(timerDefinition);
+    addExtensionElement(executionListener);
+    return executionListener;
   }
 }

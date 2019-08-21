@@ -17,17 +17,11 @@
 package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.CatchEvent;
 import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ConditionalEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.EventDefinition;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.TimeCycle;
-import org.camunda.bpm.model.bpmn.instance.TimeDate;
-import org.camunda.bpm.model.bpmn.instance.TimeDuration;
-import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
 
 /**
  * @author Sebastian Menski
@@ -84,13 +78,7 @@ public abstract class AbstractCatchEventBuilder<B extends  AbstractCatchEventBui
    * @return the builder object
    */
   public B timerWithDate(String timerDate) {
-    TimeDate timeDate = createInstance(TimeDate.class);
-    timeDate.setTextContent(timerDate);
-
-    TimerEventDefinition timerEventDefinition = createInstance(TimerEventDefinition.class);
-    timerEventDefinition.setTimeDate(timeDate);
-
-    element.getEventDefinitions().add(timerEventDefinition);
+    element.getEventDefinitions().add(createTimeDate(timerDate));
 
     return myself;
   }
@@ -102,13 +90,7 @@ public abstract class AbstractCatchEventBuilder<B extends  AbstractCatchEventBui
    * @return the builder object
    */
   public B timerWithDuration(String timerDuration) {
-    TimeDuration timeDuration = createInstance(TimeDuration.class);
-    timeDuration.setTextContent(timerDuration);
-
-    TimerEventDefinition timerEventDefinition = createInstance(TimerEventDefinition.class);
-    timerEventDefinition.setTimeDuration(timeDuration);
-
-    element.getEventDefinitions().add(timerEventDefinition);
+    element.getEventDefinitions().add(createTimeDuration(timerDuration));
 
     return myself;
   }
@@ -120,13 +102,7 @@ public abstract class AbstractCatchEventBuilder<B extends  AbstractCatchEventBui
    * @return the builder object
    */
   public B timerWithCycle(String timerCycle) {
-    TimeCycle timeCycle = createInstance(TimeCycle.class);
-    timeCycle.setTextContent(timerCycle);
-
-    TimerEventDefinition timerEventDefinition = createInstance(TimerEventDefinition.class);
-    timerEventDefinition.setTimeCycle(timeCycle);
-
-    element.getEventDefinitions().add(timerEventDefinition);
+    element.getEventDefinitions().add(createTimeCycle(timerCycle));
 
     return myself;
   }

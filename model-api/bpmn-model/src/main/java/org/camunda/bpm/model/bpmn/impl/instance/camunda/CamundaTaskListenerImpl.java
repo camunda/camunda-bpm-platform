@@ -19,6 +19,7 @@ package org.camunda.bpm.model.bpmn.impl.instance.camunda;
 import java.util.Collection;
 
 import org.camunda.bpm.model.bpmn.impl.instance.BpmnModelElementInstanceImpl;
+import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaField;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaScript;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
@@ -51,6 +52,7 @@ public class CamundaTaskListenerImpl extends BpmnModelElementInstanceImpl implem
   protected static Attribute<String> camundaDelegateExpressionAttribute;
   protected static ChildElementCollection<CamundaField> camundaFieldCollection;
   protected static ChildElement<CamundaScript> camundaScriptChild;
+  protected static ChildElementCollection<TimerEventDefinition> timeoutCollection;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CamundaTaskListener.class, CAMUNDA_ELEMENT_TASK_LISTENER)
@@ -83,6 +85,9 @@ public class CamundaTaskListenerImpl extends BpmnModelElementInstanceImpl implem
       .build();
 
     camundaScriptChild = sequenceBuilder.element(CamundaScript.class)
+      .build();
+
+    timeoutCollection = sequenceBuilder.element(TimerEventDefinition.class)
       .build();
 
     typeBuilder.build();
@@ -134,6 +139,10 @@ public class CamundaTaskListenerImpl extends BpmnModelElementInstanceImpl implem
 
   public void setCamundaScript(CamundaScript camundaScript) {
     camundaScriptChild.setChild(this, camundaScript);
+  }
+
+  public Collection<TimerEventDefinition> getTimeouts() {
+    return timeoutCollection.get(this);
   }
 
 }

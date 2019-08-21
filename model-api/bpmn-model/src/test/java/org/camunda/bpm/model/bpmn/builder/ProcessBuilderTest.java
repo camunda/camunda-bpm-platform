@@ -1637,6 +1637,342 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testCamundaTimeoutCycleTaskListenerByClassName() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerClassTimeoutWithCycle("timeout-1", "aClass", "R/PT1H")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaClass()).isEqualTo("aClass");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNotNull();
+    assertThat(timeout.getTimeCycle().getRawTextContent()).isEqualTo("R/PT1H");
+    assertThat(timeout.getTimeDate()).isNull();
+    assertThat(timeout.getTimeDuration()).isNull();
+  }
+
+  @Test
+  public void testCamundaTimeoutDateTaskListenerByClassName() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerClassTimeoutWithDate("timeout-1", "aClass", "2019-09-09T12:12:12")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaClass()).isEqualTo("aClass");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNull();
+    assertThat(timeout.getTimeDate()).isNotNull();
+    assertThat(timeout.getTimeDate().getRawTextContent()).isEqualTo("2019-09-09T12:12:12");
+    assertThat(timeout.getTimeDuration()).isNull();
+  }
+
+  @Test
+  public void testCamundaTimeoutDurationTaskListenerByClassName() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerClassTimeoutWithDuration("timeout-1", "aClass", "PT1H")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaClass()).isEqualTo("aClass");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNull();
+    assertThat(timeout.getTimeDate()).isNull();
+    assertThat(timeout.getTimeDuration()).isNotNull();
+    assertThat(timeout.getTimeDuration().getRawTextContent()).isEqualTo("PT1H");
+  }
+
+  @Test
+  public void testCamundaTimeoutDurationTaskListenerByClass() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerClassTimeoutWithDuration("timeout-1", this.getClass(), "PT1H")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaClass()).isEqualTo(this.getClass().getName());
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNull();
+    assertThat(timeout.getTimeDate()).isNull();
+    assertThat(timeout.getTimeDuration()).isNotNull();
+    assertThat(timeout.getTimeDuration().getRawTextContent()).isEqualTo("PT1H");
+  }
+
+  @Test
+  public void testCamundaTimeoutCycleTaskListenerByClass() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerClassTimeoutWithCycle("timeout-1", this.getClass(), "R/PT1H")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaClass()).isEqualTo(this.getClass().getName());
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNotNull();
+    assertThat(timeout.getTimeCycle().getRawTextContent()).isEqualTo("R/PT1H");
+    assertThat(timeout.getTimeDate()).isNull();
+    assertThat(timeout.getTimeDuration()).isNull();
+  }
+
+  @Test
+  public void testCamundaTimeoutDateTaskListenerByClass() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerClassTimeoutWithDate("timeout-1", this.getClass(), "2019-09-09T12:12:12")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaClass()).isEqualTo(this.getClass().getName());
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNull();
+    assertThat(timeout.getTimeDate()).isNotNull();
+    assertThat(timeout.getTimeDate().getRawTextContent()).isEqualTo("2019-09-09T12:12:12");
+    assertThat(timeout.getTimeDuration()).isNull();
+  }
+
+  @Test
+  public void testCamundaTimeoutCycleTaskListenerByExpression() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerExpressionTimeoutWithCycle("timeout-1", "anExpression", "R/PT1H")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaExpression()).isEqualTo("anExpression");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNotNull();
+    assertThat(timeout.getTimeCycle().getRawTextContent()).isEqualTo("R/PT1H");
+    assertThat(timeout.getTimeDate()).isNull();
+    assertThat(timeout.getTimeDuration()).isNull();
+  }
+
+  @Test
+  public void testCamundaTimeoutDateTaskListenerByExpression() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerExpressionTimeoutWithDate("timeout-1", "anExpression", "2019-09-09T12:12:12")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaExpression()).isEqualTo("anExpression");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNull();
+    assertThat(timeout.getTimeDate()).isNotNull();
+    assertThat(timeout.getTimeDate().getRawTextContent()).isEqualTo("2019-09-09T12:12:12");
+    assertThat(timeout.getTimeDuration()).isNull();
+  }
+
+  @Test
+  public void testCamundaTimeoutDurationTaskListenerByExpression() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerExpressionTimeoutWithDuration("timeout-1", "anExpression", "PT1H")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaExpression()).isEqualTo("anExpression");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNull();
+    assertThat(timeout.getTimeDate()).isNull();
+    assertThat(timeout.getTimeDuration()).isNotNull();
+    assertThat(timeout.getTimeDuration().getRawTextContent()).isEqualTo("PT1H");
+  }
+
+  @Test
+  public void testCamundaTimeoutCycleTaskListenerByDelegateExpression() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerDelegateExpressionTimeoutWithCycle("timeout-1", "aDelegate", "R/PT1H")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaDelegateExpression()).isEqualTo("aDelegate");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNotNull();
+    assertThat(timeout.getTimeCycle().getRawTextContent()).isEqualTo("R/PT1H");
+    assertThat(timeout.getTimeDate()).isNull();
+    assertThat(timeout.getTimeDuration()).isNull();
+  }
+
+  @Test
+  public void testCamundaTimeoutDateTaskListenerByDelegateExpression() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerDelegateExpressionTimeoutWithDate("timeout-1", "aDelegate", "2019-09-09T12:12:12")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaDelegateExpression()).isEqualTo("aDelegate");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNull();
+    assertThat(timeout.getTimeDate()).isNotNull();
+    assertThat(timeout.getTimeDate().getRawTextContent()).isEqualTo("2019-09-09T12:12:12");
+    assertThat(timeout.getTimeDuration()).isNull();
+  }
+
+  @Test
+  public void testCamundaTimeoutDurationTaskListenerByDelegateExpression() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerDelegateExpressionTimeoutWithDuration("timeout-1", "aDelegate", "PT1H")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaDelegateExpression()).isEqualTo("aDelegate");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("timeout");
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNull();
+    assertThat(timeout.getTimeDate()).isNull();
+    assertThat(timeout.getTimeDuration()).isNotNull();
+    assertThat(timeout.getTimeDuration().getRawTextContent()).isEqualTo("PT1H");
+  }
+
+  @Test
   public void testCamundaExecutionListenerByClassName() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
@@ -2120,7 +2456,7 @@ public class ProcessBuilderTest {
         .boundaryEvent("boundary").error("myErrorCode")
         .endEvent("boundaryEnd")
         .done();
-    
+
     assertErrorEventDefinition("boundary", "myErrorCode", null);
   }
 
@@ -2161,7 +2497,7 @@ public class ProcessBuilderTest {
       .done();
 
     Bpmn.writeModelToStream(System.out, modelInstance);
-    
+
     assertErrorEventDefinition("boundary", "errorCode", "errorMessage");
     assertErrorEventDefinitionForErrorVariables("boundary", "errorCodeVariable", "errorMessageVariable");
   }
@@ -2175,14 +2511,14 @@ public class ProcessBuilderTest {
 
     assertErrorEventDefinition("end", "myErrorCode", "errorMessage");
   }
-  
+
   @Test
   public void testErrorEndEventWithoutErrorMessage() {
     modelInstance = Bpmn.createProcess()
         .startEvent()
         .endEvent("end").error("myErrorCode")
         .done();
-    
+
     assertErrorEventDefinition("end", "myErrorCode", null);
   }
 
@@ -2220,7 +2556,7 @@ public class ProcessBuilderTest {
 
     assertErrorEventDefinition("subProcessStart", "myErrorCode", "errorMessage");
   }
-  
+
   @Test
   public void testErrorStartEventWithoutErrorMessage() {
     modelInstance = Bpmn.createProcess()
@@ -2233,7 +2569,7 @@ public class ProcessBuilderTest {
             .error("myErrorCode")
             .endEvent()
         .done();
-    
+
     assertErrorEventDefinition("subProcessStart", "myErrorCode", null);
   }
 

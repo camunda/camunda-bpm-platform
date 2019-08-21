@@ -17,7 +17,7 @@
 package org.camunda.bpm.model.bpmn.instance.camunda;
 
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
-
+import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
 import java.util.Collection;
 
 /**
@@ -48,5 +48,7 @@ public interface CamundaTaskListener extends BpmnModelElementInstance {
   CamundaScript getCamundaScript();
 
   void setCamundaScript(CamundaScript camundaScript);
+
+  Collection<TimerEventDefinition> getTimeouts();
 
 }

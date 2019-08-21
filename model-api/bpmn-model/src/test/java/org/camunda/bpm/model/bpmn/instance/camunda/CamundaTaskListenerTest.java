@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstanceTest;
+import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
@@ -35,7 +36,8 @@ public class CamundaTaskListenerTest extends BpmnModelElementInstanceTest {
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
       new ChildElementAssumption(CAMUNDA_NS, CamundaField.class),
-      new ChildElementAssumption(CAMUNDA_NS, CamundaScript.class, 0, 1)
+      new ChildElementAssumption(CAMUNDA_NS, CamundaScript.class, 0, 1),
+      new ChildElementAssumption(TimerEventDefinition.class, 0, 1)
     );
   }
 

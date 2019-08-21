@@ -86,6 +86,7 @@ import org.camunda.bpm.model.bpmn.instance.SendTask;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
+import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaConnector;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaConnectorId;
@@ -801,6 +802,15 @@ public class CamundaExtensionsTest {
     CamundaField field = taskListener.getCamundaFields().iterator().next();
     assertThat(field.getCamundaName()).isEqualTo(TEST_STRING_XML);
     assertThat(field.getCamundaString().getTextContent()).isEqualTo(TEST_STRING_XML);
+
+    Collection<TimerEventDefinition> timeouts = taskListener.getTimeouts();
+    assertThat(timeouts.size()).isEqualTo(1);
+
+    TimerEventDefinition timeout = timeouts.iterator().next();
+    assertThat(timeout.getTimeCycle()).isNull();
+    assertThat(timeout.getTimeDate()).isNull();
+    assertThat(timeout.getTimeDuration()).isNotNull();
+    assertThat(timeout.getTimeDuration().getRawTextContent()).isEqualTo("PT1H");
   }
 
   @Test
