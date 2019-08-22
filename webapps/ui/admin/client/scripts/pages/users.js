@@ -33,11 +33,22 @@ var Controller = [
   'UserResource',
   'page',
   '$translate',
-  function($scope, $location, search, UserResource, pageService, $translate) {
+  'Notifications',
+  function(
+    $scope,
+    $location,
+    search,
+    UserResource,
+    pageService,
+    $translate,
+    Notifications
+  ) {
     $scope.searchConfig = angular.copy(searchConfig);
 
     $scope.blocked = true;
     $scope.onSearchChange = updateView;
+
+    $scope.canSortEntries = true;
 
     $scope.query = $scope.pages = null;
     var sorting;
@@ -85,7 +96,27 @@ var Controller = [
 
               return total;
             })
-            .catch(angular.noop);
+            .catch(() => {
+              // When using LDAP, sorting parameters might not work and throw errors
+              // Try again with default sorting
+              delete queryParams.sortBy;
+              delete queryParams.sortOrder;
+              return UserResource.query(
+                angular.extend({}, $scope.query, queryParams)
+              ).$promise.then(function(data) {
+                $scope.canSortEntries = false;
+                $scope.userList = data;
+                $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
+
+                Notifications.addMessage({
+                  status: $translate.instant('USERS_NO_SORTING_HEADER'),
+                  message: $translate.instant('USERS_NO_SORTING_BODY'),
+                  exclusive: true
+                });
+
+                return total;
+              });
+            });
         })
         .catch(angular.noop);
     }
