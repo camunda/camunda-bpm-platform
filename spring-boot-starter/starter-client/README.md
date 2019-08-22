@@ -90,7 +90,7 @@ You can also use the basic Spriung integration without the Spring Boot Starter:
   @ExternalTask(topicName = "invoiceCreator", lockDuration = 1000)
   @ExternalTask(topicName = "offerCreator", lockDuration = 2000)
   @Component
-  public class InvoiceCreator implents ExternalTaskHandler {
+  public class InvoiceCreator implements ExternalTaskHandler {
       void execute(ExternalTask externalTask, ExternalTaskService externalTaskService);
   }
   ```
