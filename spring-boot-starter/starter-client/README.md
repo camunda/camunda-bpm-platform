@@ -33,7 +33,7 @@ You need this dependency in order to get started
   ```java
   @ExternalTaskSubscription("invoiceCreator")
   @Component
-  public class InvoiceCreator implents ExternalTaskHandler {
+  public class InvoiceCreator implements ExternalTaskHandler {
       void execute(ExternalTask externalTask, ExternalTaskService externalTaskService);
   }
   ```
