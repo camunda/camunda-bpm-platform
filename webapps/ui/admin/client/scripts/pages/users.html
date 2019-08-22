@@ -30,7 +30,7 @@
                sorting-id="admin-sorting-users"
                on-sort-change="onSortChanged(sorting)"
                on-sort-initialized="onSortInitialized(sorting)">
-          <tr>
+          <tr ng-if="canSortEntries">
             <th class="username"
                 cam-sortable-table-column
                 sort-by-property="userId">{{ 'USERS_ID' | translate }}
@@ -47,6 +47,13 @@
                 cam-sortable-table-column
                 sort-by-property="email">{{ 'USERS_EMAIL' | translate }}
             </th>
+            <th class="action">{{ 'USERS_ACTION' | translate }}</th>
+          </tr>
+          <tr ng-if="!canSortEntries">
+            <th class="username">{{ 'USERS_ID' | translate }}</th>
+            <th class="firstname">{{ 'USERS_FIRSTNAME' | translate }}</th>
+            <th class="lastname">{{ 'USERS_LASTNAME' | translate }}</th>
+            <th class="email">{{ 'USERS_EMAIL' | translate }}</th>
             <th class="action">{{ 'USERS_ACTION' | translate }}</th>
           </tr>
         </thead>
