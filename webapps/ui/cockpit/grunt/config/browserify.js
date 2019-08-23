@@ -27,14 +27,6 @@ module.exports = function(config, browserifyConfig) {
       watch: true,
       transform: [
       [
-        'exposify',
-        {
-          expose: {
-            'camunda-bpm-sdk-js': 'camunda-bpm-sdk-js'
-          }
-        }
-      ],
-      [
         'babelify',
         {
           global: true,
