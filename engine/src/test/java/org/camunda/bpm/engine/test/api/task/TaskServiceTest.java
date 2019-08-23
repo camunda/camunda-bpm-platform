@@ -82,6 +82,7 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -97,6 +98,11 @@ import org.junit.rules.RuleChain;
 public class TaskServiceTest {
 
   protected static final String TWO_TASKS_PROCESS = "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml";
+
+  protected static final String USER_TASK_THROW_ERROR = "throw-error";
+  protected static final String ERROR_CODE = "300";
+  protected static final String PROCESS_KEY = "process";
+  protected static final String USER_TASK_AFTER_CATCH = "after-catch";
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
@@ -2454,6 +2460,159 @@ public class TaskServiceTest {
     // then
     assertNotNull(variables);
     assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  public void testThrowBpmnErrorWithoutCatch() {
+    // given
+    BpmnModelInstance model =Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask(USER_TASK_THROW_ERROR)
+        .userTask("skipped-error")
+        .endEvent()
+        .done();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleBpmnError(task.getId(), ERROR_CODE);
+
+    // then
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(0, processInstances.size());
+  }
+
+  @Test
+  public void testHandleBpmnErrorWithErrorCodeVariable() {
+    // given
+    String errorCodeVariableName = "errorCodeVar";
+    BpmnModelInstance model = createUserTaskProcessWithCatchBoundaryEvent(errorCodeVariableName, null);
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleBpmnError(task.getId(), ERROR_CODE);
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_AFTER_CATCH, taskAfterThrow.getTaskDefinitionKey());
+    VariableInstance errorCodeVariable = runtimeService.createVariableInstanceQuery().variableName(errorCodeVariableName).singleResult();
+    assertEquals(ERROR_CODE, errorCodeVariable.getValue());
+  }
+
+  @Test
+  public void testHandleBpmnErrorIncludingMessage() {
+    // given
+    String errorMessageVariableName = "errorMessageVar";
+    BpmnModelInstance model = createUserTaskProcessWithCatchBoundaryEvent(null, errorMessageVariableName);
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+    String errorMessageValue = "Error message for ERROR-" + ERROR_CODE;
+
+    // when
+    taskService.handleBpmnError(task.getId(), ERROR_CODE, errorMessageValue);
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_AFTER_CATCH, taskAfterThrow.getTaskDefinitionKey());
+    VariableInstance errorMessageVariable = runtimeService.createVariableInstanceQuery().variableName(errorMessageVariableName).singleResult();
+    assertEquals(errorMessageValue, errorMessageVariable.getValue());
+  }
+
+  @Test
+  public void testHandleBpmnErrorWithVariables() {
+    // given
+    BpmnModelInstance model = createUserTaskProcessWithCatchBoundaryEvent(null, null);
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+    String variableName = "foo";
+    String variableValue = "bar";
+
+    // when
+    taskService.handleBpmnError(task.getId(), ERROR_CODE, null, Variables.createVariables().putValue(variableName, variableValue));
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_AFTER_CATCH, taskAfterThrow.getTaskDefinitionKey());
+    VariableInstance variablePassedDuringThrowError = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
+    assertEquals(variableValue, variablePassedDuringThrowError.getValue());
+  }
+
+
+  @Test
+  public void testThrowBpmnErrorCatchInEventSubprocess() {
+    // given
+    String errorCodeVariableName = "errorCodeVar";
+    String errorMessageVariableName = "errorMessageVar";
+    BpmnModelInstance model = createUserTaskProcessWithEventSubprocess(errorCodeVariableName, errorMessageVariableName);
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+    String variableName = "foo";
+    String variableValue = "bar";
+    String errorMessageValue = "Error message for ERROR-" + ERROR_CODE;
+
+    // when
+    taskService.handleBpmnError(task.getId(), ERROR_CODE, errorMessageValue, Variables.createVariables().putValue(variableName, variableValue));
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_AFTER_CATCH, taskAfterThrow.getTaskDefinitionKey());
+    VariableInstance variablePassedDuringThrowError = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
+    assertEquals(variableValue, variablePassedDuringThrowError.getValue());
+    VariableInstance errorMessageVariable = runtimeService.createVariableInstanceQuery().variableName(errorMessageVariableName).singleResult();
+    assertEquals(errorMessageValue, errorMessageVariable.getValue());
+    VariableInstance errorCodeVariable = runtimeService.createVariableInstanceQuery().variableName(errorCodeVariableName).singleResult();
+    assertEquals(ERROR_CODE, errorCodeVariable.getValue());
+  }
+
+  protected BpmnModelInstance createUserTaskProcessWithCatchBoundaryEvent(
+      String errorCodeVariable, String errorMessageVariableName) {
+    return Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask(USER_TASK_THROW_ERROR)
+          .boundaryEvent("catch-error")
+            .errorEventDefinition()
+              .error(ERROR_CODE)
+              .errorCodeVariable(errorCodeVariable)
+              .errorMessageVariable(errorMessageVariableName)
+            .errorEventDefinitionDone()
+          .userTask(USER_TASK_AFTER_CATCH)
+          .endEvent()
+        .moveToActivity(USER_TASK_THROW_ERROR)
+        .userTask("after-throw")
+        .endEvent()
+        .done();
+  }
+
+  protected BpmnModelInstance createUserTaskProcessWithEventSubprocess(
+      String errorCodeVariable, String errorMessageVariableName) {
+    ProcessBuilder processBuilder = Bpmn.createExecutableProcess(PROCESS_KEY);
+    BpmnModelInstance model = processBuilder
+        .startEvent()
+        .userTask(USER_TASK_THROW_ERROR)
+        .userTask("after-throw")
+        .endEvent()
+        .done();
+    processBuilder.eventSubProcess()
+       .startEvent("catch-error")
+         .errorEventDefinition()
+           .error(ERROR_CODE)
+           .errorCodeVariable(errorCodeVariable)
+           .errorMessageVariable(errorMessageVariableName)
+         .errorEventDefinitionDone()
+       .userTask(USER_TASK_AFTER_CATCH)
+       .endEvent();
+    return model;
   }
 
 }
