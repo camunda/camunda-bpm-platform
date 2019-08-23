@@ -30,8 +30,9 @@
 
   <select id="selectRunningProcessInstancesCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
           resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectProcessInstances" />
+    ${countDistinctAfterEnd}
 
   </select>
 
