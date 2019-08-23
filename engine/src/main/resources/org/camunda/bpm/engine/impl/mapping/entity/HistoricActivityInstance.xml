@@ -222,12 +222,18 @@
   </select>
 
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
-    select count(
-    <if test="authCheck.shouldPerformAuthorizatioCheck">
-    distinct
-    </if>
-    RES.ID_)
+    <choose>
+      <when test="authCheck.shouldPerformAuthorizatioCheck">
+        ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
+      </when>
+      <otherwise>
+        select count(RES.ID_)
+      </otherwise>
+    </choose>
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
+    <if test="authCheck.shouldPerformAuthorizatioCheck">
+      ${countDistinctAfterEnd}
+    </if>
   </select>
 
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
