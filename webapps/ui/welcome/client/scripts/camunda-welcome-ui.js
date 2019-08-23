@@ -24,7 +24,7 @@ require('dom4');
 var $ = (window.jQuery = window.$ = require('jquery'));
 
 var commons = require('camunda-commons-ui/lib');
-var sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
+var sdk = require('camunda-bpm-sdk-js/lib/angularjs/index');
 var camCommon = require('../../../common/scripts/module');
 var lodash = require('camunda-commons-ui/vendor/lodash');
 

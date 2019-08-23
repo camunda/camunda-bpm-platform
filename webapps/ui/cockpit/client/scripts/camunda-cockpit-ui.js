@@ -24,7 +24,7 @@ var $ = (window.jQuery = window.$ = require('jquery'));
 require('camunda-commons-ui/vendor/bootstrap');
 
 var commons = require('camunda-commons-ui/lib');
-var sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
+var sdk = require('camunda-bpm-sdk-js/lib/angularjs/index');
 var dataDepend = require('angular-data-depend');
 var camCommon = require('../../../common/scripts/module');
 var moment = require('camunda-commons-ui/vendor/moment');
