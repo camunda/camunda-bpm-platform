@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.dto.task.IdentityLinkDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskBpmnErrorDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.hal.Hal;
@@ -138,4 +139,9 @@ public interface TaskResource {
 
   @DELETE
   void deleteTask(@PathParam("id") String id);
+
+  @POST
+  @Path("/bpmnError")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void handleBpmnError(TaskBpmnErrorDto dto);
 }

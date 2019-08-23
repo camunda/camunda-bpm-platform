@@ -27,6 +27,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
 import static org.camunda.bpm.engine.authorization.Permissions.TASK_WORK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.UPDATE_TASK_VARIABLE;
 import static org.camunda.bpm.engine.authorization.TaskPermissions.UPDATE_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
@@ -48,6 +49,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -6384,6 +6386,62 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertTrue(auths.size() == 1);
   }
 
+  public void testHandleBpmnErrorWithoutAuthorization() {
+    // given
+    disableAuthorization();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().taskDefinitionKey("theTask").singleResult();
+    enableAuthorization();
+
+    try {
+      // when
+      taskService.handleBpmnError(task.getId(), "anErrorCode");
+      fail("Expected an authorization exception");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent("does not have one of the following permissions", message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(processInstance.getId(), message);
+      assertTextPresent(PROCESS_INSTANCE.resourceName(), message);
+      assertTextPresent(UPDATE_INSTANCE.getName(), message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+  }
+
+  public void testHandleBpmnErrorWithUpdateProcessInstancePermission() {
+    // given
+    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, Permissions.UPDATE);
+    disableAuthorization();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().taskDefinitionKey("theTask").singleResult();
+    enableAuthorization();
+
+    // when
+    taskService.handleBpmnError(task.getId(), "anErrorCode");
+
+    // then
+    disableAuthorization();
+    assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());
+  }
+
+  public void testHandleBpmnErrorWithUpdateProcessDefinitionPermission() {
+    // given
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, Permissions.UPDATE_INSTANCE);
+    disableAuthorization();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().taskDefinitionKey("theTask").singleResult();
+    enableAuthorization();
+
+    // when
+    taskService.handleBpmnError(task.getId(), "anErrorCode");
+
+    // then
+    disableAuthorization();
+    assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());
+  }
 
   // helper ////////////////////////////////////////////////////////////////////////////////
 

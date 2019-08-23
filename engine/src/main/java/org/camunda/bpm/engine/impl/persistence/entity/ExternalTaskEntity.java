@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -388,11 +388,10 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       bpmnError = new BpmnError(errorCode);
     }
     try {
-      ExternalTaskActivityBehavior behavior = ((ExternalTaskActivityBehavior) activityExecution.getActivity().getActivityBehavior());
       if (variables != null && !variables.isEmpty()) {
         activityExecution.setVariables(variables);
       }
-      behavior.propagateBpmnError(bpmnError, activityExecution);
+      BpmnExceptionHandler.propagateBpmnError(bpmnError, activityExecution);
     } catch (Exception ex) {
       throw ProcessEngineLogger.CMD_LOGGER.exceptionBpmnErrorPropagationFailed(errorCode, ex);
     }
