@@ -73,8 +73,9 @@
   </select>
   
    <select id="selectTenantCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TenantQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectTenantByQueryCriteriaSql" />
+    ${countDistinctAfterEnd}
   </select>
   
   <sql id="selectTenantByQueryCriteriaSql">

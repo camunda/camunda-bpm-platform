@@ -56,8 +56,9 @@
 
   <select id ="selectHistoricActivityStatisticsCount" resultType="long" 
     parameterType="org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectHistoricActivityStatisticsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectHistoricActivityStatisticsByQueryCriteriaSql">
@@ -123,8 +124,9 @@
 
   <select id ="selectHistoricCaseActivityStatisticsCount" resultType="long" 
     parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityStatisticsQueryImpl">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectHistoricCaseActivityStatisticsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectHistoricCaseActivityStatisticsByQueryCriteriaSql">

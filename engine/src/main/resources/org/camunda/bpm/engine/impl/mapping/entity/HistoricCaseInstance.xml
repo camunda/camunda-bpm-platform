@@ -139,8 +139,9 @@
   </select>
 
   <select id="selectHistoricCaseInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectHistoricCaseInstancesByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectHistoricCaseInstancesByQueryCriteriaSql">
@@ -339,8 +340,9 @@
 
   <!-- Select History Cleanup Report Entities -->
   <select id="selectFinishedCaseInstancesReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricCaseInstanceReportImpl" resultType="long">
-    SELECT COUNT(DISTINCT RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectFinishedCaseInstancesReportEntitiesSql" />
+    ${countDistinctAfterEnd}
   </select>
 
   <select id="selectFinishedCaseInstancesReportEntities" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricCaseInstanceReportImpl" resultMap="finishedReportResultMap">

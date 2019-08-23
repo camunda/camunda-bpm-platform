@@ -182,8 +182,9 @@
   </select>
 
   <select id="selectCaseDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <!-- mysql specific sql -->
@@ -199,8 +200,9 @@
 
   <!-- mysql specific sql -->
   <select id="selectCaseDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectCaseDefinitionsByQueryCriteriaSql">

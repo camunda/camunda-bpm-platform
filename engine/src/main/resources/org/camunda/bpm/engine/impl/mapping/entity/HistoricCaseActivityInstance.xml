@@ -141,8 +141,9 @@
   </select>
 
   <select id="selectHistoricCaseActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectHistoricCaseActivityInstancesByQueryCriteriaSql"/>
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectHistoricCaseActivityInstancesByQueryCriteriaSql">
