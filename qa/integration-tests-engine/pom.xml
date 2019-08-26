@@ -157,7 +157,7 @@
       PaDataFormatConfiguratorJodaTest uses ShrinkWrap to pack jackson-datatype-joda
       plus transitive dependencies into a WAR and deploy that via Arquillian.
       One transitive dependency is jackson-databind. jackson-datatype-joda declares a dependency
-      to jackson-databind 2.9.9, however our current managed dependency version is 2.9.9.1 (via spin).
+      to jackson-databind 2.9.9, however our current managed dependency version is 2.9.9.3 (via spin).
       In that case, Shrinkwrap is not able to resolve the managed dependency version and
       fails to resolve the dependency, because 2.9.9 is not available in the local Maven repo.
       
