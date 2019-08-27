@@ -56,7 +56,7 @@ public class ExecuteJobsRunnable implements Runnable {
 
     Context.setJobExecutorContext(jobExecutorContext);
 
-    ClassLoader classLoaderBeforeExecution = setContextClassloader(ProcessEngine.class.getClassLoader());
+    ClassLoader classLoaderBeforeExecution = getContextClassloaderAndSwitchTheLoader();
 
     try {
       while (!currentProcessorJobQueue.isEmpty()) {
@@ -105,9 +105,9 @@ public class ExecuteJobsRunnable implements Runnable {
     commandExecutor.execute(new UnlockJobCmd(nextJobId));
   }
 
-  protected ClassLoader setContextClassloader(ClassLoader classLoader) {
+  protected ClassLoader getContextClassloaderAndSwitchTheLoader() {
     ClassLoader classLoaderBeforeExecution = Thread.currentThread().getContextClassLoader();
-    ClassLoaderUtil.setContextClassloader(ProcessEngine.class.getClassLoader());
+    Thread.currentThread().setContextClassLoader(ProcessEngine.class.getClassLoader());
     return classLoaderBeforeExecution;
   }
 
