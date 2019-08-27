@@ -209,12 +209,7 @@ public class ProcessInstanceSnapshot {
 
   public JobDefinition getJobDefinitionForActivityIdAndType(String activityId, String jobHandlerType) {
 
-    List<JobDefinition> collectedDefinitions = new ArrayList<JobDefinition>();
-    for (JobDefinition jobDefinition : getJobDefinitions()) {
-      if (activityId.equals(jobDefinition.getActivityId()) && jobHandlerType.equals(jobDefinition.getJobType())) {
-        collectedDefinitions.add(jobDefinition);
-      }
-    }
+    List<JobDefinition> collectedDefinitions = getJobDefinitionsForActivityIdAndType(activityId, jobHandlerType);
 
     if (collectedDefinitions.isEmpty()) {
       return null;
@@ -225,6 +220,16 @@ public class ProcessInstanceSnapshot {
     else {
       throw new RuntimeException("There is more than one job definition for activity " + activityId + " and job handler type " + jobHandlerType);
     }
+  }
+
+  protected List<JobDefinition> getJobDefinitionsForActivityIdAndType(String activityId, String jobHandlerType) {
+    List<JobDefinition> collectedDefinitions = new ArrayList<JobDefinition>();
+    for (JobDefinition jobDefinition : getJobDefinitions()) {
+      if (activityId.equals(jobDefinition.getActivityId()) && jobHandlerType.equals(jobDefinition.getJobType())) {
+        collectedDefinitions.add(jobDefinition);
+      }
+    }
+    return collectedDefinitions;
   }
 
   public void setJobDefinitions(List<JobDefinition> jobDefinitions) {

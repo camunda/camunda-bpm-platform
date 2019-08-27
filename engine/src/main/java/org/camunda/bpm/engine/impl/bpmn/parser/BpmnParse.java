@@ -853,25 +853,25 @@ public class BpmnParse extends Parse {
     List<ActivityImpl> startEventActivities = new ArrayList<ActivityImpl>();
     if(startEventElements.size() > 0) {
       for (Element startEventElement : startEventElements) {
-  
+
         ActivityImpl startEventActivity = createActivityOnScope(startEventElement, scope);
         parseAsynchronousContinuationForActivity(startEventElement, startEventActivity);
-  
+
         if (scope instanceof ProcessDefinitionEntity) {
           parseProcessDefinitionStartEvent(startEventActivity, startEventElement, parentElement, scope);
           startEventActivities.add(startEventActivity);
         } else {
           parseScopeStartEvent(startEventActivity, startEventElement, parentElement, (ActivityImpl) scope);
         }
-  
+
         ensureNoIoMappingDefined(startEventElement);
-  
+
         parseExecutionListenersOnScope(startEventElement, startEventActivity);
-  
+
         for (BpmnParseListener parseListener : parseListeners) {
           parseListener.parseStartEvent(startEventElement, scope, startEventActivity);
         }
-  
+
       }
     } else {
       if(parentElement.getTagName().equals("subProcess") ) {
@@ -2600,7 +2600,7 @@ public class BpmnParse extends Parse {
 
     parseAsynchronousContinuationForActivity(userTaskElement, activity);
 
-    TaskDefinition taskDefinition = parseTaskDefinition(userTaskElement, activity.getId(), (ProcessDefinitionEntity) scope.getProcessDefinition());
+    TaskDefinition taskDefinition = parseTaskDefinition(userTaskElement, activity.getId(), activity, (ProcessDefinitionEntity) scope.getProcessDefinition());
     TaskDecorator taskDecorator = new TaskDecorator(taskDefinition, expressionManager);
 
     UserTaskActivityBehavior userTaskActivity = new UserTaskActivityBehavior(taskDecorator);
@@ -2615,7 +2615,7 @@ public class BpmnParse extends Parse {
     return activity;
   }
 
-  public TaskDefinition parseTaskDefinition(Element taskElement, String taskDefinitionKey, ProcessDefinitionEntity processDefinition) {
+  public TaskDefinition parseTaskDefinition(Element taskElement, String taskDefinitionKey, ActivityImpl activity, ProcessDefinitionEntity processDefinition) {
     TaskFormHandler taskFormHandler;
     String taskFormHandlerClassName = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formHandlerClass");
     if (taskFormHandlerClassName != null) {
@@ -2650,7 +2650,7 @@ public class BpmnParse extends Parse {
     parsePotentialOwner(taskElement, taskDefinition);
 
     // Activiti custom extension
-    parseUserTaskCustomExtensions(taskElement, taskDefinition);
+    parseUserTaskCustomExtensions(taskElement, activity, taskDefinition);
 
     return taskDefinition;
   }
@@ -2711,7 +2711,7 @@ public class BpmnParse extends Parse {
     return expression.substring(prefix.length(), expression.length() - 1).trim();
   }
 
-  protected void parseUserTaskCustomExtensions(Element taskElement, TaskDefinition taskDefinition) {
+  protected void parseUserTaskCustomExtensions(Element taskElement, ActivityImpl activity, TaskDefinition taskDefinition) {
 
     // assignee
     String assignee = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, ASSIGNEE_EXTENSION);
@@ -2742,7 +2742,7 @@ public class BpmnParse extends Parse {
     }
 
     // Task listeners
-    parseTaskListeners(taskElement, taskDefinition);
+    parseTaskListeners(taskElement, activity, taskDefinition);
 
     // Due date
     String dueDateExpression = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, DUE_DATE_EXTENSION);
@@ -2806,7 +2806,7 @@ public class BpmnParse extends Parse {
     return result;
   }
 
-  protected void parseTaskListeners(Element userTaskElement, TaskDefinition taskDefinition) {
+  protected void parseTaskListeners(Element userTaskElement, ActivityImpl activity, TaskDefinition taskDefinition) {
     Element extentionsElement = userTaskElement.element("extensionElements");
     if (extentionsElement != null) {
       List<Element> taskListenerElements = extentionsElement.elementsNS(CAMUNDA_BPMN_EXTENSIONS_NS, "taskListener");
@@ -2817,8 +2817,11 @@ public class BpmnParse extends Parse {
               || TaskListener.EVENTNAME_COMPLETE.equals(eventName) || TaskListener.EVENTNAME_DELETE.equals(eventName)) {
             TaskListener taskListener = parseTaskListener(taskListenerElement);
             taskDefinition.addTaskListener(eventName, taskListener);
+          } else if (TaskListener.EVENTNAME_TIMEOUT.equals(eventName)) {
+            TaskListener taskListener = parseTimeoutTaskListener(taskListenerElement, activity, taskDefinition);
+            taskDefinition.addTimeoutTaskListener(taskListenerElement.attribute("id"), taskListener);
           } else {
-            addError("Attribute 'event' must be one of {create|assignment|complete|delete}", userTaskElement);
+            addError("Attribute 'event' must be one of {create|assignment|complete|delete|timeout}", userTaskElement);
           }
         } else {
           addError("Attribute 'event' is mandatory on taskListener", userTaskElement);
@@ -2854,6 +2857,25 @@ public class BpmnParse extends Parse {
       addError("Element 'class', 'expression', 'delegateExpression' or 'script' is mandatory on taskListener", taskListenerElement);
     }
     return taskListener;
+  }
+
+  protected TaskListener parseTimeoutTaskListener(Element taskListenerElement, ActivityImpl timerActivity, TaskDefinition taskDefinition) {
+    String listenerId = taskListenerElement.attribute("id");
+    if (listenerId == null) {
+      addError("Element 'id' is mandatory on taskListener of type 'timeout'", taskListenerElement);
+    }
+    Element timerEventDefinition = taskListenerElement.element(TIMER_EVENT_DEFINITION);
+    if (timerEventDefinition == null) {
+      addError("Element 'timerEventDefinition' is mandatory on taskListener of type 'timeout'", taskListenerElement);
+    }
+    timerActivity.setScope(true);
+    timerActivity.setEventScope(timerActivity);
+    TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerTaskListenerJobHandler.TYPE);
+    timerDeclaration.setRawJobHandlerConfiguration(timerActivity.getId() + TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_DELIMITER +
+        TimerEventJobHandler.JOB_HANDLER_CONFIG_TASK_LISTENER_PREFIX + listenerId);
+    addTimerListenerDeclaration(listenerId, timerActivity, timerDeclaration);
+
+    return parseTaskListener(taskListenerElement);
   }
 
   /**
@@ -3443,6 +3465,16 @@ public class BpmnParse extends Parse {
 
   protected void addTimerDeclaration(ScopeImpl scope, TimerDeclarationImpl timerDeclaration) {
     scope.getProperties().putMapEntry(BpmnProperties.TIMER_DECLARATIONS, timerDeclaration.getActivityId(), timerDeclaration);
+  }
+
+  protected void addTimerListenerDeclaration(String listenerId, ScopeImpl scope, TimerDeclarationImpl timerDeclaration) {
+    if (scope.getProperties().get(BpmnProperties.TIMEOUT_LISTENER_DECLARATIONS) != null && scope.getProperties().get(BpmnProperties.TIMEOUT_LISTENER_DECLARATIONS).get(timerDeclaration.getActivityId()) != null) {
+      scope.getProperties().get(BpmnProperties.TIMEOUT_LISTENER_DECLARATIONS).get(timerDeclaration.getActivityId()).put(listenerId, timerDeclaration);
+    } else {
+      Map<String, TimerDeclarationImpl> activityDeclarations = new HashMap<>();
+      activityDeclarations.put(listenerId, timerDeclaration);
+      scope.getProperties().putMapEntry(BpmnProperties.TIMEOUT_LISTENER_DECLARATIONS, timerDeclaration.getActivityId(), activityDeclarations);
+    }
   }
 
   @SuppressWarnings("unchecked")

@@ -29,29 +29,40 @@ public abstract class TimerEventJobHandler implements JobHandler<TimerJobConfigu
 
   public static final String JOB_HANDLER_CONFIG_PROPERTY_DELIMITER = "$";
   public static final String JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED = "followUpJobCreated";
+  public static final String JOB_HANDLER_CONFIG_TASK_LISTENER_PREFIX = "taskListener~";
 
   @Override
   public TimerJobConfiguration newConfiguration(String canonicalString) {
     String[] configParts = canonicalString.split("\\" + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER);
 
-    if (configParts.length > 2) {
+    if (configParts.length > 3) {
       throw new ProcessEngineException("Illegal timer job handler configuration: '" + canonicalString
-          + "': exprecting a one or two part configuration seperated by '" + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + "'.");
+          + "': exprecting a one, two or three part configuration seperated by '" + JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + "'.");
     }
 
     TimerJobConfiguration configuration = new TimerJobConfiguration();
     configuration.timerElementKey = configParts[0];
 
-    if (configParts.length == 2) {
-      configuration.followUpJobCreated = JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED.equals(configParts[1]);
+    // depending on the job configuration, the next parts can be a task listener id and/or the follow-up-job flag
+    for (int i = 1; i < configParts.length; i++) {
+      adjustConfiguration(configuration, configParts[i]);
     }
 
     return configuration;
   }
 
+  protected void adjustConfiguration(TimerJobConfiguration configuration, String configPart) {
+    if (configPart.startsWith(JOB_HANDLER_CONFIG_TASK_LISTENER_PREFIX)) {
+      configuration.setTimerElementSecondaryKey(configPart.substring(JOB_HANDLER_CONFIG_TASK_LISTENER_PREFIX.length()));
+    } else {
+      configuration.followUpJobCreated = JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED.equals(configPart);
+    }
+  }
+
   public static class TimerJobConfiguration implements JobHandlerConfiguration {
 
     protected String timerElementKey;
+    protected String timerElementSecondaryKey;
     protected boolean followUpJobCreated;
 
     public String getTimerElementKey() {
@@ -70,9 +81,21 @@ public abstract class TimerEventJobHandler implements JobHandler<TimerJobConfigu
       this.followUpJobCreated = followUpJobCreated;
     }
 
+    public String getTimerElementSecondaryKey() {
+      return timerElementSecondaryKey;
+    }
+
+    public void setTimerElementSecondaryKey(String timerElementSecondaryKey) {
+      this.timerElementSecondaryKey = timerElementSecondaryKey;
+    }
+
     @Override
     public String toCanonicalString() {
       String canonicalString = timerElementKey;
+
+      if (timerElementSecondaryKey != null) {
+        canonicalString += JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + JOB_HANDLER_CONFIG_TASK_LISTENER_PREFIX + timerElementSecondaryKey;
+      }
 
       if (followUpJobCreated) {
         canonicalString += JOB_HANDLER_CONFIG_PROPERTY_DELIMITER + JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
