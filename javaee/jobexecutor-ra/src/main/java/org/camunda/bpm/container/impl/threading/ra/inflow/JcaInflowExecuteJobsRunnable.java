@@ -106,4 +106,9 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
       throw new RuntimeException("NoSuchMethodException while invoking getMethod() on class "+JobExecutionHandler.class, e);
     }
   }
+
+  @Override
+  protected ClassLoader getContextClassloaderAndSwitchTheLoader() {
+    return Thread.currentThread().getContextClassLoader();
+  }
 }
