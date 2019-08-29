@@ -12,7 +12,7 @@
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-bom</artifactId>
-  <version>7.12.0-alpha3</version>
+  <version>7.12.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Bom</name>
   <url>http://camunda.org</url>
@@ -238,7 +238,7 @@
     <url>https://github.com/camunda/camunda-bpm-platform</url>
     <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
-    <tag>7.12.0-alpha3</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <issueManagement>
