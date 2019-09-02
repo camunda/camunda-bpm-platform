@@ -48,6 +48,9 @@ public interface Task {
   /** Change the description of the task */
 	void setDescription(String description);
 
+  /** The {@link org.camunda.bpm.engine.delegate.TaskState} of the Task lifecycle. */
+  String getLifecycleState();
+
 	/** indication of how important/urgent this task is with a number between
 	 * 0 and 100 where higher values mean a higher priority and lower values mean
 	 * lower priority: [0..19] lowest, [20..39] low, [40..59] normal, [60..79] high

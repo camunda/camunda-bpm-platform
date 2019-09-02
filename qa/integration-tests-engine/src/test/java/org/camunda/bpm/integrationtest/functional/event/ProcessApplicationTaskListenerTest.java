@@ -63,39 +63,44 @@ public class ProcessApplicationTaskListenerTest extends AbstractFoxPlatformInteg
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(TaskListener.EVENTNAME_CREATE, false);
     variables.put(TaskListener.EVENTNAME_ASSIGNMENT, false);
+    variables.put(TaskListener.EVENTNAME_UPDATE, false);
     variables.put(TaskListener.EVENTNAME_COMPLETE, false);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     boolean createEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_CREATE);
     boolean assignmentEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_ASSIGNMENT);
+    boolean updateEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_UPDATE);
     boolean completeEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_COMPLETE);
 
     Assert.assertTrue(createEventFired);
     Assert.assertFalse(assignmentEventFired);
     Assert.assertFalse(completeEventFired);
+    Assert.assertFalse(updateEventFired);
 
     Task task = taskService.createTaskQuery().processDefinitionKey("testProcess").singleResult();
     taskService.claim(task.getId(), "jonny");
 
     createEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_CREATE);
     assignmentEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_ASSIGNMENT);
+    updateEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_UPDATE);
     completeEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_COMPLETE);
 
     Assert.assertTrue(createEventFired);
     Assert.assertTrue(assignmentEventFired);
+    Assert.assertTrue(updateEventFired);
     Assert.assertFalse(completeEventFired);
 
     taskService.complete(task.getId());
 
     createEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_CREATE);
     assignmentEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_ASSIGNMENT);
+    updateEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_UPDATE);
     completeEventFired = (Boolean) runtimeService.getVariable(processInstance.getId(), TaskListener.EVENTNAME_COMPLETE);
 
     Assert.assertTrue(createEventFired);
     Assert.assertTrue(assignmentEventFired);
+    Assert.assertTrue(updateEventFired);
     Assert.assertTrue(completeEventFired);
-
   }
-
 }

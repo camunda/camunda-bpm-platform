@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.delegate.TaskState;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -53,7 +54,6 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
       try {
         checkCreateTask(task, commandContext);
         task.insert(null);
-        commandContext.getHistoricTaskInstanceManager().createHistoricTask(task);
         operation = UserOperationLogEntry.OPERATION_TYPE_CREATE;
         task.executeMetrics(Metrics.ACTIVTY_INSTANCE_START);
       } catch (NullValueException e) {
@@ -66,9 +66,8 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
       task.update();
       operation = UserOperationLogEntry.OPERATION_TYPE_UPDATE;
     }
-
     task.fireAuthorizationProvider();
-    task.fireEvents();
+    task.dispatchLifecycleEvents(TaskState.STATE_CREATED);
     task.createHistoricTaskDetails(operation);
 
     return null;

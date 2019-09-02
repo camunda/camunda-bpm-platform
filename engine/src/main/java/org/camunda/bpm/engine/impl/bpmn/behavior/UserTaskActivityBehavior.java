@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.Collection;
 
-import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.delegate.TaskState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
@@ -55,14 +55,11 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Mi
   public void performExecution(ActivityExecution execution) throws Exception {
     TaskEntity task = TaskEntity.createAndInsert(execution);
 
+    // initialize task properties
     taskDecorator.decorate(task, execution);
 
-    Context.getCommandContext()
-      .getHistoricTaskInstanceManager()
-      .createHistoricTask(task);
-
-    // All properties set, now firing 'create' event
-    task.fireEvent(TaskListener.EVENTNAME_CREATE);
+    // fire lifecycle events after task is persisted
+    task.dispatchLifecycleEvents(TaskState.STATE_CREATED);
   }
 
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {

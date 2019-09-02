@@ -89,6 +89,7 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     } else {
       task.addIdentityLink(userId, groupId, type);
     }
+    task.dispatchLifecycleEvents();
 
     return null;
   }

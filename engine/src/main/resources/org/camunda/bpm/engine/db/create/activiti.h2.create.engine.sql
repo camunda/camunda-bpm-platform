@@ -181,6 +181,7 @@ create table ACT_RU_TASK (
     DUE_DATE_ timestamp,
     FOLLOW_UP_DATE_ timestamp,
     SUSPENSION_STATE_ integer,
+    LIFECYCLE_STATE_ varchar(64) default 'created',
     TENANT_ID_ varchar(64),
     primary key (ID_)
 );

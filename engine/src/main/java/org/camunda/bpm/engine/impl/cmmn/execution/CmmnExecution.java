@@ -75,7 +75,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.CaseVariableListener;
 import org.camunda.bpm.engine.delegate.Expression;
-import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.delegate.TaskState;
 import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
@@ -174,12 +174,8 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
     taskDecorator.decorate(task, this);
 
-    Context.getCommandContext()
-      .getHistoricTaskInstanceManager()
-      .createHistoricTask(task);
-
-    // All properties set, now firing 'create' event
-    task.fireEvent(TaskListener.EVENTNAME_CREATE);
+    // fire lifecycle events after task is persisted
+    task.dispatchLifecycleEvents(TaskState.STATE_CREATED);
 
     return task;
   }
