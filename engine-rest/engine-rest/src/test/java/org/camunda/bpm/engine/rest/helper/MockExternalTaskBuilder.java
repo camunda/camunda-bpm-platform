@@ -152,7 +152,7 @@ public class MockExternalTaskBuilder {
     when(task.getLockExpirationTime()).thenReturn(lockExpirationTime);
     when(task.getProcessDefinitionId()).thenReturn(processDefinitionId);
     when(task.getProcessDefinitionKey()).thenReturn(processDefinitionKey);
-//    when(task.getProcessDefinitionVersionTag()).thenReturn(processDefinitionVersionTag);
+    when(task.getProcessDefinitionVersionTag()).thenReturn(processDefinitionVersionTag);
     when(task.getProcessInstanceId()).thenReturn(processInstanceId);
     when(task.getRetries()).thenReturn(retries);
     when(task.isSuspended()).thenReturn(suspended);
