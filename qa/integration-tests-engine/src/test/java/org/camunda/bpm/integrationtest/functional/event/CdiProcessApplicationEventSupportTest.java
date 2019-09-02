@@ -68,7 +68,9 @@ public class CdiProcessApplicationEventSupportTest extends AbstractFoxPlatformIn
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     taskService.setAssignee(task.getId(), "demo");
     listenerInvocationCount = (Integer) runtimeService.getVariable(processInstance.getId(), ExecutionListenerProcessApplication.LISTENER_INVOCATION_COUNT);
-    Assert.assertEquals(7, listenerInvocationCount.intValue());
+
+    // assignment & update events fired
+    Assert.assertEquals(8, listenerInvocationCount.intValue());
   }
 
 }

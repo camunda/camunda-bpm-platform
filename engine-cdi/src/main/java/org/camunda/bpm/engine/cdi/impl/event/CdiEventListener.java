@@ -120,6 +120,9 @@ public class CdiEventListener implements TaskListener, ExecutionListener, Serial
     else if (TaskListener.EVENTNAME_COMPLETE.equals(eventName)) {
       type = BusinessProcessEventType.COMPLETE_TASK;
     }
+    else if (TaskListener.EVENTNAME_UPDATE.equals(eventName)) {
+      type = BusinessProcessEventType.UPDATE_TASK;
+    }
     else if (TaskListener.EVENTNAME_DELETE.equals(eventName)) {
       type = BusinessProcessEventType.DELETE_TASK;
     }

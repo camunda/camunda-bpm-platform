@@ -88,6 +88,7 @@ public class SubmitTaskFormCmd implements Command<VariableMap>, Serializable {
     if (DelegationState.PENDING.equals(task.getDelegationState())) {
       task.resolve();
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_RESOLVE);
+      task.triggerUpdateEvent();
     } else {
       task.complete();
       task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_COMPLETE);

@@ -129,6 +129,28 @@ public class UserTaskBpmnModelExecutionContextTest {
   }
 
   @Test
+  public void shouldGetBpmnModelElementInstanceOnUpdateAfterAssignment() {
+    String eventName = TaskListener.EVENTNAME_UPDATE;
+    deployProcess(eventName);
+
+    runtimeService.startProcessInstanceByKey(PROCESS_ID);
+
+    assertNull(ModelExecutionContextTaskListener.modelInstance);
+    assertNull(ModelExecutionContextTaskListener.userTask);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.setAssignee(taskId, "demo");
+
+    assertNotNull(ModelExecutionContextTaskListener.modelInstance);
+    assertNotNull(ModelExecutionContextTaskListener.userTask);
+
+    taskService.complete(taskId);
+
+    assertModelInstance();
+    assertUserTask(eventName);
+  }
+
+  @Test
   @Deployment
   public void shouldGetBpmnModelElementInstanceOnTimeout() {
     runtimeService.startProcessInstanceByKey(PROCESS_ID);

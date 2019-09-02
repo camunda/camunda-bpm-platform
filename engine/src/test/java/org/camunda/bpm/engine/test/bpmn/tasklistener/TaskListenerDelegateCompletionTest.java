@@ -119,6 +119,36 @@ public class TaskListenerDelegateCompletionTest {
   }
 
   @Test
+  public void testCompletionIsPossibleAfterAssignmentUpdate () {
+    //given
+    createProcessWithListener(TaskListener.EVENTNAME_UPDATE);
+
+    //when
+    runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setAssignee(task.getId(),"test assignee");
+
+    //then
+    task = taskService.createTaskQuery().singleResult();
+    assertThat(task, is(nullValue()));
+  }
+
+  @Test
+  public void testCompletionIsPossibleAfterPropertyUpdate () {
+    //given
+    createProcessWithListener(TaskListener.EVENTNAME_UPDATE);
+
+    //when
+    runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setOwner(task.getId(),"ownerId");
+
+    //then
+    task = taskService.createTaskQuery().singleResult();
+    assertThat(task, is(nullValue()));
+  }
+
+  @Test
   @Deployment
   public void testCompletionIsPossibleOnTimeout() {
     TaskQuery taskQuery = taskService.createTaskQuery();
