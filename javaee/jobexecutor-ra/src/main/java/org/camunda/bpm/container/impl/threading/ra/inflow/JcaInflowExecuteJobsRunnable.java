@@ -107,8 +107,15 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
     }
   }
 
+  /**
+   * Context class loader switch is not necessary since
+   * the loader used for job execution is successor of the engine's
+   * @see org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable#switchClassLoader()
+   *
+   * @return the context class loader of the current thread.
+   */
   @Override
-  protected ClassLoader getContextClassloaderAndSwitchTheLoader() {
+  protected ClassLoader switchClassLoader() {
     return Thread.currentThread().getContextClassLoader();
   }
 }
