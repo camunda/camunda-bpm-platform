@@ -56,7 +56,7 @@ public class ExecuteJobsRunnable implements Runnable {
 
     Context.setJobExecutorContext(jobExecutorContext);
 
-    ClassLoader classLoaderBeforeExecution = getContextClassloaderAndSwitchTheLoader();
+    ClassLoader classLoaderBeforeExecution = switchClassLoader();
 
     try {
       while (!currentProcessorJobQueue.isEmpty()) {
@@ -105,7 +105,19 @@ public class ExecuteJobsRunnable implements Runnable {
     commandExecutor.execute(new UnlockJobCmd(nextJobId));
   }
 
-  protected ClassLoader getContextClassloaderAndSwitchTheLoader() {
+  /**
+   * Switch the context classloader to the ProcessEngine's
+   * to assure the loading of the engine classes during job execution<br>
+   *
+   * <b>Note</b>: this method is overridden by
+   * org.camunda.bpm.container.impl.threading.ra.inflow.JcaInflowExecuteJobsRunnable#switchClassLoader()
+   * - where the classloader switch is not required
+   *
+   * @see https://app.camunda.com/jira/browse/CAM-10379
+   *
+   * @return the classloader before the switch to return it back after the job execution
+   */
+  protected ClassLoader switchClassLoader() {
     ClassLoader classLoaderBeforeExecution = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(ProcessEngine.class.getClassLoader());
     return classLoaderBeforeExecution;
