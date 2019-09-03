@@ -1001,7 +1001,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   protected TaskListener getTimeoutListener(String timeoutId) {
     TaskDefinition resolvedTaskDefinition = getTaskDefinition();
-    if (resolvedTaskDefinition == null || skipCustomListeners) {
+    if (resolvedTaskDefinition == null) {
       return null;
     } else {
       return resolvedTaskDefinition.getTimeoutTaskListener(timeoutId);
