@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.rest.impl.history;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatistics;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
+import org.camunda.bpm.engine.impl.HistoricDecisionInstanceStatisticsQueryImpl;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceStatisticsDto;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionStatisticsRestService;
 
@@ -45,7 +46,10 @@ public class HistoricDecisionStatisticsRestServiceImpl implements HistoricDecisi
       statisticsQuery.decisionInstanceId(decisionInstanceId);
     }
 
-    for (HistoricDecisionInstanceStatistics stats : statisticsQuery.list()) {
+    List<HistoricDecisionInstanceStatistics> statistics =
+        ((HistoricDecisionInstanceStatisticsQueryImpl) statisticsQuery).unboundedResultList();
+
+    for (HistoricDecisionInstanceStatistics stats : statistics) {
       result.add(HistoricDecisionInstanceStatisticsDto.fromDecisionDefinitionStatistics(stats));
     }
 

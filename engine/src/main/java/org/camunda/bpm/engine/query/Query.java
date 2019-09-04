@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.query;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
@@ -50,9 +51,28 @@ public interface Query<T extends Query< ? , ? >, U extends Object> {
    */
   U singleResult();
 
-  /** Executes the query and get a list of entities as the result. */
+  /**
+   * Executes the query and get a list of entities as the result.
+   *
+   * @return a list of results
+   * @throws BadUserRequestException
+   *   When a maximum results limit is specified. A maximum results limit can be specified with
+   *   the process engine configuration property <code>queryMaxResultsLimit</code> (default
+   *   {@link Integer#MAX_VALUE}).
+   *   Please use {@link #listPage(int, int)} instead.
+   */
   List<U> list();
 
-  /** Executes the query and get a list of entities as the result. */
+  /**
+   * Executes the query and get a list of entities as the result.
+   *
+   * @param firstResult the index of the first result
+   * @param maxResults the maximum number of results
+   * @return a list of results
+   * @throws BadUserRequestException
+   *   When {@param maxResults} exceeds the maximum results limit. A maximum results limit can
+   *   be specified with the process engine configuration property <code>queryMaxResultsLimit</code>
+   *   (default {@link Integer#MAX_VALUE}).
+   */
   List<U> listPage(int firstResult, int maxResults);
 }

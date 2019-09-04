@@ -75,6 +75,7 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -385,7 +386,7 @@ public class ProcessEngineRestServiceTest extends
   private void createHistoricActivityStatisticsMock() {
     List<HistoricActivityStatistics> statistics = MockProvider.createMockHistoricActivityStatistics();
 
-    HistoricActivityStatisticsQuery query = mock(HistoricActivityStatisticsQuery.class);
+    HistoricActivityStatisticsQuery query = mock(HistoricActivityStatisticsQueryImpl.class);
     when(mockHistoryService.createHistoricActivityStatisticsQuery(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(query);
     when(query.list()).thenReturn(statistics);
   }

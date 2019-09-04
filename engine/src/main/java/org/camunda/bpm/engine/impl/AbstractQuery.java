@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.QueryMaxResultsLimitUtil;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.query.QueryProperty;
 import org.joda.time.DateTime;
@@ -64,6 +65,8 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   protected Map<String, String> expressions = new HashMap<String, String>();
 
   protected Set<Validator<AbstractQuery<?, ?>>> validators = new HashSet<Validator<AbstractQuery<?, ?>>>();
+
+  protected boolean maxResultsLimitEnabled;
 
   protected AbstractQuery() {
   }
@@ -129,19 +132,13 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   @SuppressWarnings("unchecked")
   public U singleResult() {
     this.resultType = ResultType.SINGLE_RESULT;
-    if (commandExecutor!=null) {
-      return (U) commandExecutor.execute(this);
-    }
-    return executeSingleResult(Context.getCommandContext());
+    return (U) executeResult(resultType);
   }
 
   @SuppressWarnings("unchecked")
   public List<U> list() {
     this.resultType = ResultType.LIST;
-    if (commandExecutor!=null) {
-      return (List<U>) commandExecutor.execute(this);
-    }
-    return evaluateExpressionsAndExecuteList(Context.getCommandContext(), null);
+    return (List<U>) executeResult(resultType);
   }
 
   @SuppressWarnings("unchecked")
@@ -149,10 +146,28 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     this.firstResult = firstResult;
     this.maxResults = maxResults;
     this.resultType = ResultType.LIST_PAGE;
-    if (commandExecutor!=null) {
-      return (List<U>) commandExecutor.execute(this);
+    return (List<U>) executeResult(resultType);
+  }
+
+  public Object executeResult(ResultType resultType) {
+
+    if (commandExecutor != null) {
+      if (!maxResultsLimitEnabled) {
+        maxResultsLimitEnabled = Context.getCommandContext() == null;
+      }
+
+      return commandExecutor.execute(this);
     }
-    return evaluateExpressionsAndExecuteList(Context.getCommandContext(), new Page(firstResult, maxResults));
+
+    switch (resultType) {
+      case SINGLE_RESULT:
+        return executeSingleResult(Context.getCommandContext());
+      case LIST_PAGE:
+      case LIST:
+        return evaluateExpressionsAndExecuteList(Context.getCommandContext(), null);
+      default:
+        throw new ProcessEngineException("Unknown result type!");
+    }
   }
 
   public long count() {
@@ -161,6 +176,15 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
       return (Long) commandExecutor.execute(this);
     }
     return evaluateExpressionsAndExecuteCount(Context.getCommandContext());
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<U> unboundedResultList() {
+    this.resultType = ResultType.LIST;
+    if (commandExecutor != null) {
+      return (List<U>) commandExecutor.execute(this);
+    }
+    return evaluateExpressionsAndExecuteList(Context.getCommandContext(), null);
   }
 
   public Object execute(CommandContext commandContext) {
@@ -186,6 +210,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public abstract long executeCount(CommandContext commandContext);
 
   public List<U> evaluateExpressionsAndExecuteList(CommandContext commandContext, Page page) {
+    checkMaxResultsLimit();
     validate();
     evaluateExpressions();
     return !hasExcludingConditions() ? executeList(commandContext, page) : new ArrayList<U>();
@@ -209,7 +234,8 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public abstract List<U> executeList(CommandContext commandContext, Page page);
 
   public U executeSingleResult(CommandContext commandContext) {
-    List<U> results = evaluateExpressionsAndExecuteList(commandContext, null);
+    disableMaxResultsLimit();
+    List<U> results = evaluateExpressionsAndExecuteList(commandContext, new Page(0, 2));
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
@@ -323,10 +349,18 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   @SuppressWarnings("unchecked")
   public List<String> listIds() {
     this.resultType = ResultType.LIST_IDS;
+    List<String> ids = null;
     if (commandExecutor != null) {
-      return (List<String>) commandExecutor.execute(this);
+      ids = (List<String>) commandExecutor.execute(this);
+    } else {
+      ids = evaluateExpressionsAndExecuteIdsList(Context.getCommandContext());
     }
-    return evaluateExpressionsAndExecuteIdsList(Context.getCommandContext());
+
+    if (ids != null) {
+      QueryMaxResultsLimitUtil.checkMaxResultsLimit(ids.size());
+    }
+
+    return ids;
   }
 
   public List<String> evaluateExpressionsAndExecuteIdsList(CommandContext commandContext) {
@@ -337,6 +371,20 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
 
   public List<String> executeIdsList(CommandContext commandContext) {
     throw new UnsupportedOperationException();
+  }
+
+  protected void checkMaxResultsLimit() {
+    if (maxResultsLimitEnabled) {
+      QueryMaxResultsLimitUtil.checkMaxResultsLimit(maxResults);
+    }
+  }
+
+  public void enableMaxResultsLimit() {
+    maxResultsLimitEnabled = true;
+  }
+
+  public void disableMaxResultsLimit() {
+    maxResultsLimitEnabled = false;
   }
 
 }

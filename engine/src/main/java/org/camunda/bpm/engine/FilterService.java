@@ -104,6 +104,10 @@ public interface FilterService {
    *  Expression evaluation can be activated by setting the process engine configuration properties
    *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
    *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *  <li>When a maximum results limit is specified. A maximum results limit can be specified with
+   *  the process engine configuration property <code>queryMaxResultsLimit</code> (default
+   *  {@link Integer#MAX_VALUE}).
+   *  Please use {@link #listPage(String, int, int)} instead.
    */
   <T> List<T> list(String filterId);
 
@@ -120,6 +124,10 @@ public interface FilterService {
    *  Expression evaluation can be activated by setting the process engine configuration properties
    *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
    *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *  <li>When a maximum results limit is specified. A maximum results limit can be specified with
+   *  the process engine configuration property <code>queryMaxResultsLimit</code> (default
+   *  {@link Integer#MAX_VALUE}).
+   *  Please use {@link #listPage(String, Query, int, int)} instead.
    */
   <T, Q extends Query<?, T>> List<T> list(String filterId, Q extendingQuery);
 
@@ -136,6 +144,9 @@ public interface FilterService {
    *  Expression evaluation can be activated by setting the process engine configuration properties
    *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
    *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *  <li>When {@param maxResults} exceeds the maximum results limit. A maximum results limit can
+   *  be specified with the process engine configuration property <code>queryMaxResultsLimit</code>
+   *  (default {@link Integer#MAX_VALUE}).
    */
   <T> List<T> listPage(String filterId, int firstResult, int maxResults);
 
@@ -154,6 +165,9 @@ public interface FilterService {
    *  Expression evaluation can be activated by setting the process engine configuration properties
    *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
    *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
+   *  <li>When {@param maxResults} exceeds the maximum results limit. A maximum results limit can
+   *  be specified with the process engine configuration property <code>queryMaxResultsLimit</code>
+   *  (default {@link Integer#MAX_VALUE}).
    */
   <T, Q extends Query<?, T>> List<T> listPage(String filterId, Q extendingQuery, int firstResult, int maxResults);
 

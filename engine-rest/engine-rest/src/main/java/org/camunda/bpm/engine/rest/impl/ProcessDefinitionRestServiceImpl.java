@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsBuilder;
@@ -172,7 +173,8 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
       query.includeRootIncidents();
     }
 
-    List<ProcessDefinitionStatistics> queryResults = query.list();
+    List<ProcessDefinitionStatistics> queryResults =
+        ((ProcessDefinitionStatisticsQueryImpl) query).unboundedResultList();
 
     List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
     for (ProcessDefinitionStatistics queryResult : queryResults) {
