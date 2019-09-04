@@ -1152,7 +1152,7 @@ public interface TaskService {
   TaskReport createTaskReport();
 
   /**
-   * Signals that an business error appears, which should be handled by the process engine.
+   * Signals that a business error appears, which should be handled by the process engine.
    *
    * @param taskId the id of an existing active task
    * @param errorCode the error code of the corresponding bmpn error
@@ -1185,4 +1185,38 @@ public interface TaskService {
    * @param variables the variables to pass to the execution
    */
   void handleBpmnError(String taskId, String errorCode, String errorMessage, Map<String, Object> variables);
+
+  /**
+   * Signals that an escalation appears, which should be handled by the process engine.
+   *
+   * @param taskId the id of an existing active task
+   * @param escalationCode the escalation code of the corresponding escalation
+   * @param variables the variables to pass to the execution
+   *
+   * @throws NullValueException if no task with the given id exists
+   * @throws SuspendedEntityInteractionException if the task is suspended
+   * @throws AuthorizationException if the user has none of the following permissions:
+   * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or
+   *                                                    {@link Resources#PROCESS_DEFINITION} resource</li>
+   * <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK} resource</li>
+   * <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION} resource</li>
+  */
+  void handleEscalation(String taskId, String escalationCode);
+
+  /**
+   * Signals that an escalation appears, which should be handled by the process engine.
+   *
+   * @param taskId the id of an existing active task
+   * @param escalationCode the escalation code of the corresponding escalation
+   * @param variables the variables to pass to the execution
+   *
+   * @throws NullValueException if no task with the given id exists
+   * @throws SuspendedEntityInteractionException if the task is suspended
+   * @throws AuthorizationException if the user has none of the following permissions:
+   * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or
+   *                                                    {@link Resources#PROCESS_DEFINITION} resource</li>
+   * <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK} resource</li>
+   * <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION} resource</li>
+  */
+  void handleEscalation(String taskId, String escalationCode, Map<String, Object> variables);
 }
