@@ -17,7 +17,8 @@
 
 'use strict';
 
-// DOM Polyfills
+// Polyfills
+require('core-js');
 require('dom4');
 
 var $ = (window.jQuery = window.$ = require('jquery'));
