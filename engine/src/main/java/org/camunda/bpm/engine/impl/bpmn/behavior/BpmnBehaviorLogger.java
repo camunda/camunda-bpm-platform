@@ -271,4 +271,14 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
         errorCode));
   }
 
+
+  public ProcessEngineException missingBoundaryCatchEventEscalation(String executionId, String escalationCode) {
+    return new ProcessEngineException(
+      exceptionMessage(
+        "043",
+        "Execution with id '{}' throws an escalation event with escalationCode '{}', but no escalation handler was defined. ",
+        executionId,
+        escalationCode));
+  }
+
 }

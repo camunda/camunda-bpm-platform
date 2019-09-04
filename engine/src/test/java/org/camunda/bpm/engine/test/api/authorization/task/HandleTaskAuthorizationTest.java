@@ -27,16 +27,21 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSp
 import static org.junit.Assert.assertNull;
 
 import java.util.Collection;
+import java.util.List;
 
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineLoggingRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +55,7 @@ import org.junit.runners.Parameterized.Parameters;
 import ch.qos.logback.classic.Level;
 
 @RunWith(Parameterized.class)
-public class HandleTaskBpmnErrorAuthorizationTest {
+public class HandleTaskAuthorizationTest {
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
 
@@ -68,6 +73,7 @@ public class HandleTaskBpmnErrorAuthorizationTest {
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected TaskService taskService;
   protected RuntimeService runtimeService;
+  protected RepositoryService repositoryService;
 
   protected static final String userId = "userId";
   protected String deploymentId;
@@ -107,20 +113,21 @@ public class HandleTaskBpmnErrorAuthorizationTest {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     taskService = engineRule.getTaskService();
     runtimeService = engineRule.getRuntimeService();
+    repositoryService = engineRule.getRepositoryService();
 
     authRule.createUserAndGroup("userId", "groupId");
-    deploymentId = engineRule.getRepositoryService().createDeployment().addClasspathResource(ONE_TASK_PROCESS).deployWithResult().getId();
   }
 
   @After
   public void tearDown() {
     authRule.deleteUsersAndGroups();
-    engineRule.getRepositoryService().deleteDeployment(deploymentId, true);
+    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   @Test
-  public void testProcessTask() {
+  public void testHandleTaskBpmnError() {
     // given
+    deploymentId = repositoryService.createDeployment().addClasspathResource(ONE_TASK_PROCESS).deployWithResult().getId();
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
@@ -138,6 +145,40 @@ public class HandleTaskBpmnErrorAuthorizationTest {
       assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult());
       assertThat(loggingRule.getFilteredLog(BPMN_BEHAVIOR_LOGGER, "Execution is ended (none end event semantics)").size()).isEqualTo(1);
       assertThat(loggingRule.getFilteredLog(BPMN_BEHAVIOR_LOGGER, "no catching boundary event was defined").size()).isEqualTo(1);
+    }
+  }
+
+  @Test
+  public void testHandleTaskEscalation() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask("throw-escalation")
+          .boundaryEvent()
+            .escalation("anEscalationCode")
+          .userTask("after-catch")
+        .moveToActivity("throw-escalation")
+        .userTask("after-throw")
+        .endEvent()
+        .done();
+    deploymentId = repositoryService.createDeployment().addModelInstance("escalation.bpmn", model).deploy().getId();
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    authRule
+        .init(scenario)
+        .withUser("userId")
+        .bindResource("taskId", taskId)
+        .start();
+
+    taskService.handleEscalation(taskId, "anEscalationCode");
+
+    // then
+    if (authRule.assertScenario(scenario)) {
+      List<Task> tasks = taskService.createTaskQuery().list();
+      assertThat(tasks.size()).isEqualTo(1);
+      assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("after-catch");
     }
   }
 

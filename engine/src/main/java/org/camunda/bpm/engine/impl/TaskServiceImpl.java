@@ -58,6 +58,7 @@ import org.camunda.bpm.engine.impl.cmd.GetTaskVariableCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskVariableCmdTyped;
 import org.camunda.bpm.engine.impl.cmd.GetTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.HandleTaskBpmnErrorCmd;
+import org.camunda.bpm.engine.impl.cmd.HandleTaskEscalationCmd;
 import org.camunda.bpm.engine.impl.cmd.PatchTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.RemoveTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.ResolveTaskCmd;
@@ -436,5 +437,15 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   @Override
   public void handleBpmnError(String taskId, String errorCode, String errorMessage, Map<String, Object> variables) {
     commandExecutor.execute(new HandleTaskBpmnErrorCmd(taskId, errorCode, errorMessage, variables));
+  }
+
+  @Override
+  public void handleEscalation(String taskId, String escalationCode) {
+    commandExecutor.execute(new HandleTaskEscalationCmd(taskId, escalationCode));
+  }
+
+  @Override
+  public void handleEscalation(String taskId, String escalationCode, Map<String, Object> variables) {
+    commandExecutor.execute(new HandleTaskEscalationCmd(taskId, escalationCode, variables));
   }
 }

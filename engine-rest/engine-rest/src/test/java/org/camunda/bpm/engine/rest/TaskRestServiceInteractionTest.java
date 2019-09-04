@@ -187,6 +187,7 @@ public class TaskRestServiceInteractionTest extends
   protected static final String TASK_CREATE_URL = TASK_SERVICE_URL + "/create";
 
   protected static final String HANDLE_BPMN_ERROR_URL = SINGLE_TASK_URL + "/bpmnError";
+  protected static final String HANDLE_BPMN_ESCALATION_URL = SINGLE_TASK_URL + "/bpmnEscalation";
 
   private Task mockTask;
   private TaskService taskServiceMock;
@@ -3412,7 +3413,7 @@ public class TaskRestServiceInteractionTest extends
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(parameters)
-      .pathParam("id", "anExternalTaskId")
+      .pathParam("id", "aTaskId")
     .then()
       .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -3420,6 +3421,128 @@ public class TaskRestServiceInteractionTest extends
       .body("message", equalTo("aMessage"))
     .when()
       .post(HANDLE_BPMN_ERROR_URL);
+  }
+
+
+  @Test
+  public void testHandleBpmnEscalation() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("escalationCode", "anEscalationCode");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(HANDLE_BPMN_ESCALATION_URL);
+
+    verify(taskServiceMock).handleEscalation("aTaskId", "anEscalationCode", null);
+    verifyNoMoreInteractions(taskServiceMock);
+  }
+
+  @Test
+  public void testHandleBpmnEscalationWithVariables() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("escalationCode", "anEscalationCode");
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+        .variable("var1", "val1")
+        .variable("var2", "val2", "String")
+        .variable("var3", ValueType.OBJECT.getName(), "val3", "aFormat", "aRootType")
+        .getVariables();
+    parameters.put("variables", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(HANDLE_BPMN_ESCALATION_URL);
+
+    verify(taskServiceMock).handleEscalation(
+        eq("aTaskId"),
+        eq("anEscalationCode"),
+        argThat(EqualsVariableMap.matches()
+          .matcher("var1", EqualsUntypedValue.matcher().value("val1"))
+          .matcher("var2", EqualsPrimitiveValue.stringValue("val2"))
+          .matcher("var3",
+            EqualsObjectValue.objectValueMatcher()
+              .type(ValueType.OBJECT)
+              .serializedValue("val3")
+              .serializationFormat("aFormat")
+              .objectTypeName("aRootType"))));
+    verifyNoMoreInteractions(taskServiceMock);
+  }
+
+  @Test
+  public void testHandleBpmnEscalationNonExistingTask() {
+    doThrow(new NullValueException())
+      .when(taskServiceMock)
+      .handleEscalation(anyString(), anyString(), anyMapOf(String.class, Object.class));
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("escalationCode", "anEscalationCode");
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Task with id aTaskId does not exist"))
+    .when()
+      .post(HANDLE_BPMN_ESCALATION_URL);
+  }
+
+  @Test
+  public void testHandleBpmnEscalationThrowsAuthorizationException() {
+    doThrow(new AuthorizationException("aMessage"))
+      .when(taskServiceMock)
+      .handleEscalation(any(String.class), any(String.class),anyMapOf(String.class, Object.class));
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("escalationCode", "escalationCode");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo("aMessage"))
+    .when()
+      .post(HANDLE_BPMN_ESCALATION_URL);
+  }
+
+  @Test
+  public void testHandleBpmnEscalationThrowsBadUserRequestException() {
+    doThrow(new BadUserRequestException("aMessage"))
+      .when(taskServiceMock)
+      .handleEscalation(any(String.class), any(String.class), anyMapOf(String.class, Object.class));
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("escalationCode", "escalationCode");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("aMessage"))
+    .when()
+      .post(HANDLE_BPMN_ESCALATION_URL);
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

@@ -3086,10 +3086,11 @@ public class BpmnParse extends Parse {
 
       } else if (escalationEventDefinition != null) {
 
-        if (attachedActivity.isSubProcessScope() || attachedActivity.getActivityBehavior() instanceof CallActivityBehavior) {
+        if (attachedActivity.isSubProcessScope() || attachedActivity.getActivityBehavior() instanceof CallActivityBehavior ||
+            attachedActivity.getActivityBehavior() instanceof UserTaskActivityBehavior) {
           parseBoundaryEscalationEventDefinition(escalationEventDefinition, isCancelActivity, boundaryEventActivity);
         } else {
-          addError("An escalation boundary event should only be attached to a subprocess or a call activity", boundaryEventElement);
+          addError("An escalation boundary event should only be attached to a subprocess, a call activity or an user task", boundaryEventElement);
         }
 
       } else if (conditionalEventDefinition != null) {
