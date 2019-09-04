@@ -148,7 +148,7 @@
           <label class="control-label col-sm-4 col-md-2"
                  for="inputAuthenticationUserPassword"
                  ng-if="userId !== authenticatedUser">
-            {{ 'USERS_MY_PASSWORD' | translate }}
+            {{ 'USERS_MY_PASSWORD' | translate:{name: $root.userFullName} }}
           </label>
 
           <div class="col-sm-8 col-md-10">
