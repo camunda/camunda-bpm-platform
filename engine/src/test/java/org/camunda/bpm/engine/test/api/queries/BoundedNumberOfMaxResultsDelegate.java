@@ -14,34 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmd;
+package org.camunda.bpm.engine.test.api.queries;
+
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.AbstractQuery;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.query.Query;
+import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @author Sebastian Menski
- */
-public class ExecuteFilterListCmd extends AbstractExecuteFilterCmd implements Command<List<?>> {
+public class BoundedNumberOfMaxResultsDelegate implements JavaDelegate {
 
-  private static final long serialVersionUID = 1L;
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    List<ProcessInstance> processInstances = execution.getProcessEngineServices()
+        .getRuntimeService()
+        .createProcessInstanceQuery()
+        .list();
 
-  public ExecuteFilterListCmd(String filterId) {
-    super(filterId);
-  }
-
-  public ExecuteFilterListCmd(String filterId, Query<?, ?> extendingQuery) {
-    super(filterId, extendingQuery);
-  }
-
-  public List<?> execute(CommandContext commandContext) {
-    Query<?, ?> query = getFilterQuery(commandContext);
-    ((AbstractQuery) query).enableMaxResultsLimit();
-    return query.list();
+    assertThat(processInstances.size()).isEqualTo(0);
   }
 
 }

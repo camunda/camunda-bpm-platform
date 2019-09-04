@@ -795,6 +795,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected int loginDelayMaxTime = 60;
   protected int loginDelayBase = 3;
 
+  // max results limit
+  protected int queryMaxResultsLimit = Integer.MAX_VALUE;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -4347,6 +4350,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setAdminUsers(List<String> adminUsers) {
     this.adminUsers = adminUsers;
+  }
+
+  public int getQueryMaxResultsLimit() {
+    return queryMaxResultsLimit;
+  }
+
+  public ProcessEngineConfigurationImpl setQueryMaxResultsLimit(int queryMaxResultsLimit) {
+    this.queryMaxResultsLimit = queryMaxResultsLimit;
+    return this;
   }
 
 }

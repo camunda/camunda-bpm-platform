@@ -33,7 +33,12 @@ import org.camunda.bpm.engine.rest.dto.runtime.FilterDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.hal.*;
+import org.camunda.bpm.engine.rest.hal.EmptyHalCollection;
+import org.camunda.bpm.engine.rest.hal.EmptyHalResource;
+import org.camunda.bpm.engine.rest.hal.Hal;
+import org.camunda.bpm.engine.rest.hal.HalCollectionResource;
+import org.camunda.bpm.engine.rest.hal.HalResource;
+import org.camunda.bpm.engine.rest.hal.HalVariableValue;
 import org.camunda.bpm.engine.rest.hal.task.HalTask;
 import org.camunda.bpm.engine.rest.hal.task.HalTaskList;
 import org.camunda.bpm.engine.rest.impl.AbstractAuthorizedRestResource;
@@ -42,11 +47,23 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.camunda.bpm.engine.authorization.Permissions.*;
@@ -519,9 +536,9 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
         .createVariableInstanceQuery()
         .disableBinaryFetching()
         .disableCustomObjectDeserialization()
-        .variableNameIn(variableNames.toArray(new String[variableNames.size()]))
-        .variableScopeIdIn(variableScopeIds.toArray(new String[variableScopeIds.size()]))
-        .list();
+        .variableNameIn(variableNames.toArray(new String[0]))
+        .variableScopeIdIn(variableScopeIds.toArray(new String[0]))
+        .listPage(0, 5 * variableNames.size());
 
   }
 

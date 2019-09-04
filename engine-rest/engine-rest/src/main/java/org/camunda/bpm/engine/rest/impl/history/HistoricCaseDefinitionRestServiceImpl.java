@@ -26,6 +26,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
+import org.camunda.bpm.engine.history.HistoricCaseActivityStatisticsQuery;
+import org.camunda.bpm.engine.impl.HistoricCaseActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityStatisticsDto;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricCaseInstanceReportDto;
@@ -51,7 +53,12 @@ public class HistoricCaseDefinitionRestServiceImpl implements HistoricCaseDefini
   public List<HistoricCaseActivityStatisticsDto> getHistoricCaseActivityStatistics(String caseDefinitionId) {
     HistoryService historyService = processEngine.getHistoryService();
 
-    List<HistoricCaseActivityStatistics> statistics = historyService.createHistoricCaseActivityStatisticsQuery(caseDefinitionId).list();
+    HistoricCaseActivityStatisticsQuery historicCaseActivityStatisticsQuery =
+        historyService.createHistoricCaseActivityStatisticsQuery(caseDefinitionId);
+
+    List<HistoricCaseActivityStatistics> statistics =
+        ((HistoricCaseActivityStatisticsQueryImpl) historicCaseActivityStatisticsQuery)
+            .unboundedResultList();
 
     List<HistoricCaseActivityStatisticsDto> result = new ArrayList<HistoricCaseActivityStatisticsDto>();
     for (HistoricCaseActivityStatistics currentStatistics : statistics) {

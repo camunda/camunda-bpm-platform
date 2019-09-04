@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.externaltask;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -42,6 +43,11 @@ public interface UpdateExternalTaskRetriesBuilder extends UpdateExternalTaskRetr
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
    *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
    *   </ul>
+   * @throws BadUserRequestException
+   *   When the affected instances count exceeds the maximum results limit. A maximum results
+   *   limit can be specified with the process engine configuration property
+   *   <code>queryMaxResultsLimit</code> (default {@link Integer#MAX_VALUE}).
+   *   Please use the batch operation {@link #setAsync} instead.
    */
   void set(int retries);
 
