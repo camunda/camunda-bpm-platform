@@ -52,8 +52,9 @@ public class TaskDefinition {
   protected Expression formKey;
 
   // task listeners
-  protected Map<String, List<TaskListener>> taskListeners = new HashMap<String, List<TaskListener>>();
-  protected Map<String, List<TaskListener>> builtinTaskListeners = new HashMap<String, List<TaskListener>>();
+  protected Map<String, List<TaskListener>> taskListeners = new HashMap<>();
+  protected Map<String, List<TaskListener>> builtinTaskListeners = new HashMap<>();
+  protected Map<String, TaskListener> timeoutTaskListeners = new HashMap<>();
 
   public TaskDefinition(TaskFormHandler taskFormHandler) {
     this.taskFormHandler = taskFormHandler;
@@ -161,6 +162,10 @@ public class TaskDefinition {
     return builtinTaskListeners.get(eventName);
   }
 
+  public TaskListener getTimeoutTaskListener(String timeoutId) {
+    return timeoutTaskListeners.get(timeoutId);
+  }
+
   public void addTaskListener(String eventName, TaskListener taskListener) {
     CollectionUtil.addToMapOfLists(taskListeners, eventName, taskListener);
   }
@@ -177,6 +182,9 @@ public class TaskDefinition {
     CollectionUtil.addToMapOfLists(builtinTaskListeners, eventName, taskListener);
   }
 
+  public void addTimeoutTaskListener(String timeoutId, TaskListener taskListener) {
+    timeoutTaskListeners.put(timeoutId, taskListener);
+  }
 
   public Expression getFormKey() {
     return formKey;

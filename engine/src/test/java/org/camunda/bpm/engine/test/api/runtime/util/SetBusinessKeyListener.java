@@ -14,31 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.delegate;
+package org.camunda.bpm.engine.test.api.runtime.util;
 
-/**
- * Listener interface implemented by user code which wants to be notified when a property of a task changes.
- *
- * <p>The following Task Events are supported:
- * <ul>
- * <li>{@link #EVENTNAME_CREATE}</li>
- * <li>{@link #EVENTNAME_ASSIGNMENT}</li>
- * <li>{@link #EVENTNAME_COMPLETE}</li>
- * <li>{@link #EVENTNAME_DELETE}</li>
- * <li>{@link #EVENTNAME_TIMEOUT}</li>
- * </ul>
- * </p>
- *
- * @author Tom Baeyens
- */
-public interface TaskListener {
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.TaskListener;
 
-  String EVENTNAME_CREATE = "create";
-  String EVENTNAME_ASSIGNMENT = "assignment";
-  String EVENTNAME_COMPLETE = "complete";
-  String EVENTNAME_DELETE = "delete";
-  String EVENTNAME_TIMEOUT = "timeout";
+public class SetBusinessKeyListener implements TaskListener {
 
-  void notify(DelegateTask delegateTask);
+  public static final String BUSINESS_KEY_VARIABLE = "businessKeyVar";
+
+  @Override
+  public void notify(DelegateTask delegateTask) {
+    DelegateExecution execution = delegateTask.getExecution();
+    String newKeyValue = (String) execution.getVariable(BUSINESS_KEY_VARIABLE);
+    execution.setProcessBusinessKey(newKeyValue);
+  }
 
 }

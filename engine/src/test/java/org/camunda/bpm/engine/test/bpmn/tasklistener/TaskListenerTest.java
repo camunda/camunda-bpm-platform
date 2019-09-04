@@ -17,13 +17,20 @@
 package org.camunda.bpm.engine.test.bpmn.tasklistener;
 
 import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -33,10 +40,15 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener.RecordedTaskEvent;
@@ -48,6 +60,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
+import org.joda.time.LocalDateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -392,6 +405,180 @@ public class TaskListenerTest {
 
     // then
     assertEquals(1, AssignmentTaskListener.eventCounter);
+  }
+
+  @Test
+  @Deployment
+  public void testTimeoutTaskListenerDuration() {
+    // given
+    ProcessInstance instance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+
+    // when
+    ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
+
+    // then
+    assertThat((String) runtimeService.getVariable(instance.getId(), "timeout-status"), is("fired"));
+  }
+
+  @Test
+  @Deployment
+  public void testTimeoutTaskListenerDate() throws ParseException {
+    // given
+    ProcessInstance instance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+
+    // when
+    ClockUtil.setCurrentTime(new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss").parse("2019-09-09T13:00:00"));
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
+
+    // then
+    assertThat((String) runtimeService.getVariable(instance.getId(), "timeout-status"), is("fired"));
+  }
+
+  @Test
+  @Deployment
+  public void testTimeoutTaskListenerCycle() {
+    // given
+    ProcessInstance instance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+
+    // when
+    ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
+    ClockUtil.offset(TimeUnit.MINUTES.toMillis(130L));
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
+
+    // then
+    assertThat((String) runtimeService.getVariable(instance.getId(), "timeout-status"), is("fired2"));
+  }
+
+  @Test
+  @Deployment
+  public void testMultipleTimeoutTaskListeners() {
+    // given
+    ProcessInstance instance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+
+    // assume
+    assertThat(engineRule.getManagementService().createJobQuery().count(), is(2L));
+
+    // when
+    ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
+
+    // then
+    assertThat(engineRule.getManagementService().createJobQuery().count(), is(1L));
+    assertThat((String) runtimeService.getVariable(instance.getId(), "timeout-status"), is("fired"));
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.testTimeoutTaskListenerDuration.bpmn20.xml")
+  public void testTimeoutTaskListenerNotCalledWhenTaskCompleted() {
+    // given
+    JobQuery jobQuery = engineRule.getManagementService().createJobQuery();
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    runtimeService.startProcessInstanceByKey("process");
+
+    // assume
+    assertThat(jobQuery.count(), is(1L));
+
+    // when
+    taskService.complete(taskQuery.singleResult().getId());
+
+    // then
+    HistoricVariableInstanceQuery variableQuery = historyService.createHistoricVariableInstanceQuery().variableName("timeout-status");
+    assertThat(variableQuery.count(), is(0L));
+    assertThat(jobQuery.count(), is(0L));
+  }
+
+  @Test
+  @Deployment
+  public void testTimeoutTaskListenerNotCalledWhenTaskCompletedByBoundaryEvent() {
+    // given
+    JobQuery jobQuery = engineRule.getManagementService().createJobQuery();
+    runtimeService.startProcessInstanceByKey("process");
+
+    // assume
+    assertThat(jobQuery.count(), is(2L));
+
+    // when the boundary event is triggered
+    ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
+
+    // then
+    HistoricVariableInstanceQuery variableQuery = historyService.createHistoricVariableInstanceQuery().variableName("timeout-status");
+    assertThat(variableQuery.count(), is(0L));
+    assertThat(jobQuery.count(), is(0L));
+  }
+
+  @Test
+  @Deployment
+  public void testRecalculateTimeoutTaskListenerDuedateCreationDateBased() {
+    // given
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", Variables.putValue("duration", "PT1H"));
+
+    JobQuery jobQuery = engineRule.getManagementService().createJobQuery().processInstanceId(pi.getId());
+    List<Job> jobs = jobQuery.list();
+    assertEquals(1, jobs.size());
+    Job job = jobs.get(0);
+    Date oldDate = job.getDuedate();
+
+    // when
+    runtimeService.setVariable(pi.getId(), "duration", "PT15M");
+    engineRule.getManagementService().recalculateJobDuedate(job.getId(), true);
+
+    // then
+    Job jobUpdated = jobQuery.singleResult();
+    assertEquals(job.getId(), jobUpdated.getId());
+    assertNotEquals(oldDate, jobUpdated.getDuedate());
+    assertTrue(oldDate.after(jobUpdated.getDuedate()));
+    assertEquals(LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(15).toDate(), jobUpdated.getDuedate());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.testRecalculateTimeoutTaskListenerDuedateCreationDateBased.bpmn20.xml")
+  public void testRecalculateTimeoutTaskListenerDuedateCurrentDateBased() {
+    // given
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", Variables.putValue("duration", "PT1H"));
+
+    JobQuery jobQuery = engineRule.getManagementService().createJobQuery().processInstanceId(pi.getId());
+    List<Job> jobs = jobQuery.list();
+    assertEquals(1, jobs.size());
+    Job job = jobs.get(0);
+    Date oldDate = job.getDuedate();
+
+    // when
+    engineRule.getManagementService().recalculateJobDuedate(job.getId(), false);
+
+    // then
+    Job jobUpdated = jobQuery.singleResult();
+    assertEquals(job.getId(), jobUpdated.getId());
+    assertNotEquals(oldDate, jobUpdated.getDuedate());
+    assertTrue(oldDate.before(jobUpdated.getDuedate()));
+  }
+
+  @Test
+  @Deployment
+  public void testRecalculateTimeoutTaskListenerDuedateCreationDateBasedWithDefinedBoundaryEvent() {
+    // given
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", Variables.putValue("duration", "PT1H"));
+
+    JobQuery jobQuery = engineRule.getManagementService().createJobQuery()
+        .processInstanceId(pi.getId())
+        .activityId("userTask");
+    List<Job> jobs = jobQuery.list();
+    assertEquals(1, jobs.size());
+    Job job = jobs.get(0);
+    Date oldDate = job.getDuedate();
+
+    // when
+    runtimeService.setVariable(pi.getId(), "duration", "PT15M");
+    engineRule.getManagementService().recalculateJobDuedate(job.getId(), true);
+
+    // then
+    Job jobUpdated = jobQuery.singleResult();
+    assertEquals(job.getId(), jobUpdated.getId());
+    assertNotEquals(oldDate, jobUpdated.getDuedate());
+    assertTrue(oldDate.after(jobUpdated.getDuedate()));
+    assertEquals(LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(15).toDate(), jobUpdated.getDuedate());
   }
 
   @Test

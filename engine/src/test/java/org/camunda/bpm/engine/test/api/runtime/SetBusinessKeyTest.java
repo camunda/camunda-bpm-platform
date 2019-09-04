@@ -19,22 +19,28 @@ package org.camunda.bpm.engine.test.api.runtime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.concurrent.TimeUnit;
+
+import static org.camunda.bpm.engine.test.api.runtime.util.SetBusinessKeyListener.BUSINESS_KEY_VARIABLE;
+
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.runtime.util.SetBusinessKeyListener;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
@@ -75,7 +81,6 @@ public class SetBusinessKeyTest {
       .endEvent("endEvent")
       .done();
 
-  protected static final String BUSINESS_KEY_VARIABLE = "businessKeyVar";
   protected RuntimeService runtimeService;
   protected TaskService taskService;
   protected HistoryService historyService;
@@ -168,6 +173,23 @@ public class SetBusinessKeyTest {
   }
 
   @Test
+  public void testNewKeyInAssignTaskListener() {
+    // given
+    String listener = TaskListener.EVENTNAME_ASSIGNMENT;
+    BpmnModelInstance process = createModelTaskListener(listener);
+    testRule.deploy(process);
+
+    String newBusinessKeyValue = "newBusinessKey";
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+
+    // when
+    taskService.setAssignee(taskService.createTaskQuery().singleResult().getId(), "newUserId");
+
+    // then
+    checkBusinessKeyChanged(newBusinessKeyValue);
+  }
+
+  @Test
   public void testNewKeyInEndTaskListener() {
     // given
     String listener = TaskListener.EVENTNAME_COMPLETE;
@@ -181,6 +203,21 @@ public class SetBusinessKeyTest {
 
     // assume
     assertNotNull(taskService.createTaskQuery().taskDefinitionKey("userTask2").singleResult());
+
+    // then
+    checkBusinessKeyChanged(newBusinessKeyValue);
+  }
+
+  @Test
+  @Deployment
+  public void testNewKeyInTimeoutTaskListener() {
+    // given
+    String newBusinessKeyValue = "newBusinessKey";
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, Variables.createVariables().putValue(BUSINESS_KEY_VARIABLE, newBusinessKeyValue));
+
+    // when
+    ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     // then
     checkBusinessKeyChanged(newBusinessKeyValue);
@@ -336,13 +373,4 @@ public class SetBusinessKeyTest {
 
   }
 
-  public static class SetBusinessKeyListener implements TaskListener {
-
-    public void notify(DelegateTask delegateTask) {
-      DelegateExecution execution = delegateTask.getExecution();
-      String newKeyValue = (String) execution.getVariable(BUSINESS_KEY_VARIABLE);
-      execution.setProcessBusinessKey(newKeyValue);
-    }
-
-  }
 }

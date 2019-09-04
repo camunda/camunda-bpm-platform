@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
@@ -959,26 +960,67 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
     if (taskEventListeners != null) {
       for (TaskListener taskListener : taskEventListeners) {
-        CoreExecution execution = getExecution();
-        if (execution == null) {
-          execution = getCaseExecution();
-        }
-
-        if (execution != null) {
-          setEventName(taskEventName);
-        }
-        try {
-          boolean success = invokeListener(execution, taskEventName, taskListener);
-          if (!success) {
-            return false;
-          }
-        } catch (Exception e) {
-          throw LOG.invokeTaskListenerException(e);
+        if (!invokeListener(taskEventName, taskListener)){
+          return false;
         }
       }
     }
 
     return true;
+  }
+
+  protected List<TaskListener> getListenersForEvent(String event) {
+    TaskDefinition resolvedTaskDefinition = getTaskDefinition();
+    if (resolvedTaskDefinition != null) {
+      if (skipCustomListeners) {
+        return resolvedTaskDefinition.getBuiltinTaskListeners(event);
+      }
+      else {
+        return resolvedTaskDefinition.getTaskListeners(event);
+      }
+
+    }
+    else {
+      return null;
+    }
+  }
+
+  /**
+   * @return true if invoking the listener was successful;
+   *   if not successful, either false is returned (case: BPMN error propagation)
+   *   or an exception is thrown
+   */
+  public boolean fireTimeoutEvent(String timeoutId) {
+    TaskListener taskListener = getTimeoutListener(timeoutId);
+    if (taskListener == null) {
+      throw LOG.invokeTaskListenerException(new NotFoundException("Cannot find timeout taskListener with id '"
+          + timeoutId + "' for task " + this.id));
+    }
+    return invokeListener(TaskListener.EVENTNAME_TIMEOUT, taskListener);
+  }
+
+  protected TaskListener getTimeoutListener(String timeoutId) {
+    TaskDefinition resolvedTaskDefinition = getTaskDefinition();
+    if (resolvedTaskDefinition == null) {
+      return null;
+    } else {
+      return resolvedTaskDefinition.getTimeoutTaskListener(timeoutId);
+    }
+  }
+
+  protected boolean invokeListener(String taskEventName, TaskListener taskListener) {
+    CoreExecution execution = getExecution();
+    if (execution == null) {
+      execution = getCaseExecution();
+    }
+    if (execution != null) {
+      setEventName(taskEventName);
+    }
+    try {
+      return invokeListener(execution, taskEventName, taskListener);
+    } catch (Exception e) {
+      throw LOG.invokeTaskListenerException(e);
+    }
   }
 
   /**
@@ -1011,22 +1053,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       }
     }
     return true;
-  }
-
-  protected List<TaskListener> getListenersForEvent(String event) {
-    TaskDefinition resolvedTaskDefinition = getTaskDefinition();
-    if (resolvedTaskDefinition != null) {
-      if (skipCustomListeners) {
-        return resolvedTaskDefinition.getBuiltinTaskListeners(event);
-      }
-      else {
-        return resolvedTaskDefinition.getTaskListeners(event);
-      }
-
-    }
-    else {
-      return null;
-    }
   }
 
   /**
