@@ -82,6 +82,15 @@ module.exports = [
             });
           };
 
+          $scope.$root.$watch('userFullName', function(name) {
+            if (name) {
+              $scope.currentUserPassword = $translate.instant(
+                'USERS_MY_PASSWORD',
+                {name: $scope.$root.userFullName}
+              );
+            }
+          });
+
           $scope.decodedUserId = unescape(
             encodeURIComponent($routeParams.userId)
           );
