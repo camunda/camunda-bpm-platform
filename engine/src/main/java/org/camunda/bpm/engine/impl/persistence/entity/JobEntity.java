@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -101,6 +102,9 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
   // sequence counter //////////////////////////
   protected long sequenceCounter = 1;
+
+  // last failure log id ///////////////////////
+  protected String lastFailureLogId;
 
   public void execute(CommandContext commandContext) {
     if (executionId != null) {
@@ -313,6 +317,17 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
             .findIncidentByConfigurationAndIncidentType(id, incidentHandlerType);
 
         if (!failedJobIncidents.isEmpty()) {
+          // update the historic job log id in the historic incidents (if available)
+          for (Incident incident : failedJobIncidents) {
+            HistoricIncidentEntity historicIncidentEvent = Context
+                .getCommandContext()
+                .getHistoricIncidentManager()
+                .findHistoricIncidentById(incident.getId());
+            if (historicIncidentEvent != null) {
+              historicIncidentEvent.setHistoryConfiguration(getLastFailureLogId());
+              Context.getCommandContext().getDbEntityManager().merge(historicIncidentEvent);
+            }
+          }
           return;
         }
 
@@ -320,6 +335,7 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
 
       IncidentContext incidentContext = createIncidentContext();
       incidentContext.setActivityId(getActivityId());
+      incidentContext.setHistoryConfiguration(getLastFailureLogId());
 
       processEngineConfiguration
         .getIncidentHandler(incidentHandlerType)
@@ -608,6 +624,31 @@ public abstract class JobEntity extends AcquirableJobEntity implements Serializa
     }
 
     return referenceIdAndClass;
+  }
+
+  public String getLastFailureLogId() {
+    if (lastFailureLogId == null) {
+      // try to find the last failure log in the database,
+      // can occur if setRetries is called manually since
+      // otherwise the failure handling ensures that a log
+      // entry is written before the incident is created
+      List<HistoricJobLog> logEntries = Context.getCommandContext()
+        .getProcessEngineConfiguration()
+        .getHistoryService()
+        .createHistoricJobLogQuery()
+        .failureLog()
+        .jobId(id)
+        .orderPartiallyByOccurrence().desc()
+        .list();
+      if (!logEntries.isEmpty()) {
+        lastFailureLogId = logEntries.get(0).getId();
+      }
+    }
+    return lastFailureLogId;
+  }
+
+  public void setLastFailureLogId(String lastFailureLogId) {
+    this.lastFailureLogId = lastFailureLogId;
   }
 
   @Override

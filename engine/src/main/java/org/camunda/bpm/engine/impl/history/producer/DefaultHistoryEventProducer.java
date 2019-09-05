@@ -354,6 +354,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setIncidentMessage(incident.getIncidentMessage());
     evt.setTenantId(incident.getTenantId());
     evt.setJobDefinitionId(incident.getJobDefinitionId());
+    evt.setHistoryConfiguration(incident.getHistoryConfiguration());
 
     String jobId = incident.getConfiguration();
     if (jobId != null && isHistoryRemovalTimeStrategyStart()) {

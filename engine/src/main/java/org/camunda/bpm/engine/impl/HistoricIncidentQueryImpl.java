@@ -45,6 +45,7 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
+  protected String historyConfiguration;
   protected IncidentState incidentState;
   protected String[] tenantIds;
   protected String[] jobDefinitionIds;
@@ -119,6 +120,12 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   public HistoricIncidentQuery configuration(String configuration) {
     ensureNotNull("configuration", configuration);
     this.configuration = configuration;
+    return this;
+  }
+
+  public HistoricIncidentQuery historyConfiguration(String historyConfiguration) {
+    ensureNotNull("historyConfiguration", historyConfiguration);
+    this.historyConfiguration = historyConfiguration;
     return this;
   }
 
@@ -216,6 +223,11 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return this;
   }
 
+  public HistoricIncidentQuery orderByHistoryConfiguration() {
+    orderBy(HistoricIncidentQueryProperty.HISTORY_CONFIGURATION);
+    return this;
+  }
+
   public HistoricIncidentQuery orderByIncidentState() {
     orderBy(HistoricIncidentQueryProperty.INCIDENT_STATE);
     return this;
@@ -282,6 +294,10 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
 
   public String getConfiguration() {
     return configuration;
+  }
+
+  public String getHistoryConfiguration() {
+    return historyConfiguration;
   }
 
   public IncidentState getIncidentState() {

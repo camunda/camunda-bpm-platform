@@ -49,6 +49,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   private static final String SORT_BY_CAUSE_INCIDENT_ID = "causeIncidentId";
   private static final String SORT_BY_ROOT_CAUSE_INCIDENT_ID = "rootCauseIncidentId";
   private static final String SORT_BY_CONFIGURATION = "configuration";
+  private static final String SORT_BY_HISTORY_CONFIGURATION = "historyConfiguration";
   private static final String SORT_BY_TENANT_ID = "tenantId";
   private static final String SORT_BY_INCIDENT_STATE = "incidentState";
 
@@ -67,6 +68,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     VALID_SORT_BY_VALUES.add(SORT_BY_CAUSE_INCIDENT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_ROOT_CAUSE_INCIDENT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_CONFIGURATION);
+    VALID_SORT_BY_VALUES.add(SORT_BY_HISTORY_CONFIGURATION);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_STATE);
   }
@@ -81,11 +83,13 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
+  protected String historyConfiguration;
   protected Boolean open;
   protected Boolean resolved;
   protected Boolean deleted;
   protected List<String> tenantIds;
   protected List<String> jobDefinitionIds;
+
 
   public HistoricIncidentQueryDto() {}
 
@@ -141,6 +145,11 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   @CamundaQueryParam("configuration")
   public void setConfiguration(String configuration) {
     this.configuration = configuration;
+  }
+
+  @CamundaQueryParam("historyConfiguration")
+  public void setHistoryConfiguration(String historyConfiguration) {
+    this.historyConfiguration = historyConfiguration;
   }
 
   @CamundaQueryParam(value = "open", converter = BooleanConverter.class)
@@ -210,6 +219,9 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     if (configuration != null) {
       query.configuration(configuration);
     }
+    if (historyConfiguration != null) {
+      query.historyConfiguration(historyConfiguration);
+    }
     if (open != null) {
       query.open();
     }
@@ -253,6 +265,8 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
       query.orderByRootCauseIncidentId();
     } else if (sortBy.equals(SORT_BY_CONFIGURATION)) {
       query.orderByConfiguration();
+    } else if (sortBy.equals(SORT_BY_HISTORY_CONFIGURATION)) {
+      query.orderByHistoryConfiguration();
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
     } else if (sortBy.equals(SORT_BY_INCIDENT_STATE)) {

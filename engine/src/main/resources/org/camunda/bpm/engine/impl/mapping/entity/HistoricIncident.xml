@@ -39,6 +39,7 @@
         CAUSE_INCIDENT_ID_,
         ROOT_CAUSE_INCIDENT_ID_,
         CONFIGURATION_,
+        HISTORY_CONFIGURATION_,
         INCIDENT_STATE_,
         TENANT_ID_,
         JOB_DEF_ID_,
@@ -58,6 +59,7 @@
         #{causeIncidentId ,jdbcType=VARCHAR},
         #{rootCauseIncidentId ,jdbcType=VARCHAR},
         #{configuration, jdbcType=VARCHAR},
+        #{historyConfiguration, jdbcType=VARCHAR},
         #{incidentState, jdbcType=INTEGER},
         #{tenantId, jdbcType=VARCHAR},
         #{jobDefinitionId, jdbcType=VARCHAR},
@@ -84,7 +86,19 @@
     where
       ID_ = #{id, jdbcType=VARCHAR}
   </update>
-
+  
+  <update id="updateHistoricIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity">
+    update
+      ${prefix}ACT_HI_INCIDENT
+    set
+      <!-- MySQL requires timestamps to always be part of the 
+      UPDATE statement or else it is going to update them to the current time -->
+      CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
+      HISTORY_CONFIGURATION_ = #{historyConfiguration, jdbcType=VARCHAR}
+    where
+      ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+  
   <update id="updateHistoricIncidentsByRootProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_INCIDENT set
@@ -242,6 +256,7 @@
     <result property="causeIncidentId" column="CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentId" column="ROOT_CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
+    <result property="historyConfiguration" column="HISTORY_CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="incidentState" column="INCIDENT_STATE_" jdbcType="INTEGER" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
@@ -249,6 +264,10 @@
   </resultMap>
 
   <!-- HISTORIC INCIDENT SELECT -->
+  
+  <select id="selectHistoricIncidentById" resultMap="historicIncidentResultMap">
+    select RES.* from ${prefix}ACT_HI_INCIDENT RES where RES.ID_ = #{id}
+  </select>
 
   <select id="selectHistoricIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl" resultMap="historicIncidentResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
