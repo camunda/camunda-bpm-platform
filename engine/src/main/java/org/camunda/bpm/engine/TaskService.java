@@ -1151,33 +1151,38 @@ public interface TaskService {
   /** Instantiate a task report */
   TaskReport createTaskReport();
 
-  /** Signals that an business error appears, which should be handled by the process engine.
+  /**
+   * Signals that an business error appears, which should be handled by the process engine.
    *
    * @param taskId the id of an existing active task
    * @param errorCode the error code of the corresponding bmpn error
    *
    * @throws NullValueException if no task with the given id exists
+   * @throws SuspendedEntityInteractionException if the task is suspended
+   * @throws AuthorizationException if the user has none of the following permissions:
+   * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or
+   *                                                    {@link Resources#PROCESS_DEFINITION} resource</li>
+   * <li>{@link Permissions#UPDATE} permission on {@link Resources#TASK} resource</li>
+   * <li>{@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION} resource</li>
    */
   void handleBpmnError(String taskId, String errorCode);
 
-  /** Signals that an business error appears, which should be handled by the process engine.
+  /**
+   * @see #handleBpmnError(String, String)
    *
    * @param taskId the id of an existing active task
    * @param errorCode the error code of the corresponding bmpn error
    * @param errorMessage the error message of the corresponding bmpn error
-   *
-   * @throws NullValueException if no task with the given id exists
    */
   void handleBpmnError(String taskId, String errorCode, String errorMessage);
 
-  /** Signals that an business error appears, which should be handled by the process engine.
+  /**
+   * @see #handleBpmnError(String, String)
    *
    * @param taskId the id of an existing active task
    * @param errorCode the error code of the corresponding bmpn error
    * @param errorMessage the error message of the corresponding bmpn error
    * @param variables the variables to pass to the execution
-   *
-   * @throws NullValueException if no task with the given id exists
    */
   void handleBpmnError(String taskId, String errorCode, String errorMessage, Map<String, Object> variables);
 }

@@ -65,10 +65,7 @@ public class HandleTaskBpmnErrorCmd implements Command<Void>, Serializable{
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      String processInstanceId = task.getProcessInstanceId();
-      if (processInstanceId != null) {
-        checker.checkUpdateProcessInstanceById(processInstanceId);
-      }
+      checker.checkTaskWork(task);
     }
 
     task.bpmnError(errorCode, errorMessage, variables);
