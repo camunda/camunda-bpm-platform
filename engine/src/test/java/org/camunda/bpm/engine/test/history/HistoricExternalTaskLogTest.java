@@ -113,7 +113,7 @@ public class HistoricExternalTaskLogTest {
       .singleResult();
 
     // then
-    assertHistoricLogPropertiesAreProperlySet(task, log);
+    assertHistoricLogPropertiesAreProperlySet(task, null, log);
     assertEquals(WORKER_ID, log.getWorkerId());
     assertLogIsInFailedState(log);
 
@@ -305,6 +305,10 @@ public class HistoricExternalTaskLogTest {
   }
 
   protected void assertHistoricLogPropertiesAreProperlySet(ExternalTask task, HistoricExternalTaskLog log) {
+    assertHistoricLogPropertiesAreProperlySet(task, task.getRetries(), log);
+  }
+
+  protected void assertHistoricLogPropertiesAreProperlySet(ExternalTask task, Integer retries, HistoricExternalTaskLog log) {
     assertNotNull(log);
     assertNotNull(log.getId());
     assertNotNull(log.getTimestamp());
@@ -313,7 +317,7 @@ public class HistoricExternalTaskLogTest {
     assertEquals(task.getActivityId(), log.getActivityId());
     assertEquals(task.getActivityInstanceId(), log.getActivityInstanceId());
     assertEquals(task.getTopicName(), log.getTopicName());
-    assertEquals(task.getRetries(), log.getRetries());
+    assertEquals(retries, log.getRetries());
     assertEquals(task.getExecutionId(), log.getExecutionId());
     assertEquals(task.getProcessInstanceId(), log.getProcessInstanceId());
     assertEquals(task.getProcessDefinitionId(), log.getProcessDefinitionId());

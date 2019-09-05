@@ -31,17 +31,17 @@ public interface HistoricIncident {
   /**
    * Returns the unique identifier for this incident.
    */
-  public String getId();
+  String getId();
 
   /**
    * Time when the incident happened.
    */
-  public Date getCreateTime();
+  Date getCreateTime();
 
   /**
    * Time when the incident has been resolved or deleted.
    */
-  public Date getEndTime();
+  Date getEndTime();
 
   /**
    * Returns the type of this incident to identify the
@@ -53,24 +53,24 @@ public interface HistoricIncident {
    * in the case of an incident, which identify failed job
    * during the execution of a process instance.
    */
-  public String getIncidentType();
+  String getIncidentType();
 
   /**
    * Returns the incident message.
    */
-  public String getIncidentMessage();
+  String getIncidentMessage();
 
   /**
    * Returns the specific execution on which this
    * incident has happened.
    */
-  public String getExecutionId();
+  String getExecutionId();
 
   /**
    * Returns the id of the activity of the process instance
    * on which this incident has happened.
    */
-  public String getActivityId();
+  String getActivityId();
 
   /**
    * Returns the specific root process instance id of the process instance
@@ -82,60 +82,65 @@ public interface HistoricIncident {
    * Returns the specific process instance on which this
    * incident has happened.
    */
-  public String getProcessInstanceId();
+  String getProcessInstanceId();
 
   /**
    * Returns the id of the process definition of this
    * process instance on which the incident has happened.
    */
-  public String getProcessDefinitionId();
+  String getProcessDefinitionId();
 
   /**
    * Returns the key of the process definition of this
    * process instance on which the incident has happened.
    */
-  public String getProcessDefinitionKey();
+  String getProcessDefinitionKey();
 
   /**
    * Returns the id of the incident on which this incident
    * has been triggered.
    */
-  public String getCauseIncidentId();
+  String getCauseIncidentId();
 
   /**
    * Returns the id of the root incident on which
    * this transitive incident has been triggered.
    */
-  public String getRootCauseIncidentId();
+  String getRootCauseIncidentId();
 
   /**
    * Returns the payload of this incident.
    */
-  public String getConfiguration();
+  String getConfiguration();
+
+  /**
+   * Returns the history payload of this incident.
+   */
+  String getHistoryConfiguration();
 
   /**
    * Returns <code>true</code>, iff the corresponding incident
    * has not been deleted or resolved.
    */
-  public boolean isOpen();
+  boolean isOpen();
 
   /**
    * Returns <code>true</code>, iff the corresponding incident
    * has been <strong>deleted</strong>.
    */
-  public boolean isDeleted();
+  boolean isDeleted();
 
   /**
   * Returns <code>true</code>, iff the corresponding incident
   * has been <strong>resolved</strong>.
   */
-  public boolean isResolved();
+  boolean isResolved();
 
   /**
    * Returns the id of the tenant this incident belongs to. Can be <code>null</code>
    * if the incident belongs to no single tenant.
    */
-  public String getTenantId();
+  String getTenantId();
 
   /**
    * Returns the id of the job definition the incident belongs to. Can be <code>null</code>
@@ -145,5 +150,4 @@ public interface HistoricIncident {
 
   /** The time the historic incident will be removed. */
   Date getRemovalTime();
-
 }

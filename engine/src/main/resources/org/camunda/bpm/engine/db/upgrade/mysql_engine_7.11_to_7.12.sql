@@ -21,3 +21,7 @@ values ('100', CURRENT_TIMESTAMP, '7.12.0');
 -- https://app.camunda.com/jira/browse/CAM-10665
 ALTER TABLE ACT_HI_OP_LOG
   ADD COLUMN ANNOTATION_ varchar(4000);
+
+-- https://app.camunda.com/jira/browse/CAM-10672
+ALTER TABLE ACT_HI_INCIDENT
+  ADD HISTORY_CONFIGURATION_ varchar(255);
