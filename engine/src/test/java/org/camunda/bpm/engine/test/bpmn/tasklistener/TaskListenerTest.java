@@ -544,6 +544,7 @@ public class TaskListenerTest {
     assertEquals(1, jobs.size());
     Job job = jobs.get(0);
     Date oldDate = job.getDuedate();
+    ClockUtil.offset(2000L);
 
     // when
     engineRule.getManagementService().recalculateJobDuedate(job.getId(), false);

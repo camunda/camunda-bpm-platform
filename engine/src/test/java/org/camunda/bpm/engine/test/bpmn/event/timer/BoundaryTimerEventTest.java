@@ -196,6 +196,7 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(1, jobs.size());
     Job job = jobs.get(0);
     Date oldDate = job.getDuedate();
+    ClockUtil.offset(2000L);
 
     // After recalculation of the timer, the job's duedate should be changed
     managementService.recalculateJobDuedate(job.getId(), false);
