@@ -135,7 +135,11 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   public void setJobDuedate(String jobId, Date newDuedate) {
-    commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate));
+    setJobDuedate(jobId, newDuedate, false);
+  }
+  
+  public void setJobDuedate(String jobId, Date newDuedate, boolean cascade) {
+    commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate, cascade));
   }
 
   public void recalculateJobDuedate(String jobId, boolean creationDateBased) {

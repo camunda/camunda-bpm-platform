@@ -119,7 +119,7 @@ public class TimerEntity extends JobEntity {
         .getProcessEngineConfiguration()
         .getBusinessCalendarManager()
         .getBusinessCalendar(CycleBusinessCalendar.NAME);
-    return businessCalendar.resolveDuedate(repeat);
+    return ((CycleBusinessCalendar) businessCalendar).resolveDuedate(repeat, null, repeatOffset);
   }
 
   public String getRepeat() {

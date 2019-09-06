@@ -955,7 +955,23 @@ public interface ManagementService {
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void setJobDuedate(String jobId, Date newDuedate);
-  
+
+  /**
+   * Sets a new due date for the provided id. The offset between 
+   * the old and the new due date can be cascaded to all follow-up
+   * jobs. Cascading only works with timer jobs.
+   * When newDuedate is null, the job is executed with the next
+   * job executor run. In this case the cascade parameter is ignored.
+   *
+   * @param jobId id of job to modify, cannot be null.
+   * @param newDuedate new date for job execution
+   * @param cascade indicate whether follow-up jobs should be affected
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void setJobDuedate(String jobId, Date newDuedate, boolean cascade);
   /**
    * Triggers the recalculation for the job with the provided id.
    * 
