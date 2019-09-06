@@ -21,3 +21,7 @@ values ('100', CURRENT_TIMESTAMP, '7.12.0');
 -- https://app.camunda.com/jira/browse/CAM-10665
 ALTER TABLE ACT_HI_OP_LOG
   ADD ANNOTATION_ varchar(4000);
+
+--https://app.camunda.com/jira/browse/CAM-9855
+ALTER TABLE ACT_RU_JOB
+  ADD REPEAT_OFFSET_ bigint;

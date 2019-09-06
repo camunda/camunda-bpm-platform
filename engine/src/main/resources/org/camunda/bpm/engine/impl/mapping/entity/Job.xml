@@ -144,6 +144,7 @@
 
   <resultMap id="timerResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.TimerEntity" extends="jobResultMap">
     <result property="repeat" column="REPEAT_" jdbcType="VARCHAR" />
+    <result property="repeatOffset" column="REPEAT_OFFSET_" jdbcType="BIGINT" />
   </resultMap>
 
   <resultMap id="acquirableJobResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity">
@@ -420,6 +421,7 @@
             EXCEPTION_MSG_,
             DUEDATE_,
             REPEAT_,
+            REPEAT_OFFSET_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
             DEPLOYMENT_ID_,
@@ -445,6 +447,7 @@
             #{exceptionMessage, jdbcType=VARCHAR},
             #{duedate, jdbcType=TIMESTAMP},
             #{repeat, jdbcType=VARCHAR},
+            #{repeatOffset, jdbcType=BIGINT},
             #{jobHandlerType, jdbcType=VARCHAR},
             #{jobHandlerConfigurationRaw, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},
@@ -472,6 +475,7 @@
        EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
        DUEDATE_ = #{duedate, jdbcType=TIMESTAMP},
        REPEAT_ = #{repeat, jdbcType=VARCHAR},
+       REPEAT_OFFSET_ = #{repeatOffset, jdbcType=BIGINT},
        SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
        PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
        PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},

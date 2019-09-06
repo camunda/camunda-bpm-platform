@@ -44,6 +44,8 @@ public class TimerEntity extends JobEntity {
 
   protected String repeat;
 
+  protected long repeatOffset;
+
   public TimerEntity() {
   }
 
@@ -56,6 +58,7 @@ public class TimerEntity extends JobEntity {
     jobHandlerType = te.jobHandlerType;
     isExclusive = te.isExclusive;
     repeat = te.repeat;
+    repeatOffset = te.repeatOffset;
     retries = te.retries;
     executionId = te.executionId;
     processInstanceId = te.processInstanceId;
@@ -127,6 +130,14 @@ public class TimerEntity extends JobEntity {
     this.repeat = repeat;
   }
 
+  public long getRepeatOffset() {
+    return repeatOffset;
+  }
+
+  public void setRepeatOffset(long repeatOffset) {
+    this.repeatOffset = repeatOffset;
+  }
+
   @Override
   public String getType() {
     return TYPE;
@@ -147,6 +158,7 @@ public class TimerEntity extends JobEntity {
            + ", id=" + id
            + ", revision=" + revision
            + ", duedate=" + duedate
+           + ", repeatOffset=" + repeatOffset
            + ", lockOwner=" + lockOwner
            + ", lockExpirationTime=" + lockExpirationTime
            + ", executionId=" + executionId
