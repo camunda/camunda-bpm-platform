@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular'),
+var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
   camTasklistForm = require('./directives/cam-tasklist-form'),
   camTasklistFormGeneric = require('./directives/cam-tasklist-form-generic'),
   camTasklistFormGenericVariables = require('./directives/cam-tasklist-form-generic-variables'),

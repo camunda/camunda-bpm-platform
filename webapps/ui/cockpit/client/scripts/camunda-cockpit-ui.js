@@ -21,21 +21,21 @@
 require('dom4');
 
 var $ = (window.jQuery = window.$ = require('jquery'));
-require('camunda-commons-ui/vendor/bootstrap');
+require('../../../../camunda-commons-ui/vendor/bootstrap');
 
-var commons = require('camunda-commons-ui/lib');
+var commons = require('../../../../camunda-commons-ui/lib');
 var sdk = require('camunda-bpm-sdk-js/lib/angularjs/index');
 var dataDepend = require('angular-data-depend');
 var camCommon = require('../../../common/scripts/module');
-var moment = require('camunda-commons-ui/vendor/moment');
+var moment = require('../../../../camunda-commons-ui/vendor/moment');
 var events = require('events');
-var lodash = require('camunda-commons-ui/vendor/lodash');
+var lodash = require('../../../../camunda-commons-ui/vendor/lodash');
 
 require('../../../common/scripts/module');
 
 var APP_NAME = 'cam.cockpit';
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../../camunda-commons-ui/vendor/angular');
 
 module.exports = function(pluginDependencies) {
   var ngDependencies = [

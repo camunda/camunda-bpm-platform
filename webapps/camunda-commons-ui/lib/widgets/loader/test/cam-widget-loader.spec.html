@@ -1,0 +1,287 @@
+<html>
+  <head>
+    <title>Camunda commons UI library</title>
+    <base href="/" />
+    <!--[if IE]><script type="text/javascript">
+        // Fix for IE ignoring relative base tags.
+        // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+        (function() {
+            var baseTag = document.getElementsByTagName('base');
+            if (baseTag[0]) { baseTag[0].href = baseTag[0].href; }
+        })();
+    </script><![endif]-->
+    <link rel="icon" href="resources/img/favicon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <link href="test-styles.css" rel="stylesheet" />
+  </head>
+  <body class="cam-widget-loader-test-page">
+    <!-- gh-pages-menu -->
+
+    <header>
+      <div>
+        <h1>loader</h1>
+      </div>
+    </header>
+
+    <section class="widget-description">
+      <header>
+        <h2>Description</h2>
+      </header>
+      <p>A loader is aimed to wrap the loading of content in a standard way. It shows a loading state at first and then either the what has been loaded (or the results) or a "no records".<br/>
+      You can customize what comes in the center with <a href="//docs.angularjs.org/api/ng/directive/ngTransclude">ng-transclude</a>.</p>
+    </section>
+
+    <section class="widget-reference">
+      <header>
+        <h2>Usage</h2>
+      </header>
+
+      <h3>Options</h3>
+      <dl>
+        <dt><span class="badge">@</span> text-loading</dt>
+        <dd>can be used to provide a custom "loading" text</dd>
+
+        <dt><span class="badge">@</span> text-empty</dt>
+        <dd>can be used to provide a custom "empty response" text (which is blank by default)</dd>
+
+        <dt><span class="badge">@</span> text-error</dt>
+        <dd>can be used to provide a custom "error" text (which is blank by default)</dd>
+
+        <dt><span class="badge">@</span> loading-state</dt>
+        <dd class="possibilities">
+          <dl>
+            <dt>INITIAL</dt>
+            <dd>is the default state, used when the loading process has not been started</dd>
+
+            <dt>LOADING</dt>
+            <dd>is used when the loading process has started and is not complete</dd>
+
+            <dt>LOADED</dt>
+            <dd>is used when the loading process is complete and data were received</dd>
+
+            <dt>EMPTY</dt>
+            <dd>is used when the loading process is complete and no data were received</dd>
+
+            <dt>ERROR</dt>
+            <dd>is used when the loading process is failed</dd>
+          </dl>
+        </dd>
+      </dl>
+    </section>
+
+    <section class="widget-examples">
+      <header>
+        <h2>Examples</h2>
+      </header>
+
+      <div class="widget-example"
+           id="initial-state">
+        <h3>Initial state</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-loader&gt;&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-loader></div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="loading-state">
+        <h3>Loading state</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-loader
+     loading-state="LOADING"&gt;&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-loader
+               loading-state="LOADING"></div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="loading-state-custom">
+        <h3>Loading state with custom text</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-loader
+     text-loading="Custom loading text"
+     loading-state="LOADING"&gt;&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-loader
+               text-loading="Custom loading text"
+               loading-state="LOADING"></div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="loaded-state">
+        <h3>Loaded state</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-loader
+     loading-state="LOADED"&gt;
+
+  &lt;div class="panel panel-default"&gt;
+    &lt;div class="panel-heading"&gt;
+      This has been loaded
+    &lt;/div&gt;
+    &lt;div class="panel-body"&gt;
+      &lt;p&gt;Bacon ipsum dolor amet shank sirloin meatball, salami jerky short loin corned beef andouille strip steak cow ham kevin pastrami.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;&lt;!-- /.panel --&gt;
+
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-loader
+               loading-state="LOADED">
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                This has been loaded
+              </div>
+              <div class="panel-body">
+                <p>Bacon ipsum dolor amet shank sirloin meatball, salami jerky short loin corned beef andouille strip steak cow ham kevin pastrami.</p>
+              </div>
+            </div><!-- /.panel -->
+
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="empty-state">
+        <h3>Empty state</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-loader
+     loading-state="EMPTY"&gt;
+
+  &lt;div class="expected-hidden"&gt;
+    Should not be visible.
+  &lt;/div&gt;
+
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-loader
+               loading-state="EMPTY">
+
+            <div class="expected-hidden">
+              Should not be visible.
+            </div>
+
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="empty-state-custom">
+        <h3>Empty state with custom text</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-loader
+     loading-state="EMPTY"
+     text-empty="Custom 'empty' text"&gt;
+
+  &lt;div class="expected-hidden"&gt;
+    Should not be visible.
+  &lt;/div&gt;
+
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-loader
+               loading-state="EMPTY"
+               text-empty="Custom 'empty' text">
+
+            <div class="expected-hidden">
+              Should not be visible.
+            </div>
+
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="interactive"
+           ng-controller="testInteractiveController">
+        <h3>Interactive</h3>
+        <pre ng-non-bindable>&lt;div class="row"&gt;
+  &lt;div class="btn-group col-xs-4"&gt;
+    &lt;button class="btn btn-default reload"
+            ng-click="reload()"
+            ng-enabled="ctrlState !== 'LOADING'"&gt;
+      Load
+    &lt;/button&gt;
+    &lt;button class="btn btn-default reload-empty"
+            ng-click="reload(true)"
+            ng-enabled="ctrlState !== 'LOADING'"&gt;
+      Load empty
+    &lt;/button&gt;
+    &lt;button class="btn btn-danger fail-load"
+            ng-click="fail()"
+            ng-disabled="['LOADED', 'EMPTY', 'ERROR'].indexOf(ctrlState) !== -1"&gt;
+      Fail! &lt;span class="glyphicon glyphicon-fire"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class="col-xs-8"&gt;
+    Current state: &lt;code class="state-display"&gt;{{ ctrlState }}&lt;/code&gt;
+  &lt;/div&gt;
+&lt;/div&gt;&lt;!-- /.row --&gt;
+&lt;hr /&gt;
+
+&lt;div cam-widget-loader
+     loading-state="{{ ctrlState }}"
+     text-error="Custom error text"&gt;
+
+  &lt;div class="panel panel-default"&gt;
+    &lt;div class="panel-heading"&gt;
+      This has been loaded
+    &lt;/div&gt;
+    &lt;div class="panel-body"&gt;
+      &lt;p&gt;testInteractiveController has &lt;code&gt;ctrlVar1&lt;/code&gt; with &lt;code&gt;{{ ctrlVar1 }}&lt;/code&gt;.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;&lt;!-- /.panel --&gt;
+
+&lt;/div&gt;</pre>
+        <div class="test-container"
+             id="interactive-container">
+          <div class="row">
+            <div class="btn-group col-xs-4">
+              <button class="btn btn-default reload"
+                      ng-click="reload()"
+                      ng-enabled="ctrlState !== 'LOADING'">
+                Load
+              </button>
+              <button class="btn btn-default reload-empty"
+                      ng-click="reload(true)"
+                      ng-enabled="ctrlState !== 'LOADING'">
+                Load empty
+              </button>
+              <button class="btn btn-danger fail-load"
+                      ng-click="fail()"
+                      ng-disabled="['LOADED', 'EMPTY', 'ERROR'].indexOf(ctrlState) !== -1">
+                Fail! <span class="glyphicon glyphicon-fire"></span>
+              </button>
+            </div>
+            <div class="col-xs-8">
+              Current state: <code class="state-display">{{ ctrlState }}</code>
+            </div>
+          </div><!-- /.row -->
+          <hr />
+
+          <div cam-widget-loader
+               loading-state="{{ ctrlState }}"
+               text-error="Custom error text">
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                This has been loaded
+              </div>
+              <div class="panel-body">
+                <p>testInteractiveController has <code>ctrlVar1</code> with <code>{{ ctrlVar1 }}</code>.</p>
+              </div>
+            </div><!-- /.panel -->
+
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+    </section>
+
+    <!-- gh-pages-footer -->
+
+    <script src="lib/widgets/loader/test/cam-widget-loader.build.js"></script>
+  </body>
+</html>

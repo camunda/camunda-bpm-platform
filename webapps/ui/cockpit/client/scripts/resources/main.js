@@ -17,9 +17,9 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 
-require('camunda-commons-ui/lib/util/index');
+require('../../../../../camunda-commons-ui/lib/util/index');
 
 var processDefinitionResource = require('./processDefinitionResource'),
   incidentResource = require('./incidentResource'),

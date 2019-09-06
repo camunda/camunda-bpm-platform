@@ -20,14 +20,17 @@ module.exports = function() {
 
   return {
     plugin: {
-      src: [
-        'target/webapp/plugin'
-      ]
+      src: ['target/webapp/plugin']
     },
     apps: {
+      src: ['target/webapp/app', 'target/webapp/lib']
+    },
+    'sdk-js': {
       src: [
-        'target/webapp/app',
-        'target/webapp/lib'
+        'camunda-bpm-sdk-js/documentation',
+        'camunda-bpm-sdk-js/dist',
+        'camunda-bpm-sdk-js/.tmp',
+        'camunda-bpm-sdk-js/staging'
       ]
     }
   };

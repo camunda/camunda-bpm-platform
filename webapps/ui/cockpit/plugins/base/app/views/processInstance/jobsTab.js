@@ -19,7 +19,7 @@
 
 var fs = require('fs');
 var angular = require('angular');
-var moment = require('camunda-commons-ui/vendor/moment');
+var moment = require('../../../../../../../camunda-commons-ui/vendor/moment');
 
 var jobsTemplate = fs.readFileSync(__dirname + '/jobs-tab.html', 'utf8');
 var jobRescheduleTemplate = fs.readFileSync(

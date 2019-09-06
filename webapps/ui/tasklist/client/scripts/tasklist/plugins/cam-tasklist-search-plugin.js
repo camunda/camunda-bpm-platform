@@ -27,8 +27,8 @@ var searchConfigJSON = fs.readFileSync(
   'utf8'
 );
 
-var angular = require('camunda-commons-ui/vendor/angular');
-var moment = require('camunda-commons-ui/vendor/moment');
+var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
+var moment = require('../../../../../../camunda-commons-ui/vendor/moment');
 
 var expressionsRegex = /^[\s]*([#$]){/;
 var simpleDateExp = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})$/;

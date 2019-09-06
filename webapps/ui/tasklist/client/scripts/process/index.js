@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular'),
+var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
   camNavbarActionStartProcessPlugin = require('./plugins/action/cam-tasklist-navbar-action-start-process-plugin'),
   camProcessStartModalCtrl = require('./plugins/action/modals/cam-tasklist-process-start-modal');
 

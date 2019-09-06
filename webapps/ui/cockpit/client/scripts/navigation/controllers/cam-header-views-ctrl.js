@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
 
 function checkActive(plugin, path) {
   return path.indexOf(plugin.id) > -1;

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular'),
+var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
   breadcrumbs = require('./../../../../common/scripts/directives/breadcrumbs'),
   numeric = require('./numeric'),
   date = require('./../../../../common/scripts/directives/date'),

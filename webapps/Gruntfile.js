@@ -24,7 +24,8 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   var pkg = require('./package.json');
-  var protractorConfig = grunt.option('protractorConfig') || 'ui/common/tests/ci.conf.js';
+  var protractorConfig =
+    grunt.option('protractorConfig') || 'ui/common/tests/ci.conf.js';
 
   var config = pkg.gruntConfig || {};
 
@@ -32,20 +33,25 @@ module.exports = function(grunt) {
   config.pkg = pkg;
   config.protractorConfig = protractorConfig;
 
-  var browserifyConf = { };
+  var browserifyConf = {};
 
   require('./ui/welcome/grunt/config/browserify')(config, browserifyConf);
   require('./ui/admin/grunt/config/browserify')(config, browserifyConf);
   require('./ui/tasklist/grunt/config/browserify')(config, browserifyConf);
   require('./ui/cockpit/grunt/config/browserify')(config, browserifyConf);
+  require('./camunda-bpm-sdk-js/grunt/config/browserify')(
+    config,
+    browserifyConf
+  );
 
   var copyConf = require('./grunt/config/copy');
   require('./ui/welcome/grunt/config/copy')(config, copyConf);
   require('./ui/admin/grunt/config/copy')(config, copyConf);
   require('./ui/cockpit/grunt/config/copy')(config, copyConf);
   require('./ui/tasklist/grunt/config/copy')(config, copyConf);
+  require('./camunda-bpm-sdk-js/grunt/config/copy')(config, copyConf);
 
-  var lessConf = { };
+  var lessConf = {};
   require('./grunt/config/less')(config, lessConf, {
     appName: 'welcome',
     sourceDir: pkg.gruntConfig.welcomeSourceDir,
@@ -88,7 +94,13 @@ module.exports = function(grunt) {
     plugin: true
   });
 
-  var localesConf = { };
+  require('./grunt/config/less')(config, lessConf, {
+    appName: 'commons-ui',
+    sourceDir: 'camunda-commons-ui/resources/less/',
+    buildTarget: 'camunda-commons-ui'
+  });
+
+  var localesConf = {};
   require('./grunt/config/localescompile')(config, localesConf, {
     appName: 'tasklist',
     sourceDir: pkg.gruntConfig.tasklistSourceDir,
@@ -116,7 +128,7 @@ module.exports = function(grunt) {
   var watchConf = {
     commons_styles: {
       options: {
-        liverreload: false,
+        liverreload: false
       },
       files: [
         'ui/common/styles/**/*.less',
@@ -137,6 +149,8 @@ module.exports = function(grunt) {
   require('./ui/admin/grunt/config/uglify')(config, uglifyConf);
   require('./ui/tasklist/grunt/config/uglify')(config, uglifyConf);
   require('./ui/cockpit/grunt/config/uglify')(config, uglifyConf);
+  require('./camunda-bpm-sdk-js/grunt/config/uglify')(config, uglifyConf);
+
 
   var eslintConf = {};
   require('./ui/welcome/grunt/config/eslint')(config, eslintConf);
@@ -144,39 +158,39 @@ module.exports = function(grunt) {
   require('./ui/tasklist/grunt/config/eslint')(config, eslintConf);
   require('./ui/cockpit/grunt/config/eslint')(config, eslintConf);
   require('./ui/common/grunt/config/eslint')(config, eslintConf);
+  require('./camunda-bpm-sdk-js/grunt/config/eslint')(config, eslintConf);
 
   require('./grunt/tasks/license-book')(grunt);
   require('./grunt/tasks/license-check')(grunt);
 
   grunt.initConfig({
-    buildMode:        'dev',
+    buildMode: 'dev',
 
-    pkg:              pkg,
+    pkg: pkg,
 
-    browserify:       browserifyConf,
+    browserify: browserifyConf,
 
-    persistify:       browserifyConf,
+    persistify: browserifyConf,
 
-    copy:             copyConf,
+    copy: copyConf,
 
-    less:             lessConf,
+    less: lessConf,
 
-    localescompile:   localesConf,
+    localescompile: localesConf,
 
-    uglify:           uglifyConf,
+    uglify: uglifyConf,
 
+    clean: require('./grunt/config/clean')(config),
 
-    clean:            require('./grunt/config/clean')(config),
+    watch: watchConf,
 
-    watch:            watchConf,
-
-    eslint:           eslintConf,
+    eslint: eslintConf,
 
     ensureLibs: {
       thirdParty: {}
     },
 
-    protractor:       require('./grunt/config/protractor')(config),
+    protractor: require('./grunt/config/protractor')(config),
 
     karma: {
       unit: {
@@ -192,25 +206,49 @@ module.exports = function(grunt) {
   });
 
   require('./grunt/tasks/license-header')(grunt, false);
-  require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
-  require('camunda-commons-ui/grunt/tasks/persistify')(grunt, __dirname);
-  require('camunda-commons-ui/grunt/tasks/ensureLibs')(grunt, __dirname);
+  require('./camunda-commons-ui/grunt/tasks/localescompile')(grunt);
+  require('./camunda-commons-ui/grunt/tasks/persistify')(grunt, __dirname);
+  require('./camunda-commons-ui/grunt/tasks/ensureLibs')(grunt, __dirname);
+  require('./camunda-commons-ui/grunt/tasks/gh-pages')(grunt);
 
   grunt.loadNpmTasks('grunt-karma');
 
-grunt.registerTask('build', function(mode, app) {
+  grunt.registerTask('commons-build-gh-pages', [
+    'less:commons-ui-styles',
+    'gh-pages'
+  ]);
 
+  grunt.registerTask('build-sdk-js', [
+    'eslint:sdk-js',
+    'clean:sdk-js',
+    'copy:sdk-js',
+    'browserify:sdk-js',
+    'uglify:sdk-js'
+  ]);
 
-    if(typeof app !== 'undefined') {
+  grunt.registerTask('build', function(mode, app) {
+    if (typeof app !== 'undefined') {
       console.log(' ------------  will build ' + app + ' -------------');
-      var objs = [browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf, eslintConf];
-      for(var i = 0; i < objs.length; i++) {
+      var objs = [
+        browserifyConf,
+        copyConf,
+        lessConf,
+        localesConf,
+        watchConf,
+        uglifyConf,
+        eslintConf
+      ];
+      for (var i = 0; i < objs.length; i++) {
         var obj = objs[i];
         for (var key in obj) {
-          if (obj.hasOwnProperty(key) && key.toLowerCase().indexOf(app) === -1 && key !== 'options' &&
-                                         key.toLowerCase().indexOf('webapp') === -1 &&
-                                         key.toLowerCase().indexOf('sdk') === -1) {
-              delete obj[key];
+          if (
+            obj.hasOwnProperty(key) &&
+            key.toLowerCase().indexOf(app) === -1 &&
+            key !== 'options' &&
+            key.toLowerCase().indexOf('webapp') === -1 &&
+            key.toLowerCase().indexOf('sdk') === -1
+          ) {
+            delete obj[key];
           }
         }
       }
@@ -221,78 +259,77 @@ grunt.registerTask('build', function(mode, app) {
     var tasksToRun = [];
 
     tasksToRun.push('license-check');
-    if(grunt.config.data.buildMode === 'prod') {
+    if (grunt.config.data.buildMode === 'prod') {
       tasksToRun.push('eslint');
     } else {
       tasksToRun.push('newer:eslint');
     }
 
+    tasksToRun.push('clean', 'ensureLibs', 'persistify', 'copy', 'less');
 
-    tasksToRun.push(
-      'clean',
-      'ensureLibs',
-      'persistify',
-      'copy',
-      'less'
-    );
-
-    if(typeof app === 'undefined' || app === 'tasklist' || app === 'cockpit' || app === 'admin') {
+    if (
+      typeof app === 'undefined' ||
+      app === 'tasklist' ||
+      app === 'cockpit' ||
+      app === 'admin'
+    ) {
       tasksToRun.push('localescompile');
     }
 
-    if(grunt.config.data.buildMode === 'prod') {
+    if (grunt.config.data.buildMode === 'prod') {
       tasksToRun.push('uglify');
     }
 
     tasksToRun.push('license-header');
 
     grunt.task.run(tasksToRun);
-
   });
 
   grunt.registerTask('auto-build', function(app) {
-    if(app) {
-      grunt.task.run([
-        'build:dev:' + app,
-        'watch'
-      ]);
+    if (app) {
+      grunt.task.run(['build:dev:' + app, 'watch']);
     } else {
-      grunt.task.run([
-        'build:dev',
-        'watch'
-      ]);
+      grunt.task.run(['build:dev', 'watch']);
     }
   });
 
   grunt.registerTask('ensureSelenium', function() {
     // set correct webdriver version
-    var done,
-        path;
+    var done, path;
 
-    if(fs.existsSync('node_modules/grunt-protractor-runner/node_modules/protractor/config.json')) {
+    if (
+      fs.existsSync(
+        'node_modules/grunt-protractor-runner/node_modules/protractor/config.json'
+      )
+    ) {
       // npm 2
       path = 'node_modules/grunt-protractor-runner/node_modules/protractor/';
-    } else if(fs.existsSync('node_modules/protractor/config.json')) {
+    } else if (fs.existsSync('node_modules/protractor/config.json')) {
       // npm 3+
       path = 'node_modules/protractor/';
     }
 
-    fs.writeFileSync(path + 'config.json',
-      '    {\n'+
-      '      "webdriverVersions": {\n' +
-      '        "selenium": "2.47.1",\n' +
-      '        "chromedriver": "2.24",\n' +
-      '        "iedriver": "2.47.0"\n' +
-      '      }\n' +
-      '    }'
+    fs.writeFileSync(
+      path + 'config.json',
+      '    {\n' +
+        '      "webdriverVersions": {\n' +
+        '        "selenium": "2.47.1",\n' +
+        '        "chromedriver": "2.24",\n' +
+        '        "iedriver": "2.47.0"\n' +
+        '      }\n' +
+        '    }'
     );
 
     // async task
     done = this.async();
 
-    child_process.execFile('node', [__dirname + '/' + path + 'bin/webdriver-manager', '--chrome', 'update'], function(err) {
-      done();
-    });
+    child_process.execFile(
+      'node',
+      [__dirname + '/' + path + 'bin/webdriver-manager', '--chrome', 'update'],
+      function(err) {
+        done();
+      }
+    );
   });
 
   grunt.registerTask('default', ['build']);

@@ -19,7 +19,7 @@
 
 var Table = require('./../../table');
 
-var Variable = require('camunda-commons-ui/lib/widgets/variables-table/test/cam-widget-variables-table.page')
+var Variable = require('../../../../../../camunda-commons-ui/lib/widgets/variables-table/test/cam-widget-variables-table.page')
   .Variable;
 
 module.exports = Table.extend({

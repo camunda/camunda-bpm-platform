@@ -16,8 +16,8 @@
  */
 
 'use strict';
-var moment = require('camunda-commons-ui/vendor/moment'),
-  angular = require('camunda-commons-ui/vendor/angular');
+var moment = require('../../../../camunda-commons-ui/vendor/moment'),
+  angular = require('../../../../camunda-commons-ui/vendor/angular');
 
 var now = new Date().getTime();
 

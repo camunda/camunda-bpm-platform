@@ -1,0 +1,51 @@
+<!-- # CE - camunda-commons-ui/lib/directives/inPlaceTextField.html -->
+<div in-place-text-field-root>
+  <div ng-if="!editing">
+    {{ context[property] }}
+    <span class="edit-toggle"
+          ng-click="enter()">
+      <span class="glyphicon glyphicon-pencil"></span>
+    </span>
+  </div>
+
+  <form ng-if="editing"
+        ng-submit="submit()"
+        class="inline-edit"
+        name="inPlaceTextFieldForm"
+        novalidate
+        request-aware>
+
+    <fieldset>
+      <!-- {{ value }} -->
+      <input name="value"
+             ng-model="value"
+             type="text"
+             class="in-place-edit form-control"
+             placeholder="{{ placeholder }}"
+             autofocus
+             ng-required="isRequired">
+    </fieldset>
+
+    <div class="inline-edit-footer">
+
+      <p class="error" ng-show="error">
+        {{ error.message }}
+      </p>
+
+      <div class="btn-group">
+        <button type="submit"
+                class="btn btn-sm btn-primary"
+                ng-disabled="inPlaceTextFieldForm.$invalid">
+          <span class="glyphicon glyphicon-ok "></span>
+        </button>
+        <button type="button"
+                class="btn btn-sm btn-default"
+                ng-click="leave()">
+          <span class="glyphicon glyphicon-ban-circle"></span>
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>
+<!-- / CE - camunda-commons-ui/lib/directives/inPlaceTextField.html -->

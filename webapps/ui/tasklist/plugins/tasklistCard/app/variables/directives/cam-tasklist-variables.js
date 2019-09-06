@@ -27,7 +27,7 @@ var modalTemplate = fs.readFileSync(
   'utf8'
 );
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../../../../../camunda-commons-ui/vendor/angular');
 
 // AngularJS DI
 module.exports = [

@@ -18,7 +18,7 @@
 'use strict';
 
 var fs = require('fs');
-var lodash = require('camunda-commons-ui/vendor/lodash');
+var lodash = require('../../../../../../../camunda-commons-ui/vendor/lodash');
 
 var template = fs.readFileSync(
   __dirname + '/cam-cockpit-deployments.html',

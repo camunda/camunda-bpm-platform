@@ -1,0 +1,132 @@
+<div class="search-field">
+  <form ng-submit="createSearch()"
+        ng-class="{'has-search': searches.length, 'focused': focused}">
+
+    <div class="form-container search-container"
+         ng-style="{'padding-right': getRightPadding()}"
+         ng-class="{'has-icon': !!mode}">
+      <div ng-if="isMatchAnyActive && searches.length > 0"
+           class="match-any">
+        <button ng-click="switchMatchType()"
+                type="button"
+                class="btn btn-default btn-xs"
+                ng-disabled="searches.length < 2">
+          {{ (matchAny ? 'CAM_WIDGET_SEARCH_MATCH_TYPE_ANY' : 'CAM_WIDGET_SEARCH_MATCH_TYPE_ALL') | translate }}
+        </button>
+        <span ng-disabled="searches.length < 2">{{ 'CAM_WIDGET_SEARCH_MATCH_TYPE' | translate }}</span>
+        </div>
+        <span ng-if="mode" class="search-type glyphicon" ng-class="'glyphicon-' + mode"></span>
+      <span cam-widget-search-pill
+            ng-repeat="search in searches"
+            extended="search.extended"
+            basic="search.basic"
+            allow-dates="search.allowDates"
+            enforce-dates="search.enforceDates"
+            valid="search.valid"
+            name="search.name"
+            potential-names="search.potentialNames"
+            type="search.type"
+            operator="search.operator"
+            value="search.value"
+            options="search.options"
+            allow-non-values="search.allowNonValues"
+            invalid-text="{{ translations.invalid }}"
+            delete-text="{{ translations.deleteSearch }}"
+            on-change="handleChange($index, field, before, value, $event)"
+            on-delete="deleteSearch($index)"
+            disable-typeahead-autoselect="disableTypeaheadAutoselect"></span>
+
+      <input class="form-control main-field"
+             type="text"
+             ng-model="inputQuery"
+             ng-keydown="onKeydown($event)"
+             uib-typeahead="type as type.value for type in dropdownTypes | filter:$viewValue:instantTypeahead"
+             typeahead-on-select="createSearch($item)"
+             instant-typeahead />
+
+      <div class="ignore-case" ng-if="searchHasVariableQuery">
+        {{'CAM_WIDGET_SEARCH_VARIABLE_CASE_ATTRIBUTE' | translate }}
+          <label>
+            <input type="checkbox" ng-model="caseHandeling.ignoreNames" >
+            {{'CAM_WIDGET_SEARCH_VARIABLE_CASE_NAME' | translate}}
+          </label>
+          <label>
+            <input type="checkbox" ng-model="caseHandeling.ignoreValues">
+            {{'CAM_WIDGET_SEARCH_VARIABLE_CASE_VALUE' | translate}}.
+          </label>
+      </div>
+
+
+
+    </div>
+  </form>
+  <div class="controls">
+    <span ng-if="total"
+          class="total-results"
+          uib-tooltip="{{ 'CAM_WIDGET_SEARCH_TOTAL_NUMBER_RESULTS' | translate }}">
+      {{total}}
+    </span>
+
+    <span cam-share-link></span>
+
+    <span class="dropdown stored-criteria" uib-dropdown>
+      <button ng-disabled="!searches.length && !hasCriteriaSets()"
+              class="dropdown-toggle btn btn-default" uib-dropdown-toggle>
+        <span class="glyphicon glyphicon-floppy-disk"></span>
+        <span class="caret"></span>
+      </button>
+
+      <ul class="dropdown-menu dropdown-menu-right"
+          ng-if="searchCriteriaStorage.group || hasCriteriaSets()" uib-dropdown-menu>
+        <li ng-if="searchCriteriaStorage.group">
+          <div class="input-group input-group-sm">
+            <input type="text"
+                   class="form-control"
+                   ng-model="searchCriteriaStorage.nameInput"
+                   ng-click="storedCriteriaInputClick($event)"
+                   ng-keydown="searchCriteriaInputKeydown($event)" />
+            <span class="input-group-btn">
+              <button ng-disabled="!searchCriteriaStorage.nameInput"
+                      ng-click="storedCriteriaSaveClick($event)"
+                      class="btn btn-default"
+                      type="button">
+                <span class="glyphicon glyphicon-ok"></span>
+              </button>
+            </span>
+          </div>
+        </li>
+
+        <li role="separator"
+            class="divider"
+            ng-if="searchCriteriaStorage.group && hasCriteriaSets()"></li>
+
+        <li class="stored-criteria-set"
+            ng-if="hasCriteriaSets() && !isSearchCriteriaStorageGrouped"
+            ng-repeat="(key, value) in searchCriteriaStorage.available">
+          <div>
+            <a class="glyphicon glyphicon-remove-sign"
+              ng-click="dropCriteriaSet($event, key)"
+              href></a>
+
+            <a href
+              ng-click="loadCriteriaSet($event, key)">{{ key }}</a>
+          </div>
+        </li>
+
+        <li class="stored-criteria-set"
+            ng-if="hasCriteriaSets() && isSearchCriteriaStorageGrouped"
+            ng-repeat="(group, values) in searchCriteriaStorage.available">
+          <div ng-repeat="(name, value) in values">
+            <a class="glyphicon glyphicon-remove-sign"
+              ng-click="dropCriteriaSet($event, name, group)"
+              href></a>
+
+            <a href
+              ng-click="loadCriteriaSet($event, name, group)">{{ group }} : {{ name }}</a>
+          </div>
+        </li>
+
+      </ul>
+    </span>
+  </div>
+</div>
