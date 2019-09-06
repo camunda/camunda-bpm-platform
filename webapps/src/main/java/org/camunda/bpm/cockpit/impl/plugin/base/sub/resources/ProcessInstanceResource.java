@@ -58,6 +58,7 @@ public class ProcessInstanceResource extends AbstractPluginResource {
   public List<CalledProcessInstanceDto> queryCalledProcessInstances(CalledProcessInstanceQueryDto queryParameter) {
     queryParameter.setParentProcessInstanceId(id);
     configureExecutionQuery(queryParameter);
+    queryParameter.disableMaxResultsLimit();
     return getQueryService().executeQuery("selectCalledProcessInstances", queryParameter);
   }
 

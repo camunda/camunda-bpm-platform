@@ -118,5 +118,10 @@ public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
 
     return String.format(mappingsFileTemplate, builder.toString());
   }
+
+  public ProcessEngineConfigurationImpl getWrappedConfiguration() {
+    return wrappedConfiguration;
+  }
+
 }
 

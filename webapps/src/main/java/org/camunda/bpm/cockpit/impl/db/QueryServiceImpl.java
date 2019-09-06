@@ -21,9 +21,12 @@ import java.util.List;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryParameters;
 import org.camunda.bpm.cockpit.db.QueryService;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.util.QueryMaxResultsLimitUtil;
 
 public class QueryServiceImpl implements QueryService {
 
@@ -40,6 +43,12 @@ public class QueryServiceImpl implements QueryService {
       public List<T> execute(CommandContext commandContext) {
         commandContext.getAuthorizationManager()
           .enableQueryAuthCheck(parameter.getAuthCheck());
+
+        if (parameter.isMaxResultsLimitEnabled()) {
+          QueryMaxResultsLimitUtil.checkMaxResultsLimit(parameter.getMaxResults(),
+            getProcessEngineConfiguration(commandContext));
+        }
+
         return (List<T>) commandContext.getDbSqlSession().selectList(statement, parameter);
       }
 
@@ -71,4 +80,22 @@ public class QueryServiceImpl implements QueryService {
     });
     return queryResult;
   }
+
+  protected ProcessEngineConfigurationImpl getProcessEngineConfiguration(
+    CommandContext commandContext) {
+    QuerySessionFactory querySessionFactory =
+      (QuerySessionFactory) commandContext.getProcessEngineConfiguration();
+
+    ProcessEngineConfigurationImpl processEngineConfiguration = null;
+    if (querySessionFactory != null) {
+      processEngineConfiguration = querySessionFactory.getWrappedConfiguration();
+    }
+
+    if (processEngineConfiguration == null) {
+      throw new ProcessEngineException("Process Engine Configuration missing!");
+    }
+
+    return processEngineConfiguration;
+  }
+
 }
