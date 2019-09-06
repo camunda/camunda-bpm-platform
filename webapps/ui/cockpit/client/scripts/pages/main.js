@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular'),
+var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
   dashboard = require('./dashboard'),
   processes = require('./processes'),
   decisions = require('./decisions'),

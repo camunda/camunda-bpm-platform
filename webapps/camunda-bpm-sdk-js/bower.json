@@ -1,0 +1,28 @@
+{
+  "name": "camunda-bpm-sdk-js",
+  "description": "Javascript client library for camunda BPM",
+  "version": "7.13.0-SNAPSHOT",
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "homepage": "http://camunda.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/camunda/camunda-bpm-sdk-js"
+  },
+  "keywords": [
+    "camunda",
+    "camunda-bpm",
+    "sdk"
+  ],
+  "authors": [
+    "Valentin Vago <valentin.vago@camunda.com>",
+    "Daniel Meyer <daniel.meyer@camunda.com>"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

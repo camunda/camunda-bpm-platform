@@ -20,7 +20,7 @@
 var chai = require('chai');
 var expect = chai.expect;
 var sinon = require('sinon');
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 var drdCommon = require('../index');
 require('angular-mocks');
 

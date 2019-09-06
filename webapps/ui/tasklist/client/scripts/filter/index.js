@@ -24,7 +24,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular'),
+var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
   /* directives */
   camTasklistFilters = require('./directives/cam-tasklist-filters'),
   camTasklistFilterModalForm = require('./directives/cam-tasklist-filter-modal-form'),

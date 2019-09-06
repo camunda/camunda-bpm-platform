@@ -1,0 +1,11 @@
+node_modules
+*.swp
+*.log
+documentation
+dist
+/.project
+.idea/
+staging/
+camunda-bpm-sdk*
+vendor/superagent/index.js
+vendor/fast-xml-parser/index.js

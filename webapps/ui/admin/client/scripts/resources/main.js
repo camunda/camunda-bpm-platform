@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular'),
+var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
   userResource = require('./userResource'),
   groupResource = require('./groupResource'),
   groupMembershipResource = require('./groupMembershipResource'),

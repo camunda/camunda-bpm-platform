@@ -1,0 +1,93 @@
+{
+  "private": true,
+  "name": "camunda-bpm-sdk-js",
+  "version": "7.13.0-SNAPSHOT",
+  "description": "Javascript client library for camunda BPM",
+  "scripts": {
+    "test": "node_modules/.bin/jasmine_node",
+    "dependencies": "license-checker --production --json --relativeLicensePath"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/camunda/camunda-bpm-sdk-js.git"
+  },
+  "keywords": [
+    "camunda-bpm",
+    "sdk"
+  ],
+  "author": "Valentin Vago <valentin.vago@camunda.com>",
+  "contributors": [
+    "Daniel Meyer <daniel.meyer@camunda.com>"
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://app.camunda.com/jira/browse/CAM/component/12351"
+  },
+  "homepage": "https://github.com/camunda/camunda-bpm-sdk-js",
+  "dependencies": {
+    "moment": "2.24.0",
+    "q": "1.5.1",
+    "superagent": "4.1.0",
+    "fast-xml-parser": "3.12.14"
+  },
+  "devDependencies": {
+    "@babel/core": "7.4.5",
+    "@babel/preset-env": "7.4.5",
+    "babelify": "10.0.0",
+    "browserify": "16.2.3",
+    "chai": "4.2.0",
+    "core-js": "3.1.4",
+    "eslint": "5.16.0",
+    "eslint-config-prettier": "4.3.0",
+    "eslint-plugin-camunda-licensed": "0.4.2",
+    "eslint-plugin-prettier": "3.1.0",
+    "exposify": "0.5.0",
+    "fixturer": "git://github.com/camunda-third-party/fixturer",
+    "grunt": "1.0.4",
+    "grunt-bower-release": "git://github.com/camunda-third-party/grunt-bower-release#0.0.7",
+    "grunt-browserify": "5.3.0",
+    "grunt-bump": "git://github.com/camunda-third-party/grunt-bump",
+    "grunt-contrib-clean": "2.0.0",
+    "grunt-contrib-copy": "1.0.0",
+    "grunt-contrib-jshint": "2.1.0",
+    "grunt-contrib-uglify": "4.0.1",
+    "grunt-contrib-watch": "1.1.0",
+    "grunt-eslint": "21.0.0",
+    "grunt-karma": "3.0.1",
+    "grunt-mocha-cli": "4.0.0",
+    "grunt-newer": "1.3.0",
+    "grunt-release": "0.14.0",
+    "husky": "2.3.0",
+    "karma": "4.0.1",
+    "karma-browserify": "6.0.0",
+    "karma-chai": "0.1.0",
+    "karma-chrome-launcher": "2.2.0",
+    "karma-firefox-launcher": "1.1.0",
+    "karma-mocha": "1.3.0",
+    "karma-phantomjs-launcher": "1.0.4",
+    "license-checker": "25.0.1",
+    "lint-staged": "8.1.7",
+    "load-grunt-tasks": "4.0.0",
+    "mocha": "6.0.2",
+    "prettier": "1.17.1",
+    "sinon": "7.3.1",
+    "superagent-mock": "3.7.0",
+    "underscore": "1.9.1",
+    "underscore.string": "3.3.5",
+    "uuid": "3.3.2"
+  },
+  "optionalDependencies": {
+    "angular": "1.7.9"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}

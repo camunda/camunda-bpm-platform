@@ -21,12 +21,12 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/decision-instance.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular'),
+var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
   routeUtil = require('../../../../common/scripts/util/routeUtil');
 
 require('angular-data-depend');
 
-var camCommons = require('camunda-commons-ui/lib');
+var camCommons = require('../../../../../camunda-commons-ui/lib');
 
 var ngModule = angular.module('cam.cockpit.pages.decisionInstance', [
   'dataDepend',

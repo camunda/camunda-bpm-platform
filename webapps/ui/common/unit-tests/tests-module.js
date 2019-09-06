@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../camunda-commons-ui/vendor/angular');
 var createCamApiMock = require('./create-cam-api-mock');
 var ViewsProvider = require('./views-provider-mock');
 var $routeProvider = require('./route-provider-mock');

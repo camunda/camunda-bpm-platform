@@ -24,7 +24,7 @@ var template = fs.readFileSync(
 );
 
 var jquery = require('jquery');
-var moment = require('camunda-commons-ui/vendor/moment');
+var moment = require('../../../../../../../camunda-commons-ui/vendor/moment');
 
 var findOrCreateDay = function(days, timestamp) {
   var day = jquery.grep(days, function(elem) {

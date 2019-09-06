@@ -17,8 +17,8 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
-var moment = require('camunda-commons-ui/vendor/moment');
+var angular = require('../../../../camunda-commons-ui/vendor/angular');
+var moment = require('../../../../camunda-commons-ui/vendor/moment');
 var includes = require('./includes');
 
 module.exports = {

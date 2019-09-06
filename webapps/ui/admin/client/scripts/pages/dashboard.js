@@ -21,7 +21,7 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/dashboard.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 var isArray = angular.isArray;
 
 var Controller = [

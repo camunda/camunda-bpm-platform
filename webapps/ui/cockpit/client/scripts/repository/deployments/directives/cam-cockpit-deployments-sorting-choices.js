@@ -24,7 +24,7 @@ var template = fs.readFileSync(
   'utf8'
 );
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../../../../../camunda-commons-ui/vendor/angular');
 
 module.exports = [
   '$translate',

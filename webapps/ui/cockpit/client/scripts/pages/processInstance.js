@@ -21,11 +21,11 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/process-instance.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 var commonModule = require('../../../../common/scripts/module');
 
 var routeUtil = require('../../../../common/scripts/util/routeUtil');
-var camCommons = require('camunda-commons-ui/lib');
+var camCommons = require('../../../../../camunda-commons-ui/lib');
 
 var ngModule = angular.module('cam.cockpit.pages.processInstance', [
   camCommons.name,

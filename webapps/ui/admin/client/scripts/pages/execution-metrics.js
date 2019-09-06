@@ -20,7 +20,7 @@
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/execution-metrics.html', 'utf8');
-var CamSDK = require('camunda-bpm-sdk-js');
+var CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
 
 var Controller = [
   '$scope',

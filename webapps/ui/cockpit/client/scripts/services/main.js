@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular'),
+var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
   transform = require('./transform'),
   variables = require('./variables'),
   breadcrumbTrails = require('./breadcrumbTrails'),
@@ -26,7 +26,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
   page = require('./../../../../common/scripts/services/page'),
   camAPI = require('./../../../../common/scripts/services/cam-api'),
   hasPlugin = require('./../../../../common/scripts/services/has-plugin'),
-  localConf = require('camunda-commons-ui/lib/services/cam-local-configuration'),
+  localConf = require('../../../../../camunda-commons-ui/lib/services/cam-local-configuration'),
   typeUtils = require('./../../../../common/scripts/services/typeUtils'),
   escapeHtml = require('./escapeHtml');
 

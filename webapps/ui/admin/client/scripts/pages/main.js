@@ -17,10 +17,10 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 
 require('angular-route');
-require('camunda-commons-ui');
+require('../../../../../camunda-commons-ui');
 
 var authorizations = require('./authorizations'),
   authorizationCreate = require('./authorizationCreate'),

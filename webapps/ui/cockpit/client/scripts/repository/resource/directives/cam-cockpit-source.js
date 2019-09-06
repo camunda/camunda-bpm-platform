@@ -21,8 +21,8 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-cockpit-source.html', 'utf8');
 
-var angular = require('camunda-commons-ui/vendor/angular');
-require('camunda-commons-ui/vendor/prism');
+var angular = require('../../../../../../../camunda-commons-ui/vendor/angular');
+require('../../../../../../../camunda-commons-ui/vendor/prism');
 
 module.exports = [
   '$window',

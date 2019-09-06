@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
+var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 var camAPI = require('./../../../../common/scripts/services/cam-api');
 var customLinks = require('./custom-links');
 

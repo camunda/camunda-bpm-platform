@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular'),
+var angular = require('../../../../../../camunda-commons-ui/vendor/angular'),
   /* controllers */
   camResourceDetailsCtrl = require('./controllers/cam-cockpit-resource-details-ctrl'),
   /* directives */

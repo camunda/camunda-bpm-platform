@@ -21,12 +21,18 @@ module.exports = function(config, lessConfig, pathConfig) {
   var path = require('path');
 
   var file = {};
-  var source = pathConfig.sourceDir + '/styles/styles.less';
-  var destination = pathConfig.buildTarget+'/styles/styles.css';
 
-  if(pathConfig.plugin) {
+  var source = pathConfig.sourceDir + '/styles/styles.less';
+  var destination = pathConfig.buildTarget + '/styles/styles.css';
+
+  if (pathConfig.plugin) {
     source = pathConfig.sourceDir + '/styles.less';
-    destination = pathConfig.buildTarget+'/plugin.css';
+    destination = pathConfig.buildTarget + '/plugin.css';
+  }
+
+  if (pathConfig.appName === 'commons-ui') {
+    source = pathConfig.sourceDir + '/test-styles.less';
+    destination = pathConfig.buildTarget + '/test-styles.css';
   }
 
   file[destination] = source;
@@ -43,7 +49,9 @@ module.exports = function(config, lessConfig, pathConfig) {
     eePrefix + 'ui/' + pathConfig.appName + '/client/scripts'
   ];
 
-  lessConfig[pathConfig.appName + (pathConfig.plugin ? '_plugin' : '') + '_styles'] = {
+  lessConfig[
+    pathConfig.appName + (pathConfig.plugin ? '_plugin' : '') + '_styles'
+  ] = {
     options: {
       paths: includePaths,
 
@@ -57,7 +65,7 @@ module.exports = function(config, lessConfig, pathConfig) {
 
   if (pathConfig.appName === 'cockpit' && !pathConfig.plugin) {
     source = pathConfig.sourceDir + '/styles/styles-components.less';
-    destination = pathConfig.buildTarget+'/styles/styles-components.css';
+    destination = pathConfig.buildTarget + '/styles/styles-components.css';
     file = {};
     file[destination] = source;
 

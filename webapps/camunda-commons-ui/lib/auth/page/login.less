@@ -1,0 +1,44 @@
+.form-signin {
+  width: 50vw;
+  max-width: @grid-gutter-width * 15;
+  padding: @grid-gutter-width;
+  margin: @grid-gutter-width auto;
+  overflow: hidden;
+
+  background-color: @body-bg;
+
+  border: 1px solid #e5e5e5;
+
+  .checkbox {
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    margin: 0 0 (@grid-gutter-width * 0.5) 0;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    font-size: 18px;
+    margin-bottom: (@grid-gutter-width * 0.5);
+  }
+
+  .btn-primary {
+    float: right;
+  }
+}
+
+
+.form-signin-container {
+  padding: @grid-gutter-width;
+}
+
+@media screen and (max-width: (@grid-float-breakpoint - 1)) {
+  .form-signin {
+    width: 100%;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+  }
+}

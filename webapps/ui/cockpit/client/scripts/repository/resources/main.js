@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular'),
+var angular = require('../../../../../../camunda-commons-ui/vendor/angular'),
   camCockpitResources = require('./directives/cam-cockpit-resources');
 
 var resourcesModule = angular.module('cam.cockpit.repository.resources', []);
