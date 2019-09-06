@@ -57,7 +57,7 @@ public class CsrfPreventionIT extends AbstractWebIntegrationTest {
     List<String> values = headers.get("Set-Cookie");
     for (String value : values) {
       if (value.startsWith("XSRF-TOKEN=")) {
-        return value.contains(";SameSite=Strict");
+        return value.contains(";SameSite=Lax");
       }
     }
 
