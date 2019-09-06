@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.cockpit.plugin.base;
 
+import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -24,12 +25,16 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.resources.IncidentRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,19 +44,34 @@ import org.junit.Test;
 public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
 
   private ProcessEngine processEngine;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
   private RepositoryService repositoryService;
   private RuntimeService runtimeService;
   private IncidentRestService resource;
+  protected IdentityService identityService;
 
   @Before
   public void setUp() throws Exception {
     super.before();
 
     processEngine = getProcessEngine();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+      .getProcessEngineConfiguration();
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
+    identityService = processEngine.getIdentityService();
 
     resource = new IncidentRestService(processEngine.getName());
+  }
+
+  @After
+  public void clearAuthentication() {
+    identityService.clearAuthentication();
+  }
+
+  @After
+  public void resetQueryMaxResultsLimit() {
+    processEngineConfiguration.setQueryMaxResultsLimit(Integer.MAX_VALUE);
   }
 
   @Test
@@ -397,6 +417,87 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     // then
     assertThat(ascending).extracting("id").containsExactly(incident1.getId(), incident3.getId(), incident2.getId());
     assertThat(descending).extracting("id").containsExactly(incident2.getId(), incident3.getId(), incident1.getId());
+  }
+
+  @Test
+  public void shouldReturnPaginatedResult() {
+    // given
+    processEngineConfiguration.setQueryMaxResultsLimit(10);
+
+    identityService.setAuthenticatedUserId("foo");
+
+    try {
+      // when
+      resource.queryIncidents(new IncidentQueryDto(), 0, 10);
+      // then: no exception expected
+    } catch (BadUserRequestException e) {
+      // then
+      fail("No exception expected");
+    }
+  }
+
+  @Test
+  public void shouldReturnUnboundedResult_NotAuthenticated() {
+    // given
+    processEngineConfiguration.setQueryMaxResultsLimit(10);
+
+    try {
+      // when
+      resource.queryIncidents(new IncidentQueryDto(), null, null);
+      // then: no exception expected
+    } catch (BadUserRequestException e) {
+      // then
+      fail("No exception expected");
+    }
+  }
+
+  @Test
+  public void shouldReturnUnboundedResult_NoLimitConfigured() {
+    // given
+    identityService.setAuthenticatedUserId("foo");
+
+    try {
+      // when
+      resource.queryIncidents(new IncidentQueryDto(), null, null);
+      // then: no exception expected
+    } catch (BadUserRequestException e) {
+      // then
+      fail("No exception expected");
+    }
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenMaxResultsLimitExceeded() {
+    // given
+    processEngineConfiguration.setQueryMaxResultsLimit(10);
+
+    identityService.setAuthenticatedUserId("foo");
+
+    try {
+      // when
+      resource.queryIncidents(new IncidentQueryDto(), 0, 11);
+      fail("Exception expected!");
+    } catch (BadUserRequestException e) {
+      // then
+      assertThat(e).hasMessage("Max results limit of 10 exceeded!");
+    }
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenQueryUnbounded() {
+    // given
+    processEngineConfiguration.setQueryMaxResultsLimit(10);
+
+    identityService.setAuthenticatedUserId("foo");
+
+    try {
+      // when
+      resource.queryIncidents(new IncidentQueryDto(), null, null);
+      fail("Exception expected!");
+    } catch (BadUserRequestException e) {
+      // then
+      assertThat(e).hasMessage("An unbound number of results is forbidden!");
+    }
   }
 
   protected List<IncidentDto> queryIncidents(String sorting, String order)

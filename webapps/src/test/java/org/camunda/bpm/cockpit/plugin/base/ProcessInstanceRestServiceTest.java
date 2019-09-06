@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.cockpit.plugin.base;
 
+import static junit.framework.TestCase.fail;
 import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.EQUALS_OPERATOR_NAME;
 import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.GREATER_THAN_OPERATOR_NAME;
 import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.GREATER_THAN_OR_EQUALS_OPERATOR_NAME;
@@ -38,11 +39,14 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.resources.ProcessInstanceRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -50,6 +54,7 @@ import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -64,8 +69,10 @@ import org.junit.experimental.categories.Category;
 public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
   private ProcessEngine processEngine;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
+  protected IdentityService identityService;
 
   private ProcessInstanceRestService resource;
 
@@ -74,10 +81,23 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     super.before();
 
     processEngine = getProcessEngine();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) getProcessEngine()
+      .getProcessEngineConfiguration();
     runtimeService = processEngine.getRuntimeService();
     repositoryService = processEngine.getRepositoryService();
+    identityService = processEngine.getIdentityService();
 
     resource = new ProcessInstanceRestService(processEngine.getName());
+  }
+
+  @After
+  public void clearAuthentication() {
+    identityService.clearAuthentication();
+  }
+
+  @After
+  public void resetQueryMaxResultsLimit() {
+    processEngineConfiguration.setQueryMaxResultsLimit(Integer.MAX_VALUE);
   }
 
   private void startProcessInstances(String processDefinitionKey, int numOfInstances) {
@@ -3353,6 +3373,87 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(5);
+  }
+
+  @Test
+  public void shouldReturnPaginatedResult() {
+    // given
+    processEngineConfiguration.setQueryMaxResultsLimit(10);
+
+    identityService.setAuthenticatedUserId("foo");
+
+    try {
+      // when
+      resource.queryProcessInstances(new ProcessInstanceQueryDto(), 0, 10);
+      // then: no exception expected
+    } catch (BadUserRequestException e) {
+      // then
+      fail("No exception expected");
+    }
+  }
+
+  @Test
+  public void shouldReturnUnboundedResult_NotAuthenticated() {
+    // given
+    processEngineConfiguration.setQueryMaxResultsLimit(10);
+
+    try {
+      // when
+      resource.queryProcessInstances(new ProcessInstanceQueryDto(), null, null);
+      // then: no exception expected
+    } catch (BadUserRequestException e) {
+      // then
+      fail("No exception expected");
+    }
+  }
+
+  @Test
+  public void shouldReturnUnboundedResult_NoLimitConfigured() {
+    // given
+    identityService.setAuthenticatedUserId("foo");
+
+    try {
+      // when
+      resource.queryProcessInstances(new ProcessInstanceQueryDto(), null, null);
+      // then: no exception expected
+    } catch (BadUserRequestException e) {
+      // then
+      fail("No exception expected");
+    }
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenMaxResultsLimitExceeded() {
+    // given
+    processEngineConfiguration.setQueryMaxResultsLimit(10);
+
+    identityService.setAuthenticatedUserId("foo");
+
+    try {
+      // when
+      resource.queryProcessInstances(new ProcessInstanceQueryDto(), 0, 11);
+      fail("Exception expected!");
+    } catch (BadUserRequestException e) {
+      // then
+      assertThat(e).hasMessage("Max results limit of 10 exceeded!");
+    }
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenQueryUnbounded() {
+    // given
+    processEngineConfiguration.setQueryMaxResultsLimit(10);
+
+    identityService.setAuthenticatedUserId("foo");
+
+    try {
+      // when
+      resource.queryProcessInstances(new ProcessInstanceQueryDto(), null, null);
+      fail("Exception expected!");
+    } catch (BadUserRequestException e) {
+      // then
+      assertThat(e).hasMessage("An unbound number of results is forbidden!");
+    }
   }
 
   private VariableQueryParameterDto createVariableParameter(String name, String operator, Object value) {

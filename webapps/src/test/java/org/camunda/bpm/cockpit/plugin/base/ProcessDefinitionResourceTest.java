@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.cockpit.plugin.base;
 
+import static junit.framework.TestCase.fail;
 import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.EQUALS_OPERATOR_NAME;
 import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.LIKE_OPERATOR_NAME;
 import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.NOT_EQUALS_OPERATOR_NAME;
@@ -30,13 +31,17 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessDefinitionDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessDefinitionResource;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,18 +50,33 @@ import org.junit.experimental.categories.Category;
 public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
 
   private ProcessEngine processEngine;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
   private ProcessDefinitionResource resource;
+  protected IdentityService identityService;
 
   @Before
   public void setUp() throws Exception {
     super.before();
 
     processEngine = getProcessEngine();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
+      .getProcessEngineConfiguration();
 
     runtimeService = processEngine.getRuntimeService();
     repositoryService = processEngine.getRepositoryService();
+    identityService = processEngine.getIdentityService();
+  }
+
+  @After
+  public void clearAuthentication() {
+    identityService.clearAuthentication();
+  }
+
+  @After
+  public void resetQueryMaxResultsLimit() {
+    processEngineConfiguration.setQueryMaxResultsLimit(Integer.MAX_VALUE);
   }
 
   @Test
@@ -630,6 +650,24 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     List<ProcessDefinitionDto> results = resource.queryCalledProcessDefinitions(queryParameter);
     assertThat(results).hasSize(1);
 
+  }
+
+  @Test
+  public void shouldNotThrowExceptionWhenQueryUnbounded() {
+    // given
+    resource = new ProcessDefinitionResource(getProcessEngine().getName(), "anId");
+
+    processEngineConfiguration.setQueryMaxResultsLimit(10);
+
+    identityService.setAuthenticatedUserId("foo");
+
+    try {
+      // when
+      resource.queryCalledProcessDefinitions(new ProcessDefinitionQueryDto());
+      // then: no exception thrown
+    } catch (BadUserRequestException e) {
+      fail("No exception expected");
+    }
   }
 
   private VariableQueryParameterDto createVariableParameter(String name, String operator, Object value) {

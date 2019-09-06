@@ -27,8 +27,9 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 public class QueryParameters<T> extends ListQueryParameterObject {
 
   private static final long serialVersionUID = 1L;
-  
+
   protected boolean historyEnabled = true;
+  protected boolean maxResultsLimitEnabled = true;
 
   public QueryParameters() { }
 
@@ -44,4 +45,13 @@ public class QueryParameters<T> extends ListQueryParameterObject {
   public void setHistoryEnabled(boolean historyEnabled) {
     this.historyEnabled = historyEnabled;
   }
+
+  public boolean isMaxResultsLimitEnabled() {
+    return maxResultsLimitEnabled;
+  }
+
+  public void disableMaxResultsLimit() {
+    maxResultsLimitEnabled = false;
+  }
+
 }
