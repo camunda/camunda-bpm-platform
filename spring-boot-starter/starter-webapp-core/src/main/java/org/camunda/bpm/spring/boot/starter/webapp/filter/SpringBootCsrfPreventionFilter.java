@@ -479,7 +479,7 @@ public class SpringBootCsrfPreventionFilter implements Filter {
         }
 
       } else { // default
-        this.sameSiteCookieValue = SameSiteOption.STRICT.getValue();
+        this.sameSiteCookieValue = SameSiteOption.LAX.getValue();
 
       }
     }

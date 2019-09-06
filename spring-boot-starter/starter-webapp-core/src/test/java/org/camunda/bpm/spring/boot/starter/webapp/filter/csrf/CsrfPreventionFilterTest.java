@@ -123,7 +123,7 @@ public class CsrfPreventionFilterTest {
     Assert.assertNotNull(cookieToken);
     Assert.assertNotNull(headerToken);
 
-    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}; Path=/camunda; SameSite=Strict");
+    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}; Path=/camunda; SameSite=Lax");
 
     Assert.assertEquals("No HTTP Header Token!",false, headerToken.isEmpty());
     assertThat(cookieToken).contains(headerToken);
@@ -211,7 +211,7 @@ public class CsrfPreventionFilterTest {
     Assert.assertNotNull(cookieToken);
     Assert.assertNotNull(headerToken);
 
-    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}; Path=/; SameSite=Strict");
+    assertThat(cookieToken).matches(CSRF_COOKIE_NAME + "=[A-Z0-9]{32}; Path=/; SameSite=Lax");
 
     Assert.assertEquals("No HTTP Header Token!",false, headerToken.isEmpty());
     assertThat(cookieToken).contains(headerToken);

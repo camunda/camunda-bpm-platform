@@ -50,7 +50,7 @@ public class SameSiteEnabledIT {
     String xsrfCookieValue = headerRule.getXsrfCookieValue(connection);
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader(connection);
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Strict");
+    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Lax");
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
