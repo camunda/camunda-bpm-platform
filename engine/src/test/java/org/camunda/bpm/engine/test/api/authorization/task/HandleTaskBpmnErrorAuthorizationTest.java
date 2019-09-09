@@ -70,7 +70,7 @@ public class HandleTaskBpmnErrorAuthorizationTest {
   protected RuntimeService runtimeService;
 
   protected static final String userId = "userId";
-  protected String deploumentId;
+  protected String deploymentId;
 
   protected static final String BPMN_BEHAVIOR_LOGGER = "org.camunda.bpm.engine.bpmn.behavior";
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
@@ -109,13 +109,13 @@ public class HandleTaskBpmnErrorAuthorizationTest {
     runtimeService = engineRule.getRuntimeService();
 
     authRule.createUserAndGroup("userId", "groupId");
-    deploumentId = engineRule.getRepositoryService().createDeployment().addClasspathResource(ONE_TASK_PROCESS).deployWithResult().getId();
+    deploymentId = engineRule.getRepositoryService().createDeployment().addClasspathResource(ONE_TASK_PROCESS).deployWithResult().getId();
   }
 
   @After
   public void tearDown() {
     authRule.deleteUsersAndGroups();
-    engineRule.getRepositoryService().deleteDeployment(deploumentId, true);
+    engineRule.getRepositoryService().deleteDeployment(deploymentId, true);
   }
 
   @Test
