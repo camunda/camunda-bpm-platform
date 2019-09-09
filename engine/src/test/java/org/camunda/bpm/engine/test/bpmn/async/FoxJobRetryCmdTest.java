@@ -264,7 +264,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
-  public void FAILING_testFailedRetryWithTimeShift() throws ParseException {
+  public void testFailedRetryWithTimeShift() throws ParseException {
     // set date to hour before time shift (2015-10-25T03:00:00 CEST =>
     // 2015-10-25T02:00:00 CET)
     Date tenMinutesBeforeTimeShift = createDateFromLocalString("2015-10-25T02:50:00 CEST");

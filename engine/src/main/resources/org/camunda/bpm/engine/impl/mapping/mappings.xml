@@ -23,6 +23,11 @@
 	<settings>
 		<setting name="lazyLoadingEnabled" value="false" />
 	</settings>
+<!--   <typeHandlers> -->
+<!--     <typeHandler handler="org.camunda.bpm.engine.impl.db.sql.UTCDateTypeHandler" /> -->
+<!--     <typeHandler handler="org.camunda.bpm.engine.impl.db.sql.UTCDateOnlyTypeHandler" /> -->
+<!--     <typeHandler handler="org.camunda.bpm.engine.impl.db.sql.UTCTimeOnlyTypeHandler" /> -->
+<!--   </typeHandlers> -->
 	<mappers>
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Commons.xml" />
     
