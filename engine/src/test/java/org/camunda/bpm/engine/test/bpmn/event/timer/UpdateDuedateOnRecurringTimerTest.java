@@ -199,7 +199,7 @@ public class UpdateDuedateOnRecurringTimerTest extends PluggableProcessEngineTes
   }
 
   private Job modifyDueDate(Job job, boolean cascade, long offset) {
-    managementService.setJobDuedate(job.getId(), null, cascade);
+    managementService.setJobDuedate(job.getId(), new Date(job.getDuedate().getTime() + offset), cascade);
     return managementService.createJobQuery().singleResult();
   }
 
