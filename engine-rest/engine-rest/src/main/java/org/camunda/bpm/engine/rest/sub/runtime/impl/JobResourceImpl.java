@@ -99,7 +99,7 @@ public class JobResourceImpl implements JobResource {
   public void setJobDuedate(JobDuedateDto dto) {
     try {
       ManagementService managementService = engine.getManagementService();
-      managementService.setJobDuedate(jobId, dto.getDuedate());
+      managementService.setJobDuedate(jobId, dto.getDuedate(), dto.isCascade());
     } catch (AuthorizationException e) {
       throw e;
     } catch (ProcessEngineException e) {
