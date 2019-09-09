@@ -55,14 +55,17 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -82,11 +85,11 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -96,6 +99,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -106,6 +110,7 @@ import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
@@ -115,10 +120,13 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.EqualsVariableMap;
 import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsObjectValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
 import org.camunda.bpm.engine.rest.util.EncodingUtil;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -130,15 +138,14 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
-import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
-
 
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
@@ -178,6 +185,8 @@ public class TaskRestServiceInteractionTest extends
   protected static final String SINGLE_TASK_SINGLE_ATTACHMENT_DATA_URL = SINGLE_TASK_ATTACHMENTS_URL + "/{attachmentId}/data";
 
   protected static final String TASK_CREATE_URL = TASK_SERVICE_URL + "/create";
+
+  protected static final String HANDLE_BPMN_ERROR_URL = SINGLE_TASK_URL + "/bpmnError";
 
   private Task mockTask;
   private TaskService taskServiceMock;
@@ -3288,6 +3297,129 @@ public class TaskRestServiceInteractionTest extends
       .body("message",equalTo(message))
     .when()
       .get(DEPLOYED_TASK_FORM_URL);
+  }
+
+  @Test
+  public void testHandleBpmnError() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("errorCode", "anErrorCode");
+    parameters.put("errorMessage", "anErrorMessage");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(HANDLE_BPMN_ERROR_URL);
+
+    verify(taskServiceMock).handleBpmnError("aTaskId", "anErrorCode", "anErrorMessage", null);
+    verifyNoMoreInteractions(taskServiceMock);
+  }
+
+  @Test
+  public void testHandleBpmnErrorWithVariables() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("errorCode", "anErrorCode");
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+        .variable("var1", "val1")
+        .variable("var2", "val2", "String")
+        .variable("var3", ValueType.OBJECT.getName(), "val3", "aFormat", "aRootType")
+        .getVariables();
+    parameters.put("variables", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(HANDLE_BPMN_ERROR_URL);
+
+    verify(taskServiceMock).handleBpmnError(
+        eq("aTaskId"),
+        eq("anErrorCode"),
+        isNull(String.class),
+        argThat(EqualsVariableMap.matches()
+          .matcher("var1", EqualsUntypedValue.matcher().value("val1"))
+          .matcher("var2", EqualsPrimitiveValue.stringValue("val2"))
+          .matcher("var3",
+            EqualsObjectValue.objectValueMatcher()
+              .type(ValueType.OBJECT)
+              .serializedValue("val3")
+              .serializationFormat("aFormat")
+              .objectTypeName("aRootType"))));
+    verifyNoMoreInteractions(taskServiceMock);
+  }
+
+  @Test
+  public void testHandleBpmnErrorNonExistingTask() {
+    doThrow(new NullValueException())
+      .when(taskServiceMock)
+      .handleBpmnError(anyString(), anyString(), anyString(), anyMapOf(String.class, Object.class));
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("errorCode", "anErrorCode");
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Task with id aTaskId does not exist"))
+    .when()
+      .post(HANDLE_BPMN_ERROR_URL);
+  }
+
+  @Test
+  public void testHandleBpmnErrorThrowsAuthorizationException() {
+    doThrow(new AuthorizationException("aMessage"))
+      .when(taskServiceMock)
+      .handleBpmnError(any(String.class), any(String.class), any(String.class), anyMapOf(String.class, Object.class));
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("errorCode", "errorCode");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo("aMessage"))
+    .when()
+      .post(HANDLE_BPMN_ERROR_URL);
+  }
+
+  @Test
+  public void testHandleBpmnErrorThrowsBadUserRequestException() {
+    doThrow(new BadUserRequestException("aMessage"))
+      .when(taskServiceMock)
+      .handleBpmnError(any(String.class), any(String.class), any(String.class), anyMapOf(String.class, Object.class));
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("errorCode", "errorCode");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("aMessage"))
+    .when()
+      .post(HANDLE_BPMN_ERROR_URL);
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

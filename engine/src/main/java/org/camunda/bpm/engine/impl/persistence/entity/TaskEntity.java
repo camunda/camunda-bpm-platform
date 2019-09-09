@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.Expression;
@@ -1591,4 +1592,24 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
     return referenceIdAndClass;
   }
+
+  public void bpmnError(String errorCode, String errorMessage, Map<String, Object> variables) {
+    ensureTaskActive();
+    ActivityExecution activityExecution = getExecution();
+    BpmnError bpmnError = null;
+    if (errorMessage != null) {
+      bpmnError = new BpmnError(errorCode, errorMessage);
+    } else {
+      bpmnError = new BpmnError(errorCode);
+    }
+    try {
+      if (variables != null && !variables.isEmpty()) {
+        activityExecution.setVariables(variables);
+      }
+      BpmnExceptionHandler.propagateBpmnError(bpmnError, activityExecution);
+    } catch (Exception ex) {
+      throw ProcessEngineLogger.CMD_LOGGER.exceptionBpmnErrorPropagationFailed(errorCode, ex);
+    }
+  }
+
 }
