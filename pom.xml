@@ -195,6 +195,9 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
+        <module>typed-values</module>
+        <module>engine-dmn</module>
+
         <module>javaee/ejb-client</module>
 
         <module>engine-plugins</module>
