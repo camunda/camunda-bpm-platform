@@ -62,7 +62,7 @@ public class DmnExpressionLanguageTest {
 
     DmnDecisionTableResult result = decisionService.evaluateDecisionTableByKey("decision_1", inputs);
 
-    assertThat(result.getSingleEntry()).isEqualTo("B_FROM_MAP");
+    assertThat((String)result.getSingleEntry()).isEqualTo("B_FROM_MAP");
   }
 
   @Test
@@ -77,6 +77,6 @@ public class DmnExpressionLanguageTest {
 
     DmnDecisionTableResult result = decisionService.evaluateDecisionTableByKey("decision_1", inputs);
 
-    assertThat(result.getSingleEntry()).isEqualTo("0_FROM_LIST");
+    assertThat((String)result.getSingleEntry()).isEqualTo("0_FROM_LIST");
   }
 }
