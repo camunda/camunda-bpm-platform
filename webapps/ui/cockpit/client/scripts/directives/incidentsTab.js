@@ -240,11 +240,26 @@ var Directive = [
       };
 
       scope.getJobStacktraceUrl = function(incident) {
-        return Uri.appUri(
-          'engine://engine/:engine/job/' +
-            incident.rootCauseIncidentConfiguration +
-            '/stacktrace'
-        );
+        var basePath = 'engine://engine/:engine';
+        var id = incident.rootCauseIncidentConfiguration;
+        var resource = 'job';
+        var stacktraceName = 'stacktrace';
+
+        if (incident.incidentType === 'failedExternalTask') {
+          resource = 'external-task';
+          stacktraceName = 'errorDetails';
+        }
+
+        if (scope.incidentsContext === 'history') {
+          basePath = 'engine://engine/:engine/history';
+          id = incident.historyConfiguration;
+          resource += '-log';
+          if (incident.incidentType === 'failedExternalTask') {
+            stacktraceName = 'error-details';
+          }
+        }
+
+        return Uri.appUri(`${basePath}/${resource}/${id}/${stacktraceName}`);
       };
 
       scope.incidentHasActions = function(incident) {
