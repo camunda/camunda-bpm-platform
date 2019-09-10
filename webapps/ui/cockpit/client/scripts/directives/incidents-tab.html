@@ -42,14 +42,14 @@
           uib-tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
           tooltip-placement="top"
           ng-if="incident.incidentType === 'failedExternalTask'">
-        <span external-task-error-message-link="incident.rootCauseIncidentConfiguration">
+        <a ng-click="viewVariable(incident)">
           <span ng-show="incident.rootCauseIncidentMessage">
             {{ incident.rootCauseIncidentMessage }}
           </span>
           <span ng-show="!incident.rootCauseIncidentMessage">
             <i>Message is null.</i>
           </span>
-        </span>
+        </a>
       </td>
       <td class="message"
           ng-if="['failedExternalTask', 'failedJob'].indexOf(incident.incidentType) === -1 && incident.rootCauseIncidentMessage">
