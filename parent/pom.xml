@@ -44,7 +44,7 @@
     <version.wildfly.core>8.0.0.Final</version.wildfly.core>
 
     <version.glassfish>3.1.2</version.glassfish>
-    <version.tomcat>9.0.19</version.tomcat>
+    <version.tomcat>9.0.24</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
