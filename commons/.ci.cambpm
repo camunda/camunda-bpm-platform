@@ -1,2 +1,2 @@
 @Library("camunda-ci") _
-buildMavenAndDeployToMavenCentral([jdk:7, licenseCheck:true])
+buildMavenAndDeployToMavenCentral([jdk:7, licenseCheck:true, publishZipArtifactToCamundaOrg:true])
