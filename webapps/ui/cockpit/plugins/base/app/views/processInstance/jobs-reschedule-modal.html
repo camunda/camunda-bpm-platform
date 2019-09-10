@@ -6,7 +6,7 @@
 <div class="modal-body">
   <div notifications-panel></div>
 
-  
+
   <div ng-hide="status === 'DONE'">
     <p class="">{{ 'PLUGIN_JOBS_MODAL_DESCRIPTION' | translate }}</p>
     <form name="rescheduleJobDuedateForm" class="form-horizontal">
@@ -24,12 +24,12 @@
           <div class="col-xs-8">
               <label class="radio">
                 <input type="radio" ng-model="recalculationType" value="creation">
-                {{ 'PLUGIN_JOBS_FROM_CREATION' | translate }} 
+                {{ 'PLUGIN_JOBS_FROM_CREATION' | translate }}
               </label>
 
             <label class="radio">
                 <input type="radio" ng-model="recalculationType" value="now">
-                {{ 'PLUGIN_JOBS_FROM_NOW' | translate }} 
+                {{ 'PLUGIN_JOBS_FROM_NOW' | translate }}
             </label>
           </div>
         </div>
@@ -43,7 +43,7 @@
               <span class="glyphicon glyphicon-question-sign"></span>
             </span>
           </label>
-        
+
           <div class="col-xs-8">
               <label class="radio">
                 <input type="radio" ng-model="recalculationType" value="specific">
@@ -53,6 +53,21 @@
         <div class="form-group"
             ng-show="recalculationType==='specific'">
           <label class="control-label col-xs-4">
+            {{'PLUGIN_JOBS_CASCADE' | translate}}
+
+          <span uib-tooltip="{{'PLUGIN_JOBS_CASCADE_TOOLTIP' | translate}}"
+                tooltip-placement="right">
+            <span class="glyphicon glyphicon-question-sign"></span>
+          </span>
+          </label>
+
+          <div class="col-xs-8">
+            <label class="checkbox">
+                <input type="checkbox" ng-model="cascade">
+            </label>
+          </div>
+
+          <label class="control-label col-xs-4">
             {{'PLUGIN_JOBS_DATE_INPUT' | translate}}
           </label>
 
@@ -60,7 +75,7 @@
             <input date type="text" ng-model="date" name="dateValue" ng-disabled="recalculationType!=='specific'" class="form-control">
             <p class="invalid" ng-show="this.rescheduleJobDuedateForm.$error.datePattern">
               {{ 'PLUGIN_JOBS_VALID_PATTERN' | translate }}
-            </p>  
+            </p>
           </div>
         </div>
       </fieldset>
@@ -77,8 +92,8 @@
           class="btn btn-primary"
           ng-disabled="!isValid()"
           ng-hide="status === 'DONE'">
-   
-    {{ 'PLUGIN_JOBS_CHANGE' | translate }} 
-  </button> 
+
+    {{ 'PLUGIN_JOBS_CHANGE' | translate }}
+  </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/ui/cockpit/plugins/base/app/views/processInstance/jobs-reschedule-modal.html -->

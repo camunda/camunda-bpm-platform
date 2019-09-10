@@ -169,27 +169,30 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
           );
         };
 
-        var setDuedate = function(job, date) {
-          jobProvider.setDuedate({id: job.id, duedate: date}, function(err) {
-            if (err) {
-              Notifications.addError({
-                status: $translate.instant('PLUGIN_JOBS_RECALCULATE_ERROR'),
-                message: $translate.instant(
-                  'PLUGIN_JOBS_SET_DUEDATE_ERROR_MESSAGE'
-                ),
-                exclusive: true
-              });
-            } else {
-              Notifications.addMessage({
-                status: $translate.instant('PLUGIN_JOBS_RECALCULATE_SUCCESS'),
-                message: $translate.instant(
-                  'PLUGIN_JOBS_SET_DUEDATE_SUCCESS_MESSAGE'
-                ),
-                exclusive: true
-              });
-              updateJob(job);
+        var setDuedate = function(job, date, cascade) {
+          jobProvider.setDuedate(
+            {id: job.id, duedate: date, cascade: cascade},
+            function(err) {
+              if (err) {
+                Notifications.addError({
+                  status: $translate.instant('PLUGIN_JOBS_RECALCULATE_ERROR'),
+                  message: $translate.instant(
+                    'PLUGIN_JOBS_SET_DUEDATE_ERROR_MESSAGE'
+                  ),
+                  exclusive: true
+                });
+              } else {
+                Notifications.addMessage({
+                  status: $translate.instant('PLUGIN_JOBS_RECALCULATE_SUCCESS'),
+                  message: $translate.instant(
+                    'PLUGIN_JOBS_SET_DUEDATE_SUCCESS_MESSAGE'
+                  ),
+                  exclusive: true
+                });
+                updateJob(job);
+              }
             }
-          });
+          );
         };
 
         var updateJob = function(job) {
@@ -213,6 +216,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
                   var dateFilter = $filter('date'),
                     dateFormat = "yyyy-MM-dd'T'HH:mm:ss";
 
+                  $scope.cascade = true;
                   $scope.date = dateFilter(Date.now(), dateFormat);
                   $scope.submit = function() {
                     switch ($scope.recalculationType) {
@@ -221,7 +225,8 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
                           job,
                           moment($scope.date, moment.ISO_8601).format(
                             'YYYY-MM-DDTHH:mm:ss.SSSZZ'
-                          )
+                          ),
+                          $scope.cascade
                         );
                         break;
                       case 'now':
