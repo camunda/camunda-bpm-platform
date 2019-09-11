@@ -41,6 +41,7 @@ public class MockExternalTaskBuilder {
   protected Date lockExpirationTime;
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected String processDefinitionVersionTag;
   protected String processInstanceId;
   protected Integer retries;
   protected boolean suspended;
@@ -88,6 +89,11 @@ public class MockExternalTaskBuilder {
 
   public MockExternalTaskBuilder processDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
+  public MockExternalTaskBuilder processDefinitionVersionTag(String processDefinitionVersionTag) {
+    this.processDefinitionVersionTag = processDefinitionVersionTag;
     return this;
   }
 
@@ -146,6 +152,7 @@ public class MockExternalTaskBuilder {
     when(task.getLockExpirationTime()).thenReturn(lockExpirationTime);
     when(task.getProcessDefinitionId()).thenReturn(processDefinitionId);
     when(task.getProcessDefinitionKey()).thenReturn(processDefinitionKey);
+    when(task.getProcessDefinitionVersionTag()).thenReturn(processDefinitionVersionTag);
     when(task.getProcessInstanceId()).thenReturn(processInstanceId);
     when(task.getRetries()).thenReturn(retries);
     when(task.isSuspended()).thenReturn(suspended);
@@ -168,6 +175,7 @@ public class MockExternalTaskBuilder {
     when(task.getLockExpirationTime()).thenReturn(lockExpirationTime);
     when(task.getProcessDefinitionId()).thenReturn(processDefinitionId);
     when(task.getProcessDefinitionKey()).thenReturn(processDefinitionKey);
+    when(task.getProcessDefinitionVersionTag()).thenReturn(processDefinitionVersionTag);
     when(task.getProcessInstanceId()).thenReturn(processInstanceId);
     when(task.getRetries()).thenReturn(retries);
     when(task.getTopicName()).thenReturn(topicName);

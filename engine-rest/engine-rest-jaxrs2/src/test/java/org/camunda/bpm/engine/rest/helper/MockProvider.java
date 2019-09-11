@@ -52,6 +52,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_ACTIVITY_INSTANCE_ID = "anActivityInstanceId";
   public static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcDefId";
   public static final String EXAMPLE_PROCESS_DEFINITION_KEY = "aKey";
+  public static final String EXAMPLE_PROCESS_DEFINITION_VERSION_TAG = "42";
   public static final String EXAMPLE_TENANT_ID = "aTenantId";
   public static final Integer EXTERNAL_TASK_RETRIES = new Integer(5);
   public static final String EXTERNAL_TASK_ERROR_MESSAGE = "some error";
@@ -87,6 +88,7 @@ public abstract class MockProvider {
       .lockExpirationTime(DateTimeUtil.parseDate(EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
       .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
       .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
+      .processDefinitionVersionTag(EXAMPLE_PROCESS_DEFINITION_VERSION_TAG)
       .processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID)
       .retries(EXTERNAL_TASK_RETRIES)
       .suspended(EXTERNAL_TASK_SUSPENDED)
