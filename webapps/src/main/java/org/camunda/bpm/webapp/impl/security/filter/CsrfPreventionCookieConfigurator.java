@@ -73,7 +73,7 @@ public class CsrfPreventionCookieConfigurator {
       }
 
     } else { // default
-      this.sameSiteCookieValue = SameSiteOption.STRICT.getValue();
+      this.sameSiteCookieValue = SameSiteOption.LAX.getValue();
 
     }
   }
