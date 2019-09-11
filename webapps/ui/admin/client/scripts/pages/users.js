@@ -103,19 +103,23 @@ var Controller = [
               delete queryParams.sortOrder;
               return UserResource.query(
                 angular.extend({}, $scope.query, queryParams)
-              ).$promise.then(function(data) {
-                $scope.canSortEntries = false;
-                $scope.userList = data;
-                $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
+              )
+                .$promise.then(function(data) {
+                  $scope.canSortEntries = false;
+                  $scope.userList = data;
+                  $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
-                Notifications.addMessage({
-                  status: $translate.instant('USERS_NO_SORTING_HEADER'),
-                  message: $translate.instant('USERS_NO_SORTING_BODY'),
-                  exclusive: true
+                  Notifications.addMessage({
+                    status: $translate.instant('USERS_NO_SORTING_HEADER'),
+                    message: $translate.instant('USERS_NO_SORTING_BODY'),
+                    exclusive: true
+                  });
+
+                  return total;
+                })
+                .catch(function() {
+                  $scope.loadingState = 'EMPTY';
                 });
-
-                return total;
-              });
             });
         })
         .catch(angular.noop);
