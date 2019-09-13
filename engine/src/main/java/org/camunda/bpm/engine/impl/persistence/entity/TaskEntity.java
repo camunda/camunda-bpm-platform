@@ -18,15 +18,18 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
 import org.camunda.bpm.engine.impl.bpmn.helper.ErrorPropagationException;
+import org.camunda.bpm.engine.impl.bpmn.helper.EscalationHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -959,26 +962,67 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
     if (taskEventListeners != null) {
       for (TaskListener taskListener : taskEventListeners) {
-        CoreExecution execution = getExecution();
-        if (execution == null) {
-          execution = getCaseExecution();
-        }
-
-        if (execution != null) {
-          setEventName(taskEventName);
-        }
-        try {
-          boolean success = invokeListener(execution, taskEventName, taskListener);
-          if (!success) {
-            return false;
-          }
-        } catch (Exception e) {
-          throw LOG.invokeTaskListenerException(e);
+        if (!invokeListener(taskEventName, taskListener)){
+          return false;
         }
       }
     }
 
     return true;
+  }
+
+  protected List<TaskListener> getListenersForEvent(String event) {
+    TaskDefinition resolvedTaskDefinition = getTaskDefinition();
+    if (resolvedTaskDefinition != null) {
+      if (skipCustomListeners) {
+        return resolvedTaskDefinition.getBuiltinTaskListeners(event);
+      }
+      else {
+        return resolvedTaskDefinition.getTaskListeners(event);
+      }
+
+    }
+    else {
+      return null;
+    }
+  }
+
+  /**
+   * @return true if invoking the listener was successful;
+   *   if not successful, either false is returned (case: BPMN error propagation)
+   *   or an exception is thrown
+   */
+  public boolean fireTimeoutEvent(String timeoutId) {
+    TaskListener taskListener = getTimeoutListener(timeoutId);
+    if (taskListener == null) {
+      throw LOG.invokeTaskListenerException(new NotFoundException("Cannot find timeout taskListener with id '"
+          + timeoutId + "' for task " + this.id));
+    }
+    return invokeListener(TaskListener.EVENTNAME_TIMEOUT, taskListener);
+  }
+
+  protected TaskListener getTimeoutListener(String timeoutId) {
+    TaskDefinition resolvedTaskDefinition = getTaskDefinition();
+    if (resolvedTaskDefinition == null) {
+      return null;
+    } else {
+      return resolvedTaskDefinition.getTimeoutTaskListener(timeoutId);
+    }
+  }
+
+  protected boolean invokeListener(String taskEventName, TaskListener taskListener) {
+    CoreExecution execution = getExecution();
+    if (execution == null) {
+      execution = getCaseExecution();
+    }
+    if (execution != null) {
+      setEventName(taskEventName);
+    }
+    try {
+      return invokeListener(execution, taskEventName, taskListener);
+    } catch (Exception e) {
+      throw LOG.invokeTaskListenerException(e);
+    }
   }
 
   /**
@@ -1011,22 +1055,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       }
     }
     return true;
-  }
-
-  protected List<TaskListener> getListenersForEvent(String event) {
-    TaskDefinition resolvedTaskDefinition = getTaskDefinition();
-    if (resolvedTaskDefinition != null) {
-      if (skipCustomListeners) {
-        return resolvedTaskDefinition.getBuiltinTaskListeners(event);
-      }
-      else {
-        return resolvedTaskDefinition.getTaskListeners(event);
-      }
-
-    }
-    else {
-      return null;
-    }
   }
 
   /**
@@ -1564,5 +1592,34 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
 
     return referenceIdAndClass;
+  }
+
+  public void bpmnError(String errorCode, String errorMessage, Map<String, Object> variables) {
+    ensureTaskActive();
+    ActivityExecution activityExecution = getExecution();
+    BpmnError bpmnError = null;
+    if (errorMessage != null) {
+      bpmnError = new BpmnError(errorCode, errorMessage);
+    } else {
+      bpmnError = new BpmnError(errorCode);
+    }
+    try {
+      if (variables != null && !variables.isEmpty()) {
+        activityExecution.setVariables(variables);
+      }
+      BpmnExceptionHandler.propagateBpmnError(bpmnError, activityExecution);
+    } catch (Exception ex) {
+      throw ProcessEngineLogger.CMD_LOGGER.exceptionBpmnErrorPropagationFailed(errorCode, ex);
+    }
+  }
+
+  public void escalation(String escalationCode, Map<String, Object> variables) {
+    ensureTaskActive();
+    ActivityExecution activityExecution = getExecution();
+
+    if (variables != null && !variables.isEmpty()) {
+      activityExecution.setVariables(variables);
+    }
+    EscalationHandler.propagateEscalation(activityExecution, escalationCode);
   }
 }

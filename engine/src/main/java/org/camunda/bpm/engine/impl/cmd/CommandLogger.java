@@ -294,4 +294,12 @@ public class CommandLogger extends ProcessEngineLogger {
       "043",
       "No subscriptions were found during evaluation of the conditional start events."));
   }
+
+
+  public ProcessEngineException exceptionEscalationPropagationFailed(String escalationCode, Throwable cause) {
+    return new ProcessEngineException(exceptionMessage(
+      "044",
+      "Propagation of escalation {} failed. ",
+      escalationCode), cause);
+  }
 }

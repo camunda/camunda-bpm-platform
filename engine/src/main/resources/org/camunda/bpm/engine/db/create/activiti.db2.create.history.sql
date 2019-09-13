@@ -251,6 +251,7 @@ create table ACT_HI_INCIDENT (
   CAUSE_INCIDENT_ID_ varchar(64),
   ROOT_CAUSE_INCIDENT_ID_ varchar(64),
   CONFIGURATION_ varchar(255),
+  HISTORY_CONFIGURATION_ varchar(255),
   INCIDENT_STATE_ integer,
   TENANT_ID_ varchar(64),
   JOB_DEF_ID_ varchar(64),

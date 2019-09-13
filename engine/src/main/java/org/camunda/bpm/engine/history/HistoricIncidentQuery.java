@@ -57,6 +57,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
   /** Only select incidents which contain the configuration. **/
   HistoricIncidentQuery configuration(String configuration);
 
+  /** Only select incidents which contain the historyConfiguration. **/
+  HistoricIncidentQuery historyConfiguration(String historyConfiguration);
+
   /** Only select incidents that belong to one of the given job definition ids. */
   HistoricIncidentQuery jobDefinitionIdIn(String... jobDefinitionIds);
 
@@ -104,6 +107,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
 
   /** Order by configuration (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricIncidentQuery orderByConfiguration();
+
+  /** Order by historyConfiguration (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricIncidentQuery orderByHistoryConfiguration();
 
   /** Order by incidentState (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricIncidentQuery orderByIncidentState();

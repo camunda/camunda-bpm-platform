@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1mm4dtf" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.2.1">
+  <bpmn:process id="process" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_1azm3nc</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1azm3nc" sourceRef="StartEvent_1" targetRef="userTask" />
+    <bpmn:userTask id="userTask">
+      <bpmn:incoming>SequenceFlow_1azm3nc</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_18ewnwn</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="timer" attachedToRef="userTask">
+      <bpmn:outgoing>SequenceFlow_063ksng</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1H</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_063ksng" sourceRef="timer" targetRef="EndEvent_130kn1h" />
+    <bpmn:endEvent id="EndEvent_130kn1h">
+      <bpmn:incoming>SequenceFlow_063ksng</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_1ejgtlr">
+      <bpmn:incoming>SequenceFlow_18ewnwn</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_18ewnwn" sourceRef="userTask" targetRef="EndEvent_1ejgtlr" />
+  </bpmn:process>
+</bpmn:definitions>

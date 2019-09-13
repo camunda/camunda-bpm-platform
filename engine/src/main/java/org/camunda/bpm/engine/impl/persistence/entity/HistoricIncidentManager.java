@@ -43,6 +43,10 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
     return (Long) getDbEntityManager().selectOne("selectHistoricIncidentCountByQueryCriteria", query);
   }
 
+  public HistoricIncidentEntity findHistoricIncidentById(String id) {
+    return (HistoricIncidentEntity) getDbEntityManager().selectOne("selectHistoricIncidentById", id);
+  }
+
   @SuppressWarnings("unchecked")
   public List<HistoricIncident> findHistoricIncidentByQueryCriteria(HistoricIncidentQueryImpl query, Page page) {
     configureQuery(query);

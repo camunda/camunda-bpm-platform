@@ -56,6 +56,10 @@ public class HistoryEventProcessor {
     public List<HistoryEvent> createHistoryEvents(HistoryEventProducer producer) {
       return Collections.emptyList();
     }
+
+    public void postHandleSingleHistoryEventCreated(HistoryEvent event) {
+      return;
+    }
   }
 
 
@@ -73,6 +77,7 @@ public class HistoryEventProcessor {
     HistoryEvent singleEvent = creator.createHistoryEvent(historyEventProducer);
     if (singleEvent != null) {
       historyEventHandler.handleEvent(singleEvent);
+      creator.postHandleSingleHistoryEventCreated(singleEvent);
     }
 
     List<HistoryEvent> eventList = creator.createHistoryEvents(historyEventProducer);

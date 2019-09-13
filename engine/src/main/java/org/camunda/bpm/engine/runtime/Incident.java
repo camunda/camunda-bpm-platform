@@ -135,4 +135,9 @@ public interface Incident {
    */
   String getJobDefinitionId();
 
+  /**
+   * Returns the history payload of this incident.
+   */
+  String getHistoryConfiguration();
+
 }

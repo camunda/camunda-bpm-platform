@@ -224,6 +224,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerTaskListenerJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.BatchWindowManager;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.DefaultBatchWindowManager;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupBatch;
@@ -1897,6 +1898,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     TimerActivateJobDefinitionHandler activateJobDefinitionHandler = new TimerActivateJobDefinitionHandler();
     jobHandlers.put(activateJobDefinitionHandler.getType(), activateJobDefinitionHandler);
+
+    TimerTaskListenerJobHandler taskListenerJobHandler = new TimerTaskListenerJobHandler();
+    jobHandlers.put(taskListenerJobHandler.getType(), taskListenerJobHandler);
 
     BatchSeedJobHandler batchSeedJobHandler = new BatchSeedJobHandler();
     jobHandlers.put(batchSeedJobHandler.getType(), batchSeedJobHandler);

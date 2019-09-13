@@ -97,6 +97,10 @@ The header can be added manually, it can be set through your IDE's settings so t
 
 It should be noted that `Java` source files from a contribution, that do not contain a valid license header, will not be merged with the codebase.
 
+## Contributor License Agreement
+
+In order to merge your contribution you have to sign our [Contributor License Agreement](https://cla-assistant.io/camunda/) (CLA) (which needs to be done only once). The CLA contains the terms and conditions under which the contribution has been submitted. Keep in mind without signed CLA the contribution will not be merged.
+
 ## Commit Message Conventions
 
 > This page defines a convention for commit messages for [camundaBPM](http://camunda.org) related projects.

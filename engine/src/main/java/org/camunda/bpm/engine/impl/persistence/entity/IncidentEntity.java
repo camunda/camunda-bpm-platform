@@ -63,6 +63,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   protected String incidentMessage;
   protected String tenantId;
   protected String jobDefinitionId;
+  protected String historyConfiguration;
 
   public List<IncidentEntity> createRecursiveIncidents() {
     List<IncidentEntity> createdIncidents = new ArrayList<IncidentEntity>();
@@ -119,6 +120,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     newIncident.setProcessDefinitionId(context.getProcessDefinitionId());
     newIncident.setTenantId(context.getTenantId());
     newIncident.setJobDefinitionId(context.getJobDefinitionId());
+    newIncident.setHistoryConfiguration(context.getHistoryConfiguration());
 
     if (context.getExecutionId() != null) {
       // fetch execution
@@ -463,6 +465,14 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   @Override
   public int getRevisionNext() {
     return revision + 1;
+  }
+
+  public String getHistoryConfiguration() {
+    return historyConfiguration;
+  }
+
+  public void setHistoryConfiguration(String historyConfiguration) {
+    this.historyConfiguration = historyConfiguration;
   }
 
   @Override

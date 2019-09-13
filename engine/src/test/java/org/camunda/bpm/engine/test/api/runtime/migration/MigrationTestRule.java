@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerTaskListenerJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
@@ -234,6 +235,27 @@ public class MigrationTestRule extends ProcessEngineTestRule {
     }
   }
 
+  public void assertJobsCreated(String activityId, String handlerType, int countJobs) {
+    List<JobDefinition> jobDefinitionsAfter = snapshotAfterMigration.getJobDefinitionsForActivityIdAndType(activityId, handlerType);
+    assertEquals(
+        "Expected that " + countJobs + "job definitions for activity '" + activityId + "' exist after migration, but found " + jobDefinitionsAfter.size(),
+        countJobs, jobDefinitionsAfter.size());
+
+    for (JobDefinition jobDefinitionAfter : jobDefinitionsAfter) {
+      Job jobAfter = snapshotAfterMigration.getJobForDefinitionId(jobDefinitionAfter.getId());
+      assertNotNull("Expected that a job for activity '" + activityId + "' exists after migration", jobAfter);
+      assertTimerJob(jobAfter);
+      assertEquals(jobDefinitionAfter.getProcessDefinitionId(), jobAfter.getProcessDefinitionId());
+      assertEquals(jobDefinitionAfter.getProcessDefinitionKey(), jobAfter.getProcessDefinitionKey());
+
+      for (Job job : snapshotBeforeMigration.getJobs()) {
+        if (jobAfter.getId().equals(job.getId())) {
+          fail("Expected job '" + jobAfter.getId() + "' to be created first after migration");
+        }
+      }
+    }
+  }
+
   public void assertJobRemoved(String activityId, String handlerType) {
     JobDefinition jobDefinitionBefore = snapshotBeforeMigration.getJobDefinitionForActivityIdAndType(activityId, handlerType);
     assertNotNull("Expected that a job definition for activity '" + activityId + "' exists before migration", jobDefinitionBefore);
@@ -250,13 +272,17 @@ public class MigrationTestRule extends ProcessEngineTestRule {
   }
 
   public void assertJobMigrated(String activityIdBefore, String activityIdAfter, String handlerType) {
+    assertJobMigrated(activityIdBefore, activityIdAfter, handlerType, null);
+  }
+
+  public void assertJobMigrated(String activityIdBefore, String activityIdAfter, String handlerType, Date dueDateAfter) {
     JobDefinition jobDefinitionBefore = snapshotBeforeMigration.getJobDefinitionForActivityIdAndType(activityIdBefore, handlerType);
     assertNotNull("Expected that a job definition for activity '" + activityIdBefore + "' exists before migration", jobDefinitionBefore);
 
     Job jobBefore = snapshotBeforeMigration.getJobForDefinitionId(jobDefinitionBefore.getId());
     assertNotNull("Expected that a timer job for activity '" + activityIdBefore + "' exists before migration", jobBefore);
 
-    assertJobMigrated(jobBefore, activityIdAfter, jobBefore.getDuedate());
+    assertJobMigrated(jobBefore, activityIdAfter, dueDateAfter == null ? jobBefore.getDuedate() : dueDateAfter);
   }
 
   public void assertJobMigrated(Job jobBefore, String activityIdAfter) {
@@ -313,6 +339,26 @@ public class MigrationTestRule extends ProcessEngineTestRule {
 
   public void assertEventSubProcessTimerJobRemoved(String activityId) {
     assertJobRemoved(activityId, TimerStartEventSubprocessJobHandler.TYPE);
+  }
+
+  public void assertTaskListenerTimerJobCreated(String activityId) {
+    assertJobCreated(activityId, TimerTaskListenerJobHandler.TYPE);
+  }
+
+  public void assertTaskListenerTimerJobsCreated(String activityId, int countJobs) {
+    assertJobsCreated(activityId, TimerTaskListenerJobHandler.TYPE, countJobs);
+  }
+
+  public void assertTaskListenerTimerJobRemoved(String activityId) {
+    assertJobRemoved(activityId, TimerTaskListenerJobHandler.TYPE);
+  }
+
+  public void assertTaskListenerTimerJobMigrated(String activityIdBefore, String activityIdAfter) {
+    assertJobMigrated(activityIdBefore, activityIdAfter, TimerTaskListenerJobHandler.TYPE);
+  }
+
+  public void assertTaskListenerTimerJobMigrated(String activityIdBefore, String activityIdAfter, Date dueDateAfter) {
+    assertJobMigrated(activityIdBefore, activityIdAfter, TimerTaskListenerJobHandler.TYPE, dueDateAfter);
   }
 
   public void assertVariableMigratedToExecution(VariableInstance variableBefore, String executionId) {

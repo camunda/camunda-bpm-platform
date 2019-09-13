@@ -29,6 +29,7 @@ public class IncidentContext {
   protected String configuration;
   protected String tenantId;
   protected String jobDefinitionId;
+  protected String historyConfiguration;
 
   public IncidentContext() {}
 
@@ -87,6 +88,14 @@ public class IncidentContext {
 
   public void setJobDefinitionId(String jobDefinitionId) {
     this.jobDefinitionId = jobDefinitionId;
+  }
+
+  public String getHistoryConfiguration() {
+    return historyConfiguration;
+  }
+
+  public void setHistoryConfiguration(String historicConfiguration) {
+    this.historyConfiguration = historicConfiguration;
   }
 
 }

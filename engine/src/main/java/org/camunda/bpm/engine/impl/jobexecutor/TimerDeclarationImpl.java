@@ -203,12 +203,32 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     return resolveJobHandler().newConfiguration(rawJobHandlerConfiguration);
   }
 
+  /**
+   * @return all timers declared in the given scope
+   */
   public static Map<String, TimerDeclarationImpl> getDeclarationsForScope(PvmScope scope) {
     if (scope == null) {
       return Collections.emptyMap();
     }
 
     Map<String, TimerDeclarationImpl> result = scope.getProperties().get(BpmnProperties.TIMER_DECLARATIONS);
+    if (result != null) {
+      return result;
+    }
+    else {
+      return Collections.emptyMap();
+    }
+  }
+
+  /**
+   * @return all timeout listeners declared in the given scope
+   */
+  public static Map<String, Map<String, TimerDeclarationImpl>> getTimeoutListenerDeclarationsForScope(PvmScope scope) {
+    if (scope == null) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, Map<String, TimerDeclarationImpl>> result = scope.getProperties().get(BpmnProperties.TIMEOUT_LISTENER_DECLARATIONS);
     if (result != null) {
       return result;
     }

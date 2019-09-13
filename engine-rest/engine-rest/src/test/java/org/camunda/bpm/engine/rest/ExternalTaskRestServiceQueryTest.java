@@ -133,6 +133,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     String lockExpirationTime = from(content).getString("[0].lockExpirationTime");
     String processDefinitionId = from(content).getString("[0].processDefinitionId");
     String processDefinitionKey = from(content).getString("[0].processDefinitionKey");
+    String processDefinitionVersionTag = from(content).getString("[0].processDefinitionVersionTag");
     String processInstanceId = from(content).getString("[0].processInstanceId");
     Integer retries = from(content).getInt("[0].retries");
     Boolean suspended = from(content).getBoolean("[0].suspended");
@@ -150,6 +151,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_LOCK_EXPIRATION_TIME, lockExpirationTime);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, processDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, processDefinitionKey);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION_TAG, processDefinitionVersionTag);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, processInstanceId);
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_RETRIES, retries);
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_SUSPENDED, suspended);
@@ -175,6 +177,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("processInstanceId", "someProcessInstanceId");
     parameters.put("processInstanceIdIn", "aProcessInstanceId,anotherProcessInstanceId");
     parameters.put("processDefinitionId", "someProcessDefinitionId");
+    parameters.put("processDefinitionVersionTag", "someProcessDefinitionVersionTag");
     parameters.put("active", "true");
     parameters.put("suspended", "true");
     parameters.put("withRetriesLeft", "true");
@@ -199,6 +202,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).executionId("someExecutionId");
     verify(mockQuery).processInstanceId("someProcessInstanceId");
     verify(mockQuery).processInstanceIdIn("aProcessInstanceId", "anotherProcessInstanceId");
+    verify(mockQuery).processDefinitionId("someProcessDefinitionId");
     verify(mockQuery).processDefinitionId("someProcessDefinitionId");
     verify(mockQuery).active();
     verify(mockQuery).suspended();
