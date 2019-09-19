@@ -15,9 +15,11 @@ class CamundaValueMapper extends JavaValueMapper {
     // joda-time
     case x: org.joda.time.LocalDate =>
       ValDate(LocalDate.of(x.getYear, x.getMonthOfYear, x.getDayOfMonth))
+
     case x: org.joda.time.LocalTime =>
       ValLocalTime(
         LocalTime.of(x.getHourOfDay, x.getMinuteOfHour, x.getSecondOfMinute))
+
     case x: org.joda.time.LocalDateTime =>
       ValLocalDateTime(
         LocalDateTime.of(x.getYear,
@@ -26,10 +28,26 @@ class CamundaValueMapper extends JavaValueMapper {
                          x.getHourOfDay,
                          x.getMinuteOfHour,
                          x.getSecondOfMinute))
+
+    case x: org.joda.time.DateTime =>
+      ValDateTime(
+        ZonedDateTime.of(
+          LocalDateTime.of(x.getYear,
+                           x.getMonthOfYear,
+                           x.getDayOfMonth,
+                           x.getHourOfDay,
+                           x.getMinuteOfHour,
+                           x.getSecondOfMinute),
+          ZoneId.of(x.getZone.getID)
+        )
+      )
+
     case x: org.joda.time.Duration =>
       ValDayTimeDuration(Duration.ofMillis(x.getMillis))
+
     case x: org.joda.time.Period =>
       ValYearMonthDuration(Period.of(x.getYears, x.getMonths, 0))
+
     // Camunda Spin
     case x: SpinJsonNode   => spinJsonToVal(x)
     case x: SpinXmlElement => spinXmlToVal(x)
