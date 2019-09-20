@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -124,6 +125,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String caseExecutionId;
 
   protected List<String> cachedCandidateGroups;
+  protected HashMap<String, List<String>> cachedUserGroups;
 
   // or query /////////////////////////////
   protected List<TaskQueryImpl> queries = new ArrayList<TaskQueryImpl>(Arrays.asList(this));
@@ -932,42 +934,40 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       return cachedCandidateGroups;
     }
 
-    if (isOrQueryActive) {
-
-      if (candidateGroup != null) {
-        cachedCandidateGroups = new ArrayList<String>();
-        cachedCandidateGroups.add(candidateGroup);
-
-        if (candidateGroups != null) {
-          cachedCandidateGroups.addAll(candidateGroups);
-        }
-
-      }
-      else if (candidateGroups != null) {
-        cachedCandidateGroups = candidateGroups;
-      }
-
-      return cachedCandidateGroups;
-    }
-
     if (candidateGroup != null && candidateGroups != null) {
-      //get intersection of candidateGroups and candidateGroup
       cachedCandidateGroups = new ArrayList<String>(candidateGroups);
-      cachedCandidateGroups.retainAll(Arrays.asList(candidateGroup));
-    }
-    else if (candidateGroup != null) {
+      if (!isOrQueryActive) {
+        // get intersection of candidateGroups and candidateGroup
+        cachedCandidateGroups.retainAll(Arrays.asList(candidateGroup));
+      } else {
+        // get union of candidateGroups and candidateGroup
+        if (!candidateGroups.contains(candidateGroup)) {
+          cachedCandidateGroups.add(candidateGroup);
+        }
+      }
+    } else if (candidateGroup != null) {
       cachedCandidateGroups = Arrays.asList(candidateGroup);
-    }
-    else if (candidateUser != null) {
-      cachedCandidateGroups = getGroupsForCandidateUser(candidateUser);
-    }
-    else if (candidateGroups != null) {
+    } else if (candidateGroups != null) {
       cachedCandidateGroups = candidateGroups;
+    }
+
+    if (candidateUser != null) {
+      List<String> groupsForCandidateUser = getGroupsForCandidateUser(candidateUser);
+
+      if (cachedCandidateGroups == null) { // if not an 'or' query, it is always empty here
+        cachedCandidateGroups = groupsForCandidateUser;
+      } else {
+        for (String group : groupsForCandidateUser) {
+          if (!cachedCandidateGroups.contains(group)) {
+            cachedCandidateGroups.add(group);
+          }
+        }
+      }
     }
 
     return cachedCandidateGroups;
   }
-
+  
   public Boolean isWithCandidateGroups() {
     if (withCandidateGroups == null) {
       return false;
@@ -1013,17 +1013,30 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   protected List<String> getGroupsForCandidateUser(String candidateUser) {
-    List<Group> groups = Context
-      .getCommandContext()
-      .getReadOnlyIdentityProvider()
-      .createGroupQuery()
-      .groupMember(candidateUser)
-      .list();
+    HashMap<String, List<String>> cachedGroups = getCachedUserGroups();
+
+    if (cachedGroups.containsKey(candidateUser)) {
+      return cachedGroups.get(candidateUser);
+    }
+
+    List<Group> groups = Context.getCommandContext().getReadOnlyIdentityProvider().createGroupQuery()
+        .groupMember(candidateUser).list();
     List<String> groupIds = new ArrayList<String>();
     for (Group group : groups) {
       groupIds.add(group.getId());
     }
+
+    cachedGroups.put(candidateUser, groupIds);
+
     return groupIds;
+  }
+
+  private HashMap<String, List<String>> getCachedUserGroups() {
+    // store and retrieve cached user groups always from the first (root) query
+    if (queries.get(0).cachedUserGroups == null) {
+      queries.get(0).cachedUserGroups = new HashMap<String, List<String>>();
+    }
+    return queries.get(0).cachedUserGroups;
   }
 
   protected void ensureOrExpressionsEvaluated() {

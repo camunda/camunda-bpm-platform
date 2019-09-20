@@ -84,6 +84,12 @@ public class TaskCandidateTest extends PluggableProcessEngineTestCase {
     Task task = tasks.get(0);
     assertEquals("Pay out expenses", task.getName());
 
+    // The above query again, now between 'or' and 'endOr'
+    tasks = taskService.createTaskQuery().or().taskCandidateUser(KERMIT).endOr().list();
+    assertEquals(1, tasks.size());
+    task = tasks.get(0);
+    assertEquals("Pay out expenses", task.getName());
+    
     // Claim the task
     taskService.claim(task.getId(), KERMIT);
 
