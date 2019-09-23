@@ -23,24 +23,52 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 
-public class UpdateDuedateOnRecurringTimerTest extends PluggableProcessEngineTestCase {
+public class UpdateDuedateOnRecurringTimerTest {
+
+  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  RuntimeService runtimeService;
+  ManagementService managementService;
+  Date t0;
+
+  @Before
+  public void init() {
+    runtimeService = engineRule.getRuntimeService();
+    managementService = engineRule.getManagementService();
+
+    t0 = new Date(0);
+    ClockUtil.setCurrentTime(t0);
+  }
+
+  @After
+  public void resetClock() {
+    ClockUtil.resetClock();
+  }
 
   @Test
   public void testCascadeChangeToRecurringTimerAddToDuedate() {
     // given timer R2/PT30M
     BpmnModelInstance process = Bpmn.createExecutableProcess("process").startEvent().userTask("userTask").boundaryEvent().cancelActivity(false)
         .timerWithCycle("R2/PT30M").endEvent().moveToActivity("userTask").endEvent().done();
-    deployment(process);
-
-    Date t0 = new Date(0);
-    ClockUtil.setCurrentTime(t0);
+    testRule.deploy(process);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
@@ -73,10 +101,7 @@ public class UpdateDuedateOnRecurringTimerTest extends PluggableProcessEngineTes
     // given timer R3/PT30M
     BpmnModelInstance process = Bpmn.createExecutableProcess("process").startEvent().userTask("userTask").boundaryEvent().cancelActivity(false)
         .timerWithCycle("R3/PT30M").endEvent().moveToActivity("userTask").endEvent().done();
-    deployment(process);
-
-    Date t0 = new Date(0);
-    ClockUtil.setCurrentTime(t0);
+    testRule.deploy(process);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
@@ -109,6 +134,7 @@ public class UpdateDuedateOnRecurringTimerTest extends PluggableProcessEngineTes
 
     // then
     assertThat(ClockUtil.getCurrentTime()).isAfter(job3.getDuedate());
+    assertThat(managementService.createJobQuery().count()).isEqualTo(0);
     // no duplicates
     assertThat(new HashSet<String>(Arrays.asList(job1.getId(), job2.getId(), job3.getId())).size()).isEqualTo(3);
     // job1 is due after 45 minutes (30 + 15 offset)
@@ -125,10 +151,7 @@ public class UpdateDuedateOnRecurringTimerTest extends PluggableProcessEngineTes
     // given timer R2/PT30M
     BpmnModelInstance process = Bpmn.createExecutableProcess("process").startEvent().userTask("userTask").boundaryEvent().cancelActivity(false)
         .timerWithCycle("R2/PT30M").endEvent().moveToActivity("userTask").endEvent().done();
-    deployment(process);
-
-    Date t0 = new Date(0);
-    ClockUtil.setCurrentTime(t0);
+    testRule.deploy(process);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
@@ -161,10 +184,7 @@ public class UpdateDuedateOnRecurringTimerTest extends PluggableProcessEngineTes
     // given timer R3/PT30M
     BpmnModelInstance process = Bpmn.createExecutableProcess("process").startEvent().userTask("userTask").boundaryEvent().cancelActivity(false)
         .timerWithCycle("R3/PT30M").endEvent().moveToActivity("userTask").endEvent().done();
-    deployment(process);
-
-    Date t0 = new Date(0);
-    ClockUtil.setCurrentTime(t0);
+    testRule.deploy(process);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
@@ -209,10 +229,7 @@ public class UpdateDuedateOnRecurringTimerTest extends PluggableProcessEngineTes
     // given timer R3/PT30M
     BpmnModelInstance process = Bpmn.createExecutableProcess("process").startEvent().userTask("userTask").boundaryEvent().cancelActivity(false)
         .timerWithCycle("R3/PT30M").endEvent().moveToActivity("userTask").endEvent().done();
-    deployment(process);
-
-    Date t0 = new Date(0);
-    ClockUtil.setCurrentTime(t0);
+    testRule.deploy(process);
     runtimeService.startProcessInstanceByKey("process");
 
     // when
@@ -251,7 +268,7 @@ public class UpdateDuedateOnRecurringTimerTest extends PluggableProcessEngineTes
 
   private void setTimeAndExecuteJobs(Date time) {
     ClockUtil.setCurrentTime(time);
-    waitForJobExecutorToProcessAllJobs(5000);
+    testRule.waitForJobExecutorToProcessAllJobs(5000);
   }
 
   private Job modifyDueDate(Job job, boolean cascade, long offset) {
