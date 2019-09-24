@@ -10,16 +10,16 @@
   
   <startEvent id="start" />
   
-  <sequenceFlow sourceRef="start" targetRef="myUserTask" />
+  <sequenceFlow sourceRef="start" targetRef="activity" />
   
-  <userTask id="myUserTask" />
+  <serviceTask id="activity" camunda:expression="${true}" />
   
-  <!-- escalation boundary should only be attached to subprocess or call activity -->
-  <boundaryEvent id="escalationBoundaryEvent" attachedToRef="myUserTask">
+  <!-- escalation boundary should only be attached to subprocess, call activity or user task -->
+  <boundaryEvent id="escalationBoundaryEvent" attachedToRef="activity">
     <escalationEventDefinition escalationRef="escalation" />
   </boundaryEvent>
   
-  <sequenceFlow sourceRef="myUserTask" targetRef="theEnd" />
+  <sequenceFlow sourceRef="activity" targetRef="theEnd" />
   
   <endEvent id="theEnd" />
   

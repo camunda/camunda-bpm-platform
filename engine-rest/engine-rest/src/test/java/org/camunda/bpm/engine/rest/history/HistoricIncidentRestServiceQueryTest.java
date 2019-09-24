@@ -514,11 +514,23 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
     String configuration = MockProvider.EXAMPLE_HIST_INCIDENT_CONFIGURATION;
 
     given()
-      .queryParam("configuration", configuration)
+    .queryParam("configuration", configuration)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(HISTORY_INCIDENT_QUERY_URL);
+
+    verify(mockedQuery).configuration(configuration);
+  }
+
+  @Test
+  public void testQueryByHistoryConfiguration() {
+    String historyConfiguration = MockProvider.EXAMPLE_HIST_INCIDENT_HISTORY_CONFIGURATION;
+
+    given()
+      .queryParam("historyConfiguration", historyConfiguration)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(HISTORY_INCIDENT_QUERY_URL);
 
-    verify(mockedQuery).configuration(configuration);
+    verify(mockedQuery).historyConfiguration(historyConfiguration);
   }
 
   @Test
@@ -582,7 +594,7 @@ public class HistoricIncidentRestServiceQueryTest extends AbstractRestServiceTes
   public void testQueryByJobDefinitionIds() {
     String jobDefinitionIds = EXAMPLE_JOB_DEFINITION_ID + "," + NON_EXISTING_JOB_DEFINITION_ID;
 
-    Response response = given()
+    given()
         .queryParam("jobDefinitionIdIn", jobDefinitionIds)
       .then().expect()
         .statusCode(Status.OK.getStatusCode())

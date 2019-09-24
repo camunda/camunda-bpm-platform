@@ -40,6 +40,7 @@ public class HistoricIncidentDto {
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
+  protected String historyConfiguration;
   protected String incidentMessage;
   protected String tenantId;
   protected String jobDefinitionId;
@@ -103,6 +104,10 @@ public class HistoricIncidentDto {
     return configuration;
   }
 
+  public String getHistoryConfiguration() {
+    return historyConfiguration;
+  }
+
   public String getIncidentMessage() {
     return incidentMessage;
   }
@@ -142,6 +147,7 @@ public class HistoricIncidentDto {
     dto.causeIncidentId = historicIncident.getCauseIncidentId();
     dto.rootCauseIncidentId = historicIncident.getRootCauseIncidentId();
     dto.configuration = historicIncident.getConfiguration();
+    dto.historyConfiguration = historicIncident.getHistoryConfiguration();
     dto.incidentMessage = historicIncident.getIncidentMessage();
     dto.open = historicIncident.isOpen();
     dto.deleted = historicIncident.isDeleted();

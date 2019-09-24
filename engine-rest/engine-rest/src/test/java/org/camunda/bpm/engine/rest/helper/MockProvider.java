@@ -274,6 +274,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROCESS_DEFINITION_CATEGORY = "aCategory";
   public static final String EXAMPLE_PROCESS_DEFINITION_DESCRIPTION = "aDescription";
   public static final int EXAMPLE_PROCESS_DEFINITION_VERSION = 42;
+  public static final String EXAMPLE_PROCESS_DEFINITION_VERSION_TAG = "42";
   public static final String EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME = "aResourceName";
   public static final String EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME = "aResourceName.png";
   public static final boolean EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED = true;
@@ -686,6 +687,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HIST_INCIDENT_CAUSE_INCIDENT_ID = "aCauseIncidentId";
   public static final String EXAMPLE_HIST_INCIDENT_ROOT_CAUSE_INCIDENT_ID = "aRootCauseIncidentId";
   public static final String EXAMPLE_HIST_INCIDENT_CONFIGURATION = "aConfiguration";
+  public static final String EXAMPLE_HIST_INCIDENT_HISTORY_CONFIGURATION = "aHistoryConfiguration";
   public static final String EXAMPLE_HIST_INCIDENT_MESSAGE = "anIncidentMessage";
   public static final boolean EXAMPLE_HIST_INCIDENT_STATE_OPEN = false;
   public static final boolean EXAMPLE_HIST_INCIDENT_STATE_DELETED = false;
@@ -2932,6 +2934,7 @@ public abstract class MockProvider {
       .lockExpirationTime(DateTimeUtil.parseDate(EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
       .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
       .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
+      .processDefinitionVersionTag(EXAMPLE_PROCESS_DEFINITION_VERSION_TAG)
       .processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID)
       .retries(EXTERNAL_TASK_RETRIES)
       .suspended(EXTERNAL_TASK_SUSPENDED)

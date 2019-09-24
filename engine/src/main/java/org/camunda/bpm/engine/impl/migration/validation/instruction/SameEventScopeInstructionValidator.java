@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -44,8 +43,12 @@ public class SameEventScopeInstructionValidator implements MigrationInstructionV
     }
 
     if (targetEventScope == null) {
-      report.addFailure("The source activity's event scope (" + sourceEventScope.getId() + ") must be mapped but the "
-          + "target activity has no event scope");
+      // target event scope is allowed to be null for user tasks with timeout listeners
+      // if all listeners are removed in the target
+      if (!isUserTaskWithTimeoutListener(sourceActivity)) {
+        report.addFailure("The source activity's event scope (" + sourceEventScope.getId() + ") must be mapped but the "
+            + "target activity has no event scope");
+      }
     }
     else {
       ScopeImpl mappedSourceEventScope = findMappedEventScope(sourceEventScope, instruction, instructions);
@@ -59,6 +62,13 @@ public class SameEventScopeInstructionValidator implements MigrationInstructionV
   protected boolean isCompensationBoundaryEvent(ActivityImpl sourceActivity) {
     String activityType = sourceActivity.getProperties().get(BpmnProperties.TYPE);
     return ActivityTypes.BOUNDARY_COMPENSATION.equals(activityType);
+  }
+
+  protected boolean isUserTaskWithTimeoutListener(ActivityImpl sourceActivity) {
+    return ActivityTypes.TASK_USER_TASK.equals(sourceActivity.getProperties().get(BpmnProperties.TYPE)) &&
+        sourceActivity.isScope() && sourceActivity.equals(sourceActivity.getEventScope()) &&
+        sourceActivity.getProperties().get(BpmnProperties.TIMEOUT_LISTENER_DECLARATIONS) != null &&
+        !sourceActivity.getProperties().get(BpmnProperties.TIMEOUT_LISTENER_DECLARATIONS).isEmpty();
   }
 
   protected ScopeImpl findMappedEventScope(ScopeImpl sourceEventScope, ValidatingMigrationInstruction instruction, ValidatingMigrationInstructions instructions) {

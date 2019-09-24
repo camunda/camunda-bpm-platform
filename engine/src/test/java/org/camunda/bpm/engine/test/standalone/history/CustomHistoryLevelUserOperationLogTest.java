@@ -70,6 +70,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -80,8 +81,10 @@ public class CustomHistoryLevelUserOperationLogTest {
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String ONE_TASK_CASE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
 
-  HistoryLevel customHistoryLevelUOL = new CustomHistoryLevelUserOperationLog();
-  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  static HistoryLevel customHistoryLevelUOL = new CustomHistoryLevelUserOperationLog();
+
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJdbcUrl("jdbc:h2:mem:CustomHistoryLevelUserOperationLogTest");
       configuration.setCustomHistoryLevels(Arrays.asList(customHistoryLevelUOL));
@@ -96,7 +99,7 @@ public class CustomHistoryLevelUserOperationLogTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(authRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testRule);
 
   protected HistoryService historyService;
   protected RuntimeService runtimeService;
@@ -507,7 +510,7 @@ public class CustomHistoryLevelUserOperationLogTest {
 
     verifyQueryResults(query, 2);
   }
-  
+
   @Test
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQueryByCategories() {
@@ -625,7 +628,7 @@ public class CustomHistoryLevelUserOperationLogTest {
   }
 
   protected Map<String, Object> createMapForVariableAddition() {
-    Map<String, Object> variables =  new HashMap<String, Object>();
+    Map<String, Object> variables =  new HashMap<>();
     variables.put("testVariable1", "THIS IS TESTVARIABLE!!!");
     variables.put("testVariable2", "OVER 9000!");
 
@@ -633,7 +636,7 @@ public class CustomHistoryLevelUserOperationLogTest {
   }
 
   protected Collection<String> createCollectionForVariableDeletion() {
-    Collection<String> variables = new ArrayList<String>();
+    Collection<String> variables = new ArrayList<>();
     variables.add("testVariable3");
     variables.add("testVariable4");
 
@@ -659,7 +662,7 @@ public class CustomHistoryLevelUserOperationLogTest {
       assertEquals(category, logEntry.getCategory());
     }
   }
-  
+
   protected UserOperationLogQuery query() {
     return historyService.createUserOperationLogQuery();
   }

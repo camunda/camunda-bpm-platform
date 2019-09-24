@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.identity.Group;
@@ -82,8 +83,10 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -96,9 +99,19 @@ import org.junit.rules.RuleChain;
  */
 public class TaskServiceTest {
 
+
   protected static final String TWO_TASKS_PROCESS = "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml";
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  protected static final String USER_TASK_THROW_ERROR = "throw-error";
+  protected static final String ERROR_CODE = "300";
+  protected static final String ESCALATION_CODE = "432";
+  protected static final String PROCESS_KEY = "process";
+  protected static final String USER_TASK_AFTER_CATCH = "after-catch";
+  protected static final String USER_TASK_AFTER_THROW = "after-throw";
+  protected static final String USER_TASK_THROW_ESCALATION = "throw-escalation";
+
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setJavaSerializationFormatEnabled(true);
       return configuration;
@@ -108,7 +121,7 @@ public class TaskServiceTest {
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -2454,6 +2467,352 @@ public class TaskServiceTest {
     // then
     assertNotNull(variables);
     assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  public void testHandleBpmnErrorWithNonexistingTask() {
+    // given
+    // non-existing task
+
+    // then
+    thrown.expect(NullValueException.class);
+    thrown.expectMessage("Cannot find task with id non-existing: task is null");
+
+    // when
+    taskService.handleBpmnError("non-existing", ERROR_CODE);
+  }
+
+  @Test
+  public void testThrowBpmnErrorWithoutCatch() {
+    // given
+    BpmnModelInstance model =Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask(USER_TASK_THROW_ERROR)
+        .userTask("skipped-error")
+        .endEvent()
+        .done();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleBpmnError(task.getId(), ERROR_CODE);
+
+    // then
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(0, processInstances.size());
+  }
+
+  @Test
+  public void testHandleBpmnErrorWithErrorCodeVariable() {
+    // given
+    BpmnModelInstance model = createUserTaskProcessWithCatchBoundaryEvent();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleBpmnError(task.getId(), ERROR_CODE);
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_AFTER_CATCH, taskAfterThrow.getTaskDefinitionKey());
+    VariableInstance errorCodeVariable = runtimeService.createVariableInstanceQuery().variableName("errorCodeVar").singleResult();
+    assertEquals(ERROR_CODE, errorCodeVariable.getValue());
+  }
+
+  @Test
+  public void testHandleBpmnErrorIncludingMessage() {
+    // given
+    BpmnModelInstance model = createUserTaskProcessWithCatchBoundaryEvent();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+    String errorMessageValue = "Error message for ERROR-" + ERROR_CODE;
+
+    // when
+    taskService.handleBpmnError(task.getId(), ERROR_CODE, errorMessageValue);
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_AFTER_CATCH, taskAfterThrow.getTaskDefinitionKey());
+    VariableInstance errorMessageVariable = runtimeService.createVariableInstanceQuery().variableName("errorMessageVar").singleResult();
+    assertEquals(errorMessageValue, errorMessageVariable.getValue());
+  }
+
+  @Test
+  public void testHandleBpmnErrorWithVariables() {
+    // given
+    BpmnModelInstance model = createUserTaskProcessWithCatchBoundaryEvent();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+    String variableName = "foo";
+    String variableValue = "bar";
+
+    // when
+    taskService.handleBpmnError(task.getId(), ERROR_CODE, null, Variables.createVariables().putValue(variableName, variableValue));
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_AFTER_CATCH, taskAfterThrow.getTaskDefinitionKey());
+    VariableInstance variablePassedDuringThrowError = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
+    assertEquals(variableValue, variablePassedDuringThrowError.getValue());
+  }
+
+  @Test
+  public void testThrowBpmnErrorCatchInEventSubprocess() {
+    // given
+    String errorCodeVariableName = "errorCodeVar";
+    String errorMessageVariableName = "errorMessageVar";
+    BpmnModelInstance model = createUserTaskProcessWithEventSubprocess(errorCodeVariableName, errorMessageVariableName);
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ERROR, task.getTaskDefinitionKey());
+    String variableName = "foo";
+    String variableValue = "bar";
+    String errorMessageValue = "Error message for ERROR-" + ERROR_CODE;
+
+    // when
+    taskService.handleBpmnError(task.getId(), ERROR_CODE, errorMessageValue, Variables.createVariables().putValue(variableName, variableValue));
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_AFTER_CATCH, taskAfterThrow.getTaskDefinitionKey());
+    VariableInstance variablePassedDuringThrowError = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
+    assertEquals(variableValue, variablePassedDuringThrowError.getValue());
+    VariableInstance errorMessageVariable = runtimeService.createVariableInstanceQuery().variableName(errorMessageVariableName).singleResult();
+    assertEquals(errorMessageValue, errorMessageVariable.getValue());
+    VariableInstance errorCodeVariable = runtimeService.createVariableInstanceQuery().variableName(errorCodeVariableName).singleResult();
+    assertEquals(ERROR_CODE, errorCodeVariable.getValue());
+  }
+
+  @Test
+  public void testHandleEscalationWithNonexistingTask() {
+    // given
+    // non-existing task
+
+    // then
+    thrown.expect(NullValueException.class);
+    thrown.expectMessage("Cannot find task with id non-existing: task is null");
+
+    // when
+    taskService.handleEscalation("non-existing", ESCALATION_CODE);
+  }
+
+  @Test
+  public void testThrowEscalationWithoutCatchEvent() {
+    // given
+    BpmnModelInstance model =Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask(USER_TASK_THROW_ESCALATION)
+        .userTask("skipped-error")
+        .endEvent()
+        .done();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
+
+    // then
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Execution with id '" + task.getTaskDefinitionKey()
+        + "' throws an escalation event with escalationCode '" + ESCALATION_CODE
+        + "', but no escalation handler was defined.");
+
+    // when
+    taskService.handleEscalation(task.getId(), ESCALATION_CODE);
+  }
+
+  @Test
+  public void testHandleEscalationInterruptEventWithVariables() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask(USER_TASK_THROW_ESCALATION)
+          .boundaryEvent("catch-escalation")
+            .escalation(ESCALATION_CODE)
+          .userTask(USER_TASK_AFTER_CATCH)
+          .endEvent()
+        .moveToActivity(USER_TASK_THROW_ESCALATION)
+        .userTask(USER_TASK_AFTER_THROW)
+        .endEvent()
+        .done();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleEscalation(task.getId(), ESCALATION_CODE, Variables.createVariables().putValue("foo", "bar"));
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_AFTER_CATCH, taskAfterThrow.getTaskDefinitionKey());
+    assertEquals("bar",runtimeService.createVariableInstanceQuery().variableName("foo").singleResult().getValue());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.handleUserTaskEscalation.bpmn20.xml" })
+  public void testHandleEscalationNonInterruptWithVariables() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleEscalation(task.getId(), "301", Variables.createVariables().putValue("foo", "bar"));
+
+    // then
+    List<Task> list = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(2, list.size());
+    for (Task taskAfterThrow : list) {
+      if (!taskAfterThrow.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()) && !taskAfterThrow.getTaskDefinitionKey().equals("after-301")) {
+        fail("Two task should be active:" + task.getTaskDefinitionKey() + " & "
+                                          + "after-301");
+      }
+    }
+    assertEquals("bar",runtimeService.createVariableInstanceQuery().variableName("foo").singleResult().getValue());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.handleUserTaskEscalation.bpmn20.xml" })
+  public void testHandleEscalationInterruptWithVariables() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleEscalation(task.getId(), "302", Variables.createVariables().putValue("foo", "bar"));
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("after-302", taskAfterThrow.getTaskDefinitionKey());
+    assertEquals("bar",runtimeService.createVariableInstanceQuery().variableName("foo").singleResult().getValue());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.handleUserTaskEscalation.bpmn20.xml" })
+  public void testHandleEscalationNonInterruptEventSubprocess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleEscalation(task.getId(), "303");
+
+    // then
+    List<Task> list = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(2, list.size());
+    for (Task taskAfterThrow : list) {
+      if (!taskAfterThrow.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()) && !taskAfterThrow.getTaskDefinitionKey().equals("after-303")) {
+        fail("Two task should be active:" + task.getTaskDefinitionKey() + " & "
+                                          + "after-303");
+      }
+    }
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.handleUserTaskEscalation.bpmn20.xml" })
+  public void testHandleEscalationInterruptInEventSubprocess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleEscalation(task.getId(), "304", Variables.createVariables().putValue("foo", "bar"));
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("after-304", taskAfterThrow.getTaskDefinitionKey());
+    assertEquals("bar",runtimeService.createVariableInstanceQuery().variableName("foo").singleResult().getValue());
+  }
+
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.handleUserTaskEscalation.bpmn20.xml" })
+  public void testHandleEscalationNonInterruptEmbeddedSubprocess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleEscalation(task.getId(), "305");
+
+    // then
+    List<Task> list = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(2, list.size());
+    for (Task taskAfterThrow : list) {
+      if (!taskAfterThrow.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()) && !taskAfterThrow.getTaskDefinitionKey().equals("after-305")) {
+        fail("Two task should be active:" + task.getTaskDefinitionKey() + " & "
+                                          + "after-305");
+      }
+    }
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/task/TaskServiceTest.handleUserTaskEscalation.bpmn20.xml" })
+  public void testHandleEscalationInterruptInEmbeddedSubprocess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
+
+    // when
+    taskService.handleEscalation(task.getId(), "306", Variables.createVariables().putValue("foo", "bar"));
+
+    // then
+    Task taskAfterThrow = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("after-306", taskAfterThrow.getTaskDefinitionKey());
+    assertEquals("bar",runtimeService.createVariableInstanceQuery().variableName("foo").singleResult().getValue());
+  }
+
+  protected BpmnModelInstance createUserTaskProcessWithCatchBoundaryEvent() {
+    return Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask(USER_TASK_THROW_ERROR)
+          .boundaryEvent("catch-error")
+            .errorEventDefinition()
+              .error(ERROR_CODE)
+              .errorCodeVariable("errorCodeVar")
+              .errorMessageVariable("errorMessageVar")
+            .errorEventDefinitionDone()
+          .userTask(USER_TASK_AFTER_CATCH)
+          .endEvent()
+        .moveToActivity(USER_TASK_THROW_ERROR)
+        .userTask(USER_TASK_AFTER_THROW)
+        .endEvent()
+        .done();
+  }
+
+  protected BpmnModelInstance createUserTaskProcessWithEventSubprocess(
+      String errorCodeVariable, String errorMessageVariableName) {
+    ProcessBuilder processBuilder = Bpmn.createExecutableProcess(PROCESS_KEY);
+    BpmnModelInstance model = processBuilder
+        .startEvent()
+        .userTask(USER_TASK_THROW_ERROR)
+        .userTask(USER_TASK_AFTER_THROW)
+        .endEvent()
+        .done();
+    processBuilder.eventSubProcess()
+       .startEvent("catch-error")
+         .errorEventDefinition()
+           .error(ERROR_CODE)
+           .errorCodeVariable(errorCodeVariable)
+           .errorMessageVariable(errorMessageVariableName)
+         .errorEventDefinitionDone()
+       .userTask(USER_TASK_AFTER_CATCH)
+       .endEvent();
+    return model;
   }
 
 }

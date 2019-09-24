@@ -39,6 +39,7 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
   protected int incidentState;
   protected String tenantId;
   protected String jobDefinitionId;
+  protected String historyConfiguration;
 
   public Date getCreateTime() {
     return createTime;
@@ -94,6 +95,14 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
 
   public void setConfiguration(String configuration) {
     this.configuration = configuration;
+  }
+
+  public String getHistoryConfiguration() {
+    return historyConfiguration;
+  }
+
+  public void setHistoryConfiguration(String historyConfiguration) {
+    this.historyConfiguration = historyConfiguration;
   }
 
   public String getIncidentMessage() {
