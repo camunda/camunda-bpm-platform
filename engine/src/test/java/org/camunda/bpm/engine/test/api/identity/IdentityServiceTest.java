@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -35,7 +36,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.camunda.bpm.engine.AuthenticationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
@@ -52,6 +52,8 @@ import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.WatchLogger;
+import org.camunda.bpm.engine.test.util.ProcessEngineLoggingRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
@@ -67,9 +69,13 @@ public class IdentityServiceTest {
   private final String INVALID_ID_MESSAGE = "%s has an invalid id: '%s' is not a valid resource identifier.";
 
   private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  private static final String INDENTITY_LOGGER = "org.camunda.bpm.engine.identity";
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -689,21 +695,25 @@ public class IdentityServiceTest {
   }
 
   @Test
+  @WatchLogger(loggerNames = {INDENTITY_LOGGER}, level = "INFO")
   public void testUsuccessfulAttemptsResultInException() throws ParseException {
+    // given
     User user = identityService.newUser("johndoe");
     user.setPassword("xxx");
     identityService.saveUser(user);
 
-    thrown.expect(AuthenticationException.class);
-    thrown.expectMessage("The user with id 'johndoe' is permanently locked. Please contact your admin to unlock the account.");
-
     Date now = sdf.parse("2000-01-24T13:00:00");
     ClockUtil.setCurrentTime(now);
-    for (int i = 0; i <= 11; i++) {
+
+    // when
+    for (int i = 0; i < 11; i++) {
       assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
       now = DateUtils.addMinutes(now, 1);
       ClockUtil.setCurrentTime(now);
     }
+
+    // then
+    assertThat(loggingRule.getFilteredLog(INDENTITY_LOGGER, "The user with id 'johndoe' is permanently locked.").size()).isEqualTo(1);
   }
 
   @Test
@@ -722,27 +732,32 @@ public class IdentityServiceTest {
   }
 
   @Test
+  @WatchLogger(loggerNames = {INDENTITY_LOGGER}, level = "INFO")
   public void testSuccessfulLoginAfterFailureWithoutDelay() {
+    // given
     User user = identityService.newUser("johndoe");
     user.setPassword("xxx");
     identityService.saveUser(user);
 
     Date now = ClockUtil.getCurrentTime();
     assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
-    try{
     assertFalse(identityService.checkPassword("johndoe", "xxx"));
-    fail("expected exception");
-    } catch (AuthenticationException e) {
-      assertTrue(e.getMessage().contains("The user with id 'johndoe' is locked."));
-    }
-    ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 30));
-    assertTrue(identityService.checkPassword("johndoe", "xxx"));
 
-    identityService.deleteUser("johndoe");
+    // assume
+    assertThat(loggingRule.getFilteredLog(INDENTITY_LOGGER, "The user with id 'johndoe' is locked.").size()).isEqualTo(1);
+
+    // when
+    ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 30));
+    boolean checkPassword = identityService.checkPassword("johndoe", "xxx");
+
+    // then
+    assertTrue(checkPassword);
   }
 
   @Test
+  @WatchLogger(loggerNames = {INDENTITY_LOGGER}, level = "INFO")
   public void testUnsuccessfulLoginAfterFailureWithoutDelay() {
+    // given
     User user = identityService.newUser("johndoe");
     user.setPassword("xxx");
     identityService.saveUser(user);
@@ -751,18 +766,14 @@ public class IdentityServiceTest {
     now = ClockUtil.getCurrentTime();
     assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
 
-
-    // try again before exprTime
     ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 1));
-    try {
-      assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
-      fail("expected exception");
-    } catch (AuthenticationException e) {
-      Date expectedLockExpitation = DateUtils.addSeconds(now, 3);
-      assertTrue(e.getMessage().contains("The lock will expire at " + expectedLockExpitation));
-    }
+    Date expectedLockExpitation = DateUtils.addSeconds(now, 3);
 
-    identityService.deleteUser("johndoe");
+    // when try again before exprTime
+    assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
+
+    // then
+    assertThat(loggingRule.getFilteredLog(INDENTITY_LOGGER, "The lock will expire at " + expectedLockExpitation).size()).isEqualTo(1);
   }
 
   @Test
