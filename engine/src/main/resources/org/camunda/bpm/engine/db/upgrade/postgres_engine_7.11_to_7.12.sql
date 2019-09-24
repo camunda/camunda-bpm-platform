@@ -24,7 +24,7 @@ ALTER TABLE ACT_HI_OP_LOG
 
 -- https://app.camunda.com/jira/browse/CAM-9855
 ALTER TABLE ACT_RU_JOB
-  ADD REPEAT_OFFSET bigint default 0;
+  ADD REPEAT_OFFSET_ bigint default 0;
 
 -- https://app.camunda.com/jira/browse/CAM-10672
 ALTER TABLE ACT_HI_INCIDENT
