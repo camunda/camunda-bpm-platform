@@ -31,11 +31,17 @@ public class CycleBusinessCalendar implements BusinessCalendar {
   public Date resolveDuedate(String duedateDescription) {
     return resolveDuedate(duedateDescription, null);
   }
-  
+
   public Date resolveDuedate(String duedateDescription, Date startDate) {
+    return resolveDuedate(duedateDescription, startDate, 0L);
+  }
+
+  public Date resolveDuedate(String duedateDescription, Date startDate, long repeatOffset) {
     try {
       if (duedateDescription.startsWith("R")) {
-        return new DurationHelper(duedateDescription, startDate).getDateAfter(startDate);
+        DurationHelper durationHelper = new DurationHelper(duedateDescription, startDate);
+        durationHelper.setRepeatOffset(repeatOffset);
+        return durationHelper.getDateAfter(startDate);
       } else {
         CronExpression ce = new CronExpression(duedateDescription);
         return ce.getTimeAfter(startDate == null ? ClockUtil.getCurrentTime() : startDate);

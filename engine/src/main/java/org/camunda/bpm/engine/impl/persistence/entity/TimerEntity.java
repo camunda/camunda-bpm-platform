@@ -44,6 +44,8 @@ public class TimerEntity extends JobEntity {
 
   protected String repeat;
 
+  protected long repeatOffset;
+
   public TimerEntity() {
   }
 
@@ -56,6 +58,7 @@ public class TimerEntity extends JobEntity {
     jobHandlerType = te.jobHandlerType;
     isExclusive = te.isExclusive;
     repeat = te.repeat;
+    repeatOffset = te.repeatOffset;
     retries = te.retries;
     executionId = te.executionId;
     processInstanceId = te.processInstanceId;
@@ -116,7 +119,7 @@ public class TimerEntity extends JobEntity {
         .getProcessEngineConfiguration()
         .getBusinessCalendarManager()
         .getBusinessCalendar(CycleBusinessCalendar.NAME);
-    return businessCalendar.resolveDuedate(repeat);
+    return ((CycleBusinessCalendar) businessCalendar).resolveDuedate(repeat, null, repeatOffset);
   }
 
   public String getRepeat() {
@@ -125,6 +128,14 @@ public class TimerEntity extends JobEntity {
 
   public void setRepeat(String repeat) {
     this.repeat = repeat;
+  }
+
+  public long getRepeatOffset() {
+    return repeatOffset;
+  }
+
+  public void setRepeatOffset(long repeatOffset) {
+    this.repeatOffset = repeatOffset;
   }
 
   @Override
@@ -147,6 +158,7 @@ public class TimerEntity extends JobEntity {
            + ", id=" + id
            + ", revision=" + revision
            + ", duedate=" + duedate
+           + ", repeatOffset=" + repeatOffset
            + ", lockOwner=" + lockOwner
            + ", lockExpirationTime=" + lockExpirationTime
            + ", executionId=" + executionId

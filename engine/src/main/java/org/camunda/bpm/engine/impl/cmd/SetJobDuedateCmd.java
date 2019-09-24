@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 
 
 /**
@@ -37,14 +38,16 @@ public class SetJobDuedateCmd implements Command<Void>, Serializable {
   private static final long serialVersionUID = 1L;
 
   private final String jobId;
-  private final Date newDuedate;
+  private Date newDuedate;
+  private final boolean cascade;
 
-  public SetJobDuedateCmd(String jobId, Date newDuedate) {
+  public SetJobDuedateCmd(String jobId, Date newDuedate, boolean cascade) {
     if (jobId == null || jobId.length() < 1) {
       throw new ProcessEngineException("The job id is mandatory, but '" + jobId + "' has been provided.");
     }
     this.jobId = jobId;
     this.newDuedate = newDuedate;
+    this.cascade = cascade;
   }
 
   public Void execute(CommandContext commandContext) {
@@ -60,6 +63,12 @@ public class SetJobDuedateCmd implements Command<Void>, Serializable {
       commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_SET_DUEDATE, jobId, 
           job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), job.getProcessDefinitionKey(),
           Collections.singletonList(new PropertyChange("duedate", job.getDuedate(), newDuedate)));
+
+      // for timer jobs cascade due date changes
+      if (cascade && newDuedate != null && job instanceof TimerEntity) {
+        long offset = newDuedate.getTime() - job.getDuedate().getTime();
+        ((TimerEntity) job).setRepeatOffset(((TimerEntity) job).getRepeatOffset() + offset);
+      }
 
       job.setDuedate(newDuedate);
     } else {
