@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
@@ -342,8 +343,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
 
-    verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, newDuedate);
-
+    verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, newDuedate, false);
   }
 
   @Test
@@ -355,17 +355,43 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
 
-    verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, null);
-
+    verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, null, false);
   }
 
+  @Test
+  public void testSetJobDuedateCascade() {
+    Date newDuedate = MockProvider.createMockDuedate();
+    Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
+    duedateVariableJson.put("duedate", newDuedate);
+    duedateVariableJson.put("cascade", true);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
+    .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
+    
+    verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, newDuedate, true);
+  }
+  
+  @Test
+  public void testSetJobDuedateNullCascade() {
+    Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
+    duedateVariableJson.put("duedate", null);
+    duedateVariableJson.put("cascade", true);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
+    .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
+    
+    verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, null, true);
+  }
+  
   @Test
   public void testSetJobDuedateNonExistentJob() {
     Date newDuedate = MockProvider.createMockDuedate();
     String expectedMessage = "No job found with id '" + MockProvider.NON_EXISTING_JOB_ID + "'.";
 
     doThrow(new ProcessEngineException(expectedMessage)).when(mockManagementService).setJobDuedate(MockProvider.NON_EXISTING_JOB_ID,
-        newDuedate);
+        newDuedate, false);
 
     Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
     duedateVariableJson.put("duedate", newDuedate);
@@ -377,13 +403,13 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     .body("message", equalTo(expectedMessage))
     .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
 
-    verify(mockManagementService).setJobDuedate(MockProvider.NON_EXISTING_JOB_ID, newDuedate);
+    verify(mockManagementService).setJobDuedate(MockProvider.NON_EXISTING_JOB_ID, newDuedate, false);
   }
 
   @Test
   public void testSetJobDuedateThrowsAuthorizationException() {
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(mockManagementService).setJobDuedate(anyString(), any(Date.class));
+    doThrow(new AuthorizationException(message)).when(mockManagementService).setJobDuedate(anyString(), any(Date.class), anyBoolean());
 
     Date newDuedate = MockProvider.createMockDuedate();
     Map<String, Object> duedateVariableJson = new HashMap<String, Object>();

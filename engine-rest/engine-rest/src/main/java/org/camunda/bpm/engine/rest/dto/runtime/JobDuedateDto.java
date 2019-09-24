@@ -21,6 +21,7 @@ import java.util.Date;
 public class JobDuedateDto {
 
   private Date duedate;
+  private boolean cascade;
 
   public Date getDuedate() {
     return duedate;
@@ -28,5 +29,13 @@ public class JobDuedateDto {
 
   public void setDuedate(Date duedate) {
     this.duedate = duedate;
+  }
+
+  public boolean isCascade() {
+    return cascade;
+  }
+
+  public void setCascade(boolean cascade) {
+    this.cascade = cascade;
   }
 }
