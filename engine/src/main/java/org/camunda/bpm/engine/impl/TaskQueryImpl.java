@@ -954,7 +954,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     if (candidateUser != null) {
       List<String> groupsForCandidateUser = getGroupsForCandidateUser(candidateUser);
 
-      if (cachedCandidateGroups == null) { // if not an 'or' query, it is always empty here
+      if (cachedCandidateGroups == null) {
         cachedCandidateGroups = groupsForCandidateUser;
       } else {
         for (String group : groupsForCandidateUser) {
