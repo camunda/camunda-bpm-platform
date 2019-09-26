@@ -696,7 +696,7 @@ public class IdentityServiceTest {
 
   @Test
   @WatchLogger(loggerNames = {INDENTITY_LOGGER}, level = "INFO")
-  public void testUsuccessfulAttemptsResultInException() throws ParseException {
+  public void testUsuccessfulAttemptsResultInBlockedUser() throws ParseException {
     // given
     User user = identityService.newUser("johndoe");
     user.setPassword("xxx");

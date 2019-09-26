@@ -86,7 +86,7 @@ public class LoginAttemptsTest {
   }
 
   @Test
-  public void testUsuccessfulAttemptsResultInException() throws ParseException {
+  public void testUsuccessfulAttemptsResultInLockedUser() throws ParseException {
     // given
     User user = identityService.newUser("johndoe");
     user.setPassword("xxx");
