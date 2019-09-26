@@ -122,7 +122,7 @@
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-netty4</artifactId>
-          <version>3.0.19.Final</version>
+          <version>4.3.1.Final</version>
           <scope>test</scope>
         </dependency>
 
