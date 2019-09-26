@@ -32,7 +32,7 @@ public class DashboardIT extends AbstractWebappUiIntegrationTest {
   public void testLogin() throws URISyntaxException {
     driver.get(appUrl + "app/cockpit/#/login");
 
-    WebDriverWait wait = new WebDriverWait(driver, 10);
+    WebDriverWait wait = new WebDriverWait(driver, 30);
 
     WebElement user = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type=\"text\"]")));
     user.sendKeys("demo");
