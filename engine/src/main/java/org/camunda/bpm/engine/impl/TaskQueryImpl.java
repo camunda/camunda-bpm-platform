@@ -929,13 +929,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public List<String> getCandidateGroups() {
-
     if (cachedCandidateGroups != null) {
       return cachedCandidateGroups;
     }
 
     if (candidateGroup != null && candidateGroups != null) {
-      cachedCandidateGroups = new ArrayList<String>(candidateGroups);
+      cachedCandidateGroups = new ArrayList<>(candidateGroups);
       if (!isOrQueryActive) {
         // get intersection of candidateGroups and candidateGroup
         cachedCandidateGroups.retainAll(Arrays.asList(candidateGroup));
@@ -1013,28 +1012,31 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   protected List<String> getGroupsForCandidateUser(String candidateUser) {
-    HashMap<String, List<String>> cachedGroups = getCachedUserGroups();
-
-    if (cachedGroups.containsKey(candidateUser)) {
-      return cachedGroups.get(candidateUser);
+    HashMap<String, List<String>> cachedUserGroups = getCachedUserGroups();
+    if (cachedUserGroups.containsKey(candidateUser)) {
+      return cachedUserGroups.get(candidateUser);
     }
 
-    List<Group> groups = Context.getCommandContext().getReadOnlyIdentityProvider().createGroupQuery()
-        .groupMember(candidateUser).list();
-    List<String> groupIds = new ArrayList<String>();
+    List<Group> groups = Context
+        .getCommandContext()
+        .getReadOnlyIdentityProvider()
+        .createGroupQuery()
+        .groupMember(candidateUser)
+        .list();
+    
+    List<String> groupIds = new ArrayList<>();
     for (Group group : groups) {
       groupIds.add(group.getId());
     }
-
-    cachedGroups.put(candidateUser, groupIds);
+    cachedUserGroups.put(candidateUser, groupIds);
 
     return groupIds;
   }
 
-  private HashMap<String, List<String>> getCachedUserGroups() {
-    // store and retrieve cached user groups always from the first (root) query
+  protected HashMap<String, List<String>> getCachedUserGroups() {
+    // store and retrieve cached user groups always from the first query
     if (queries.get(0).cachedUserGroups == null) {
-      queries.get(0).cachedUserGroups = new HashMap<String, List<String>>();
+      queries.get(0).cachedUserGroups = new HashMap<>();
     }
     return queries.get(0).cachedUserGroups;
   }
