@@ -40,12 +40,10 @@ public class SpringProcessEngineConfiguration extends SpringTransactionsProcessE
     this.applicationContext = applicationContext;
   }
 
-  /**
-   * Make the beans managed by the Spring container available in scripting
-   */
   @Override
   protected void initScripting() {
     super.initScripting();
+    // make Spring container managed beans available for scripting
     this.getResolverFactories().add(new SpringBeansResolverFactory(applicationContext));
   }
 }
