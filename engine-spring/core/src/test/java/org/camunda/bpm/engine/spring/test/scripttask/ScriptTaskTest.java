@@ -16,14 +16,15 @@
  */
 package org.camunda.bpm.engine.spring.test.scripttask;
 
+import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.spring.test.SpringProcessEngineTestCase;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -33,15 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-/**
- *
- * @author Laszlo Palossy
- *
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
     "classpath:org/camunda/bpm/engine/spring/test/scripttask/ScriptTaskTest-applicationContext.xml" })
-public class ScriptTaskTest extends SpringProcessEngineTestCase {
+public class ScriptTaskTest {
 
   @Autowired
   private RuntimeService runtimeService;
@@ -49,13 +45,11 @@ public class ScriptTaskTest extends SpringProcessEngineTestCase {
   @Autowired
   private RepositoryService repositoryService;
 
-  @Autowired
-  Testbean testbean;
-
   private static final String JAVASCRIPT = "javascript";
   private static final String PYTHON = "python";
   private static final String GROOVY = "groovy";
   private static final String JUEL = "juel";
+  private static final String TEST_BEAN_NAME = "name property of testbean";
 
   private List<String> deploymentIds = new ArrayList<String>();
 
@@ -67,76 +61,11 @@ public class ScriptTaskTest extends SpringProcessEngineTestCase {
   }
 
   @Test
-  public void testJavascriptProcessVarVisibility() {
-
-    deployProcess(JAVASCRIPT,
-
-        // GIVEN
-        // an execution variable 'foo', value is set to the testbean's name property
-        "execution.setVariable('foo', testbean.name);");
-
-    // GIVEN
-    // that we start an instance of this process
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
-
-    // THEN
-    // the script task can be executed without exceptions
-    // the execution variable is stored and has the correct value
-    Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
-    assertEquals("name property of the testbean", variableValue);
-
-  }
-
-  @Test
-  public void testPythonProcessVarVisibility() {
-
-    deployProcess(PYTHON,
-
-        // GIVEN
-        // an execution variable 'foo', value is set to the testbean's name property
-        "execution.setVariable('foo', testbean.name)\n");
-
-    // GIVEN
-    // that we start an instance of this process
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
-
-    // THEN
-    // the script task can be executed without exceptions
-    // the execution variable is stored and has the correct value
-    Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
-    assertEquals("name property of the testbean", variableValue);
-
-  }
-
-  @Test
-  public void testGroovyProcessVarVisibility() {
-
-    deployProcess(GROOVY,
-
-        // GIVEN
-        // an execution variable 'foo', value is set to the testbean's name property
-        "execution.setVariable('foo', testbean.name)\n");
-
-    // GIVEN
-    // that we start an instance of this process
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
-
-    // THEN
-    // the script task can be executed without exceptions
-    // the execution variable is stored and has the correct value
-    Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
-    assertEquals("name property of the testbean", variableValue);
-
-  }
-
-  @Test
-  public void testJuelExpression() {
-    deployProcess(JUEL, "${execution.setVariable('foo', testbean.name)}");
-
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
-
-    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
-    assertEquals("name property of the testbean", variableValue);
+  public void testSpringBeanVisibility() {
+    testSpringBeanVisibility(JAVASCRIPT, "execution.setVariable('foo', testbean.name);");
+    testSpringBeanVisibility(GROOVY, "execution.setVariable('foo', testbean.name)\n");
+    testSpringBeanVisibility(PYTHON, "execution.setVariable('foo', testbean.name)\n");
+    testSpringBeanVisibility(JUEL, "${execution.setVariable('foo', testbean.name)}");
   }
 
   protected void deployProcess(BpmnModelInstance process) {
@@ -154,4 +83,31 @@ public class ScriptTaskTest extends SpringProcessEngineTestCase {
     return Bpmn.createExecutableProcess("testProcess").startEvent().scriptTask().scriptFormat(scriptFormat)
         .scriptText(scriptText).userTask().endEvent().done();
   }
+
+  /**
+   * Test if a Spring bean is visible for scripting for the scripftormat
+   * 
+   * @param scriptFormat
+   *          the scriptformat like 'javascript', 'groovy', etc.
+   * @param scriptText
+   *          sets execution variable 'foo' to the testbean's name property
+   */
+  protected void testSpringBeanVisibility(String scriptFormat, String scriptText) {
+
+    // GIVEN
+    // execution variable 'foo' is set the testbean's name property (by the
+    // scriptText code)
+    deployProcess(scriptFormat, scriptText);
+
+    // GIVEN
+    // that we start an instance of this process
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // THEN
+    // the script task can be executed without exceptions
+    // the execution variable is stored and has the correct value
+    Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals(TEST_BEAN_NAME, variableValue);
+  }
+
 }

@@ -27,15 +27,14 @@ import org.springframework.context.ApplicationContext;
 
 /**
  * <p>
- * The {@link ResolverFactory} and {@link Resolver}class to access all the beans
- * managed by the Spring container, to make them available in scripting.
+ * {@link ResolverFactory} and {@link Resolver} classes to make the beans
+ * managed by the Spring container available in scripting
  * </p>
  * 
  * <p>
  * {@see org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration#initScripting()}
  * <p>
  *
- * @author Laszlo Palossy
  */
 public class SpringBeansResolverFactory implements ResolverFactory, Resolver {
 
