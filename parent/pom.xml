@@ -40,8 +40,8 @@
     <!-- application servers -->
     <version.jboss.as>7.2.0.Final</version.jboss.as>
     <version.wildfly8>8.2.1.Final</version.wildfly8>
-    <version.wildfly>16.0.0.Final</version.wildfly>
-    <version.wildfly.core>8.0.0.Final</version.wildfly.core>
+    <version.wildfly>17.0.1.Final</version.wildfly>
+    <version.wildfly.core>9.0.2.Final</version.wildfly.core>
 
     <version.glassfish>3.1.2</version.glassfish>
     <version.tomcat>9.0.24</version.tomcat>
