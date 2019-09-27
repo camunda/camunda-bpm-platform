@@ -19,6 +19,7 @@ package org.camunda.bpm.cockpit;
 import org.camunda.bpm.AbstractWebappUiIntegrationTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -33,6 +34,16 @@ public class DashboardIT extends AbstractWebappUiIntegrationTest {
     driver.get(appUrl + "app/cockpit/#/login");
 
     WebDriverWait wait = new WebDriverWait(driver, 30);
+
+    try {
+      wait.until(ExpectedConditions.titleIs("Camunda Cockpit"));
+
+    } catch (TimeoutException e) {
+      driver.get(appUrl + "app/cockpit/#/login");
+
+      wait.until(ExpectedConditions.titleIs("Camunda Cockpit"));
+
+    }
 
     WebElement user = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type=\"text\"]")));
     user.sendKeys("demo");
