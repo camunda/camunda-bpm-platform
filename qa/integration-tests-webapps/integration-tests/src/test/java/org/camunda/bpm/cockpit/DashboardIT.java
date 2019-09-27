@@ -19,7 +19,6 @@ package org.camunda.bpm.cockpit;
 import org.camunda.bpm.AbstractWebappUiIntegrationTest;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -33,17 +32,7 @@ public class DashboardIT extends AbstractWebappUiIntegrationTest {
   public void testLogin() throws URISyntaxException {
     driver.get(appUrl + "app/cockpit/#/login");
 
-    WebDriverWait wait = new WebDriverWait(driver, 30);
-
-    try {
-      wait.until(ExpectedConditions.titleIs("Camunda Cockpit"));
-
-    } catch (TimeoutException e) {
-      driver.get(appUrl + "app/cockpit/#/login");
-
-      wait.until(ExpectedConditions.titleIs("Camunda Cockpit"));
-
-    }
+    WebDriverWait wait = new WebDriverWait(driver, 10);
 
     WebElement user = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[type=\"text\"]")));
     user.sendKeys("demo");
@@ -54,7 +43,6 @@ public class DashboardIT extends AbstractWebappUiIntegrationTest {
     WebElement submit = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("button[type=\"submit\"]")));
     submit.submit();
 
-    wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(".deployed .processes .value"), "1"));
     wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(".deployed .processes .stats-label"), "Process Definitions"));
 
     wait.until(currentURIIs(new URI(appUrl + "app/cockpit/default/#/dashboard")));
