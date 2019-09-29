@@ -31,7 +31,7 @@ public final class CsrfConstants {
 
   public static final String CSRF_TOKEN_HEADER_REQUIRED = "Required";
 
-  public static final String CSRF_TOKEN_COOKIE_NAME = "XSRF-TOKEN";
+  public static final String CSRF_TOKEN_DEFAULT_COOKIE_NAME = "XSRF-TOKEN";
 
   public static final Pattern CSRF_NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
 

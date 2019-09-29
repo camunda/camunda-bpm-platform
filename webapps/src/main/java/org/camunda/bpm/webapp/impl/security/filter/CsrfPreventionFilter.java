@@ -101,6 +101,8 @@ public class CsrfPreventionFilter implements Filter {
 
   private final Set<String> entryPoints = new HashSet<String>();
 
+  protected String cookieName = CsrfConstants.CSRF_TOKEN_DEFAULT_COOKIE_NAME;
+
   protected CsrfPreventionCookieConfigurator cookieConfigurator = new CsrfPreventionCookieConfigurator();
 
   @Override
@@ -128,6 +130,11 @@ public class CsrfPreventionFilter implements Filter {
       String customEntryPoints = filterConfig.getInitParameter("entryPoints");
       if (!isBlank(customEntryPoints)) {
         setEntryPoints(customEntryPoints);
+      }
+
+      String cookieName = filterConfig.getInitParameter("cookieName");
+      if (!isBlank(cookieName)) {
+        setCookieName(cookieName);
       }
 
       cookieConfigurator.parseParams(filterConfig);
@@ -256,7 +263,7 @@ public class CsrfPreventionFilter implements Filter {
         if (session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME) == null) {
           String token = generateCSRFToken();
 
-          String csrfCookieValue = CsrfConstants.CSRF_TOKEN_COOKIE_NAME + "=" + token;
+          String csrfCookieValue = cookieName + "=" + token;
 
           String contextPath = "/";
           if (!request.getContextPath().isEmpty()) {
@@ -307,6 +314,10 @@ public class CsrfPreventionFilter implements Filter {
    */
   public void setEntryPoints(String entryPoints) {
     this.entryPoints.addAll(parseURLs(entryPoints));
+  }
+
+  public void setCookieName(String cookieName) {
+    this.cookieName = cookieName;
   }
 
   /**
