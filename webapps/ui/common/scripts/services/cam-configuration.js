@@ -51,7 +51,8 @@ var defaultConfig = {
   },
   batchOperation: {
     mode: 'filter'
-  }
+  },
+  csrfCookieName: 'XSRF-TOKEN'
 };
 
 module.exports = function(config, app) {
@@ -154,6 +155,11 @@ module.exports = function(config, app) {
         return (config['defaultFilter'] || {})[
           'historicProcessDefinitionInstancesSearch'
         ];
+      };
+
+      this.getCsrfCookieName = function() {
+        var param = 'csrfCookieName';
+        return config[param] || defaultConfig[param];
       };
 
       this.$get = function() {

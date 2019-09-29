@@ -42,5 +42,6 @@ window.camAdminConf = {
   // 'locales': {
   //   'availableLocales': ['en', 'de'],
   //   'fallbackLocale': 'en'
-  // }
+  // },
+  // csrfCookieName: 'XSRF-TOKEN'
 };

@@ -69,6 +69,16 @@ window.__define(
         // before we start initializing admin though (and leave the requirejs context),
         // lets see if we should load some custom scripts first
 
+        if (window.camAdminConf && window.camAdminConf.csrfCookieName) {
+          angular.module('cam.commons').config([
+            '$httpProvider',
+            function($httpProvider) {
+              $httpProvider.defaults.xsrfCookieName =
+                window.camAdminConf.csrfCookieName;
+            }
+          ]);
+        }
+
         if (
           typeof window.camAdminConf !== 'undefined' &&
           window.camAdminConf.customScripts

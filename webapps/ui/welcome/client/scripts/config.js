@@ -47,5 +47,6 @@ window.camWelcomeConf = {
   //     href: 'https://slashdot.org',
   //     description: 'News for nerds, stuff that matter'
   //   }
-  // ]
+  // ],
+  // csrfCookieName: 'XSRF-TOKEN'
 };

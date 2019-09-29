@@ -77,6 +77,16 @@ window.__define(
         // before we start initializing the cockpit though (and leave the requirejs context),
         // lets see if we should load some custom scripts first
 
+        if (window.camCockpitConf && window.camCockpitConf.csrfCookieName) {
+          angular.module('cam.commons').config([
+            '$httpProvider',
+            function($httpProvider) {
+              $httpProvider.defaults.xsrfCookieName =
+                window.camCockpitConf.csrfCookieName;
+            }
+          ]);
+        }
+
         if (
           typeof window.camCockpitConf !== 'undefined' &&
           (window.camCockpitConf.customScripts || window.camCockpitConf.bpmnJs)
