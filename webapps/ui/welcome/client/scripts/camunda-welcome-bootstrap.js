@@ -77,6 +77,16 @@ window.__define(
         // before we start initializing the welcome though (and leave the requirejs context),
         // lets see if we should load some custom scripts first
 
+        if (window.camWelcomeConf && window.camWelcomeConf.csrfCookieName) {
+          angular.module('cam.commons').config([
+            '$httpProvider',
+            function($httpProvider) {
+              $httpProvider.defaults.xsrfCookieName =
+                window.camWelcomeConf.csrfCookieName;
+            }
+          ]);
+        }
+
         if (
           typeof window.camWelcomeConf !== 'undefined' &&
           window.camWelcomeConf.customScripts

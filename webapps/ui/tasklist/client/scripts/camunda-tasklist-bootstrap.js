@@ -75,6 +75,16 @@ window.__define(
         // before we start initializing the tasklist though (and leave the requirejs context),
         // lets see if we should load some custom scripts first
 
+        if (window.camTasklistConf && window.camTasklistConf.csrfCookieName) {
+          angular.module('cam.commons').config([
+            '$httpProvider',
+            function($httpProvider) {
+              $httpProvider.defaults.xsrfCookieName =
+                window.camTasklistConf.csrfCookieName;
+            }
+          ]);
+        }
+
         if (
           typeof window.camTasklistConf !== 'undefined' &&
           window.camTasklistConf.customScripts

@@ -47,6 +47,7 @@ window.camTasklistConf = {
   //     'custom-ui': 'custom-ui/scripts'
   //   }
   // },
+  // csrfCookieName: 'XSRF-TOKEN',
 
   shortcuts: {
     claimTask: {

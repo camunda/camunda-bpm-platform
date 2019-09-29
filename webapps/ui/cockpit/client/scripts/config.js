@@ -74,5 +74,6 @@ window.camCockpitConf = {
   //     lastDays: 5,
   //     event: 'started'
   //   }
-  // }
+  // },
+  // csrfCookieName: 'XSRF-TOKEN'
 };
