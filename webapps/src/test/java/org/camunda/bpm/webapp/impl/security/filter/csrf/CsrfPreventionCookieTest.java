@@ -168,4 +168,17 @@ public class CsrfPreventionCookieTest {
     assertThat(headerRule.getCookieHeader()).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/camunda;SameSite=Lax");
   }
 
+  @Test
+  public void shouldConfigureCookieName() {
+    // given
+    headerRule.startServer("changed_cookie_name_web.xml", "csrf");
+
+    // when
+    headerRule.performRequest();
+
+    // then
+    assertThat(headerRule.getCookieHeader())
+      .matches("myCookieName=[A-Z0-9]{32};Path=/camunda;SameSite=Lax");
+  }
+
 }
