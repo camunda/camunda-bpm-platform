@@ -38,6 +38,7 @@ public class CsrfProperties {
   protected boolean enableSameSiteCookie = true;
   protected String sameSiteCookieOption;
   protected String sameSiteCookieValue;
+  protected String cookieName;
 
   public String getTargetOrigin() {
     return targetOrigin;
@@ -103,6 +104,14 @@ public class CsrfProperties {
     this.sameSiteCookieValue = sameSiteCookieValue;
   }
 
+  public String getCookieName() {
+    return cookieName;
+  }
+
+  public void setCookieName(String cookieName) {
+    this.cookieName = cookieName;
+  }
+
   public Map<String, String> getInitParams() {
     Map<String, String> initParams = new HashMap<>();
 
@@ -138,6 +147,10 @@ public class CsrfProperties {
       initParams.put("sameSiteCookieValue", sameSiteCookieValue);
     }
 
+    if (StringUtils.isNotBlank(cookieName)) {
+      initParams.put("cookieName", cookieName);
+    }
+
     return initParams;
   }
 
@@ -152,6 +165,7 @@ public class CsrfProperties {
       .add("enableSameSiteCookie='" + enableSameSiteCookie + '\'')
       .add("sameSiteCookieOption='" + sameSiteCookieOption + '\'')
       .add("sameSiteCookieValue='" + sameSiteCookieValue + '\'')
+      .add("cookieName='" + cookieName + '\'')
       .toString();
   }
 }

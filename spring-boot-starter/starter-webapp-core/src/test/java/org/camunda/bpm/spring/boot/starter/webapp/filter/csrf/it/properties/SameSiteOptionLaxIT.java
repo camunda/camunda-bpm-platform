@@ -41,14 +41,14 @@ public class SameSiteOptionLaxIT {
   public HeaderRule headerRule = new HeaderRule();
 
   @LocalServerPort
-  int port;
+  public int port;
 
   @Test
   public void shouldSetSameSiteCookieOptionLax() {
-    URLConnection connection = headerRule.performRequest("http://localhost:" + port + "/app/tasklist/default");
+    headerRule.performRequest("http://localhost:" + port + "/app/tasklist/default");
 
-    String xsrfCookieValue = headerRule.getXsrfCookieValue(connection);
-    String xsrfTokenHeader = headerRule.getXsrfTokenHeader(connection);
+    String xsrfCookieValue = headerRule.getXsrfCookieValue();
+    String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
 
     assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Lax");
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");

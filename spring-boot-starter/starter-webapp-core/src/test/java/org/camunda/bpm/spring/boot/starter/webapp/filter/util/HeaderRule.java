@@ -73,20 +73,24 @@ public class HeaderRule extends ExternalResource {
     return connection.getHeaderField("X-XSRF-TOKEN");
   }
 
-  public String getXsrfTokenHeader(URLConnection connection) {
+  public String getXsrfTokenHeader() {
     return getHeaderXsrfToken();
   }
 
-  public String getXsrfCookieValue(URLConnection connection) {
+  public String getCookieValue(String cookieName) {
     List<String> cookies = getCookieHeaders();
 
     for (String cookie : cookies) {
-      if (cookie.startsWith("XSRF-TOKEN=")) {
+      if (cookie.startsWith(cookieName + "=")) {
         return cookie;
       }
     }
 
     return "";
+  }
+
+  public String getXsrfCookieValue() {
+    return getCookieValue("XSRF-TOKEN");
   }
 
   public List<String> getHeaders(String name) {

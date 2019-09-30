@@ -72,4 +72,16 @@ public class DefaultCookieTest extends ParsePropertiesHelper {
     assertThat(properties.getInitParams()).doesNotContainKey("sameSiteCookieValue");
   }
 
+  @Test
+  public void shouldCheckDefaultCookieName() {
+    // given
+
+    // when
+    CsrfProperties properties = webapp.getCsrf();
+
+    // then
+    assertThat(properties.getCookieName()).isNull();
+    assertThat(properties.getInitParams()).doesNotContainKey("cookieName");
+  }
+
 }

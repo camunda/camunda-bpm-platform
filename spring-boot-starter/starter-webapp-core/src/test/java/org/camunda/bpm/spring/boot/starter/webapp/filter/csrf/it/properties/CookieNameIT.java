@@ -26,16 +26,14 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.net.URLConnection;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
-  "camunda.bpm.webapp.csrf.enableSameSiteCookie=true"
+  "camunda.bpm.webapp.csrf.cookieName=myFancyCookieName"
 })
-public class SameSiteEnabledIT {
+public class CookieNameIT {
 
   @Rule
   public HeaderRule headerRule = new HeaderRule();
@@ -44,13 +42,17 @@ public class SameSiteEnabledIT {
   public int port;
 
   @Test
-  public void shouldEnableSameSiteCookie() {
+  public void shouldChangeCookieName() {
+    // given
+
+    // when
     headerRule.performRequest("http://localhost:" + port + "/app/tasklist/default");
 
-    String xsrfCookieValue = headerRule.getXsrfCookieValue();
+    String xsrfCookieValue = headerRule.getCookieValue("myFancyCookieName");
     String xsrfTokenHeader = headerRule.getXsrfTokenHeader();
 
-    assertThat(xsrfCookieValue).matches("XSRF-TOKEN=[A-Z0-9]{32};Path=/;SameSite=Lax");
+    // then
+    assertThat(xsrfCookieValue).matches("myFancyCookieName=[A-Z0-9]{32};Path=/;SameSite=Lax");
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
