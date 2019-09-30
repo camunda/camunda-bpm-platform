@@ -45,7 +45,7 @@ public class SpringBeansResolverFactory implements ResolverFactory, Resolver {
     this.applicationContext = applicationContext;
 
     String[] beannames = applicationContext.getBeanDefinitionNames();
-    this.keySet = new HashSet<String>(Arrays.asList(beannames));
+    this.keySet = new HashSet<>(Arrays.asList(beannames));
   }
 
   @Override

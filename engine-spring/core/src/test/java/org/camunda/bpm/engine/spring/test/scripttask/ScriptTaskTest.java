@@ -17,10 +17,10 @@
 package org.camunda.bpm.engine.spring.test.scripttask;
 
 import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -61,10 +61,22 @@ public class ScriptTaskTest {
   }
 
   @Test
-  public void testSpringBeanVisibility() {
+  public void testJavascriptSpringBeanVisibility() {
     testSpringBeanVisibility(JAVASCRIPT, "execution.setVariable('foo', testbean.name);");
+  }
+
+  @Test
+  public void testGroovySpringBeanVisibility() {
     testSpringBeanVisibility(GROOVY, "execution.setVariable('foo', testbean.name)\n");
+  }
+
+  @Test
+  public void testPythonSpringBeanVisibility() {
     testSpringBeanVisibility(PYTHON, "execution.setVariable('foo', testbean.name)\n");
+  }
+
+  @Test
+  public void testJuelSpringBeanVisibility() {
     testSpringBeanVisibility(JUEL, "${execution.setVariable('foo', testbean.name)}");
   }
 
@@ -79,8 +91,10 @@ public class ScriptTaskTest {
   }
 
   protected BpmnModelInstance createProcess(String scriptFormat, String scriptText) {
-
-    return Bpmn.createExecutableProcess("testProcess").startEvent().scriptTask().scriptFormat(scriptFormat)
+    return Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .scriptTask()
+        .scriptFormat(scriptFormat)
         .scriptText(scriptText).userTask().endEvent().done();
   }
 
