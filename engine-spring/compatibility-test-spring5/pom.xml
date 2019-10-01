@@ -13,7 +13,7 @@
   
   <properties>
     <version.spring.framework>5.1.6.RELEASE</version.spring.framework>
-    <version.hibernate>5.4.2.Final</version.hibernate>
+    <version.hibernate>5.4.6.Final</version.hibernate>
   </properties>
   
   <dependencies>
