@@ -25,6 +25,7 @@
   <properties>
     <jackson.version>2.9.10</jackson.version>
     <jackson.version.databind>${jackson.version}</jackson.version.databind>
+    <jackson.version.annotations>2.9.0</jackson.version.annotations>
     <spin.version.old>1.7.1</spin.version.old>
     <groovy.version>2.4.13</groovy.version>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
@@ -87,6 +88,12 @@
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
         <version>${jackson.version.databind}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.version.annotations}</version>
       </dependency>
 
       <dependency>
