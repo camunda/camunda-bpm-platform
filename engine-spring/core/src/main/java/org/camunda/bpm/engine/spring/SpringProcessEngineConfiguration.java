@@ -20,11 +20,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-
 /**
  * @author Svetlana Dorokhova
  */
-public class SpringProcessEngineConfiguration extends SpringTransactionsProcessEngineConfiguration implements ApplicationContextAware {
+public class SpringProcessEngineConfiguration extends SpringTransactionsProcessEngineConfiguration
+    implements ApplicationContextAware {
 
   protected ApplicationContext applicationContext;
 
@@ -38,5 +38,12 @@ public class SpringProcessEngineConfiguration extends SpringTransactionsProcessE
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     this.applicationContext = applicationContext;
+  }
+
+  @Override
+  protected void initScripting() {
+    super.initScripting();
+    // make Spring container managed beans available for scripting
+    this.getResolverFactories().add(new SpringBeansResolverFactory(applicationContext));
   }
 }
