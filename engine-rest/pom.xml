@@ -15,8 +15,8 @@
   <name>camunda BPM - engine - REST - Root</name>
 
   <properties>
-    <jackson.version>2.9.9</jackson.version>
-    <jackson.databind.version>2.9.9.3</jackson.databind.version>
+    <jackson.version>2.10.0</jackson.version>
+    <jackson.databind.version>${jackson.version}</jackson.databind.version>
   </properties>
 
   <modules>
