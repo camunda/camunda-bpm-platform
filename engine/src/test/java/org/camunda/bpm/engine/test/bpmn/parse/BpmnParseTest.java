@@ -1066,6 +1066,24 @@ public class BpmnParseTest {
   }
 
   @Test
+  public void testParseExecutionListenerNotProcessable() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidExecutionListenerClassDefinition");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process definition could be parsed, although an execution listener definition contains empty attribute 'class'.");
+    } catch (ProcessEngineException e) {
+      testRule.assertTextPresent("Attribute 'class' cannot be empty", e.getMessage());
+    }
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidExecutionListenerDelegateDefinition");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process definition could be parsed, although an execution listener definition contains empty attribute 'delegateExpression'.");
+    } catch (ProcessEngineException e) {
+      testRule.assertTextPresent("Attribute 'delegateExpression' cannot be empty", e.getMessage());
+    }
+  }
+
+  @Test
   public void testXxeProcessing() {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionXXE");

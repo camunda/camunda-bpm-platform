@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_13wyz3m" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.1.0">
+  <bpmn:process id="Process_0e0ybm0" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_0qwlsks</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_1v32izq">
+      <bpmn:extensionElements>
+        <camunda:executionListener class="" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0qwlsks</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_15kwd86</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="SequenceFlow_0qwlsks" sourceRef="StartEvent_1" targetRef="Task_1v32izq" />
+    <bpmn:sequenceFlow id="SequenceFlow_15kwd86" sourceRef="Task_1v32izq" targetRef="EndEvent_0c246kp" />
+    <bpmn:endEvent id="EndEvent_0c246kp">
+      <bpmn:incoming>SequenceFlow_15kwd86</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+</bpmn:definitions>
