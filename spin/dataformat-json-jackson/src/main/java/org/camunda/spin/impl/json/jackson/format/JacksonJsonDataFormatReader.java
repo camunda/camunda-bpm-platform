@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.databind.node.MissingNode;
 import org.camunda.spin.impl.json.jackson.JacksonJsonLogger;
 import org.camunda.spin.spi.TextBasedDataFormatReader;
 
@@ -46,7 +47,7 @@ public class JacksonJsonDataFormatReader extends TextBasedDataFormatReader {
 
     try {
       final JsonNode jsonNode = mapper.readTree(input);
-      if (jsonNode == null) {
+      if (jsonNode instanceof MissingNode) {
         throw new IOException("Input is empty");
       }
       return jsonNode;

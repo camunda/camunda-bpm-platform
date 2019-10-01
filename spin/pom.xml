@@ -23,9 +23,9 @@
   </modules>
 
   <properties>
-    <jackson.version>2.9.10</jackson.version>
+    <jackson.version>2.10.0</jackson.version>
     <jackson.version.databind>${jackson.version}</jackson.version.databind>
-    <jackson.version.annotations>2.9.0</jackson.version.annotations>
+    <jackson.version.annotations>${jackson.version}</jackson.version.annotations>
     <spin.version.old>1.7.1</spin.version.old>
     <groovy.version>2.4.13</groovy.version>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
@@ -91,12 +91,6 @@
       </dependency>
 
       <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson.version.annotations}</version>
-      </dependency>
-
-      <dependency>
         <groupId>net.javacrumbs.json-unit</groupId>
         <artifactId>json-unit-fluent</artifactId>
         <version>1.1.6</version>
@@ -131,6 +125,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
+          <version>3.5.0</version>
           <configuration>
             <instructions>
               <Export-Package>org.camunda.spin*</Export-Package>
