@@ -4216,12 +4216,19 @@ public class BpmnParse extends Parse {
     Element scriptElement = executionListenerElement.elementNS(CAMUNDA_BPMN_EXTENSIONS_NS, "script");
 
     if (className != null) {
-      executionListener = new ClassDelegateExecutionListener(className, parseFieldDeclarations(executionListenerElement));
+      if (className.isEmpty()) {
+        addError("Attribute 'class' cannot be empty", executionListenerElement);
+      } else {
+        executionListener = new ClassDelegateExecutionListener(className, parseFieldDeclarations(executionListenerElement));
+      }
     } else if (expression != null) {
       executionListener = new ExpressionExecutionListener(expressionManager.createExpression(expression));
     } else if (delegateExpression != null) {
-      executionListener = new DelegateExpressionExecutionListener(expressionManager.createExpression(delegateExpression),
-          parseFieldDeclarations(executionListenerElement));
+      if (delegateExpression.isEmpty()) {
+        addError("Attribute 'delegateExpression' cannot be empty", executionListenerElement);
+      } else {
+        executionListener = new DelegateExpressionExecutionListener(expressionManager.createExpression(delegateExpression), parseFieldDeclarations(executionListenerElement));
+      }
     } else if (scriptElement != null) {
       try {
         ExecutableScript executableScript = parseCamundaScript(scriptElement);
