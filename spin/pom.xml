@@ -25,7 +25,6 @@
   <properties>
     <jackson.version>2.10.0</jackson.version>
     <jackson.version.databind>${jackson.version}</jackson.version.databind>
-    <jackson.version.annotations>${jackson.version}</jackson.version.annotations>
     <spin.version.old>1.7.1</spin.version.old>
     <groovy.version>2.4.13</groovy.version>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
