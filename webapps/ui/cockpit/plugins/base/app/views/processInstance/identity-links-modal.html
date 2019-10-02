@@ -21,7 +21,9 @@
 
         <tbody>
           <tr ng-repeat="(delta, identityLink) in identityLinks">
-            <td class="id">{{ identityLink[key] }}</td>
+            <td class="id">
+              <span cam-widget-clipboard="identityLink[key]">{{ identityLink[key] }}</span>
+            </td>
             <td class="action text-right">
               <span class="btn btn-default action-button"
                     ng-click="removeItem()">
