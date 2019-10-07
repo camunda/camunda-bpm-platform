@@ -167,9 +167,14 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   public TaskEntity createTask(TaskDecorator taskDecorator) {
-    TaskEntity task = TaskEntity.createWithInsertAndDecorate(this, taskDecorator);
+    TaskEntity task = TaskEntity.createAndInsert(this);
 
     setTask(task);
+
+    taskDecorator.decorate(task, this);
+
+    // fire lifecycle events after task is persisted
+    task.dispatchLifecycleEvents(TaskEntity.TaskState.STATE_CREATED);
 
     return task;
   }

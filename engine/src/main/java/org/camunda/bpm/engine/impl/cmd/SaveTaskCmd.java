@@ -47,13 +47,14 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
     ensureNotNull("task", task);
 
     String operation;
-
+    TaskEntity.TaskState taskState = null;
     if (task.getRevision() == 0) {
 
       try {
         checkCreateTask(task, commandContext);
         task.insert(null);
         operation = UserOperationLogEntry.OPERATION_TYPE_CREATE;
+        taskState = TaskEntity.TaskState.STATE_CREATED;
         task.executeMetrics(Metrics.ACTIVTY_INSTANCE_START);
       } catch (NullValueException e) {
         throw new NotValidException(e.getMessage(), e);
@@ -63,9 +64,9 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
       checkTaskAssign(task, commandContext);
       task.update();
       operation = UserOperationLogEntry.OPERATION_TYPE_UPDATE;
-      task.dispatchLifecycleEvents();
     }
     task.fireAuthorizationProvider();
+    task.dispatchLifecycleEvents(taskState);
     task.createHistoricTaskDetails(operation);
 
     return null;

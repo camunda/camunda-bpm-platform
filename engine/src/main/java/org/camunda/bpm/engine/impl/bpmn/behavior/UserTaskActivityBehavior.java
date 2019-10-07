@@ -51,7 +51,13 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Mi
 
   @Override
   public void performExecution(ActivityExecution execution) throws Exception {
-    TaskEntity.createWithInsertAndDecorate(execution, taskDecorator);
+    TaskEntity task = TaskEntity.createAndInsert(execution);
+
+    // initialize task properties
+    taskDecorator.decorate(task, execution);
+
+    // fire lifecycle events after task is persisted
+    task.dispatchLifecycleEvents(TaskEntity.TaskState.STATE_CREATED);
   }
 
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {

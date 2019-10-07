@@ -53,7 +53,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
-import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.task.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -184,11 +183,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   /** creates and initializes a new persistent task. */
   public static TaskEntity createAndInsert(VariableScope execution) {
-    return createWithInsertAndDecorate(execution, null);
-  }
-
-  public static TaskEntity createWithInsertAndDecorate(VariableScope execution,
-                                                  TaskDecorator decorator) {
 
     TaskEntity task = create();
 
@@ -202,10 +196,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
     else if (execution instanceof CaseExecutionEntity) {
       task.setCaseExecution((DelegateCaseExecution) execution);
-    }
-
-    if (decorator != null) {
-      decorator.decorate(task, execution);
     }
 
     task.insert(null);
@@ -225,8 +215,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     if(execution != null) {
       execution.addTask(this);
     }
-
-    dispatchLifecycleEvents(TaskState.STATE_CREATED);
   }
 
   protected void propagateExecutionTenantId(ExecutionEntity execution) {
@@ -1148,7 +1136,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return dispatchLifecycleEvents(null);
   }
 
-  protected boolean dispatchLifecycleEvents(TaskState state) {
+  public boolean dispatchLifecycleEvents(TaskState state) {
 
     // if state hasn't changed or is null, only fire update/assign
     // events and do not update state
