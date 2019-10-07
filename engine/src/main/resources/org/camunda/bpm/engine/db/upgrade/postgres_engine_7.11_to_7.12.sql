@@ -29,6 +29,3 @@ ALTER TABLE ACT_RU_JOB
 -- https://app.camunda.com/jira/browse/CAM-10672
 ALTER TABLE ACT_HI_INCIDENT
   ADD HISTORY_CONFIGURATION_ varchar(255);
-
-ALTER TABLE ACT_RU_TASK
-  ADD LIFECYCLE_STATE_ varchar(64) default 'created';

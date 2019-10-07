@@ -181,7 +181,6 @@ create table ACT_RU_TASK (
     DUE_DATE_ datetime(3),
     FOLLOW_UP_DATE_ datetime(3),
     SUSPENSION_STATE_ integer,
-    LIFECYCLE_STATE_ varchar(64) default 'created',
     TENANT_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;

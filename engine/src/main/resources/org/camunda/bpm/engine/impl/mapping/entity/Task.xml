@@ -44,7 +44,6 @@
       DUE_DATE_,
       FOLLOW_UP_DATE_,
       SUSPENSION_STATE_,
-      LIFECYCLE_STATE_,
       TENANT_ID_,
       REV_
     ) values (
@@ -67,7 +66,6 @@
       #{dueDate, jdbcType=TIMESTAMP},
       #{followUpDate, jdbcType=TIMESTAMP},
       #{suspensionState, jdbcType=INTEGER},
-      #{lifecycleState, jdbcType=VARCHAR},
       #{tenantId, jdbcType=VARCHAR},
       1
     )
@@ -96,7 +94,6 @@
       DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
       FOLLOW_UP_DATE_ = #{followUpDate, jdbcType=TIMESTAMP},
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
-      LIFECYCLE_STATE_ = #{lifecycleState, jdbcType=VARCHAR},
       TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
@@ -169,7 +166,6 @@
     <result property="dueDateWithoutCascade" column="DUE_DATE_" jdbcType="TIMESTAMP"/>
     <result property="followUpDateWithoutCascade" column="FOLLOW_UP_DATE_" jdbcType="TIMESTAMP"/>
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
-    <result property="lifecycleState" column="LIFECYCLE_STATE_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <!-- note: if you add mappings here, make sure to select the columns in 'columnSelection' -->
   </resultMap>
@@ -228,7 +224,7 @@
     RES.CREATE_TIME_, RES.OWNER_, RES.ASSIGNEE_, RES.DELEGATION_, RES.EXECUTION_ID_,
     RES.PROC_INST_ID_, RES.PROC_DEF_ID_, RES.CASE_EXECUTION_ID_, RES.CASE_INST_ID_,
     RES.CASE_DEF_ID_, RES.TASK_DEF_KEY_, RES.DUE_DATE_, RES.FOLLOW_UP_DATE_,
-    RES.SUSPENSION_STATE_, RES.LIFECYCLE_STATE_, RES.TENANT_ID_
+    RES.SUSPENSION_STATE_, RES.TENANT_ID_
   </sql>
 
   <sql id="selectTaskByQueryCriteriaSql">
