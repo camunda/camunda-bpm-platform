@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 
@@ -98,7 +97,7 @@ public class ProcessEngineLoggingRule extends TestWatcher {
     List<ILoggingEvent> log = getLog();
     return filterLog(log, subString);
   }
-  
+
   public List<ILoggingEvent> getFilteredLog(String loggerName, String subString) {
     List<ILoggingEvent> log = getLog(loggerName);
     return filterLog(log, subString);
@@ -106,7 +105,7 @@ public class ProcessEngineLoggingRule extends TestWatcher {
 
   @Override
   protected void starting(Description description) {
-    Map<String, Logger> tempWatched = new HashMap<>();
+    Map<String, Logger> toWatch = new HashMap<>(globallyWatched);
     WatchLogger watchLoggerAnnotation = description.getAnnotation(WatchLogger.class);
     if (watchLoggerAnnotation != null) {
       Level level = Level.toLevel(watchLoggerAnnotation.level());
@@ -116,18 +115,19 @@ public class ProcessEngineLoggingRule extends TestWatcher {
       for (String loggerName : watchLoggerAnnotation.loggerNames()) {
         Logger logger = getLogger(loggerName);
         logger.setLevel(level);
-        tempWatched.put(loggerName, logger);
+        toWatch.put(loggerName, logger);
       }
     }
-    watchLoggers(globallyWatched);
-    watchLoggers(tempWatched);
+    watchLoggers(toWatch);
   }
 
   @Override
   protected void finished(Description description) {
     // reset logback configuration
-    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-    loggerContext.reset();
+    for (Logger logger : allWatched.values()) {
+      logger.detachAppender(APPENDER_NAME);
+      logger.setLevel(null);
+    }
   }
 
   private void watchLoggers(Map<String, Logger> loggers) {
@@ -143,7 +143,7 @@ public class ProcessEngineLoggingRule extends TestWatcher {
       allWatched.put(loggerEntry.getKey(), logger);
     }
   }
-  
+
   private List<ILoggingEvent> filterLog(List<ILoggingEvent> log, String subString){
     List<ILoggingEvent> filteredLog = new ArrayList<>();
     for (ILoggingEvent logEntry : log) {
