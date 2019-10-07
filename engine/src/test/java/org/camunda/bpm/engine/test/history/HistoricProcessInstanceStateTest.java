@@ -261,22 +261,14 @@ public class HistoricProcessInstanceStateTest {
   }
 
   @Test
-  @Ignore("CAM-9934")
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/CAM-9934.bpmn"})
-  public void test() {
+  public void shouldSetCorrectInstanceStateOnInterruption() {
     // given
     processEngineRule.getRuntimeService().startProcessInstanceByKey("Process_1");
 
-    String jobId = processEngineRule.getManagementService()
-      .createJobQuery()
-      .timers()
-      .executable()
-      .singleResult()
-      .getId();
-
     // when
-    processEngineRule.getManagementService()
-      .executeJob(jobId);
+    processEngineRule.getRuntimeService()
+      .correlateMessage("SubProcessTrigger");
 
     HistoricProcessInstance historicProcessInstance = processEngineRule.getHistoryService()
       .createHistoricProcessInstanceQuery()
@@ -288,7 +280,6 @@ public class HistoricProcessInstanceStateTest {
   }
 
   @Test
-  @Ignore("CAM-9934")
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/CAM-9934.bpmn"})
   public void shouldSetRemovalTimeOnHistoricActivityInstances() {
     // given
@@ -297,16 +288,9 @@ public class HistoricProcessInstanceStateTest {
 
     processEngineRule.getRuntimeService().startProcessInstanceByKey("Process_1");
 
-    String jobId = processEngineRule.getManagementService()
-      .createJobQuery()
-      .timers()
-      .executable()
-      .singleResult()
-      .getId();
-
     // when
-    processEngineRule.getManagementService()
-      .executeJob(jobId);
+    processEngineRule.getRuntimeService()
+      .correlateMessage("SubProcessTrigger");
 
     HistoricTaskInstance taskInstance = processEngineRule.getHistoryService()
         .createHistoricTaskInstanceQuery()
