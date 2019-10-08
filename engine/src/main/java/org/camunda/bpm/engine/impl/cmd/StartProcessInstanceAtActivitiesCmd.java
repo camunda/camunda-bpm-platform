@@ -113,7 +113,8 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
         processInstance.getId(),
         processInstance.getProcessDefinitionId(),
         processInstance.getProcessDefinition().getKey(),
-        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE),
+        modificationBuilder.getAnnotation());
 
     return new ProcessInstanceWithVariablesImpl(processInstance, variablesListener.getVariables());
   }

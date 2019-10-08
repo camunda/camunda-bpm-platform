@@ -171,7 +171,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionKey(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
 
     mockUpdateProcessInstancesSuspensionStateBuilder = mock(UpdateProcessInstancesSuspensionStateBuilder.class);
-    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceIds(anyList())).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceIds(anyListOf(String.class))).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
     when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceQuery(any(ProcessInstanceQuery.class))).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
     when(mockUpdateSuspensionStateSelectBuilder.byHistoricProcessInstanceQuery(any(HistoricProcessInstanceQuery.class))).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
 
@@ -3069,6 +3069,43 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testSyncProcessInstanceModificationWithAnnotation() {
+    ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(
+        ModificationInstructionBuilder.startBefore()
+          .activityId("activityId")
+          .getJson());
+    json.put("instructions", instructions);
+    json.put("annotation", "anAnnotation");
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .post(PROCESS_INSTANCE_MODIFICATION_URL);
+
+    verify(runtimeServiceMock).createProcessInstanceModification(eq(EXAMPLE_PROCESS_INSTANCE_ID));
+
+    InOrder inOrder = inOrder(mockModificationBuilder);
+    inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId");
+    inOrder.verify(mockModificationBuilder).annotation("anAnnotation");
+
+
+    inOrder.verify(mockModificationBuilder).execute(false, false);
+
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
   public void testSetRetriesByProcessAsync() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     Batch batchEntity = MockProvider.createMockBatch();
@@ -3475,6 +3512,43 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("message", equalTo(message))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
+  }
+
+
+  @Test
+  public void testAsyncProcessInstanceModificationWithAnnotation() {
+    ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
+    Batch batchMock = createMockBatch();
+    when(mockModificationBuilder.executeAsync(anyBoolean(), anyBoolean())).thenReturn(batchMock);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
+
+    json.put("instructions", instructions);
+    json.put("annotation", "anAnnotation");
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
+
+    verify(runtimeServiceMock).createProcessInstanceModification(eq(EXAMPLE_PROCESS_INSTANCE_ID));
+
+    InOrder inOrder = inOrder(mockModificationBuilder);
+    inOrder.verify(mockModificationBuilder).cancelAllForActivity("activityId");
+    inOrder.verify(mockModificationBuilder).annotation("anAnnotation");
+
+    inOrder.verify(mockModificationBuilder).executeAsync(false, false);
+
+    inOrder.verifyNoMoreInteractions();
   }
 
   @SuppressWarnings("unchecked")

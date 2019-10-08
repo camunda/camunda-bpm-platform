@@ -123,6 +123,9 @@ public interface ProcessInstanceModificationBuilder extends
    */
   ProcessInstanceModificationBuilder cancelAllForActivity(String activityId);
 
+  /** Provides annotation for the current modification. */
+  ProcessInstanceModificationBuilder annotation(String annotation);
+
   /**
    * Execute all instructions. Custom execution and task listeners, as well as task input output mappings
    * are executed.

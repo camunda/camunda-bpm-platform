@@ -99,7 +99,8 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
         processInstanceId,
         null,
         null,
-        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE),
+        builder.getAnnotation());
     }
 
     return null;

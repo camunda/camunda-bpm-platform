@@ -51,6 +51,7 @@ public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd
   public Batch execute(CommandContext commandContext) {
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
     Collection<String> processInstanceIds = collectProcessInstanceIds(commandContext);
+    String annotation = builder.getAnnotation();
 
     ensureNotEmpty(BadUserRequestException.class, "Modification instructions cannot be empty", instructions);
     ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty", "Process instance ids", processInstanceIds);
@@ -63,7 +64,8 @@ public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd
 
     writeUserOperationLog(commandContext, processDefinition,
         processInstanceIds.size(),
-        true);
+        true,
+        annotation);
 
     BatchEntity batch = createBatch(commandContext, instructions, processInstanceIds, processDefinition);
     batch.createSeedJobDefinition();
