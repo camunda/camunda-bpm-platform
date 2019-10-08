@@ -27,12 +27,16 @@
           <div class="dropdown"
                ng-if="allDefinitions && allDefinitions.length > 1"
                uib-dropdown>
-            <a href
-               class="dropdown-toggle"
-               uib-dropdown-toggle>
-              {{ decisionDefinition.version }}
-              <span class="caret"></span>
-            </a>
+            <span>
+              <span change-version="decisionDefinition"
+                    type="decision"></span>
+
+              <a href
+                 uib-dropdown-toggle
+                 class="dropdown-toggle btn btn-xs btn-default">
+                <span class="caret"></span>
+              </a>
+            </span>
 
             <ul uib-dropdown-menu class="dropdown-menu">
               <li ng-repeat="definition in allDefinitions">

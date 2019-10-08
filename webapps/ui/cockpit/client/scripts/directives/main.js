@@ -38,6 +38,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
   quickFilter = require('./quickFilter'),
   diagramStatisticsLoader = require('./diagramStatisticsLoader'),
   timeToLive = require('./time-to-live.js'),
+  changeVersion = require('./change-version.js'),
   camCommon = require('../../../../common/scripts/module'),
   isSidebarCollapsed = require('./isSidebarCollapsed'),
   incidentsTab = require('./incidentsTab'),
@@ -67,6 +68,7 @@ directivesModule.directive('camDynamicName', dynamicName);
 directivesModule.directive('camQuickFilter', quickFilter);
 directivesModule.directive('diagramStatisticsLoader', diagramStatisticsLoader);
 directivesModule.directive('timeToLive', timeToLive);
+directivesModule.directive('changeVersion', changeVersion);
 directivesModule.directive('isSidebarCollapsed', isSidebarCollapsed);
 directivesModule.directive('sortableTableHead', sortableTableHead);
 directivesModule.directive('incidentsTab', incidentsTab);

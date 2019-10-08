@@ -49,6 +49,7 @@ var Controller = [
   'processDefinition',
   'page',
   '$translate',
+  'queryMaxResults',
   function(
     $location,
     $scope,
@@ -66,7 +67,8 @@ var Controller = [
     dataDepend,
     processDefinition,
     page,
-    $translate
+    $translate,
+    queryMaxResults
   ) {
     var processData = ($scope.processData = dataDepend.create($scope));
     var pageData = ($scope.pageData = dataDepend.create($scope));
@@ -281,7 +283,15 @@ var Controller = [
           queryParams.withoutTenantId = true;
         }
 
-        return ProcessDefinitionResource.query(queryParams).$promise;
+        return queryMaxResults(
+          queryParams,
+          function(params) {
+            return ProcessDefinitionResource.query(params).$promise;
+          },
+          function(params) {
+            return ProcessDefinitionResource.count(params).$promise;
+          }
+        );
       }
     ]);
 

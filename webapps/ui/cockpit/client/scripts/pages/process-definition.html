@@ -28,12 +28,16 @@
           <div class="dropdown"
                ng-if="instanceStatistics.$loaded && allDefinitions.length > 1"
                uib-dropdown>
-            <a href
-               class="dropdown-toggle"
-               uib-dropdown-toggle>
-              {{ processDefinition.version }}
-              <span class="caret"></span>
-            </a>
+            <span>
+              <span change-version="processDefinition"
+                    type="process"></span>
+
+              <a href
+                 uib-dropdown-toggle
+                 class="dropdown-toggle btn btn-xs btn-default">
+                <span class="caret"></span>
+              </a>
+            </span>
 
             <ul uib-dropdown-menu class="dropdown-menu">
               <li ng-repeat="definition in allDefinitions">

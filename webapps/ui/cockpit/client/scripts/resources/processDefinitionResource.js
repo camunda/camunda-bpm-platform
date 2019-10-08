@@ -45,6 +45,10 @@ var Resource = [
           method: 'GET',
           params: {action: 'xml'},
           cache: true
+        },
+        count: {
+          method: 'GET',
+          params: {action: 'count'}
         }
       }
     );
