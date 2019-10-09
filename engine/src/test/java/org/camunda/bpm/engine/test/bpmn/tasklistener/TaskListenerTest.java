@@ -502,8 +502,7 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
   @Test
   public void testUpdateTaskListenerOnTaskFormSubmit() {
     // given
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
     engineRule.getRuntimeService().startProcessInstanceByKey("process");
     Task task = engineRule.getTaskService().createTaskQuery().singleResult();
 
@@ -514,7 +513,7 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
     // then
     // first update event comes from delegating the task,
     // setting it's delegation state to PENDING
-    assertEquals(2, UpdateTaskListener.eventCounter);
+    assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
