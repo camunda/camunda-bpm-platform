@@ -32,18 +32,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -51,58 +44,34 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.bpmn.tasklistener.util.CompletingTaskListener;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener.RecordedTaskEvent;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.TaskDeleteListener;
-import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
-import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 import org.joda.time.LocalDateTime;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
 
 
 /**
  * @author Joram Barrez
  */
-public class TaskListenerTest {
-
-  public static final String ERROR_CODE = "208";
-  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  protected RuntimeService runtimeService;
-  protected TaskService taskService;
-  protected HistoryService historyService;
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+public class TaskListenerTest extends AbstractTaskListenerTest {
+  /*
+  Testing use-cases when Task Events are thrown and caught by Task Listeners
+   */
 
   @Before
-  public void setUp() {
-    runtimeService = engineRule.getRuntimeService();
-    taskService = engineRule.getTaskService();
-    historyService = engineRule.getHistoryService();
-    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
-
-    AssignmentTaskListener.reset();
-    UpdateTaskListener.reset();
-    ModifyingTaskListener.reset();
+  public void resetListenerCounters() {
+    VariablesCollectingListener.reset();
   }
 
-  @Before
-  public void resetListeners() {
-    ThrowBPMNErrorListener.reset();
-    DeleteListener.reset();
-  }
+  // CREATE Task Listener tests
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
@@ -112,6 +81,74 @@ public class TaskListenerTest {
     assertEquals("Schedule meeting", task.getName());
     assertEquals("TaskCreateListener is listening!", task.getDescription());
   }
+
+  @Test
+  public void testCompleteTaskInCreateEventTaskListener() {
+    // given process with user task and task create listener
+    BpmnModelInstance modelInstance =
+        Bpmn.createExecutableProcess("startToEnd")
+            .startEvent()
+            .userTask()
+            .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, CompletingTaskListener.class.getName())
+            .name("userTask")
+            .endEvent().done();
+
+    testRule.deploy(modelInstance);
+
+    // when process is started and user task completed in task create listener
+    runtimeService.startProcessInstanceByKey("startToEnd");
+
+    // then task is successfully completed without an exception
+    assertNull(taskService.createTaskQuery().singleResult());
+  }
+
+  @Test
+  public void testCompleteTaskInCreateEventTaskListenerWithIdentityLinks() {
+    // given process with user task, identity links and task create listener
+    BpmnModelInstance modelInstance =
+        Bpmn.createExecutableProcess("startToEnd")
+            .startEvent()
+            .userTask()
+            .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, CompletingTaskListener.class.getName())
+            .name("userTask")
+            .camundaCandidateUsers(Arrays.asList(new String[]{"users1", "user2"}))
+            .camundaCandidateGroups(Arrays.asList(new String[]{"group1", "group2"}))
+            .endEvent().done();
+
+    testRule.deploy(modelInstance);
+
+    // when process is started and user task completed in task create listener
+    runtimeService.startProcessInstanceByKey("startToEnd");
+
+    // then task is successfully completed without an exception
+    assertNull(taskService.createTaskQuery().singleResult());
+  }
+
+  @Test
+  public void testCompleteTaskInCreateEventListenerWithFollowingCallActivity() {
+    final BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subProc")
+                                             .startEvent()
+                                             .userTask("calledTask")
+                                             .endEvent()
+                                             .done();
+
+    final BpmnModelInstance instance = Bpmn.createExecutableProcess("mainProc")
+                                           .startEvent()
+                                           .userTask("mainTask")
+                                           .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, CompletingTaskListener.class.getName())
+                                           .callActivity().calledElement("subProc")
+                                           .endEvent()
+                                           .done();
+
+    testRule.deploy(subProcess, instance);
+
+    runtimeService.startProcessInstanceByKey("mainProc");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    Assert.assertEquals(task.getTaskDefinitionKey(), "calledTask");
+  }
+
+  // COMPLETE Task Listener tests
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
@@ -133,6 +170,8 @@ public class TaskListenerTest {
     assertEquals("Hello from The Process", runtimeService.getVariable(processInstance.getId(), "greeting"));
     assertEquals("Act", runtimeService.getVariable(processInstance.getId(), "shortName"));
   }
+
+  // DELETE Task Listener tests
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
@@ -171,6 +210,77 @@ public class TaskListenerTest {
     assertEquals(task.getTaskDefinitionKey(), TaskDeleteListener.lastTaskDefinitionKey);
     assertEquals("deleted", TaskDeleteListener.lastDeleteReason);
   }
+
+  @Test
+  public void testActivityInstanceIdOnDeleteInCalledProcess() {
+    // given
+    RecorderTaskListener.clear();
+
+    BpmnModelInstance callActivityProcess = Bpmn.createExecutableProcess("calling")
+                                                .startEvent()
+                                                .callActivity()
+                                                .calledElement("called")
+                                                .endEvent()
+                                                .done();
+
+    BpmnModelInstance calledProcess = Bpmn.createExecutableProcess("called")
+                                          .startEvent()
+                                          .userTask()
+                                          .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, RecorderTaskListener.class.getName())
+                                          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, RecorderTaskListener.class.getName())
+                                          .endEvent()
+                                          .done();
+
+    testRule.deploy(callActivityProcess, calledProcess);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calling");
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // then
+    List<RecordedTaskEvent> recordedEvents = RecorderTaskListener.getRecordedEvents();
+    assertEquals(2, recordedEvents.size());
+    String createActivityInstanceId = recordedEvents.get(0).getActivityInstanceId();
+    String deleteActivityInstanceId = recordedEvents.get(1).getActivityInstanceId();
+
+    assertEquals(createActivityInstanceId, deleteActivityInstanceId);
+  }
+
+  @Test
+  public void testVariableAccessOnDeleteInCalledProcess() {
+    // given
+    VariablesCollectingListener.reset();
+
+    BpmnModelInstance callActivityProcess = Bpmn.createExecutableProcess("calling")
+                                                .startEvent()
+                                                .callActivity()
+                                                .camundaIn("foo", "foo")
+                                                .calledElement("called")
+                                                .endEvent()
+                                                .done();
+
+    BpmnModelInstance calledProcess = Bpmn.createExecutableProcess("called")
+                                          .startEvent()
+                                          .userTask()
+                                          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, VariablesCollectingListener.class.getName())
+                                          .endEvent()
+                                          .done();
+
+    testRule.deploy(callActivityProcess, calledProcess);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calling",
+                                                                               Variables.createVariables().putValue("foo", "bar"));
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // then
+    VariableMap collectedVariables = VariablesCollectingListener.getCollectedVariables();
+    assertNotNull(collectedVariables);
+    assertEquals(1, collectedVariables.size());
+    assertEquals("bar", collectedVariables.get("foo"));
+  }
+
+  // Expression & Scripts Task Listener tests
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
@@ -244,291 +354,149 @@ public class TaskListenerTest {
     }
   }
 
-
-  public static class TaskCreateListener implements TaskListener {
-    public void notify(DelegateTask delegateTask) {
-      delegateTask.complete();
-    }
-  }
-
-  @Test
-  public void testCompleteTaskInCreateTaskListener() {
-    // given process with user task and task create listener
-    BpmnModelInstance modelInstance =
-      Bpmn.createExecutableProcess("startToEnd")
-        .startEvent()
-        .userTask()
-        .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, TaskCreateListener.class.getName())
-        .name("userTask")
-        .endEvent().done();
-
-    testRule.deploy(modelInstance);
-
-    // when process is started and user task completed in task create listener
-    runtimeService.startProcessInstanceByKey("startToEnd");
-
-    // then task is successfully completed without an exception
-    assertNull(taskService.createTaskQuery().singleResult());
-  }
-
-  @Test
-  public void testCompleteTaskInCreateTaskListenerWithIdentityLinks() {
-    // given process with user task, identity links and task create listener
-    BpmnModelInstance modelInstance =
-      Bpmn.createExecutableProcess("startToEnd")
-        .startEvent()
-        .userTask()
-        .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, TaskCreateListener.class.getName())
-        .name("userTask")
-        .camundaCandidateUsers(Arrays.asList(new String[]{"users1", "user2"}))
-        .camundaCandidateGroups(Arrays.asList(new String[]{"group1", "group2"}))
-        .endEvent().done();
-
-    testRule.deploy(modelInstance);
-
-    // when process is started and user task completed in task create listener
-    runtimeService.startProcessInstanceByKey("startToEnd");
-
-    // then task is successfully completed without an exception
-    assertNull(taskService.createTaskQuery().singleResult());
-  }
-
-  @Test
-  public void testActivityInstanceIdOnDeleteInCalledProcess() {
-    // given
-    RecorderTaskListener.clear();
-
-    BpmnModelInstance callActivityProcess = Bpmn.createExecutableProcess("calling")
-        .startEvent()
-        .callActivity()
-          .calledElement("called")
-        .endEvent()
-        .done();
-
-    BpmnModelInstance calledProcess = Bpmn.createExecutableProcess("called")
-        .startEvent()
-        .userTask()
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, RecorderTaskListener.class.getName())
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, RecorderTaskListener.class.getName())
-        .endEvent()
-        .done();
-
-    testRule.deploy(callActivityProcess, calledProcess);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calling");
-
-    // when
-    runtimeService.deleteProcessInstance(processInstance.getId(), null);
-
-    // then
-    List<RecordedTaskEvent> recordedEvents = RecorderTaskListener.getRecordedEvents();
-    assertEquals(2, recordedEvents.size());
-    String createActivityInstanceId = recordedEvents.get(0).getActivityInstanceId();
-    String deleteActivityInstanceId = recordedEvents.get(1).getActivityInstanceId();
-
-    assertEquals(createActivityInstanceId, deleteActivityInstanceId);
-  }
-
-  @Test
-  public void testVariableAccessOnDeleteInCalledProcess() {
-    // given
-    VariablesCollectingListener.reset();
-
-    BpmnModelInstance callActivityProcess = Bpmn.createExecutableProcess("calling")
-        .startEvent()
-        .callActivity()
-          .camundaIn("foo", "foo")
-          .calledElement("called")
-        .endEvent()
-        .done();
-
-    BpmnModelInstance calledProcess = Bpmn.createExecutableProcess("called")
-        .startEvent()
-        .userTask()
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, VariablesCollectingListener.class.getName())
-        .endEvent()
-        .done();
-
-    testRule.deploy(callActivityProcess, calledProcess);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calling",
-        Variables.createVariables().putValue("foo", "bar"));
-
-    // when
-    runtimeService.deleteProcessInstance(processInstance.getId(), null);
-
-    // then
-    VariableMap collectedVariables = VariablesCollectingListener.getCollectedVariables();
-    assertNotNull(collectedVariables);
-    assertEquals(1, collectedVariables.size());
-    assertEquals("bar", collectedVariables.get("foo"));
-  }
-
-  @Test
-  public void testCompleteTaskOnCreateListenerWithFollowingCallActivity() {
-    final BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subProc")
-        .startEvent()
-        .userTask("calledTask")
-        .endEvent()
-        .done();
-
-    final BpmnModelInstance instance = Bpmn.createExecutableProcess("mainProc")
-        .startEvent()
-        .userTask("mainTask")
-        .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, CreateTaskListener.class.getName())
-        .callActivity().calledElement("subProc")
-        .endEvent()
-        .done();
-
-    testRule.deploy(subProcess);
-    testRule.deploy(instance);
-
-    engineRule.getRuntimeService().startProcessInstanceByKey("mainProc");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
-
-    Assert.assertEquals(task.getTaskDefinitionKey(), "calledTask");
-  }
+  // UPDATE Task Listener tests
 
   @Test
   public void testUpdateTaskListenerOnAssign() {
     // given
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    engineRule.getTaskService().setAssignee(task.getId(), "gonzo");
+    taskService.setAssignee(task.getId(), "gonzo");
+    taskService.setAssignee(task.getId(), "leelo");
 
     // then
-    assertEquals(1, UpdateTaskListener.eventCounter);
+    assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
   public void testUpdateTaskListenerOnOwnerSet() {
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    engineRule.getTaskService().setOwner(task.getId(), "gonzo");
+    taskService.setOwner(task.getId(), "gonzo");
 
     // then
-    assertEquals(1, UpdateTaskListener.eventCounter);
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
   public void testUpdateTaskListenerOnUserIdLinkAdd() {
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    engineRule.getTaskService().addUserIdentityLink(task.getId(), "gonzo", IdentityLinkType.CANDIDATE);
+    taskService.addUserIdentityLink(task.getId(), "gonzo", IdentityLinkType.CANDIDATE);
 
     // then
-    assertEquals(1, UpdateTaskListener.eventCounter);
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
   public void testUpdateTaskListenerOnUserIdLinkDelete() {
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
-    engineRule.getTaskService().addUserIdentityLink(task.getId(), "gonzo", IdentityLinkType.CANDIDATE);
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.addUserIdentityLink(task.getId(), "gonzo", IdentityLinkType.CANDIDATE);
 
     // when
-    engineRule.getTaskService().deleteUserIdentityLink(task.getId(), "gonzo", IdentityLinkType.CANDIDATE);
+    taskService.deleteUserIdentityLink(task.getId(), "gonzo", IdentityLinkType.CANDIDATE);
 
     // then
-    assertEquals(2, UpdateTaskListener.eventCounter);
+    assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
   public void testUpdateTaskListenerOnGroupIdLinkAdd() {
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    engineRule.getTaskService().addGroupIdentityLink(task.getId(), "admins", IdentityLinkType.CANDIDATE);
+    taskService.addGroupIdentityLink(task.getId(), "admins", IdentityLinkType.CANDIDATE);
 
     // then
-    assertEquals(1, UpdateTaskListener.eventCounter);
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
   public void testUpdateTaskListenerOnGroupIdLinkDelete() {
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
-    engineRule.getTaskService().addGroupIdentityLink(task.getId(), "admins", IdentityLinkType.CANDIDATE);
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.addGroupIdentityLink(task.getId(), "admins", IdentityLinkType.CANDIDATE);
 
     // when
-    engineRule.getTaskService().deleteGroupIdentityLink(task.getId(), "admins", IdentityLinkType.CANDIDATE);
+    taskService.deleteGroupIdentityLink(task.getId(), "admins", IdentityLinkType.CANDIDATE);
 
     // then
-    assertEquals(2, UpdateTaskListener.eventCounter);
+    assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
   public void testUpdateTaskListenerOnTaskResolve() {
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    engineRule.getTaskService().resolveTask(task.getId());
+    taskService.resolveTask(task.getId());
 
     // then
-    assertEquals(1, UpdateTaskListener.eventCounter);
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
-  public void testUpdateTaskListenerOnDeledate() {
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+  public void testUpdateTaskListenerOnDelegate() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    engineRule.getTaskService().delegateTask(task.getId(), "gonzo");
+    taskService.delegateTask(task.getId(), "gonzo");
 
     // then
-    assertEquals(1, UpdateTaskListener.eventCounter);
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
   public void testUpdateTaskListenerOnClaim() {
     // given
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    engineRule.getTaskService().claim(task.getId(), "test");
+    taskService.claim(task.getId(), "test");
 
     // then
-    assertEquals(1, UpdateTaskListener.eventCounter);
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
   public void testUpdateTaskListenerOnPrioritySet() {
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    engineRule.getTaskService().setPriority(task.getId(), 3000);
+    taskService.setPriority(task.getId(), 3000);
 
     // then
-    assertEquals(1, UpdateTaskListener.eventCounter);
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
@@ -552,150 +520,57 @@ public class TaskListenerTest {
   @Test
   public void testUpdateTaskListenerOnPropertyUpdate() {
     // given
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
     task.setDueDate(new Date());
-    engineRule.getTaskService().saveTask(task);
+    taskService.saveTask(task);
 
     // then
-    assertEquals(1, UpdateTaskListener.eventCounter);
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
   public void testUpdateTaskListenerOnPropertyUpdateOnlyOnce() {
     // given
-    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
     task.setAssignee("test");
     task.setDueDate(new Date());
     task.setOwner("test");
-    engineRule.getTaskService().saveTask(task);
+    taskService.saveTask(task);
 
     // then
-    assertEquals(1, UpdateTaskListener.eventCounter);
-  }
-
-  @Test
-  public void testNoUpdateEventAfterCreateTaskListenerUpdatesProperties() {
-    // given
-    final BpmnModelInstance process =
-        createModelUpdateListenerOnUserTaskAndModifyOn(TaskListener.EVENTNAME_CREATE);
-    testRule.deploy(process);
-
-    // when
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-
-    // then
-    assertEquals(TaskListener.EVENTNAME_CREATE, ModifyingTaskListener.eventName);
-    assertEquals(0, UpdateTaskListener.eventCounter);
-  }
-
-  @Test
-  public void testNoUpdateEventAfterUpdateTaskListenerUpdatesProperties() {
-    // given
-    final BpmnModelInstance process =
-        createModelUpdateListenerOnUserTaskAndModifyOn(TaskListener.EVENTNAME_UPDATE);
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
-
-    // when
-    taskService.setPriority(task.getId(), 3000);
-
-    // then
-    assertEquals(TaskListener.EVENTNAME_UPDATE, ModifyingTaskListener.eventName);
-    // only the initial, first update event is expected
-    assertEquals(1, UpdateTaskListener.eventCounter);
-  }
-
-  @Test
-  public void testNoUpdateEventAfterAssignmentTaskListenerUpdatesProperties() {
-    // given
-    final BpmnModelInstance process =
-        createModelUpdateListenerOnUserTaskAndModifyOn(TaskListener.EVENTNAME_ASSIGNMENT);
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
-
-    // when
-    taskService.setAssignee(task.getId(), "john");
-
-    // then
-    assertEquals(TaskListener.EVENTNAME_ASSIGNMENT, ModifyingTaskListener.eventName);
-    // only one update event is expected, from the initial assignment
-    assertEquals(1, UpdateTaskListener.eventCounter);
-  }
-
-  @Test
-  public void testNoUpdateEventAfterCompleteTaskListenerUpdatesProperties() {
-    // given
-    final BpmnModelInstance process =
-        createModelUpdateListenerOnUserTaskAndModifyOn(TaskListener.EVENTNAME_COMPLETE);
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
-
-    // when
-    taskService.complete(task.getId());
-
-    // then
-    assertEquals(TaskListener.EVENTNAME_COMPLETE, ModifyingTaskListener.eventName);
-    assertEquals(0, UpdateTaskListener.eventCounter);
-  }
-
-  @Test
-  public void testNoUpdateEventAfterDeleteTaskListenerUpdatesProperties() {
-    // given
-    final BpmnModelInstance process =
-        createModelUpdateListenerOnUserTaskAndModifyOn(TaskListener.EVENTNAME_DELETE);
-    testRule.deploy(process);
-    ProcessInstance processInstance = engineRule.getRuntimeService()
-                                                .startProcessInstanceByKey("process");
-
-    // when
-    runtimeService.deleteProcessInstance(processInstance.getId(), "Trigger Delete Event");
-
-    // then
-    assertEquals(TaskListener.EVENTNAME_DELETE, ModifyingTaskListener.eventName);
-    assertEquals(0, UpdateTaskListener.eventCounter);
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
   }
 
   @Test
   public void testAssignmentTaskListenerWhenSavingTask() {
-    final BpmnModelInstance process = Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("task")
-          .camundaTaskListenerClass("assignment", AssignmentTaskListener.class)
-        .endEvent()
-        .done();
-
-    testRule.deploy(process);
-    engineRule.getRuntimeService().startProcessInstanceByKey("process");
-
     // given
-    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_ASSIGNMENT);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
     task.setAssignee("gonzo");
-    engineRule.getTaskService().saveTask(task);
+    taskService.saveTask(task);
 
     // then
-    assertEquals(1, AssignmentTaskListener.eventCounter);
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_ASSIGNMENT));
   }
+
+  // TIMEOUT listener tests
 
   @Test
   @Deployment
   public void testTimeoutTaskListenerDuration() {
     // given
-    ProcessInstance instance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
 
     // when
     ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
@@ -709,7 +584,7 @@ public class TaskListenerTest {
   @Deployment
   public void testTimeoutTaskListenerDate() throws ParseException {
     // given
-    ProcessInstance instance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
 
     // when
     ClockUtil.setCurrentTime(new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss").parse("2019-09-09T13:00:00"));
@@ -723,7 +598,7 @@ public class TaskListenerTest {
   @Deployment
   public void testTimeoutTaskListenerCycle() {
     // given
-    ProcessInstance instance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
 
     // when
     ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
@@ -739,17 +614,17 @@ public class TaskListenerTest {
   @Deployment
   public void testMultipleTimeoutTaskListeners() {
     // given
-    ProcessInstance instance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
 
     // assume
-    assertThat(engineRule.getManagementService().createJobQuery().count(), is(2L));
+    assertThat(managementService.createJobQuery().count(), is(2L));
 
     // when
     ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     // then
-    assertThat(engineRule.getManagementService().createJobQuery().count(), is(1L));
+    assertThat(managementService.createJobQuery().count(), is(1L));
     assertThat((String) runtimeService.getVariable(instance.getId(), "timeout-status"), is("fired"));
   }
 
@@ -757,7 +632,7 @@ public class TaskListenerTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.testTimeoutTaskListenerDuration.bpmn20.xml")
   public void testTimeoutTaskListenerNotCalledWhenTaskCompleted() {
     // given
-    JobQuery jobQuery = engineRule.getManagementService().createJobQuery();
+    JobQuery jobQuery = managementService.createJobQuery();
     TaskQuery taskQuery = taskService.createTaskQuery();
     runtimeService.startProcessInstanceByKey("process");
 
@@ -777,7 +652,7 @@ public class TaskListenerTest {
   @Deployment
   public void testTimeoutTaskListenerNotCalledWhenTaskCompletedByBoundaryEvent() {
     // given
-    JobQuery jobQuery = engineRule.getManagementService().createJobQuery();
+    JobQuery jobQuery = managementService.createJobQuery();
     runtimeService.startProcessInstanceByKey("process");
 
     // assume
@@ -799,7 +674,7 @@ public class TaskListenerTest {
     // given
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", Variables.putValue("duration", "PT1H"));
 
-    JobQuery jobQuery = engineRule.getManagementService().createJobQuery().processInstanceId(pi.getId());
+    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getId());
     List<Job> jobs = jobQuery.list();
     assertEquals(1, jobs.size());
     Job job = jobs.get(0);
@@ -807,7 +682,7 @@ public class TaskListenerTest {
 
     // when
     runtimeService.setVariable(pi.getId(), "duration", "PT15M");
-    engineRule.getManagementService().recalculateJobDuedate(job.getId(), true);
+    managementService.recalculateJobDuedate(job.getId(), true);
 
     // then
     Job jobUpdated = jobQuery.singleResult();
@@ -823,7 +698,7 @@ public class TaskListenerTest {
     // given
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", Variables.putValue("duration", "PT1H"));
 
-    JobQuery jobQuery = engineRule.getManagementService().createJobQuery().processInstanceId(pi.getId());
+    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getId());
     List<Job> jobs = jobQuery.list();
     assertEquals(1, jobs.size());
     Job job = jobs.get(0);
@@ -831,7 +706,7 @@ public class TaskListenerTest {
     ClockUtil.offset(2000L);
 
     // when
-    engineRule.getManagementService().recalculateJobDuedate(job.getId(), false);
+    managementService.recalculateJobDuedate(job.getId(), false);
 
     // then
     Job jobUpdated = jobQuery.singleResult();
@@ -846,7 +721,7 @@ public class TaskListenerTest {
     // given
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", Variables.putValue("duration", "PT1H"));
 
-    JobQuery jobQuery = engineRule.getManagementService().createJobQuery()
+    JobQuery jobQuery = managementService.createJobQuery()
         .processInstanceId(pi.getId())
         .activityId("userTask");
     List<Job> jobs = jobQuery.list();
@@ -856,7 +731,7 @@ public class TaskListenerTest {
 
     // when
     runtimeService.setVariable(pi.getId(), "duration", "PT15M");
-    engineRule.getManagementService().recalculateJobDuedate(job.getId(), true);
+    managementService.recalculateJobDuedate(job.getId(), true);
 
     // then
     Job jobUpdated = jobQuery.singleResult();
@@ -866,345 +741,17 @@ public class TaskListenerTest {
     assertEquals(LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(15).toDate(), jobUpdated.getDuedate());
   }
 
-  @Test
-  public void testThrowErrorOnCreateAndCatchOnUserTask() {
-    // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(TaskListener.EVENTNAME_CREATE);
+  // Helper methods
 
-    testRule.deploy(model);
-
-    // when
-    runtimeService.startProcessInstanceByKey("process");
-
-    // then
-    verifyErrorGotCaught();
-  }
-
-  @Test
-  public void testThrowErrorOnAssignmentAndCatchOnUserTask() {
-    // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(TaskListener.EVENTNAME_ASSIGNMENT);
-
-    testRule.deploy(model);
-    runtimeService.startProcessInstanceByKey("process");
-
-    Task firstTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(firstTask);
-
-    // when
-    firstTask.setAssignee("elmo");
-    engineRule.getTaskService().saveTask(firstTask);
-
-    // then
-    verifyErrorGotCaught();
-  }
-
-  @Test
-  public void testThrowErrorOnCompleteAndCatchOnUserTask() {
-    // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(TaskListener.EVENTNAME_COMPLETE);
-
-    testRule.deploy(model);
-    runtimeService.startProcessInstanceByKey("process");
-
-    Task firstTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(firstTask);
-
-    // when
-    taskService.complete(firstTask.getId());
-
-    // then
-    verifyErrorGotCaught();
-  }
-
-  @Test
-  public void testThrowErrorOnCreateAndCatchOnSubprocess() {
-    // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnSubprocess(TaskListener.EVENTNAME_CREATE);
-
-    testRule.deploy(model);
-
-    // when
-    runtimeService.startProcessInstanceByKey("process");
-
-    // then
-    verifyErrorGotCaught();
-  }
-
-  @Test
-  public void testThrowErrorOnAssignmentAndCatchOnSubprocess() {
-    // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnSubprocess(TaskListener.EVENTNAME_ASSIGNMENT);
-
-    testRule.deploy(model);
-    runtimeService.startProcessInstanceByKey("process");
-
-    Task firstTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(firstTask);
-
-    // when
-    firstTask.setAssignee("elmo");
-    engineRule.getTaskService().saveTask(firstTask);
-
-    // then
-    verifyErrorGotCaught();
-  }
-
-  @Test
-  public void testThrowErrorOnCompleteAndCatchOnSubprocess() {
-    // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnSubprocess(TaskListener.EVENTNAME_COMPLETE);
-
-    testRule.deploy(model);
-    runtimeService.startProcessInstanceByKey("process");
-
-    Task firstTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(firstTask);
-
-    // when
-    taskService.complete(firstTask.getId());
-
-    // then
-    verifyErrorGotCaught();
-  }
-
-  @Test
-  public void testThrowErrorOnCreateAndCatchOnEventSubprocess() {
-    // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnEventSubprocess(TaskListener.EVENTNAME_CREATE);
-
-    testRule.deploy(model);
-
-    // when
-    runtimeService.startProcessInstanceByKey("process");
-
-    // then
-    verifyErrorGotCaught();
-  }
-
-  @Test
-  public void testThrowErrorOnAssignmentAndCatchOnEventSubprocess() {
-    // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnEventSubprocess(TaskListener.EVENTNAME_ASSIGNMENT);
-
-    testRule.deploy(model);
-    runtimeService.startProcessInstanceByKey("process");
-
-    Task firstTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(firstTask);
-
-    // when
-    firstTask.setAssignee("elmo");
-    engineRule.getTaskService().saveTask(firstTask);
-
-    // then
-    verifyErrorGotCaught();
-  }
-
-  @Test
-  public void testThrowErrorOnCompleteAndCatchOnEventSubprocess() {
-    // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnEventSubprocess(TaskListener.EVENTNAME_COMPLETE);
-
-    testRule.deploy(model);
-    runtimeService.startProcessInstanceByKey("process");
-
-    Task firstTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(firstTask);
-
-    // when
-    taskService.complete(firstTask.getId());
-
-    // then
-    verifyErrorGotCaught();
-  }
-
-  @Test
-  @Deployment
-  public void testThrowErrorOnCreateScriptListenerAndCatchOnUserTask() {
-    // when
-    runtimeService.startProcessInstanceByKey("process");
-
-    // then
-    Task resultTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(resultTask);
-    assertEquals("afterCatch", resultTask.getName());
-  }
-
-  @Test
-  public void testThrowErrorOnAssignmentExpressionListenerAndCatchOnUserTask() {
-    // given
-    processEngineConfiguration.getBeans().put("myListener", new ThrowBPMNErrorListener());
-    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("mainTask")
-          .camundaTaskListenerExpression(TaskListener.EVENTNAME_ASSIGNMENT, "${myListener.notify(task)}")
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
-        .boundaryEvent("throw")
-        .error(ERROR_CODE)
-        .userTask("afterCatch")
-        .moveToActivity("mainTask")
-        .userTask("afterThrow")
-        .endEvent()
-        .done();
-    testRule.deploy(model);
-    runtimeService.startProcessInstanceByKey("process");
-
-    Task firstTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(firstTask);
-
-    // when
-    firstTask.setAssignee("elmo");
-    engineRule.getTaskService().saveTask(firstTask);
-
-    // then
-    verifyErrorGotCaught();
-  }
-
-  @Test
-  public void testThrowErrorOnDeleteAndCatchOnUserTaskShouldNotTriggerPropagation() {
-    // given
-    BpmnModelInstance model = createModelThrowErrorInListenerAndCatchOnUserTask(TaskListener.EVENTNAME_DELETE);
-
-    DeploymentWithDefinitions deployment = testRule.deploy(model);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
-
-    // when
-    try {
-      runtimeService.deleteProcessInstance(processInstance.getId(), "invoke delete listener");
-    } catch (Exception e) {
-      // then
-      assertTrue(e.getMessage().contains("business error"));
-      assertEquals(1, ThrowBPMNErrorListener.INVOCATIONS);
-      assertEquals(0, DeleteListener.INVOCATIONS);
-    }
-
-    // cleanup
-    engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true, true);
-  }
-
-  @Test
-  public void testThrowUncaughtErrorOnCompleteAndCatchOnUserTask() {
-    // given
-    processEngineConfiguration.setEnableExceptionsAfterUnhandledBpmnError(true);
-    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("mainTask")
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_COMPLETE, ThrowBPMNErrorListener.class.getName())
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
-        .userTask("afterThrow")
-        .endEvent()
-        .done();
-
-    testRule.deploy(model);
-    runtimeService.startProcessInstanceByKey("process");
-
-    Task firstTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(firstTask);
-
-    try {
-      // when
-      taskService.complete(firstTask.getId());
-    } catch (ProcessEngineException e) {
-      // then
-      assertTrue(e.getMessage().contains("There was an exception while invoking the TaskListener"));
-      assertTrue(e.getMessage().contains("Execution with id 'mainTask' throws an error event with errorCode '208', but no error handler was defined."));
-    }
-
-    // then
-    Task resultTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(resultTask);
-    assertEquals("mainTask", resultTask.getName());
-    assertEquals(1, ThrowBPMNErrorListener.INVOCATIONS);
-    assertEquals(0, DeleteListener.INVOCATIONS);
-
-    // cleanup
-    processEngineConfiguration.setEnableExceptionsAfterUnhandledBpmnError(false);
-  }
-
-  protected void verifyErrorGotCaught() {
-    Task resultTask = taskService.createTaskQuery().singleResult();
-    assertNotNull(resultTask);
-    assertEquals("afterCatch", resultTask.getName());
-    assertEquals(1, ThrowBPMNErrorListener.INVOCATIONS);
-    assertEquals(1, DeleteListener.INVOCATIONS);
-  }
-
-  protected BpmnModelInstance createModelUpdateListenerOnUserTask() {
-    return Bpmn.createExecutableProcess("process")
-        .startEvent()
-          .userTask("task")
-            .camundaTaskListenerClass(TaskListener.EVENTNAME_UPDATE, UpdateTaskListener.class)
-          .userTask("task2")
-        .endEvent()
-        .done();
-  }
-
-  protected BpmnModelInstance createModelUpdateListenerOnUserTaskAndModifyOn(String modifyOnEvent) {
-    return Bpmn.createExecutableProcess("process")
-        .startEvent()
-          .userTask("task")
-            .camundaTaskListenerClass(modifyOnEvent, ModifyingTaskListener.class)
-            .camundaTaskListenerClass(TaskListener.EVENTNAME_UPDATE, UpdateTaskListener.class)
-        .userTask("task2")
-        .endEvent()
-        .done();
-  }
-
-  protected BpmnModelInstance createModelThrowErrorInListenerAndCatchOnUserTask(String eventName) {
-    return Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("mainTask")
-          .camundaTaskListenerClass(eventName, ThrowBPMNErrorListener.class.getName())
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
-        .boundaryEvent("throw")
-        .error(ERROR_CODE)
-        .userTask("afterCatch")
-        .moveToActivity("mainTask")
-        .userTask("afterThrow")
-        .endEvent()
-        .done();
-  }
-
-  protected BpmnModelInstance createModelThrowErrorInListenerAndCatchOnSubprocess(String eventName) {
-    return Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .subProcess("sub")
-          .embeddedSubProcess()
-          .startEvent("inSub")
-          .userTask("mainTask")
-            .camundaTaskListenerClass(eventName, ThrowBPMNErrorListener.class.getName())
-            .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
-          .userTask("afterThrow")
-          .endEvent()
-        .moveToActivity("sub")
-        .boundaryEvent("throw")
-        .error(ERROR_CODE)
-        .userTask("afterCatch")
-        .endEvent()
-        .done();
-  }
-
-  protected BpmnModelInstance createModelThrowErrorInListenerAndCatchOnEventSubprocess(String eventName) {
-    ProcessBuilder processBuilder = Bpmn.createExecutableProcess("process");
-    BpmnModelInstance model = processBuilder
-        .startEvent()
-        .userTask("mainTask")
-          .camundaTaskListenerClass(eventName, ThrowBPMNErrorListener.class.getName())
-          .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, DeleteListener.class.getName())
-        .userTask("afterThrow")
-        .endEvent()
-        .done();
-    processBuilder.eventSubProcess()
-       .startEvent("errorEvent").error(ERROR_CODE)
-         .userTask("afterCatch")
-       .endEvent();
-    return model;
-  }
 
   public static class VariablesCollectingListener implements TaskListener {
 
     protected static VariableMap collectedVariables;
+
+    @Override
+    public void notify(DelegateTask delegateTask) {
+      collectedVariables = delegateTask.getVariablesTyped();
+    }
 
     public static VariableMap getCollectedVariables() {
       return collectedVariables;
@@ -1214,88 +761,5 @@ public class TaskListenerTest {
       collectedVariables = null;
     }
 
-    @Override
-    public void notify(DelegateTask delegateTask) {
-      collectedVariables = delegateTask.getVariablesTyped();
-    }
-
-  }
-
-  public static class CreateTaskListener implements TaskListener {
-
-      public void notify(DelegateTask delegateTask) {
-          delegateTask.getProcessEngineServices().getTaskService().complete(delegateTask.getId());
-      }
-  }
-
-  public static class AssignmentTaskListener implements TaskListener {
-
-    public static int eventCounter = 0;
-
-    public void notify(DelegateTask delegateTask) {
-      eventCounter++;
-    }
-
-    public static void reset() {
-      eventCounter = 0;
-    }
-
-  }
-
-  public static class UpdateTaskListener implements TaskListener {
-
-    public static int eventCounter = 0;
-
-    @Override
-    public void notify(DelegateTask delegateTask) {
-      eventCounter++;
-    }
-
-    public static void reset() {
-      eventCounter = 0;
-    }
-  }
-
-  public static class ModifyingTaskListener implements TaskListener {
-
-    public static String eventName;
-
-    @Override
-    public void notify(DelegateTask delegateTask) {
-      eventName = delegateTask.getEventName();
-
-      delegateTask.setAssignee("demo");
-      delegateTask.setOwner("john");
-      delegateTask.setDueDate(new Date());
-    }
-
-    public static void reset() {
-      eventName = null;
-    }
-  }
-
-  public static class ThrowBPMNErrorListener implements TaskListener {
-    public static int INVOCATIONS = 0;
-
-    public void notify(DelegateTask delegateTask) {
-      INVOCATIONS++;
-      throw new BpmnError(ERROR_CODE, "business error 208");
-    }
-
-    public static void reset() {
-      INVOCATIONS = 0;
-    }
-  }
-
-  public static class DeleteListener implements TaskListener {
-    public static int INVOCATIONS = 0;
-
-    public void notify(DelegateTask delegateTask) {
-      INVOCATIONS++;
-    }
-
-    public static void reset() {
-      INVOCATIONS = 0;
-    }
   }
 }

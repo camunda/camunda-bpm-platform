@@ -17,8 +17,10 @@
 package org.camunda.bpm.engine.test.bpmn.tasklistener.util;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -31,7 +33,8 @@ public class RecorderTaskListener implements TaskListener, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private static List<RecorderTaskListener.RecordedTaskEvent> recordedEvents = new ArrayList<RecorderTaskListener.RecordedTaskEvent>();
+  private static LinkedList<RecordedTaskEvent> recordedEvents = new LinkedList<>();
+  private static Map<String, Integer> eventCounters  = new HashMap<>();
 
   public static class RecordedTaskEvent {
 
@@ -39,6 +42,10 @@ public class RecorderTaskListener implements TaskListener, Serializable {
     protected String executionId;
     protected String event;
     protected String activityInstanceId;
+
+    public RecordedTaskEvent(String event) {
+      this.event = event;
+    }
 
     public RecordedTaskEvent(String taskId, String executionId, String event, String activityInstanceId) {
       this.executionId = executionId;
@@ -63,20 +70,44 @@ public class RecorderTaskListener implements TaskListener, Serializable {
       return activityInstanceId;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+      return event.equals(((RecordedTaskEvent) obj).getEvent());
+    }
   }
 
   public void notify(DelegateTask task) {
     DelegateExecution execution = task.getExecution();
-    recordedEvents.add(new RecordedTaskEvent(task.getId(), task.getExecutionId(), task.getEventName(), execution.getActivityInstanceId()));
+    String eventName = task.getEventName();
+
+    recordedEvents.addLast(new RecordedTaskEvent(task.getId(),
+                                             task.getExecutionId(),
+                                             eventName,
+                                             execution.getActivityInstanceId()));
+
+    Integer counter = eventCounters.get(eventName);
+    if (counter == null) {
+      eventCounters.put(eventName, 1);
+    } else {
+      eventCounters.put(eventName, ++counter);
+    }
   }
 
   public static void clear() {
     recordedEvents.clear();
+    eventCounters.clear();
   }
 
   public static List<RecordedTaskEvent> getRecordedEvents() {
     return recordedEvents;
   }
 
+  public static Map<String, Integer> getEventCounters() {
+    return eventCounters;
+  }
 
+  public static int getEventCount(String eventName) {
+    Integer count = eventCounters.get(eventName);
+    return (count != null)? count : 0;
+  }
 }
