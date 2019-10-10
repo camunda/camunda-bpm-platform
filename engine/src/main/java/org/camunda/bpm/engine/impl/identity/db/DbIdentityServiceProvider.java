@@ -24,15 +24,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.camunda.bpm.engine.AuthenticationException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
+import org.camunda.bpm.engine.impl.identity.IndentityLogger;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MembershipEntity;
@@ -49,6 +50,8 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  *
  */
 public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider implements WritableIdentityProvider {
+
+  protected static final IndentityLogger LOG = ProcessEngineLogger.INDENTITY_LOGGER;
 
   // users ////////////////////////////////////////////////////////
 
@@ -113,7 +116,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     }
 
     if (isUserLocked(user)) {
-      throw new AuthenticationException(userId, user.getLockExpirationTime());
+      return false;
     }
 
     if (matchPassword(password, user)) {
@@ -133,7 +136,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     int attempts = user.getAttempts();
 
     if (attempts >= maxAttempts) {
-      throw new AuthenticationException(user.getId());
+      return true;
     }
 
     Date lockExpirationTime = user.getLockExpirationTime();
@@ -155,6 +158,12 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
     long currentTime = ClockUtil.getCurrentTime().getTime();
     Date lockExpirationTime = new Date(currentTime + delay);
+
+    if(attempts >= processEngineConfiguration.getLoginMaxAttempts()) {
+      LOG.infoUserPermanentlyLocked(user.getId());
+    } else {
+      LOG.infoUserTemporarilyLocked(user.getId(), lockExpirationTime);
+    }
 
     getIdentityInfoManager().updateUserLock(user, attempts, lockExpirationTime);
   }
