@@ -136,18 +136,13 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     int attempts = user.getAttempts();
 
     if (attempts >= maxAttempts) {
-      LOG.infoUserPermanentlyLocked(user.getId());
       return true;
     }
 
     Date lockExpirationTime = user.getLockExpirationTime();
     Date currentTime = ClockUtil.getCurrentTime();
 
-    boolean locked = lockExpirationTime != null && lockExpirationTime.after(currentTime);
-    if (locked) {
-      LOG.infoUserTemporarilyLocked(user.getId(), user.getLockExpirationTime());
-    }
-    return locked;
+    return lockExpirationTime != null && lockExpirationTime.after(currentTime);
   }
 
   protected void lockUser(UserEntity user) {
@@ -163,6 +158,12 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
     long currentTime = ClockUtil.getCurrentTime().getTime();
     Date lockExpirationTime = new Date(currentTime + delay);
+
+    if(attempts >= processEngineConfiguration.getLoginMaxAttempts()) {
+      LOG.infoUserPermanentlyLocked(user.getId());
+    } else {
+      LOG.infoUserTemporarilyLocked(user.getId(), lockExpirationTime);
+    }
 
     getIdentityInfoManager().updateUserLock(user, attempts, lockExpirationTime);
   }
