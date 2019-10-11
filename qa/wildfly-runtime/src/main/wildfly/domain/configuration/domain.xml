@@ -59,12 +59,6 @@
     <profiles>
         <profile name="default">
             <subsystem xmlns="urn:jboss:domain:logging:8.0">
-                <console-handler name="CONSOLE">
-                    <level name="INFO"/>
-                    <formatter>
-                        <named-formatter name="COLOR-PATTERN"/>
-                    </formatter>
-                </console-handler>
                 <periodic-rotating-file-handler name="FILE" autoflush="true">
                     <formatter>
                         <named-formatter name="PATTERN"/>
@@ -356,7 +350,6 @@
             <subsystem xmlns="urn:jboss:domain:jmx:1.3">
                 <expose-resolved-model/>
                 <expose-expression-model/>
-                <remoting-connector/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jpa:1.1">
                 <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
@@ -396,11 +389,6 @@
                             <policy-module code="Delegating" flag="required"/>
                         </authorization>
                     </security-domain>
-                    <security-domain name="jboss-ejb-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
                     <security-domain name="jaspitest" cache-type="default">
                         <authentication-jaspi>
                             <login-module-stack name="dummy">
@@ -408,6 +396,11 @@
                             </login-module-stack>
                             <auth-module code="Dummy"/>
                         </authentication-jaspi>
+                    </security-domain>
+                    <security-domain name="jboss-ejb-policy" cache-type="default">
+                        <authorization>
+                            <policy-module code="Delegating" flag="required"/>
+                        </authorization>
                     </security-domain>
                 </security-domains>
             </subsystem>
@@ -868,11 +861,6 @@
                             <policy-module code="Delegating" flag="required"/>
                         </authorization>
                     </security-domain>
-                    <security-domain name="jboss-ejb-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
                     <security-domain name="jaspitest" cache-type="default">
                         <authentication-jaspi>
                             <login-module-stack name="dummy">
@@ -880,6 +868,11 @@
                             </login-module-stack>
                             <auth-module code="Dummy"/>
                         </authentication-jaspi>
+                    </security-domain>
+                    <security-domain name="jboss-ejb-policy" cache-type="default">
+                        <authorization>
+                            <policy-module code="Delegating" flag="required"/>
+                        </authorization>
                     </security-domain>
                 </security-domains>
             </subsystem>
@@ -1244,7 +1237,7 @@
                     <smtp-server outbound-socket-binding-ref="mail-smtp"/>
                 </mail-session>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:messaging-activemq:7.0">
+            <subsystem xmlns="urn:jboss:domain:messaging-activemq:8.0">
                 <server name="default">
                     <statistics enabled="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                     <security-setting name="#">
@@ -1302,11 +1295,6 @@
                             <policy-module code="Delegating" flag="required"/>
                         </authorization>
                     </security-domain>
-                    <security-domain name="jboss-ejb-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
                     <security-domain name="jaspitest" cache-type="default">
                         <authentication-jaspi>
                             <login-module-stack name="dummy">
@@ -1314,6 +1302,11 @@
                             </login-module-stack>
                             <auth-module code="Dummy"/>
                         </authentication-jaspi>
+                    </security-domain>
+                    <security-domain name="jboss-ejb-policy" cache-type="default">
+                        <authorization>
+                            <policy-module code="Delegating" flag="required"/>
+                        </authorization>
                     </security-domain>
                 </security-domains>
             </subsystem>
@@ -1710,7 +1703,7 @@
                     <smtp-server outbound-socket-binding-ref="mail-smtp"/>
                 </mail-session>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:messaging-activemq:7.0">
+            <subsystem xmlns="urn:jboss:domain:messaging-activemq:8.0">
                 <server name="default">
                     <cluster password="${jboss.messaging.cluster.password:CHANGE ME!!}"/>
                     <statistics enabled="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
@@ -1779,11 +1772,6 @@
                             <policy-module code="Delegating" flag="required"/>
                         </authorization>
                     </security-domain>
-                    <security-domain name="jboss-ejb-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
                     <security-domain name="jaspitest" cache-type="default">
                         <authentication-jaspi>
                             <login-module-stack name="dummy">
@@ -1791,6 +1779,11 @@
                             </login-module-stack>
                             <auth-module code="Dummy"/>
                         </authentication-jaspi>
+                    </security-domain>
+                    <security-domain name="jboss-ejb-policy" cache-type="default">
+                        <authorization>
+                            <policy-module code="Delegating" flag="required"/>
+                        </authorization>
                     </security-domain>
                 </security-domains>
             </subsystem>

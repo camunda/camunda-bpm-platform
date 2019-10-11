@@ -52,9 +52,6 @@
             </server-logger>
         </audit-log>
         <management-interfaces>
-            <native-interface security-realm="ManagementRealm">
-                <socket interface="management" port="${jboss.management-native.port}"/>
-            </native-interface>
             <http-interface security-realm="ManagementRealm">
                 <http-upgrade enabled="true"/>
                 <socket interface="management" port="${jboss.management-http.port}"/>
@@ -68,14 +65,8 @@
         <interface name="management">
             <inet-address value="${jboss.bind.address.management:127.0.0.1}"/>
         </interface>
-	        <interface name="private">
-            <inet-address value="${jboss.bind.address.private:127.0.0.1}"/>
-        </interface>
         <interface name="public">
             <inet-address value="${jboss.bind.address:127.0.0.1}"/>
-        </interface>
-        <interface name="unsecure">
-            <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>
     </interfaces>
     <jvms>
@@ -85,7 +76,6 @@
                 <option value="-server"/>
                 <option value="-XX:MetaspaceSize=96m"/>
                 <option value="-XX:MaxMetaspaceSize=256m"/>
-                <option value="--add-exports=java.base/sun.nio.ch=ALL-UNNAMED"/>
             </jvm-options>
         </jvm>
     </jvms>
