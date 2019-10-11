@@ -72,6 +72,11 @@ public class JobAcquisitionBackoffIdleTest {
     jobExecutor.shutdown();
   }
 
+  @After
+  public void resetClock() {
+    ClockUtil.reset();
+  }
+
   protected void cycleJobAcquisitionToMaxIdleTime() {
     // cycle of job acquisition
     // => 0 jobs are acquired
@@ -144,7 +149,7 @@ public class JobAcquisitionBackoffIdleTest {
   }
 
   protected  void cycleAcquisitionAndAssertAfterJobExecution(JobQuery jobQuery) {
-    // another cycle of job acquisition after acuqisition idle was reseted
+    // another cycle of job acquisition after acquisition idle was reseted
     // => 1 jobs are acquired
     triggerReconfigurationAndNextCycle();
     assertJobExecutorWaitEvent(0);
@@ -169,6 +174,7 @@ public class JobAcquisitionBackoffIdleTest {
     initAcquisitionAndIdleToMaxTime();
 
     final Date startTime = new Date();
+    ClockUtil.setCurrentTime(startTime);
     ProcessInstance procInstance = jobCreationInCycle.createJobAndContinueCycle();
 
      // After process start, there should be 1 timer created
