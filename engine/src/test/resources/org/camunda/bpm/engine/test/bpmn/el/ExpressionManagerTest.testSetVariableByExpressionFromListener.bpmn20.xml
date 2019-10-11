@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_00xrlag" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.2.1">
+  <bpmn:process id="fieldInjectionTest" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_10fdupe</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_10fdupe" sourceRef="StartEvent_1" targetRef="Task_1ia94uu" />
+    <bpmn:endEvent id="EndEvent_1grh1f5">
+      <bpmn:incoming>SequenceFlow_0tibtbc</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0tibtbc" sourceRef="Task_1ia94uu" targetRef="EndEvent_1grh1f5" />
+    <bpmn:userTask id="Task_1ia94uu" name="A">
+      <bpmn:extensionElements>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.bpmn.el.ValueIncreasingListener" event="end">
+          <camunda:field name="counter">
+            <camunda:expression>${myCounter}</camunda:expression>
+          </camunda:field>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_10fdupe</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0tibtbc</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="fieldInjectionTest">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="103" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_10fdupe_di" bpmnElement="SequenceFlow_10fdupe">
+        <di:waypoint x="215" y="121" />
+        <di:waypoint x="260" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1grh1f5_di" bpmnElement="EndEvent_1grh1f5">
+        <dc:Bounds x="392" y="103" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0tibtbc_di" bpmnElement="SequenceFlow_0tibtbc">
+        <di:waypoint x="360" y="121" />
+        <di:waypoint x="392" y="121" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0nzhhde_di" bpmnElement="Task_1ia94uu">
+        <dc:Bounds x="260" y="81" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

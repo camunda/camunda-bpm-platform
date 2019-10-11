@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Frederik Heremans
@@ -84,5 +85,15 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
     ProcessInstance secondInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     task = taskService.createTaskQuery().processInstanceId(secondInstance.getId()).singleResult();
     assertEquals("johnny", task.getAssignee());
+  }
+
+  @Deployment
+  public void testSetVariableByExpressionFromListener() {
+    // given
+    runtimeService.startProcessInstanceByKey("fieldInjectionTest", Variables.putValue("myCounter", 5));
+    // when
+    taskService.complete(taskService.createTaskQuery().singleResult().getId());
+    // then
+    assertEquals(1L, historyService.createHistoricVariableInstanceQuery().variableValueEquals("myCounter", 6).count());
   }
 }
