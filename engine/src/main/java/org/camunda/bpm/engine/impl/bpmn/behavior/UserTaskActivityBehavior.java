@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingUserTaskInstance;
 import org.camunda.bpm.engine.impl.migration.instance.parser.MigratingInstanceParseContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.TaskState;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
@@ -51,13 +52,13 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Mi
 
   @Override
   public void performExecution(ActivityExecution execution) throws Exception {
-    TaskEntity task = TaskEntity.createAndInsert(execution);
+    TaskEntity task = new TaskEntity((ExecutionEntity) execution);
 
     // initialize task properties
     taskDecorator.decorate(task, execution);
 
-    // fire lifecycle events after task is persisted
-    task.dispatchLifecycleEvents(TaskEntity.TaskState.STATE_CREATED);
+    // fire lifecycle events after task is initialized
+    task.transitionTo(TaskState.STATE_CREATED);
   }
 
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {

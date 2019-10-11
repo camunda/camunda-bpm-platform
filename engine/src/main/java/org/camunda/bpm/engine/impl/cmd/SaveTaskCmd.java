@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.TaskState;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.task.Task;
 
@@ -47,26 +48,31 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
     ensureNotNull("task", task);
 
     String operation;
-    TaskEntity.TaskState taskState = null;
     if (task.getRevision() == 0) {
 
       try {
         checkCreateTask(task, commandContext);
-        task.insert(null);
+        task.ensureParentTaskActive();
+        task.propagateParentTaskTenantId();
+        task.insert();
         operation = UserOperationLogEntry.OPERATION_TYPE_CREATE;
-        taskState = TaskEntity.TaskState.STATE_CREATED;
         task.executeMetrics(Metrics.ACTIVTY_INSTANCE_START);
       } catch (NullValueException e) {
         throw new NotValidException(e.getMessage(), e);
       }
 
+      task.fireAuthorizationProvider();
+      task.transitionTo(TaskState.STATE_CREATED);
+
     } else {
       checkTaskAssign(task, commandContext);
       task.update();
       operation = UserOperationLogEntry.OPERATION_TYPE_UPDATE;
+
+      task.fireAuthorizationProvider();
+      task.dispatchPropertyUpdates();
     }
-    task.fireAuthorizationProvider();
-    task.dispatchLifecycleEvents(taskState);
+
     task.createHistoricTaskDetails(operation);
 
     return null;

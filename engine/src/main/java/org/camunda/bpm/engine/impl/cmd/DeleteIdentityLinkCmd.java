@@ -89,7 +89,7 @@ public abstract class DeleteIdentityLinkCmd implements Command<Void>, Serializab
     } else {
       task.deleteIdentityLink(userId, groupId, type);
     }
-    task.dispatchLifecycleEvents();
+    task.dispatchPropertyUpdates();
 
     return null;
   }

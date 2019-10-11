@@ -81,7 +81,7 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     EnsureUtil.ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     checkAddIdentityLink(task, commandContext);
-    
+
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       task.setAssignee(userId);
     } else if (IdentityLinkType.OWNER.equals(type)) {
@@ -89,7 +89,7 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     } else {
       task.addIdentityLink(userId, groupId, type);
     }
-    task.dispatchLifecycleEvents();
+    task.dispatchPropertyUpdates();
 
     return null;
   }

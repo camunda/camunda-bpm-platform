@@ -78,6 +78,7 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
@@ -91,6 +92,7 @@ import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.TaskState;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -167,14 +169,15 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   public TaskEntity createTask(TaskDecorator taskDecorator) {
-    TaskEntity task = TaskEntity.createAndInsert(this);
+    TaskEntity task = new TaskEntity((CaseExecutionEntity) this);
 
     setTask(task);
 
     taskDecorator.decorate(task, this);
 
-    // fire lifecycle events after task is persisted
-    task.dispatchLifecycleEvents(TaskEntity.TaskState.STATE_CREATED);
+    // task decoration is part of the initialization of the task,
+    // so we transition to CREATED only afterwards
+    task.transitionTo(TaskState.STATE_CREATED);
 
     return task;
   }

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
@@ -53,6 +54,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.task.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -113,7 +115,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   protected Date dueDate;
   protected Date followUpDate;
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
-  protected TaskState lifecycleState;
+  protected TaskState lifecycleState = TaskState.STATE_INIT;
   protected String tenantId;
 
   protected boolean isIdentityLinksInitialized = false;
@@ -173,48 +175,52 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public static final String PRIORITY = "priority";
   public static final String CASE_INSTANCE_ID = "caseInstanceId";
 
+  /**
+   * Mybatis constructor
+   */
   public TaskEntity() {
-    this(null);
+    this.lifecycleState = TaskState.STATE_CREATED;
   }
 
-  public TaskEntity(String taskId) {
-    this.id = taskId;
+  /**
+   * Standalone task constructor
+   */
+  public TaskEntity(String id) {
+    this(TaskState.STATE_INIT);
+    this.id = id;
   }
 
-  /** creates and initializes a new persistent task. */
-  public static TaskEntity createAndInsert(VariableScope execution) {
-
-    TaskEntity task = create();
-
-    if (execution instanceof ExecutionEntity) {
-      ExecutionEntity executionEntity = (ExecutionEntity) execution;
-      task.setExecution(executionEntity);
-      task.skipCustomListeners = executionEntity.isSkipCustomListeners();
-      task.insert(executionEntity);
-      return task;
-
-    }
-    else if (execution instanceof CaseExecutionEntity) {
-      task.setCaseExecution((DelegateCaseExecution) execution);
-    }
-
-    task.insert(null);
-
-    return task;
+  protected TaskEntity(TaskState initialState) {
+    this.isIdentityLinksInitialized = true;
+    this.setCreateTime(ClockUtil.getCurrentTime());
+    this.lifecycleState = initialState;
   }
 
-  public void insert(ExecutionEntity execution) {
-    ensureParentTaskActive();
-    propagateExecutionTenantId(execution);
-    propagateParentTaskTenantId();
+  /**
+   * BPMN execution constructor
+   */
+  public TaskEntity(ExecutionEntity execution) {
+    this(TaskState.STATE_INIT);
+    setExecution(execution);
+    this.skipCustomListeners = execution.isSkipCustomListeners();
+    setTenantId(execution.getTenantId());
+    execution.addTask(this);
+    insert();
+  }
 
+  /**
+   * CMMN execution constructor
+   */
+  public TaskEntity(CaseExecutionEntity caseExecution) {
+    this(TaskState.STATE_INIT);
+    setCaseExecution(caseExecution);
+    insert();
+  }
+
+  public void insert() {
     CommandContext commandContext = Context.getCommandContext();
     TaskManager taskManager = commandContext.getTaskManager();
     taskManager.insertTask(this);
-
-    if(execution != null) {
-      execution.addTask(this);
-    }
   }
 
   protected void propagateExecutionTenantId(ExecutionEntity execution) {
@@ -223,7 +229,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  protected void propagateParentTaskTenantId() {
+  public void propagateParentTaskTenantId() {
     if (parentTaskId != null) {
 
       final TaskEntity parentTask = Context
@@ -275,20 +281,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  /** new task.  Embedded state and create time will be initialized.
-   * But this task still will have to be persisted with
-   * TransactionContext
-   *     .getCurrent()
-   *     .getPersistenceSession()
-   *     .insert(task);
-   */
-  public static TaskEntity create() {
-    TaskEntity task = new TaskEntity();
-    task.isIdentityLinksInitialized = true;
-    task.setCreateTime(ClockUtil.getCurrentTime());
-    return task;
-  }
-
   public void complete() {
 
     if (TaskState.STATE_COMPLETED.equals(this.lifecycleState)
@@ -313,7 +305,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     ensureTaskActive();
 
     // trigger TaskListener.complete event
-    final boolean listenersSuccessful = dispatchLifecycleEvents(TaskState.STATE_COMPLETED);
+    final boolean listenersSuccessful = transitionTo(TaskState.STATE_COMPLETED);
 
     if (listenersSuccessful)
     {
@@ -342,7 +334,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     ensureTaskActive();
 
     // trigger TaskListener.complete event for a case execution associated task
-    dispatchLifecycleEvents(TaskState.STATE_COMPLETED);
+    transitionTo(TaskState.STATE_COMPLETED);
 
     // delete the task
     Context
@@ -356,7 +348,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
     // only fire lifecycle events if task is actually cancelled/deleted
     if (!TaskEntity.DELETE_REASON_COMPLETED.equals(deleteReason)) {
-      dispatchLifecycleEvents(TaskState.STATE_DELETED);
+      transitionTo(TaskState.STATE_DELETED);
     }
 
     Context
@@ -443,7 +435,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return revision+1;
   }
 
-  protected void ensureParentTaskActive() {
+  public void ensureParentTaskActive() {
     if (parentTaskId != null) {
       TaskEntity parentTask = Context
           .getCommandContext()
@@ -622,10 +614,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  public void setCaseExecution(DelegateCaseExecution caseExecution) {
+  public void setCaseExecution(CaseExecutionEntity caseExecution) {
     if (caseExecution!=null) {
 
-      this.caseExecution = (CaseExecutionEntity) caseExecution;
+      this.caseExecution = caseExecution;
       this.caseExecutionId = this.caseExecution.getId();
       this.caseInstanceId = this.caseExecution.getCaseInstanceId();
       this.caseDefinitionId = this.caseExecution.getCaseDefinitionId();
@@ -1132,22 +1124,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  public boolean dispatchLifecycleEvents() {
-    return dispatchLifecycleEvents(null);
-  }
-
-  public boolean dispatchLifecycleEvents(TaskState state) {
-
-    // if state hasn't changed or is null, only fire update/assign
-    // events and do not update state
-    if ((state == null || state.equals(lifecycleState))) {
-      state = TaskState.STATE_UPDATING;
-    } else {
-      this.lifecycleState = state;
-    }
+  public boolean transitionTo(TaskState state) {
+    this.lifecycleState = state;
 
     switch (state) {
-
       case STATE_CREATED:
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext != null) {
@@ -1155,17 +1135,25 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
         }
         return fireEvent(TaskListener.EVENTNAME_CREATE) && fireAssignmentEvent();
 
-      case STATE_UPDATING:
-        return fireEvent(TaskListener.EVENTNAME_UPDATE) && fireAssignmentEvent();
-
       case STATE_COMPLETED:
         return fireEvent(TaskListener.EVENTNAME_COMPLETE);
 
       case STATE_DELETED:
         return fireEvent(EVENTNAME_DELETE);
 
+      case STATE_INIT:
       default:
-        throw new RuntimeException(String.format("The state %s is not a valid Task state.", state));
+        throw new ProcessEngineException(String.format("Task %s cannot transition into state %s.", id, state));
+    }
+  }
+
+  public boolean dispatchPropertyUpdates() {
+    if (lifecycleState == TaskState.STATE_CREATED) {
+      return fireEvent(TaskListener.EVENTNAME_UPDATE) && fireAssignmentEvent();
+    }
+    else {
+      // silently ignore; no events are triggered in the other states
+      return true;
     }
   }
 
@@ -1674,8 +1662,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public static enum TaskState {
 
+    STATE_INIT,
     STATE_CREATED,
-    STATE_UPDATING,
     STATE_COMPLETED,
     STATE_DELETED
   }
