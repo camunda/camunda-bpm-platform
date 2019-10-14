@@ -205,7 +205,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.skipCustomListeners = execution.isSkipCustomListeners();
     setTenantId(execution.getTenantId());
     execution.addTask(this);
-    insert();
   }
 
   /**
@@ -214,7 +213,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public TaskEntity(CaseExecutionEntity caseExecution) {
     this(TaskState.STATE_INIT);
     setCaseExecution(caseExecution);
-    insert();
   }
 
   public void insert() {
@@ -1010,20 +1008,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  /**
-   * @return true if invoking the listener was successful;
-   *   if not successful, either false is returned (case: BPMN error propagation)
-   *   or an exception is thrown
-   */
-  public boolean fireTimeoutEvent(String timeoutId) {
-    TaskListener taskListener = getTimeoutListener(timeoutId);
-    if (taskListener == null) {
-      throw LOG.invokeTaskListenerException(new NotFoundException("Cannot find timeout taskListener with id '"
-          + timeoutId + "' for task " + this.id));
-    }
-    return invokeListener(TaskListener.EVENTNAME_TIMEOUT, taskListener);
-  }
-
   protected TaskListener getTimeoutListener(String timeoutId) {
     TaskDefinition resolvedTaskDefinition = getTaskDefinition();
     if (resolvedTaskDefinition == null) {
@@ -1147,7 +1131,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
-  public boolean dispatchPropertyUpdates() {
+  public boolean triggerUpdateEvent() {
     if (lifecycleState == TaskState.STATE_CREATED) {
       return fireEvent(TaskListener.EVENTNAME_UPDATE) && fireAssignmentEvent();
     }
@@ -1155,6 +1139,20 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       // silently ignore; no events are triggered in the other states
       return true;
     }
+  }
+
+  /**
+   * @return true if invoking the listener was successful;
+   *   if not successful, either false is returned (case: BPMN error propagation)
+   *   or an exception is thrown
+   */
+  public boolean triggerTimeoutEvent(String timeoutId) {
+    TaskListener taskListener = getTimeoutListener(timeoutId);
+    if (taskListener == null) {
+      throw LOG.invokeTaskListenerException(new NotFoundException("Cannot find timeout taskListener with id '"
+                                                                      + timeoutId + "' for task " + this.id));
+    }
+    return invokeListener(TaskListener.EVENTNAME_TIMEOUT, taskListener);
   }
 
   protected boolean fireAssignmentEvent() {

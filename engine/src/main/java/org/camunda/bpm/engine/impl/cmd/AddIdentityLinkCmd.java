@@ -89,7 +89,7 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
     } else {
       task.addIdentityLink(userId, groupId, type);
     }
-    task.dispatchPropertyUpdates();
+    task.triggerUpdateEvent();
 
     return null;
   }

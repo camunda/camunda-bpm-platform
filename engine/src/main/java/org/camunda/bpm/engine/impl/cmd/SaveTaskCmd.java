@@ -70,7 +70,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
       operation = UserOperationLogEntry.OPERATION_TYPE_UPDATE;
 
       task.fireAuthorizationProvider();
-      task.dispatchPropertyUpdates();
+      task.triggerUpdateEvent();
     }
 
     task.createHistoricTaskDetails(operation);

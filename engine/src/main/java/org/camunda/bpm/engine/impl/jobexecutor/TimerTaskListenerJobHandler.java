@@ -45,7 +45,7 @@ public class TimerTaskListenerJobHandler extends TimerEventJobHandler {
     }
 
     if (targetTask != null) {
-      targetTask.fireTimeoutEvent(configuration.getTimerElementSecondaryKey());
+      targetTask.triggerTimeoutEvent(configuration.getTimerElementSecondaryKey());
     } else {
       throw new ProcessEngineException("Error while triggering timeout task listener '" + configuration.getTimerElementSecondaryKey()
           + "': cannot find task for activity id '" + configuration.getTimerElementKey() + "'.");

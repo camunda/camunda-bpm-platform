@@ -54,7 +54,7 @@ public class DelegateTaskCmd implements Command<Object>, Serializable {
 
     task.delegate(userId);
 
-    task.dispatchPropertyUpdates();
+    task.triggerUpdateEvent();
     task.createHistoricTaskDetails(UserOperationLogEntry.OPERATION_TYPE_DELEGATE);
 
     return null;

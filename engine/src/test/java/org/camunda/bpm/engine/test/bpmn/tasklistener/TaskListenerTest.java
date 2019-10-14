@@ -95,6 +95,7 @@ public class TaskListenerTest {
 
     AssignmentTaskListener.reset();
     UpdateTaskListener.reset();
+    ModifyingTaskListener.reset();
   }
 
   @Before
@@ -531,6 +532,24 @@ public class TaskListenerTest {
   }
 
   @Test
+  public void testUpdateTaskListenerOnTaskFormSubmit() {
+    // given
+    final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
+    testRule.deploy(process);
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+
+    // when
+    taskService.delegateTask(task.getId(), "john");
+    processEngineConfiguration.getFormService().submitTaskForm(task.getId(), null);
+
+    // then
+    // first update event comes from delegating the task,
+    // setting it's delegation state to PENDING
+    assertEquals(2, UpdateTaskListener.eventCounter);
+  }
+
+  @Test
   public void testUpdateTaskListenerOnPropertyUpdate() {
     // given
     final BpmnModelInstance process = createModelUpdateListenerOnUserTask();
@@ -562,6 +581,91 @@ public class TaskListenerTest {
 
     // then
     assertEquals(1, UpdateTaskListener.eventCounter);
+  }
+
+  @Test
+  public void testNoUpdateEventAfterCreateTaskListenerUpdatesProperties() {
+    // given
+    final BpmnModelInstance process =
+        createModelUpdateListenerOnUserTaskAndModifyOn(TaskListener.EVENTNAME_CREATE);
+    testRule.deploy(process);
+
+    // when
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+
+    // then
+    assertEquals(TaskListener.EVENTNAME_CREATE, ModifyingTaskListener.eventName);
+    assertEquals(0, UpdateTaskListener.eventCounter);
+  }
+
+  @Test
+  public void testNoUpdateEventAfterUpdateTaskListenerUpdatesProperties() {
+    // given
+    final BpmnModelInstance process =
+        createModelUpdateListenerOnUserTaskAndModifyOn(TaskListener.EVENTNAME_UPDATE);
+    testRule.deploy(process);
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+
+    // when
+    taskService.setPriority(task.getId(), 3000);
+
+    // then
+    assertEquals(TaskListener.EVENTNAME_UPDATE, ModifyingTaskListener.eventName);
+    // only the initial, first update event is expected
+    assertEquals(1, UpdateTaskListener.eventCounter);
+  }
+
+  @Test
+  public void testNoUpdateEventAfterAssignmentTaskListenerUpdatesProperties() {
+    // given
+    final BpmnModelInstance process =
+        createModelUpdateListenerOnUserTaskAndModifyOn(TaskListener.EVENTNAME_ASSIGNMENT);
+    testRule.deploy(process);
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+
+    // when
+    taskService.setAssignee(task.getId(), "john");
+
+    // then
+    assertEquals(TaskListener.EVENTNAME_ASSIGNMENT, ModifyingTaskListener.eventName);
+    // only one update event is expected, from the initial assignment
+    assertEquals(1, UpdateTaskListener.eventCounter);
+  }
+
+  @Test
+  public void testNoUpdateEventAfterCompleteTaskListenerUpdatesProperties() {
+    // given
+    final BpmnModelInstance process =
+        createModelUpdateListenerOnUserTaskAndModifyOn(TaskListener.EVENTNAME_COMPLETE);
+    testRule.deploy(process);
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+
+    // when
+    taskService.complete(task.getId());
+
+    // then
+    assertEquals(TaskListener.EVENTNAME_COMPLETE, ModifyingTaskListener.eventName);
+    assertEquals(0, UpdateTaskListener.eventCounter);
+  }
+
+  @Test
+  public void testNoUpdateEventAfterDeleteTaskListenerUpdatesProperties() {
+    // given
+    final BpmnModelInstance process =
+        createModelUpdateListenerOnUserTaskAndModifyOn(TaskListener.EVENTNAME_DELETE);
+    testRule.deploy(process);
+    ProcessInstance processInstance = engineRule.getRuntimeService()
+                                                .startProcessInstanceByKey("process");
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), "Trigger Delete Event");
+
+    // then
+    assertEquals(TaskListener.EVENTNAME_DELETE, ModifyingTaskListener.eventName);
+    assertEquals(0, UpdateTaskListener.eventCounter);
   }
 
   @Test
@@ -1028,13 +1132,23 @@ public class TaskListenerTest {
 
   protected BpmnModelInstance createModelUpdateListenerOnUserTask() {
     return Bpmn.createExecutableProcess("process")
-               .startEvent()
-               .userTask("task")
-               .camundaTaskListenerClass(TaskListener.EVENTNAME_UPDATE,
-                                         UpdateTaskListener.class.getName())
-               .userTask("task2")
-               .endEvent()
-               .done();
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerClass(TaskListener.EVENTNAME_UPDATE, UpdateTaskListener.class)
+          .userTask("task2")
+        .endEvent()
+        .done();
+  }
+
+  protected BpmnModelInstance createModelUpdateListenerOnUserTaskAndModifyOn(String modifyOnEvent) {
+    return Bpmn.createExecutableProcess("process")
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerClass(modifyOnEvent, ModifyingTaskListener.class)
+            .camundaTaskListenerClass(TaskListener.EVENTNAME_UPDATE, UpdateTaskListener.class)
+        .userTask("task2")
+        .endEvent()
+        .done();
   }
 
   protected BpmnModelInstance createModelThrowErrorInListenerAndCatchOnUserTask(String eventName) {
@@ -1139,6 +1253,24 @@ public class TaskListenerTest {
 
     public static void reset() {
       eventCounter = 0;
+    }
+  }
+
+  public static class ModifyingTaskListener implements TaskListener {
+
+    public static String eventName;
+
+    @Override
+    public void notify(DelegateTask delegateTask) {
+      eventName = delegateTask.getEventName();
+
+      delegateTask.setAssignee("demo");
+      delegateTask.setOwner("john");
+      delegateTask.setDueDate(new Date());
+    }
+
+    public static void reset() {
+      eventName = null;
     }
   }
 
