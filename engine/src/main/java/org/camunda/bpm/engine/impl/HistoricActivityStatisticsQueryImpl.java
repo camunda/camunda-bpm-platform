@@ -47,6 +47,8 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
   protected Date finishedBefore;
   protected Date finishedAfter;
 
+  protected String[] processInstanceIds;
+
   public HistoricActivityStatisticsQueryImpl(String processDefinitionId, CommandExecutor commandExecutor) {
     super(commandExecutor);
     this.processDefinitionId = processDefinitionId;
@@ -91,6 +93,13 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
     return this;
   }
 
+  @Override
+  public HistoricActivityStatisticsQuery processInstanceIdIn(String... processInstanceIds) {
+    ensureNotNull("processInstanceIds", (Object[]) processInstanceIds);
+    this.processInstanceIds = processInstanceIds;
+    return this;
+  }
+
   public HistoricActivityStatisticsQuery orderByActivityId() {
     return orderBy(HistoricActivityStatisticsQueryProperty.ACTIVITY_ID_);
   }
@@ -132,6 +141,10 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
 
   public boolean isIncludeCompleteScope() {
     return includeCompleteScope;
+  }
+
+  public String[] getProcessInstanceIds() {
+    return processInstanceIds;
   }
 
 }

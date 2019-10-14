@@ -16,17 +16,20 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
-import org.camunda.bpm.engine.rest.dto.history.HistoricActivityStatisticsDto;
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportResultDto;
+import java.util.List;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import java.util.Date;
-import java.util.List;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportResultDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricActivityStatisticsDto;
 
 /**
 *
@@ -42,10 +45,7 @@ public interface HistoricProcessDefinitionRestService {
   @GET
   @Path("/{id}/statistics")
   @Produces(MediaType.APPLICATION_JSON)
-  public List<HistoricActivityStatisticsDto> getHistoricActivityStatistics(@Context UriInfo uriInfo, @PathParam("id") String processDefinitionId,
-                                                                           @QueryParam("canceled") Boolean includeCanceled,
-      @QueryParam("finished") Boolean includeFinished, @QueryParam("completeScope") Boolean includeCompleteScope,
-      @QueryParam("sortBy") String sortBy, @QueryParam("sortOrder") String sortOrder);
+  public List<HistoricActivityStatisticsDto> getHistoricActivityStatistics(@Context UriInfo uriInfo, @PathParam("id") String processDefinitionId);
 
   @GET
   @Path("/cleanable-process-instance-report")
