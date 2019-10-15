@@ -121,7 +121,7 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
       dto.applyTo(modificationBuilder, engine, objectMapper);
 
       if (dto.getAnnotation() != null) {
-        modificationBuilder.annotation(dto.getAnnotation());
+        modificationBuilder.setAnnotation(dto.getAnnotation());
       }
 
       modificationBuilder.execute(dto.isSkipCustomListeners(), dto.isSkipIoMappings());
@@ -138,7 +138,7 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
       dto.applyTo(modificationBuilder, engine, objectMapper);
 
       if (dto.getAnnotation() != null) {
-        modificationBuilder.annotation(dto.getAnnotation());
+        modificationBuilder.setAnnotation(dto.getAnnotation());
       }
 
       try {

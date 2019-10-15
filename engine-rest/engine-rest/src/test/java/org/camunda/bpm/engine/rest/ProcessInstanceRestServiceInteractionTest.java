@@ -3097,7 +3097,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     InOrder inOrder = inOrder(mockModificationBuilder);
     inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId");
-    inOrder.verify(mockModificationBuilder).annotation("anAnnotation");
+    inOrder.verify(mockModificationBuilder).setAnnotation("anAnnotation");
 
 
     inOrder.verify(mockModificationBuilder).execute(false, false);
@@ -3544,7 +3544,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     InOrder inOrder = inOrder(mockModificationBuilder);
     inOrder.verify(mockModificationBuilder).cancelAllForActivity("activityId");
-    inOrder.verify(mockModificationBuilder).annotation("anAnnotation");
+    inOrder.verify(mockModificationBuilder).setAnnotation("anAnnotation");
 
     inOrder.verify(mockModificationBuilder).executeAsync(false, false);
 

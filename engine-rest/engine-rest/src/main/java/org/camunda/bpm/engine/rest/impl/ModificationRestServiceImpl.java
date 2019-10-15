@@ -83,7 +83,7 @@ public class ModificationRestServiceImpl extends AbstractRestProcessEngineAware 
     }
 
     if (dto.getAnnotation() != null) {
-      builder.annotation(dto.getAnnotation());
+      builder.setAnnotation(dto.getAnnotation());
     }
 
     return builder;

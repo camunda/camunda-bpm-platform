@@ -766,7 +766,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
     verify(modificationBuilderMock).skipIoMappings();
     verify(modificationBuilderMock).cancelAllForActivity("activityId");
-    verify(modificationBuilderMock).annotation("anAnnotation");
+    verify(modificationBuilderMock).setAnnotation("anAnnotation");
     verify(modificationBuilderMock).execute();
   }
 
@@ -793,7 +793,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
     verify(modificationBuilderMock).skipCustomListeners();
     verify(modificationBuilderMock).startBeforeActivity("activityId");
-    verify(modificationBuilderMock).annotation("anAnnotation");
+    verify(modificationBuilderMock).setAnnotation("anAnnotation");
     verify(modificationBuilderMock).executeAsync();
   }
 
