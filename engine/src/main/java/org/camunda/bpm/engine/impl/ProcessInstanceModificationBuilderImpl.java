@@ -233,7 +233,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   }
 
   @Override
-  public ProcessInstanceModificationBuilder annotation(String annotation) {
+  public ProcessInstanceModificationBuilder setAnnotation(String annotation) {
     ensureNotNull(NotValidException.class, "Annotation must not be null", "annotation", annotation);
     this.annotation = annotation;
     return this;
@@ -326,7 +326,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return annotation;
   }
 
-  public void setAnnotation(String annotation) {
+  public void setAnnotationInternal(String annotation) {
     this.annotation = annotation;
   }
 }

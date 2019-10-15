@@ -127,7 +127,7 @@ public class ModificationBuilderImpl implements ModificationBuilder {
   }
 
   @Override
-  public ModificationBuilder annotation(String annotation) {
+  public ModificationBuilder setAnnotation(String annotation) {
     this.annotation = annotation;
     return this;
   }
@@ -185,7 +185,7 @@ public class ModificationBuilderImpl implements ModificationBuilder {
     return annotation;
   }
 
-  public void setAnnotation(String annotation) {
+  public void setAnnotationInternal(String annotation) {
     this.annotation = annotation;
   }
 }

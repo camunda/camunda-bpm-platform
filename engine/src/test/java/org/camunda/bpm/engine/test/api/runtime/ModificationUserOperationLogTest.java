@@ -201,7 +201,7 @@ public class ModificationUserOperationLogTest {
     runtimeService.createModification(processDefinition.getId())
         .cancelAllForActivity("user1")
         .processInstanceIds(Arrays.asList(processInstance.getId()))
-        .annotation(annotation)
+        .setAnnotation(annotation)
         .execute();
 
     identityService.clearAuthentication();
@@ -237,7 +237,7 @@ public class ModificationUserOperationLogTest {
     runtimeService.createModification(processDefinition.getId())
         .startAfterActivity("user1")
         .processInstanceIds(Arrays.asList(processInstance.getId()))
-        .annotation(annotation)
+        .setAnnotation(annotation)
         .executeAsync();
 
     identityService.clearAuthentication();
@@ -272,7 +272,7 @@ public class ModificationUserOperationLogTest {
     runtimeService.createProcessInstanceModification(processInstance.getId())
         .startBeforeActivity("user1")
         .cancelAllForActivity("user1")
-        .annotation(annotation)
+        .setAnnotation(annotation)
         .execute();
 
     identityService.clearAuthentication();
@@ -299,7 +299,7 @@ public class ModificationUserOperationLogTest {
     // when
     runtimeService.createProcessInstanceModification(processInstance.getId())
         .cancelActivityInstance("user1")
-        .annotation(annotation)
+        .setAnnotation(annotation)
         .executeAsync();
 
     identityService.clearAuthentication();
