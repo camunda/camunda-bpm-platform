@@ -338,8 +338,13 @@
           and RES.TENANT_ID_ is null
         </if>
       </if>
-      <if test="versionTag != null">
-        and RES.VERSION_TAG_ = #{versionTag}
+      <if test="isVersionTagSet">
+        <if test="versionTag != null">
+          and RES.VERSION_TAG_ = #{versionTag}
+        </if>
+        <if test="versionTag == null">
+          and RES.VERSION_TAG_ is null
+        </if>
       </if>
       <if test="versionTagLike != null">
         and RES.VERSION_TAG_ like #{versionTagLike} ESCAPE ${escapeChar}
