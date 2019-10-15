@@ -19,10 +19,12 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.UnlockJobCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.interceptor.ProcessDataLoggingContext;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 
 import java.util.List;
@@ -50,7 +52,8 @@ public class ExecuteJobsRunnable implements Runnable {
     final JobExecutorContext jobExecutorContext = new JobExecutorContext();
 
     final List<String> currentProcessorJobQueue = jobExecutorContext.getCurrentProcessorJobQueue();
-    CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    ProcessEngineConfigurationImpl engineConfiguration = processEngine.getProcessEngineConfiguration();
+    CommandExecutor commandExecutor = engineConfiguration.getCommandExecutorTxRequired();
 
     currentProcessorJobQueue.addAll(jobIds);
 
@@ -62,15 +65,21 @@ public class ExecuteJobsRunnable implements Runnable {
       while (!currentProcessorJobQueue.isEmpty()) {
 
         String nextJobId = currentProcessorJobQueue.remove(0);
-        if(jobExecutor.isActive()) {
+        if (jobExecutor.isActive()) {
           JobFailureCollector jobFailureCollector = new JobFailureCollector(nextJobId);
           try {
-            ExecuteJobHelper.executeJob(nextJobId, commandExecutor, jobFailureCollector, new ExecuteJobsCmd(nextJobId, jobFailureCollector));
-          }
-          catch(Throwable t) {
-            if(ProcessEngineLogger.shouldLogJobException(processEngine.getProcessEngineConfiguration(), jobFailureCollector.getJob())) {
+            ExecuteJobHelper.executeJob(nextJobId, commandExecutor, jobFailureCollector, new ExecuteJobsCmd(nextJobId, jobFailureCollector), engineConfiguration);
+          } catch(Throwable t) {
+            if (ProcessEngineLogger.shouldLogJobException(engineConfiguration, jobFailureCollector.getJob())) {
               ExecuteJobHelper.LOGGING_HANDLER.exceptionWhileExecutingJob(nextJobId, t);
             }
+          } finally {
+            /*
+             * clear MDC of potential leftovers from command execution
+             * that have not been cleared in Context#removeCommandInvocationContext()
+             * in case of exceptions in command execution
+             */
+            new ProcessDataLoggingContext(engineConfiguration).clearMdc();
           }
         } else {
             try {

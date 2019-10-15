@@ -18,9 +18,11 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.interceptor.ProcessDataLoggingContext;
 
 public class ExecuteJobHelper {
 
@@ -30,7 +32,7 @@ public class ExecuteJobHelper {
 
     @Override
     public void exceptionWhileExecutingJob(String jobId, Throwable exception) {
-      
+
       // Default behavior, just log exception
       LOG.exceptionWhileExecutingJob(jobId, exception);
     }
@@ -46,6 +48,11 @@ public class ExecuteJobHelper {
   }
 
   public static void executeJob(String nextJobId, CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector, Command<Void> cmd) {
+    executeJob(nextJobId, commandExecutor, jobFailureCollector, cmd, null);
+  }
+
+  public static void executeJob(String nextJobId, CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector, Command<Void> cmd,
+      ProcessEngineConfigurationImpl configuration) {
     try {
       commandExecutor.execute(cmd);
     } catch (RuntimeException exception) {
@@ -57,7 +64,23 @@ public class ExecuteJobHelper {
       // wrap the exception and throw it to indicate the ExecuteJobCmd failed
       throw LOG.wrapJobExecutionFailure(jobFailureCollector, exception);
     } finally {
+      // preserve MDC properties before listener invocation and clear MDC for job listener
+      ProcessDataLoggingContext loggingContext = null;
+      if (configuration != null) {
+        loggingContext = new ProcessDataLoggingContext(configuration);
+        loggingContext.fetchCurrentContext();
+        loggingContext.clearMdc();
+      }
+      // invoke job listener
       invokeJobListener(commandExecutor, jobFailureCollector);
+      /*
+       * reset MDC properties after successful listener invocation,
+       * in case of an exception in the listener the logging context
+       * of the listener is preserved and used from here on
+       */
+      if (loggingContext != null) {
+        loggingContext.update();
+      }
     }
   }
 

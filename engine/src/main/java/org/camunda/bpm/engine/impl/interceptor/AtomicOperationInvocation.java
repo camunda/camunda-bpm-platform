@@ -54,7 +54,7 @@ public class AtomicOperationInvocation {
     this.performAsync = performAsync;
   }
 
-  public void execute(BpmnStackTrace stackTrace) {
+  public void execute(BpmnStackTrace stackTrace, ProcessDataLoggingContext loggingContext) {
 
     if(operation != PvmAtomicOperation.ACTIVITY_START_CANCEL_SCOPE
        && operation != PvmAtomicOperation.ACTIVITY_START_INTERRUPT_SCOPE
@@ -89,6 +89,9 @@ public class AtomicOperationInvocation {
     activityName = execution.getCurrentActivityName();
     stackTrace.add(this);
 
+
+    boolean popSection = loggingContext.pushSection(execution);
+
     try {
       Context.setExecutionContext(execution);
       if(!performAsync) {
@@ -97,6 +100,9 @@ public class AtomicOperationInvocation {
       }
       else {
         execution.scheduleAtomicOperationAsync(this);
+      }
+      if (popSection) {
+        loggingContext.popSection();
       }
     } finally {
       Context.removeExecutionContext();
