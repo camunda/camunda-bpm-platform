@@ -59,7 +59,8 @@ public abstract class AbstractModificationCmd<T> implements Command<T> {
   protected void writeUserOperationLog(CommandContext commandContext,
       ProcessDefinition processDefinition,
       int numInstances,
-      boolean async) {
+      boolean async,
+      String annotation) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
     propertyChanges.add(new PropertyChange("nrOfInstances",
@@ -72,7 +73,8 @@ public abstract class AbstractModificationCmd<T> implements Command<T> {
           null,
           processDefinition.getId(),
           processDefinition.getKey(),
-          propertyChanges);
+          propertyChanges,
+          annotation);
   }
 
   protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String processDefinitionId) {

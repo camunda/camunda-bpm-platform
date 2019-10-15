@@ -308,4 +308,8 @@ public class UserOperationLogContextEntryBuilder {
     return this;
   }
 
+  public UserOperationLogContextEntryBuilder annotation(String annotation) {
+    entry.setAnnotation(annotation);
+    return this;
+  }
 }

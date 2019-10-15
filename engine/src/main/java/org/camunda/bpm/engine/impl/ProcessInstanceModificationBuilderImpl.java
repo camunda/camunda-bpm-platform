@@ -56,6 +56,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
 
   protected boolean skipCustomListeners = false;
   protected boolean skipIoMappings = false;
+  protected String annotation;
 
   protected List<AbstractProcessInstanceModificationCommand> operations = new ArrayList<AbstractProcessInstanceModificationCommand>();
 
@@ -231,6 +232,12 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
+  @Override
+  public ProcessInstanceModificationBuilder setAnnotation(String annotation) {
+    ensureNotNull(NotValidException.class, "Annotation must not be null", "annotation", annotation);
+    this.annotation = annotation;
+    return this;
+  }
 
   @Override
   public void execute() {
@@ -313,5 +320,13 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
 
   public void setModificationReason(String modificationReason) {
     this.modificationReason = modificationReason;
+  }
+
+  public String getAnnotation() {
+    return annotation;
+  }
+
+  public void setAnnotationInternal(String annotation) {
+    this.annotation = annotation;
   }
 }

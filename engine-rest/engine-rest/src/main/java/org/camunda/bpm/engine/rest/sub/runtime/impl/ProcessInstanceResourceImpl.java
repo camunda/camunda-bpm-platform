@@ -120,6 +120,10 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
 
       dto.applyTo(modificationBuilder, engine, objectMapper);
 
+      if (dto.getAnnotation() != null) {
+        modificationBuilder.setAnnotation(dto.getAnnotation());
+      }
+
       modificationBuilder.execute(dto.isSkipCustomListeners(), dto.isSkipIoMappings());
     }
   }
@@ -132,6 +136,10 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
           engine.getRuntimeService().createProcessInstanceModification(processInstanceId);
 
       dto.applyTo(modificationBuilder, engine, objectMapper);
+
+      if (dto.getAnnotation() != null) {
+        modificationBuilder.setAnnotation(dto.getAnnotation());
+      }
 
       try {
         batch = modificationBuilder.executeAsync(dto.isSkipCustomListeners(), dto.isSkipIoMappings());

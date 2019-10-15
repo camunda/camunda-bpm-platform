@@ -84,6 +84,9 @@ public interface ModificationBuilder extends InstantiationBuilder<ModificationBu
    */
   ModificationBuilder skipIoMappings();
 
+  /** Provides annotation for the current modification. */
+  ModificationBuilder setAnnotation(String annotation);
+
   /**
    * Execute the modification synchronously.
    *

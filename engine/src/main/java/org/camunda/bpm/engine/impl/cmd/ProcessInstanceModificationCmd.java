@@ -47,6 +47,7 @@ public class ProcessInstanceModificationCmd extends AbstractModificationCmd<Void
   public Void execute(final CommandContext commandContext) {
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
     final Collection<String> processInstanceIds = collectProcessInstanceIds(commandContext);
+    String annotation = builder.getAnnotation();
 
     ensureNotEmpty(BadUserRequestException.class, "Modification instructions cannot be empty", instructions);
     ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty", "Process instance ids", processInstanceIds);
@@ -56,7 +57,7 @@ public class ProcessInstanceModificationCmd extends AbstractModificationCmd<Void
     ensureNotNull(BadUserRequestException.class, "Process definition id cannot be null", processDefinition);
 
     if (writeUserOperationLog) {
-      writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), false);
+      writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), false, annotation);
     }
 
     boolean skipCustomListeners = builder.isSkipCustomListeners();

@@ -66,7 +66,8 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
       processInstanceId,
       null,
       null,
-      Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+      Collections.singletonList(PropertyChange.EMPTY_CHANGE),
+      builder.getAnnotation());
 
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getModificationOperations();
     BatchEntity batch = createBatch(commandContext, instructions, processInstance);

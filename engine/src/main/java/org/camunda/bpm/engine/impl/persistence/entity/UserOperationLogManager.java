@@ -249,16 +249,22 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logProcessInstanceOperation(String operation, String processInstanceId, String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges) {
+    logProcessInstanceOperation(operation, processInstanceId, processDefinitionId, processDefinitionKey, propertyChanges, null);
+  }
+
+  public void logProcessInstanceOperation(String operation, String processInstanceId, String processDefinitionId, String processDefinitionKey, List<PropertyChange> propertyChanges, String annotation) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
-      UserOperationLogContextEntryBuilder entryBuilder =
-          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.PROCESS_INSTANCE)
+      UserOperationLogContextEntryBuilder entryBuilder =  UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.PROCESS_INSTANCE)
             .propertyChanges(propertyChanges)
             .processInstanceId(processInstanceId)
             .processDefinitionId(processDefinitionId)
             .processDefinitionKey(processDefinitionKey)
             .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+      if (annotation != null) {
+        entryBuilder.annotation(annotation);
+      }
 
       if(processInstanceId != null) {
         ExecutionEntity instance = getProcessInstanceManager().findExecutionById(processInstanceId);
