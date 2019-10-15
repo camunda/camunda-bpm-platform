@@ -57,7 +57,7 @@ public class ContextLogger extends ProcessEngineLogger {
   }
 
   public void bpmnStackTrace(String string) {
-    logError(
+    logDebug(
         "006",
         string);
   }
