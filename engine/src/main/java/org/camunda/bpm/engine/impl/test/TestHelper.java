@@ -154,7 +154,7 @@ public abstract class TestHelper {
 
   public static void deleteDeployment(ProcessEngine processEngine, String deploymentId) {
     if(deploymentId != null) {
-      processEngine.getRepositoryService().deleteDeployment(deploymentId, true);
+      processEngine.getRepositoryService().deleteDeployment(deploymentId, true, true, true);
     }
   }
 

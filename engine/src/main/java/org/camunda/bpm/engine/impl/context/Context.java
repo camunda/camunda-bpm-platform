@@ -77,7 +77,17 @@ public class Context {
   }
 
   public static void removeCommandInvocationContext() {
-    getStack(commandInvocationContextThreadLocal).pop();
+    Stack<CommandInvocationContext> stack = getStack(commandInvocationContextThreadLocal);
+    CommandInvocationContext currentContext = stack.pop();
+    if (stack.isEmpty()) {
+      // do not clear when called from JobExecutor, will be cleared there after logging
+      if (getJobExecutorContext() == null) {
+        currentContext.getLoggingContext().clearMdc();
+      }
+    } else {
+      // reset the MDC to the logging context of the outer command invocation
+      stack.peek().getLoggingContext().update();
+    }
   }
 
   public static ProcessEngineConfigurationImpl getProcessEngineConfiguration() {

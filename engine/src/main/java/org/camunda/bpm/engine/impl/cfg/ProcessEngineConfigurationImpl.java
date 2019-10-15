@@ -798,6 +798,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // max results limit
   protected int queryMaxResultsLimit = Integer.MAX_VALUE;
 
+  // logging context property names (with default values)
+  protected String logginContextActivityId = "activityId";
+  protected String logginContextApplicationName = "applicationName";
+  protected String logginContextBusinessKey;// default == null => disabled by default
+  protected String logginContextProcessDefinitionId = "processDefinitionId";
+  protected String logginContextProcessInstanceId = "processInstanceId";
+  protected String logginContextTenantId = "tenantId";
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -4358,6 +4366,60 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setQueryMaxResultsLimit(int queryMaxResultsLimit) {
     this.queryMaxResultsLimit = queryMaxResultsLimit;
+    return this;
+  }
+
+  public String getLogginContextActivityId() {
+    return logginContextActivityId;
+  }
+
+  public ProcessEngineConfigurationImpl setLogginContextActivityId(String logginContextActivityId) {
+    this.logginContextActivityId = logginContextActivityId;
+    return this;
+  }
+
+  public String getLogginContextApplicationName() {
+    return logginContextApplicationName;
+  }
+
+  public ProcessEngineConfigurationImpl setLogginContextApplicationName(String logginContextApplicationName) {
+    this.logginContextApplicationName = logginContextApplicationName;
+    return this;
+  }
+
+  public String getLogginContextBusinessKey() {
+    return logginContextBusinessKey;
+  }
+
+  public ProcessEngineConfigurationImpl setLogginContextBusinessKey(String logginContextBusinessKey) {
+    this.logginContextBusinessKey = logginContextBusinessKey;
+    return this;
+  }
+
+  public String getLogginContextProcessDefinitionId() {
+    return logginContextProcessDefinitionId;
+  }
+
+  public ProcessEngineConfigurationImpl setLogginContextProcessDefinitionId(String logginContextProcessDefinitionId) {
+    this.logginContextProcessDefinitionId = logginContextProcessDefinitionId;
+    return this;
+  }
+
+  public String getLogginContextProcessInstanceId() {
+    return logginContextProcessInstanceId;
+  }
+
+  public ProcessEngineConfigurationImpl setLogginContextProcessInstanceId(String logginContextProcessInstanceId) {
+    this.logginContextProcessInstanceId = logginContextProcessInstanceId;
+    return this;
+  }
+
+  public String getLogginContextTenantId() {
+    return logginContextTenantId;
+  }
+
+  public ProcessEngineConfigurationImpl setLogginContextTenantId(String logginContextTenantId) {
+    this.logginContextTenantId = logginContextTenantId;
     return this;
   }
 

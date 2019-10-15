@@ -90,7 +90,7 @@ public class CommandContextInterceptor extends CommandInterceptor {
     boolean isNew = ProcessEngineContextImpl.consume();
     boolean openNew = (context == null || isNew);
 
-    CommandInvocationContext commandInvocationContext = new CommandInvocationContext(command);
+    CommandInvocationContext commandInvocationContext = new CommandInvocationContext(command, processEngineConfiguration);
     Context.setCommandInvocationContext(commandInvocationContext);
 
     try {

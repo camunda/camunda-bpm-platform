@@ -16,6 +16,21 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.delegate.TaskListener.EVENTNAME_DELETE;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.BpmnError;
@@ -51,6 +66,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
+import org.camunda.bpm.engine.impl.interceptor.CommandInvocationContext;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -65,21 +81,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.camunda.bpm.engine.delegate.TaskListener.EVENTNAME_DELETE;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -1011,15 +1012,25 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   protected boolean invokeListener(String taskEventName, TaskListener taskListener) {
+    boolean popLoggingContext = false;
+    CommandInvocationContext commandInvocationContext = Context.getCommandInvocationContext();
     CoreExecution execution = getExecution();
     if (execution == null) {
       execution = getCaseExecution();
+    } else {
+      if (commandInvocationContext != null) {
+        popLoggingContext = commandInvocationContext.getLoggingContext().pushSection((ExecutionEntity) execution);
+      }
     }
     if (execution != null) {
       setEventName(taskEventName);
     }
     try {
-      return invokeListener(execution, taskEventName, taskListener);
+      boolean result = invokeListener(execution, taskEventName, taskListener);
+      if (popLoggingContext) {
+        commandInvocationContext.getLoggingContext().popSection();
+      }
+      return result;
     } catch (Exception e) {
       throw LOG.invokeTaskListenerException(e);
     }
