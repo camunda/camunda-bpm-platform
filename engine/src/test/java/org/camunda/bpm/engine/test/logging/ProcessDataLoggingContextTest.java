@@ -436,7 +436,7 @@ public class ProcessDataLoggingContextTest {
   }
 
   @Test
-  @WatchLogger(loggerNames = CONTEXT_LOGGER, level = "ERROR")
+  @WatchLogger(loggerNames = CONTEXT_LOGGER, level = "DEBUG")
   public void shouldLogFailureFromNestedDelegateInOuterContext() {
     // given
     manageDeployment("failing.bpmn", Bpmn.createExecutableProcess(FAILING_PROCESS)
@@ -466,7 +466,7 @@ public class ProcessDataLoggingContextTest {
   }
 
   @Test
-  @WatchLogger(loggerNames = CONTEXT_LOGGER, level = "ERROR")
+  @WatchLogger(loggerNames = CONTEXT_LOGGER, level = "DEBUG")
   public void shouldLogFailureFromNestedExecutionListenerInOuterContext() {
     // given
     manageDeployment("failing.bpmn", Bpmn.createExecutableProcess(FAILING_PROCESS)
