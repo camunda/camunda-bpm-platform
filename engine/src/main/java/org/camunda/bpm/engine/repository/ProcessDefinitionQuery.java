@@ -157,6 +157,12 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    */
   ProcessDefinitionQuery versionTagLike(String versionTagLike);
 
+  /**
+   * Only selects process definitions without a version tag
+   * @return
+   */
+  ProcessDefinitionQuery withoutVersionTag();
+
   // Support for event subscriptions /////////////////////////////////////
 
   /**

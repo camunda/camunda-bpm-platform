@@ -80,6 +80,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected String[] tenantIds;
   protected boolean includeDefinitionsWithoutTenantId = false;
 
+  protected boolean isVersionTagSet = false;
   protected String versionTag;
   protected String versionTagLike;
 
@@ -259,6 +260,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQuery versionTag(String versionTag) {
     ensureNotNull("versionTag", versionTag);
     this.versionTag = versionTag;
+    this.isVersionTagSet = true;
 
     return this;
   }
@@ -266,6 +268,13 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQuery versionTagLike(String versionTagLike) {
     ensureNotNull("versionTagLike", versionTagLike);
     this.versionTagLike = versionTagLike;
+
+    return this;
+  }
+
+  public ProcessDefinitionQuery withoutVersionTag() {
+    this.isVersionTagSet = true;
+    this.versionTag = null;
 
     return this;
   }
