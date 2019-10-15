@@ -83,6 +83,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private Boolean includeDefinitionsWithoutTenantId;
   private String versionTag;
   private String versionTagLike;
+  private Boolean withoutVersionTag;
   private List<String> keys;
   private Boolean startableInTasklist;
   private Boolean notStartableInTasklist;
@@ -245,6 +246,11 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.versionTagLike = versionTagLike;
   }
 
+  @CamundaQueryParam(value = "withoutVersionTag", converter = BooleanConverter.class)
+  public void setWithoutVersionTag(Boolean withoutVersionTag) {
+    this.withoutVersionTag = withoutVersionTag;
+  }
+
   @CamundaQueryParam(value = "startableInTasklist", converter = BooleanConverter.class)
   public void setStartableInTasklist(Boolean startableInTasklist) {
     this.startableInTasklist = startableInTasklist;
@@ -350,6 +356,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     }
     if( versionTagLike != null) {
       query.versionTagLike(versionTagLike);
+    }
+    if (TRUE.equals(withoutVersionTag)) {
+      query.withoutVersionTag();
     }
     if (TRUE.equals(startableInTasklist)) {
       query.startableInTasklist();
