@@ -19,10 +19,12 @@ package org.camunda.bpm.engine.test.bpmn.el;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
@@ -88,6 +90,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testSetVariableByExpressionFromListener() {
     // given
     runtimeService.startProcessInstanceByKey("fieldInjectionTest", Variables.putValue("myCounter", 5));
