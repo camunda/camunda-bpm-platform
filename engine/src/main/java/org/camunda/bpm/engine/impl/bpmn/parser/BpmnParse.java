@@ -851,7 +851,7 @@ public class BpmnParse extends Parse {
   public void parseStartEvents(Element parentElement, ScopeImpl scope) {
     List<Element> startEventElements = parentElement.elements("startEvent");
     List<ActivityImpl> startEventActivities = new ArrayList<ActivityImpl>();
-    if(startEventElements.size() > 0) {
+    if (startEventElements.size() > 0) {
       for (Element startEventElement : startEventElements) {
 
         ActivityImpl startEventActivity = createActivityOnScope(startEventElement, scope);
@@ -867,20 +867,23 @@ public class BpmnParse extends Parse {
         ensureNoIoMappingDefined(startEventElement);
 
         parseExecutionListenersOnScope(startEventElement, startEventActivity);
-
-        for (BpmnParseListener parseListener : parseListeners) {
-          parseListener.parseStartEvent(startEventElement, scope, startEventActivity);
-        }
-
       }
     } else {
-      if(parentElement.getTagName().equals("subProcess") ) {
+      if (parentElement.getTagName().equals("subProcess") ) {
         addError("subProcess must define a startEvent element", parentElement);
       }
     }
     if (scope instanceof ProcessDefinitionEntity) {
       selectInitial(startEventActivities, (ProcessDefinitionEntity) scope, parentElement);
       parseStartFormHandlers(startEventElements, (ProcessDefinitionEntity) scope);
+    }
+
+    // invoke parse listeners
+    for (Element startEventElement : startEventElements) {
+      ActivityImpl startEventActivity = scope.getChildActivity(startEventElement.attribute("id"));
+      for (BpmnParseListener parseListener : parseListeners) {
+        parseListener.parseStartEvent(startEventElement, scope, startEventActivity);
+      }
     }
   }
 
@@ -898,7 +901,7 @@ public class BpmnParse extends Parse {
         }
       }
     }
-    // if there is a single start event, select it as initial, regardless of it's type:
+    // if there is a single start event, select it as initial, regardless of its type:
     if (initial == null && startEventActivities.size() == 1) {
       initial = startEventActivities.get(0);
     }
