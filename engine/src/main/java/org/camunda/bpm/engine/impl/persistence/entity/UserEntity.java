@@ -170,6 +170,10 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
     return result.isValid();
   }
 
+  public boolean hasNewPassword() {
+    return newPassword != null;
+  }
+
   public String toString() {
     return this.getClass().getSimpleName()
            + "[id=" + id

@@ -49,13 +49,13 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("user", user);
     ensureWhitelistedResourceId(commandContext, "User", user.getId());
-    
-    if(!skipPasswordPolicy && commandContext.getProcessEngineConfiguration().isEnablePasswordPolicy()) {
+
+    if(shouldCheckPasswordPolicy(commandContext)) {
       if(!user.checkPasswordAgainstPolicy()) {
         throw new ProcessEngineException("Password does not match policy");
       }
     }
-    
+
     IdentityOperationResult operationResult = commandContext
       .getWritableIdentityProvider()
       .saveUser(user);
@@ -63,5 +63,10 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
     commandContext.getOperationLogManager().logUserOperation(operationResult, user.getId());
 
     return null;
+  }
+
+  protected boolean shouldCheckPasswordPolicy(CommandContext commandContext) {
+    return user.hasNewPassword() && !skipPasswordPolicy
+        && commandContext.getProcessEngineConfiguration().isEnablePasswordPolicy();
   }
 }
