@@ -410,7 +410,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     String variableName = "varName";
     String variableValue = "varValue";
     String queryValue = variableName + "_eq_" + variableValue;
-    
+
     given()
     .queryParam("variables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -419,7 +419,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).matchVariableValuesIgnoreCase();
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
   }
@@ -429,7 +429,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     String variableName = "varName";
     String variableValue = "varValue";
     String queryValue = variableName + "_neq_" + variableValue;
-    
+
     given()
     .queryParam("variables", queryValue)
     .queryParam("variableNamesIgnoreCase", true)
@@ -438,7 +438,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).matchVariableNamesIgnoreCase();
     verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
   }
@@ -448,7 +448,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     String variableName = "varName";
     String variableValue = "varValue";
     String queryValue = variableName + "_neq_" + variableValue;
-    
+
     given()
     .queryParam("variables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -457,17 +457,17 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).matchVariableValuesIgnoreCase();
     verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
   }
-  
+
   @Test
   public void testVariableValuesLikeIgnoreCase() {
     String variableName = "varName";
     String variableValue = "varValue";
     String queryValue = variableName + "_like_" + variableValue;
-    
+
     given()
     .queryParam("variables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -476,7 +476,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).matchVariableValuesIgnoreCase();
     verify(mockedQuery).variableValueLike(variableName, variableValue);
   }
@@ -662,14 +662,14 @@ public class ProcessInstanceRestServiceQueryTest extends
     variableJson.put("name", "varName");
     variableJson.put("value", "varValue");
     variableJson.put("operator", "eq");
-    
+
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
-    
+
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     json.put("variableValuesIgnoreCase", true);
-    
+
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -678,7 +678,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).matchVariableValuesIgnoreCase();
     verify(mockedQuery).variableValueEquals("varName", "varValue");
   }
@@ -689,14 +689,14 @@ public class ProcessInstanceRestServiceQueryTest extends
     variableJson.put("name", "varName");
     variableJson.put("value", "varValue");
     variableJson.put("operator", "neq");
-    
+
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
-    
+
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     json.put("variableValuesIgnoreCase", true);
-    
+
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -705,7 +705,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).matchVariableValuesIgnoreCase();
     verify(mockedQuery).variableValueNotEquals("varName", "varValue");
   }
@@ -716,14 +716,14 @@ public class ProcessInstanceRestServiceQueryTest extends
     variableJson.put("name", "varName");
     variableJson.put("value", "varValue");
     variableJson.put("operator", "like");
-    
+
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
-    
+
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     json.put("variableValuesIgnoreCase", true);
-    
+
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -732,7 +732,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).matchVariableValuesIgnoreCase();
     verify(mockedQuery).variableValueLike("varName", "varValue");
   }
@@ -744,14 +744,14 @@ public class ProcessInstanceRestServiceQueryTest extends
     variableJson.put("name", "varName");
     variableJson.put("value", "varValue");
     variableJson.put("operator", "eq");
-    
+
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
-    
+
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     json.put("variableNamesIgnoreCase", true);
-    
+
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -760,7 +760,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).matchVariableNamesIgnoreCase();
     verify(mockedQuery).variableValueEquals("varName", "varValue");
   }
@@ -771,14 +771,14 @@ public class ProcessInstanceRestServiceQueryTest extends
     variableJson.put("name", "varName");
     variableJson.put("value", "varValue");
     variableJson.put("operator", "neq");
-    
+
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
     variables.add(variableJson);
-    
+
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     json.put("variableNamesIgnoreCase", true);
-    
+
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -787,7 +787,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(PROCESS_INSTANCE_QUERY_URL);
-    
+
     verify(mockedQuery).matchVariableNamesIgnoreCase();
     verify(mockedQuery).variableValueNotEquals("varName", "varValue");
   }

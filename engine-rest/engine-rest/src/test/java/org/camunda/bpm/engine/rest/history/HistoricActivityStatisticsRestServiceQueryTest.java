@@ -59,7 +59,7 @@ public class HistoricActivityStatisticsRestServiceQueryTest extends AbstractRest
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String HISTORY_URL = TEST_RESOURCE_ROOT_PATH + "/history";
   protected static final String HISTORIC_ACTIVITY_STATISTICS_URL = HISTORY_URL + "/process-definition/{id}/statistics";
 
@@ -291,6 +291,24 @@ public class HistoricActivityStatisticsRestServiceQueryTest extends AbstractRest
     verifyNoMoreInteractions(historicActivityStatisticsQuery);
   }
 
+
+  @Test
+  public void testProcessInstanceIdInFilter() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("processInstanceIdIn", "foo,bar")
+      .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
+
+    InOrder inOrder = Mockito.inOrder(historicActivityStatisticsQuery);
+    inOrder.verify(historicActivityStatisticsQuery).processInstanceIdIn(new String[] {"foo", "bar"});
+    inOrder.verify((HistoricActivityStatisticsQueryImpl)historicActivityStatisticsQuery)
+        .unboundedResultList();
+    inOrder.verifyNoMoreInteractions();
+  }
+
+
   @Test
   public void testSimpleTaskQuery() {
     Response response = given()
@@ -336,7 +354,7 @@ public class HistoricActivityStatisticsRestServiceQueryTest extends AbstractRest
   public void testSortByParameterOnly() {
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-      .queryParam("sortBy", "dueDate")
+      .queryParam("sortBy", "activityId")
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
@@ -362,7 +380,7 @@ public class HistoricActivityStatisticsRestServiceQueryTest extends AbstractRest
       .queryParam("sortBy", "activityId")
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("sortOrder parameter has invalid value: invalid"))
+      .body("message", equalTo("Cannot set query parameter 'sortOrder' to value 'invalid'"))
       .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
   }
 
@@ -374,7 +392,7 @@ public class HistoricActivityStatisticsRestServiceQueryTest extends AbstractRest
       .queryParam("sortBy", "invalid")
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("sortBy parameter has invalid value: invalid"))
+      .body("message", equalTo("Cannot set query parameter 'sortBy' to value 'invalid'"))
       .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
   }
 

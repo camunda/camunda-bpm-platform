@@ -21,6 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -892,6 +894,84 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(2, task.getCanceled());
     assertEquals(4, task.getFinished());
     assertEquals(0, task.getCompleteScope());
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
+  public void testQueryByProcessInstanceIds() {
+    // given
+    String processDefinitionId = getProcessDefinitionId();
+
+    startProcesses(3);
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+    String cancelledInstance = processInstances.get(0).getId();
+    String completedInstance = processInstances.get(1).getId();
+
+    runtimeService.deleteProcessInstance(cancelledInstance, "test");
+    Task task = taskService.createTaskQuery().processInstanceId(completedInstance).singleResult();
+    taskService.complete(task.getId());
+
+    // when
+    HistoricActivityStatisticsQuery query = historyService
+        .createHistoricActivityStatisticsQuery(processDefinitionId)
+        .processInstanceIdIn(cancelledInstance, completedInstance) // excluding the third running instance
+        .includeFinished()
+        .includeCompleteScope()
+        .includeCanceled()
+        .orderByActivityId()
+        .asc();
+    List<HistoricActivityStatistics> statistics = query.list();
+
+    // then
+    // end
+    HistoricActivityStatistics endStats = statistics.get(0);
+
+    assertEquals("end", endStats.getId());
+    assertEquals(0, endStats.getInstances());
+    assertEquals(0, endStats.getCanceled());
+    assertEquals(1, endStats.getFinished());
+    assertEquals(1, endStats.getCompleteScope());
+
+    // start
+    HistoricActivityStatistics startStats = statistics.get(1);
+
+    assertEquals("start", startStats.getId());
+    assertEquals(0, startStats.getInstances());
+    assertEquals(0, startStats.getCanceled());
+    assertEquals(2, startStats.getFinished());
+    assertEquals(0, startStats.getCompleteScope());
+
+    // task
+    HistoricActivityStatistics taskStats = statistics.get(2);
+
+    assertEquals("task", taskStats.getId());
+    assertEquals(0, taskStats.getInstances());
+    assertEquals(1, taskStats.getCanceled());
+    assertEquals(2, taskStats.getFinished());
+    assertEquals(0, taskStats.getCompleteScope());
+  }
+
+  public void testCheckProcessInstanceIdsForNull() {
+    // given
+    HistoricActivityStatisticsQuery query = historyService
+    .createHistoricActivityStatisticsQuery("foo");
+
+    // when 1
+    try {
+      query.processInstanceIdIn((String[]) null);
+      fail("exception expected");
+    } catch (NullValueException e) {
+      // then 1
+      assertTextPresent("processInstanceIds is null", e.getMessage());
+    }
+
+    // when 2
+    try {
+      query.processInstanceIdIn((String) null);
+      fail("exception expected");
+    } catch (NullValueException e) {
+      // then 2
+      assertTextPresent("processInstanceIds contains null value", e.getMessage());
+    }
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")

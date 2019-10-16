@@ -104,6 +104,14 @@
             <if test="finishedAfter != null">
             and PI.END_TIME_ &gt;= #{finishedAfter}
             </if>
+            <if test="processInstanceIds != null">
+            and PI.ID_ in
+            <foreach item="processInstanceId" index="index" collection="processInstanceIds"
+                open="(" separator="," close=")">
+            #{processInstanceId}
+            </foreach>
+            </if>
+            
           GROUP BY ACT_ID_
 
         ) RES
