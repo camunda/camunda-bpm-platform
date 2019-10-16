@@ -71,14 +71,6 @@ public class CustomPasswordPolicyTest {
   }
 
   @Test
-  public void testCustomPasswordPolicyWithNoPassword() {
-    thrown.expect(ProcessEngineException.class);
-    User user = identityService.newUser("user");
-    identityService.saveUser(user);
-    thrown.expectMessage("password is null");
-  }
-  
-  @Test
   public void testCustomPasswordPolicyWithCompliantPassword() {
     User user = identityService.newUser("user");
     user.setPassword("this-is-1-STRONG-password");
