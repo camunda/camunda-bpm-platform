@@ -38,11 +38,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HistoricProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements HistoricProcessDefinitionRestService {
 
-  public static final String QUERY_PARAM_STARTED_AFTER = "startedAfter";
-  public static final String QUERY_PARAM_STARTED_BEFORE = "startedBefore";
-  public static final String QUERY_PARAM_FINISHED_AFTER = "finishedAfter";
-  public static final String QUERY_PARAM_FINISHED_BEFORE = "finishedBefore";
-
   public HistoricProcessDefinitionRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
     super(processEngine.getName(), objectMapper);
   }
