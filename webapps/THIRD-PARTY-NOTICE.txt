@@ -20,163 +20,132 @@ This project incorporates components from the projects listed below. The origina
 14.   ansi-regex@2.1.1 (https://github.com/chalk/ansi-regex) 
 15.   ansi-regex@3.0.0 (https://github.com/chalk/ansi-regex) 
 16.   ansi-styles@2.2.1 (https://github.com/chalk/ansi-styles) 
-17.   async@2.6.2 (https://github.com/caolan/async) 
-18.   asynckit@0.4.0 (https://github.com/alexindigo/asynckit) 
-19.   babel-polyfill@6.23.0 (https://github.com/babel/babel/tree/master/packages/babel-polyfill) 
-20.   babel-runtime@6.26.0 (https://github.com/babel/babel/tree/master/packages/babel-runtime) 
-21.   balanced-match@1.0.0 (https://github.com/juliangruber/balanced-match) 
-22.   body@5.1.0 (https://github.com/Raynos/body) 
-23.   bootstrap@3.4.1 (https://github.com/twbs/bootstrap) 
-24.   bpmn-font@0.8.0 (https://github.com/bpmn-io/bpmn-font) 
-25.   bpmn-js@3.4.3 (https://github.com/bpmn-io/bpmn-js) 
-26.   bpmn-moddle@5.2.0 (https://github.com/bpmn-io/bpmn-moddle) 
-27.   brace-expansion@1.1.11 (https://github.com/juliangruber/brace-expansion) 
-28.   bytes@1.0.0 (https://github.com/visionmedia/bytes.js) 
-29.   camunda-webapp-translations@7.12.0-SNAPSHOT (https://github.com/camunda/camunda-webapp-translations) 
-30.   chalk@1.1.3 (https://github.com/chalk/chalk) 
-31.   chardet@0.4.2 (https://github.com/runk/node-chardet) 
-32.   cli-cursor@2.1.0 (https://github.com/sindresorhus/cli-cursor) 
-33.   cli-width@2.2.0 (https://github.com/knownasilya/cli-width) 
-34.   clipboard@2.0.4 (https://github.com/zenorocha/clipboard.js) 
-35.   closest@0.0.1 (https://github.com/ForbesLindesay/closest) 
-36.   cmmn-font@0.5.0 (https://github.com/bpmn-io/cmmn-font) 
-37.   cmmn-js@0.18.1 (https://github.com/bpmn-io/cmmn-js) 
-38.   cmmn-moddle@5.0.0 (https://github.com/bpmn-io/cmmn-moddle) 
-39.   combined-stream@1.0.8 (https://github.com/felixge/node-combined-stream) 
-40.   component-emitter@1.3.0 (https://github.com/component/emitter) 
-41.   component-event@0.1.4 (https://github.com/component/event) 
-42.   component-props@1.1.1 (https://github.com/component/props) 
-43.   component-xor@0.0.4 (https://github.com/component/xor) 
-44.   concat-map@0.0.1 (https://github.com/substack/node-concat-map) 
-45.   continuable-cache@0.3.1 (https://github.com/Raynos/continuable-cache) 
-46.   cookiejar@2.1.2 (https://github.com/bmeck/node-cookiejar) 
-47.   core-js@2.6.9 (https://github.com/zloirock/core-js) 
-48.   css.escape@1.5.1 (https://github.com/mathiasbynens/CSS.escape) 
-49.   debug@3.2.6 (https://github.com/visionmedia/debug) 
-50.   debug@4.1.1 (https://github.com/visionmedia/debug) 
-51.   delayed-stream@1.0.0 (https://github.com/felixge/node-delayed-stream) 
-52.   delegate-events@1.1.1 (https://github.com/HenrikJoreteg/delegate) 
-53.   delegate@3.2.0 (https://github.com/zenorocha/delegate) 
-54.   diagram-js-direct-editing@1.5.0 (https://github.com/bpmn-io/diagram-js-direct-editing) 
-55.   diagram-js@3.3.1 (https://github.com/bpmn-io/diagram-js) 
-56.   didi@4.0.0 (https://github.com/nikku/didi) 
-57.   dmn-js-decision-table@6.3.3 (https://github.com/bpmn-io/dmn-js) 
-58.   dmn-js-drd@6.3.3 (https://github.com/bpmn-io/dmn-js) 
-59.   dmn-js-literal-expression@6.3.3 (https://github.com/bpmn-io/dmn-js) 
-60.   dmn-js-shared@6.3.3 (https://github.com/bpmn-io/dmn-js) 
-61.   dmn-js@6.3.3 (https://github.com/bpmn-io/dmn-js) 
-62.   dmn-moddle@5.0.0 (https://github.com/bpmn-io/dmn-moddle) 
-63.   dom-iterator@1.0.0 (https://github.com/MatthewMueller/dom-iterator) 
-64.   dom4@2.1.5 (https://github.com/WebReflection/dom4) 
-65.   domify@1.4.0 (https://github.com/component/domify) 
-66.   encoding@0.1.12 (https://github.com/andris9/encoding) 
-67.   error@7.0.2 (https://github.com/Raynos/error) 
-68.   escape-html@1.0.3 (https://github.com/component/escape-html) 
-69.   escape-string-regexp@1.0.5 (https://github.com/sindresorhus/escape-string-regexp) 
-70.   events@3.0.0 (https://github.com/Gozala/events) 
-71.   external-editor@2.2.0 (https://github.com/mrkmg/node-external-editor) 
-72.   fast-xml-parser@3.12.14 (https://github.com/NaturalIntelligence/fast-xml-parser) 
-73.   faye-websocket@0.10.0 (https://github.com/faye/faye-websocket-node) 
-74.   figures@2.0.0 (https://github.com/sindresorhus/figures) 
-75.   form-data@2.5.0 (https://github.com/form-data/form-data) 
-76.   formidable@1.2.1 (https://github.com/felixge/node-formidable) 
-77.   fs.realpath@1.0.0 (https://github.com/isaacs/fs.realpath) 
-78.   gaze@1.1.3 (https://github.com/shama/gaze) 
-79.   glob@7.1.4 (https://github.com/isaacs/node-glob) 
-80.   globule@1.2.1 (https://github.com/cowboy/node-globule) 
-81.   good-listener@1.2.2 (https://github.com/zenorocha/good-listener) 
-82.   grunt-contrib-watch@1.1.0 (https://github.com/gruntjs/grunt-contrib-watch) 
-83.   hammerjs@2.0.8 (https://github.com/hammerjs/hammer.js) 
-84.   has-ansi@2.0.0 (https://github.com/sindresorhus/has-ansi) 
-85.   hat@0.0.3 (https://github.com/substack/node-hat) 
-86.   http-parser-js@0.4.10 (https://github.com/creationix/http-parser-js) 
-87.   iconv-lite@0.4.24 (https://github.com/ashtuchkin/iconv-lite) 
-88.   ids@0.2.2 (https://github.com/bpmn-io/ids) 
-89.   indexof@0.0.1 (undefined) 
-90.   inferno-vnode-flags@5.0.6 (https://github.com/infernojs/inferno) 
-91.   inferno@5.0.6 (https://github.com/infernojs/inferno) 
-92.   inflight@1.0.6 (https://github.com/npm/inflight) 
-93.   inherits@2.0.4 (https://github.com/isaacs/inherits) 
-94.   inquirer@3.0.6 (https://github.com/SBoudrias/Inquirer.js) 
-95.   is-fullwidth-code-point@2.0.0 (https://github.com/sindresorhus/is-fullwidth-code-point) 
-96.   is-promise@2.1.0 (https://github.com/then/is-promise) 
-97.   is-stream@1.1.0 (https://github.com/sindresorhus/is-stream) 
-98.   jquery-ui@1.12.1 (https://github.com/jquery/jquery-ui) 
-99.   jquery@3.3.1 (https://github.com/jquery/jquery) 
-100.  livereload-js@2.4.0 (https://github.com/livereload/livereload-js) 
-101.  lodash@4.17.11 (https://github.com/lodash/lodash) 
-102.  marked@0.6.2 (https://github.com/markedjs/marked) 
-103.  matches-selector@0.0.1 (https://github.com/ForbesLindesay/matches-selector) 
-104.  matches-selector@1.2.0 (https://github.com/ForbesLindesay/matches-selector) 
-105.  methods@1.1.2 (https://github.com/jshttp/methods) 
-106.  mime-db@1.40.0 (https://github.com/jshttp/mime-db) 
-107.  mime-types@2.1.24 (https://github.com/jshttp/mime-types) 
-108.  mime@2.4.4 (https://github.com/broofa/node-mime) 
-109.  mimic-fn@1.2.0 (https://github.com/sindresorhus/mimic-fn) 
-110.  min-dash@3.5.0 (https://github.com/bpmn-io/min-dash) 
-111.  min-dom@3.1.1 (https://github.com/bpmn-io/min-dom) 
-112.  minimatch@3.0.4 (https://github.com/isaacs/minimatch) 
-113.  minimist@1.2.0 (https://github.com/substack/minimist) 
-114.  moddle-xml@7.5.0 (https://github.com/bpmn-io/moddle-xml) 
-115.  moddle@4.1.0 (https://github.com/bpmn-io/moddle) 
-116.  moment@2.24.0 (https://github.com/moment/moment) 
-117.  mousetrap@1.6.3 (https://github.com/ccampbell/mousetrap) 
-118.  ms@2.1.2 (https://github.com/zeit/ms) 
-119.  mute-stream@0.0.7 (https://github.com/isaacs/mute-stream) 
-120.  nimn-date-parser@1.0.0 (https://github.com/nimndata/nimnjs-date-parser) 
-121.  nimn_schema_builder@1.1.0 (https://github.com/nimndata/nimnjs-schema-builder) 
-122.  nimnjs@1.3.2 (https://github.com/nimndata/nimnjs-node) 
-123.  node-fetch@1.6.3 (https://github.com/bitinn/node-fetch) 
-124.  object-assign@4.1.1 (https://github.com/sindresorhus/object-assign) 
-125.  object-refs@0.3.0 (https://github.com/bpmn-io/object-refs) 
-126.  once@1.4.0 (https://github.com/isaacs/once) 
-127.  onetime@2.0.1 (https://github.com/sindresorhus/onetime) 
-128.  opencollective@1.0.3 (https://github.com/opencollective/opencollective-cli) 
-129.  opn@4.0.2 (https://github.com/sindresorhus/opn) 
-130.  os-tmpdir@1.0.2 (https://github.com/sindresorhus/os-tmpdir) 
-131.  path-intersection@1.1.1 (https://github.com/bpmn-io/path-intersection) 
-132.  path-is-absolute@1.0.1 (https://github.com/sindresorhus/path-is-absolute) 
-133.  pinkie-promise@2.0.1 (https://github.com/floatdrop/pinkie-promise) 
-134.  pinkie@2.0.4 (https://github.com/floatdrop/pinkie) 
-135.  q@1.5.1 (https://github.com/kriskowal/q) 
-136.  qs@6.7.0 (https://github.com/ljharb/qs) 
-137.  raw-body@1.1.7 (https://github.com/stream-utils/raw-body) 
-138.  readable-stream@3.4.0 (https://github.com/nodejs/readable-stream) 
-139.  regenerator-runtime@0.10.5 (https://github.com/facebook/regenerator/tree/master/packages/regenerator-runtime) 
-140.  regenerator-runtime@0.11.1 (https://github.com/facebook/regenerator/tree/master/packages/regenerator-runtime) 
-141.  requirejs-angular-define@1.1.0 (https://github.com/Nikku/requirejs-angular-define) 
-142.  requirejs@2.1.22 (https://github.com/jrburke/r.js) 
-143.  requirejs@2.3.6 (https://github.com/jrburke/r.js) 
-144.  restore-cursor@2.0.0 (https://github.com/sindresorhus/restore-cursor) 
-145.  run-async@2.3.0 (https://github.com/SBoudrias/run-async) 
-146.  rx@4.1.0 (https://github.com/Reactive-Extensions/RxJS) 
-147.  safe-buffer@5.1.2 (https://github.com/feross/safe-buffer) 
-148.  safe-json-parse@1.0.1 (https://github.com/Raynos/safe-json-parse) 
-149.  safer-buffer@2.1.2 (https://github.com/ChALkeR/safer-buffer) 
-150.  saxen@8.1.0 (https://github.com/nikku/saxen) 
-151.  select@1.1.2 (https://github.com/zenorocha/select) 
-152.  selection-ranges@3.0.3 (https://github.com/nikku/selection-ranges) 
-153.  selection-update@0.1.2 (https://github.com/nikku/selection-update) 
-154.  signal-exit@3.0.2 (https://github.com/tapjs/signal-exit) 
-155.  string-template@0.2.1 (https://github.com/Matt-Esch/string-template) 
-156.  string-width@2.1.1 (https://github.com/sindresorhus/string-width) 
-157.  string_decoder@0.10.31 (https://github.com/rvagg/string_decoder) 
-158.  string_decoder@1.2.0 (https://github.com/nodejs/string_decoder) 
-159.  strip-ansi@3.0.1 (https://github.com/chalk/strip-ansi) 
-160.  strip-ansi@4.0.0 (https://github.com/chalk/strip-ansi) 
-161.  superagent@4.1.0 (https://github.com/visionmedia/superagent) 
-162.  supports-color@2.0.0 (https://github.com/chalk/supports-color) 
-163.  table-js@5.1.0 (https://github.com/bpmn-io/table-js) 
-164.  through@2.3.8 (https://github.com/dominictarr/through) 
-165.  tiny-emitter@2.1.0 (https://github.com/scottcorgan/tiny-emitter) 
-166.  tiny-lr@1.1.1 (https://github.com/mklabs/tiny-lr) 
-167.  tiny-svg@2.2.1 (https://github.com/bpmn-io/tiny-svg) 
-168.  tmp@0.0.33 (https://github.com/raszi/node-tmp) 
-169.  util-deprecate@1.0.2 (https://github.com/TooTallNate/util-deprecate) 
-170.  websocket-driver@0.7.3 (https://github.com/faye/websocket-driver-node) 
-171.  websocket-extensions@0.1.3 (https://github.com/faye/websocket-extensions-node) 
-172.  wrappy@1.0.2 (https://github.com/npm/wrappy) 
-173.  xtend@4.0.2 (https://github.com/Raynos/xtend) 
+17.   asynckit@0.4.0 (https://github.com/alexindigo/asynckit) 
+18.   babel-polyfill@6.23.0 (https://github.com/babel/babel/tree/master/packages/babel-polyfill) 
+19.   babel-runtime@6.26.0 (https://github.com/babel/babel/tree/master/packages/babel-runtime) 
+20.   bootstrap@3.4.1 (https://github.com/twbs/bootstrap) 
+21.   bpmn-font@0.8.0 (https://github.com/bpmn-io/bpmn-font) 
+22.   bpmn-js@3.4.3 (https://github.com/bpmn-io/bpmn-js) 
+23.   bpmn-moddle@5.2.0 (https://github.com/bpmn-io/bpmn-moddle) 
+24.   camunda-webapp-translations@7.12.0-SNAPSHOT (https://github.com/camunda/camunda-webapp-translations) 
+25.   chalk@1.1.3 (https://github.com/chalk/chalk) 
+26.   chardet@0.4.2 (https://github.com/runk/node-chardet) 
+27.   cli-cursor@2.1.0 (https://github.com/sindresorhus/cli-cursor) 
+28.   cli-width@2.2.0 (https://github.com/knownasilya/cli-width) 
+29.   clipboard@2.0.4 (https://github.com/zenorocha/clipboard.js) 
+30.   closest@0.0.1 (https://github.com/ForbesLindesay/closest) 
+31.   cmmn-font@0.5.0 (https://github.com/bpmn-io/cmmn-font) 
+32.   cmmn-js@0.18.1 (https://github.com/bpmn-io/cmmn-js) 
+33.   cmmn-moddle@5.0.0 (https://github.com/bpmn-io/cmmn-moddle) 
+34.   combined-stream@1.0.8 (https://github.com/felixge/node-combined-stream) 
+35.   component-emitter@1.3.0 (https://github.com/component/emitter) 
+36.   component-event@0.1.4 (https://github.com/component/event) 
+37.   component-props@1.1.1 (https://github.com/component/props) 
+38.   component-xor@0.0.4 (https://github.com/component/xor) 
+39.   cookiejar@2.1.2 (https://github.com/bmeck/node-cookiejar) 
+40.   core-js@2.6.10 (https://github.com/zloirock/core-js) 
+41.   css.escape@1.5.1 (https://github.com/mathiasbynens/CSS.escape) 
+42.   debug@4.1.1 (https://github.com/visionmedia/debug) 
+43.   delayed-stream@1.0.0 (https://github.com/felixge/node-delayed-stream) 
+44.   delegate-events@1.1.1 (https://github.com/HenrikJoreteg/delegate) 
+45.   delegate@3.2.0 (https://github.com/zenorocha/delegate) 
+46.   diagram-js-direct-editing@1.6.0 (https://github.com/bpmn-io/diagram-js-direct-editing) 
+47.   diagram-js@3.3.1 (https://github.com/bpmn-io/diagram-js) 
+48.   didi@4.0.0 (https://github.com/nikku/didi) 
+49.   dmn-js-decision-table@6.3.3 (https://github.com/bpmn-io/dmn-js) 
+50.   dmn-js-drd@6.3.3 (https://github.com/bpmn-io/dmn-js) 
+51.   dmn-js-literal-expression@6.3.3 (https://github.com/bpmn-io/dmn-js) 
+52.   dmn-js-shared@6.3.3 (https://github.com/bpmn-io/dmn-js) 
+53.   dmn-js@6.3.3 (https://github.com/bpmn-io/dmn-js) 
+54.   dmn-moddle@5.0.0 (https://github.com/bpmn-io/dmn-moddle) 
+55.   dom-iterator@1.0.0 (https://github.com/MatthewMueller/dom-iterator) 
+56.   dom4@2.1.5 (https://github.com/WebReflection/dom4) 
+57.   domify@1.4.0 (https://github.com/component/domify) 
+58.   encoding@0.1.12 (https://github.com/andris9/encoding) 
+59.   escape-html@1.0.3 (https://github.com/component/escape-html) 
+60.   escape-string-regexp@1.0.5 (https://github.com/sindresorhus/escape-string-regexp) 
+61.   events@3.0.0 (https://github.com/Gozala/events) 
+62.   external-editor@2.2.0 (https://github.com/mrkmg/node-external-editor) 
+63.   fast-xml-parser@3.12.14 (https://github.com/NaturalIntelligence/fast-xml-parser) 
+64.   figures@2.0.0 (https://github.com/sindresorhus/figures) 
+65.   form-data@2.5.1 (https://github.com/form-data/form-data) 
+66.   formidable@1.2.1 (https://github.com/felixge/node-formidable) 
+67.   good-listener@1.2.2 (https://github.com/zenorocha/good-listener) 
+68.   hammerjs@2.0.8 (https://github.com/hammerjs/hammer.js) 
+69.   has-ansi@2.0.0 (https://github.com/sindresorhus/has-ansi) 
+70.   hat@0.0.3 (https://github.com/substack/node-hat) 
+71.   iconv-lite@0.4.24 (https://github.com/ashtuchkin/iconv-lite) 
+72.   ids@0.2.2 (https://github.com/bpmn-io/ids) 
+73.   indexof@0.0.1 (undefined) 
+74.   inferno-vnode-flags@5.0.6 (https://github.com/infernojs/inferno) 
+75.   inferno@5.0.6 (https://github.com/infernojs/inferno) 
+76.   inherits@2.0.4 (https://github.com/isaacs/inherits) 
+77.   inquirer@3.0.6 (https://github.com/SBoudrias/Inquirer.js) 
+78.   is-fullwidth-code-point@2.0.0 (https://github.com/sindresorhus/is-fullwidth-code-point) 
+79.   is-promise@2.1.0 (https://github.com/then/is-promise) 
+80.   is-stream@1.1.0 (https://github.com/sindresorhus/is-stream) 
+81.   jquery-ui@1.12.1 (https://github.com/jquery/jquery-ui) 
+82.   jquery@3.4.1 (https://github.com/jquery/jquery) 
+83.   lodash@4.17.14 (https://github.com/lodash/lodash) 
+84.   matches-selector@0.0.1 (https://github.com/ForbesLindesay/matches-selector) 
+85.   matches-selector@1.2.0 (https://github.com/ForbesLindesay/matches-selector) 
+86.   methods@1.1.2 (https://github.com/jshttp/methods) 
+87.   mime-db@1.40.0 (https://github.com/jshttp/mime-db) 
+88.   mime-types@2.1.24 (https://github.com/jshttp/mime-types) 
+89.   mime@2.4.4 (https://github.com/broofa/node-mime) 
+90.   mimic-fn@1.2.0 (https://github.com/sindresorhus/mimic-fn) 
+91.   min-dash@3.5.2 (https://github.com/bpmn-io/min-dash) 
+92.   min-dom@3.1.1 (https://github.com/bpmn-io/min-dom) 
+93.   minimist@1.2.0 (https://github.com/substack/minimist) 
+94.   moddle-xml@7.5.0 (https://github.com/bpmn-io/moddle-xml) 
+95.   moddle@4.1.0 (https://github.com/bpmn-io/moddle) 
+96.   moment@2.24.0 (https://github.com/moment/moment) 
+97.   mousetrap@1.6.3 (https://github.com/ccampbell/mousetrap) 
+98.   ms@2.1.2 (https://github.com/zeit/ms) 
+99.   mute-stream@0.0.7 (https://github.com/isaacs/mute-stream) 
+100.  nimn-date-parser@1.0.0 (https://github.com/nimndata/nimnjs-date-parser) 
+101.  nimn_schema_builder@1.1.0 (https://github.com/nimndata/nimnjs-schema-builder) 
+102.  nimnjs@1.3.2 (https://github.com/nimndata/nimnjs-node) 
+103.  node-fetch@1.6.3 (https://github.com/bitinn/node-fetch) 
+104.  object-assign@4.1.1 (https://github.com/sindresorhus/object-assign) 
+105.  object-refs@0.3.0 (https://github.com/bpmn-io/object-refs) 
+106.  onetime@2.0.1 (https://github.com/sindresorhus/onetime) 
+107.  opencollective@1.0.3 (https://github.com/opencollective/opencollective-cli) 
+108.  opn@4.0.2 (https://github.com/sindresorhus/opn) 
+109.  os-tmpdir@1.0.2 (https://github.com/sindresorhus/os-tmpdir) 
+110.  path-intersection@1.1.1 (https://github.com/bpmn-io/path-intersection) 
+111.  pinkie-promise@2.0.1 (https://github.com/floatdrop/pinkie-promise) 
+112.  pinkie@2.0.4 (https://github.com/floatdrop/pinkie) 
+113.  q@1.5.1 (https://github.com/kriskowal/q) 
+114.  qs@6.9.0 (https://github.com/ljharb/qs) 
+115.  readable-stream@3.4.0 (https://github.com/nodejs/readable-stream) 
+116.  regenerator-runtime@0.10.5 (https://github.com/facebook/regenerator/tree/master/packages/regenerator-runtime) 
+117.  regenerator-runtime@0.11.1 (https://github.com/facebook/regenerator/tree/master/packages/regenerator-runtime) 
+118.  requirejs-angular-define@1.1.0 (https://github.com/Nikku/requirejs-angular-define) 
+119.  requirejs@2.1.22 (https://github.com/jrburke/r.js) 
+120.  requirejs@2.3.6 (https://github.com/jrburke/r.js) 
+121.  restore-cursor@2.0.0 (https://github.com/sindresorhus/restore-cursor) 
+122.  run-async@2.3.0 (https://github.com/SBoudrias/run-async) 
+123.  rx@4.1.0 (https://github.com/Reactive-Extensions/RxJS) 
+124.  safe-buffer@5.2.0 (https://github.com/feross/safe-buffer) 
+125.  safer-buffer@2.1.2 (https://github.com/ChALkeR/safer-buffer) 
+126.  saxen@8.1.0 (https://github.com/nikku/saxen) 
+127.  select@1.1.2 (https://github.com/zenorocha/select) 
+128.  selection-ranges@3.0.3 (https://github.com/nikku/selection-ranges) 
+129.  selection-update@0.1.2 (https://github.com/nikku/selection-update) 
+130.  signal-exit@3.0.2 (https://github.com/tapjs/signal-exit) 
+131.  string-width@2.1.1 (https://github.com/sindresorhus/string-width) 
+132.  string_decoder@1.3.0 (https://github.com/nodejs/string_decoder) 
+133.  strip-ansi@3.0.1 (https://github.com/chalk/strip-ansi) 
+134.  strip-ansi@4.0.0 (https://github.com/chalk/strip-ansi) 
+135.  superagent@4.1.0 (https://github.com/visionmedia/superagent) 
+136.  supports-color@2.0.0 (https://github.com/chalk/supports-color) 
+137.  table-js@5.1.0 (https://github.com/bpmn-io/table-js) 
+138.  through@2.3.8 (https://github.com/dominictarr/through) 
+139.  tiny-emitter@2.1.0 (https://github.com/scottcorgan/tiny-emitter) 
+140.  tiny-svg@2.2.2 (https://github.com/bpmn-io/tiny-svg) 
+141.  tmp@0.0.33 (https://github.com/raszi/node-tmp) 
+142.  util-deprecate@1.0.2 (https://github.com/TooTallNate/util-deprecate) 
 
 
 
@@ -660,33 +629,6 @@ END OF ansi-styles@2.2.1 NOTICES AND INFORMATION
 
 
 
-async@2.6.2 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright (c) 2010-2018 Caolan McMahon
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-==========================================
-END OF async@2.6.2 NOTICES AND INFORMATION
-
-
-
 asynckit@0.4.0 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 The MIT License (MIT)
@@ -733,61 +675,6 @@ babel-runtime@6.26.0 NOTICES AND INFORMATION BEGIN HERE
 
 ==========================================
 END OF babel-runtime@6.26.0 NOTICES AND INFORMATION
-
-
-
-balanced-match@1.0.0 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-(MIT)
-
-Copyright (c) 2013 Julian Gruber &lt;julian@juliangruber.com&gt;
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-==========================================
-END OF balanced-match@1.0.0 NOTICES AND INFORMATION
-
-
-
-body@5.1.0 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright (c) 2012 Raynos.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-==========================================
-END OF body@5.1.0 NOTICES AND INFORMATION
 
 
 
@@ -975,97 +862,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ==========================================
 END OF bpmn-moddle@5.2.0 NOTICES AND INFORMATION
-
-
-
-brace-expansion@1.1.11 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-MIT License
-
-Copyright (c) 2013 Julian Gruber <julian@juliangruber.com>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-==========================================
-END OF brace-expansion@1.1.11 NOTICES AND INFORMATION
-
-
-
-bytes@1.0.0 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-# node-bytes
-
-  Byte string parser / formatter.
-
-## Example:
-
-```js
-bytes('1kb')
-// => 1024
-
-bytes('2mb')
-// => 2097152
-
-bytes('1gb')
-// => 1073741824
-
-bytes(1073741824)
-// => 1gb
-
-bytes(1099511627776)
-// => 1tb
-```
-
-## Installation
-
-```
-$ npm install bytes
-$ component install visionmedia/bytes.js
-```
-
-## License 
-
-(The MIT License)
-
-Copyright (c) 2012 TJ Holowaychuk &lt;tj@vision-media.ca&gt;
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-'Software'), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-==========================================
-END OF bytes@1.0.0 NOTICES AND INFORMATION
 
 
 
@@ -1970,59 +1766,6 @@ END OF component-xor@0.0.4 NOTICES AND INFORMATION
 
 
 
-concat-map@0.0.1 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-This software is released under the MIT license:
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-==========================================
-END OF concat-map@0.0.1 NOTICES AND INFORMATION
-
-
-
-continuable-cache@0.3.1 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright (c) 2013 Colingo.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-==========================================
-END OF continuable-cache@0.3.1 NOTICES AND INFORMATION
-
-
-
 cookiejar@2.1.2 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 The MIT License (MIT)
@@ -2040,7 +1783,7 @@ END OF cookiejar@2.1.2 NOTICES AND INFORMATION
 
 
 
-core-js@2.6.9 NOTICES AND INFORMATION BEGIN HERE
+core-js@2.6.10 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 Copyright (c) 2014-2019 Denis Pushkarev
 
@@ -2063,7 +1806,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ==========================================
-END OF core-js@2.6.9 NOTICES AND INFORMATION
+END OF core-js@2.6.10 NOTICES AND INFORMATION
 
 
 
@@ -2092,33 +1835,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ==========================================
 END OF css.escape@1.5.1 NOTICES AND INFORMATION
-
-
-
-debug@3.2.6 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-(The MIT License)
-
-Copyright (c) 2014 TJ Holowaychuk <tj@vision-media.ca>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
-and associated documentation files (the 'Software'), to deal in the Software without restriction, 
-including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial 
-portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT 
-LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-==========================================
-END OF debug@3.2.6 NOTICES AND INFORMATION
 
 
 
@@ -2336,7 +2052,7 @@ END OF delegate@3.2.0 NOTICES AND INFORMATION
 
 
 
-diagram-js-direct-editing@1.5.0 NOTICES AND INFORMATION BEGIN HERE
+diagram-js-direct-editing@1.6.0 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 The MIT License (MIT)
 
@@ -2360,7 +2076,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ==========================================
-END OF diagram-js-direct-editing@1.5.0 NOTICES AND INFORMATION
+END OF diagram-js-direct-editing@1.6.0 NOTICES AND INFORMATION
 
 
 
@@ -2912,107 +2628,6 @@ END OF encoding@0.1.12 NOTICES AND INFORMATION
 
 
 
-error@7.0.2 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-# error
-
-<!--
-    [![build status][1]][2]
-    [![NPM version][3]][4]
-    [![Coverage Status][5]][6]
-    [![gemnasium Dependency Status][7]][8]
-    [![Davis Dependency status][9]][10]
--->
-
-<!-- [![browser support][11]][12] -->
-
-Custom errors
-
-## Typed Error
-
-```js
-var TypedError = require("error/typed")
-
-var ServerError = TypedError({
-    type: 'server.5xx',
-    message: '{title} server error, status={statusCode}',
-    title: null,
-    statusCode: null
-});
-var ClientError = TypedError({
-    type: 'client.4xx',
-    message: '{title} client error, status={statusCode}',
-    title: null,
-    statusCode: null
-});
-
-var error = ServerError({
-    title:'some title',
-    statusCode: 500
-});
-var error2 = ClientError({
-    title: 'some title',
-    statusCode: 404
-});
-```
-
-## Wrapped Errors
-
-```js
-var net = require('net');
-var WrappedError = require('error/wrapped');
-
-var ServerListenError = WrappedError({
-    message: 'server: {origMessage}',
-    type: 'server.listen-failed',
-    requestedPort: null,
-    host: null
-});
-
-var server = net.createServer();
-
-server.on('error', function onError(err) {
-    if (err.code === 'EADDRINUSE') {
-        throw ServerListenError(err, {
-            requestedPort: 3000,
-            host: null
-        });
-    } else {
-        throw err;
-    }
-});
-
-server.listen(3000);
-```
-
-## Installation
-
-`npm install error`
-
-## Contributors
-
- - Raynos
-
-## MIT Licenced
-
-  [1]: https://secure.travis-ci.org/Raynos/error.png
-  [2]: https://travis-ci.org/Raynos/error
-  [3]: https://badge.fury.io/js/error.png
-  [4]: https://badge.fury.io/js/error
-  [5]: https://coveralls.io/repos/Raynos/error/badge.png
-  [6]: https://coveralls.io/r/Raynos/error
-  [7]: https://gemnasium.com/Raynos/error.png
-  [8]: https://gemnasium.com/Raynos/error
-  [9]: https://david-dm.org/Raynos/error.png
-  [10]: https://david-dm.org/Raynos/error
-  [11]: https://ci.testling.com/Raynos/error.png
-  [12]: https://ci.testling.com/Raynos/error
-
-==========================================
-END OF error@7.0.2 NOTICES AND INFORMATION
-
-
-
 escape-html@1.0.3 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 (The MIT License)
@@ -3164,350 +2779,6 @@ END OF fast-xml-parser@3.12.14 NOTICES AND INFORMATION
 
 
 
-faye-websocket@0.10.0 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-# faye-websocket
-
-* Travis CI build: [![Build
-  status](https://secure.travis-ci.org/faye/faye-websocket-node.svg)](http://travis-ci.org/faye/faye-websocket-node)
-* Autobahn tests: [server](http://faye.jcoglan.com/autobahn/servers/),
-  [client](http://faye.jcoglan.com/autobahn/clients/)
-
-This is a general-purpose WebSocket implementation extracted from the
-[Faye](http://faye.jcoglan.com) project. It provides classes for easily building
-WebSocket servers and clients in Node. It does not provide a server itself, but
-rather makes it easy to handle WebSocket connections within an existing
-[Node](http://nodejs.org/) application. It does not provide any abstraction
-other than the standard [WebSocket API](http://dev.w3.org/html5/websockets/).
-
-It also provides an abstraction for handling
-[EventSource](http://dev.w3.org/html5/eventsource/) connections, which are
-one-way connections that allow the server to push data to the client. They are
-based on streaming HTTP responses and can be easier to access via proxies than
-WebSockets.
-
-
-## Installation
-
-```
-$ npm install faye-websocket
-```
-
-
-## Handling WebSocket connections in Node
-
-You can handle WebSockets on the server side by listening for HTTP Upgrade
-requests, and creating a new socket for the request. This socket object exposes
-the usual WebSocket methods for receiving and sending messages. For example this
-is how you'd implement an echo server:
-
-```js
-var WebSocket = require('faye-websocket'),
-    http      = require('http');
-
-var server = http.createServer();
-
-server.on('upgrade', function(request, socket, body) {
-  if (WebSocket.isWebSocket(request)) {
-    var ws = new WebSocket(request, socket, body);
-    
-    ws.on('message', function(event) {
-      ws.send(event.data);
-    });
-    
-    ws.on('close', function(event) {
-      console.log('close', event.code, event.reason);
-      ws = null;
-    });
-  }
-});
-
-server.listen(8000);
-```
-
-`WebSocket` objects are also duplex streams, so you could replace the
-`ws.on('message', ...)` line with:
-
-```js
-    ws.pipe(ws);
-```
-
-Note that under certain circumstances (notably a draft-76 client connecting
-through an HTTP proxy), the WebSocket handshake will not be complete after you
-call `new WebSocket()` because the server will not have received the entire
-handshake from the client yet. In this case, calls to `ws.send()` will buffer
-the message in memory until the handshake is complete, at which point any
-buffered messages will be sent to the client.
-
-If you need to detect when the WebSocket handshake is complete, you can use the
-`onopen` event.
-
-If the connection's protocol version supports it, you can call `ws.ping()` to
-send a ping message and wait for the client's response. This method takes a
-message string, and an optional callback that fires when a matching pong message
-is received. It returns `true` if and only if a ping message was sent. If the
-client does not support ping/pong, this method sends no data and returns
-`false`.
-
-```js
-ws.ping('Mic check, one, two', function() {
-  // fires when pong is received
-});
-```
-
-
-## Using the WebSocket client
-
-The client supports both the plain-text `ws` protocol and the encrypted `wss`
-protocol, and has exactly the same interface as a socket you would use in a web
-browser. On the wire it identifies itself as `hybi-13`.
-
-```js
-var WebSocket = require('faye-websocket'),
-    ws        = new WebSocket.Client('ws://www.example.com/');
-
-ws.on('open', function(event) {
-  console.log('open');
-  ws.send('Hello, world!');
-});
-
-ws.on('message', function(event) {
-  console.log('message', event.data);
-});
-
-ws.on('close', function(event) {
-  console.log('close', event.code, event.reason);
-  ws = null;
-});
-```
-
-The WebSocket client also lets you inspect the status and headers of the
-handshake response via its `statusCode` and `headers` properties.
-
-To connect via a proxy, set the `proxy` option to the HTTP origin of the proxy,
-including any authorization information, custom headers and TLS config you
-require. Only the `origin` setting is required.
-
-```js
-var ws = new WebSocket.Client('ws://www.example.com/', [], {
-  proxy: {
-    origin:  'http://username:password@proxy.example.com',
-    headers: {'User-Agent': 'node'},
-    tls:     {cert: fs.readFileSync('client.crt')}
-  }
-});
-```
-
-The `tls` value is a Node 'TLS options' object that will be passed to
-[`tls.connect()`](http://nodejs.org/api/tls.html#tls_tls_connect_options_callback).
-
-
-## Subprotocol negotiation
-
-The WebSocket protocol allows peers to select and identify the application
-protocol to use over the connection. On the client side, you can set which
-protocols the client accepts by passing a list of protocol names when you
-construct the socket:
-
-```js
-var ws = new WebSocket.Client('ws://www.example.com/', ['irc', 'amqp']);
-```
-
-On the server side, you can likewise pass in the list of protocols the server
-supports after the other constructor arguments:
-
-```js
-var ws = new WebSocket(request, socket, body, ['irc', 'amqp']);
-```
-
-If the client and server agree on a protocol, both the client- and server-side
-socket objects expose the selected protocol through the `ws.protocol` property.
-
-
-## Protocol extensions
-
-faye-websocket is based on the
-[websocket-extensions](https://github.com/faye/websocket-extensions-node)
-framework that allows extensions to be negotiated via the
-`Sec-WebSocket-Extensions` header. To add extensions to a connection, pass an
-array of extensions to the `:extensions` option. For example, to add
-[permessage-deflate](https://github.com/faye/permessage-deflate-node):
-
-```js
-var deflate = require('permessage-deflate');
-
-var ws = new WebSocket(request, socket, body, [], {extensions: [deflate]});
-```
-
-
-## Initialization options
-
-Both the server- and client-side classes allow an options object to be passed in
-at initialization time, for example:
-
-```js
-var ws = new WebSocket(request, socket, body, protocols, options);
-var ws = new WebSocket.Client(url, protocols, options);
-```
-
-`protocols` is an array of subprotocols as described above, or `null`.
-`options` is an optional object containing any of these fields:
-
-* `extensions` - an array of
-  [websocket-extensions](https://github.com/faye/websocket-extensions-node)
-  compatible extensions, as described above
-* `headers` - an object containing key-value pairs representing HTTP headers to
-  be sent during the handshake process
-* `maxLength` - the maximum allowed size of incoming message frames, in bytes.
-  The default value is `2^26 - 1`, or 1 byte short of 64 MiB.
-* `ping` - an integer that sets how often the WebSocket should send ping frames,
-  measured in seconds
-
-The client accepts some additional options:
-
-* `proxy` - settings for a proxy as described above
-* `tls` - a Node 'TLS options' object containing TLS settings for the origin
-  server, this will be passed to
-  [`tls.connect()`](http://nodejs.org/api/tls.html#tls_tls_connect_options_callback)
-* `ca` - (legacy) a shorthand for passing `{tls: {ca: value}}`
-
-
-## WebSocket API
-
-Both server- and client-side `WebSocket` objects support the following API.
-
-* <b>`on('open', function(event) {})`</b> fires when the socket connection is
-  established. Event has no attributes.
-* <b>`on('message', function(event) {})`</b> fires when the socket receives a
-  message. Event has one attribute, <b>`data`</b>, which is either a `String`
-  (for text frames) or a `Buffer` (for binary frames).
-* <b>`on('error', function(event) {})`</b> fires when there is a protocol error
-  due to bad data sent by the other peer. This event is purely informational,
-  you do not need to implement error recover.
-* <b>`on('close', function(event) {})`</b> fires when either the client or the
-  server closes the connection. Event has two optional attributes, <b>`code`</b>
-  and <b>`reason`</b>, that expose the status code and message sent by the peer
-  that closed the connection.
-* <b>`send(message)`</b> accepts either a `String` or a `Buffer` and sends a
-  text or binary message over the connection to the other peer.
-* <b>`ping(message, function() {})`</b> sends a ping frame with an optional
-  message and fires the callback when a matching pong is received.
-* <b>`close(code, reason)`</b> closes the connection, sending the given status
-  code and reason text, both of which are optional.
-* <b>`version`</b> is a string containing the version of the `WebSocket`
-  protocol the connection is using.
-* <b>`protocol`</b> is a string (which may be empty) identifying the subprotocol
-  the socket is using.
-
-
-## Handling EventSource connections in Node
-
-EventSource connections provide a very similar interface, although because they
-only allow the server to send data to the client, there is no `onmessage` API.
-EventSource allows the server to push text messages to the client, where each
-message has an optional event-type and ID.
-
-```js
-var WebSocket   = require('faye-websocket'),
-    EventSource = WebSocket.EventSource,
-    http        = require('http');
-
-var server = http.createServer();
-
-server.on('request', function(request, response) {
-  if (EventSource.isEventSource(request)) {
-    var es = new EventSource(request, response);
-    console.log('open', es.url, es.lastEventId);
-    
-    // Periodically send messages
-    var loop = setInterval(function() { es.send('Hello') }, 1000);
-    
-    es.on('close', function() {
-      clearInterval(loop);
-      es = null;
-    });
-  
-  } else {
-    // Normal HTTP request
-    response.writeHead(200, {'Content-Type': 'text/plain'});
-    response.end('Hello');
-  }
-});
-
-server.listen(8000);
-```
-
-The `send` method takes two optional parameters, `event` and `id`. The default
-event-type is `'message'` with no ID. For example, to send a `notification`
-event with ID `99`:
-
-```js
-es.send('Breaking News!', {event: 'notification', id: '99'});
-```
-
-The `EventSource` object exposes the following properties:
-
-* <b>`url`</b> is a string containing the URL the client used to create the
-  EventSource.
-* <b>`lastEventId`</b> is a string containing the last event ID received by the
-  client. You can use this when the client reconnects after a dropped connection
-  to determine which messages need resending.
-
-When you initialize an EventSource with ` new EventSource()`, you can pass
-configuration options after the `response` parameter. Available options are:
-
-* <b>`headers`</b> is an object containing custom headers to be set on the
-  EventSource response.
-* <b>`retry`</b> is a number that tells the client how long (in seconds) it
-  should wait after a dropped connection before attempting to reconnect.
-* <b>`ping`</b> is a number that tells the server how often (in seconds) to send
-  'ping' packets to the client to keep the connection open, to defeat timeouts
-  set by proxies. The client will ignore these messages.
-
-For example, this creates a connection that allows access from any origin, pings
-every 15 seconds and is retryable every 10 seconds if the connection is broken:
-
-```js
-var es = new EventSource(request, response, {
-  headers: {'Access-Control-Allow-Origin': '*'},
-  ping:    15,
-  retry:   10
-});
-```
-
-You can send a ping message at any time by calling `es.ping()`. Unlike
-WebSocket, the client does not send a response to this; it is merely to send
-some data over the wire to keep the connection alive.
-
-
-## License
-
-(The MIT License)
-
-Copyright (c) 2010-2015 James Coglan
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the 'Software'), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-==========================================
-END OF faye-websocket@0.10.0 NOTICES AND INFORMATION
-
-
-
 figures@2.0.0 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 The MIT License (MIT)
@@ -3537,7 +2808,7 @@ END OF figures@2.0.0 NOTICES AND INFORMATION
 
 
 
-form-data@2.5.0 NOTICES AND INFORMATION BEGIN HERE
+form-data@2.5.1 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 Copyright (c) 2012 Felix Geisendörfer (felix@debuggable.com) and contributors
 
@@ -3560,7 +2831,7 @@ Copyright (c) 2012 Felix Geisendörfer (felix@debuggable.com) and contributors
  THE SOFTWARE.
 
 ==========================================
-END OF form-data@2.5.0 NOTICES AND INFORMATION
+END OF form-data@2.5.1 NOTICES AND INFORMATION
 
 
 
@@ -3576,146 +2847,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ==========================================
 END OF formidable@1.2.1 NOTICES AND INFORMATION
-
-
-
-fs.realpath@1.0.0 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-The ISC License
-
-Copyright (c) Isaac Z. Schlueter and Contributors
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
-IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-----
-
-This library bundles a version of the `fs.realpath` and `fs.realpathSync`
-methods from Node.js v0.10 under the terms of the Node.js MIT license.
-
-Node's license follows, also included at the header of `old.js` which contains
-the licensed code:
-
-  Copyright Joyent, Inc. and other Node contributors.
-
-  Permission is hereby granted, free of charge, to any person obtaining a
-  copy of this software and associated documentation files (the "Software"),
-  to deal in the Software without restriction, including without limitation
-  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-  and/or sell copies of the Software, and to permit persons to whom the
-  Software is furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-  DEALINGS IN THE SOFTWARE.
-
-==========================================
-END OF fs.realpath@1.0.0 NOTICES AND INFORMATION
-
-
-
-gaze@1.1.3 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright (c) 2018 Kyle Robinson Young
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
-==========================================
-END OF gaze@1.1.3 NOTICES AND INFORMATION
-
-
-
-glob@7.1.4 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-The ISC License
-
-Copyright (c) Isaac Z. Schlueter and Contributors
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
-IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-## Glob Logo
-
-Glob's logo created by Tanya Brassie <http://tanyabrassie.com/>, licensed
-under a Creative Commons Attribution-ShareAlike 4.0 International License
-https://creativecommons.org/licenses/by-sa/4.0/
-
-==========================================
-END OF glob@7.1.4 NOTICES AND INFORMATION
-
-
-
-globule@1.2.1 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright (c) 2018 "Cowboy" Ben Alman
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
-==========================================
-END OF globule@1.2.1 NOTICES AND INFORMATION
 
 
 
@@ -3815,530 +2946,6 @@ listener.destroy();
 
 ==========================================
 END OF good-listener@1.2.2 NOTICES AND INFORMATION
-
-
-
-grunt-contrib-watch@1.1.0 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-# grunt-contrib-watch v1.1.0 [![Build Status: Linux](https://travis-ci.org/gruntjs/grunt-contrib-watch.svg?branch=master)](https://travis-ci.org/gruntjs/grunt-contrib-watch) [![Build Status: Windows](https://ci.appveyor.com/api/projects/status/olyu3uhcq59avm8v/branch/master?svg=true)](https://ci.appveyor.com/project/gruntjs/grunt-contrib-watch/branch/master)
-
-> Run predefined tasks whenever watched file patterns are added, changed or deleted
-
-
-
-## Getting Started
-
-If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
-
-```shell
-npm install grunt-contrib-watch --save-dev
-```
-
-Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
-
-```js
-grunt.loadNpmTasks('grunt-contrib-watch');
-```
-
-
-
-
-## Watch task
-_Run this task with the `grunt watch` command._
-
-
-### Settings
-
-There are a number of options available. Please review the [minimatch options here](https://github.com/isaacs/minimatch#options). As well as some additional options as follows:
-
-#### files
-Type: `String|Array`
-
-This defines what file patterns this task will watch. It can be a string or an array of files and/or minimatch patterns.
-
-#### tasks
-Type: `String|Array`
-
-This defines which tasks to run when a watched file event occurs.
-
-#### options.spawn
-Type: `Boolean`  
-Default: `true`
-
-Whether to spawn task runs in a child process. Setting this option to `false` speeds up the reaction time of the watch (usually 500ms faster for most) and allows subsequent task runs to share the same context. Not spawning task runs can make the watch more prone to failing so please use as needed.
-
-Example:
-```js
-watch: {
-  scripts: {
-    files: ['**/*.js'],
-    tasks: ['jshint'],
-    options: {
-      spawn: false,
-    },
-  },
-},
-```
-
-*For backwards compatibility the option `nospawn` is still available and will do the opposite of `spawn`.*
-
-#### options.interrupt
-Type: `Boolean`  
-Default: `false`
-
-As files are modified this watch task will spawn tasks in child processes. The default behavior will only spawn a new child process per target when the previous process has finished. Set the `interrupt` option to true to terminate the previous process and spawn a new one upon later changes.
-
-Example:
-```js
-watch: {
-  scripts: {
-    files: '**/*.js',
-    tasks: ['jshint'],
-    options: {
-      interrupt: true,
-    },
-  },
-},
-```
-
-#### options.debounceDelay
-Type: `Integer`  
-Default: `500`
-
-How long to wait before emitting events in succession for the same filepath and status. For example if your `Gruntfile.js` file was `changed`, a `changed` event will only fire again after the given milliseconds.
-
-Example:
-```js
-watch: {
-  scripts: {
-    files: '**/*.js',
-    tasks: ['jshint'],
-    options: {
-      debounceDelay: 250,
-    },
-  },
-},
-```
-
-#### options.interval
-Type: `Integer`  
-Default: `100`
-
-The `interval` is passed to `fs.watchFile`. Since `interval` is only used by `fs.watchFile` and this watcher also uses `fs.watch`; it is recommended to ignore this option. *Default is 100ms*.
-
-#### options.event
-Type: `String|Array`  
-Default: `'all'`
-
-Specify the type of watch events that triggers the specified task. This option can be one or many of: `'all'`, `'changed'`, `'added'` and `'deleted'`.
-
-Example:
-```js
-watch: {
-  scripts: {
-    files: '**/*.js',
-    tasks: ['generateFileManifest'],
-    options: {
-      event: ['added', 'deleted'],
-    },
-  },
-},
-```
-
-#### options.reload
-Type: `Boolean`  
-Default: `false`
-
-By default, if `Gruntfile.js` is being watched, then changes to it will trigger the watch task to restart, and reload the `Gruntfile.js` changes.
-When `reload` is set to `true`, changes to *any* of the watched files will trigger the watch task to restart.
-This is especially useful if your `Gruntfile.js` is dependent on other files.
-
-```js
-watch: {
-  configFiles: {
-    files: [ 'Gruntfile.js', 'config/*.js' ],
-    options: {
-      reload: true
-    }
-  }
-}
-```
-
-
-#### options.forever
-Type: `Boolean`  
-Default: `true`
-
-This is *only a task level option* and cannot be configured per target. By default the watch task will duck punch `grunt.fatal` and `grunt.warn` to try and prevent them from exiting the watch process. If you don't want `grunt.fatal` and `grunt.warn` to be overridden set the `forever` option to `false`.
-
-#### options.dateFormat
-Type: `Function`
-
-This is *only a task level option* and cannot be configured per target. By default when the watch has finished running tasks it will display the message `Completed in 1.301s at Thu Jul 18 2013 14:58:21 GMT-0700 (PDT) - Waiting...`. You can override this message by supplying your own function:
-
-```js
-watch: {
-  options: {
-    dateFormat: function(time) {
-      grunt.log.writeln('The watch finished in ' + time + 'ms at' + (new Date()).toString());
-      grunt.log.writeln('Waiting for more changes...');
-    },
-  },
-  scripts: {
-    files: '**/*.js',
-    tasks: 'jshint',
-  },
-},
-```
-
-#### options.atBegin
-Type: `Boolean`  
-Default: `false`
-
-This option will trigger the run of each specified task at startup of the watcher.
-
-#### options.livereload
-Type: `Boolean|Number|Object`  
-Default: `false`
-
-Set to `true` or set `livereload: 1337` to a port number to enable live reloading. Default and recommended port is `35729`.
-
-If enabled a live reload server will be started with the watch task per target. Then after the indicated tasks have run, the live reload server will be triggered with the modified files.
-
-See also how to [enable livereload on your HTML](https://github.com/gruntjs/grunt-contrib-watch/blob/master/docs/watch-examples.md#enabling-live-reload-in-your-html).
-
-Example:
-```js
-watch: {
-  css: {
-    files: '**/*.sass',
-    tasks: ['sass'],
-    options: {
-      livereload: true,
-    },
-  },
-},
-```
-
-Passing an object to `livereload` allows listening on a specific port and hostname/IP or over https connections (by specifying `key` and `cert` paths).
-
-Example:
-```js
-watch: {
-  css: {
-    files: '**/*.sass',
-    tasks: ['sass'],
-    options: {
-      livereload: {
-        host: 'localhost',
-        port: 9000,
-        key: grunt.file.read('path/to/ssl.key'),
-        cert: grunt.file.read('path/to/ssl.crt')
-        // you can pass in any other options you'd like to the https server, as listed here: http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener
-      }
-    },
-  },
-},
-```
-
-
-#### options.cwd
-Type: `String|Object`  
-Default: `process.cwd()`
-
-Ability to set the current working directory. Defaults to `process.cwd()`. Can either be a string to set the cwd to match files and spawn tasks or an object to set each independently. Such as:
-```js
-options: {
-  cwd: {
-    files: 'match/files/from/here',
-    spawn: 'but/spawn/files/from/here'
-  }
-}
-```
-
-To strip off a path before emitting events:
-```js
-options: {
-  cwd: {
-    files: 'a/path',
-    event: 'a/path'
-  }
-}
-```
-This will strip off `a/path` before emitting events. This option is useful for specifying the base directory to use with livereload.
-
-
-#### options.livereloadOnError
-Type: `Boolean`  
-Default: `true`  
-
-Option to prevent the livereload if the executed tasks encountered an error. If set to `false`, the livereload will only be triggered if all tasks completed successfully.
-
-### Examples
-
-```js
-// Simple config to run jshint any time a file is added, changed or deleted
-grunt.initConfig({
-  watch: {
-    files: ['**/*'],
-    tasks: ['jshint'],
-  },
-});
-```
-
-```js
-// Advanced config. Run specific tasks when specific files are added, changed or deleted.
-grunt.initConfig({
-  watch: {
-    gruntfile: {
-      files: 'Gruntfile.js',
-      tasks: ['jshint:gruntfile'],
-    },
-    src: {
-      files: ['lib/*.js', 'css/**/*.scss', '!lib/dontwatch.js'],
-      tasks: ['default'],
-    },
-    test: {
-      files: '<%= jshint.test.src %>',
-      tasks: ['jshint:test', 'qunit'],
-    },
-  },
-});
-```
-
-#### Using the `watch` event
-This task will emit a `watch` event when watched files are modified. This is useful if you would like a simple notification when files are edited or if you're using this task in tandem with another task. Here is a simple example using the `watch` event:
-
-```js
-grunt.initConfig({
-  watch: {
-    scripts: {
-      files: ['lib/*.js'],
-    },
-  },
-});
-grunt.event.on('watch', function(action, filepath, target) {
-  grunt.log.writeln(target + ': ' + filepath + ' has ' + action);
-});
-```
-
-**The `watch` event is not intended for replacing the standard Grunt API for configuring and running tasks. If you're trying to run tasks from within the `watch` event you're more than likely doing it wrong. Please read [configuring tasks](http://gruntjs.com/configuring-tasks).**
-
-##### Compiling Files As Needed
-A very common request is to only compile files as needed. Here is an example that will only lint changed files with the `jshint` task:
-
-```js
-grunt.initConfig({
-  watch: {
-    scripts: {
-      files: ['lib/*.js'],
-      tasks: ['jshint'],
-      options: {
-        spawn: false,
-      },
-    },
-  },
-  jshint: {
-    all: {
-      src: ['lib/*.js'],
-    },
-  },
-});
-
-// On watch events configure jshint:all to only run on changed file
-grunt.event.on('watch', function(action, filepath) {
-  grunt.config('jshint.all.src', filepath);
-});
-```
-
-If you need to dynamically modify your config, the `spawn` option must be disabled to keep the watch running under the same context.
-
-If you save multiple files simultaneously you may opt for a more robust method:
-
-```js
-var changedFiles = Object.create(null);
-var onChange = grunt.util._.debounce(function() {
-  grunt.config('jshint.all.src', Object.keys(changedFiles));
-  changedFiles = Object.create(null);
-}, 200);
-grunt.event.on('watch', function(action, filepath) {
-  changedFiles[filepath] = action;
-  onChange();
-});
-```
-
-#### Live Reloading
-Live reloading is built into the watch task. Set the option `livereload` to `true` to enable on the default port `35729` or set to a custom port: `livereload: 1337`.
-
-The simplest way to add live reloading to all your watch targets is by setting `livereload` to `true` at the task level. This will run a single live reload server and trigger the live reload for all your watch targets:
-
-```js
-grunt.initConfig({
-  watch: {
-    options: {
-      livereload: true,
-    },
-    css: {
-      files: ['public/scss/*.scss'],
-      tasks: ['compass'],
-    },
-  },
-});
-```
-
-You can also configure live reload for individual watch targets or run multiple live reload servers. Just be sure if you're starting multiple servers they operate on different ports:
-
-```js
-grunt.initConfig({
-  watch: {
-    css: {
-      files: ['public/scss/*.scss'],
-      tasks: ['compass'],
-      options: {
-        // Start a live reload server on the default port 35729
-        livereload: true,
-      },
-    },
-    another: {
-      files: ['lib/*.js'],
-      tasks: ['anothertask'],
-      options: {
-        // Start another live reload server on port 1337
-        livereload: 1337,
-      },
-    },
-    dont: {
-      files: ['other/stuff/*'],
-      tasks: ['dostuff'],
-    },
-  },
-});
-```
-
-##### Enabling Live Reload in Your HTML
-Once you've started a live reload server you'll be able to access the live reload script. To enable live reload on your page, add a script tag before your closing `</body>` tag pointing to the `livereload.js` script:
-
-```html
-<script src="//localhost:35729/livereload.js"></script>
-```
-
-Feel free to add this script to your template situation and toggle with some sort of `dev` flag.
-
-##### Using Live Reload with the Browser Extension
-Instead of adding a script tag to your page, you can live reload your page by installing a browser extension. Please visit [how do I install and use the browser extensions](http://feedback.livereload.com/knowledgebase/articles/86242-how-do-i-install-and-use-the-browser-extensions-) for help installing an extension for your browser.
-
-Once installed please use the default live reload port `35729` and the browser extension will automatically reload your page without needing the `<script>` tag.
-
-##### Using Connect Middleware
-Since live reloading is used when developing, you may want to disable building for production (and are not using the browser extension). One method is to use Connect middleware to inject the script tag into your page. Try the [connect-livereload](https://github.com/intesso/connect-livereload) middleware for injecting the live reload script into your page.
-
-##### Rolling Your Own Live Reload
-Live reloading is made easy by the library [tiny-lr](https://github.com/mklabs/tiny-lr). It is encouraged to read the documentation for `tiny-lr`. If you would like to trigger the live reload server yourself, simply POST files to the URL: `http://localhost:35729/changed`. Or if you rather roll your own live reload implementation use the following example:
-
-```js
-// Create a live reload server instance
-var lrserver = require('tiny-lr')();
-
-// Listen on port 35729
-lrserver.listen(35729, function(err) { console.log('LR Server Started'); });
-
-// Then later trigger files or POST to localhost:35729/changed
-lrserver.changed({body:{files:['public/css/changed.css']}});
-```
-
-##### Live Reload with Preprocessors
-Any time a watched file is edited with the `livereload` option enabled, the file will be sent to the live reload server. Some edited files you may desire to have sent to the live reload server, such as when preprocessing (`sass`, `less`, `coffeescript`, etc). As any file not recognized will reload the entire page as opposed to just the `css` or `javascript`.
-
-The solution is to point a `livereload` watch target to your destination files:
-
-```js
-grunt.initConfig({
-  sass: {
-    dev: {
-      src: ['src/sass/*.sass'],
-      dest: 'dest/css/index.css',
-    },
-  },
-  watch: {
-    sass: {
-      // We watch and compile sass files as normal but don't live reload here
-      files: ['src/sass/*.sass'],
-      tasks: ['sass'],
-    },
-    livereload: {
-      // Here we watch the files the sass task will compile to
-      // These files are sent to the live reload server after sass compiles to them
-      options: { livereload: true },
-      files: ['dest/**/*'],
-    },
-  },
-});
-```
-
-### FAQs
-
-#### How do I fix the error `EMFILE: Too many opened files.`?
-This is because of your system's max opened file limit. For OSX the default is very low (256). Temporarily increase your limit with `ulimit -n 10480`, the number being the new max limit.
-
-In some versions of OSX the above solution doesn't work. In that case try `launchctl limit maxfiles 10480 10480 ` and restart your terminal. See [here](http://superuser.com/questions/261023/how-to-change-default-ulimit-values-in-mac-os-x-10-6).
-
-#### Can I use this with Grunt v0.3?
-`grunt-contrib-watch@0.1.x` is compatible with Grunt v0.3 but it is highly recommended to upgrade Grunt instead.
-
-#### Why is the watch devouring all my memory/cpu?
-Likely because of an enthusiastic pattern trying to watch thousands of files. Such as `'**/*.js'` but forgetting to exclude the `node_modules` folder with `'!**/node_modules/**'`. Try grouping your files within a subfolder or be more explicit with your file matching pattern.
-
-Another reason if you're watching a large number of files could be the low default `interval`. Try increasing with `options: { interval: 5007 }`. Please see issues [#35](https://github.com/gruntjs/grunt-contrib-watch/issues/35) and [#145](https://github.com/gruntjs/grunt-contrib-watch/issues/145) for more information.
-
-#### Why spawn as child processes as a default?
-The goal of this watch task is as files are changed, run tasks as if they were triggered by the user himself or herself. Each time a user runs `grunt` a process is spawned and tasks are ran in succession. In an effort to keep the experience consistent and continually produce expected results, this watch task spawns tasks as child processes by default.
-
-Sandboxing task runs also allows this watch task to run more stable over long periods of time. As well as more efficiently with more complex tasks and file structures.
-
-Spawning does cause a performance hit (usually 500ms for most environments). It also cripples tasks that rely on the watch task to share the context with each subsequent run (i.e., reload tasks). If you would like a faster watch task or need to share the context please set the `spawn` option to `false`. Just be aware that with this option enabled, the watch task is more prone to failure.
-
-#### How can I have the browser reload for files listed in a task?
-Instead of restarting your server each time a static file is changed, start a static web server using (grunt-contrib-connect)[https://github.com/gruntjs/grunt-contrib-connect].
-
-You'll have the `connect` web server on seperate port ex: port 9000 from your main server. When the 'livereload' option is enabled for 'watch' tasks, it will handle triggerring the live reload server for each tasks and when files are modified, which then server back to main server ex: 3000. The main server must include a script tag or a browser extension to the livereload server in order for the browser automatically.
-
-
-## Release History
-
- * 2018-05-12   v1.1.0   Update to `tiny-lr@1.1.1`, `lodash@4.17.10`, `async@2.6.0`
- * 2018-04-20   v1.0.1   Update to `gaze@1.1`, `lodash@4`
- * 2016-03-12   v1.0.0   Updated tiny-lr, gaze, async and lodash dependencies. Fix endless loop issue with `atBegin`/`nospawn`. Expose hostname parameter of tiny-lr. Support `cwd.event` to emit events relative to path. Removed peerDependencies setting.
- * 2014-03-19   v0.6.1   Fix for watch targets named "default".
- * 2014-03-11   v0.6.0   Clear changed files after triggering live reload to ensure they're only triggered once. `cwd` option now accepts separate settings for files and spawn. Fix to make interrupt work more than once. Enable live reload over HTTPS. Print newline after initial 'Waiting...'. Remove deprecated `grunt.util` libs. Add reload option to specify files other than Gruntfile files to reload. Update to gaze@0.5.1. Use a fork of tiny-lr (which has quiter operation, support for HTTPS and Windows path fixes). Add `livereloadOnError`, which if set to `false` will not trigger live reload if there is an error.
- * 2013-08-25   v0.5.3   Fixed for live reload missing files.
- * 2013-08-16   v0.5.2   Fixed issue running tasks after gruntfile is reloaded. Ignores empty file paths.
- * 2013-07-20   v0.5.1   Fixed issue with options resetting.
- * 2013-07-18   v0.5.0   Added target name to watch event. Added `atBegin` option to run tasks when watcher starts. Changed `nospawn` option to `spawn` (`nospawn` still available for backwards compatibility). Moved libs/vars into top scope to prevent re-init. Bumped Gaze version to ~0.4. Re-grab task/target options upon each task run. Add dateFormat option to override the date/time output upon completion.
- * 2013-05-27   v0.4.4   Remove gracefully closing SIGINT. Not needed and causes problems for Windows. Ensure tasks are an array to not conflict with `cliArgs`.
- * 2013-05-11   v0.4.3   Only group changed files per target to send correct files to live reload.
- * 2013-05-09   v0.4.2   Fix for closing watchers.
- * 2013-05-09   v0.4.1   Removed "beep" notification. Tasks now optional with livereload option. Reverted "run again" with interrupt off to fix infinite recursion issue. Watchers now close more properly on task run.
- * 2013-05-03   v0.4.0   Option `livereload` to start live reload servers. Will reload a Gruntfile before running tasks if Gruntfile is modified. Option event to only trigger watch on certain events. Refactor watch task into separate task runs per target. Option `forever` to override `grunt.fatal`/`warn` to help keeping the watch alive with `nospawn` enabled. Emit a beep upon complete. Logs all watched files with verbose flag set. If interrupt is off, will run the tasks once more if watch triggered during a previous task run. tasks property is optional for use with watch event. Watchers properly closed when exiting.
- * 2013-02-28   v0.3.1   Fix for top level options.
- * 2013-02-27   v0.3.0   `nospawn` option added to run tasks without spawning as child processes. Watch emits 'watch' events upon files being triggered with `grunt.event`. Completion time in seconds and date/time shown after tasks ran. Negate file patterns fixed. Tasks debounced individually to handle simultaneous triggering for multiple targets. Errors handled better and viewable with `--stack` CLI option. Code complexity reduced making the watch task code easier to read.
- * 2013-02-15   v0.2.0   First official release for Grunt 0.4.0.
- * 2013-01-18   v0.2.0rc7   Updating grunt/gruntplugin dependencies to rc6. Changing in-development grunt/gruntplugin dependency versions from tilde version ranges to specific versions.
- * 2013-01-09   v0.2.0rc5   Updating to work with grunt v0.4.0rc5.
- * 2012-12-15   v0.2.0a   Conversion to grunt v0.4 conventions. Remove Node.js v0.6 and grunt v0.3 support. Allow watch task to be renamed. Use `grunt.util.spawn` "grunt" option. Updated to gaze@0.3.0, `forceWatchMethod` option removed.
- * 2012-11-01   v0.1.4   Prevent watch from spawning duplicate watch tasks.
- * 2012-10-28   v0.1.3   Better method to spawn the grunt bin. Bump gaze to v0.2.0. Better handles some events and new option `forceWatchMethod`. Only support Node.js >= v0.8.
- * 2012-10-17   v0.1.2   Only spawn a process per task one at a time. Add `interrupt` option to cancel previous spawned process. Grunt v0.3 compatibility changes.
- * 2012-10-16   v0.1.1   Fallback to global grunt bin if local doesn't exist. Fatal if bin cannot be found. Update to gaze 0.1.6.
- * 2012-10-08   v0.1.0   Release watch task. Remove spawn from helper. Run on Grunt v0.4.
-
----
-
-Task submitted by [Kyle Robinson Young](http://dontkry.com)
-
-*This file was generated on Sat May 12 2018 21:15:02.*
-
-==========================================
-END OF grunt-contrib-watch@1.1.0 NOTICES AND INFORMATION
 
 
 
@@ -4476,123 +3083,6 @@ You can get the data out again with `rack.get(id)` and set the data with
 
 ==========================================
 END OF hat@0.0.3 NOTICES AND INFORMATION
-
-
-
-http-parser-js@0.4.10 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright (c) 2015 Tim Caswell (https://github.com/creationix) and other
-contributors. All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-
-Some files from the tests folder are from joyent/node and mscedex/io.js, a fork
-of nodejs/io.js:
-
-- tests/iojs/test-http-parser-durability.js
-
-  This file is from https://github.com/mscdex/io.js/blob/js-http-parser/test/pummel/test-http-parser-durability.js
-  with modifications by Jan Schär (jscissr).
-
-  """
-  Copyright io.js contributors. All rights reserved.
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to
-  deal in the Software without restriction, including without limitation the
-  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-  sell copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-  IN THE SOFTWARE.
-  """
-
-- tests/fixtures/*
-  tests/parallel/*
-  tests/testpy/*
-  tests/common.js
-  tests/test.py
-  tests/utils.py
-
-  These files are from https://github.com/nodejs/node with changes by
-  Jan Schär (jscissr).
-
-  Node.js is licensed for use as follows:
-  
-  """
-  Copyright Node.js contributors. All rights reserved.
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to
-  deal in the Software without restriction, including without limitation the
-  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-  sell copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-  IN THE SOFTWARE.
-  """
-
-  This license applies to parts of Node.js originating from the
-  https://github.com/joyent/node repository:
-
-  """
-  Copyright Joyent, Inc. and other Node contributors. All rights reserved.
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to
-  deal in the Software without restriction, including without limitation the
-  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-  sell copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-  IN THE SOFTWARE.
-  """
-  
-==========================================
-END OF http-parser-js@0.4.10 NOTICES AND INFORMATION
 
 
 
@@ -5555,29 +4045,6 @@ END OF inferno@5.0.6 NOTICES AND INFORMATION
 
 
 
-inflight@1.0.6 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-The ISC License
-
-Copyright (c) Isaac Z. Schlueter
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
-IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-==========================================
-END OF inflight@1.0.6 NOTICES AND INFORMATION
-
-
-
 inherits@2.0.4 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 The ISC License
@@ -6099,19 +4566,10 @@ END OF jquery-ui@1.12.1 NOTICES AND INFORMATION
 
 
 
-jquery@3.3.1 NOTICES AND INFORMATION BEGIN HERE
+jquery@3.4.1 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 Copyright JS Foundation and other contributors, https://js.foundation/
 
-This software consists of voluntary contributions made by many
-individuals. For exact contribution history, see the revision history
-available at https://github.com/jquery/jquery
-
-The following license applies to all parts of this software except as
-documented below:
-
-====
-
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
 "Software"), to deal in the Software without restriction, including
@@ -6131,48 +4589,14 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-====
-
-All files located in the node_modules and external directories are
-externally maintained libraries used by this software which have their
-own licenses; we recommend you read them, as their terms may differ from
-the terms above.
-
 ==========================================
-END OF jquery@3.3.1 NOTICES AND INFORMATION
+END OF jquery@3.4.1 NOTICES AND INFORMATION
 
 
 
-livereload-js@2.4.0 NOTICES AND INFORMATION BEGIN HERE
+lodash@4.17.14 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
-Copyright (c) 2010-2012 Andrey Tarantsov
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-==========================================
-END OF livereload-js@2.4.0 NOTICES AND INFORMATION
-
-
-
-lodash@4.17.11 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright JS Foundation and other contributors <https://js.foundation/>
+Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
 
 Based on Underscore.js, copyright Jeremy Ashkenas,
 DocumentCloud and Investigative Reporters & Editors <http://underscorejs.org/>
@@ -6221,58 +4645,7 @@ licenses; we recommend you read them, as their terms may differ from the
 terms above.
 
 ==========================================
-END OF lodash@4.17.11 NOTICES AND INFORMATION
-
-
-
-marked@0.6.2 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-# License information
-
-## Contribution License Agreement
-
-If you contribute code to this project, you are implicitly allowing your code
-to be distributed under the MIT license. You are also implicitly verifying that
-all code is your original work. `</legalese>`
-
-## Marked
-
-Copyright (c) 2011-2018, Christopher Jeffrey (https://github.com/chjj/)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-## Markdown
-
-Copyright © 2004, John Gruber 
-http://daringfireball.net/ 
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-* Neither the name “Markdown” nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-This software is provided by the copyright holders and contributors “as is” and any express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed. In no event shall the copyright owner or contributors be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
-
-==========================================
-END OF marked@0.6.2 NOTICES AND INFORMATION
+END OF lodash@4.17.14 NOTICES AND INFORMATION
 
 
 
@@ -6469,7 +4842,7 @@ END OF mimic-fn@1.2.0 NOTICES AND INFORMATION
 
 
 
-min-dash@3.5.0 NOTICES AND INFORMATION BEGIN HERE
+min-dash@3.5.2 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 The MIT License (MIT)
 
@@ -6493,7 +4866,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ==========================================
-END OF min-dash@3.5.0 NOTICES AND INFORMATION
+END OF min-dash@3.5.2 NOTICES AND INFORMATION
 
 
 
@@ -6523,29 +4896,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ==========================================
 END OF min-dom@3.1.1 NOTICES AND INFORMATION
-
-
-
-minimatch@3.0.4 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-The ISC License
-
-Copyright (c) Isaac Z. Schlueter and Contributors
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
-IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-==========================================
-END OF minimatch@3.0.4 NOTICES AND INFORMATION
 
 
 
@@ -7088,29 +5438,6 @@ END OF object-refs@0.3.0 NOTICES AND INFORMATION
 
 
 
-once@1.4.0 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-The ISC License
-
-Copyright (c) Isaac Z. Schlueter and Contributors
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
-IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-==========================================
-END OF once@1.4.0 NOTICES AND INFORMATION
-
-
-
 onetime@2.0.1 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 The MIT License (MIT)
@@ -7255,35 +5582,6 @@ END OF path-intersection@1.1.1 NOTICES AND INFORMATION
 
 
 
-path-is-absolute@1.0.1 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-The MIT License (MIT)
-
-Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-==========================================
-END OF path-is-absolute@1.0.1 NOTICES AND INFORMATION
-
-
-
 pinkie-promise@2.0.1 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 The MIT License (MIT)
@@ -7368,147 +5666,40 @@ END OF q@1.5.1 NOTICES AND INFORMATION
 
 
 
-qs@6.7.0 NOTICES AND INFORMATION BEGIN HERE
+qs@6.9.0 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
-Copyright (c) 2014 Nathan LaFreniere and other contributors.
+BSD 3-Clause License
+
+Copyright (c) 2014, Nathan LaFreniere and other [contributors](https://github.com/ljharb/qs/graphs/contributors)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * The names of any contributors may not be used to endorse or promote
-      products derived from this software without specific prior written
-      permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS AND CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
 
-                                  *   *   *
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
 
-The complete list of contributors can be found at: https://github.com/hapijs/qs/graphs/contributors
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
-==========================================
-END OF qs@6.7.0 NOTICES AND INFORMATION
-
-
-
-raw-body@1.1.7 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-# raw-body
-
-[![NPM version](https://badge.fury.io/js/method-override.svg)](http://badge.fury.io/js/raw-body)
-[![Build Status](https://travis-ci.org/stream-utils/raw-body.svg?branch=master)](https://travis-ci.org/stream-utils/raw-body)
-[![Coverage Status](https://img.shields.io/coveralls/stream-utils/raw-body.svg?branch=master)](https://coveralls.io/r/stream-utils/raw-body)
-
-Gets the entire buffer of a stream either as a `Buffer` or a string.
-Validates the stream's length against an expected length and maximum limit.
-Ideal for parsing request bodies.
-
-## API
-
-```js
-var getRawBody = require('raw-body')
-
-app.use(function (req, res, next) {
-  getRawBody(req, {
-    length: req.headers['content-length'],
-    limit: '1mb',
-    encoding: 'utf8'
-  }, function (err, string) {
-    if (err)
-      return next(err)
-
-    req.text = string
-    next()
-  })
-})
-```
-
-or in a Koa generator:
-
-```js
-app.use(function* (next) {
-  var string = yield getRawBody(this.req, {
-    length: this.length,
-    limit: '1mb',
-    encoding: 'utf8'
-  })
-})
-```
-
-### getRawBody(stream, [options], [callback])
-
-Returns a thunk for yielding with generators.
-
-Options:
-
-- `length` - The length length of the stream.
-  If the contents of the stream do not add up to this length,
-  an `400` error code is returned.
-- `limit` - The byte limit of the body.
-  If the body ends up being larger than this limit,
-  a `413` error code is returned.
-- `encoding` - The requested encoding.
-  By default, a `Buffer` instance will be returned.
-  Most likely, you want `utf8`.
-  You can use any type of encoding supported by [StringDecoder](http://nodejs.org/api/string_decoder.html).
-  You can also pass `true` which sets it to the default `utf8`
-
-`callback(err, res)`:
-
-- `err` - the following attributes will be defined if applicable:
-
-    - `limit` - the limit in bytes
-    - `length` and `expected` - the expected length of the stream
-    - `received` - the received bytes
-    - `status` and `statusCode` - the corresponding status code for the error
-    - `type` - either `entity.too.large`, `request.size.invalid`, or `stream.encoding.set`
-
-- `res` - the result, either as a `String` if an encoding was set or a `Buffer` otherwise.
-
-If an error occurs, the stream will be paused,
-and you are responsible for correctly disposing the stream.
-For HTTP requests, no handling is required if you send a response.
-For streams that use file descriptors, you should `stream.destroy()` or `stream.close()` to prevent leaks.
-
-## License
-
-The MIT License (MIT)
-
-Copyright (c) 2013 Jonathan Ong me@jongleberry.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ==========================================
-END OF raw-body@1.1.7 NOTICES AND INFORMATION
+END OF qs@6.9.0 NOTICES AND INFORMATION
 
 
 
@@ -7788,7 +5979,7 @@ END OF rx@4.1.0 NOTICES AND INFORMATION
 
 
 
-safe-buffer@5.1.2 NOTICES AND INFORMATION BEGIN HERE
+safe-buffer@5.2.0 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 The MIT License (MIT)
 
@@ -7813,34 +6004,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ==========================================
-END OF safe-buffer@5.1.2 NOTICES AND INFORMATION
-
-
-
-safe-json-parse@1.0.1 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright (c) 2013 Raynos.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-==========================================
-END OF safe-json-parse@1.0.1 NOTICES AND INFORMATION
+END OF safe-buffer@5.2.0 NOTICES AND INFORMATION
 
 
 
@@ -8038,33 +6202,6 @@ END OF signal-exit@3.0.2 NOTICES AND INFORMATION
 
 
 
-string-template@0.2.1 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright (c) 2013 Matt Esch.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-==========================================
-END OF string-template@0.2.1 NOTICES AND INFORMATION
-
-
-
 string-width@2.1.1 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 MIT License
@@ -8082,35 +6219,7 @@ END OF string-width@2.1.1 NOTICES AND INFORMATION
 
 
 
-string_decoder@0.10.31 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright Joyent, Inc. and other Node contributors.
-
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to permit
-persons to whom the Software is furnished to do so, subject to the
-following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-==========================================
-END OF string_decoder@0.10.31 NOTICES AND INFORMATION
-
-
-
-string_decoder@1.2.0 NOTICES AND INFORMATION BEGIN HERE
+string_decoder@1.3.0 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 Node.js is licensed for use as follows:
 
@@ -8162,7 +6271,7 @@ IN THE SOFTWARE.
 
 
 ==========================================
-END OF string_decoder@1.2.0 NOTICES AND INFORMATION
+END OF string_decoder@1.3.0 NOTICES AND INFORMATION
 
 
 
@@ -8352,37 +6461,7 @@ END OF tiny-emitter@2.1.0 NOTICES AND INFORMATION
 
 
 
-tiny-lr@1.1.1 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright (c) 2012-2016 Mickael Daniel
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
-==========================================
-END OF tiny-lr@1.1.1 NOTICES AND INFORMATION
-
-
-
-tiny-svg@2.2.1 NOTICES AND INFORMATION BEGIN HERE
+tiny-svg@2.2.2 NOTICES AND INFORMATION BEGIN HERE
 ==========================================
 The MIT License (MIT)
 
@@ -8407,7 +6486,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ==========================================
-END OF tiny-svg@2.2.1 NOTICES AND INFORMATION
+END OF tiny-svg@2.2.2 NOTICES AND INFORMATION
 
 
 
@@ -8469,104 +6548,5 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 ==========================================
 END OF util-deprecate@1.0.2 NOTICES AND INFORMATION
-
-
-
-websocket-driver@0.7.3 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-Copyright 2010-2019 James Coglan
-
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-CONDITIONS OF ANY KIND, either express or implied. See the License for the
-specific language governing permissions and limitations under the License.
-
-==========================================
-END OF websocket-driver@0.7.3 NOTICES AND INFORMATION
-
-
-
-websocket-extensions@0.1.3 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-# The MIT License
-
-Copyright (c) 2014-2017 James Coglan
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the 'Software'), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-==========================================
-END OF websocket-extensions@0.1.3 NOTICES AND INFORMATION
-
-
-
-wrappy@1.0.2 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-The ISC License
-
-Copyright (c) Isaac Z. Schlueter and Contributors
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
-IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-==========================================
-END OF wrappy@1.0.2 NOTICES AND INFORMATION
-
-
-
-xtend@4.0.2 NOTICES AND INFORMATION BEGIN HERE
-==========================================
-The MIT License (MIT)
-Copyright (c) 2012-2014 Raynos.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-==========================================
-END OF xtend@4.0.2 NOTICES AND INFORMATION
 
 
