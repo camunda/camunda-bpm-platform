@@ -336,7 +336,8 @@ public abstract class TestHelper {
       message.append("Database is not clean:\n")
              .append(databasePurgeReport.getPurgeReportAsString());
     } else {
-      LOG.debug("Database was clean.");
+      LOG.debug(
+          purgeReport.getDatabasePurgeReport().isDbContainsLicenseKey() ? "Database contains license key but is considered clean." : "Database was clean.");
     }
     if (paRegistrationMessage != null) {
       message.append(paRegistrationMessage);
@@ -345,6 +346,7 @@ public abstract class TestHelper {
     if (fail && message.length() > 0) {
       Assert.fail(message.toString());
     }
+
     return message.toString();
   }
 

@@ -178,6 +178,18 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new DeletePropertyCmd(name));
   }
 
+  public void setLicenseKey(String licenseKey) {
+    commandExecutor.execute(new SetLicenseKeyCmd(licenseKey));
+  }
+
+  public String getLicenseKey() {
+    return commandExecutor.execute(new GetLicenseKeyCmd());
+  }
+
+  public void deleteLicenseKey() {
+    commandExecutor.execute(new DeleteLicenseKeyCmd(true));
+  }
+
   public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
     return commandExecutor.execute(new Command<String>() {
       public String execute(CommandContext commandContext) {
