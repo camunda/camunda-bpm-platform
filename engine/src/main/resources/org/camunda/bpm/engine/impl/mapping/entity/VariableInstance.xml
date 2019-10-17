@@ -433,10 +433,10 @@
 
             <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance & Execution, the same query object is used there! -->
             <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-              and 
+              and
+              <bind name="varPrefix" value="'RES.'"/>
               <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
               <bind name="varTypeField" value="'TYPE_'"/>
-              <bind name="varPrefix" value="'RES.'"/>
               <if test="queryVariableValue.valueConditions != null">
                 and
                 <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
