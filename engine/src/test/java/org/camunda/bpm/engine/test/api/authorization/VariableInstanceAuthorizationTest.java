@@ -446,15 +446,21 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
   /*
    * CAM-10864: Tests that the query itself works if authorization is used and a value matcher
    */
-  public void FAILING_testQueryWithVariableValueFilter() {
+  public void testQueryWithVariableValueFilter() {
     // given
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("foo", "bar");
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_INSTANCE);
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals(VARIABLE_NAME, VARIABLE_VALUE);
+    VariableInstanceQuery ignoreCaseQuery = runtimeService.createVariableInstanceQuery().variableValueEquals(VARIABLE_NAME, VARIABLE_VALUE).matchVariableNamesIgnoreCase();
 
     // when
     List<VariableInstance> results = query.list();
+    List<VariableInstance> ignoreCaseResults = ignoreCaseQuery.list();
 
     // then
-    assertEquals(0, results.size());
+    assertEquals(1, results.size());
+    assertEquals(1, ignoreCaseResults.size());
   }
 
   // helper ////////////////////////////////////////////////////////////////

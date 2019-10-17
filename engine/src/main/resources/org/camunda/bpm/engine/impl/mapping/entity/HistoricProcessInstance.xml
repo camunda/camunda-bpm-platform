@@ -440,11 +440,13 @@
               from
               ${prefix}ACT_HI_VARINST
               WHERE
+              <bind name="varPrefix" value="''"/>
+
               <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableNameEqualsCaseInsensitive" />
+
               AND PROC_INST_ID_ = SELF.PROC_INST_ID_
 
               <bind name="varTypeField" value="'VAR_TYPE_'"/>
-              <bind name="varPrefix" value="''"/>
               <if test="queryVariableValue.valueConditions != null">
                 and <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
               </if>
