@@ -29,6 +29,7 @@ public class DatabasePurgeReport implements PurgeReporting<Long> {
    * Value: entity count
    */
   Map<String, Long> deletedEntities = new HashMap<String, Long>();
+  boolean dbContainsLicenseKey;
 
   @Override
   public void addPurgeInformation(String key, Long value) {
@@ -63,5 +64,13 @@ public class DatabasePurgeReport implements PurgeReporting<Long> {
 
   public boolean isEmpty() {
     return deletedEntities.isEmpty();
+  }
+
+  public boolean isDbContainsLicenseKey() {
+    return dbContainsLicenseKey;
+  }
+
+  public void setDbContainsLicenseKey(boolean dbContainsLicenseKey) {
+    this.dbContainsLicenseKey = dbContainsLicenseKey;
   }
 }
