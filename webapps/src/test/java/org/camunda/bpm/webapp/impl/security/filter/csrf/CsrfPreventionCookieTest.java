@@ -181,4 +181,17 @@ public class CsrfPreventionCookieTest {
       .matches("myCookieName=[A-Z0-9]{32};Path=/camunda;SameSite=Lax");
   }
 
+  @Test
+  public void shouldRejectModifyingRequest() {
+    // given
+    headerRule.startServer("web.xml", "csrf");
+
+    // when
+    headerRule.performPostRequest("/api/admin/auth/user/default/login/welcome");
+
+    // then
+    assertThat(headerRule.getResponseBody())
+      .matches("CSRFPreventionFilter: Token provided via HTTP Header is absent/empty.");
+  }
+
 }
