@@ -722,8 +722,8 @@ public class IdentityServiceTest {
     user.setPassword("xxx");
     identityService.saveUser(user);
 
-    Date now = null;
-    now = ClockUtil.getCurrentTime();
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
     assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
     ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 30));
     assertTrue(identityService.checkPassword("johndoe", "xxx"));
@@ -740,6 +740,7 @@ public class IdentityServiceTest {
     identityService.saveUser(user);
 
     Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
     assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
     assertFalse(identityService.checkPassword("johndoe", "xxx"));
 
@@ -762,8 +763,8 @@ public class IdentityServiceTest {
     user.setPassword("xxx");
     identityService.saveUser(user);
 
-    Date now = null;
-    now = ClockUtil.getCurrentTime();
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
     assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
 
     ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 1));
