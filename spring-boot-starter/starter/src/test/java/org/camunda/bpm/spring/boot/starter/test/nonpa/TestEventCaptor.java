@@ -19,8 +19,12 @@ package org.camunda.bpm.spring.boot.starter.test.nonpa;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.spring.boot.starter.event.ExecutionEvent;
+import org.camunda.bpm.spring.boot.starter.event.TaskEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Stack;
 
@@ -29,7 +33,16 @@ public class TestEventCaptor {
 
   public Stack<HistoryEvent> historyEvents = new Stack<>();
   public Stack<TaskEvent> taskEvents = new Stack<>();
+  public Stack<TaskEvent> immutableTaskEvents = new Stack<>();
   public Stack<ExecutionEvent> executionEvents = new Stack<>();
+  public Stack<ExecutionEvent> immutableExecutionEvents = new Stack<>();
+
+  // Transactional Listener Events
+  public Stack<HistoryEvent> transactionHistoryEvents = new Stack<>();
+  public Stack<TaskEvent> transactionTaskEvents = new Stack<>();
+  public Stack<TaskEvent> transactionImmutableTaskEvents = new Stack<>();
+  public Stack<ExecutionEvent> transactionExecutionEvents = new Stack<>();
+  public Stack<ExecutionEvent> transactionImmutableExecutionEvents = new Stack<>();
 
   @EventListener
   public void onEvent(HistoryEvent event) {
@@ -46,30 +59,53 @@ public class TestEventCaptor {
     taskEvents.push(new TaskEvent(event));
   }
 
-  public static class ExecutionEvent {
-    public final String id;
-    public final String processInstanceId;
-    public final String activityId;
-    public final String eventName;
-
-    public ExecutionEvent(DelegateExecution execution) {
-      this.id = execution.getId();
-      this.processInstanceId = execution.getProcessInstanceId();
-      this.activityId = execution.getCurrentActivityId();
-      this.eventName = execution.getEventName();
-    }
+  @EventListener
+  public void onEvent(ExecutionEvent event) {
+    immutableExecutionEvents.push(event);
   }
 
-  public static class TaskEvent {
-    public final String id;
-    public final String processInstanceId;
-    public final String eventName;
+  @EventListener
+  public void onEvent(TaskEvent event) {
+    immutableTaskEvents.push(event);
+  }
 
-    public TaskEvent(DelegateTask task) {
-      this.id = task.getId();
-      this.processInstanceId = task.getProcessInstanceId();
-      this.eventName = task.getEventName();
-    }
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+  public void onTransactionalEvent(HistoryEvent event) {
+    transactionHistoryEvents.push(event);
+  }
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+  public void onTransactionalEvent(DelegateExecution event) {
+    transactionExecutionEvents.push(new ExecutionEvent(event));
+  }
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+  public void onTransactionalEvent(DelegateTask event) {
+    transactionTaskEvents.push(new TaskEvent(event));
+  }
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+  public void onTransactionalEvent(ExecutionEvent event) {
+    transactionImmutableExecutionEvents.push(event);
+  }
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+  public void onTransactionalEvent(TaskEvent event) {
+    transactionImmutableTaskEvents.push(event);
+  }
+
+  public void clear() {
+    historyEvents.clear();
+    taskEvents.clear();
+    immutableTaskEvents.clear();
+    executionEvents.clear();
+    immutableExecutionEvents.clear();
+
+    transactionHistoryEvents.clear();
+    transactionTaskEvents.clear();
+    transactionImmutableTaskEvents.clear();
+    transactionExecutionEvents.clear();
+    transactionImmutableExecutionEvents.clear();
   }
 
 }

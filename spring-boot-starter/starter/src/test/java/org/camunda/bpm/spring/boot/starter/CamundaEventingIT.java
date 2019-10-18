@@ -19,12 +19,13 @@ package org.camunda.bpm.spring.boot.starter;
 import org.assertj.core.util.DateUtil;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.spring.boot.starter.event.TaskEvent;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestEventCaptor;
 import org.junit.After;
@@ -37,7 +38,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 
 import static junit.framework.TestCase.fail;
@@ -49,7 +49,6 @@ import static org.assertj.core.api.Assertions.assertThat;
   webEnvironment = WebEnvironment.NONE
 )
 @ActiveProfiles("eventing")
-@Transactional
 public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
 
   @Autowired
@@ -65,13 +64,7 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
 
   @Before
   public void init() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-      .processDefinitionKey("eventing")
-      .singleResult();
-    assertThat(processDefinition).isNotNull();
-
-    eventCaptor.historyEvents.clear();
-    instance = runtime.startProcessInstanceByKey("eventing");
+    eventCaptor.clear();
   }
 
   @After
@@ -87,98 +80,110 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
 
   @Test
   public final void shouldEventTaskCreation() {
+    // when
+    startEventingInstance();
 
-    assertThat(eventCaptor.taskEvents).isNotEmpty();
-
+    // then
     Task task = taskService.createTaskQuery().active().singleResult();
-    TestEventCaptor.TaskEvent taskEvent = eventCaptor.taskEvents.pop();
+    assertTaskEvents(task, TaskListener.EVENTNAME_CREATE);
+  }
 
-    assertThat(taskEvent.eventName).isEqualTo("create");
-    assertThat(taskEvent.id).isEqualTo(task.getId());
-    assertThat(taskEvent.processInstanceId).isEqualTo(task.getProcessInstanceId());
+  @Test
+  public final void shouldEventTaskCreationWithAssignment() {
+    // when
+    instance = runtime.startProcessInstanceByKey("eventingWithAssignment");
+
+    // then
+    Task task = taskService.createTaskQuery().active().singleResult();
+    // two events fired ('create' and then 'assignment')
+    assertTaskEvents(task, 2, TaskListener.EVENTNAME_ASSIGNMENT, TaskListener.EVENTNAME_CREATE);
+  }
+
+  @Test
+  public final void shouldEventTaskUpdate() {
+    // given
+    startEventingInstance();
+    Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
+
+    // when
+    taskService.setOwner(task.getId(), "newUser");
+
+    // then
+    assertTaskEvents(task, TaskListener.EVENTNAME_UPDATE);
   }
 
   @Test
   public final void shouldEventTaskAssignment() {
-
     // given
-    assertThat(eventCaptor.taskEvents).isNotEmpty();
-    eventCaptor.taskEvents.clear();
+    startEventingInstance();
     Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
 
     // when
     taskService.setAssignee(task.getId(), "kermit");
 
     // then
-    TestEventCaptor.TaskEvent taskEvent = eventCaptor.taskEvents.pop();
-    assertThat(taskEvent.eventName).isEqualTo("assignment");
-    assertThat(taskEvent.id).isEqualTo(task.getId());
-    assertThat(taskEvent.processInstanceId).isEqualTo(task.getProcessInstanceId());
+    // two events fired ('update' and then 'assignment')
+    assertTaskEvents(task, 2, TaskListener.EVENTNAME_ASSIGNMENT, TaskListener.EVENTNAME_UPDATE);
   }
-
 
   @Test
   public final void shouldEventTaskComplete() {
-
     // given
-    assertThat(eventCaptor.taskEvents).isNotEmpty();
-    eventCaptor.taskEvents.clear();
+    startEventingInstance();
     Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
 
     // when
     taskService.complete(task.getId());
 
     // then
-    TestEventCaptor.TaskEvent taskEvent = eventCaptor.taskEvents.pop();
-    assertThat(taskEvent.eventName).isEqualTo("complete");
-    assertThat(taskEvent.id).isEqualTo(task.getId());
-    assertThat(taskEvent.processInstanceId).isEqualTo(task.getProcessInstanceId());
+    assertTaskEvents(task, TaskListener.EVENTNAME_COMPLETE);
   }
 
   @Test
   public final void shouldEventTaskDelete() {
-
     // given
-    assertThat(eventCaptor.taskEvents).isNotEmpty();
-    eventCaptor.taskEvents.clear();
+    startEventingInstance();
     Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
 
     // when
     runtimeService.deleteProcessInstance(instance.getProcessInstanceId(), "no need");
 
     // then
-    TestEventCaptor.TaskEvent taskEvent = eventCaptor.taskEvents.pop();
-    assertThat(taskEvent.eventName).isEqualTo("delete");
-    assertThat(taskEvent.id).isEqualTo(task.getId());
-    assertThat(taskEvent.processInstanceId).isEqualTo(task.getProcessInstanceId());
+    assertTaskEvents(task, TaskListener.EVENTNAME_DELETE);
   }
 
   @Test
   public final void shouldEventExecution() {
     // given
-    assertThat(eventCaptor.executionEvents).isNotEmpty();
-    eventCaptor.executionEvents.clear();
+    startEventingInstance();
     Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
 
     // when
     taskService.complete(task.getId());
 
-    // then 7
+    // then 8
     // 2 for user task (take, end)
     // 3 for service task (start, take, end)
     // 2 for end event (start, end)
     // 1 for process (end)
-    assertThat(eventCaptor.executionEvents.size()).isEqualTo(2 + 3 + 2 + 1);
+    int expectedCount = 2 + 3 + 2 + 1;
+    assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionImmutableExecutionEvents).hasSize(expectedCount);
   }
 
   @Test
   public final void shouldEventHistoryTaskAssignmentChanges() {
     // given
-    assertThat(eventCaptor.historyEvents).isNotEmpty();
-    eventCaptor.historyEvents.clear();
-    assertThat(eventCaptor.historyEvents).isEmpty();
-
+    startEventingInstance();
     Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
 
     // when
     taskService.addCandidateUser(task.getId(), "userId");
@@ -236,18 +241,18 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
     assertThat(eventCaptor.historyEvents).isEmpty();
   }
 
-
   @Test
   public void shouldEventHistoryTaskAttributeChanges() {
-    assertThat(eventCaptor.historyEvents).isNotEmpty();
-    eventCaptor.historyEvents.clear();
-
+    // given
+    startEventingInstance();
     Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
 
+    // when
     task.setName("new Name");
     taskService.saveTask(task);
 
-
+    // then
     HistoryEvent taskChangeEvent = eventCaptor.historyEvents.pop();
     assertThat(taskChangeEvent.getEventType()).isEqualTo("update");
     if (taskChangeEvent instanceof HistoricTaskInstanceEventEntity) {
@@ -260,13 +265,10 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
 
   @Test
   public void shouldEventHistoryTaskMultipleAssignmentChanges() {
-
     // given
-    assertThat(eventCaptor.historyEvents).isNotEmpty();
-    eventCaptor.historyEvents.clear();
-    assertThat(eventCaptor.historyEvents).isEmpty();
-
+    startEventingInstance();
     Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
 
     // when
     taskService.addCandidateUser(task.getId(), "user1");
@@ -301,16 +303,18 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
 
   @Test
   public void shouldEventHistoryTaskFollowUpDateChanges() {
-    assertThat(eventCaptor.historyEvents).isNotEmpty();
-    eventCaptor.historyEvents.clear();
-
+    // given
+    startEventingInstance();
     Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
 
     Date now = DateUtil.now();
 
+    // when
     task.setFollowUpDate(now);
     taskService.saveTask(task);
 
+    // then
     HistoryEvent taskChangeEvent = eventCaptor.historyEvents.pop();
     assertThat(taskChangeEvent.getEventType()).isEqualTo("update");
     if (taskChangeEvent instanceof HistoricTaskInstanceEventEntity) {
@@ -318,5 +322,38 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
     } else {
       fail("Expected task instance change event");
     }
+  }
+
+  protected void assertTaskEvents(Task task, String event) {
+    assertTaskEvents(task, 1, event);
+  }
+
+  protected void assertTaskEvents(Task task, int numberOfEvents, String...events) {
+    assertThat(eventCaptor.taskEvents).hasSize(numberOfEvents);
+    assertThat(eventCaptor.immutableTaskEvents).hasSize(numberOfEvents);
+    assertThat(eventCaptor.transactionTaskEvents).hasSize(numberOfEvents);
+    assertThat(eventCaptor.transactionImmutableTaskEvents).hasSize(numberOfEvents);
+
+    for (int i = 0; i < numberOfEvents; i++) {
+      /*
+       * oldest event happened before latest does not work for mutable transaction
+       * listener events since the delegate task was altered to assignment when the
+       * event is dispatched to the listener
+       */
+      assertTaskEvent(task, eventCaptor.taskEvents.pop(), events[i]);
+      assertTaskEvent(task, eventCaptor.immutableTaskEvents.pop(), events[i]);
+      assertTaskEvent(task, eventCaptor.transactionTaskEvents.pop(), events[0]);
+      assertTaskEvent(task, eventCaptor.transactionImmutableTaskEvents.pop(), events[i]);
+    }
+  }
+
+  protected void assertTaskEvent(Task task, TaskEvent taskEvent, String event) {
+    assertThat(taskEvent.getEventName()).isEqualTo(event);
+    assertThat(taskEvent.getId()).isEqualTo(task.getId());
+    assertThat(taskEvent.getProcessInstanceId()).isEqualTo(task.getProcessInstanceId());
+  }
+
+  protected void startEventingInstance() {
+    instance = runtime.startProcessInstanceByKey("eventing");
   }
 }

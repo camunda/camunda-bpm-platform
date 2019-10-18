@@ -44,7 +44,8 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
     EVENTNAME_COMPLETE,
     EVENTNAME_ASSIGNMENT,
     EVENTNAME_CREATE,
-    EVENTNAME_DELETE);
+    EVENTNAME_DELETE,
+    EVENTNAME_UPDATE);
   private static final List<String> EXECUTION_EVENTS = Arrays.asList(
     EVENTNAME_START,
     EVENTNAME_END);
@@ -54,17 +55,23 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
 
   public PublishDelegateParseListener(final ApplicationEventPublisher publisher, final EventingProperty property) {
 
-    this.taskListener = delegateTask -> {
-      if (property.isTask()) {
+    if (property.isTask()) {
+      this.taskListener = delegateTask -> {
         publisher.publishEvent(delegateTask);
-      }
-    };
+        publisher.publishEvent(new TaskEvent(delegateTask));
+      };
+    } else {
+      this.taskListener = null;
+    }
 
-    this.executionListener = delegateExecution -> {
-      if (property.isExecution()) {
+    if (property.isExecution()) {
+      this.executionListener = delegateExecution -> {
         publisher.publishEvent(delegateExecution);
-      }
-    };
+        publisher.publishEvent(new ExecutionEvent(delegateExecution));
+      };
+    } else {
+      this.executionListener = null;
+    }
   }
 
 
@@ -177,8 +184,10 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
-    for (String event : EXECUTION_EVENTS) {
-      processDefinition.addListener(event, executionListener);
+    if (executionListener != null) {
+      for (String event : EXECUTION_EVENTS) {
+        processDefinition.addListener(event, executionListener);
+      }
     }
   }
 
@@ -227,20 +236,25 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
     addExecutionListener(activity);
   }
 
-
   private void addExecutionListener(final ActivityImpl activity) {
-    for (String event : EXECUTION_EVENTS) {
-      activity.addListener(event, executionListener);
+    if (executionListener != null) {
+      for (String event : EXECUTION_EVENTS) {
+        activity.addListener(event, executionListener);
+      }
     }
   }
 
   private void addExecutionListener(final TransitionImpl transition) {
-    transition.addListener(EVENTNAME_TAKE, executionListener);
+    if (executionListener != null) {
+      transition.addListener(EVENTNAME_TAKE, executionListener);
+    }
   }
 
   private void addTaskListener(TaskDefinition taskDefinition) {
-    for (String event : TASK_EVENTS) {
-      taskDefinition.addTaskListener(event, taskListener);
+    if (taskListener != null) {
+      for (String event : TASK_EVENTS) {
+        taskDefinition.addTaskListener(event, taskListener);
+      }
     }
   }
 
