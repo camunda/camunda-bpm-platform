@@ -25,7 +25,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
+import java.net.URLConnection;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.fail;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -61,6 +65,29 @@ public class CsrfPreventionIT {
     assertThat(xsrfTokenHeader).matches("[A-Z0-9]{32}");
 
     assertThat(xsrfCookieValue).contains(xsrfTokenHeader);
+  }
+
+  @Test
+  public void shouldRejectModifyingRequest() {
+    // given
+
+    // when
+    URLConnection urlConnection = headerRule.performPostRequest("http://localhost:" + port + "/api/admin/auth/user/default/login/welcome",
+      "Content-Type", "application/x-www-form-urlencoded");
+
+    /*
+      This "then" block smells bad. However, due to
+      https://app.camunda.com/jira/browse/CAM-10911
+      it is not possible to check the error properly.
+     */
+    try {
+      urlConnection.getContent();
+      fail("Exception expected!");
+    } catch (IOException e) {
+      // then
+      assertThat(e).hasMessageContaining("Server returned HTTP response code: 500 for URL: ");
+    }
+
   }
 
 }

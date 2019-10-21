@@ -328,7 +328,6 @@ public class SpringBootCsrfPreventionFilter implements Filter {
    * */
   protected boolean isNonModifyingRequest(HttpServletRequest request) {
     return CsrfConstants.CSRF_NON_MODIFYING_METHODS_PATTERN.matcher(request.getMethod()).matches()
-      || CsrfConstants.CSRF_DEFAULT_ENTRY_URL_PATTERN.matcher(getRequestedPath(request)).matches()
       || entryPoints.contains(getRequestedPath(request));
   }
 
@@ -426,8 +425,6 @@ public class SpringBootCsrfPreventionFilter implements Filter {
     public static final String CSRF_TOKEN_DEFAULT_COOKIE_NAME = "XSRF-TOKEN";
 
     public static final Pattern CSRF_NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
-
-    public static final Pattern CSRF_DEFAULT_ENTRY_URL_PATTERN = Pattern.compile("^/api/admin/auth/user/.+/login/(cockpit|tasklist|admin|welcome)$");
 
     public static final String CSRF_SET_COOKIE_HEADER_NAME = "Set-Cookie";
 
