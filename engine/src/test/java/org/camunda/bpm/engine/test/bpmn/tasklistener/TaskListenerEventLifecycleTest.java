@@ -61,22 +61,7 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   // CREATE phase
 
   @Test
-  public void shouldFireCreateEventBeforeAssignmentEventWhenTaskCreated() {
-    // given
-    createAndDeployModelWithTaskEventsRecorderOnUserTaskWithAssignee("kermit", TRACKED_EVENTS);
-
-    // when
-    runtimeService.startProcessInstanceByKey("process");
-
-    // then
-    List<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
-    assertThat(orderedEvents.size()).isEqualTo(2);
-    assertThat(orderedEvents).containsExactly(TaskListener.EVENTNAME_CREATE,
-                                              TaskListener.EVENTNAME_ASSIGNMENT);
-  }
-
-  @Test
-  public void shouldNotFireUpdateEventWhenTaskIsCreated() {
+  public void shouldOnlyFireCreateAndAssignmentEventsWhenTaskIsCreated() {
     // given
     createAndDeployModelWithTaskEventsRecorderOnUserTaskWithAssignee("kermit", TRACKED_EVENTS);
 
@@ -165,7 +150,7 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   }
 
   @Test
-  public void shouldCancelTimeoutTaskListenerWhenTaskCompleted
+  public void shouldCancelTimeoutTaskListenerWhenTaskCompleted() {
     // given
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
     Calendar now = Calendar.getInstance();
@@ -285,7 +270,7 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   }
 
   @Test
-  public void shouldNotFireUpdateEventAfterCreateTaskListenerUpdatesProperties
+  public void shouldNotFireUpdateEventAfterCreateTaskListenerUpdatesProperties() {
     // given
     BpmnModelInstance process = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                   null,
@@ -474,13 +459,38 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
     Task task = taskService.createTaskQuery().singleResult();
 
     // when
+    try {
+      taskService.complete(task.getId());
+    } finally {
+      // then
+      LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
+
+      assertThat(orderedEvents.size()).isEqualTo(2);
+      assertThat(orderedEvents.getLast()).isEqualToIgnoringCase(TaskListener.EVENTNAME_COMPLETE);
+    }
+  }
+
+  @Test
+  public void shouldFireDeleteEventOnProcessInstanceDeletedInCompleteListener() {
+    // given
+    BpmnModelInstance model = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
+                                                                                  null,
+                                                                                  TaskListener.EVENTNAME_COMPLETE,
+                                                                                  ProcessInstanceDeleteTaskListener.class);
+    testRule.deploy(model);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
     taskService.complete(task.getId());
 
     // then
     LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
 
-    assertThat(orderedEvents.size()).isEqualTo(2);
-    assertThat(orderedEvents.getLast()).isEqualToIgnoringCase(TaskListener.EVENTNAME_COMPLETE);
+    assertThat(orderedEvents.size()).isEqualTo(3);
+    assertThat(orderedEvents).containsExactly(TaskListener.EVENTNAME_CREATE,
+                                              TaskListener.EVENTNAME_COMPLETE,
+                                              TaskListener.EVENTNAME_DELETE);
   }
 
   @Test
@@ -496,13 +506,16 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
     Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    taskService.complete(task.getId());
+    try {
+      taskService.complete(task.getId());
+    } finally {
+      // then
+      LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
 
-    // then
-    LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
-
-    assertThat(orderedEvents.size()).isEqualTo(1);
-    assertThat(orderedEvents.getFirst()).isEqualToIgnoringCase(TaskListener.EVENTNAME_CREATE);
+      assertThat(orderedEvents.size()).isEqualTo(2);
+      assertThat(orderedEvents.getFirst()).isEqualToIgnoringCase(TaskListener.EVENTNAME_CREATE);
+      assertThat(orderedEvents.getLast()).isEqualToIgnoringCase(TaskListener.EVENTNAME_COMPLETE);
+    }
   }
 
   // DELETE phase
@@ -566,6 +579,75 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
     assertThat(orderedEvents.getLast()).isEqualToIgnoringCase(TaskListener.EVENTNAME_DELETE);
   }
 
+  @Test
+  public void shouldNotFireCompleteEventOnCompleteAttemptInDeleteListener() {
+    // given
+    thrown.expectMessage("invalid task state");
+    BpmnModelInstance model = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
+                                                                                  null,
+                                                                                  TaskListener.EVENTNAME_DELETE,
+                                                                                  CompletingTaskListener.class);
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    try {
+      runtimeService.deleteProcessInstance(processInstance.getId(), "Canceled!");
+    } finally {
+      // then
+      LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
+
+      assertThat(orderedEvents.size()).isEqualTo(2);
+      assertThat(orderedEvents.getFirst()).isEqualToIgnoringCase(TaskListener.EVENTNAME_CREATE);
+      assertThat(orderedEvents.getLast()).isEqualToIgnoringCase(TaskListener.EVENTNAME_DELETE);
+    }
+  }
+
+  @Test
+  public void shouldNotFireDeleteEventOnTaskDeleteAttemptInDeleteListener() {
+    // given
+    thrown.expectMessage("The task cannot be deleted because is part of a running process");
+    BpmnModelInstance model = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
+                                                                                  null,
+                                                                                  TaskListener.EVENTNAME_DELETE,
+                                                                                  TaskDeleteTaskListener.class);
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    try {
+      runtimeService.deleteProcessInstance(processInstance.getId(), "Canceled!");
+    } finally {
+      // then
+      LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
+
+      assertThat(orderedEvents.size()).isEqualTo(2);
+      assertThat(orderedEvents.getFirst()).isEqualToIgnoringCase(TaskListener.EVENTNAME_CREATE);
+      assertThat(orderedEvents.getLast()).isEqualToIgnoringCase(TaskListener.EVENTNAME_DELETE);
+    }
+  }
+
+  @Test
+  public void shouldNotFireDeleteEventOnProcessDeleteAttemptInDeleteListener() {
+    // given
+    BpmnModelInstance model = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
+                                                                                  null,
+                                                                                  TaskListener.EVENTNAME_DELETE,
+                                                                                  ProcessInstanceDeleteTaskListener.class);
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), "Canceled!");
+
+    // then
+    LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
+
+    assertThat(orderedEvents.size()).isEqualTo(2);
+    assertThat(orderedEvents.getFirst()).isEqualToIgnoringCase(TaskListener.EVENTNAME_CREATE);
+    assertThat(orderedEvents.getLast()).isEqualToIgnoringCase(TaskListener.EVENTNAME_DELETE);
+  }
+
   // HELPER methods and classes
 
   public static class ModifyingTaskListener implements TaskListener {
@@ -581,6 +663,14 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
     @Override
     public void notify(DelegateTask delegateTask) {
       delegateTask.getProcessEngineServices().getTaskService().deleteTask(delegateTask.getId());
+    }
+  }
+
+  public static class ProcessInstanceDeleteTaskListener implements TaskListener {
+    @Override
+    public void notify(DelegateTask delegateTask) {
+      delegateTask.getProcessEngineServices().getRuntimeService()
+                  .deleteProcessInstance(delegateTask.getProcessInstanceId(), "Trigger a Task Delete event.");
     }
   }
 }

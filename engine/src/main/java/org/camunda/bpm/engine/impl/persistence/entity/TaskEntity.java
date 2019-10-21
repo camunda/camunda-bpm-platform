@@ -304,9 +304,11 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     ensureTaskActive();
 
     // trigger TaskListener.complete event
-    final boolean listenersSuccessful = transitionTo(TaskState.STATE_COMPLETED);
+    final boolean shouldDeleteTask = transitionTo(TaskState.STATE_COMPLETED);
 
-    if (listenersSuccessful)
+    // shouldn't attempt to delete the task if the COMPLETE Task listener failed,
+    // or managed to cancel the Process or Task Instance
+    if (shouldDeleteTask)
     {
       // delete the task
       // this method call doesn't invoke additional task listeners
@@ -346,7 +348,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.deleteReason = deleteReason;
 
     // only fire lifecycle events if task is actually cancelled/deleted
-    if (!TaskEntity.DELETE_REASON_COMPLETED.equals(deleteReason)) {
+    if (!TaskEntity.DELETE_REASON_COMPLETED.equals(deleteReason)
+        && !TaskState.STATE_DELETED.equals(lifecycleState)) {
       transitionTo(TaskState.STATE_DELETED);
     }
 
@@ -1131,7 +1134,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
         return fireEvent(TaskListener.EVENTNAME_CREATE) && fireAssignmentEvent();
 
       case STATE_COMPLETED:
-        return fireEvent(TaskListener.EVENTNAME_COMPLETE);
+        return fireEvent(TaskListener.EVENTNAME_COMPLETE) && TaskState.STATE_COMPLETED.equals(this.lifecycleState);
 
       case STATE_DELETED:
         return fireEvent(EVENTNAME_DELETE);
