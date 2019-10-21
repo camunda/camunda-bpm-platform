@@ -27,7 +27,7 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.slf4j.MDC;
+import org.camunda.commons.logging.MdcAccess;
 
 /**
  * Holds the contextual process data used in logging.<br>
@@ -159,7 +159,7 @@ public class ProcessDataLoggingContext {
   /** Remove all logging context properties from the MDC */
   public void clearMdc() {
     for (String property : propertyNames) {
-      MDC.remove(property);
+      MdcAccess.remove(property);
     }
   }
 
@@ -178,7 +178,7 @@ public class ProcessDataLoggingContext {
     if (!propertyNames.isEmpty()) {
       startNewSection = true;
       for (String property : propertyNames) {
-        addToStack(MDC.get(property), property, false);
+        addToStack(MdcAccess.get(property), property, false);
       }
       startNewSection = false;
     }
@@ -201,12 +201,12 @@ public class ProcessDataLoggingContext {
     if (value == null) {
       deque.addFirst(NULL_VALUE);
       if (addToMdc) {
-        MDC.remove(property);
+        MdcAccess.remove(property);
       }
     } else {
       deque.addFirst(value);
       if (addToMdc) {
-        MDC.put(property, value);
+        MdcAccess.put(property, value);
       }
     }
   }
@@ -241,9 +241,9 @@ public class ProcessDataLoggingContext {
   protected void updateMdc(String property) {
     String previousValue = propertyValues.containsKey(property) ? propertyValues.get(property).peekFirst() : null;
     if (isNull(previousValue)) {
-      MDC.remove(property);
+      MdcAccess.remove(property);
     } else {
-      MDC.put(property, previousValue);
+      MdcAccess.put(property, previousValue);
     }
   }
 
