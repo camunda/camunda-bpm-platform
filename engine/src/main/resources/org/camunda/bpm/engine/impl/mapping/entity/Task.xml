@@ -583,7 +583,7 @@
             </if>
 
             <if test="query.involvedUser != null">
-              ${queryType} I.USER_ID_ = #{involvedUser}
+              ${queryType} I.USER_ID_ = #{query.involvedUser}
             </if>
 
 
