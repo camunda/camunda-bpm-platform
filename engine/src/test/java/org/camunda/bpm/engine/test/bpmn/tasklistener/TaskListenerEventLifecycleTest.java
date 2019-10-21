@@ -165,7 +165,7 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   }
 
   @Test
-  public void testTimeoutTaskListenerCanceledWhenTaskCompleted() {
+  public void shouldCancelTimeoutTaskListenerWhenTaskCompleted
     // given
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
     Calendar now = Calendar.getInstance();
@@ -285,7 +285,7 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   }
 
   @Test
-  public void testNoUpdateEventAfterCreateTaskListenerUpdatesProperties() {
+  public void shouldNotFireUpdateEventAfterCreateTaskListenerUpdatesProperties
     // given
     BpmnModelInstance process = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                   null,
@@ -307,7 +307,7 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   }
 
   @Test
-  public void testNoUpdateEventAfterUpdateTaskListenerUpdatesProperties() {
+  public void shouldNotFireUpdateEventAfterUpdateTaskListenerUpdatesProperties() {
     // given
     BpmnModelInstance process = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                     null,
@@ -333,7 +333,7 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   }
 
   @Test
-  public void testNoUpdateEventAfterAssignmentTaskListenerUpdatesProperties() {
+  public void shouldNotFireUpdateEventAfterAssignmentTaskListenerUpdatesProperties() {
     // given
     BpmnModelInstance process = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                     null,
@@ -357,7 +357,7 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   }
 
   @Test
-  public void testNoUpdateEventAfterCompleteTaskListenerUpdatesProperties() {
+  public void shouldNotFireUpdateEventAfterCompleteTaskListenerUpdatesProperties() {
     // given
     BpmnModelInstance process = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                     null,
@@ -379,7 +379,7 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   }
 
   @Test
-  public void testNoUpdateEventAfterDeleteTaskListenerUpdatesProperties() {
+  public void shouldNotFireUpdateEventAfterDeleteTaskListenerUpdatesProperties() {
     // given
     BpmnModelInstance process = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                     null,
@@ -551,7 +551,7 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
     BpmnModelInstance model = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                   null,
                                                                                   TaskListener.EVENTNAME_DELETE,
-                                                                                  CandidateUserAssignment.class);
+                                                                                  AssigneeAssignment.class);
     testRule.deploy(model);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
