@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.rest.GroupRestService;
@@ -25,16 +26,21 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
 import org.camunda.bpm.engine.rest.dto.identity.GroupQueryDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.GroupResource;
 import org.camunda.bpm.engine.rest.sub.identity.impl.GroupResourceImpl;
 import org.camunda.bpm.engine.rest.util.PathUtil;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
@@ -78,10 +84,10 @@ public class GroupRestServiceImpl extends AbstractAuthorizedRestResource impleme
 
   public CountResultDto getGroupCount(UriInfo uriInfo) {
     GroupQueryDto queryDto = new GroupQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-    return getGroupCount(queryDto);
+    return queryGroupCount(queryDto);
   }
 
-  protected CountResultDto getGroupCount(GroupQueryDto queryDto) {
+  public CountResultDto queryGroupCount(GroupQueryDto queryDto) {
     GroupQuery query = queryDto.toQuery(getProcessEngine());
     long count = query.count();
     return new CountResultDto(count);

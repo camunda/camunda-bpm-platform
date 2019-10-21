@@ -70,7 +70,7 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
   }
 
   @CamundaQueryParam(value = "idIn", converter = StringArrayConverter.class)
-  public void setId(String[] groupIds) {
+  public void setIdIn(String[] groupIds) {
     this.ids = groupIds;
   }
 
@@ -90,7 +90,7 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
   }
 
   @CamundaQueryParam("member")
-  public void setGroupMember(String member) {
+  public void setMember(String member) {
     this.member = member;
   }
 
