@@ -152,6 +152,8 @@ public class GroupRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).groupType(MockProvider.EXAMPLE_GROUP_TYPE);
     verify(mockQuery).groupMember(MockProvider.EXAMPLE_USER_ID);
     verify(mockQuery).memberOfTenant(MockProvider.EXAMPLE_TENANT_ID);
+    verify(mockQuery).groupId(MockProvider.EXAMPLE_GROUP_ID);
+    verify(mockQuery).groupIdIn(MockProvider.EXAMPLE_GROUP_ID, MockProvider.EXAMPLE_GROUP_ID2);
 
     verify(mockQuery).list();
 
@@ -165,6 +167,8 @@ public class GroupRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("type", MockProvider.EXAMPLE_GROUP_TYPE);
     parameters.put("member", MockProvider.EXAMPLE_USER_ID);
     parameters.put("memberOfTenant", MockProvider.EXAMPLE_TENANT_ID);
+    parameters.put("id", MockProvider.EXAMPLE_GROUP_ID);
+    parameters.put("idIn", MockProvider.EXAMPLE_GROUP_ID + "," + MockProvider.EXAMPLE_GROUP_ID2);
 
     return parameters;
   }
