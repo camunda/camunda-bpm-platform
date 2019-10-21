@@ -53,6 +53,7 @@ public class ExternalTaskImplTest {
         + "priority=0, "
         + "processDefinitionId=null, "
         + "processDefinitionKey=null, "
+        + "processDefinitionVersionTag=null, "
         + "processInstanceId=null, "
         + "receivedVariableMap=null, "
         + "retries=null, "
@@ -61,7 +62,7 @@ public class ExternalTaskImplTest {
         + "variables=null, "
         + "workerId=null]", task.toString());
   }
-  
+
   @Test
   public void shouldDisplayAttributesFilledInToString() {
     // with basic attributes set, attributes should be displayed and separated by comma
@@ -79,6 +80,7 @@ public class ExternalTaskImplTest {
     task.setPriority(3L);
     task.setProcessDefinitionId("pdi");
     task.setProcessDefinitionKey("pdk");
+    task.setProcessDefinitionVersionTag("versionTag");
     task.setProcessInstanceId("pii");
     task.setRetries(34);
     task.setTenantId("ti");
@@ -96,6 +98,7 @@ public class ExternalTaskImplTest {
         + "priority=3, "
         + "processDefinitionId=pdi, "
         + "processDefinitionKey=pdk, "
+        + "processDefinitionVersionTag=versionTag, "
         + "processInstanceId=pii, "
         + "receivedVariableMap=null, "
         + "retries=34, "
@@ -111,7 +114,7 @@ public class ExternalTaskImplTest {
   public void shouldDisplayAttributesIncludingMapsInToString() {
     // variables map entries should be displayed as well
     ExternalTaskImpl task = new ExternalTaskImpl();
-    
+
     Date date = new Date(0L);// January 1,1970, 00:00:00 GMT
     task.setActivityId("ai");
     task.setActivityInstanceId("aii");
@@ -124,22 +127,23 @@ public class ExternalTaskImplTest {
     task.setPriority(3L);
     task.setProcessDefinitionId("pdi");
     task.setProcessDefinitionKey("pdk");
+    task.setProcessDefinitionVersionTag("versionTag");
     task.setProcessInstanceId("pii");
     task.setRetries(34);
     task.setTenantId("ti");
     task.setTopicName("tn");
     task.setWorkerId("wi");
-    
+
     Map<String, VariableValue> receivedVariables = new LinkedHashMap<>();
     receivedVariables.put("rv1", generateVariableValue("pii", "variable1", ValueType.STRING.getName(), "value1", 42, "vi2"));
     receivedVariables.put("rv2", generateVariableValue("pii", "variable2", ValueType.INTEGER.getName(), 99, 42, "vi2", 87L));
     task.setReceivedVariableMap(receivedVariables);
-    
+
     Map<String, TypedValueField> variables = new LinkedHashMap<>();
     variables.put("v1", generateTypedValueField(ValueType.STRING.getName(), "value2", 43, "vi3"));
     variables.put("v2", generateTypedValueField(ValueType.INTEGER.getName(), 999, 43, "vi3", 88L));
     task.setVariables(variables);
-    
+
     assertEquals("ExternalTaskImpl [activityId=ai, "
         + "activityInstanceId=aii, "
         + "businessKey=bk, "
@@ -151,6 +155,7 @@ public class ExternalTaskImplTest {
         + "priority=3, "
         + "processDefinitionId=pdi, "
         + "processDefinitionKey=pdk, "
+        + "processDefinitionVersionTag=versionTag, "
         + "processInstanceId=pii, "
         + "receivedVariableMap={"
           + "rv1=VariableValue [cachedValue=null, processInstanceId=pii, variableName=variable1, typedValueField="

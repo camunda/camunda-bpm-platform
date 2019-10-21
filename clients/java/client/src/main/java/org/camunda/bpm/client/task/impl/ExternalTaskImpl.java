@@ -44,6 +44,7 @@ public class ExternalTaskImpl implements ExternalTask {
   protected Date lockExpirationTime;
   protected String processDefinitionId;
   protected String processDefinitionKey;
+  protected String processDefinitionVersionTag;
   protected String processInstanceId;
   protected Integer retries;
   protected String workerId;
@@ -91,6 +92,10 @@ public class ExternalTaskImpl implements ExternalTask {
 
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public void setProcessDefinitionVersionTag(String processDefinitionVersionTag) {
+    this.processDefinitionVersionTag = processDefinitionVersionTag;
   }
 
   public void setProcessInstanceId(String processInstanceId) {
@@ -178,6 +183,10 @@ public class ExternalTaskImpl implements ExternalTask {
   @Override
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
+  }
+
+  public String getProcessDefinitionVersionTag() {
+    return processDefinitionVersionTag;
   }
 
   @Override
@@ -293,6 +302,7 @@ public class ExternalTaskImpl implements ExternalTask {
         + "priority=" + priority + ", "
         + "processDefinitionId=" + processDefinitionId + ", "
         + "processDefinitionKey=" + processDefinitionKey + ", "
+        + "processDefinitionVersionTag=" + processDefinitionVersionTag + ", "
         + "processInstanceId=" + processInstanceId + ", "
         + "receivedVariableMap=" + receivedVariableMap + ", "
         + "retries=" + retries + ", "
@@ -301,6 +311,6 @@ public class ExternalTaskImpl implements ExternalTask {
         + "variables=" + variables + ", "
         + "workerId=" + workerId + "]";
   }
-  
+
 }
 

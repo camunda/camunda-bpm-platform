@@ -243,9 +243,9 @@ public class TopicSubscriptionIT {
   @Test
   public void shouldFilterByProcessDefinitionVersionTag() {
     // given
-    ProcessDefinitionDto processDefinition3 = engineRule.deploy(ONE_EXTERNAL_TASK_WITH_VERSION_TAG).get(0);
+    ProcessDefinitionDto processDefinitionWithVersionTag = engineRule.deploy(ONE_EXTERNAL_TASK_WITH_VERSION_TAG).get(0);
+    engineRule.startProcessInstance(processDefinitionWithVersionTag.getId());
     engineRule.startProcessInstance(processDefinition.getId());
-    engineRule.startProcessInstance(processDefinition3.getId());
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
@@ -259,6 +259,28 @@ public class TopicSubscriptionIT {
     List<ExternalTask> handledTasks = handler.getHandledTasks();
     assertThat(handledTasks.size()).isEqualTo(1);
     assertThat(handledTasks.get(0).getProcessDefinitionKey()).isEqualTo(PROCESS_DEFINITION_VERSION_TAG);
+    assertThat(handledTasks.get(0).getProcessDefinitionVersionTag()).isEqualTo(PROCESS_DEFINITION_VERSION_TAG);
+  }
+
+  @Test
+  public void shouldSetProcessDefinitionVersionTag() {
+    // given
+    ProcessDefinitionDto processDefinitionWithVersionTag = engineRule.deploy(ONE_EXTERNAL_TASK_WITH_VERSION_TAG).get(0);
+    engineRule.startProcessInstance(processDefinitionWithVersionTag.getId());
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    List<ExternalTask> handledTasks = handler.getHandledTasks();
+    assertThat(handledTasks.size()).isEqualTo(2);
+    assertThat(handledTasks.get(0).getProcessDefinitionVersionTag()).isEqualTo(PROCESS_DEFINITION_VERSION_TAG);
+    assertThat(handledTasks.get(1).getProcessDefinitionVersionTag()).isEqualTo(null);
   }
 
   @Test

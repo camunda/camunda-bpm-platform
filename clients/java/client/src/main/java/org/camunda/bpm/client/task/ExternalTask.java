@@ -76,6 +76,11 @@ public interface ExternalTask {
   String getProcessDefinitionKey();
 
   /**
+   * @return the version tag of the process definition the tasks activity belongs to
+   */
+  String getProcessDefinitionVersionTag();
+
+  /**
    * @return the id of the process instance the external task belongs to
    */
   String getProcessInstanceId();
