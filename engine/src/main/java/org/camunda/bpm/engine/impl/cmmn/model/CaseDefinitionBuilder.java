@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.model;
 
-import java.util.Stack;
-
+import java.util.ArrayDeque;
+import java.util.Deque;
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.StageActivityBehavior;
@@ -31,7 +31,7 @@ public class CaseDefinitionBuilder {
 
   protected CmmnCaseDefinition caseDefinition;
   protected CmmnActivity casePlanModel;
-  protected Stack<CmmnActivity> activityStack = new Stack<CmmnActivity>();
+  protected Deque<CmmnActivity> activityStack = new ArrayDeque<>();
   protected CoreModelElement processElement = caseDefinition;
 
   public CaseDefinitionBuilder() {
