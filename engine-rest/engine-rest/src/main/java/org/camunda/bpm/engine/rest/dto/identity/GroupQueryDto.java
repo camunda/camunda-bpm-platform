@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -48,6 +49,7 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
   }
 
   protected String id;
+  protected String[] ids;
   protected String name;
   protected String nameLike;
   protected String type;
@@ -67,6 +69,11 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
     this.id = groupId;
   }
 
+  @CamundaQueryParam(value = "idIn", converter = StringArrayConverter.class)
+  public void setIdIn(String[] groupIds) {
+    this.ids = groupIds;
+  }
+
   @CamundaQueryParam("name")
   public void setName(String groupName) {
     this.name = groupName;
@@ -83,7 +90,7 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
   }
 
   @CamundaQueryParam("member")
-  public void setGroupMember(String member) {
+  public void setMember(String member) {
     this.member = member;
   }
 
@@ -106,6 +113,9 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
   protected void applyFilters(GroupQuery query) {
     if (id != null) {
       query.groupId(id);
+    }
+    if (ids != null) {
+      query.groupIdIn(ids);
     }
     if (name != null) {
       query.groupName(name);
