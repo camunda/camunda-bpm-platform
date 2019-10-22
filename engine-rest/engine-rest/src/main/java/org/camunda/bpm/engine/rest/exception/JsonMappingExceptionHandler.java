@@ -16,14 +16,12 @@
  */
 package org.camunda.bpm.engine.rest.exception;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import org.camunda.bpm.engine.rest.dto.ExceptionDto;
-
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 /**
  * @author Thorben Lindhauer
@@ -34,7 +32,8 @@ public class JsonMappingExceptionHandler implements ExceptionMapper<JsonMappingE
 
   @Override
   public Response toResponse(JsonMappingException exception) {
-    ExceptionDto dto = ExceptionDto.fromException(exception);
-    return Response.status(Status.BAD_REQUEST).entity(dto).type(MediaType.APPLICATION_JSON_TYPE).build();
+    InvalidRequestException badRequestException = new InvalidRequestException(Status.BAD_REQUEST,
+                                                                              exception, "");
+    return ExceptionHandlerHelper.getInstance().getResponse(badRequestException);
   }
 }

@@ -71,6 +71,12 @@
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-logging</artifactId>
+      <scope>provided</scope>
+    </dependency>
     
     <dependency>
       <groupId>javax.activation</groupId>

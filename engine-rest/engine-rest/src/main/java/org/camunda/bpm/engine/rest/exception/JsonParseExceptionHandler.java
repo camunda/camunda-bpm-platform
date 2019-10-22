@@ -34,7 +34,8 @@ public class JsonParseExceptionHandler implements ExceptionMapper<JsonParseExcep
 
   @Override
   public Response toResponse(JsonParseException exception) {
-    ExceptionDto dto = ExceptionDto.fromException(exception);
-    return Response.status(Status.BAD_REQUEST).entity(dto).type(MediaType.APPLICATION_JSON_TYPE).build();
+    InvalidRequestException badRequestException = new InvalidRequestException(Status.BAD_REQUEST,
+                                                                              exception, "");
+    return ExceptionHandlerHelper.getInstance().getResponse(badRequestException);
   }
 }
