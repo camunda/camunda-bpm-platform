@@ -17,6 +17,7 @@
     <module>bom</module>
     <module>logging</module>
     <module>utils</module>
+    <module>testing</module>
   </modules>
 
   <properties>
