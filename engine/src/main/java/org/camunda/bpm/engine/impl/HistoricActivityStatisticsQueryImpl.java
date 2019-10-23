@@ -18,13 +18,10 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.Date;
 import java.util.List;
-import org.apache.tools.ant.util.DateUtils;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
-
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
@@ -41,6 +38,7 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
   protected boolean includeFinished;
   protected boolean includeCanceled;
   protected boolean includeCompleteScope;
+  protected boolean includeClosedIncidents;
 
   protected Date startedBefore;
   protected Date startedAfter;
@@ -66,6 +64,11 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
 
   public HistoricActivityStatisticsQuery includeCompleteScope() {
     includeCompleteScope = true;
+    return this;
+  }
+
+  public HistoricActivityStatisticsQuery includeClosedIncidents() {
+    includeClosedIncidents = true;
     return this;
   }
 
@@ -145,6 +148,10 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
 
   public String[] getProcessInstanceIds() {
     return processInstanceIds;
+  }
+
+  public boolean isIncludeClosedIncidents() {
+    return includeClosedIncidents;
   }
 
 }

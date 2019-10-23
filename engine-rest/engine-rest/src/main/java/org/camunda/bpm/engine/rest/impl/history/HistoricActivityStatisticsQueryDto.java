@@ -28,8 +28,6 @@ import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
-import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HistoricActivityStatisticsQueryDto extends AbstractQueryDto<HistoricActivityStatisticsQuery> {
@@ -41,6 +39,7 @@ public class HistoricActivityStatisticsQueryDto extends AbstractQueryDto<Histori
   protected Boolean includeCanceled;
   protected Boolean includeFinished;
   protected Boolean includeCompleteScope;
+  protected Boolean includeClosedIncidents;
 
   protected Date startedAfter;
   protected Date startedBefore;
@@ -74,6 +73,11 @@ public class HistoricActivityStatisticsQueryDto extends AbstractQueryDto<Histori
   @CamundaQueryParam(value = "completeScope", converter = BooleanConverter.class)
   public void setIncludeCompleteScope(Boolean includeCompleteScope) {
     this.includeCompleteScope = includeCompleteScope;
+  }
+
+  @CamundaQueryParam(value = "closedIncidents", converter = BooleanConverter.class)
+  public void setIncludeClosedIncidents(Boolean includeClosedIncidents) {
+    this.includeClosedIncidents = includeClosedIncidents;
   }
 
   @CamundaQueryParam(value = "startedAfter", converter = DateConverter.class)
@@ -124,6 +128,10 @@ public class HistoricActivityStatisticsQueryDto extends AbstractQueryDto<Histori
 
     if (includeCompleteScope != null && includeCompleteScope) {
       query.includeCompleteScope();
+    }
+
+    if (includeClosedIncidents !=null && includeClosedIncidents) {
+      query.includeClosedIncidents();
     }
 
     if (startedAfter != null) {

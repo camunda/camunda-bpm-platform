@@ -49,4 +49,7 @@ public interface HistoricActivityStatistics {
    */
   long getCompleteScope();
 
+  /** The number of resolved and deleted incidents of the activity. */
+  long getClosedIncidents();
+
 }
