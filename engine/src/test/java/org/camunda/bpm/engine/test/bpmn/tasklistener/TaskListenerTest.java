@@ -16,14 +16,15 @@
  */
 package org.camunda.bpm.engine.test.bpmn.tasklistener;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,6 +41,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -52,6 +54,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.commons.utils.IoUtil;
 import org.joda.time.LocalDateTime;
 import org.junit.Assert;
 import org.junit.Before;
@@ -549,6 +552,186 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
   }
 
   @Test
+  public void testUpdateTaskListenerOnCommentCreate() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
+    taskService.createComment(task.getId(), null, "new comment");
+
+    // then
+    assertEquals(1, RecorderTaskListener.getTotalEventCount());
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
+  }
+
+  @Test
+  public void testUpdateTaskListenerOnCommentAdd() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
+    taskService.addComment(task.getId(), null, "new comment");
+
+    // then
+    assertEquals(1, RecorderTaskListener.getTotalEventCount());
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
+  }
+
+  @Test
+  public void testUpdateTaskListenerOnAttachmentCreate() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
+    taskService.createAttachment("foo", task.getId(), null, "bar", "baz", IoUtil.stringAsInputStream("foo"));
+
+    // then
+    assertEquals(1, RecorderTaskListener.getTotalEventCount());
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
+  }
+
+
+  @Test
+  public void testUpdateTaskListenerOnAttachmentUpdate() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    Attachment attachment = taskService.createAttachment("foo", task.getId(), null, "bar", "baz", IoUtil.stringAsInputStream("foo"));
+    attachment.setDescription("bla");
+    attachment.setName("foo");
+
+    // when
+    taskService.saveAttachment(attachment);
+
+    // then
+    assertEquals(2, RecorderTaskListener.getTotalEventCount());
+    assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE)); // create and update attachment
+  }
+
+  @Test
+  public void testUpdateTaskListenerOnAttachmentDelete() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    Attachment attachment = taskService.createAttachment("foo", task.getId(), null, "bar", "baz", IoUtil.stringAsInputStream("foo"));
+
+    // when
+    taskService.deleteAttachment(attachment.getId());
+
+    // then
+    assertEquals(2, RecorderTaskListener.getTotalEventCount());
+    assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE)); // create and delete attachment
+  }
+
+  @Test
+  public void testUpdateTaskListenerOnSetLocalVariable() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
+    taskService.setVariableLocal(task.getId(), "foo", "bar");
+
+    // then
+    assertEquals(1, RecorderTaskListener.getTotalEventCount());
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
+  }
+
+  @Test
+  public void testUpdateTaskListenerOnSetLocalVariables() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    VariableMap variables = Variables.createVariables()
+        .putValue("var1", "val1")
+        .putValue("var2", "val2");
+
+    // when
+    taskService.setVariablesLocal(task.getId(), variables);
+
+    // then
+    // only a single invocation of the listener is triggered
+    assertEquals(1, RecorderTaskListener.getTotalEventCount());
+    assertEquals(1, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
+  }
+
+  @Test
+  public void testUpdateTaskListenerOnSetVariableInTaskScope() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setVariableLocal(task.getId(), "foo", "bar");
+
+    // when
+    taskService.setVariable(task.getId(), "foo", "bar");
+
+    // then
+    assertEquals(2, RecorderTaskListener.getTotalEventCount());
+    assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE)); // local and non-local
+  }
+
+  @Test
+  public void testUpdateTaskListenerOnSetVariableInHigherScope() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
+    taskService.setVariable(task.getId(), "foo", "bar");
+
+    // then
+    assertEquals(0, RecorderTaskListener.getTotalEventCount());
+    assertEquals(0, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE));
+  }
+
+  @Test
+  public void testUpdateTaskListenerInvokedBeforeConditionalEventsOnSetVariable() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask("task")
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_UPDATE, RecorderTaskListener.class)
+      .boundaryEvent()
+        .condition("${triggerBoundaryEvent}")
+      .userTask("afterBoundaryEvent")
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, RecorderTaskListener.class)
+      .endEvent()
+      .moveToActivity("task")
+      .endEvent()
+      .done();
+
+    testRule.deploy(modelInstance);
+
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setVariableLocal(task.getId(), "taskLocalVariable", "bar");
+    RecorderTaskListener.clear();
+
+    VariableMap variables = Variables.createVariables().putValue("triggerBoundaryEvent", true).putValue("taskLocalVariable", "baz");
+
+    // when
+    taskService.setVariables(task.getId(), variables);
+
+    // then
+    assertThat(RecorderTaskListener.getOrderedEvents()).containsExactly(TaskListener.EVENTNAME_UPDATE, TaskListener.EVENTNAME_CREATE);
+  }
+
+  @Test
   public void testAssignmentTaskListenerWhenSavingTask() {
     // given
     createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_ASSIGNMENT);
@@ -576,7 +759,7 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     // then
-    assertThat((String) runtimeService.getVariable(instance.getId(), "timeout-status"), is("fired"));
+    assertThat(runtimeService.getVariable(instance.getId(), "timeout-status")).isEqualTo("fired");
   }
 
   @Test
@@ -590,7 +773,7 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     // then
-    assertThat((String) runtimeService.getVariable(instance.getId(), "timeout-status"), is("fired"));
+    assertThat(runtimeService.getVariable(instance.getId(), "timeout-status")).isEqualTo("fired");
   }
 
   @Test
@@ -606,7 +789,7 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     // then
-    assertThat((String) runtimeService.getVariable(instance.getId(), "timeout-status"), is("fired2"));
+    assertThat(runtimeService.getVariable(instance.getId(), "timeout-status")).isEqualTo("fired2");
   }
 
   @Test
@@ -616,15 +799,15 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
 
     // assume
-    assertThat(managementService.createJobQuery().count(), is(2L));
+    assertThat(managementService.createJobQuery().count()).isEqualTo(2L);
 
     // when
     ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
 
     // then
-    assertThat(managementService.createJobQuery().count(), is(1L));
-    assertThat((String) runtimeService.getVariable(instance.getId(), "timeout-status"), is("fired"));
+    assertThat(managementService.createJobQuery().count()).isEqualTo(1L);
+    assertThat(runtimeService.getVariable(instance.getId(), "timeout-status")).isEqualTo("fired");
   }
 
   @Test
@@ -636,15 +819,15 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
     runtimeService.startProcessInstanceByKey("process");
 
     // assume
-    assertThat(jobQuery.count(), is(1L));
+    assertThat(jobQuery.count()).isEqualTo(1L);
 
     // when
     taskService.complete(taskQuery.singleResult().getId());
 
     // then
     HistoricVariableInstanceQuery variableQuery = historyService.createHistoricVariableInstanceQuery().variableName("timeout-status");
-    assertThat(variableQuery.count(), is(0L));
-    assertThat(jobQuery.count(), is(0L));
+    assertThat(variableQuery.count()).isEqualTo(0L);
+    assertThat(jobQuery.count()).isEqualTo(0L);
   }
 
   @Test
@@ -655,7 +838,7 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
     runtimeService.startProcessInstanceByKey("process");
 
     // assume
-    assertThat(jobQuery.count(), is(2L));
+    assertThat(jobQuery.count()).isEqualTo(2L);
 
     // when the boundary event is triggered
     ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
@@ -663,8 +846,8 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
 
     // then
     HistoricVariableInstanceQuery variableQuery = historyService.createHistoricVariableInstanceQuery().variableName("timeout-status");
-    assertThat(variableQuery.count(), is(0L));
-    assertThat(jobQuery.count(), is(0L));
+    assertThat(variableQuery.count()).isEqualTo(0L);
+    assertThat(jobQuery.count()).isEqualTo(0L);
   }
 
   @Test

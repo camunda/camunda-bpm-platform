@@ -54,10 +54,7 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
 
     executeOperation(scope);
 
-    ExecutionEntity contextExecution = getContextExecution();
-    if (contextExecution != null) {
-      contextExecution.dispatchDelayedEventsAndPerformOperation((Callback<PvmExecutionImpl, Void>) null);
-    }
+    onSuccess(scope);
 
     if(!preventLogUserOperation) {
       logVariableOperation(scope);
@@ -75,4 +72,11 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
   protected abstract void executeOperation(AbstractVariableScope scope);
 
   protected abstract String getLogEntryOperation();
+
+  protected void onSuccess(AbstractVariableScope scope) {
+    ExecutionEntity contextExecution = getContextExecution();
+    if (contextExecution != null) {
+      contextExecution.dispatchDelayedEventsAndPerformOperation((Callback<PvmExecutionImpl, Void>) null);
+    }
+  }
 }

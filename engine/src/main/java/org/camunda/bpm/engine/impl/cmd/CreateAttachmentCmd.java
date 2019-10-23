@@ -119,6 +119,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     if (task != null) {
       commandContext.getOperationLogManager()
           .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, task, propertyChange);
+      task.triggerUpdateEvent();
     } else if (processInstance != null) {
       commandContext.getOperationLogManager()
           .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, processInstance, propertyChange);

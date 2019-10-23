@@ -22,18 +22,23 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
+public class SetTaskVariablesCmd extends AbstractSetVariableCmd implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
 
   private static final long serialVersionUID = 1L;
+
+  protected boolean taskLocalVariablesUpdated = false;
+
 
   public SetTaskVariablesCmd(String taskId, Map<String, ? extends Object> variables, boolean isLocal) {
     super(taskId, variables, isLocal);
@@ -50,7 +55,22 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
 
     checkSetTaskVariables(task);
 
+    task.addCustomLifecycleListener(this);
+
     return task;
+  }
+
+  @Override
+  protected void onSuccess(AbstractVariableScope scope) {
+    TaskEntity task = (TaskEntity) scope;
+
+    if (taskLocalVariablesUpdated) {
+      task.triggerUpdateEvent();
+    }
+
+    task.removeCustomLifecycleListener(this);
+
+    super.onSuccess(scope);
   }
 
   @Override
@@ -68,5 +88,24 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateTaskVariable(task);
     }
+  }
+
+  protected void onLocalVariableChanged() {
+    taskLocalVariablesUpdated = true;
+  }
+
+  @Override
+  public void onCreate(VariableInstanceEntity variableInstance, AbstractVariableScope sourceScope) {
+    onLocalVariableChanged();
+  }
+
+  @Override
+  public void onDelete(VariableInstanceEntity variableInstance, AbstractVariableScope sourceScope) {
+    onLocalVariableChanged();
+  }
+
+  @Override
+  public void onUpdate(VariableInstanceEntity variableInstance, AbstractVariableScope sourceScope) {
+    onLocalVariableChanged();
   }
 }

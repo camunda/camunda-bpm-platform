@@ -106,6 +106,16 @@ public class RecorderTaskListener implements TaskListener, Serializable {
     return eventCounters;
   }
 
+  public static int getTotalEventCount() {
+    int total = 0;
+
+    for (Integer eventCount : eventCounters.values()) {
+      total += eventCount != null ? eventCount : 0;
+    }
+
+    return total;
+  }
+
   public static int getEventCount(String eventName) {
     Integer count = eventCounters.get(eventName);
     return (count != null)? count : 0;
