@@ -354,7 +354,7 @@
           <relocations>
             <relocation>
               <pattern>com.google.gson</pattern>
-              <shadedPattern>camundajar.com.google.gson</shadedPattern>
+              <shadedPattern>camundajar.impl.com.google.gson</shadedPattern>
             </relocation>
           </relocations>
           <transformers>
