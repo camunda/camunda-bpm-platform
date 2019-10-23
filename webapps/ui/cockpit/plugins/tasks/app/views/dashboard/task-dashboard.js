@@ -174,7 +174,43 @@ module.exports = [
               $translate.instant('PLUGIN_TASK_ERROR_PER_GROUP'),
               TaskReportResource,
               'countByCandidateGroup'
-            );
+            ).then(function(candidateGroups) {
+              var groupIds = candidateGroups.map(function(group) {
+                return group.groupName;
+              });
+
+              // Filter falsy values
+              groupIds = groupIds.filter(Boolean);
+
+              return camAPI
+                .resource('group')
+                .list({
+                  idIn: groupIds,
+                  maxResults: groupIds.length
+                })
+                .then(function(groupDefinitions) {
+                  return candidateGroups.map(function(group) {
+                    group.id = group.groupName;
+
+                    var groupDef = groupDefinitions.filter(function(def) {
+                      return def.id === group.groupName;
+                    })[0];
+
+                    if (groupDef) {
+                      group.groupName = groupDef.name;
+                    }
+
+                    return group;
+                  });
+                })
+                .catch(function() {
+                  // When the query fails, still display the IDs
+                  return candidateGroups.map(function(group) {
+                    group.id = group.groupName;
+                    return group;
+                  });
+                });
+            });
           });
 
           // -- observe task data --------------
