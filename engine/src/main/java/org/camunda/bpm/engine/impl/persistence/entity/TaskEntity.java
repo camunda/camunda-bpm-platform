@@ -92,6 +92,13 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  */
 public class TaskEntity extends AbstractVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, HasDbReferences, CommandContextListener, VariablesProvider<VariableInstanceEntity> {
 
+  protected static final List<VariableInstanceLifecycleListener<CoreVariableInstance>> DEFAULT_VARIABLE_LIFECYCLE_LISTENERS =
+    Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
+      (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
+      (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
+      (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE
+    );
+
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   public static final String DELETE_REASON_COMPLETED = "completed";
@@ -163,6 +170,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   protected transient List<PropertyChange> identityLinkChanges = new ArrayList<>();
 
+  protected List<VariableInstanceLifecycleListener<VariableInstanceEntity>> customLifecycleListeners;
+
   // name references of tracked properties
   public static final String ASSIGNEE = "assignee";
   public static final String DELEGATION = "delegation";
@@ -175,6 +184,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public static final String PARENT_TASK = "parentTask";
   public static final String PRIORITY = "priority";
   public static final String CASE_INSTANCE_ID = "caseInstanceId";
+
 
   /**
    * Mybatis constructor
@@ -505,11 +515,34 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners() {
-    return Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
-        (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
-        (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
-        (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE
-      );
+    if (customLifecycleListeners == null || customLifecycleListeners.isEmpty()) {
+      return DEFAULT_VARIABLE_LIFECYCLE_LISTENERS;
+    } else {
+      List<VariableInstanceLifecycleListener<CoreVariableInstance>> listeners = new ArrayList<>();
+      listeners.addAll(DEFAULT_VARIABLE_LIFECYCLE_LISTENERS);
+      listeners.addAll((List) customLifecycleListeners);
+      return listeners;
+    }
+  }
+
+  public void addCustomLifecycleListener(
+      VariableInstanceLifecycleListener<VariableInstanceEntity> customLifecycleListener) {
+
+    if (customLifecycleListeners == null) {
+      customLifecycleListeners = new ArrayList<>();
+    }
+
+    this.customLifecycleListeners.add(customLifecycleListener);
+  }
+
+  public VariableInstanceLifecycleListener<VariableInstanceEntity> removeCustomLifecycleListener(
+      VariableInstanceLifecycleListener<VariableInstanceEntity> customLifecycleListener) {
+
+    if (customLifecycleListeners != null) {
+      customLifecycleListeners.remove(customLifecycleListener);
+    }
+
+    return customLifecycleListener;
   }
 
   @Override

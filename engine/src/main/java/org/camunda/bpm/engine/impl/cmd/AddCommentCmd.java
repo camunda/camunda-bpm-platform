@@ -69,7 +69,7 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
     comment.setProcessInstanceId(processInstanceId);
     comment.setAction(Event.ACTION_ADD_COMMENT);
 
-    ExecutionEntity execution = getExecution(commandContext, taskId, processInstanceId);
+    ExecutionEntity execution = getExecution(commandContext);
     if (execution != null) {
       comment.setRootProcessInstanceId(execution.getRootProcessInstanceId());
     }
@@ -90,24 +90,42 @@ public class AddCommentCmd implements Command<Comment>, Serializable {
       .getCommentManager()
       .insert(comment);
 
+    TaskEntity task = getTask(commandContext);
+    if (task != null) {
+      task.triggerUpdateEvent();
+    }
+
     return comment;
   }
 
-  protected ExecutionEntity getExecution(CommandContext commandContext, String taskId, String processInstanceId) {
-    ExecutionEntity execution = null;
+  protected ExecutionEntity getExecution(CommandContext commandContext) {
+
     if (taskId != null) {
-      TaskEntity task = commandContext.getTaskManager()
-        .findTaskById(taskId);
-
+      TaskEntity task = getTask(commandContext);
       if (task != null) {
-        execution = task.getExecution();
+        return task.getExecution();
+      } else {
+        return null;
       }
-    } else if (processInstanceId != null) {
-      execution = commandContext.getExecutionManager()
-        .findExecutionById(processInstanceId);
+    } else {
+      return getProcessInstance(commandContext);
     }
+  }
 
-    return execution;
+  protected ExecutionEntity getProcessInstance(CommandContext commandContext) {
+    if (processInstanceId != null) {
+      return commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    } else {
+      return null;
+    }
+  }
+
+  protected TaskEntity getTask(CommandContext commandContext) {
+    if (taskId != null) {
+      return commandContext.getTaskManager().findTaskById(taskId);
+    } else {
+      return null;
+    }
   }
 
   protected boolean isHistoryRemovalTimeStrategyStart() {
