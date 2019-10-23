@@ -62,7 +62,7 @@
           <tr ng-if="taskGroupState.$loaded" ng-repeat="taskGroup in taskGroups">
             <td ng-if="!hasSearchPlugin">{{ taskGroup.taskCount }}</td>
             <td ng-if="hasSearchPlugin">
-              <a class="search-link" ng-click="createSearch(taskGroup.groupName, 'group')">{{ taskGroup.taskCount }}</a>
+              <a class="search-link" ng-click="createSearch(taskGroup.id, 'group')">{{ taskGroup.taskCount }}</a>
             </td>
             <td>{{ formatGroupName(taskGroup.groupName) }}</td>
           </tr>
