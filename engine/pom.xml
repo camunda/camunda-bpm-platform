@@ -52,6 +52,11 @@
 
     <dependency>
       <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-testing</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-typed-values</artifactId>
     </dependency>
 
