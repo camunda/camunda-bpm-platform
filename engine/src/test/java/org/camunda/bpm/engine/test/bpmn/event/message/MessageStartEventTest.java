@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 
@@ -370,4 +372,26 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
       assertTrue(e.getMessage().contains("expressions in the message start event name are not allowed!"));
     }
   }
+
+  //test fix CAM-10819
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testMessageStartEventUsingCorrelationEngine.bpmn"})
+  public void testMessageStartEventUsingCorrelationEngineAndLocalVariable() {
+
+    // sending newCorrelationStartMessage using correlation engine
+
+    ProcessInstance  processInstance = runtimeService.createMessageCorrelation("newCorrelationStartMessage")
+            .setVariableLocal("var", "value")
+            .correlateWithResult().getProcessInstance();
+
+    //ensure it is process-available
+    String processInstanceValue = (String) runtimeService.getVariableLocal(processInstance.getId(), "var");
+    assertThat(processInstanceValue, equalTo("value"));
+
+    //ensure it is activity-available
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+    String activityInstanceValue = (String) runtimeService.getVariableLocal(activityInstance.getId(), "var");
+    assertThat(activityInstanceValue, equalTo("value"));
+
+  }
+
 }

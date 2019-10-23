@@ -78,7 +78,7 @@ public abstract class AbstractCorrelateMessageCmd {
       variablesListener = new ExecutionVariableSnapshotObserver(processInstance, false, deserializeVariableValues);
     }
 
-    processInstance.setVariablesLocal(builder.getPayloadProcessInstanceVariablesLocal());
+    mergeLocalVariablesIntoProcess();
 
     processInstance.start(builder.getPayloadProcessInstanceVariables());
 
@@ -124,6 +124,10 @@ public abstract class AbstractCorrelateMessageCmd {
   protected ExecutionEntity findProcessInstanceExecution(final CommandContext commandContext, final CorrelationHandlerResult handlerResult) {
     ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(handlerResult.getExecution().getProcessInstanceId());
     return execution;
+  }
+
+  private void mergeLocalVariablesIntoProcess() {
+    builder.setVariables(builder.getPayloadProcessInstanceVariablesLocal());
   }
 
 }
