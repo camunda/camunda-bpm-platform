@@ -89,6 +89,8 @@ public abstract class AbstractRestServiceTest {
   protected static final String EXAMPLE_PROCESS_DEFINITION_KEY = "aKey";
   protected static final String EXAMPLE_BUSINESS_KEY = "aBusinessKey";
   protected static final String EXAMPLE_EXECUTION_ID = "anExecutionId";
+  protected static final String EXAMPLE_INCIDENT_ID = "anIncidentId";
+  protected static final String EXAMPLE_ANOTHER_INCIDENT_ID = "anotherIncidentId";
 
   protected static final String CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID = "aChildActivityInstanceId";
   protected static final String CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID = "aChildParentActivityInstanceId";
@@ -124,6 +126,7 @@ public abstract class AbstractRestServiceTest {
     childActivity.setExecutionIds(new String[]{EXAMPLE_EXECUTION_ID});
     childActivity.setChildActivityInstances(new ActivityInstance[0]);
     childActivity.setChildTransitionInstances(new TransitionInstance[0]);
+    childActivity.setIncidentIds(new String[]{EXAMPLE_INCIDENT_ID});
 
     TransitionInstanceImpl childTransition = new TransitionInstanceImpl();
     childTransition.setId(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID);
@@ -134,6 +137,7 @@ public abstract class AbstractRestServiceTest {
     childTransition.setProcessInstanceId(CHILD_EXAMPLE_PROCESS_INSTANCE_ID);
     childTransition.setProcessDefinitionId(CHILD_EXAMPLE_PROCESS_DEFINITION_ID);
     childTransition.setExecutionId(EXAMPLE_EXECUTION_ID);
+    childTransition.setIncidentIds(new String[]{EXAMPLE_ANOTHER_INCIDENT_ID});
 
     instance.setChildActivityInstances(new ActivityInstance[]{childActivity});
     instance.setChildTransitionInstances(new TransitionInstance[]{childTransition});

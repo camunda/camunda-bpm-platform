@@ -32,6 +32,7 @@ public class TransitionInstanceDto {
   protected String activityName;
   protected String activityType;
   protected String executionId;
+  protected String[] incidentIds;
 
   public String getId() {
     return id;
@@ -70,6 +71,10 @@ public class TransitionInstanceDto {
     return executionId;
   }
 
+  public String[] getIncidentIds() {
+    return incidentIds;
+  }
+
   public static TransitionInstanceDto fromTransitionInstance(TransitionInstance instance) {
     TransitionInstanceDto result = new TransitionInstanceDto();
     result.id = instance.getId();
@@ -80,6 +85,7 @@ public class TransitionInstanceDto {
     result.processInstanceId = instance.getProcessInstanceId();
     result.processDefinitionId = instance.getProcessDefinitionId();
     result.executionId = instance.getExecutionId();
+    result.incidentIds = instance.getIncidentIds();
     return result;
   }
 

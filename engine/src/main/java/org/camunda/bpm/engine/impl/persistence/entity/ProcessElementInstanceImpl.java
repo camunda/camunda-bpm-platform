@@ -23,12 +23,14 @@ import org.camunda.bpm.engine.runtime.ProcessElementInstance;
  *
  */
 public class ProcessElementInstanceImpl implements ProcessElementInstance {
-  
+
+  protected static final String[] NO_IDS = new String[0];
+
   protected String id;
   protected String parentActivityInstanceId;
   protected String processInstanceId;
   protected String processDefinitionId;
-  
+
   public String getId() {
     return id;
   }

@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -45,6 +46,28 @@ public class ActivityInstanceAssert {
 
     public void hasStructure(ActivityInstance expected) {
       assertTreeMatch(expected, actual);
+    }
+
+    public void hasTotalIncidents(int expected) {
+      List<ActivityInstance> activityInstances = new LinkedList<>();
+      activityInstances.add(actual);
+
+      int actualIncidents = 0;
+
+      while (!activityInstances.isEmpty()) {
+        ActivityInstance current = activityInstances.remove(0);
+        actualIncidents += current.getIncidentIds().length;
+
+        for (TransitionInstance transitionInstance : current.getChildTransitionInstances()) {
+          actualIncidents += transitionInstance.getIncidentIds().length;
+        }
+
+        for (ActivityInstance activityInstance : current.getChildActivityInstances()) {
+          activityInstances.add(activityInstance);
+        }
+      }
+
+      Assert.assertEquals(expected, actualIncidents);
     }
 
     protected void assertTreeMatch(ActivityInstance expected, ActivityInstance actual) {

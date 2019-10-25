@@ -31,12 +31,14 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
@@ -94,16 +96,21 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       return null;
     }
 
+    Map<String, List<String>> incidents = groupIncidentIdsByExecutionId(commandContext);
+
     // create act instance for process instance
     ActivityInstanceImpl processActInst = createActivityInstance(
       processInstance,
       processInstance.getProcessDefinition(),
       processInstanceId,
-      null);
+      null,
+      incidents);
+
     Map<String, ActivityInstanceImpl> activityInstances = new HashMap<String, ActivityInstanceImpl>();
     activityInstances.put(processInstanceId, processActInst);
 
     Map<String, TransitionInstanceImpl> transitionInstances = new HashMap<String, TransitionInstanceImpl>();
+
 
     for (ExecutionEntity leaf : leaves) {
       // skip leafs without activity, e.g. if only the process instance exists after cancellation
@@ -129,14 +136,15 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
           ActivityInstanceImpl leafInstance = createActivityInstance(leaf,
               leaf.getActivity(),
               leaf.getActivityInstanceId(),
-              parentActivityInstanceId);
+              parentActivityInstanceId,
+              incidents);
           activityInstances.put(leafInstance.getId(), leafInstance);
 
           scopeInstancesToCreate.remove(leaf.getActivity());
         }
       }
       else {
-        TransitionInstanceImpl transitionInstance = createTransitionInstance(leaf);
+        TransitionInstanceImpl transitionInstance = createTransitionInstance(leaf, incidents);
         transitionInstances.put(transitionInstance.getId(), transitionInstance);
 
         scopeInstancesToCreate.remove(leaf.getActivity());
@@ -169,7 +177,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
               scopeExecution,
               scope,
               activityInstanceId,
-              parentActivityInstanceId);
+              parentActivityInstanceId,
+              incidents);
           activityInstances.put(activityInstanceId, scopeInstance);
         }
       }
@@ -192,7 +201,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
   }
 
   protected ActivityInstanceImpl createActivityInstance(PvmExecutionImpl scopeExecution, ScopeImpl scope,
-      String activityInstanceId, String parentActivityInstanceId) {
+      String activityInstanceId, String parentActivityInstanceId, Map<String, List<String>> incidentsByExecution) {
     ActivityInstanceImpl actInst = new ActivityInstanceImpl();
 
     actInst.setId(activityInstanceId);
@@ -216,20 +225,33 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     }
 
     List<String> executionIds = new ArrayList<String>();
+    List<String> incidentIds = new ArrayList<>();
+
     executionIds.add(scopeExecution.getId());
+
+    ActivityImpl executionActivity = scopeExecution.getActivity();
+
+    // do not collect incidents if scopeExecution is a compacted subtree
+    // and we currently create the scope activity instance
+    if (executionActivity == null || executionActivity == scope) {
+      incidentIds.addAll(getIncidentList(incidentsByExecution, scopeExecution));
+    }
 
     for (PvmExecutionImpl childExecution : scopeExecution.getNonEventScopeExecutions()) {
       // add all concurrent children that are not in an activity
-      if (childExecution.isConcurrent() && (childExecution.getActivityId() == null)) {
+      if (childExecution.isConcurrent() && childExecution.getActivityId() == null) {
         executionIds.add(childExecution.getId());
+        incidentIds.addAll(getIncidentList(incidentsByExecution, childExecution));
       }
     }
+
     actInst.setExecutionIds(executionIds.toArray(new String[executionIds.size()]));
+    actInst.setIncidentIds(incidentIds.toArray(new String[incidentIds.size()]));
 
     return actInst;
   }
 
-  protected TransitionInstanceImpl createTransitionInstance(PvmExecutionImpl execution) {
+  protected TransitionInstanceImpl createTransitionInstance(PvmExecutionImpl execution, Map<String, List<String>> incidentsByExecution) {
     TransitionInstanceImpl transitionInstance = new TransitionInstanceImpl();
 
     // can use execution id as persistent ID for transition as an execution
@@ -250,6 +272,10 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       transitionInstance.setActivityName(name);
       transitionInstance.setActivityType((String) activity.getProperty("type"));
     }
+
+    List<String> incidentIdList = getIncidentList(incidentsByExecution, execution);
+    String[] incidentIds = incidentIdList.toArray(new String[incidentIdList.size()]);
+    transitionInstance.setIncidentIds(incidentIds);
 
     return transitionInstance;
   }
@@ -396,6 +422,24 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       for (ExecutionEntity child : childrenOfThisExecution) {
         loadChildExecutionsFromCache(child, childExecutions);
       }
+    }
+  }
+
+  protected Map<String, List<String>> groupIncidentIdsByExecutionId(CommandContext commandContext) {
+    List<IncidentEntity> incidents = commandContext.getIncidentManager().findIncidentsByProcessInstance(processInstanceId);
+    Map<String, List<String>> result = new HashMap<>();
+    for (IncidentEntity incidentEntity : incidents) {
+      CollectionUtil.addToMapOfLists(result, incidentEntity.getExecutionId(), incidentEntity.getId());
+    }
+    return result;
+  }
+
+  protected List<String> getIncidentList(Map<String, List<String>> incidents, PvmExecutionImpl execution) {
+    List<String> incidentList = incidents.get(execution.getId());
+    if (incidentList != null) {
+      return incidentList;
+    } else {
+      return Collections.emptyList();
     }
   }
 
