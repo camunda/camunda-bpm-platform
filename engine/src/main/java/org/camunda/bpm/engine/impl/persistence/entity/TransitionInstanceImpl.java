@@ -29,6 +29,8 @@ public class TransitionInstanceImpl extends ProcessElementInstanceImpl implement
   protected String activityName;
   protected String activityType;
 
+  protected String[] incidentIds = NO_IDS;
+
   public String getActivityId() {
     return activityId;
   }
@@ -63,6 +65,15 @@ public class TransitionInstanceImpl extends ProcessElementInstanceImpl implement
 
   public void setActivityName(String activityName) {
     this.activityName = activityName;
+  }
+
+  @Override
+  public String[] getIncidentIds() {
+    return incidentIds;
+  }
+
+  public void setIncidentIds(String[] incidentIds) {
+    this.incidentIds = incidentIds;
   }
 
   public String toString() {
