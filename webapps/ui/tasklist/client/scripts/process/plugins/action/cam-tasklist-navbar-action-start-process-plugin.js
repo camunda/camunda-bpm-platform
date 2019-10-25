@@ -36,7 +36,9 @@ var Controller = [
   '$q',
   'camAPI',
   'dataDepend',
-  function($scope, $modal, $q, camAPI, dataDepend) {
+  '$location',
+  'search',
+  function($scope, $modal, $q, camAPI, dataDepend, $location, search) {
     var ProcessDefinition = camAPI.resource('process-definition');
 
     var processData = ($scope.processData = dataDepend.create($scope));
@@ -98,7 +100,11 @@ var Controller = [
       }
     ]);
 
-    $scope.open = function() {
+    $scope.open = function(ignoreSearch) {
+      if (!ignoreSearch) {
+        search.updateSilently({processStart: true});
+      }
+
       processData.set(
         'processDefinitionQuery',
         angular.copy(DEFAULT_PROCESS_DEFINITION_QUERY)
@@ -116,14 +122,21 @@ var Controller = [
 
       modalInstance.result.then(
         function() {
+          search.updateSilently({processStart: null});
           $scope.$root.$broadcast('refresh');
           document.querySelector('.start-process-action a').focus();
         },
         function() {
+          search.updateSilently({processStart: null});
           document.querySelector('.start-process-action a').focus();
         }
       );
     };
+
+    //open if deep-linked
+    if ($location.search()['processStart']) {
+      $scope.open(true);
+    }
 
     $scope.$on('shortcut:startProcess', $scope.open);
   }

@@ -28,6 +28,8 @@ module.exports = [
   'Notifications',
   'processData',
   'assignNotification',
+  '$location',
+  'search',
   function(
     $rootScope,
     $scope,
@@ -36,7 +38,9 @@ module.exports = [
     debounce,
     Notifications,
     processData,
-    assignNotification
+    assignNotification,
+    $location,
+    search
   ) {
     function errorNotification(src, err) {
       $translate(src)
@@ -62,10 +66,6 @@ module.exports = [
     }
 
     // setup ////////////////////////////////////////////////////////////////////////
-
-    $scope.$on('$locationChangeSuccess', function() {
-      $scope.$dismiss();
-    });
 
     var processStartData = processData.newChild($scope);
 
@@ -180,10 +180,23 @@ module.exports = [
         deploymentId: deploymentId
       };
 
+      search.updateSilently({processStart: processDefinitionId});
+
       processStartData.set('currentProcessDefinitionId', {
         id: processDefinitionId
       });
     };
+
+    var processToStart = $location.search()['processStart'];
+    if (processToStart && typeof processToStart === 'string') {
+      processStartData.set('currentProcessDefinitionId', {
+        id: $location.search()['processStart']
+      });
+      $scope.params = {
+        processDefinitionId: processToStart
+      };
+      $scope.PROCESS_TO_START_SELECTED = true;
+    }
 
     // start a process view /////////////////////////////////////////////////////////////////
 
