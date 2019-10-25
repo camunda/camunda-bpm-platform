@@ -1293,8 +1293,8 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     return getProcessDefinitionIdByKey("process");
   }
 
-  protected Incident createIncident(String firstInstance) {
-    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(firstInstance).active().singleResult();
+  protected Incident createIncident(String instanceId) {
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(instanceId).active().singleResult();
     return runtimeService.createIncident("foo", execution.getId(), execution.getActivityId(), "exec" + execution.getId());
   }
 

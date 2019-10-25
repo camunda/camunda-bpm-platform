@@ -61,10 +61,6 @@ public class HistoricStatisticsManager extends AbstractManager {
     }
   }
 
-  public List<HistoricActivityStatistics> getpo(HistoricActivityStatisticsQueryImpl query) {
-    return getDbEntityManager().selectList("selectHistoricActivityStatisticsWithIncident", query);
-  }
-
   @SuppressWarnings("unchecked")
   public List<HistoricCaseActivityStatistics> getHistoricStatisticsGroupedByCaseActivity(HistoricCaseActivityStatisticsQueryImpl query, Page page) {
     return getDbEntityManager().selectList("selectHistoricCaseActivityStatistics", query, page);
