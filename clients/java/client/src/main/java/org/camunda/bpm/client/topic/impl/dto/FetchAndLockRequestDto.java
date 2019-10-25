@@ -29,18 +29,28 @@ import java.util.List;
 public class FetchAndLockRequestDto extends RequestDto {
 
   protected int maxTasks;
+  protected boolean usePriority;
   protected Long asyncResponseTimeout;
   protected List<TopicRequestDto> topics = new ArrayList<>();
 
   public FetchAndLockRequestDto(String workerId, int maxTasks, Long asyncResponseTimeout, List<TopicRequestDto> topics) {
+    this(workerId, maxTasks, asyncResponseTimeout, topics, true);
+  }
+
+  public FetchAndLockRequestDto(String workerId, int maxTasks, Long asyncResponseTimeout, List<TopicRequestDto> topics, boolean usePriority) {
     super(workerId);
     this.maxTasks = maxTasks;
+    this.usePriority = usePriority;
     this.asyncResponseTimeout = asyncResponseTimeout;
     this.topics = topics;
   }
 
   public int getMaxTasks() {
     return maxTasks;
+  }
+
+  public boolean isUsePriority() {
+    return usePriority;
   }
 
   public List<TopicRequestDto> getTopics() {

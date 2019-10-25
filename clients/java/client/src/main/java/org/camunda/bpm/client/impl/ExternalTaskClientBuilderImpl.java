@@ -68,6 +68,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected String baseUrl;
   protected String workerId;
   protected int maxTasks;
+  protected boolean usePriority;
   protected Long asyncResponseTimeout;
   protected long lockDuration;
 
@@ -89,6 +90,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   public ExternalTaskClientBuilderImpl() {
     // default values
     this.maxTasks = 10;
+    this.usePriority = true;
     this.asyncResponseTimeout = null;
     this.lockDuration = 20_000;
     this.interceptors = new ArrayList<>();
@@ -114,6 +116,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   public ExternalTaskClientBuilder maxTasks(int maxTasks) {
     this.maxTasks = maxTasks;
+    return this;
+  }
+
+  public ExternalTaskClientBuilder usePriority(boolean usePriority) {
+    this.usePriority = usePriority;
     return this;
   }
 
@@ -256,7 +263,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected void initEngineClient() {
     RequestInterceptorHandler requestInterceptorHandler = new RequestInterceptorHandler(interceptors);
     RequestExecutor requestExecutor = new RequestExecutor(requestInterceptorHandler, objectMapper);
-    engineClient = new EngineClient(workerId, maxTasks, asyncResponseTimeout, baseUrl, requestExecutor);
+    engineClient = new EngineClient(workerId, maxTasks, asyncResponseTimeout, baseUrl, requestExecutor, usePriority);
   }
 
   protected void initTopicSubscriptionManager() {

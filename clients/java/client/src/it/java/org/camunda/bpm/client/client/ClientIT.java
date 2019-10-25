@@ -49,7 +49,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_PRIORITY;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
+import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
+import static org.camunda.bpm.client.util.ProcessModels.TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS;
 import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
 import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
 
@@ -629,6 +632,65 @@ public class ClientIT {
       // then
       assertThat(handler.getException().getMessage()).containsIgnoringCase("ScriptEvaluationException");
     } finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldUsePriorityOnFetchAndLockByDefault() {
+    String processId = engineRule.deploy(TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS).get(0).getId();
+
+    // given
+    engineRule.startProcessInstance(processId).getId();
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .handler(handler)
+        .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 2);
+
+    assertThat(handler.getHandledTasks().size()).isEqualTo(2);
+    assertThat(handler.getHandledTasks().get(0).getPriority())
+        .isGreaterThan(EXTERNAL_TASK_PRIORITY);
+    assertThat(handler.getHandledTasks().get(1).getPriority())
+        .isEqualTo(EXTERNAL_TASK_PRIORITY);
+  }
+
+  @Test
+  public void shouldNotUsePriorityOnFetchAndLock() {
+    String processId = engineRule.deploy(TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS).get(0).getId();
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(processId).getId();
+
+      client = ExternalTaskClient.create()
+                                 .baseUrl(" " + BASE_URL + " ")
+                                 .maxTasks(3)
+                                 .usePriority(false)
+                                 .build();
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+            .handler(handler)
+            .open();
+
+      // when
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 2);
+
+      // then tasks are fetched in an arbitrary order
+      // and a first low priority task can't be guaranteed
+      assertThat(handler.getHandledTasks().size()).isEqualTo(2);
+      assertThat(handler.getHandledTasks().get(0).getPriority())
+          .isGreaterThanOrEqualTo(EXTERNAL_TASK_PRIORITY);
+      assertThat(handler.getHandledTasks().get(1).getPriority())
+          .isGreaterThanOrEqualTo(EXTERNAL_TASK_PRIORITY);
+    }
+    finally {
       if (client != null) {
         client.stop();
       }

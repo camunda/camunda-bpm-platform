@@ -67,6 +67,15 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder maxTasks(int maxTasks);
 
   /**
+   * Specifies whether tasks should be fetched based on their priority or arbitrarily.
+   * This information is optional. Default is <code>true</code>.
+   *
+   * @param usePriority when fetching and locking tasks
+   * @return the builder
+   */
+  ExternalTaskClientBuilder usePriority(boolean usePriority);
+
+  /**
    * Specifies the serialization format that is used to serialize objects when no specific
    * format is requested. This option defaults to application/json.
    *

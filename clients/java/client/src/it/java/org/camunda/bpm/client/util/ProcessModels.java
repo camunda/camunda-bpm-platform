@@ -78,6 +78,21 @@ public class ProcessModels {
       .endEvent("endEvent")
       .done();
 
+  public static final BpmnModelInstance TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS =
+      newModel()
+          .startEvent("startEvent")
+            .parallelGateway("parallelGateway")
+            .serviceTask(EXTERNAL_TASK_ONE_ID)
+              .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
+                .camundaTaskPriority(String.valueOf(EXTERNAL_TASK_PRIORITY))
+            .endEvent("endEvent1")
+            .moveToLastGateway()
+            .serviceTask(EXTERNAL_TASK_TWO_ID)
+              .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
+                .camundaTaskPriority(String.valueOf(EXTERNAL_TASK_PRIORITY + 1000L))
+            .endEvent("endEvent2")
+            .done();
+
   public static final BpmnModelInstance ONE_EXTERNAL_TASK_WITH_OUTPUT_PARAM_PROCESS =
       newModel(PROCESS_KEY_2)
       .startEvent("startEvent")
