@@ -16,8 +16,10 @@
  */
 package org.camunda.spin;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -96,7 +98,7 @@ public class DataFormats {
 
   public Set<DataFormat<? extends Spin<?>>> getAllAvailableDataFormats() {
     ensureDataformatsInitialized();
-    return new HashSet<DataFormat<? extends Spin<?>>>(availableDataFormats.values());
+    return new HashSet<>(availableDataFormats.values());
   }
 
   public DataFormat<? extends Spin<?>> getDataFormatByName(String name) {
@@ -118,6 +120,12 @@ public class DataFormats {
   }
 
   public void registerDataFormats(ClassLoader classloader) {
+    registerDataFormats(classloader, Collections.EMPTY_LIST);
+  }
+
+  public void registerDataFormats(ClassLoader classloader,
+                                  List<DataFormatConfigurator> configurators) {
+
     Map<String, DataFormat<?>> dataFormats = new HashMap<String, DataFormat<?>>();
 
     if(classloader == null) {
@@ -128,7 +136,7 @@ public class DataFormats {
     registerCustomDataFormats(dataFormats, classloader);
 
     // discover and apply data format configurators on the classpath
-    applyConfigurators(dataFormats, classloader);
+    applyConfigurators(dataFormats, classloader, configurators);
 
     LOG.logDataFormats(dataFormats.values());
 
@@ -160,9 +168,23 @@ public class DataFormats {
 
   @SuppressWarnings("rawtypes")
   protected void applyConfigurators(Map<String, DataFormat<?>> dataFormats, ClassLoader classloader) {
+    applyConfigurators(dataFormats, classloader, Collections.EMPTY_LIST);
+  }
+
+  protected void applyConfigurators(Map<String, DataFormat<?>> dataFormats,
+                                    ClassLoader classloader,
+                                    List<DataFormatConfigurator> dataFormatConfigurators) {
+
     ServiceLoader<DataFormatConfigurator> configuratorLoader = ServiceLoader.load(DataFormatConfigurator.class, classloader);
 
+    // apply SPI configurators
     for (DataFormatConfigurator configurator : configuratorLoader) {
+      LOG.logDataFormatConfigurator(configurator);
+      applyConfigurator(dataFormats, configurator);
+    }
+
+    // apply additional, non-SPI, configurators
+    for (DataFormatConfigurator configurator : dataFormatConfigurators) {
       LOG.logDataFormatConfigurator(configurator);
       applyConfigurator(dataFormats, configurator);
     }
@@ -183,6 +205,10 @@ public class DataFormats {
 
   public static void loadDataFormats(ClassLoader classloader) {
     INSTANCE.registerDataFormats(classloader);
+  }
+
+  public static void loadDataFormats(ClassLoader classloader, List<DataFormatConfigurator> configurators) {
+    INSTANCE.registerDataFormats(classloader, configurators);
   }
 
 }

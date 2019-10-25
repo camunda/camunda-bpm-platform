@@ -22,6 +22,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -44,7 +45,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * @author Thorben Lindhauer
  */
 @RunWith(PowerMockRunner.class)
-public class DataFormatProviderTest {
+public class DataFormatLoadingTest {
 
   protected ServiceLoader<DataFormatProvider> mockServiceLoader;
 
@@ -94,6 +95,44 @@ public class DataFormatProviderTest {
     // then the configuration was applied
     ExampleCustomDataFormat customFormat = (ExampleCustomDataFormat) format;
     assertThat(customFormat.getProperty()).isEqualTo(ExampleCustomDataFormatConfigurator.UPDATED_PROPERTY);
+  }
+
+  @Test
+  @PrepareForTest(DataFormats.class)
+  public void testConfigureDataFormatWithConfiguratorList() {
+    // given a custom data format provider that is returned by the service loader API
+    mockProviders(new CustomDataFormatProvider());
+    mockConfigurators();
+    DataFormatConfigurator configurator = new ExampleCustomDataFormatConfigurator();
+
+    // when a list of data format configurators is passed to the "load" method
+    DataFormats.loadDataFormats(DataFormats.class.getClassLoader(),
+                                Collections.singletonList(configurator));
+
+    // then the configuration was applied
+    ExampleCustomDataFormat customFormat = (ExampleCustomDataFormat) DataFormats
+        .getDataFormat(CustomDataFormatProvider.NAME);
+    assertThat(customFormat.getProperty())
+        .isEqualTo(ExampleCustomDataFormatConfigurator.UPDATED_PROPERTY);
+  }
+
+  @Test
+  @PrepareForTest(DataFormats.class)
+  public void testRegisterDataFormatWithConfiguratorList() {
+    // given a custom data format provider that is returned by the service loader API
+    mockProviders(new CustomDataFormatProvider());
+    mockConfigurators();
+    DataFormatConfigurator configurator = new ExampleCustomDataFormatConfigurator();
+
+    // when a list of data format configurators is passed to the "load" method
+    DataFormats.getInstance().registerDataFormats(DataFormats.class.getClassLoader(),
+                                                  Collections.singletonList(configurator));
+
+    // then the configuration was applied
+    ExampleCustomDataFormat customFormat = (ExampleCustomDataFormat) DataFormats
+        .getDataFormat(CustomDataFormatProvider.NAME);
+    assertThat(customFormat.getProperty())
+        .isEqualTo(ExampleCustomDataFormatConfigurator.UPDATED_PROPERTY);
   }
 
   protected void mockProviders(final DataFormatProvider... providers) {
