@@ -75,5 +75,6 @@ window.camCockpitConf = {
   //     event: 'started'
   //   }
   // },
-  // csrfCookieName: 'XSRF-TOKEN'
+  // csrfCookieName: 'XSRF-TOKEN',
+  // disableWelcomeMessage: false
 };

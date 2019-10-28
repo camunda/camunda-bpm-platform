@@ -48,6 +48,7 @@ window.camTasklistConf = {
   //   }
   // },
   // csrfCookieName: 'XSRF-TOKEN',
+  // disableWelcomeMessage: false,
 
   shortcuts: {
     claimTask: {
