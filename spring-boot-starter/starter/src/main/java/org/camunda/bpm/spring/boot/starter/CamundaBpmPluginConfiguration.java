@@ -16,8 +16,16 @@
  */
 package org.camunda.bpm.spring.boot.starter;
 
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorJSR310;
+import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorJdk8;
+import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorParameterNames;
+import org.camunda.bpm.spring.boot.starter.spin.SpringBootSpinProcessEnginePlugin;
 import org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin;
+import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormat;
 import org.camunda.spin.plugin.impl.SpinProcessEnginePlugin;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -27,6 +35,42 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CamundaBpmPluginConfiguration {
 
+  @ConditionalOnClass({JacksonJsonDataFormat.class, JavaTimeModule.class})
+  @Configuration
+  static class SpinDataFormatConfigurationJSR310 {
+
+    @Bean
+    @ConditionalOnMissingBean(name = "spinDataFormatConfiguratorJSR310")
+    public static CamundaJacksonFormatConfiguratorJSR310 spinDataFormatConfiguratorJSR310() {
+      return new CamundaJacksonFormatConfiguratorJSR310();
+    }
+
+  }
+
+  @ConditionalOnClass({JacksonJsonDataFormat.class, ParameterNamesModule.class})
+  @Configuration
+  static class SpinDataFormatConfigurationParameterNames {
+
+    @Bean
+    @ConditionalOnMissingBean(name = "spinDataFormatConfiguratorParameterNames")
+    public static CamundaJacksonFormatConfiguratorParameterNames spinDataFormatConfiguratorParameterNames() {
+      return new CamundaJacksonFormatConfiguratorParameterNames();
+    }
+
+  }
+
+  @ConditionalOnClass({JacksonJsonDataFormat.class, Jdk8Module.class})
+  @Configuration
+  static class SpinDataFormatConfigurationJdk8 {
+
+    @Bean
+    @ConditionalOnMissingBean(name = "spinDataFormatConfiguratorJdk8")
+    public static CamundaJacksonFormatConfiguratorJdk8 spinDataFormatConfiguratorJdk8() {
+      return new CamundaJacksonFormatConfiguratorJdk8();
+    }
+
+  }
+
   @ConditionalOnClass(SpinProcessEnginePlugin.class)
   @Configuration
   static class SpinConfiguration {
@@ -34,8 +78,9 @@ public class CamundaBpmPluginConfiguration {
     @Bean
     @ConditionalOnMissingBean(name = "spinProcessEnginePlugin")
     public static ProcessEnginePlugin spinProcessEnginePlugin() {
-      return new SpinProcessEnginePlugin();
+      return new SpringBootSpinProcessEnginePlugin();
     }
+
   }
 
   @ConditionalOnClass(ConnectProcessEnginePlugin.class)

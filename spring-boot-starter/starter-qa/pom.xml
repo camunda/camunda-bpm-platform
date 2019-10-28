@@ -18,6 +18,7 @@
 
   <modules>
     <module>integration-test-webapp</module>
+    <module>integration-test-plugins</module>
   </modules>
 
 </project>

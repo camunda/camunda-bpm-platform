@@ -14,7 +14,7 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-spring</artifactId>
     </dependency>
-    
+
     <!-- Spring dependencies required by camunda-engine-spring -->
     <dependency>
       <groupId>org.springframework</groupId>
@@ -36,6 +36,12 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-spin</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
       <optional>true</optional>
     </dependency>
 
@@ -85,7 +91,7 @@
       <artifactId>spring-boot-starter-security</artifactId>
       <optional>true</optional>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>

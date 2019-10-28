@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
@@ -25,7 +26,14 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngineServices;
+import org.camunda.bpm.engine.impl.cfg.CompositeProcessEnginePlugin;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
+import org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin;
+import org.camunda.spin.plugin.impl.SpinObjectValueSerializer;
+import org.camunda.spin.plugin.impl.SpinProcessEnginePlugin;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +44,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class CamundaBpmAutoConfigurationIT {
+
+  @Autowired
+  ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Autowired
   private ApplicationContext appContext;
@@ -49,6 +60,38 @@ public class CamundaBpmAutoConfigurationIT {
       assertSame(classToCheck + " must be exposed as '" + beanName + "'. Check configuration", bean, appContext.getBean(beanName));
     }
 
+  }
+
+  @Test
+  public void ensureSpinProcessEnginePluginIsCorrectlyLoaded() {
+    // given
+    List<ProcessEnginePlugin> plugins = processEngineConfiguration.getProcessEnginePlugins();
+    List<TypedValueSerializer<?>> serializers = processEngineConfiguration.getVariableSerializers().getSerializers();
+
+    if (plugins.get(0) instanceof CompositeProcessEnginePlugin) {
+      plugins = ((CompositeProcessEnginePlugin) plugins.get(0)).getPlugins();
+    }
+
+    boolean isJacksonJsonDataFormat = serializers.stream().anyMatch(s ->
+        s instanceof SpinObjectValueSerializer
+        && s.getSerializationDataformat().equals("application/json"));
+
+    // then
+    assertThat(plugins.stream().anyMatch(plugin -> plugin instanceof SpinProcessEnginePlugin)).isTrue();
+    assertThat(isJacksonJsonDataFormat).isTrue();
+  }
+
+  @Test
+  public void ensureConnectProcessEnginePluginIsCorrectlyLoaded() {
+    // given
+    List<ProcessEnginePlugin> plugins = processEngineConfiguration.getProcessEnginePlugins();
+
+    if (plugins.get(0) instanceof CompositeProcessEnginePlugin) {
+      plugins = ((CompositeProcessEnginePlugin) plugins.get(0)).getPlugins();
+    }
+
+    // then
+    assertThat(plugins.stream().anyMatch(plugin -> plugin instanceof ConnectProcessEnginePlugin)).isTrue();
   }
 
   private String convertToBeanName(Class<?> beanClass) {
