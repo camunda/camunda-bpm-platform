@@ -21,6 +21,8 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import static org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties.joinOn;
 
 public class WebappProperty {
+  public static final String PREFIX = CamundaBpmProperties.PREFIX + ".webapp";
+
   private boolean indexRedirectEnabled = true;
 
   private String webjarClasspath = "/META-INF/resources/webjars/camunda";
