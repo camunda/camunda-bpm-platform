@@ -29,6 +29,13 @@ section header {
   font-weight: 100;
 }
 
+.subsection-title {
+  font-size: 20px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  font-weight: 100;
+}
+
 .section-actions {
   margin-top: 15px;
 }
@@ -107,70 +114,25 @@ section.invoice .section-body {
   padding-right: 0.25em;
 }
 
-
-.webapp-screenshot {
-  display: block;
-  position: absolute;
-}
-.webapp-screenshot:before,
-.webapp-screenshot:after {
-  display: none;
-}
-.webapp-screenshot img {
-  max-width: 280px;
-  margin: 0;
-}
-
-
 section.invoice .section-body {
   min-height: 200px;
 }
 
 section.webapps .section-body {
-  min-height: 650px;
+  margin-bottom: 30px;
 }
 .webapp-screenshot img {
   max-width: 500px;
 }
 
 @media screen and (max-width: 992px) {
-  section.webapps .section-body {
-    min-height: 550px;
-  }
   .webapp-screenshot img {
     max-width: 380px;
   }
 }
 
 @media screen and (max-width: 767px) {
-  section.webapps .section-body {
-    min-height: 450px;
-  }
   .webapp-screenshot img {
     max-width: 320px;
   }
-}
-
-
-
-
-.webapp-welcome {
-  z-index: 1;
-  top: 10px;
-  left: 15%;
-}
-.webapp-admin {
-  z-index: 2;
-  top: 65px;
-  right: 5%;
-}
-.webapp-tasklist {
-  z-index: 3;
-  bottom: 65px;
-  left: 5%;
-}
-.webapp-cockpit {
-  z-index: 4;
-  bottom: 10px;
-  right: 15%;
 }
