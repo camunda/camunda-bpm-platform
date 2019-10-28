@@ -118,7 +118,7 @@
             <configuration>
               <argLine>-XX:PermSize=128m -XX:MaxPermSize=256m</argLine>
               <excludes>
-                <exclude>**/DataFormatProviderTest.java</exclude>
+                <exclude>**/DataFormatLoadingTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
